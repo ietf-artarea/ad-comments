@@ -1,0 +1,250 @@
+idnits 2.17.1 
+
+draft-ietf-dnsop-must-not-ecc-gost-04.txt:
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     No nits found.
+--------------------------------------------------------------------------------
+
+
+2	Network Working Group                                        W. Hardaker
+3	Internet-Draft                                                   USC/ISI
+4	Updates: 5933 (if approved)                                    W. Kumari
+5	Intended status: Standards Track                                  Google
+6	Expires: 19 September 2025                                 18 March 2025
+
+8	               Deprecate usage of ECC-GOST within DNSSEC
+9	                 draft-ietf-dnsop-must-not-ecc-gost-04
+
+11	Abstract
+
+13	   This document retires the use of ECC-GOST within DNSSEC.
+
+15	   RFC5933 (now historic) defined the use of GOST R 34.10-2001 and GOST
+16	   R 34.11-94 algorithms with DNS Security Extensions (DNSSEC).  This
+17	   document updates RFC5933 by deprecating the use of ECC-GOST.
+
+19	   [RFC Editor: please remove this before publication: It is unclear if
+20	   updating RFC5933 (a Historic document) is the correct thing to do or
+21	   not.  We did it so that it shows up in Datatracker and similar, but
+22	   this may be a mistake.  We are happy to change this if the RFC Editor
+23	   / IESG / whoever thinks this is a bad idea.]
+
+25	Status of This Memo
+
+27	   This Internet-Draft is submitted in full conformance with the
+28	   provisions of BCP 78 and BCP 79.
+
+30	   Internet-Drafts are working documents of the Internet Engineering
+31	   Task Force (IETF).  Note that other groups may also distribute
+32	   working documents as Internet-Drafts.  The list of current Internet-
+33	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+35	   Internet-Drafts are draft documents valid for a maximum of six months
+36	   and may be updated, replaced, or obsoleted by other documents at any
+37	   time.  It is inappropriate to use Internet-Drafts as reference
+38	   material or to cite them other than as "work in progress."
+
+40	   This Internet-Draft will expire on 19 September 2025.
+
+42	Copyright Notice
+
+44	   Copyright (c) 2025 IETF Trust and the persons identified as the
+45	   document authors.  All rights reserved.
+
+47	   This document is subject to BCP 78 and the IETF Trust's Legal
+48	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+49	   license-info) in effect on the date of publication of this document.
+50	   Please review these documents carefully, as they describe your rights
+51	   and restrictions with respect to this document.  Code Components
+52	   extracted from this document must include Revised BSD License text as
+53	   described in Section 4.e of the Trust Legal Provisions and are
+54	   provided without warranty as described in the Revised BSD License.
+
+56	Table of Contents
+
+58	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+59	     1.1.  Requirements notation . . . . . . . . . . . . . . . . . .   3
+60	   2.  Deprecating ECC-GOST algorithms in DNSSEC . . . . . . . . . .   3
+61	   3.  Security Considerations . . . . . . . . . . . . . . . . . . .   3
+62	   4.  Operational Considerations  . . . . . . . . . . . . . . . . .   3
+63	   5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   3
+64	   6.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   4
+65	     6.1.  Normative References  . . . . . . . . . . . . . . . . . .   4
+66	     6.2.  Informative References  . . . . . . . . . . . . . . . . .   4
+67	   Appendix A.  Acknowledgments  . . . . . . . . . . . . . . . . . .   5
+68	   Appendix B.  Current algorithm usage levels . . . . . . . . . . .   5
+69	   Appendix C.  Github Version of this document  . . . . . . . . . .   5
+70	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .   5
+
+72	1.  Introduction
+
+74	   The use of the GOST R 34.10-2001 and GOST R 34.11-94 algorithms with
+75	   the DNS Security Extensions (DNSSEC) [RFC9364] was documented in
+76	   [RFC5933].  These two algorithms were deprecated by the Orders of the
+77	   Federal Agency for Technical Regulation and Metrology of Russia
+78	   (Rosstandart) in August 2012, and were superseded by GOST 34.10-2012
+79	   and GOST 34.11-2012 respectively.  The use of GOST 34.10-2012 and
+80	   GOST 34.11-2012 in DNSSEC is documented in [RFC9558], and so
+81	   [RFC5933] has been made Historic.
+
+83	   Thus, the use of GOST R 34.10-2001 (mnemonic GOST-ECC) and and GOST R
+84	   34.11-94 is no longer recommended for use in DNSSEC [RFC9364].
+
+86	   Note that this document does not change or discuss the use of GOST
+87	   34.10-2012 and GOST 34.11-2012.
+
+89	1.1.  Requirements notation
+
+91	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+92	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+93	   "OPTIONAL" in this document are to be interpreted as described in BCP
+94	   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+95	   capitals, as shown here.
+
+97	2.  Deprecating ECC-GOST algorithms in DNSSEC
+
+99	   The GOST R 34.11-94 [RFC5933] algorithm MUST NOT be used when
+100	   creating DS records.  Validating resolvers MUST treat GOST R 34.11-94
+101	   DS records as insecure.  If no other DS records of accepted
+102	   cryptographic algorithms are available, the DNS records below the
+103	   delegation point MUST be treated as insecure.
+
+105	   The ECC-GOST [RFC5933] algorithm MUST NOT be used when creating
+106	   DNSKEY and RRSIG records.  Validating resolvers MUST treat RRSIG
+107	   records created from DNSKEY records using these algorithms as an
+108	   unsupported algorithm.  If no other RRSIG records of accepted
+109	   cryptographic algorithms are available, the validating resolver MUST
+110	   consider the associated resource records as insecure.
+
+112	3.  Security Considerations
+
+114	   This document potentially increases the security of the DNSSEC
+115	   ecosystem by deprecating algorithms that are no longer recommended
+116	   for use.
+
+118	4.  Operational Considerations
+
+120	   This document removes support for ECC-GOST.  Zone operators currently
+121	   making use of ECC-GOST based algorithms should switch to algorithms
+122	   that remain supported.  DNS registries should prohibit their clients
+123	   from uploading and publishing ECC-GOST based DS records to ensure
+124	   that they are using algorithms which are supported by DNSSEC
+125	   validators, and so can be DNSSEC validated.
+
+127	5.  IANA Considerations
+
+129	   IANA is requested to set the "Use for DNSSEC Signing", "Use for
+130	   DNSSEC Validation", "Implement for DNSSEC Signing", and "Implement
+131	   for DNSSEC Validation" columns of the DNS Security Algorithm Numbers
+132	   registry [DNSKEY-IANA] for ECC-GOST (12) to MUST NOT.  Note that
+133	   previously the "Use for DNSSEC Signing" and "Implement for DNSSEC
+134	   Delegation" columns were already MUST NOT.
+
+136	   IANA is requested to set the "Use for DNSSEC Delegation", "Use for
+137	   DNSSEC Validation", "Implement for DNSSEC Delegation", and "Implement
+138	   for DNSSEC Validation" columns of the "Digest Algorithms" registry
+139	   [DS-IANA] for GOST R 34.11-94 (3) to MUST NOT.  Note that previously
+140	   the "Use for DNSSEC Signing" and "Implement for DNSSEC Delegation"
+141	   columns were already MUST NOT.
+
+143	6.  References
+
+145	6.1.  Normative References
+
+147	   [DNSKEY-IANA]
+148	              IANA, "Domain Name System Security (DNSSEC) Algorithm
+149	              Numbers", n.d., <https://www.iana.org/assignments/dns-sec-
+150	              alg-numbers/dns-sec-alg-numbers.xhtml>.
+
+152	   [DS-IANA]  IANA, "Delegation Signer (DS) Resource Record (RR) Type
+153	              Digest Algorithms", n.d.,
+154	              <http://www.iana.org/assignments/ds-rr-types>.
+
+156	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+157	              Requirement Levels", BCP 14, RFC 2119,
+158	              DOI 10.17487/RFC2119, March 1997,
+159	              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+161	   [RFC5933]  Dolmatov, V., Ed., Chuprina, A., and I. Ustinov, "Use of
+162	              GOST Signature Algorithms in DNSKEY and RRSIG Resource
+163	              Records for DNSSEC", RFC 5933, DOI 10.17487/RFC5933, July
+164	              2010, <https://www.rfc-editor.org/rfc/rfc5933>.
+
+166	   [RFC9364]  Hoffman, P., "DNS Security Extensions (DNSSEC)", BCP 237,
+167	              RFC 9364, DOI 10.17487/RFC9364, February 2023,
+168	              <https://www.rfc-editor.org/rfc/rfc9364>.
+
+170	6.2.  Informative References
+
+172	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+173	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+174	              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+176	   [RFC9558]  Makarenko, B. and V. Dolmatov, Ed., "Use of GOST 2012
+177	              Signature Algorithms in DNSKEY and RRSIG Resource Records
+178	              for DNSSEC", RFC 9558, DOI 10.17487/RFC9558, April 2024,
+179	              <https://www.rfc-editor.org/rfc/rfc9558>.
+
+181	Appendix A.  Acknowledgments
+
+183	   The authors appreciate the comments and suggestions from the
+184	   following IETF participants in helping produce this document: Mark
+185	   Andrews, Steve Crocker, Brian Dickson, Russ Housely, Shumon Huque,
+186	   Paul Hoffman, S Moonesamy, Peter Dickson, Peter Thomassen, Stefan
+187	   Ubbink, Paul Wouters, Tim Wicinski, and the many members of the DNSOP
+188	   working group that discussed this draft.
+
+190	Appendix B.  Current algorithm usage levels
+
+192	   The DNSSEC scanning project by Viktor Dukhovni and Wes Hardaker
+193	   highlights the current deployment of various algorithms on the
+194	   https://stats.dnssec-tools.org/ website.
+
+196	   <RFC Editor: please delete this section upon publication>
+
+198	Appendix C.  Github Version of this document
+
+200	   While this document is under development, it can be viewed, tracked,
+201	   fill here:
+
+203	   https://github.com/hardaker/draft-hardaker-dnsop-must-not-gost
+
+205	   <RFC Editor: please delete this section upon publication>
+
+207	Authors' Addresses
+
+209	   Wes Hardaker
+210	   USC/ISI
+211	   Email: ietf@hardakers.net
+
+213	   Warren Kumari
+214	   Google
+215	   Email: warren@kumari.net
+
+
+
+
+
+
+
+
+
