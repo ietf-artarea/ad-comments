@@ -8,8 +8,8 @@ if [ $# -ne 2 ]; then
 fi
 
 
-AUTHOR_NAME="$2"
-DRAFT_VERSION="$1"
+AUTHOR_NAME="$1"
+DRAFT_VERSION="$2"
 DRAFT="${DRAFT_VERSION%-*}"  # Remove everything after the last hyphen
 TEMPLATE_FILE="templates/iesg-evaluation-$AUTHOR_NAME.md"
 TARGET_DIR="iesg-evaluation/$DRAFT_VERSION"
