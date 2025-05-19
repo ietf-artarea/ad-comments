@@ -1,0 +1,276 @@
+idnits 2.17.1 
+
+draft-ietf-dnsop-must-not-sha1-06.txt:
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     No nits found.
+--------------------------------------------------------------------------------
+
+
+2	Network Working Group                                        W. Hardaker
+3	Internet-Draft                                                   USC/ISI
+4	Updates: 4034, 5155 (if approved)                              W. Kumari
+5	Intended status: Standards Track                                  Google
+6	Expires: 13 October 2025                                   11 April 2025
+
+8	      Deprecating the use of SHA-1 in DNSSEC signature algorithms
+9	                   draft-ietf-dnsop-must-not-sha1-06
+
+11	Abstract
+
+13	   This document deprecates the use of the RSASHA1 and
+14	   RSASHA1-NSEC3-SHA1 algorithms for the creation of DNSKEY and RRSIG
+15	   records.
+
+17	   It updates RFC4034 and RFC5155 as it deprecates the use of these
+18	   algorithms.
+
+20	Status of This Memo
+
+22	   This Internet-Draft is submitted in full conformance with the
+23	   provisions of BCP 78 and BCP 79.
+
+25	   Internet-Drafts are working documents of the Internet Engineering
+26	   Task Force (IETF).  Note that other groups may also distribute
+27	   working documents as Internet-Drafts.  The list of current Internet-
+28	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+30	   Internet-Drafts are draft documents valid for a maximum of six months
+31	   and may be updated, replaced, or obsoleted by other documents at any
+32	   time.  It is inappropriate to use Internet-Drafts as reference
+33	   material or to cite them other than as "work in progress."
+
+35	   This Internet-Draft will expire on 13 October 2025.
+
+37	Copyright Notice
+
+39	   Copyright (c) 2025 IETF Trust and the persons identified as the
+40	   document authors.  All rights reserved.
+
+42	   This document is subject to BCP 78 and the IETF Trust's Legal
+43	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+44	   license-info) in effect on the date of publication of this document.
+45	   Please review these documents carefully, as they describe your rights
+46	   and restrictions with respect to this document.  Code Components
+47	   extracted from this document must include Revised BSD License text as
+48	   described in Section 4.e of the Trust Legal Provisions and are
+49	   provided without warranty as described in the Revised BSD License.
+
+51	Table of Contents
+
+53	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+54	     1.1.  Requirements notation . . . . . . . . . . . . . . . . . .   3
+55	   2.  Deprecating RSASHA1 and RSASHA1-NSEC3-SHA1 algorithms in
+56	           DNSSEC  . . . . . . . . . . . . . . . . . . . . . . . . .   3
+57	   3.  Security Considerations . . . . . . . . . . . . . . . . . . .   3
+58	   4.  Operational Considerations  . . . . . . . . . . . . . . . . .   3
+59	   5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   3
+60	   6.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   3
+61	     6.1.  Normative References  . . . . . . . . . . . . . . . . . .   3
+62	     6.2.  Informative References  . . . . . . . . . . . . . . . . .   5
+63	   Appendix A.  Acknowledgments  . . . . . . . . . . . . . . . . . .   5
+64	   Appendix B.  Current algorithm usage levels . . . . . . . . . . .   5
+65	   Appendix C.  Github Version of this document  . . . . . . . . . .   5
+66	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .   6
+
+68	1.  Introduction
+
+70	   The security of the SHA-1 algorithm [RFC3174] has been slowly
+71	   diminishing over time as various forms of attacks have weakened its
+72	   cryptographic underpinning.  DNSSEC [RFC9364] originally [RFC3110]
+73	   made extensive use of SHA-1 as a cryptographic hash algorithm in
+74	   RRSIG and Delegation Signer (DS) records, for example.  Since then,
+75	   multiple other algorithms with stronger cryptographic strength are
+76	   now widely available for DS records and for DNSKEY and RRSIG records.
+77	   Readers are encouraged to consider switching to one of the
+78	   recommended algorithms listed in the [DNSKEY-IANA] and [DS-IANA]
+79	   tables, respectively.  Further, support for validating SHA-1 based
+80	   signatures has been removed from some systems.  As a result, SHA-1 is
+81	   no longer fully interoperable in the context of DNSSEC.  As adequate
+82	   alternatives exist, the use of SHA-1 is no longer advisable.
+
+84	   This document thus further deprecates the use of RSASHA1 and
+85	   RSASHA1-NSEC3-SHA1 for DNS Security Algorithms.
+
+87	1.1.  Requirements notation
+
+89	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+90	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+91	   "OPTIONAL" in this document are to be interpreted as described in BCP
+92	   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+93	   capitals, as shown here.
+
+95	2.  Deprecating RSASHA1 and RSASHA1-NSEC3-SHA1 algorithms in DNSSEC
+
+97	   The RSASHA1 [RFC4034] and RSASHA1-NSEC3-SHA1 [RFC5155] algorithms
+98	   MUST NOT be used when creating DNSKEY and RRSIG records.
+
+100	   Validating resolver implementations MUST continue to support
+101	   validation using these algorithms as they are diminishing in use but
+102	   still actively in use for some domains as of this publication.
+103	   Because of RSASHA1 and RSASHA1-NSEC3-SHA1's non-zero use, deployed
+104	   validating resolvers MAY be configured to continue to validate RRSIG
+105	   records that use these algorithms.  Validating resolvers deployed in
+106	   more security strict environments MAY wish to treat these RRSIG
+107	   records as an unsupported algorithm.
+
+109	3.  Security Considerations
+
+111	   This document deprecates the use of RSASHA1 and RSASHA1-NSEC3-SHA1
+112	   signatures since they are no longer considered to be secure.
+
+114	4.  Operational Considerations
+
+116	   Zone owners currently making use of SHA-1 based algorithms should
+117	   immediately switch to algorithms with stronger cryptographic
+118	   algorithms, such as the recommended algorithms in the [DNSKEY-IANA]
+119	   and [DS-IANA] tables.
+
+121	5.  IANA Considerations
+
+123	   IANA is requested to set the "Use for DNSSEC Delegation" field of the
+124	   "Digest Algorithms" registry [DS-IANA] for SHA-1 (1) to MUST NOT.
+
+126	   IANA is requested to set the "Use for DNSSEC Signing" column of the
+127	   DNS Security Algorithm Numbers registry [DNSKEY-IANA] to MUST NOT for
+128	   the RSASHA1 (5) and RSASHA1-NSEC3-SHA1 (7) algorithms.
+
+130	   All other columns should remain as currently specified.
+
+132	6.  References
+
+134	6.1.  Normative References
+
+136	   [DNSKEY-IANA]
+137	              IANA, "Domain Name System Security (DNSSEC) Algorithm
+138	              Numbers", n.d., <https://www.iana.org/assignments/dns-sec-
+139	              alg-numbers/dns-sec-alg-numbers.xhtml>.
+
+141	   [DS-IANA]  IANA, "Delegation Signer (DS) Resource Record (RR) Type
+142	              Digest Algorithms", n.d.,
+143	              <http://www.iana.org/assignments/ds-rr-types>.
+
+145	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+146	              Requirement Levels", BCP 14, RFC 2119,
+147	              DOI 10.17487/RFC2119, March 1997,
+148	              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+150	   [RFC3110]  Eastlake 3rd, D., "RSA/SHA-1 SIGs and RSA KEYs in the
+151	              Domain Name System (DNS)", RFC 3110, DOI 10.17487/RFC3110,
+152	              May 2001, <https://www.rfc-editor.org/rfc/rfc3110>.
+
+154	   [RFC3174]  Eastlake 3rd, D. and P. Jones, "US Secure Hash Algorithm 1
+155	              (SHA1)", RFC 3174, DOI 10.17487/RFC3174, September 2001,
+156	              <https://www.rfc-editor.org/rfc/rfc3174>.
+
+158	   [RFC4033]  Arends, R., Austein, R., Larson, M., Massey, D., and S.
+159	              Rose, "DNS Security Introduction and Requirements",
+160	              RFC 4033, DOI 10.17487/RFC4033, March 2005,
+161	              <https://www.rfc-editor.org/rfc/rfc4033>.
+
+163	   [RFC4034]  Arends, R., Austein, R., Larson, M., Massey, D., and S.
+164	              Rose, "Resource Records for the DNS Security Extensions",
+165	              RFC 4034, DOI 10.17487/RFC4034, March 2005,
+166	              <https://www.rfc-editor.org/rfc/rfc4034>.
+
+168	   [RFC4035]  Arends, R., Austein, R., Larson, M., Massey, D., and S.
+169	              Rose, "Protocol Modifications for the DNS Security
+170	              Extensions", RFC 4035, DOI 10.17487/RFC4035, March 2005,
+171	              <https://www.rfc-editor.org/rfc/rfc4035>.
+
+173	   [RFC4509]  Hardaker, W., "Use of SHA-256 in DNSSEC Delegation Signer
+174	              (DS) Resource Records (RRs)", RFC 4509,
+175	              DOI 10.17487/RFC4509, May 2006,
+176	              <https://www.rfc-editor.org/rfc/rfc4509>.
+
+178	   [RFC5155]  Laurie, B., Sisson, G., Arends, R., and D. Blacka, "DNS
+179	              Security (DNSSEC) Hashed Authenticated Denial of
+180	              Existence", RFC 5155, DOI 10.17487/RFC5155, March 2008,
+181	              <https://www.rfc-editor.org/rfc/rfc5155>.
+
+183	   [RFC5702]  Jansen, J., "Use of SHA-2 Algorithms with RSA in DNSKEY
+184	              and RRSIG Resource Records for DNSSEC", RFC 5702,
+185	              DOI 10.17487/RFC5702, October 2009,
+186	              <https://www.rfc-editor.org/rfc/rfc5702>.
+
+188	   [RFC6605]  Hoffman, P. and W.C.A. Wijngaards, "Elliptic Curve Digital
+189	              Signature Algorithm (DSA) for DNSSEC", RFC 6605,
+190	              DOI 10.17487/RFC6605, April 2012,
+191	              <https://www.rfc-editor.org/rfc/rfc6605>.
+
+193	   [RFC8080]  Sury, O. and R. Edmonds, "Edwards-Curve Digital Security
+194	              Algorithm (EdDSA) for DNSSEC", RFC 8080,
+195	              DOI 10.17487/RFC8080, February 2017,
+196	              <https://www.rfc-editor.org/rfc/rfc8080>.
+
+198	   [RFC9364]  Hoffman, P., "DNS Security Extensions (DNSSEC)", BCP 237,
+199	              RFC 9364, DOI 10.17487/RFC9364, February 2023,
+200	              <https://www.rfc-editor.org/rfc/rfc9364>.
+
+202	6.2.  Informative References
+
+204	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+205	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+206	              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+208	Appendix A.  Acknowledgments
+
+210	   The authors appreciate the comments and suggestions from the
+211	   following IETF participants in helping produce this document: Mark
+212	   Andrews, Steve Crocker, Peter Dickson, Paul Hoffman, Russ Housley,
+213	   Shumon Huque, Barry Leiba, S Moonesamy, Yoav Nir, Florian Obser,
+214	   Peter Thomassen, Stefan Ubbink, Paul Wouters, Tim Wicinski, and the
+215	   many members of the DNSOP working group that discussed this draft.
+
+217	Appendix B.  Current algorithm usage levels
+
+219	   The DNSSEC scanning project by Viktor Dukhovni and Wes Hardaker
+220	   highlights the current deployment of various algorithms on the
+221	   https://stats.dnssec-tools.org/ website.
+
+223	   <RFC Editor: please delete this section upon publication>
+
+225	Appendix C.  Github Version of this document
+
+227	   While this document is under development, it can be viewed, tracked,
+228	   fill here:
+
+230	   https://github.com/hardaker/draft-hardaker-dnsop-must-not-sha1
+231	   <RFC Editor: please delete this section upon publication>
+
+233	Authors' Addresses
+
+235	   Wes Hardaker
+236	   USC/ISI
+237	   Email: ietf@hardakers.net
+
+239	   Warren Kumari
+240	   Google
+241	   Email: warren@kumari.net
+
+
+
+
+
+
+
+
+
