@@ -9,6 +9,6 @@ All commments must be provided to the datatracker and ietf lists which are the s
 ### Preparing a ballot
 
 ```bash
-./scripts/ballot-init.sh draft-ietf-dnsop-rfc8624-bis or13
+./scripts/ballot-init.sh or13 draft-ietf-dnsop-rfc8624-bis-09
 ```
 

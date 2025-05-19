@@ -2,13 +2,14 @@
 
 # Check if both arguments are provided
 if [ $# -ne 2 ]; then
-    echo "Usage: $0 <draft-version> <github-username>"
-    echo "Example: $0 draft-ietf-example-01 or13"
+    echo "Usage: $0 <github-username> <draft-version>"
+    echo "Example: $0 or13 draft-ietf-example-01"
     exit 1
 fi
 
-DRAFT_VERSION="$1"
+
 AUTHOR_NAME="$2"
+DRAFT_VERSION="$1"
 DRAFT="${DRAFT_VERSION%-*}"  # Remove everything after the last hyphen
 TEMPLATE_FILE="templates/iesg-evaluation-$AUTHOR_NAME.md"
 TARGET_DIR="iesg-evaluation/$DRAFT_VERSION"
