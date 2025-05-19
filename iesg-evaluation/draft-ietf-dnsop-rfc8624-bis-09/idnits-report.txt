@@ -1,0 +1,667 @@
+idnits 2.17.1 
+
+draft-ietf-dnsop-rfc8624-bis-09.txt:
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+  == There is 1 instance of lines with non-ascii characters in the document.
+
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     Summary: 0 errors (**), 0 flaws (~~), 1 warning (==), 0 comments (--).
+
+--------------------------------------------------------------------------------
+
+
+2	Network Working Group                                        W. Hardaker
+3	Internet-Draft                                                   USC/ISI
+4	Updates: 8624, 9157 (if approved)                              W. Kumari
+5	Intended status: Standards Track                                  Google
+6	Expires: 5 October 2025                                     3 April 2025
+
+8	      DNSSEC Cryptographic Algorithm Recommendation Update Process
+9	                    draft-ietf-dnsop-rfc8624-bis-09
+
+11	Abstract
+
+13	   The DNSSEC protocol makes use of various cryptographic algorithms to
+14	   provide authentication of DNS data and proof of non-existence.  To
+15	   ensure interoperability between DNS resolvers and DNS authoritative
+16	   servers, it is necessary to specify both a set of algorithm
+17	   implementation requirements and usage guidelines to ensure that there
+18	   is at least one algorithm that all implementations support.  This
+19	   document updates RFC8624 by moving the canonical source of algorithm
+20	   implementation requirements and usage guidance for DNSSEC from
+21	   RFC8624 to an IANA registry.  This is done both to allow the list to
+22	   be more easily updated, and to allow the list to be more easily
+23	   referenced.  Future extensions to this registry can be made under
+24	   new, incremental update RFCs.  This document also incorporates the
+25	   revised IANA DNSSEC considerations from [RFC9157].
+
+27	   The document does not change the status (MUST, MAY, RECOMMENDED, etc)
+28	   of any of the algorithms listed in RFC8624; that is the work of
+29	   future documents.
+
+31	Status of This Memo
+
+33	   This Internet-Draft is submitted in full conformance with the
+34	   provisions of BCP 78 and BCP 79.
+
+36	   Internet-Drafts are working documents of the Internet Engineering
+37	   Task Force (IETF).  Note that other groups may also distribute
+38	   working documents as Internet-Drafts.  The list of current Internet-
+39	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+41	   Internet-Drafts are draft documents valid for a maximum of six months
+42	   and may be updated, replaced, or obsoleted by other documents at any
+43	   time.  It is inappropriate to use Internet-Drafts as reference
+44	   material or to cite them other than as "work in progress."
+
+46	   This Internet-Draft will expire on 5 October 2025.
+
+48	Copyright Notice
+
+50	   Copyright (c) 2025 IETF Trust and the persons identified as the
+51	   document authors.  All rights reserved.
+
+53	   This document is subject to BCP 78 and the IETF Trust's Legal
+54	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+55	   license-info) in effect on the date of publication of this document.
+56	   Please review these documents carefully, as they describe your rights
+57	   and restrictions with respect to this document.  Code Components
+58	   extracted from this document must include Revised BSD License text as
+59	   described in Section 4.e of the Trust Legal Provisions and are
+60	   provided without warranty as described in the Revised BSD License.
+
+62	Table of Contents
+
+64	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
+65	     1.1.  Document Audience . . . . . . . . . . . . . . . . . . . .   3
+66	     1.2.  Updating Algorithm Requirement Levels . . . . . . . . . .   4
+67	     1.3.  Requirements notation . . . . . . . . . . . . . . . . . .   5
+68	   2.  Adding usage and implementation recommendations to the IANA
+69	           DNSSEC registries . . . . . . . . . . . . . . . . . . . .   5
+70	   3.  DNS System Algorithm Numbers Column Values  . . . . . . . . .   6
+71	   4.  DNSSEC Delegation Signer (DS) Resource Record (RR) Type Digest
+72	           Algorithms Column Values  . . . . . . . . . . . . . . . .   7
+73	   5.  Security Considerations . . . . . . . . . . . . . . . . . . .   8
+74	   6.  Operational Considerations  . . . . . . . . . . . . . . . . .   9
+75	   7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   9
+76	     7.1.  Update to the "DNS Security Algorithm Numbers"
+77	           registry  . . . . . . . . . . . . . . . . . . . . . . . .   9
+78	     7.2.  Update to the "Digest Algorithms" registry  . . . . . . .  10
+79	   8.  Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .  10
+80	   9.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  10
+81	     9.1.  Normative References  . . . . . . . . . . . . . . . . . .  10
+82	     9.2.  Informative References  . . . . . . . . . . . . . . . . .  11
+83	   Appendix A.  ChangeLog  . . . . . . . . . . . . . . . . . . . . .  12
+84	     A.1.  Changes from ietf-08 to ietf-09 . . . . . . . . . . . . .  12
+85	     A.2.  Changes from ietf-07 to ietf-08 . . . . . . . . . . . . .  13
+86	     A.3.  Changes from ietf-06 to ietf-07 . . . . . . . . . . . . .  13
+87	     A.4.  Changes from ietf-05 to ietf-06 . . . . . . . . . . . . .  13
+88	     A.5.  Changes from ietf-03 to ietf-05 . . . . . . . . . . . . .  13
+89	     A.6.  Changes from ietf-02 to ietf-03 . . . . . . . . . . . . .  13
+90	     A.7.  Changes from ietf-01 to ietf-02 . . . . . . . . . . . . .  13
+91	     A.8.  Changes from ietf-00 to ietf-01 . . . . . . . . . . . . .  13
+92	     A.9.  Changes from hardaker-04 to ietf-00 . . . . . . . . . . .  13
+93	     A.10. Changes from -03 to -04 . . . . . . . . . . . . . . . . .  14
+94	     A.11. Changes since RFC8624 . . . . . . . . . . . . . . . . . .  14
+95	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  14
+
+97	1.  Introduction
+
+99	   DNS Security Extensions (DNSSEC) [RFC9364] is used to provide
+100	   authentication of DNS data.  The DNSSEC signing algorithms are
+101	   defined by various RFCs, including [RFC4034], [RFC4509], [RFC5155],
+102	   [RFC5702], [RFC5933], [RFC6605], [RFC8080].
+
+104	   To ensure interoperability, a set of "mandatory to implement" DNSKEY
+105	   algorithms are defined in [RFC8624].  To make the current status of
+106	   the algorithms more easily accessible and understandable, and to make
+107	   future changes to these recommendations easier to publish, this
+108	   document moves the canonical status of the algorithms from [RFC8624]
+109	   to the IANA DNSSEC algorithm registries.  Additionally, as advice to
+110	   operators, it adds recommendations for deploying and the usage of
+111	   these algorithms.
+
+113	   This is similar to the process used for the [TLS-ciphersuites]
+114	   registry, where the canonical list of ciphersuites is in the IANA
+115	   registry, and the RFCs reference the IANA registry.
+
+117	1.1.  Document Audience
+
+119	   The columns added to the IANA "DNS Security Algorithm Numbers"
+120	   [DNSKEY-IANA] and "DNSSEC Delegation Signer (DS) Resource Record (RR)
+121	   Type Digest Algorithms" [DS-IANA] registries target DNSSEC operators
+122	   and implementers.
+
+124	   Implementations need to meet both high security expectations as well
+125	   as provide interoperability between various vendors and with
+126	   different versions.
+
+128	   The field of cryptography evolves continuously.  New, stronger
+129	   algorithms appear, and existing algorithms may be found to be less
+130	   secure than originally thought.  Therefore, algorithm implementation
+131	   requirements and usage guidance need to be updated from time to time
+132	   in order to reflect the new reality, and to allow for a smooth
+133	   transition to more secure algorithms, as well as deprecation of
+134	   algorithms deemed to no longer be secure.
+
+136	   Implementations need to be conservative in the selection of
+137	   algorithms they implement in order to minimize both code complexity
+138	   and the attack surface.
+
+140	   The perspective of implementers may differ from that of an operator
+141	   who wishes to deploy and configure DNSSEC with only the safest
+142	   algorithm.  As such this document also adds new recommendations about
+143	   which algorithms should be deployed regardless of implementation
+144	   status.  In general it is expected that deployment of aging
+145	   algorithms should generally be reduced before implementations stop
+146	   supporting them.
+
+148	1.2.  Updating Algorithm Requirement Levels
+
+150	   By the time a DNSSEC cryptographic algorithm is made mandatory to
+151	   implement, it should already be available in most implementations.
+152	   This document defines an IANA registration modification to allow
+153	   future documents to specify the implementation recommendations for
+154	   each algorithm, as the recommendation status of each DNSSEC
+155	   cryptographic algorithm is expected to change over time.  For
+156	   example, there is no guarantee that newly introduced algorithms will
+157	   become mandatory to implement in the future.  Likewise, published
+158	   algorithms are continuously subjected to cryptographic attack and may
+159	   become too weak, or even be completely broken, and will require
+160	   deprecation in the future.
+
+162	   It is expected that the deprecation of an algorithm will be performed
+163	   gradually.  This provides time for implementations to update their
+164	   implemented algorithms while remaining interoperable.  Unless there
+165	   are strong security reasons, an algorithm is expected to be
+166	   downgraded from MUST to NOT RECOMMENDED or MAY, instead of directly
+167	   from MUST to MUST NOT.  Similarly, an algorithm that has not been
+168	   mentioned as mandatory to implement is expected to be first
+169	   introduced as RECOMMENDED instead of a MUST.
+
+171	   Since the effect of using an unknown DNSKEY algorithm is that the
+172	   zone is treated as insecure, it is recommended that algorithms which
+173	   have been downgraded to NOT RECOMMENDED or lower not be used by
+174	   authoritative nameservers and DNSSEC signers to create new DNSKEY's.
+175	   This will allow for deprecated algorithms to become used less and
+176	   less over time.  Once an algorithm has reached a sufficiently low
+177	   level of deployment, it can be marked as MUST NOT, so that recursive
+178	   resolvers can remove support for validating it.
+
+180	   Validating recursive resolvers are encouraged to retain support for
+181	   all algorithms not marked as MUST NOT.
+
+183	1.3.  Requirements notation
+
+185	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+186	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+187	   "OPTIONAL" in this document are to be interpreted as described in BCP
+188	   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+189	   capitals, as shown here.
+
+191	   [RFC2119] considers the term SHOULD equivalent to RECOMMENDED, and
+192	   SHOULD NOT equivalent to NOT RECOMMENDED.  The authors of this
+193	   document have chosen to use the terms RECOMMENDED and NOT
+194	   RECOMMENDED, as this more clearly expresses the recommendations to
+195	   implementers.
+
+197	2.  Adding usage and implementation recommendations to the IANA DNSSEC
+198	    registries
+
+200	   Per this document, the following columns are being added to the
+201	   following DNSSEC algorithm registries registered with IANA:
+
+203	   +================================+==================================+
+204	   | Registry                       | Column added                     |
+205	   +================================+==================================+
+206	   | DNS Security Algorithm Numbers | Use for DNSSSEC Signing          |
+207	   +--------------------------------+----------------------------------+
+208	   | DNS Security Algorithm Numbers | Use for DNSSSEC Validation       |
+209	   +--------------------------------+----------------------------------+
+210	   | DNS Security Algorithm Numbers | Implement for DNSSSEC Signing    |
+211	   +--------------------------------+----------------------------------+
+212	   | DNS Security Algorithm Numbers | Implement for DNSSSEC            |
+213	   |                                | Validation                       |
+214	   +--------------------------------+----------------------------------+
+215	   | Digest Algorithm               | Use for DNSSSEC Delegation       |
+216	   +--------------------------------+----------------------------------+
+217	   | Digest Algorithm               | Use for DNSSSEC Validation       |
+218	   +--------------------------------+----------------------------------+
+219	   | Digest Algorithm               | Implement for DNSSSEC            |
+220	   |                                | Delegation                       |
+221	   +--------------------------------+----------------------------------+
+222	   | Digest Algorithm               | Implement for DNSSSEC            |
+223	   |                                | Validation                       |
+224	   +--------------------------------+----------------------------------+
+
+226	      Table 1: Columns to add to existing DNSSEC algorithm registries
+
+228	   Adding a new entry to the "DNS System Algorithm Numbers" registry
+229	   with a recommended value of "MAY" in the "Use for DNSSSEC Signing",
+230	   "Use for DNSSSEC Validation", "Implement for DNSSSEC Signing", or
+231	   "Implement for DNSSSEC Validation" columns SHALL follow the
+232	   "Specification Required" policy as defined in [RFC8126] in order to
+233	   promote continued evolution of DNSSEC algorithms and DNSSEC agility.
+234	   New entries added through the "Specification Required" process will
+235	   have the value of "MAY" for all columns.  (Ed note (RFC Editor -
+236	   please delete this before publication): As a reminder: the
+237	   "Specification Required" policy includes a requirement for a
+238	   designated expert to review the request.)
+
+240	   Adding a new entry to, or changing existing values in, the "DNS
+241	   System Algorithm Numbers" registry for the "Use for DNSSSEC Signing",
+242	   "Use for DNSSSEC Validation", "Implement for DNSSSEC Signing", or
+243	   "Implement for DNSSSEC Validation" columns to any other value than
+244	   "MAY" requires a Standards Action.
+
+246	   Adding a new entry to the "Digest Algorithms" registry with a
+247	   recommended value of "MAY" in the "Use for DNSSSEC Delegation", "Use
+248	   for DNSSSEC Validation", "Implement for DNSSSEC Delegation", or
+249	   "Implement for DNSSSEC Validation" columns SHALL follow the
+250	   "Specification Required" policy as defined in [RFC8126].
+
+252	   Adding a new entry to, or changing existing values in, the "DNS
+253	   System Algorithm Numbers" registry for the "Use for DNSSSEC
+254	   Delegation", "Use for DNSSSEC Validation", "Implement for DNSSSEC
+255	   Delegation", or "Implement for DNSSSEC Validation" columns to any
+256	   other value than "MAY" requires a Standards Action.
+
+258	   If an item is not marked as "RECOMMENDED", it does not necessarily
+259	   mean that it is flawed; rather, it indicates that the item either has
+260	   not been through the IETF consensus process, has limited
+261	   applicability, or is intended only for specific use cases.
+
+263	   The following sections state the initial values to be populated into
+264	   these rows.  The "Implement for" column values are transcribed from
+265	   [RFC8624].  The "Use for" columns are set to the same values as the
+266	   "implement for" values since the general interpretation to date
+267	   indicates they have been treated as values for both "implementation"
+268	   and "use".  We note that the values for "Implement for" and "Use for"
+269	   may diverge in the future
+
+271	3.  DNS System Algorithm Numbers Column Values
+
+273	   Initial recommendation columns of use and implementation
+274	   recommendations for the "Domain Name System Security (DNSSEC)
+275	   Algorithm Numbers" are shown in Table 2.
+
+277	   When there are multiple RECOMMENDED algorithms in the "use" column,
+278	   operators should choose the best algorithm according to local policy.
+
+280	   +==+===============+===========+===========+===========+===========+
+281	   |N |Mnemonics      |Use for    |Use for    |Implement  |Implement  |
+282	   |  |               |DNSSEC     |DNSSEC     |for DNSSEC |for DNSSEC |
+283	   |  |               |Signing    |Validation |Signing    |Validation |
+284	   +==+===============+===========+===========+===========+===========+
+285	   |1 |RSAMD5         |MUST NOT   |MUST NOT   |MUST NOT   |MUST NOT   |
+286	   +--+---------------+-----------+-----------+-----------+-----------+
+287	   |3 |DSA            |MUST NOT   |MUST NOT   |MUST NOT   |MUST NOT   |
+288	   +--+---------------+-----------+-----------+-----------+-----------+
+289	   |5 |RSASHA1        |NOT        |RECOMMENDED|NOT        |MUST       |
+290	   |  |               |RECOMMENDED|           |RECOMMENDED|           |
+291	   +--+---------------+-----------+-----------+-----------+-----------+
+292	   |6 |DSA-NSEC3-SHA1 |MUST NOT   |MUST NOT   |MUST NOT   |MUST NOT   |
+293	   +--+---------------+-----------+-----------+-----------+-----------+
+294	   |7 |RSASHA1-NSEC3- |NOT        |RECOMMENDED|NOT        |MUST       |
+295	   |  |SHA1           |RECOMMENDED|           |RECOMMENDED|           |
+296	   +--+---------------+-----------+-----------+-----------+-----------+
+297	   |8 |RSASHA256      |RECOMMENDED|RECOMMENDED|MUST       |MUST       |
+298	   +--+---------------+-----------+-----------+-----------+-----------+
+299	   |10|RSASHA512      |NOT        |RECOMMENDED|NOT        |MUST       |
+300	   |  |               |RECOMMENDED|           |RECOMMENDED|           |
+301	   +--+---------------+-----------+-----------+-----------+-----------+
+302	   |12|ECC-GOST       |MUST NOT   |MAY        |MUST NOT   |MAY        |
+303	   +--+---------------+-----------+-----------+-----------+-----------+
+304	   |13|ECDSAP256SHA256|RECOMMENDED|RECOMMENDED|MUST       |MUST       |
+305	   +--+---------------+-----------+-----------+-----------+-----------+
+306	   |14|ECDSAP384SHA384|MAY        |RECOMMENDED|MAY        |RECOMMENDED|
+307	   +--+---------------+-----------+-----------+-----------+-----------+
+308	   |15|ED25519        |RECOMMENDED|RECOMMENDED|RECOMMENDED|RECOMMENDED|
+309	   +--+---------------+-----------+-----------+-----------+-----------+
+310	   |16|ED448          |MAY        |RECOMMENDED|MAY        |RECOMMENDED|
+311	   +--+---------------+-----------+-----------+-----------+-----------+
+312	   |17|SM2/SM3        |MAY        |MAY        |MAY        |MAY        |
+313	   +--+---------------+-----------+-----------+-----------+-----------+
+314	   |23|GOST R         |MAY        |MAY        |MAY        |MAY        |
+315	   |  |34.10-2012     |           |           |           |           |
+316	   +--+---------------+-----------+-----------+-----------+-----------+
+
+318	   Table 2: Initial values for the DNS System Algorithm Numbers columns
+
+320	4.  DNSSEC Delegation Signer (DS) Resource Record (RR) Type Digest
+321	    Algorithms Column Values
+
+323	   Initial recommendation columns of use and implementation
+324	   recommendations for the "DNSSEC Delegation Signer (DS) Resource
+325	   Record (RR) Type Digest Algorithms" registry are shown in Table 3.
+
+327	   When there are multiple RECOMMENDED algorithms in the "use" column,
+328	   operators should choose the best algorithm according to local policy.
+
+330	   +======+==========+===========+===========+==========+=============+
+331	   |Number|Mnemonics |Use for    |Use for    |Implement | Implement   |
+332	   |      |          |DNSSEC     |DNSSEC     |for DNSSEC| for DNSSEC  |
+333	   |      |          |Delegation |Validation |Delegation| Validation  |
+334	   +======+==========+===========+===========+==========+=============+
+335	   |0     |NULL (CDS |MUST NOT   |MUST NOT   |MUST NOT  | MUST NOT    |
+336	   |      |only)     |[*]        |[*]        |[*]       | [*]         |
+337	   +------+----------+-----------+-----------+----------+-------------+
+338	   |1     |SHA-1     |MUST NOT   |RECOMMENDED|MUST NOT  | MUST        |
+339	   +------+----------+-----------+-----------+----------+-------------+
+340	   |2     |SHA-256   |RECOMMENDED|RECOMMENDED|MUST      | MUST        |
+341	   +------+----------+-----------+-----------+----------+-------------+
+342	   |3     |GOST R    |MUST NOT   |MAY        |MUST NOT  | MAY         |
+343	   |      |34.11-94  |           |           |          |             |
+344	   +------+----------+-----------+-----------+----------+-------------+
+345	   |4     |SHA-384   |MAY        |RECOMMENDED|MAY       | RECOMMENDED |
+346	   +------+----------+-----------+-----------+----------+-------------+
+347	   |5     |GOST R    |MAY        |MAY        |MAY       | MAY         |
+348	   |      |34.11-2012|           |           |          |             |
+349	   +------+----------+-----------+-----------+----------+-------------+
+350	   |6     |SM3       |MAY        |MAY        |MAY       | MAY         |
+351	   +------+----------+-----------+-----------+----------+-------------+
+
+353	      Table 3: Initial values for the DNSSEC Delegation Signer (DS)
+354	           Resource Record (RR) Type Digest Algorithms columns
+
+356	5.  Security Considerations
+
+358	   This document makes no modifications to the security of the existing
+359	   protocol or recommendations described in [RFC8624].  Thus, the
+360	   security considerations remain the same, which we quote below.
+
+362	   The security of cryptographic systems depends on both the strength of
+363	   the cryptographic algorithms chosen and the strength of the keys used
+364	   with those algorithms.  The security also depends on the engineering
+365	   of the protocol used by the system to ensure that there are no non-
+366	   cryptographic ways to bypass the security of the overall system.
+
+368	   This document concerns itself with the selection of cryptographic
+369	   algorithms for the use of DNSSEC, specifically with the selection of
+370	   "mandatory to implement" algorithms.  The algorithms identified in
+371	   this document as "MUST" or "RECOMMENDED" to implement are not known
+372	   to be broken at the current time, and cryptographic research so far
+373	   leads us to believe that they are likely to remain adequately secure
+374	   unless significant and unexpected discovery is made.  However, this
+375	   isn't necessarily forever, and it is expected that future documents
+376	   will be issued from time to time to reflect the current best
+377	   practices in this area.
+
+379	   Retiring an algorithm too soon would result in a zone signed with the
+380	   retired algorithm being downgraded to the equivalent of an unsigned
+381	   zone.  Therefore, algorithm deprecation must be done only after
+382	   careful consideration and ideally slowly when possible.
+
+384	6.  Operational Considerations
+
+386	   DNSKEY algorithm rollover in a live zone is a complex process.  See
+387	   [RFC6781] and [RFC7583] for guidelines on how to perform algorithm
+388	   rollovers.
+
+390	   DS algorithm rollover in a live zone is also a complex process.
+391	   Upgrading algorithm at the same time as rolling the new KSK key will
+392	   lead to DNSSEC validation failures, and users MUST upgrade the DS
+393	   algorithm first before rolling the Key Signing Key.
+
+395	7.  IANA Considerations
+
+397	   The IANA is requested to update the [DNSKEY-IANA] and [DS-IANA]
+398	   registries according to the following sections.
+
+400	7.1.  Update to the "DNS Security Algorithm Numbers" registry
+
+402	   This document requests IANA update the "DNS Security Algorithm
+403	   Numbers" registry ([DNSKEY-IANA]) registry with the following
+404	   additional columns:
+
+406	   *  "Use for DNSSEC Signing"
+
+408	   *  "Use for DNSSEC Validation"
+
+410	   *  "Implement for DNSSEC Signing"
+
+412	   *  "Implement for DNSSEC Validation"
+
+414	   These values must be populated using values from Table 2 of this
+415	   document.
+
+417	   Additionally, the registration policy for the [DNSKEY-IANA] registry
+418	   should match the text describing the requirements in this document.
+
+420	7.2.  Update to the "Digest Algorithms" registry
+
+422	   This document requests IANA update the "Digest Algorithms" registry
+423	   ([DS-IANA]) registry with the following additional columns:
+
+425	   *  "Use for DNSSEC Delegation"
+
+427	   *  "Use for DNSSEC Validation"
+
+429	   *  "Implement for DNSSEC Delegation"
+
+431	   *  "Implement for DNSSEC Validation"
+
+433	   These values must be populated using values from Table 3 of this
+434	   document.
+
+436	   *  Update the registration policy for the [DS-IANA] registry to match
+437	      the text describing update requirements above.
+
+439	   *  Mark values 128 - 252 as "Reserved"
+
+441	   *  Mark values 253 and 254 as "Reserved for Private Use"
+
+443	   *  Delete the (now superfluous) column "Status" from the registry
+
+445	   Additionally, the registration policy for the [DS-IANA] registry
+446	   should match the text describing the requirements in this document.
+
+448	8.  Acknowledgments
+
+450	   This document is based on, and extends, RFC 8624, which was authored
+451	   by Paul Wouters and Ondrej Sury.
+
+453	   The content of this document was heavily discussed by participants of
+454	   the DNSOP working group.  The authors appreciate the thoughtfulness
+455	   of the many opinions expressed by working group participants that all
+456	   helped shaped this document.  We thank Paul Hoffman and Paul Wouters
+457	   for their contributed text, and also Shumon Huque, Nicolai Leymann, S
+458	   Moonesamy, Magnus Nyström, Peter Thomassen, Stefan Ubbink, and
+459	   Loganaden Velvindron for their reviews and comments.
+
+461	9.  References
+
+463	9.1.  Normative References
+
+465	   [DNSKEY-IANA]
+466	              IANA, "DNS Security Algorithm Numbers", n.d.,
+467	              <https://www.iana.org/assignments/dns-sec-alg-numbers/dns-
+468	              sec-alg-numbers.xml#dns-sec-alg-numbers-1>.
+
+470	   [DS-IANA]  IANA, "Delegation Signer (DS) Resource Record (RR) Type
+471	              Digest Algorithms", n.d.,
+472	              <http://www.iana.org/assignments/ds-rr-types>.
+
+474	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+475	              Requirement Levels", BCP 14, RFC 2119,
+476	              DOI 10.17487/RFC2119, March 1997,
+477	              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+479	   [RFC8126]  Cotton, M., Leiba, B., and T. Narten, "Guidelines for
+480	              Writing an IANA Considerations Section in RFCs", BCP 26,
+481	              RFC 8126, DOI 10.17487/RFC8126, June 2017,
+482	              <https://www.rfc-editor.org/rfc/rfc8126>.
+
+484	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+485	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+486	              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+488	   [RFC8624]  Wouters, P. and O. Sury, "Algorithm Implementation
+489	              Requirements and Usage Guidance for DNSSEC", RFC 8624,
+490	              DOI 10.17487/RFC8624, June 2019,
+491	              <https://www.rfc-editor.org/rfc/rfc8624>.
+
+493	   [RFC9157]  Hoffman, P., "Revised IANA Considerations for DNSSEC",
+494	              RFC 9157, DOI 10.17487/RFC9157, December 2021,
+495	              <https://www.rfc-editor.org/rfc/rfc9157>.
+
+497	9.2.  Informative References
+
+499	   [RFC4034]  Arends, R., Austein, R., Larson, M., Massey, D., and S.
+500	              Rose, "Resource Records for the DNS Security Extensions",
+501	              RFC 4034, DOI 10.17487/RFC4034, March 2005,
+502	              <https://www.rfc-editor.org/rfc/rfc4034>.
+
+504	   [RFC4509]  Hardaker, W., "Use of SHA-256 in DNSSEC Delegation Signer
+505	              (DS) Resource Records (RRs)", RFC 4509,
+506	              DOI 10.17487/RFC4509, May 2006,
+507	              <https://www.rfc-editor.org/rfc/rfc4509>.
+
+509	   [RFC5155]  Laurie, B., Sisson, G., Arends, R., and D. Blacka, "DNS
+510	              Security (DNSSEC) Hashed Authenticated Denial of
+511	              Existence", RFC 5155, DOI 10.17487/RFC5155, March 2008,
+512	              <https://www.rfc-editor.org/rfc/rfc5155>.
+
+514	   [RFC5702]  Jansen, J., "Use of SHA-2 Algorithms with RSA in DNSKEY
+515	              and RRSIG Resource Records for DNSSEC", RFC 5702,
+516	              DOI 10.17487/RFC5702, October 2009,
+517	              <https://www.rfc-editor.org/rfc/rfc5702>.
+
+519	   [RFC5933]  Dolmatov, V., Ed., Chuprina, A., and I. Ustinov, "Use of
+520	              GOST Signature Algorithms in DNSKEY and RRSIG Resource
+521	              Records for DNSSEC", RFC 5933, DOI 10.17487/RFC5933, July
+522	              2010, <https://www.rfc-editor.org/rfc/rfc5933>.
+
+524	   [RFC6605]  Hoffman, P. and W.C.A. Wijngaards, "Elliptic Curve Digital
+525	              Signature Algorithm (DSA) for DNSSEC", RFC 6605,
+526	              DOI 10.17487/RFC6605, April 2012,
+527	              <https://www.rfc-editor.org/rfc/rfc6605>.
+
+529	   [RFC6781]  Kolkman, O., Mekking, W., and R. Gieben, "DNSSEC
+530	              Operational Practices, Version 2", RFC 6781,
+531	              DOI 10.17487/RFC6781, December 2012,
+532	              <https://www.rfc-editor.org/rfc/rfc6781>.
+
+534	   [RFC7583]  Morris, S., Ihren, J., Dickinson, J., and W. Mekking,
+535	              "DNSSEC Key Rollover Timing Considerations", RFC 7583,
+536	              DOI 10.17487/RFC7583, October 2015,
+537	              <https://www.rfc-editor.org/rfc/rfc7583>.
+
+539	   [RFC8080]  Sury, O. and R. Edmonds, "Edwards-Curve Digital Security
+540	              Algorithm (EdDSA) for DNSSEC", RFC 8080,
+541	              DOI 10.17487/RFC8080, February 2017,
+542	              <https://www.rfc-editor.org/rfc/rfc8080>.
+
+544	   [RFC9364]  Hoffman, P., "DNS Security Extensions (DNSSEC)", BCP 237,
+545	              RFC 9364, DOI 10.17487/RFC9364, February 2023,
+546	              <https://www.rfc-editor.org/rfc/rfc9364>.
+
+548	   [TLS-ciphersuites]
+549	              IANA, "Transport Layer Security (TLS) Parameters", n.d.,
+550	              <https://www.iana.org/assignments/tls-parameters/tls-
+551	              parameters.xhtml#tls-parameters-4>.
+
+553	Appendix A.  ChangeLog
+
+555	   (RFC Editor: please remove this ChangeLog section upon publication.)
+
+557	A.1.  Changes from ietf-08 to ietf-09
+
+559	   * Added missing alogirthms (SM2/SM3 and GOST R 34.10-2012)
+
+561	A.2.  Changes from ietf-07 to ietf-08
+
+563	   * Handle issues raised during IETF last call:
+564	       * updates 9157
+565	       * other nit fixes
+
+567	A.3.  Changes from ietf-06 to ietf-07
+
+569	   * changed to a standards track document
+
+571	A.4.  Changes from ietf-05 to ietf-06
+
+573	   * Address Eric Vyncke (RAD!) AD review comments.
+
+575	A.5.  Changes from ietf-03 to ietf-05
+
+577	* Updated "entry requirements" to be "Specification Required".
+578	* Marked values 128 - 252 as "Reserved" in "Digest Algorithms" as
+579	break-glass mechanism in case we get a flood of these. To align with the
+580	"DNS Security Algorithm Numbers" registry (that reserves 123 - ...)
+581	* Marked values 253 and 254 as "Reserved for Private Use" in "Digest
+582	Algorithms"
+583	* Deleted the (now superfluous) column "Status" from the "Digest
+
+585	A.6.  Changes from ietf-02 to ietf-03
+
+587	   *  Fixed the reference in the Abstract (no links in Abstracts)
+
+589	   *  Added Updates: to the header.
+
+591	A.7.  Changes from ietf-01 to ietf-02
+
+593	   *  Changed the MUST values in the tables for the Use columns to
+594	      RECOMMENDED based on discussions on the dnsop mailing list.
+
+596	   *  Other minor wording and formatting changes
+
+598	A.8.  Changes from ietf-00 to ietf-01
+
+600	   *  Only NIT fixing
+
+602	A.9.  Changes from hardaker-04 to ietf-00
+
+604	   *  Just a draft name and number change.
+
+606	A.10.  Changes from -03 to -04
+
+608	   *  Changed the columns being added from 2 per table to 4, based on
+609	      discussion within the dnsop working group mailing list.  This was
+610	      a fairly major set of changes.
+
+612	A.11.  Changes since RFC8624
+
+614	   *  The primary purpose of this revision is to introduce the new
+615	      columns to existing registries.  It makes no changes to the
+616	      previously defined values.
+
+618	   *  Merged in RFC9157 updates.
+
+620	   *  Set authors as Wes Hardaker, Warren Kumari.
+
+622	Authors' Addresses
+
+624	   Wes Hardaker
+625	   USC/ISI
+626	   Email: ietf@hardakers.net
+
+628	   Warren Kumari
+629	   Google
+630	   Email: warren@kumari.net
+
+
+
+
+
+
+
+
+
