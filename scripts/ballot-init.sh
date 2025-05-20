@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Check if both arguments are provided
 if [ $# -ne 2 ]; then
@@ -27,8 +27,15 @@ fi
 # Copy the template file to the new location
 cp "$TEMPLATE_FILE" "$TARGET_FILE"
 
+# Check if the OS is macOS (Darwin)
+if [[ "$(uname)" == "Darwin" ]]; then
+  SED_INPLACE_OPT="-i ''"
+else
+  SED_INPLACE_OPT="-i"
+fi
+
 # Replace DRAFT with DRAFT_VERSION in the target file
-sed -i '' "s/DRAFT/$DRAFT_VERSION/g" "$TARGET_FILE"
+sed "$SED_INPLACE_OPT" "s/DRAFT/$DRAFT_VERSION/g" "$TARGET_FILE"
 
 # Download the URL using curl and save it to the download directory
 curl -s -o "$TARGET_DIR/idnits-report.txt" "https://author-tools.ietf.org/api/idnits?url=https://www.ietf.org/archive/id/$DRAFT_VERSION.txt&submitcheck=True"
