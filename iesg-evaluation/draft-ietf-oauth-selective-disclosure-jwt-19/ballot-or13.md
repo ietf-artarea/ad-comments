@@ -10,6 +10,7 @@ CC @OR13
 * "Handling Ballot Positions":
   - https://ietf.org/about/groups/iesg/statements/handling-ballot-positions/
 
+
 ## Discuss
 
 ### Requirements for "aud" in SD-JWT and KB-JWT
@@ -32,25 +33,12 @@ Consider addressing the security considerations for "aud" in one place, and comm
 Is it safe to allow selective disclosure within the audience claim?
 Does the safeness vary between SD-JWT and KB-JWT?
 
-### Requirement for typ in Key Binding JWT
-
-Due to the nature of typ in Key Binding JWT, there does not appear to be a way to signal that specific audience values are expected for a profile, or that other specific header parameters are REQUIRED.
-For example, it would not be possible to signal that a key binding token was expected to use x5c, x5t, or x5u, because kb+jwt is mandatory.
-
-Consider adjusting the typ parameter to MUST be kbt+jwt, when the existensibility model of JWT is not needed.
-
-I like the idea of knowing that "kb+jwt" will not contain additional header parameters or validity claims, but I'm not sure that it's reasonable to prevent profiles from reusing it.
-
-TLDR: mandating a specific value for typ in KB-JWT seems against the explicit typing guidance for JWTs.
-
-
 
 ## Comments
 
 Thanks to Henry S. Thompson for the ARTART review.
 
 I agree there is some possible confusion regarding string, JSON text, and UTF-8, consider the language from STD90:
-
 
 ```
 A JSON text is a serialized value.
@@ -109,6 +97,20 @@ Perhaps:
 *  Encoding considerations: binary; application/sd-jwt+json values
    are represented as a JSON object as described in Section 3.2 of [RFC7515].
 ```
+
+### Requirement for typ in Key Binding JWT
+
+This was almost a discuss, as it relates to understanding the structure of mandatory claims and header parameters in KB-JWT.
+
+Due to the nature of typ in Key Binding JWT, there does not appear to be a way to signal that specific audience values are expected for a profile, or that other specific header parameters are REQUIRED.
+
+For example, it would not be possible to signal that a key binding token was expected to use x5c, x5t, or x5u, because kb+jwt is mandatory.
+
+Consider adjusting the typ parameter to MUST be kbt+jwt, when the extensibility model of JWT is not needed.
+
+I like the idea of knowing that "kb+jwt" will not contain additional header parameters or validity claims, but I'm not sure that it's reasonable to prevent profiles from reusing it.
+
+TLDR: mandating a specific value for typ in KB-JWT seems against the explicit typing guidance for JWTs.
 
 ### 9.9.  Forwarding Credentials
 
