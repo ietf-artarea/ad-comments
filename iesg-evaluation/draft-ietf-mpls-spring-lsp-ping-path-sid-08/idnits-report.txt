@@ -1,0 +1,670 @@
+idnits 2.17.1 
+
+draft-ietf-mpls-spring-lsp-ping-path-sid-08.txt:
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     No nits found.
+--------------------------------------------------------------------------------
+
+
+2	MPLS Working Group                                                X. Min
+3	Internet-Draft                                                   S. Peng
+4	Intended status: Standards Track                               ZTE Corp.
+5	Expires: 20 November 2025                                        L. Gong
+6	                                                            China Mobile
+7	                                                               R. Gandhi
+8	                                                     Cisco Systems, Inc.
+9	                                                            C. Pignataro
+10	                                                    Blue Fern Consulting
+11	                                                             19 May 2025
+
+13	  Label Switched Path (LSP) Ping for Segment Routing (SR) Path Segment
+14	                    Identifier with MPLS Data Plane
+15	              draft-ietf-mpls-spring-lsp-ping-path-sid-08
+
+17	Abstract
+
+19	   Path Segment is a type of Segment Routing (SR) segment, and a Path
+20	   Segment Identifier (PSID) is used to identify an SR path.  Path
+21	   Segment can be used in an SR over MPLS (SR-MPLS) data plane.  This
+22	   document specifies three new Target Forwarding Equivalence Class
+23	   (FEC) Stack sub-TLVs for PSID checks.
+
+25	Status of This Memo
+
+27	   This Internet-Draft is submitted in full conformance with the
+28	   provisions of BCP 78 and BCP 79.
+
+30	   Internet-Drafts are working documents of the Internet Engineering
+31	   Task Force (IETF).  Note that other groups may also distribute
+32	   working documents as Internet-Drafts.  The list of current Internet-
+33	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+35	   Internet-Drafts are draft documents valid for a maximum of six months
+36	   and may be updated, replaced, or obsoleted by other documents at any
+37	   time.  It is inappropriate to use Internet-Drafts as reference
+38	   material or to cite them other than as "work in progress."
+
+40	   This Internet-Draft will expire on 20 November 2025.
+
+42	Copyright Notice
+
+44	   Copyright (c) 2025 IETF Trust and the persons identified as the
+45	   document authors.  All rights reserved.
+
+47	   This document is subject to BCP 78 and the IETF Trust's Legal
+48	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+49	   license-info) in effect on the date of publication of this document.
+50	   Please review these documents carefully, as they describe your rights
+51	   and restrictions with respect to this document.  Code Components
+52	   extracted from this document must include Revised BSD License text as
+53	   described in Section 4.e of the Trust Legal Provisions and are
+54	   provided without warranty as described in the Revised BSD License.
+
+56	Table of Contents
+
+58	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+59	   2.  Conventions . . . . . . . . . . . . . . . . . . . . . . . . .   3
+60	     2.1.  Requirements Language . . . . . . . . . . . . . . . . . .   3
+61	     2.2.  Terminology . . . . . . . . . . . . . . . . . . . . . . .   3
+62	   3.  Path Segment ID Sub-TLVs  . . . . . . . . . . . . . . . . . .   3
+63	     3.1.  SR Policy's PSID  . . . . . . . . . . . . . . . . . . . .   4
+64	     3.2.  SR Candidate Path's PSID  . . . . . . . . . . . . . . . .   5
+65	     3.3.  SR Segment List's PSID  . . . . . . . . . . . . . . . . .   7
+66	   4.  PSID FEC Validation . . . . . . . . . . . . . . . . . . . . .   9
+67	     4.1.  PSID FEC Validation Rules . . . . . . . . . . . . . . . .   9
+68	   5.  Security Considerations . . . . . . . . . . . . . . . . . . .  11
+69	   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  11
+70	   7.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  12
+71	   8.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  12
+72	     8.1.  Normative References  . . . . . . . . . . . . . . . . . .  12
+73	     8.2.  Informative References  . . . . . . . . . . . . . . . . .  13
+74	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  13
+
+76	1.  Introduction
+
+78	   Path Segment is a type of Segment Routing (SR) segment, and a Path
+79	   Segment Identifier (PSID) is used to identify an SR path.  PSID in
+80	   MPLS-based segment routing networks is defined in [RFC9545].
+
+82	   As specified in [RFC9545], PSID is a single label inserted by the
+83	   ingress node of the SR path, and then processed by the egress node of
+84	   the SR path.  The PSID is placed within the MPLS label stack as a
+85	   label immediately following the last label of the SR path.  The
+86	   egress node MUST pop the PSID.
+
+88	   Procedures for LSP Ping [RFC8029] as defined in [RFC8287] and
+89	   [RFC8690] are also applicable to PSID.  Concretely, LSP Ping can be
+90	   used to check the correct operation of a PSID and verify the PSID
+91	   against the control plane.  Checking correct operation means that an
+92	   initiator can use LSP Ping to check whether a PSID reached the
+93	   intended node and got processed by that node correctly.  Moreover,
+94	   verifying a PSID against the control plane means that the initiator
+95	   can use LSP Ping to verify whether a given node has the same
+96	   understanding whith the initiator on how the PSID was constructed by
+97	   the control plane.  To that end, this document specifies three new
+98	   Target Forwarding Equivalence Class (FEC) Stack sub-TLVs for such
+99	   PSID checks.
+
+101	   LSP Traceroute [RFC8287] is left out of this document because transit
+102	   nodes are not involved in PSID processing.
+
+104	2.  Conventions
+
+106	2.1.  Requirements Language
+
+108	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+109	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+110	   "OPTIONAL" in this document are to be interpreted as described in BCP
+111	   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+112	   capitals, as shown here.
+
+114	2.2.  Terminology
+
+116	   This document uses the terminology defined in [RFC3031], [RFC8402],
+117	   and [RFC8029], readers are expected to be familiar with those terms.
+
+119	3.  Path Segment ID Sub-TLVs
+
+121	   Analogous to what's defined in Section 5 of [RFC8287] and Section 4
+122	   of [RFC9703], three new sub-TLVs are defined for the Target FEC Stack
+123	   TLV (Type 1), the Reverse-Path Target FEC Stack TLV (Type 16), and
+124	   the Reply Path TLV (Type 21).  Note that the structures of the three
+125	   new sub-TLVs follow the TLV's structure defined in Section 3 of
+126	   [RFC8029].
+
+128	        Sub-Type    Sub-TLV Name
+129	        --------    -----------------------------
+130	         TBD1       SR Policy's PSID
+131	         TBD2       SR Candidate Path's PSID
+132	         TBD3       SR Segment List's PSID
+
+134	   As specified in Section 2 of [RFC9545], a PSID is used to identify a
+135	   segment list, some or all segment lists in a Candidate path or an SR
+136	   policy, so three different Target FEC Stack sub-TLVs need to be
+137	   defined for PSID.  When a PSID is used to identify an SR Policy, the
+138	   Target FEC Stack sub-TLV of the type "SR Policy's PSID" is used to
+139	   validate the control plane to forwarding plane synchronization for
+140	   this PSID; When a PSID is used to identify an SR Candidate Path, the
+141	   Target FEC Stack sub-TLV of the type "SR Candidate Path's PSID" is
+142	   used to validate the control plane to forwarding plane
+143	   synchronization for this PSID; When a PSID is used to identify a
+144	   Segment List, the Target FEC Stack sub-TLV of the type "SR Segment
+145	   List's PSID" is used to validate the control plane to forwarding
+146	   plane synchronization for this PSID.  These three new Target FEC
+147	   Stack sub-TLVs are mutually exclusive (i.e., they must not be present
+148	   in the same message).
+
+150	3.1.  SR Policy's PSID
+
+152	   The format of SR Policy's PSID sub-TLV is specified as below:
+
+154	    0                   1                   2                   3
+155	    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+156	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+157	   |          Type = TBD1          |             Length            |
+158	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+159	   | Address Type  |                   Reserved                    |
+160	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+161	   ~                     Headend  (4/16 octets)                    ~
+162	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+163	   |                       Color  (4 octets)                       |
+164	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+165	   ~                    Endpoint  (4/16 octets)                    ~
+166	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+168	                     Figure 1: SR Policy's PSID sub-TLV
+
+170	   Type
+
+172	      This field is set to the value (TBD1) which indicates that it's an
+173	      SR Policy's PSID sub-TLV.
+
+175	   Length
+
+177	      This field is set to the length of the sub-TLV in octets, not
+178	      including the first 4 octets.  If Headend and Endpoint fields are
+179	      in IPv4 address format which is 4 octets long, it MUST be set to
+180	      16; If Headend and Endpoint fields are in IPv6 address format
+181	      which is 16 octets long, it MUST be set to 40.
+
+183	   Address Type
+
+185	      This field is set to 1 when the Headend and Endpoint are both
+186	      IPv4.  This field is set to 2 when the Headend and Endpoint are
+187	      both IPv6.
+
+189	   Reserved
+190	      The Reserved field MUST be set to 0 when sent and MUST be ignored
+191	      on receipt.
+
+193	   Headend
+
+195	      The same as defined in Section 2.1 of [RFC9256].
+
+197	   Color
+
+199	      The same as defined in Section 2.1 of [RFC9256].
+
+201	   Endpoint
+
+203	      The same as defined in Section 2.1 of [RFC9256].
+
+205	3.2.  SR Candidate Path's PSID
+
+207	   The format of SR Candidate Path's PSID sub-TLV is specified as below:
+
+209	    0                   1                   2                   3
+210	    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+211	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+212	   |          Type = TBD2          |             Length            |
+213	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+214	   | Address Type  |                   Reserved1                   |
+215	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+216	   ~                     Headend  (4/16 octets)                    ~
+217	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+218	   |                       Color  (4 octets)                       |
+219	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+220	   ~                    Endpoint  (4/16 octets)                    ~
+221	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+222	   |Protocol-Origin|                   Reserved2                   |
+223	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+224	   |                                                               |
+225	   |                                                               |
+226	   |                  Originator  (20 octets)                      |
+227	   |                                                               |
+228	   |                                                               |
+229	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+230	   |               Discriminator  (4 octets)                       |
+231	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+233	                 Figure 2: SR Candidate Path's PSID sub-TLV
+
+235	   Type
+236	      This field is set to the value (TBD2) which indicates that it's an
+237	      SR Candidate Path's PSID sub-TLV.
+
+239	   Length
+
+241	      This field is set to the length of the sub-TLV in octets, not
+242	      including the first 4 octets.  If Headend and Endpoint fields are
+243	      in IPv4 address format which is 4 octets long, it MUST be set to
+244	      44; If Headend and Endpoint fields are in IPv6 address format
+245	      which is 16 octets long, it MUST be set to 68.
+
+247	   Address Type
+
+249	      This field is set to 1 when the Headend and Endpoint are both
+250	      IPv4.  This field is set to 2 when the Headend and Endpoint are
+251	      both IPv6.
+
+253	   Reserved1
+
+255	      The Reserved1 field MUST be set to 0 when sent and MUST be ignored
+256	      on receipt.
+
+258	   Headend
+
+260	      The same as defined in Section 2.1 of [RFC9256].
+
+262	   Color
+
+264	      The same as defined in Section 2.1 of [RFC9256].
+
+266	   Endpoint
+
+268	      The same as defined in Section 2.1 of [RFC9256].
+
+270	   Protocol-Origin
+
+272	      The same as defined in Section 2.3 of [RFC9256].  This field takes
+273	      a value from the IANA registry defined in Section 8.4 of
+274	      [I-D.ietf-idr-bgp-ls-sr-policy].  If any unregistered value is
+275	      used for this field, the validation at the responder would fail.
+
+277	   Reserved2
+
+279	      The Reserved2 field MUST be set to 0 when sent and MUST be ignored
+280	      on receipt.
+
+282	   Originator
+283	      The same as defined in Section 2.4 of [RFC9256].
+
+285	   Discriminator
+
+287	      The same as defined in Section 2.5 of [RFC9256].
+
+289	3.3.  SR Segment List's PSID
+
+291	   The format of SR Segment List's PSID sub-TLV is specified as below:
+
+293	    0                   1                   2                   3
+294	    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+295	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+296	   |          Type = TBD3          |             Length            |
+297	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+298	   | Address Type  |                   Reserved1                   |
+299	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+300	   ~                     Headend  (4/16 octets)                    ~
+301	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+302	   |                       Color  (4 octets)                       |
+303	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+304	   ~                    Endpoint  (4/16 octets)                    ~
+305	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+306	   |Protocol-Origin|                   Reserved2                   |
+307	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+308	   |                                                               |
+309	   |                                                               |
+310	   |                  Originator  (20 octets)                      |
+311	   |                                                               |
+312	   |                                                               |
+313	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+314	   |               Discriminator  (4 octets)                       |
+315	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+316	   |             Segment-List-ID  (4 octets)                       |
+317	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+319	                  Figure 3: SR Segment List's PSID sub-TLV
+
+321	   Type
+
+323	      This field is set to the value (TBD3) which indicates that it's an
+324	      SR Segment List's PSID sub-TLV.
+
+326	   Length
+327	      This field is set to the length of the sub-TLV in octets, not
+328	      including the first 4 octets.  If Headend and Endpoint fields are
+329	      in IPv4 address format which is 4 octets long, it MUST be set to
+330	      48; If Headend and Endpoint fields are in IPv6 address format
+331	      which is 16 octets long, it MUST be set to 72.
+
+333	   Address Type
+
+335	      This field is set to 1 when the Headend and Endpoint are both
+336	      IPv4.  This field is set to 2 when the Headend and Endpoint are
+337	      both IPv6.
+
+339	   Reserved1
+
+341	      The Reserved1 field MUST be set to 0 when sent and MUST be ignored
+342	      on receipt.
+
+344	   Headend
+
+346	      The same as defined in Section 2.1 of [RFC9256].
+
+348	   Color
+
+350	      The same as defined in Section 2.1 of [RFC9256].
+
+352	   Endpoint
+
+354	      The same as defined in Section 2.1 of [RFC9256].
+
+356	   Protocol-Origin
+
+358	      The same as defined in Section 2.3 of [RFC9256].  This field takes
+359	      a value from the IANA registry defined in Section 8.4 of
+360	      [I-D.ietf-idr-bgp-ls-sr-policy].  If any unregistered value is
+361	      used for this field, the validation at the responder would fail.
+
+363	   Reserved2
+
+365	      The Reserved2 field MUST be set to 0 when sent and MUST be ignored
+366	      on receipt.
+
+368	   Originator
+
+370	      The same as defined in Section 2.4 of [RFC9256].
+
+372	   Discriminator
+
+374	      The same as defined in Section 2.5 of [RFC9256].
+
+376	   Segment-List-ID
+
+378	      This field identifies an SR path within the context of a candidate
+379	      path of an SR Policy.  The Segment-List-ID is a 4-octet identifier
+380	      of a segment list.
+
+382	4.  PSID FEC Validation
+
+384	   The MPLS LSP Ping procedures may be initiated by the headend of the
+385	   Segment Routing path or a centralized topology-aware data plane
+386	   monitoring system as described in [RFC8403].  For the PSID, the
+387	   responder nodes that receive echo request and send echo reply MUST be
+388	   the endpoint of the Segment Routing path.
+
+390	   When an endpoint receives the LSP echo request packet with top FEC
+391	   being the PSID, it MUST perform validity checks on the content of the
+392	   PSID FEC Stack sub-TLV.  The basic length check should be performed
+393	   on the received FEC.
+
+395	       SR Policy's PSID
+396	       ------------------
+397	       If Address Type = 1, Length should be 16 octets
+398	       If Address Type = 2, Length should be 40 octets
+
+400	       SR Candidate Path's PSID
+401	       ------------------
+402	       If Address Type = 1, Length should be 44 octets
+403	       If Address Type = 2, Length should be 68 octets
+
+405	       SR Segment List's PSID
+406	       ------------------
+407	       If Address Type = 1, Length should be 48 octets
+408	       If Address Type = 2, Length should be 72 octets
+
+410	                        Figure 4: Length Validation
+
+412	   If a malformed FEC Stack sub-TLV is received, then a return code of
+413	   1, "Malformed echo request received" as defined in [RFC8029] MUST be
+414	   sent.  The section below is appended to the procedure given in step
+415	   4a of Section 7.4 of [RFC8287].
+
+417	4.1.  PSID FEC Validation Rules
+
+419	   This is an example of Segment Routing PSID validation.
+
+421	   Else, if the Label-stack-depth is 0 and the Target FEC Stack sub-TLV
+422	   FEC-stack-depth is TBD1 (SR Policy's PSID sub-TLV), {
+423	      Set the Best-return-code to 10, "Mapping for this FEC is not the
+424	      given label at stack-depth <RSC>" if any below conditions fail
+425	      (the notation <RSC> refers to the Return Subcode):
+
+427	      -  Validate that the PSID is signaled or provisioned for the SR
+428	         Policy {
+
+430	         o  Validate that the signaled or provisioned headend, color,
+431	            and endpoint, for the PSID, matches with the responding
+432	            fields in the received SR Policy's PSID sub-TLV.
+
+434	         }
+
+436	      }
+
+438	      If all the above validations have passed, set the return code to 3
+439	      "Replying router is an egress for the FEC at stack-depth <RSC>".
+
+441	      Set FEC-Status to 1 and return.
+
+443	   }
+
+445	   Else, if the Label-stack-depth is 0 and the Target FEC Stack sub-TLV
+446	   FEC-stack-depth is TBD2 (SR Candidate Path's PSID sub-TLV), {
+
+448	      Set the Best-return-code to 10, "Mapping for this FEC is not the
+449	      given label at stack-depth <RSC>" if any below conditions fail:
+
+451	      -  Validate that the PSID is signaled or provisioned for the SR
+452	         Candidate Path {
+
+454	         o  Validate that the signaled or provisioned headend, color,
+455	            endpoint, originator, and discriminator, the PSID, matches
+456	            with the corresponding fields in the received SR Candidate
+457	            Path's PSID sub-TLV.
+
+459	         }
+
+461	      }
+
+463	      If all the above validations have passed, set the return code to 3
+464	      "Replying router is an egress for the FEC at stack-depth <RSC>".
+
+466	      Set FEC-Status to 1 and return.
+
+468	   }
+469	   Else, if the Label-stack-depth is 0 and the Target FEC Stack sub-TLV
+470	   t FEC-stack-depth is TBD3 (SR Segment List's PSID sub-TLV), {
+
+472	      Set the Best-return-code to 10, "Mapping for this FEC is not the
+473	      given label at stack-depth <RSC>" if any below conditions fail:
+
+475	      -  Validate that the PSID is signaled or provisioned for the SR
+476	         Segment List {
+
+478	         o  Validate that the signaled or provisioned headend, color,
+479	            endpoint, originator, discriminator, and segment-list-id,
+480	            the PSID, matches with the corresponding fields in the
+481	            received SR Segment List's PSID sub-TLV.
+
+483	         }
+
+485	      }
+
+487	      If all the above validations have passed, set the return code to 3
+488	      "Replying router is an egress for the FEC at stack-depth <RSC>".
+
+490	      Set FEC-Status to 1 and return.
+
+492	   }
+
+494	   When a sub-TLV defined in this document is carried in Reverse-Path
+495	   Target FEC Stack TLV (Type 16) or Reply Path TLV (Type 21), it MUST
+496	   be sent by an endpoint in an echo reply.  The headend MUST perform
+497	   validity checks as described above without setting the return code.
+498	   If any of the validations fail, then the headend MUST drop the echo
+499	   reply and SHOULD log and/or report an error.
+
+501	5.  Security Considerations
+
+503	   This document defines additional MPLS LSP Ping sub-TLVs and follows
+504	   the mechanisms defined in [RFC8029].  All the security considerations
+505	   defined in Section 5 of [RFC8029] apply to this document.  The MPLS
+506	   LSP Ping sub-TLVs defined in this document do not impose any
+507	   additional security challenges to be considered.
+
+509	6.  IANA Considerations
+
+511	   IANA is requested to assign three new sub-TLVs from the "Sub-TLVs for
+512	   TLV Types 1, 16, and 21" sub-registry in the "TLVs" registry of the
+513	   "Multiprotocol Label Switching (MPLS) Label Switched Paths (LSPs)
+514	   Ping Parameters" name space.  The Standards Action range that
+515	   requires an error message to be returned if the sub-TLV is not
+516	   recognized (range 0-16383) should be used.
+
+518	     Sub-Type   Sub-TLV Name                Reference
+519	     --------   -------------------------   ----------------------------
+520	      TBD1      SR Policy's PSID            Section 3.1 of THIS_DOCUMENT
+521	      TBD2      SR Candidate Path's PSID    Section 3.2 of THIS_DOCUMENT
+522	      TBD3      SR Segment List's PSID      Section 3.3 of THIS_DOCUMENT
+
+524	7.  Acknowledgements
+
+526	   The authors would like to acknowledge Loa Andersson, Detao Zhao, Ben
+527	   Niven-Jenkins, Greg Mirsky, Ketan Talaulikar, James Guichard, Jon
+528	   Geater, Gorry Fairhurst, Bing Liu, and Mohamed Boucadair for their
+529	   thorough review and very helpful comments.
+
+531	   The authors would like to acknowledge Yao Liu and Quan Xiong for the
+532	   very helpful f2f discussion.
+
+534	8.  References
+
+536	8.1.  Normative References
+
+538	   [I-D.ietf-idr-bgp-ls-sr-policy]
+539	              Previdi, S., Talaulikar, K., Dong, J., Gredler, H., and J.
+540	              Tantsura, "Advertisement of Segment Routing Policies using
+541	              BGP Link-State", Work in Progress, Internet-Draft, draft-
+542	              ietf-idr-bgp-ls-sr-policy-17, 6 March 2025,
+543	              <https://datatracker.ietf.org/doc/html/draft-ietf-idr-bgp-
+544	              ls-sr-policy-17>.
+
+546	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+547	              Requirement Levels", BCP 14, RFC 2119,
+548	              DOI 10.17487/RFC2119, March 1997,
+549	              <https://www.rfc-editor.org/info/rfc2119>.
+
+551	   [RFC8029]  Kompella, K., Swallow, G., Pignataro, C., Ed., Kumar, N.,
+552	              Aldrin, S., and M. Chen, "Detecting Multiprotocol Label
+553	              Switched (MPLS) Data-Plane Failures", RFC 8029,
+554	              DOI 10.17487/RFC8029, March 2017,
+555	              <https://www.rfc-editor.org/info/rfc8029>.
+
+557	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+558	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+559	              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+561	   [RFC8287]  Kumar, N., Ed., Pignataro, C., Ed., Swallow, G., Akiya,
+562	              N., Kini, S., and M. Chen, "Label Switched Path (LSP)
+563	              Ping/Traceroute for Segment Routing (SR) IGP-Prefix and
+564	              IGP-Adjacency Segment Identifiers (SIDs) with MPLS Data
+565	              Planes", RFC 8287, DOI 10.17487/RFC8287, December 2017,
+566	              <https://www.rfc-editor.org/info/rfc8287>.
+
+568	   [RFC8690]  Nainar, N., Pignataro, C., Iqbal, F., and A. Vainshtein,
+569	              "Clarification of Segment ID Sub-TLV Length for RFC 8287",
+570	              RFC 8690, DOI 10.17487/RFC8690, December 2019,
+571	              <https://www.rfc-editor.org/info/rfc8690>.
+
+573	   [RFC9256]  Filsfils, C., Talaulikar, K., Ed., Voyer, D., Bogdanov,
+574	              A., and P. Mattes, "Segment Routing Policy Architecture",
+575	              RFC 9256, DOI 10.17487/RFC9256, July 2022,
+576	              <https://www.rfc-editor.org/info/rfc9256>.
+
+578	   [RFC9545]  Cheng, W., Ed., Li, H., Li, C., Ed., Gandhi, R., and R.
+579	              Zigler, "Path Segment Identifier in MPLS-Based Segment
+580	              Routing Networks", RFC 9545, DOI 10.17487/RFC9545,
+581	              February 2024, <https://www.rfc-editor.org/info/rfc9545>.
+
+583	8.2.  Informative References
+
+585	   [RFC3031]  Rosen, E., Viswanathan, A., and R. Callon, "Multiprotocol
+586	              Label Switching Architecture", RFC 3031,
+587	              DOI 10.17487/RFC3031, January 2001,
+588	              <https://www.rfc-editor.org/info/rfc3031>.
+
+590	   [RFC8402]  Filsfils, C., Ed., Previdi, S., Ed., Ginsberg, L.,
+591	              Decraene, B., Litkowski, S., and R. Shakir, "Segment
+592	              Routing Architecture", RFC 8402, DOI 10.17487/RFC8402,
+593	              July 2018, <https://www.rfc-editor.org/info/rfc8402>.
+
+595	   [RFC8403]  Geib, R., Ed., Filsfils, C., Pignataro, C., Ed., and N.
+596	              Kumar, "A Scalable and Topology-Aware MPLS Data-Plane
+597	              Monitoring System", RFC 8403, DOI 10.17487/RFC8403, July
+598	              2018, <https://www.rfc-editor.org/info/rfc8403>.
+
+600	   [RFC9703]  Hegde, S., Srivastava, M., Arora, K., Ninan, S., and X.
+601	              Xu, "Label Switched Path (LSP) Ping/Traceroute for Segment
+602	              Routing (SR) Egress Peer Engineering (EPE) Segment
+603	              Identifiers (SIDs) with MPLS Data Plane", RFC 9703,
+604	              DOI 10.17487/RFC9703, December 2024,
+605	              <https://www.rfc-editor.org/info/rfc9703>.
+
+607	Authors' Addresses
+608	   Xiao Min
+609	   ZTE Corp.
+610	   Nanjing
+611	   China
+612	   Phone: +86 18061680168
+613	   Email: xiao.min2@zte.com.cn
+
+615	   Shaofu Peng
+616	   ZTE Corp.
+617	   Nanjing
+618	   China
+619	   Email: peng.shaofu@zte.com.cn
+
+621	   Liyan Gong
+622	   China Mobile
+623	   Beijing
+624	   China
+625	   Email: gongliyan@chinamobile.com
+
+627	   Rakesh Gandhi
+628	   Cisco Systems, Inc.
+629	   Canada
+630	   Email: rgandhi@cisco.com
+
+632	   Carlos Pignataro
+633	   Blue Fern Consulting
+634	   United States of America
+635	   Email: carlos@bluefern.consulting, cpignata@gmail.com
+
+
+
+
+
+
+
+
+
