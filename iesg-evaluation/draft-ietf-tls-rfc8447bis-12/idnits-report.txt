@@ -1,0 +1,897 @@
+idnits 2.17.1 
+
+draft-ietf-tls-rfc8447bis-12.txt:
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+  == There are 5 instances of lines with non-ascii characters in the document.
+
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     Summary: 0 errors (**), 0 flaws (~~), 1 warning (==), 0 comments (--).
+
+--------------------------------------------------------------------------------
+
+
+2	Transport Layer Security                                      J. Salowey
+3	Internet-Draft                                                    Venafi
+4	Updates: 3749, 5077, 4680, 5246, 5705, 5878,                   S. Turner
+5	         6520, 7301, 8447 (if approved)                            sn3rd
+6	Intended status: Standards Track                           11 April 2025
+7	Expires: 13 October 2025
+
+9	                 IANA Registry Updates for TLS and DTLS
+10	                      draft-ietf-tls-rfc8447bis-12
+
+12	Abstract
+
+14	   This document updates the changes to TLS and DTLS IANA registries
+15	   made in RFC 8447.  It adds a new value "D" for discouraged to the
+16	   Recommended column of the selected TLS registries and adds a
+17	   "Comments" column to all active registries that do not already have a
+18	   "Comments" column.
+
+20	   This document updates the following RFCs: 3749, 5077, 4680, 5246,
+21	   5705, 5878, 6520, 7301, and 8447.
+
+23	About This Document
+
+25	   This note is to be removed before publishing as an RFC.
+
+27	   Status information for this document may be found at
+28	   https://datatracker.ietf.org/doc/draft-ietf-tls-rfc8447bis/.
+
+30	   Discussion of this document takes place on the Transport Layer
+31	   Security Working Group mailing list (mailto:tls@ietf.org), which is
+32	   archived at https://mailarchive.ietf.org/arch/browse/tls/.  Subscribe
+33	   at https://www.ietf.org/mailman/listinfo/tls/.
+
+35	   Source for this draft and an issue tracker can be found at
+36	   https://github.com/tlswg/rfc8447bis.
+
+38	Status of This Memo
+
+40	   This Internet-Draft is submitted in full conformance with the
+41	   provisions of BCP 78 and BCP 79.
+
+43	   Internet-Drafts are working documents of the Internet Engineering
+44	   Task Force (IETF).  Note that other groups may also distribute
+45	   working documents as Internet-Drafts.  The list of current Internet-
+46	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+48	   Internet-Drafts are draft documents valid for a maximum of six months
+49	   and may be updated, replaced, or obsoleted by other documents at any
+50	   time.  It is inappropriate to use Internet-Drafts as reference
+51	   material or to cite them other than as "work in progress."
+
+53	   This Internet-Draft will expire on 13 October 2025.
+
+55	Copyright Notice
+
+57	   Copyright (c) 2025 IETF Trust and the persons identified as the
+58	   document authors.  All rights reserved.
+
+60	   This document is subject to BCP 78 and the IETF Trust's Legal
+61	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+62	   license-info) in effect on the date of publication of this document.
+63	   Please review these documents carefully, as they describe your rights
+64	   and restrictions with respect to this document.  Code Components
+65	   extracted from this document must include Revised BSD License text as
+66	   described in Section 4.e of the Trust Legal Provisions and are
+67	   provided without warranty as described in the Revised BSD License.
+
+69	Table of Contents
+
+71	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
+72	   2.  Terminology . . . . . . . . . . . . . . . . . . . . . . . . .   3
+73	   3.  Adding "Recommended" Column . . . . . . . . . . . . . . . . .   3
+74	     3.1.  Recommended Note  . . . . . . . . . . . . . . . . . . . .   4
+75	   4.  TLS ExtensionType Values  . . . . . . . . . . . . . . . . . .   4
+76	   5.  TLS Cipher Suites Registry  . . . . . . . . . . . . . . . . .   5
+77	   6.  TLS Supported Groups  . . . . . . . . . . . . . . . . . . . .  10
+78	   7.  TLS Exporter Labels Registry  . . . . . . . . . . . . . . . .  12
+79	   8.  TLS Certificate Types . . . . . . . . . . . . . . . . . . . .  12
+80	   9.  TLS HashAlgorithm Registry  . . . . . . . . . . . . . . . . .  13
+81	   10. TLS SignatureAlgorithm registry . . . . . . . . . . . . . . .  14
+82	   11. TLS ClientCertificateType Identifiers registry  . . . . . . .  14
+83	   12. TLS PskKeyExchangeMode registry . . . . . . . . . . . . . . .  15
+84	   13. TLS SignatureScheme registry  . . . . . . . . . . . . . . . .  16
+85	   14. Adding "Comment" Column . . . . . . . . . . . . . . . . . . .  16
+86	   15. Expert Review of Current and Potential IETF and IRTF
+87	           Documents . . . . . . . . . . . . . . . . . . . . . . . .  17
+88	   16. Security Considerations . . . . . . . . . . . . . . . . . . .  17
+89	   17. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  17
+90	   18. Normative References  . . . . . . . . . . . . . . . . . . . .  18
+91	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  19
+
+93	1.  Introduction
+
+95	   This document instructs IANA to make changes to a number of the IANA
+96	   registries related to Transport Layer Security (TLS) and Datagram
+97	   Transport Layer Security (DTLS).  These changes update the changes
+98	   made in [RFC8447].
+
+100	      |  NOTE for IANA: This document specifies changes to the registry
+101	      |  to update the changes made in [RFC8447].
+
+103	   This specification updates the "Recommended" column in TLS registries
+104	   to define a third value "D" for items that are discouraged.
+
+106	2.  Terminology
+
+108	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+109	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+110	   "OPTIONAL" in this document are to be interpreted as described in
+111	   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+112	   capitals, as shown here.
+
+114	3.  Adding "Recommended" Column
+
+116	   The instructions in this document update the Recommended column,
+117	   originally added in [RFC8447] to add a third value, "D", indicating
+118	   that a value is "Discouraged".  The permitted values of the
+119	   "Recommended" column are:
+
+121	   Y:  Indicates that the IETF has consensus that the item is
+122	      RECOMMENDED.  This only means that the associated mechanism is fit
+123	      for the purpose for which it was defined.  Careful reading of the
+124	      documentation for the mechanism is necessary to understand the
+125	      applicability of that mechanism.  The IETF could recommend
+126	      mechanisms that have limited applicability, but will provide
+127	      applicability statements that describe any limitations of the
+128	      mechanism or necessary constraints on its use.
+
+130	   N:  Indicates that the item has not been evaluated by the IETF and
+131	      that the IETF has made no statement about the suitability of the
+132	      associated mechanism.  This does not necessarily mean that the
+133	      mechanism is flawed, only that no consensus exists.  The IETF
+134	      might have consensus to leave an items marked as "N" on the basis
+135	      of its having limited applicability or usage constraints.
+
+137	   D:  Indicates that the item is discouraged.  This marking could be
+138	      used to identify mechanisms that might result in problems if they
+139	      are used, such as a weak cryptographic algorithm or a mechanism
+140	      that might cause interoperability problems in deployment.  When
+141	      marking a registry entry as “D”, either the References or the
+142	      Comments Column MUST include sufficient information to determine
+143	      why the marking has been applied.  Implementers SHOULD consult the
+144	      linked references associated with the item to determine the
+145	      conditions under which it SHOULD NOT or MUST NOT be used.
+
+147	   Setting a value to "Y" or "D" or transitioning the value from "Y" or
+148	   "D" in the "Recommended" column requires IETF Standards Action
+149	   [RFC8126] or IESG Approval.  Not all items defined in Standards Track
+150	   RFCs need to be set to "Y" or "D".  Any item not otherwise specified
+151	   is set to "N".  The column is blank for values that are unassigned or
+152	   reserved unless specifically set.
+
+154	3.1.  Recommended Note
+
+156	   Existing registries have a note on the meaning of the Recommended
+157	   column.  For the registries discussed in the subsequent sections this
+158	   note is updated with a sentence describing the "D" value as follows:
+
+160	   Note:  If "Recommended" column is set to "N", it does not necessarily
+161	      mean that it is flawed; rather, it indicates that the item either
+162	      has not been through the IETF consensus process, has limited
+163	      applicability, or is intended only for specific use cases.  If the
+164	      "Recommended" column is set to "D" the item is discouraged and
+165	      SHOULD NOT or MUST NOT be used, depending upon the situation;
+166	      consult the item’s references for clarity.
+
+168	4.  TLS ExtensionType Values
+
+170	   In order to reflect the changes in the Recommended column allocation,
+171	   IANA SHALL update the TLS ExtensionType Values registry as follows:
+
+173	   *  Adjust the registration procedure related to setting the
+174	      “Recommended” column as follows:
+
+176	       Setting a value to "Y" or "D" or transitioning the value from
+177	       "Y" or "D" in the "Recommended" column requires
+178	       IETF Standards Action [RFC8126] or IESG Approval.
+
+180	   *  Add a reference to this document under the reference heading.
+
+182	   *  Update the "Recommended" column with the changes as listed below.
+183	      Entries keep their existing "Y" and "N" entries except for the
+184	      entries in following table.  A reference to this document SHALL be
+185	      added to these entries.
+
+187	           +=======+============================+=============+
+188	           | Value | Extension                  | Recommended |
+189	           +=======+============================+=============+
+190	           | 4     | truncated_hmac             |           D |
+191	           +-------+----------------------------+-------------+
+192	           | 53    | connection_id (deprecated) |           D |
+193	           +-------+----------------------------+-------------+
+194	           | 40    | Reserved                   |           D |
+195	           +-------+----------------------------+-------------+
+196	           | 46    | Reserved                   |           D |
+197	           +-------+----------------------------+-------------+
+
+199	                                 Table 1
+
+201	   *  Update note on the Recommended column with text in Section 3.1.
+
+203	   *  For the truncated_hmac, add the following link to Reference
+204	      column: https://www.iacr.org/archive/
+205	      asiacrypt2011/70730368/70730368.pdf
+
+207	   *  For the two Reserved values above, add the following link in the
+208	      Reference column: https://mailarchive.ietf.org/arch/msg/tls-reg-
+209	      review/5BD62HBFjo_AsW-Y8ohVuWEe1gI/
+
+211	5.  TLS Cipher Suites Registry
+
+213	   Several categories of ciphersuites are discouraged for general use
+214	   and are marked as "D".
+
+216	   Ciphersuites that use NULL encryption do not provide the
+217	   confidentiality normally expected of TLS.  Protocols and applications
+218	   are often designed to require confidentiality as a security property.
+219	   These ciphersuites MUST NOT be used in those cases.
+
+221	   Ciphersuites marked as EXPORT use weak ciphers and were deprecated in
+222	   TLS 1.1 [RFC4346].
+
+224	   Cipher suites marked as anon do not provide any authentication and
+225	   are vulnerable to man-in-the-middle attacks and are deprecated in TLS
+226	   1.1 [RFC4346].
+
+228	   RC4 is a weak cipher and is deprecated in [RFC7465].
+
+230	   DES and IDEA are not considered secure for general use and are
+231	   deprecated in [RFC5469].  Nor is MD5 or SHA-1 and these are
+232	   deprecated in [RFC9155].
+
+234	   In order to reflect the changes in the Recommended column allocation,
+235	   IANA SHALL update the TLS ExtensionType Values registry as follows:
+
+237	   *  Adjust the registration procedure related to setting the
+238	      “Recommended” column as follows:
+
+240	       Setting a value to "Y" or "D" or transitioning the value from
+241	       "Y" or "D" in the "Recommended" column requires
+242	       IETF Standards Action [RFC8126] or IESG Approval.
+
+244	   *  Add a reference to this document under the reference heading.
+
+246	   *  Update the "Recommended" column with the changes as listed below.
+247	      Entries keep their existing "Y" and "N" entries except for the
+248	      entries in following table.  A reference to this document SHALL be
+249	      added to these entries.  This document does not make any changes
+250	      to the DTLS-OK column.
+
+252	     +===========+=====================================+=============+
+253	     | Value     | Cipher Suite Name                   | Recommended |
+254	     +===========+=====================================+=============+
+255	     | 0x00,0x1E | TLS_KRB5_WITH_DES_CBC_SHA           |           D |
+256	     +-----------+-------------------------------------+-------------+
+257	     | 0x00,0x20 | TLS_KRB5_WITH_RC4_128_SHA           |           D |
+258	     +-----------+-------------------------------------+-------------+
+259	     | 0x00,0x21 | TLS_KRB5_WITH_IDEA_CBC_SHA          |           D |
+260	     +-----------+-------------------------------------+-------------+
+261	     | 0x00,0x22 | TLS_KRB5_WITH_DES_CBC_MD5           |           D |
+262	     +-----------+-------------------------------------+-------------+
+263	     | 0x00,0x24 | TLS_KRB5_WITH_RC4_128_MD5           |           D |
+264	     +-----------+-------------------------------------+-------------+
+265	     | 0x00,0x25 | TLS_KRB5_WITH_IDEA_CBC_MD5          |           D |
+266	     +-----------+-------------------------------------+-------------+
+267	     | 0x00,0x26 | TLS_KRB5_EXPORT_WITH_DES_CBC_40_SHA |           D |
+268	     +-----------+-------------------------------------+-------------+
+269	     | 0x00,0x27 | TLS_KRB5_EXPORT_WITH_RC2_CBC_40_SHA |           D |
+270	     +-----------+-------------------------------------+-------------+
+271	     | 0x00,0x28 | TLS_KRB5_EXPORT_WITH_RC4_40_SHA     |           D |
+272	     +-----------+-------------------------------------+-------------+
+273	     | 0x00,0x29 | TLS_KRB5_EXPORT_WITH_DES_CBC_40_MD5 |           D |
+274	     +-----------+-------------------------------------+-------------+
+275	     | 0x00,0x2A | TLS_KRB5_EXPORT_WITH_RC2_CBC_40_MD5 |           D |
+276	     +-----------+-------------------------------------+-------------+
+277	     | 0x00,0x2B | TLS_KRB5_EXPORT_WITH_RC4_40_MD5     |           D |
+278	     +-----------+-------------------------------------+-------------+
+279	     | 0x00,0x2C | TLS_PSK_WITH_NULL_SHA               |           D |
+280	     +-----------+-------------------------------------+-------------+
+281	     | 0x00,0x8A | TLS_PSK_WITH_RC4_128_SHA            |           D |
+282	     +-----------+-------------------------------------+-------------+
+283	     | 0x00,0xB0 | TLS_PSK_WITH_NULL_SHA256            |           D |
+284	     +-----------+-------------------------------------+-------------+
+285	     | 0x00,0xB1 | TLS_PSK_WITH_NULL_SHA384            |           D |
+286	     +-----------+-------------------------------------+-------------+
+287	     | 0xC0,0x06 | TLS_ECDHE_ECDSA_WITH_NULL_SHA       |           D |
+288	     +-----------+-------------------------------------+-------------+
+289	     | 0xC0,0x07 | TLS_ECDHE_ECDSA_WITH_RC4_128_SHA    |           D |
+290	     +-----------+-------------------------------------+-------------+
+291	     | 0xC0,0x10 | TLS_ECDHE_RSA_WITH_NULL_SHA         |           D |
+292	     +-----------+-------------------------------------+-------------+
+293	     | 0xC0,0x11 | TLS_ECDHE_RSA_WITH_RC4_128_SHA      |           D |
+294	     +-----------+-------------------------------------+-------------+
+295	     | 0xC0,0x33 | TLS_ECDHE_PSK_WITH_RC4_128_SHA      |           D |
+296	     +-----------+-------------------------------------+-------------+
+297	     | 0xC0,0x39 | TLS_ECDHE_PSK_WITH_NULL_SHA         |           D |
+298	     +-----------+-------------------------------------+-------------+
+299	     | 0xC0,0x3A | TLS_ECDHE_PSK_WITH_NULL_SHA256      |           D |
+300	     +-----------+-------------------------------------+-------------+
+301	     | 0xC0,0x3B | TLS_ECDHE_PSK_WITH_NULL_SHA384      |           D |
+302	     +-----------+-------------------------------------+-------------+
+303	     | 0xC0,0xB4 | TLS_SHA256_SHA256                   |           D |
+304	     +-----------+-------------------------------------+-------------+
+305	     | 0xC0,0xB5 | TLS_SHA384_SHA384                   |           D |
+306	     +-----------+-------------------------------------+-------------+
+
+308	                                  Table 2
+
+310	   *  Update note on the Recommended column with text in Section 3.1.
+
+312	   *  [I-D.ietf-tls-deprecate-obsolete-kex] sets the Recommended column
+313	      for the following cipher suites to "D".  This document adds
+314	      additional references to indicate why the cipher suites are marked
+315	      as "D".
+
+317	      |  RFC Editor NOTE: Replace [ThisRFC] in the table that follows
+318	      |  with the RFCs for this document and
+319	      |  [I-D.ietf-tls-deprecate-obsolete-kex].
+
+321	   +===========+==========================================+===========+
+322	   | Value     | Cipher Suite Name                        | Reference |
+323	   +===========+==========================================+===========+
+324	   | 0x00,0x01 | TLS_RSA_WITH_NULL_MD5                    | [ThisRFC] |
+325	   +-----------+------------------------------------------+-----------+
+326	   | 0x00,0x02 | TLS_RSA_WITH_NULL_SHA                    | [ThisRFC] |
+327	   +-----------+------------------------------------------+-----------+
+328	   | 0x00,0x03 | TLS_RSA_EXPORT_WITH_RC4_40_MD5           | [ThisRFC] |
+329	   +-----------+------------------------------------------+-----------+
+330	   | 0x00,0x04 | TLS_RSA_WITH_RC4_128_MD5                 | [ThisRFC] |
+331	   +-----------+------------------------------------------+-----------+
+332	   | 0x00,0x05 | TLS_RSA_WITH_RC4_128_SHA                 | [ThisRFC] |
+333	   +-----------+------------------------------------------+-----------+
+334	   | 0x00,0x06 | TLS_RSA_EXPORT_WITH_RC2_CBC_40_MD5       | [ThisRFC] |
+335	   +-----------+------------------------------------------+-----------+
+336	   | 0x00,0x07 | TLS_RSA_WITH_IDEA_CBC_SHA                | [ThisRFC] |
+337	   +-----------+------------------------------------------+-----------+
+338	   | 0x00,0x08 | TLS_RSA_EXPORT_WITH_DES40_CBC_SHA        | [ThisRFC] |
+339	   +-----------+------------------------------------------+-----------+
+340	   | 0x00,0x09 | TLS_RSA_WITH_DES_CBC_SHA                 | [ThisRFC] |
+341	   +-----------+------------------------------------------+-----------+
+342	   | 0x00,0x0B | TLS_DH_DSS_EXPORT_WITH_DES40_CBC_SHA     | [ThisRFC] |
+343	   +-----------+------------------------------------------+-----------+
+344	   | 0x00,0x0C | TLS_DH_DSS_WITH_DES_CBC_SHA              | [ThisRFC] |
+345	   +-----------+------------------------------------------+-----------+
+346	   | 0x00,0x0E | TLS_DH_RSA_EXPORT_WITH_DES40_CBC_SHA     | [ThisRFC] |
+347	   +-----------+------------------------------------------+-----------+
+348	   | 0x00,0x0F | TLS_DH_RSA_WITH_DES_CBC_SHA              | [ThisRFC] |
+349	   +-----------+------------------------------------------+-----------+
+350	   | 0x00,0x0B | TLS_DH_DSS_EXPORT_WITH_DES40_CBC_SHA     | [ThisRFC] |
+351	   +-----------+------------------------------------------+-----------+
+352	   | 0x00,0x0C | TLS_DH_DSS_WITH_DES_CBC_SHA              | [ThisRFC] |
+353	   +-----------+------------------------------------------+-----------+
+354	   | 0x00,0x0E | TLS_DH_RSA_EXPORT_WITH_DES40_CBC_SHA     | [ThisRFC] |
+355	   +-----------+------------------------------------------+-----------+
+356	   | 0x00,0x0F | TLS_DH_RSA_WITH_DES_CBC_SHA              | [ThisRFC] |
+357	   +-----------+------------------------------------------+-----------+
+358	   | 0x00,0x11 | TLS_DHE_DSS_EXPORT_WITH_DES40_CBC_SHA    | [ThisRFC] |
+359	   +-----------+------------------------------------------+-----------+
+360	   | 0x00,0x12 | TLS_DHE_DSS_WITH_DES_CBC_SHA             | [ThisRFC] |
+361	   +-----------+------------------------------------------+-----------+
+362	   | 0x00,0x14 | TLS_DHE_RSA_EXPORT_WITH_DES40_CBC_SHA    | [ThisRFC] |
+363	   +-----------+------------------------------------------+-----------+
+364	   | 0x00,0x15 | TLS_DHE_RSA_WITH_DES_CBC_SHA             | [ThisRFC] |
+365	   +-----------+------------------------------------------+-----------+
+366	   | 0x00,0x17 | TLS_DH_anon_EXPORT_WITH_RC4_40_MD5       | [ThisRFC] |
+367	   +-----------+------------------------------------------+-----------+
+368	   | 0x00,0x18 | TLS_DH_anon_WITH_RC4_128_MD5             | [ThisRFC] |
+369	   +-----------+------------------------------------------+-----------+
+370	   | 0x00,0x19 | TLS_DH_anon_EXPORT_WITH_DES40_CBC_SHA    | [ThisRFC] |
+371	   +-----------+------------------------------------------+-----------+
+372	   | 0x00,0x1A | TLS_DH_anon_WITH_DES_CBC_SHA             | [ThisRFC] |
+373	   +-----------+------------------------------------------+-----------+
+374	   | 0x00,0x1B | TLS_DH_anon_WITH_3DES_EDE_CBC_SHA        | [ThisRFC] |
+375	   +-----------+------------------------------------------+-----------+
+376	   | 0x00,0x2D | TLS_DHE_PSK_WITH_NULL_SHA                | [ThisRFC] |
+377	   +-----------+------------------------------------------+-----------+
+378	   | 0x00,0x2E | TLS_RSA_PSK_WITH_NULL_SHA                | [ThisRFC] |
+379	   +-----------+------------------------------------------+-----------+
+380	   | 0x00,0x34 | TLS_DH_anon_WITH_AES_128_CBC_SHA         | [ThisRFC] |
+381	   +-----------+------------------------------------------+-----------+
+382	   | 0x00,0x3A | TLS_DH_anon_WITH_AES_256_CBC_SHA         | [ThisRFC] |
+383	   +-----------+------------------------------------------+-----------+
+384	   | 0x00,0x3B | TLS_RSA_WITH_NULL_SHA256                 | [ThisRFC] |
+385	   +-----------+------------------------------------------+-----------+
+386	   | 0x00,0x46 | TLS_DH_anon_WITH_CAMELLIA_128_CBC_SHA    | [ThisRFC] |
+387	   +-----------+------------------------------------------+-----------+
+388	   | 0x00,0x6C | TLS_DH_anon_WITH_AES_128_CBC_SHA256      | [ThisRFC] |
+389	   +-----------+------------------------------------------+-----------+
+390	   | 0x00,0x6D | TLS_DH_anon_WITH_AES_256_CBC_SHA256      | [ThisRFC] |
+391	   +-----------+------------------------------------------+-----------+
+392	   | 0x00,0x89 | TLS_DH_anon_WITH_CAMELLIA_256_CBC_SHA    | [ThisRFC] |
+393	   +-----------+------------------------------------------+-----------+
+394	   | 0x00,0x8E | TLS_DHE_PSK_WITH_RC4_128_SHA             | [ThisRFC] |
+395	   +-----------+------------------------------------------+-----------+
+396	   | 0x00,0x92 | TLS_RSA_PSK_WITH_RC4_128_SHA             | [ThisRFC] |
+397	   +-----------+------------------------------------------+-----------+
+398	   | 0x00,0xB4 | TLS_DHE_PSK_WITH_NULL_SHA256             | [ThisRFC] |
+399	   +-----------+------------------------------------------+-----------+
+400	   | 0x00,0xB5 | TLS_DHE_PSK_WITH_NULL_SHA384             | [ThisRFC] |
+401	   +-----------+------------------------------------------+-----------+
+402	   | 0x00,0xB8 | TLS_RSA_PSK_WITH_NULL_SHA256             | [ThisRFC] |
+403	   +-----------+------------------------------------------+-----------+
+404	   | 0x00,0xB9 | TLS_RSA_PSK_WITH_NULL_SHA384             | [ThisRFC] |
+405	   +-----------+------------------------------------------+-----------+
+406	   | 0x00,0x9B | TLS_DH_anon_WITH_SEED_CBC_SHA            | [ThisRFC] |
+407	   +-----------+------------------------------------------+-----------+
+408	   | 0x00,0xA6 | TLS_DH_anon_WITH_AES_128_GCM_SHA256      | [ThisRFC] |
+409	   +-----------+------------------------------------------+-----------+
+410	   | 0x00,0xA7 | TLS_DH_anon_WITH_AES_256_GCM_SHA384      | [ThisRFC] |
+411	   +-----------+------------------------------------------+-----------+
+412	   | 0x00,0xBF | TLS_DH_anon_WITH_CAMELLIA_128_CBC_SHA256 | [ThisRFC] |
+413	   +-----------+------------------------------------------+-----------+
+414	   | 0x00,0xC5 | TLS_DH_anon_WITH_CAMELLIA_256_CBC_SHA256 | [ThisRFC] |
+415	   +-----------+------------------------------------------+-----------+
+416	   | 0xC0,0x01 | TLS_ECDH_ECDSA_WITH_NULL_SHA             | [ThisRFC] |
+417	   +-----------+------------------------------------------+-----------+
+418	   | 0xC0,0x02 | TLS_ECDH_ECDSA_WITH_RC4_128_SHA          | [ThisRFC] |
+419	   +-----------+------------------------------------------+-----------+
+420	   | 0xC0,0x0B | TLS_ECDH_RSA_WITH_NULL_SHA               | [ThisRFC] |
+421	   +-----------+------------------------------------------+-----------+
+422	   | 0xC0,0x0C | TLS_ECDH_RSA_WITH_RC4_128_SHA            | [ThisRFC] |
+423	   +-----------+------------------------------------------+-----------+
+424	   | 0xC0,0x15 | TLS_ECDH_anon_WITH_NULL_SHA              | [ThisRFC] |
+425	   +-----------+------------------------------------------+-----------+
+426	   | 0xC0,0x16 | TLS_ECDH_anon_WITH_RC4_128_SHA           | [ThisRFC] |
+427	   +-----------+------------------------------------------+-----------+
+428	   | 0xC0,0x17 | TLS_ECDH_anon_WITH_3DES_EDE_CBC_SHA      | [ThisRFC] |
+429	   +-----------+------------------------------------------+-----------+
+430	   | 0xC0,0x18 | TLS_ECDH_anon_WITH_AES_128_CBC_SHA       | [ThisRFC] |
+431	   +-----------+------------------------------------------+-----------+
+432	   | 0xC0,0x19 | TLS_ECDH_anon_WITH_AES_256_CBC_SHA       | [ThisRFC] |
+433	   +-----------+------------------------------------------+-----------+
+434	   | 0xC0,0x46 | TLS_DH_anon_WITH_ARIA_128_CBC_SHA256     | [ThisRFC] |
+435	   +-----------+------------------------------------------+-----------+
+436	   | 0xC0,0x47 | TLS_DH_anon_WITH_ARIA_256_CBC_SHA384     | [ThisRFC] |
+437	   +-----------+------------------------------------------+-----------+
+438	   | 0xC0,0x5A | TLS_DH_anon_WITH_ARIA_128_GCM_SHA256     | [ThisRFC] |
+439	   +-----------+------------------------------------------+-----------+
+440	   | 0xC0,0x5B | TLS_DH_anon_WITH_ARIA_256_GCM_SHA384     | [ThisRFC] |
+441	   +-----------+------------------------------------------+-----------+
+442	   | 0xC0,0x84 | TLS_DH_anon_WITH_CAMELLIA_128_GCM_SHA256 | [ThisRFC] |
+443	   +-----------+------------------------------------------+-----------+
+444	   | 0xC0,0x85 | TLS_DH_anon_WITH_CAMELLIA_256_GCM_SHA384 | [ThisRFC] |
+445	   +-----------+------------------------------------------+-----------+
+
+447	                                 Table 3
+
+449	6.  TLS Supported Groups
+
+451	   In order to reflect the changes in the Recommended column allocation,
+452	   IANA SHALL update the TLS Supported Groups registry as follows:
+
+454	   *  Update the registration policy to include:
+
+456	       Setting a value to "Y" or "D" or transitioning the value from
+457	       "Y" or "D" in the "Recommended" column requires
+458	       IETF Standards Action [RFC8126] or IESG Approval
+
+460	   *  Add a reference to this document under the reference heading.
+
+462	   *  Update the "Recommended" column with the changes as listed below.
+463	      Entries keep their existing "Y" and "N" entries except for the
+464	      entries in following table.  A reference to this document SHALL be
+465	      added to these entries.
+
+467	                    +=======+===========+=============+
+468	                    | Value | Curve     | Recommended |
+469	                    +=======+===========+=============+
+470	                    | 1     | sect163k1 |           D |
+471	                    +-------+-----------+-------------+
+472	                    | 2     | sect163r1 |           D |
+473	                    +-------+-----------+-------------+
+474	                    | 3     | sect163r2 |           D |
+475	                    +-------+-----------+-------------+
+476	                    | 4     | sect193r1 |           D |
+477	                    +-------+-----------+-------------+
+478	                    | 5     | sect193r2 |           D |
+479	                    +-------+-----------+-------------+
+480	                    | 6     | sect233k1 |           D |
+481	                    +-------+-----------+-------------+
+482	                    | 7     | sect233r1 |           D |
+483	                    +-------+-----------+-------------+
+484	                    | 8     | sect239k1 |           D |
+485	                    +-------+-----------+-------------+
+486	                    | 15    | secp160k1 |           D |
+487	                    +-------+-----------+-------------+
+488	                    | 16    | secp160r1 |           D |
+489	                    +-------+-----------+-------------+
+490	                    | 17    | secp160r2 |           D |
+491	                    +-------+-----------+-------------+
+492	                    | 18    | secp192k1 |           D |
+493	                    +-------+-----------+-------------+
+494	                    | 19    | secp192r1 |           D |
+495	                    +-------+-----------+-------------+
+496	                    | 20    | secp224k1 |           D |
+497	                    +-------+-----------+-------------+
+498	                    | 21    | secp224r1 |           D |
+499	                    +-------+-----------+-------------+
+
+501	                                  Table 4
+
+503	   *  Update note on the Recommended column with text in Section 3.1.
+
+505	   *  Remove the "Elliptic curve groups" note from the registration
+506	      procedures table.
+
+508	   *  For each of the entries above, add the following link to the
+509	      Comment column:
+510	      https://datatracker.ietf.org/meeting/118/materials/slides-118-tls-
+511	      rfc8447bis-00
+
+513	7.  TLS Exporter Labels Registry
+
+515	   This document updates the registration procedure for the TLS Exporter
+516	   registry and updates the Recommended column allocation.  IANA SHALL
+517	   update the TLS Exporter Labels Registry as follows:
+
+519	   *  Change the registration procedure from Specification Required to
+520	      Expert Review and update it to include:
+
+522	       Setting a value to "Y" or "D" or transitioning the value from
+523	       "Y" or "D" in the "Recommended" column requires
+524	       IETF Standards Action [RFC8126] or IESG Approval.
+
+526	   *  Add a reference to this document under the reference heading.
+
+528	   *  Entries keep their existing Recommended column "Y" and "N" entries
+
+530	   *  Update note on the Recommended column with text in Section 3.1.
+
+532	   *  Update the note on the role of the expert reviewer as follows.
+
+534	   Note:  The role of the designated expert is described in [RFC8447],
+535	      Section 17.  Even though this registry does not require a
+536	      specification, the designated expert [RFC8126] will strongly
+537	      encourage registrants to provide a link to a publicly available
+538	      specification.  An Internet-Draft (that is posted and never
+539	      published as an RFC) or a document from another standards body,
+540	      industry consortium, university site, etc. are suitable for these
+541	      purposes.  The expert may provide more in-depth reviews, but their
+542	      approval should not be taken as an endorsement of the exporter
+543	      label.  The expert also verifies that the label is a string
+544	      consisting of printable ASCII characters beginning with
+545	      "EXPORTER".  IANA MUST also verify that one label is not a prefix
+546	      of any other label.  For example, labels "key" or "master
+547	      secretary" are forbidden.
+
+549	8.  TLS Certificate Types
+
+551	   In order to reflect the changes in the Recommended column allocation,
+552	   IANA SHALL update the the TLS Certificate Types registry as follows:
+
+554	   *  Adjust the registration procedure related to setting the
+555	      “Recommended” column as follows:
+
+557	       Setting a value to "Y" or "D" or transitioning the value from
+558	       "Y" or "D" in the "Recommended" column requires
+559	       IETF Standards Action [RFC8126] or IESG Approval.
+
+561	   *  Add a reference to this document under the reference heading.
+
+563	   *  Entries keep their existing Recommended column "Y" and "N"
+564	      entries.
+
+566	   *  Update note on the Recommended column with text in Section 3.1.
+
+568	9.  TLS HashAlgorithm Registry
+
+570	   Though TLS 1.0 and TLS 1.1 were deprecated [RFC8996], TLS 1.2 will be
+571	   in use for some time.  In order to reflect the changes in the
+572	   Recommended column allocation, IANA SHALL update the TLS
+573	   HashAlgorithm Registry registry as follows:
+
+575	   *  Update the registration procedure to include:
+
+577	       Setting a value to "Y" or "D" or transitioning the value from
+578	       "Y" or "D"  in the "Recommended" column requires
+579	       IETF Standards Action [RFC8126] or IESG Approval.
+
+581	   *  Add a reference to this document under the reference heading.
+
+583	   *  Update the TLS HashAlgorithm registry to add a "Recommended"
+584	      column as follows:
+
+586	                   +=======+=============+=============+
+587	                   | Value | Description | Recommended |
+588	                   +=======+=============+=============+
+589	                   | 0     | none        |           Y |
+590	                   +-------+-------------+-------------+
+591	                   | 1     | md5         |           D |
+592	                   +-------+-------------+-------------+
+593	                   | 2     | sha1        |           D |
+594	                   +-------+-------------+-------------+
+595	                   | 3     | sha224      |           D |
+596	                   +-------+-------------+-------------+
+597	                   | 4     | sha256      |           Y |
+598	                   +-------+-------------+-------------+
+599	                   | 5     | sha384      |           Y |
+600	                   +-------+-------------+-------------+
+601	                   | 6     | sha512      |           Y |
+602	                   +-------+-------------+-------------+
+603	                   | 8     | Intrinsic   |           Y |
+604	                   +-------+-------------+-------------+
+
+606	                                  Table 5
+
+608	   *  Add note on the Recommended column with text in Section 3.1.
+
+610	10.  TLS SignatureAlgorithm registry
+
+612	   Though TLS 1.0 and TLS 1.1 were deprecated [RFC8996], TLS 1.2 will be
+613	   in use for some time.  In order to reflect the changes in the
+614	   Recommended column allocation, IANA SHALL update the TLS
+615	   SignatureAlgorithm registry registry as follows:
+
+617	   *  Update the registration procedure to include:
+
+619	       Setting a value to "Y" or "D" or transitioning the value from
+620	       "Y" or "D"  in the "Recommended" column requires
+621	       IETF Standards Action [RFC8126] or IESG Approval.
+
+623	   *  Add a reference to this document under the reference heading.
+
+625	   *  Update the TLS SignatureAlgorithm registry to add a "Recommended"
+626	      column as follows:
+
+628	                +=======+===================+=============+
+629	                | Value | Description       | Recommended |
+630	                +=======+===================+=============+
+631	                | 0     | anonymous         |           N |
+632	                +-------+-------------------+-------------+
+633	                | 1     | rsa               |           Y |
+634	                +-------+-------------------+-------------+
+635	                | 2     | dsa               |           N |
+636	                +-------+-------------------+-------------+
+637	                | 3     | ecdsa             |           Y |
+638	                +-------+-------------------+-------------+
+639	                | 7     | ed25519           |           Y |
+640	                +-------+-------------------+-------------+
+641	                | 8     | ed448             |           Y |
+642	                +-------+-------------------+-------------+
+643	                | 64    | gostr34102012_256 |           N |
+644	                +-------+-------------------+-------------+
+645	                | 65    | gostr34102012_512 |           N |
+646	                +-------+-------------------+-------------+
+
+648	                                  Table 6
+
+650	   *  Add note on the Recommended column with text in Section 3.1.
+
+652	11.  TLS ClientCertificateType Identifiers registry
+
+654	   Though TLS 1.0 and TLS 1.1 were deprecated [RFC8996], TLS 1.2 will be
+655	   in use for some time.  In order to refect the changes in the
+656	   Recommended column allocation, IANA SHALL update the TLS
+657	   ClientCertificateType Identifier registry as follows:
+
+659	   *  Update the registration procedure to include:
+
+661	       Setting a value to "Y" or "D" or transitioning the value from
+662	       "Y" or "D"  in the "Recommended" column requires
+663	       IETF Standards Action [RFC8126] or IESG Approval.
+
+665	   *  Add a reference to this document under the reference heading.
+
+667	   *  Update the TLS ClientCertificateType Identifier registry to add a
+668	      "Recommended" column as follows:
+
+670	            +=======+===========================+=============+
+671	            | Value | Description               | Recommended |
+672	            +=======+===========================+=============+
+673	            | 1     | rsa_sign                  |           Y |
+674	            +-------+---------------------------+-------------+
+675	            | 2     | dss_sign                  |           N |
+676	            +-------+---------------------------+-------------+
+677	            | 3     | rsa_fixed_dh              |           N |
+678	            +-------+---------------------------+-------------+
+679	            | 4     | dss_fixed_dh              |           N |
+680	            +-------+---------------------------+-------------+
+681	            | 5     | rsa_ephemeral_dh_RESERVED |           D |
+682	            +-------+---------------------------+-------------+
+683	            | 6     | dss_ephemeral_dh_RESERVED |           D |
+684	            +-------+---------------------------+-------------+
+685	            | 20    | fortezza_dms_RESERVED     |           D |
+686	            +-------+---------------------------+-------------+
+687	            | 64    | ecdsa_sign                |           Y |
+688	            +-------+---------------------------+-------------+
+689	            | 65    | rsa_fixed_ecdh            |           N |
+690	            +-------+---------------------------+-------------+
+691	            | 66    | ecdsa_fixed_ecdh          |           N |
+692	            +-------+---------------------------+-------------+
+693	            | 67    | gost_sign256              |           N |
+694	            +-------+---------------------------+-------------+
+695	            | 68    | gost_sign512              |           N |
+696	            +-------+---------------------------+-------------+
+
+698	                                  Table 7
+
+700	   *  Add note on the Recommended column with text in Section 3.1.
+
+702	12.  TLS PskKeyExchangeMode registry
+
+704	   In order to reflect the changes in the Recommended column allocation,
+705	   IANA SHALL update the TLS PskKeyExchangeMode registry as follows:
+
+707	   *  Update the registration procedure to include:
+
+709	       Setting a value to "Y" or "D" or transitioning the value from
+710	       "Y" or "D"  in the "Recommended" column requires
+711	       IETF Standards Action [RFC8126] or IESG Approval.
+
+713	   *  Add a reference to this document under the reference heading.
+
+715	   *  Entries keep their existing Recommended column "Y" and "N"
+716	      entries.
+
+718	   *  Update note on the Recommended column with text in Section 3.1.
+
+720	13.  TLS SignatureScheme registry
+
+722	   IANA is requested to add a reference to this document under the
+723	   reference heading.
+
+725	14.  Adding "Comment" Column
+
+727	   IANA is requested to add a "Comment" column to the following
+728	   registries:
+
+730	   *  TLS ExtensionType Values
+
+732	   *  TLS Application-Layer Protocol Negotiation (ALPN) Protocol IDs
+
+734	   *  TLS CachedInformationType Values
+
+736	   *  TLS Certificate Compression Algorithm IDs
+
+738	   *  TLS Cipher Suites
+
+740	   *  TLS ContentType
+
+742	   *  TLS EC Point Formats
+
+744	   *  TLS EC Curve Types
+
+746	   *  TLS Supplemental Data Formats (SupplementalDataType)
+
+748	   *  TLS UserMappingType Values
+
+750	   *  TLS Authorization Data Formats
+
+752	   *  TLS Heartbeat Message Types
+
+754	   *  TLS Heartbeat Modes
+755	   *  TLS SignatureScheme
+
+757	   *  TLS PskKeyExchangeMode
+
+759	   *  TLS KDF Identifiers
+
+761	   This list of registries is all registries that do not already have a
+762	   "Comment" or "Notes" column or that were not orphaned by TLS 1.3.
+
+764	15.  Expert Review of Current and Potential IETF and IRTF Documents
+
+766	   The intent of the Specification Required standard for TLS code points
+767	   is to allow for easy registration for code points associated with
+768	   protocols and algorithms that are not being actively developed inside
+769	   IETF or IRTF.  When TLS-based technologies are being developed inside
+770	   the IRTF/IETF they should be done in coordination with the TLS WG in
+771	   order to provide appropriate review.  For this reason, unless the TLS
+772	   WG chairs indicate otherwise via email, designated experts should
+773	   decline code point registrations for documents which have already
+774	   been adopted or are being proposed for adoption by IETF working
+775	   groups or IRTF research groups.
+
+777	16.  Security Considerations
+
+779	   The change to Specification Required from IETF Review lowers the
+780	   amount of review provided by the WG for cipher suites and supported
+781	   groups.  This change reflects reality in that the WG essentially
+782	   provided no cryptographic review of the cipher suites or supported
+783	   groups.  This was especially true of national cipher suites.
+
+785	   Recommended algorithms are regarded as secure for general use at the
+786	   time of registration; however, cryptographic algorithms and
+787	   parameters will be broken or weakened over time.  It is possible that
+788	   the "Recommended" status in the registry lags behind the most recent
+789	   advances in cryptanalysis.  Implementers and users need to check that
+790	   the cryptographic algorithms listed continue to provide the expected
+791	   level of security.
+
+793	   Designated experts ensure the specification is publicly available.
+794	   They may provide more in-depth reviews.  Their review should not be
+795	   taken as an endorsement of the cipher suite, extension, supported
+796	   group, etc.
+
+798	17.  IANA Considerations
+
+800	   This document is entirely about changes to TLS-related IANA
+801	   registries.
+
+803	18.  Normative References
+
+805	   [I-D.ietf-tls-deprecate-obsolete-kex]
+806	              Bartle, C. and N. Aviram, "Deprecating Obsolete Key
+807	              Exchange Methods in TLS 1.2", Work in Progress, Internet-
+808	              Draft, draft-ietf-tls-deprecate-obsolete-kex-05, 3
+809	              September 2024, <https://datatracker.ietf.org/doc/html/
+810	              draft-ietf-tls-deprecate-obsolete-kex-05>.
+
+812	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+813	              Requirement Levels", BCP 14, RFC 2119,
+814	              DOI 10.17487/RFC2119, March 1997,
+815	              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+817	   [RFC4346]  Dierks, T. and E. Rescorla, "The Transport Layer Security
+818	              (TLS) Protocol Version 1.1", RFC 4346,
+819	              DOI 10.17487/RFC4346, April 2006,
+820	              <https://www.rfc-editor.org/rfc/rfc4346>.
+
+822	   [RFC5469]  Eronen, P., Ed., "DES and IDEA Cipher Suites for Transport
+823	              Layer Security (TLS)", RFC 5469, DOI 10.17487/RFC5469,
+824	              February 2009, <https://www.rfc-editor.org/rfc/rfc5469>.
+
+826	   [RFC7465]  Popov, A., "Prohibiting RC4 Cipher Suites", RFC 7465,
+827	              DOI 10.17487/RFC7465, February 2015,
+828	              <https://www.rfc-editor.org/rfc/rfc7465>.
+
+830	   [RFC8126]  Cotton, M., Leiba, B., and T. Narten, "Guidelines for
+831	              Writing an IANA Considerations Section in RFCs", BCP 26,
+832	              RFC 8126, DOI 10.17487/RFC8126, June 2017,
+833	              <https://www.rfc-editor.org/rfc/rfc8126>.
+
+835	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+836	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+837	              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+839	   [RFC8447]  Salowey, J. and S. Turner, "IANA Registry Updates for TLS
+840	              and DTLS", RFC 8447, DOI 10.17487/RFC8447, August 2018,
+841	              <https://www.rfc-editor.org/rfc/rfc8447>.
+
+843	   [RFC8996]  Moriarty, K. and S. Farrell, "Deprecating TLS 1.0 and TLS
+844	              1.1", BCP 195, RFC 8996, DOI 10.17487/RFC8996, March 2021,
+845	              <https://www.rfc-editor.org/rfc/rfc8996>.
+
+847	   [RFC9155]  Velvindron, L., Moriarty, K., and A. Ghedini, "Deprecating
+848	              MD5 and SHA-1 Signature Hashes in TLS 1.2 and DTLS 1.2",
+849	              RFC 9155, DOI 10.17487/RFC9155, December 2021,
+850	              <https://www.rfc-editor.org/rfc/rfc9155>.
+
+852	Authors' Addresses
+
+854	   Joe Salowey
+855	   Venafi
+856	   Email: joe@salowey.net
+
+858	   Sean Turner
+859	   sn3rd
+860	   Email: sean@sn3rd.com
+
+
+
+
+
+
+
+
+
