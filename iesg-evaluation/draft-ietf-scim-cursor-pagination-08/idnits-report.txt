@@ -1,0 +1,807 @@
+idnits 2.17.1 
+
+draft-ietf-scim-cursor-pagination-08.txt:
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     No nits found.
+--------------------------------------------------------------------------------
+
+
+2	SCIM                                                         M. Peterson
+3	Internet-Draft                                                   Entrust
+4	Updates: [7643, 7644] (if approved)                      D. Zollner, Ed.
+5	Intended status: Standards Track                               Microsoft
+6	Expires: 10 November 2025                                      A. Sehgal
+7	                                                     Amazon Web Services
+8	                                                              9 May 2025
+
+10	               Cursor-based Pagination of SCIM Resources
+11	                  draft-ietf-scim-cursor-pagination-08
+
+13	Abstract
+
+15	   This document defines additional SCIM (System for Cross-Domain
+16	   Identity Management) query parameters and result attributes to allow
+17	   use of cursor-based pagination in SCIM implementations that are
+18	   implemented with existing code bases, databases, or APIs where
+19	   cursor-based pagination is already well established.
+
+21	Discussion Venues
+
+23	   This note is to be removed before publishing as an RFC.
+
+25	   Discussion of this document takes place on the System for Cross-
+26	   domain Identity Management Working Group mailing list
+27	   (scim@ietf.org), which is archived at
+28	   https://mailarchive.ietf.org/arch/browse/scim/.
+
+30	   Source for this draft and an issue tracker can be found at
+31	   https://github.com/ietf-scim-wg/draft-ietf-scim-cursor-pagination.
+
+33	Status of This Memo
+
+35	   This Internet-Draft is submitted in full conformance with the
+36	   provisions of BCP 78 and BCP 79.
+
+38	   Internet-Drafts are working documents of the Internet Engineering
+39	   Task Force (IETF).  Note that other groups may also distribute
+40	   working documents as Internet-Drafts.  The list of current Internet-
+41	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+43	   Internet-Drafts are draft documents valid for a maximum of six months
+44	   and may be updated, replaced, or obsoleted by other documents at any
+45	   time.  It is inappropriate to use Internet-Drafts as reference
+46	   material or to cite them other than as "work in progress."
+
+48	   This Internet-Draft will expire on 10 November 2025.
+
+50	Copyright Notice
+
+52	   Copyright (c) 2025 IETF Trust and the persons identified as the
+53	   document authors.  All rights reserved.
+
+55	   This document is subject to BCP 78 and the IETF Trust's Legal
+56	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+57	   license-info) in effect on the date of publication of this document.
+58	   Please review these documents carefully, as they describe your rights
+59	   and restrictions with respect to this document.  Code Components
+60	   extracted from this document must include Revised BSD License text as
+61	   described in Section 4.e of the Trust Legal Provisions and are
+62	   provided without warranty as described in the Revised BSD License.
+
+64	Table of Contents
+
+66	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+67	     1.1.  Notational Conventions  . . . . . . . . . . . . . . . . .   3
+68	   2.  Query Parameters and Response Attributes  . . . . . . . . . .   3
+69	     2.1.  Pagination errors . . . . . . . . . . . . . . . . . . . .   6
+70	     2.2.  Sorting . . . . . . . . . . . . . . . . . . . . . . . . .   7
+71	     2.3.  Cursors as the Only Pagination Method . . . . . . . . . .   7
+72	     2.4.  Backwards Compatibility Considerations  . . . . . . . . .   8
+73	   3.  Querying Resources using HTTP POST  . . . . . . . . . . . . .   8
+74	   4.  Service Provider Configuration  . . . . . . . . . . . . . . .   9
+75	   5.  Security Considerations . . . . . . . . . . . . . . . . . . .  12
+76	     5.1.  Threat Model and Security Environment . . . . . . . . . .  12
+77	     5.2.  Confidentiality . . . . . . . . . . . . . . . . . . . . .  12
+78	     5.3.  Integrity . . . . . . . . . . . . . . . . . . . . . . . .  13
+79	     5.4.  Availability  . . . . . . . . . . . . . . . . . . . . . .  13
+80	     5.5.  Other Security References . . . . . . . . . . . . . . . .  14
+81	   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  14
+82	   7.  Change Log  . . . . . . . . . . . . . . . . . . . . . . . . .  15
+83	   8.  Acknowledgments and Contributions . . . . . . . . . . . . . .  16
+84	   9.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  16
+85	     9.1.  Normative References  . . . . . . . . . . . . . . . . . .  16
+86	     9.2.  Informative References  . . . . . . . . . . . . . . . . .  17
+87	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  17
+
+89	1.  Introduction
+
+91	   The two common patterns for result pagination are index-based
+92	   pagination and cursor-based pagination.  Rather than attempt to
+93	   compare and contrast the advantages and disadvantages of competing
+94	   pagination patterns, this document simply recognizes that SCIM
+95	   (System for Cross-Domain Identity Management) service providers are
+96	   commonly implemented as an interoperability layer on top of already
+97	   existing application codebases, databases, and/or APIs that already
+98	   have a well established pagination pattern.
+
+100	   Translating from an underlying cursor-based pagination pattern to the
+101	   index-based pagination defined in Section 3.4.2.4 of [RFC7644]
+102	   ultimately requires the SCIM service provider to fully iterate the
+103	   underlying cursor, store the results, and then serve indexed pages
+104	   from the stored results.  This task of "pagination translation"
+105	   dramatically increases complexity and memory requirements for
+106	   implementing a SCIM service provider, and may be an impediment to
+107	   SCIM adoption for some applications and identity systems.
+
+109	   This document defines a simple addition to the SCIM protocol that
+110	   allows SCIM service providers to reuse underlying cursors without
+111	   expensive translation.  Support for cursor-based pagination in SCIM
+112	   encourages broader cross-application identity management
+113	   interoperability by encouraging SCIM service provider implementations
+114	   for applications and identity systems where cursor-based pagination
+115	   is already well-established.
+
+117	   This document updates RFCs 7643 and 7644 because it adds attributes
+118	   to existing structures from those documents, as described in this
+119	   memo in Section 2.  These changes are only invoked with the "cursor"
+120	   query parameter.
+
+122	1.1.  Notational Conventions
+
+124	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+125	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+126	   "OPTIONAL" in this document are to be interpreted as described in
+127	   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+128	   capitals, as shown here.
+
+130	2.  Query Parameters and Response Attributes
+
+132	   The following table describes the URL pagination query parameters for
+133	   requesting cursor-based pagination:
+
+135	     +===========+===================================================+
+136	     | Parameter | Description                                       |
+137	     +===========+===================================================+
+138	     | cursor    | The string value of the nextCursor attribute from |
+139	     |           | a previous result page.  The cursor value MUST be |
+140	     |           | empty or omitted for the first request of a       |
+141	     |           | cursor-paginated query.  This value may only      |
+142	     |           | contain characters from the unreserved characters |
+143	     |           | set defined in section 2.3 of [RFC3986].          |
+144	     +-----------+---------------------------------------------------+
+145	     | count     | A positive integer.  Specifies the desired        |
+146	     |           | maximum number of query results per page, e.g.,   |
+147	     |           | count=10.  When specified, the service provider   |
+148	     |           | MUST NOT return more results than specified,      |
+149	     |           | although it MAY return fewer results.  If count   |
+150	     |           | is not specified in the query, the maximum number |
+151	     |           | of results is set by the service provider.        |
+152	     +-----------+---------------------------------------------------+
+
+154	                         Table 1: Query Parameters
+
+156	   The following table describes cursor-based pagination attributes
+157	   returned in a paged query response:
+
+159	    +================+===============================================+
+160	    | Element        | Description                                   |
+161	    +================+===============================================+
+162	    | nextCursor     | A cursor value string that MAY be used in a   |
+163	    |                | subsequent request to obtain the next page of |
+164	    |                | results.  Service providers supporting        |
+165	    |                | cursor-based pagination MUST include          |
+166	    |                | nextCursor in all paged query responses       |
+167	    |                | except when returning the last page.          |
+168	    |                | nextCursor is omitted from a response only to |
+169	    |                | indicate that there are no more result pages. |
+170	    +----------------+-----------------------------------------------+
+171	    | previousCursor | A cursor value string that MAY be used in a   |
+172	    |                | subsequent request to obtain the previous     |
+173	    |                | page of results.  Returning previousCursor is |
+174	    |                | OPTIONAL.                                     |
+175	    +----------------+-----------------------------------------------+
+
+177	                       Table 2: Response Attributes
+
+179	   Cursor values are opaque; clients MUST not make assumptions about
+180	   their structure.  When the client wants to retrieve another result
+181	   page for a query, it MUST query the same service provider endpoint
+182	   with all query parameters and values being identical to the initial
+183	   query with the exception of the cursor value which SHOULD be set to a
+184	   nextCursor (or previousCursor) value that was returned by service
+185	   provider in a previous response.
+
+187	   For example, to retrieve the first 10 Users with userName starting
+188	   with J, use an empty cursor and set the count to 10:
+
+190	   GET /Users?filter=userName%20sw%20J&cursor&count=10
+191	   Host: example.com
+192	   Accept: application/scim+json
+193	   Authorization: Bearer U8YJcYYRMjbGeepD
+
+195	   The SCIM service provider in response to the query above returns
+196	   metadata regarding pagination similar to the following example
+197	   (actual resources removed for brevity):
+
+199	   HTTP/1.1 200 OK
+200	   Content-Type: application/scim+json
+
+202	   {
+203	      "totalResults":100,
+204	      "itemsPerPage":10,
+205	      "nextCursor":"VZUTiyhEQJ94IR",
+206	      "schemas":["urn:ietf:params:scim:api:messages:2.0:ListResponse"],
+207	      "Resources":[{
+208	         ...
+209	      }]
+210	   }
+
+212	   Given the example above, to request the next page or results, use the
+213	   same query parameters and values except set the cursor to the value
+214	   of nextCursor (VZUTiyhEQJ94IR):
+
+216	   GET /Users?filter=username%20sw%20J&cursor=VZUTiyhEQJ94IR&count=10
+217	   Host: example.com
+218	   Accept: application/scim+json
+219	   Authorization: Bearer U8YJcYYRMjbGeepD
+
+221	   The service provider responds with:
+
+223	   HTTP/1.1 200 OK
+224	   Content-Type: application/scim+json
+
+226	   {
+227	      "totalResults": 100,
+228	      "itemsPerPage": 10,
+229	      "previousCursor: "ze7L30kMiiLX6x"
+230	      "nextCursor": "YkU3OF86Pz0rGv",
+231	      "schemas": ["urn:ietf:params:scim:api:messages:2.0:ListResponse"],
+232	      "Resources":[{
+233	         ...
+234	      }]
+235	   }
+
+237	   In the example above, the response includes the OPTIONAL
+238	   previousCursor indicating that the service provider supports forward
+239	   and reverse traversal of result pages.
+
+241	   As described in Section 3.4.1 of [RFC7644] service providers SHOULD
+242	   return an accurate value for totalResults which is the total number
+243	   of resources for all pages.  Service providers implementing cursor
+244	   pagination that are unable to estimate totalResults MAY choose to
+245	   omit the totalResults attribute.
+
+247	2.1.  Pagination errors
+
+249	   If a service provider encounters invalid pagination query parameters
+250	   (invalid cursor value, count value, etc), or other error conditions,
+251	   the service provider SHOULD return the appropriate HTTP response
+252	   status code and detailed JSON error response as defined in
+253	   Section 3.12 of [RFC7644].  Most pagination error conditions would
+254	   generate an HTTP response with status code 400.  Since many
+255	   pagination error conditions are not user recoverable, error messages
+256	   SHOULD focus on communicating error details to the SCIM client
+257	   developer.
+
+259	   For HTTP status code 400 (Bad Request) responses, the following
+260	   detail error types are defined.  These error types extend the list of
+261	   error types defined in [RFC7644] Section 3.12, Table 9: SCIM Detail
+262	   Error Keyword Values.
+
+264	   +===============+==================================+===============+
+265	   | scimType      | Description                      | Applicability |
+266	   +===============+==================================+===============+
+267	   | invalidCursor | Cursor value is invalid.  Cursor | GET (Section  |
+268	   |               | value SHOULD be empty to request | 3.4.2 of      |
+269	   |               | the first page and set to the    | [RFC7644])    |
+270	   |               | nextCursor or previousCursor     |               |
+271	   |               | value for subsequent queries.    |               |
+272	   +---------------+----------------------------------+---------------+
+273	   | expiredCursor | Cursor has expired.  Do not wait | GET (Section  |
+274	   |               | longer than service provider's   | 3.4.2 of      |
+275	   |               | cursorTimeout to request         | [RFC7644])    |
+276	   |               | additional pages.                |               |
+277	   +---------------+----------------------------------+---------------+
+278	   | invalidCount  | Count value is invalid.  Count   | GET (Section  |
+279	   |               | value must be between 1 - and    | 3.4.2 of      |
+280	   |               | service provider's maxPageSize   | [RFC7644])    |
+281	   +---------------+----------------------------------+---------------+
+
+283	                        Table 3: Pagination Errors
+
+285	2.2.  Sorting
+
+287	   If sorting is implemented as described Section 3.4.2.3 of [RFC7644],
+288	   then cursor-paged results SHOULD be sorted.
+
+290	   When a service provider supports both index- and cursor-based
+291	   pagination, clients can use the 'startIndex' and 'cursor' query
+292	   parameters to request a specific method.
+
+294	   Service providers supporting both pagination methods MUST choose a
+295	   pagination method to use when responding to requests that have not
+296	   specified a pagination query parameter.  Service providers MUST NOT
+297	   return an error due to the pagination method being unspecified when
+298	   pagination is required to complete the response.
+
+300	   If the default pagination method is not advertised in the Service
+301	   Provider Configuration data, service provider implementers MAY
+302	   dynamically determine which pagination method is used for each
+303	   response based on criteria of their choosing.
+
+305	2.3.  Cursors as the Only Pagination Method
+
+307	   A service provider MAY require cursor-based pagination to retrieve
+308	   all results for a query by including a nextCursor value in the
+309	   response even when the query does not include the cursor parameter.
+
+311	   For example:
+
+313	   GET /Users
+314	   Host: example.com
+315	   Accept: application/scim+json
+
+317	   The service provider may respond to the above query with a page
+318	   containing defaultPageSize results and a nextCursor value as shown in
+319	   the below example (Resources omitted for brevity):
+
+321	   HTTP/1.1 200 OK
+322	   Content-Type: application/scim+json
+
+324	   {
+325	      "totalResults": 5000,
+326	      "itemsPerPage": 100,
+327	      "nextCursor": "HPq72Pax3JUaNa",
+328	      "schemas": ["urn:ietf:params:scim:api:messages:2.0:ListResponse"],
+329	      "Resources": [{
+330	         ...
+331	      }]
+332	   }
+
+334	2.4.  Backwards Compatibility Considerations
+
+336	   Implementers of SCIM service providers that previously supported
+337	   index-based pagination and are adding support for cursor-based
+338	   pagination SHOULD carefully consider the impact to existing SCIM
+339	   clients before changing the default pagination method in a return
+340	   set.  SCIM clients that previously expected index-based pagination
+341	   may not be compatible with cursor-based pagination without making
+342	   changes to the SCIM client.  Adding cursor-based pagination support
+343	   but leaving the default return set pagination method as-is SHOULD not
+344	   impact existing SCIM clients.
+
+346	   SCIM clients can query the provider configuration endpoint to
+347	   determine if index-based, cursor-based or both types of pagination
+348	   are supported.
+
+350	3.  Querying Resources using HTTP POST
+
+352	   Section 3.4.3 of [RFC7644] defines how clients MAY execute queries
+353	   without passing parameters on the URL by using the POST verb combined
+354	   with the /.search path extension execute.  When posting to /.search,
+355	   the client would pass the parameters defined in Section 2 in the body
+356	   of the POST request.
+
+358	  POST /User/.search
+359	  Host: example.com
+360	  Accept: application/scim+json
+361	  Authorization: Bearer U8YJcYYRMjbGeepD
+
+363	  {
+364	     "schemas": ["urn:ietf:params:scim:api:messages:2.0:SearchRequest"],
+365	     "attributes": ["displayName", "userName"],
+366	     "filter": "displayName sw \"smith\"",
+367	     "cursor": "",
+368	     "count": 10
+369	  }
+
+371	   Which would return a result containing a nextCursor value which may
+372	   be used by the client in a subsequent call to return the next page of
+373	   resources
+
+375	   HTTP/1.1 200 OK
+376	   Content-Type: application/scim+json
+
+378	   {
+379	      "totalResults": 100,
+380	      "itemsPerPage": 10,
+381	      "nextCursor": "VZUTiyhEQJ94IR",
+382	      "schemas": ["urn:ietf:params:scim:api:messages:2.0:ListResponse"],
+383	      "Resources": [{
+384	         ...
+385	      }]
+386	   }
+
+388	4.  Service Provider Configuration
+
+390	   The /ServiceProviderConfig resource defined in Section 4 of [RFC7644]
+391	   facilitates discovery of SCIM service provider features.  A SCIM
+392	   service provider implementing cursor-based pagination SHOULD include
+393	   the following additional attribute in JSON document returned by the
+394	   /ServiceProviderConfig endpoint:
+
+396	   pagination  A complex type that indicates pagination configuration
+397	      options.  OPTIONAL.  The following sub-attributes are defined:
+
+399	      cursor  A Boolean value specifying support of cursor-based
+400	         pagination.  REQUIRED.
+
+402	      index  A Boolean value specifying support of index-based
+403	         pagination.  REQUIRED.
+
+405	      defaultPaginationMethod  A string value specifying the type of
+406	         pagination that the service provider defaults to when the
+407	         client has not specified which method it wishes to use.
+408	         Possible values are "cursor" and "index".  OPTIONAL.
+
+410	      defaultPageSize  Positive integer value specifying the default
+411	         number of results returned in a page when a count is not
+412	         specified in the query.  OPTIONAL.
+
+414	      maxPageSize  Positive integer specifying the maximum number of
+415	         results returned in a page regardless of what is specified for
+416	         the count in a query.  The maximum number of results returned
+417	         may be further restricted by other criteria.  OPTIONAL.
+
+419	      cursorTimeout  Positive integer specifying the minimum number of
+420	         seconds that a cursor is valid between page requests.  Clients
+421	         waiting too long between cursor pagination requests may receive
+422	         an invalid cursor error response.  No value being specified may
+423	         mean that there is no cursor timeout or that the cursor timeout
+424	         is not a static duration.  OPTIONAL.
+
+426	   Service providers may choose not to advertise Service Provider
+427	   Configuration information regarding default pagination method, page
+428	   size or cursor validity.  Clients MUST NOT interpret the lack of
+429	   published Service Provider Configuration values to mean that no
+430	   defaults or limits on page sizes or cursor lifetimes exist, or that
+431	   there is no default pagination method.  Service providers may choose
+432	   not to publish values for the pagination sub-attributes for many
+433	   reasons.  Examples include:
+
+435	   *  Service providers containing multiple resource types may have
+436	      different values set for each resource type.
+
+438	   *  Default and maximum page size may be determined by factors besides
+439	      or in addition to the number of resources returned, such as the
+440	      size of each resource on the page.
+
+442	   Before using cursor-based pagination, a SCIM client MAY fetch the
+443	   Service Provider Configuration document from the SCIM service
+444	   provider and verify that cursor-based pagination is supported.
+
+446	   For example:
+
+448	   GET /ServiceProviderConfig
+449	   Host: example.com
+450	   Accept: application/scim+json
+451	   A service provider supporting both cursor-based pagination and index-
+452	   based pagination would return a document similar to the following
+453	   (full ServiceProviderConfig schema defined in Section 5 of [RFC7643]
+454	   has been omitted for brevity):
+
+456	   HTTP/1.1 200 OK
+457	   Content-Type: application/scim+json
+
+459	   {
+460	      "schemas": [
+461	         "urn:ietf:params:scim:schemas:core:2.0:ServiceProviderConfig"],
+462	         ...
+
+464	      "pagination": {
+465	         "cursor": true,
+466	         "index": true,
+467	         "defaultPaginationMethod": "cursor",
+468	         "defaultPageSize": 100,
+469	         "maxPageSize": 250,
+470	         "cursorTimeout": 3600
+471	      },
+
+473	      ...
+474	   }
+
+476	   Service provider implementers SHOULD ensure that misuse of pagination
+477	   by a SCIM client does not deplete service provider resources or
+478	   prevent valid requests from other clients being handled.  Defenses
+479	   for a SCIM service provider are similar those used to protect other
+480	   Web API services -- including the use of a "Web API gateway" layer,
+481	   to provide authentication, rate limiting, IP allow/block lists,
+482	   logging and monitoring, response caching, etc.
+
+484	   For example, an obvious protection against abuse is for the service
+485	   provider to require client authentication in order to retrieve large
+486	   result sets and enforce an overriding totalResults limit for non-
+487	   authenticated clients.  Another example would be for a service
+488	   provider that implements cursor pagination to restrict the number of
+489	   cursors that can be allocated by a client or enforce cursor
+490	   lifetimes.
+
+492	5.  Security Considerations
+
+494	   This section elaborates on the security considerations associated
+495	   with the implementation of cursor pagination in SCIM.  This document
+496	   is under the same security and privacy considerations of those
+497	   described in [RFC7644].  It is imperative that implementers
+498	   additionally consider the following security aspects to safeguard
+499	   against both deliberate attacks and inadvertent misuse that may
+500	   compromise the system's security posture.
+
+502	5.1.  Threat Model and Security Environment
+
+504	   The threat landscape is characterized by two primary types of actors:
+
+506	   1.  Unauthenticated and Authenticated Malicious Actors: These
+507	       individuals or entities represent a malevolent threat.  Their
+508	       objectives include unauthorized access to data, alteration, or
+509	       deletion through cursor-enabled queries.  They may also seek to
+510	       deplete service provider resources deliberately, aiming to cause
+511	       a denial-of-service state, thereby reducing service availability.
+
+513	   2.  Authenticated Benign Users: This category includes legitimate
+514	       users who, due to confusion or a lack of understanding,
+515	       inadvertently engage in actions that consume service provider
+516	       resources excessively.  Such actions, while not ill-intended, can
+517	       lead to unintended denial of service by overwhelming the system's
+518	       capacity.
+
+520	5.2.  Confidentiality
+
+522	   To ensure that confidential data remains appropriately secured:
+
+524	   *  Implementers MUST ensure that pagination through results sets is
+525	      strictly confined to the data that the actor's current identity
+526	      has been authorized to access.  This holds true even in cases
+527	      where the actor has obtained a cursor pertaining to a result set
+528	      that was generated by a different actor.
+
+530	   *  Authorization checks MUST BE continuously applied as an actor
+531	      navigates through the result set associated with a cursor.  Under
+532	      no circumstances should possession of a cursor be interpreted as
+533	      granting any supplementary access privileges to the actor.
+
+535	   *  In alignment with Section 2, cursor values SHOULD be treated as
+536	      opaque entities.  Clients should avoid making any inferences or
+537	      assumptions about their internal structure.
+
+539	   *  The system SHOULD handle error scenarios gracefully, while not
+540	      exposing sensitive data.  For instance, if an actor attempts to
+541	      access a page of results outside their authorized scope, or if a
+542	      request is made for a non-existent page, the system should respond
+543	      with identical error messages, so as not to disclose any details
+544	      of the underlying data or the nature of the authorization failure.
+545	      It is acceptable, however, for the system to log different
+546	      messages to a log accessible by administrators or other authorized
+547	      personnel.
+
+549	5.3.  Integrity
+
+551	   The extension discussed herein is query-only and does not inherently
+552	   pose a substantial risk to data integrity.  However, the focus is
+553	   placed on safeguarding the integrity of the applications and clients
+554	   that depend on this extension, rather than the integrity of the
+555	   service provider.  Specific considerations include: It is not
+556	   required to tie a cursor to specific actor.  However, if a cursor is
+557	   tied to an actor and if the actor's permissions change, and the actor
+558	   is still using the cursor, the actor may miss records OR there may be
+559	   unauthorized access to data.
+
+561	   *  When possible, service providers SHOULD invalidate all tokens/
+562	      watermarks corresponding to an actor immediately following a
+563	      change in permissions.  This ensures that any queries executed
+564	      post-permission change, utilizing old tokens/watermarks, will be
+565	      denied.
+
+567	   *  As an alternative approach, service provider may opt to retain the
+568	      existing tokens/watermarks but must ensure that any metadata tied
+569	      to the result set, such as record counts, is updated to reflect
+570	      the new permissions accurately.
+
+572	5.4.  Availability
+
+574	   The concern for availability primarily stems from the potential for
+575	   Denial of Service (DoS) attacks.  If the service provider elects to
+576	   retain substantial data or metadata for each cursor, numerous
+577	   concurrent queries with &cursor could strain and eventually exhaust
+578	   service provider resources.  This could be orchestrated by an
+579	   attacker with malicious intent or could occur innocuously as a result
+580	   of actions taken by a benign but confused actor.
+
+582	   To mitigate such risks, the following strategies are recommended:
+
+584	   *  Implementation of rate limiting to control the volume and cadence
+585	      of cursor requests.  This approach should adhere to established
+586	      standards for rate limiting, details of which can be found in
+587	      [RFC6585].
+
+589	   *  Cursor mechanisms must be designed in a manner that avoids any
+590	      additional consumption of service provider resources with the
+591	      initiation of new &cursor requests.
+
+593	   *  It is advisable to establish a ceiling on the number of cursors
+594	      permissible at any given time.  Alternatively, the adoption of an
+595	      opaque identifier system that conservatively utilizes resources
+596	      may be used.
+
+598	   *  Token invalidation mechanisms (including mechanisms triggered by
+599	      permissions changes) must be designed to be resource-efficient to
+600	      prevent them from being exploited for DoS attacks.
+
+602	   *  Actors may face challenges in maintaining a seamless pagination
+603	      experience if their permissions are in a state of flux.  Proactive
+604	      measures should be taken to ensure that permission changes do not
+605	      disrupt the user experience.
+
+607	5.5.  Other Security References
+
+609	   Using URIs to describe and locate resources has its own set of
+610	   security considerations discussed in Section 7 of [RFC3986].
+611	   Implementations SHOULD also refer to [BCP195] and [RFC9110] for
+612	   additional security considerations that are relvant for underlying
+613	   TLS and HTTP protocols.
+
+615	6.  IANA Considerations
+
+617	   This specification requests IANA to amends the registry "SCIM Schema
+618	   URIs for Data Resources" established by [RFC7643].
+
+620	   For the urn:ietf:params:scim:api:messages:2.0:ListResponse, add
+621	   section 2 of this document to the References column.
+
+623	   For the urn:ietf:params:scim:api:messages:2.0:SearchRequest, add
+624	   section 2 of this document to the References column.
+
+626	   For the urn:ietf:params:scim:api:messages:2.0:ServiceProviderConfig,
+627	   add section 4 of this document to the References column.
+
+629	7.  Change Log
+
+631	   RFC Editor: Please remove this section in the release version of the
+632	   document.
+
+634	   -08
+
+636	   *  Fix several typos and wording consistencies
+
+638	   *  Add reference to RFC7644 in Security Considerations
+
+640	   *  Adjust indenting and wording to clarify the definition of the
+641	      pagination attribute in serviceProviderConfig
+
+643	   *  Reference RFC section 2.3 (not section 2.2) for unreserved
+644	      characters
+
+646	   *  Reference section RFC 7644 3.4.3 (not section 3.4.2.4 ) for POST
+647	      query
+
+649	   *  Added updates 7644, 7643
+
+651	   *  Changed IANA considerations to add sections of this document to
+652	      References column of SCIM Schema URIs for Data Resources impacted
+653	      by this document
+
+655	   -07
+
+657	   *  Minor grammar change
+
+659	   *  Add informative reference to BCP195 and RFC9110
+
+661	   -05
+
+663	   *  Various updates in response to WG/IETF Last Call feedback
+
+665	   -04
+
+667	   *  Added IANA Considerations section
+
+669	   *  Added Security Considerations section
+
+671	   *  Added Backwards Compatibility Considerations section
+
+673	   -03
+
+675	   *  Minor grammatical/typo fixes, rename + changes to maxPageSize SCP
+676	      definition
+
+678	   -02
+
+680	   *  Typos/semantics, acknowledgements, expansion of cursorTimeout SCP
+681	      definition
+
+683	   -01
+
+685	   *  Updated after Httpdir review.
+
+687	   -00
+
+689	   *  Adopted by SCIM WG.
+
+691	8.  Acknowledgments and Contributions
+
+693	   The authors would like to acknowledge the contribution of Paul Lanzi
+694	   (IDenovate) in leading the writing of security considerations
+695	   section.
+
+697	   The authors would also like to acknowledge the following individuals
+698	   who provided valuable feedback while reviewing the document:
+
+700	   *  Aaron Parecki - Okta
+
+702	   *  David Brossard - Axiomatics
+
+704	   *  Dean H.  Saxe - Beyond Identity
+
+706	   *  Pamela Dingle - Microsoft
+
+708	9.  References
+
+710	9.1.  Normative References
+
+712	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+713	              Requirement Levels", BCP 14, RFC 2119,
+714	              DOI 10.17487/RFC2119, March 1997,
+715	              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+717	   [RFC3986]  Berners-Lee, T., Fielding, R., and L. Masinter, "Uniform
+718	              Resource Identifier (URI): Generic Syntax", STD 66,
+719	              RFC 3986, DOI 10.17487/RFC3986, January 2005,
+720	              <https://www.rfc-editor.org/rfc/rfc3986>.
+
+722	   [RFC6585]  Nottingham, M. and R. Fielding, "Additional HTTP Status
+723	              Codes", RFC 6585, DOI 10.17487/RFC6585, April 2012,
+724	              <https://www.rfc-editor.org/rfc/rfc6585>.
+
+726	   [RFC7643]  Hunt, P., Ed., Grizzle, K., Wahlstroem, E., and C.
+727	              Mortimore, "System for Cross-domain Identity Management:
+728	              Core Schema", RFC 7643, DOI 10.17487/RFC7643, September
+729	              2015, <https://www.rfc-editor.org/rfc/rfc7643>.
+
+731	   [RFC7644]  Hunt, P., Ed., Grizzle, K., Ansari, M., Wahlstroem, E.,
+732	              and C. Mortimore, "System for Cross-domain Identity
+733	              Management: Protocol", RFC 7644, DOI 10.17487/RFC7644,
+734	              September 2015, <https://www.rfc-editor.org/rfc/rfc7644>.
+
+736	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+737	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+738	              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+740	9.2.  Informative References
+
+742	   [BCP195]   Best Current Practice 195,
+743	              <https://www.rfc-editor.org/info/bcp195>.
+744	              At the time of writing, this BCP comprises the following:
+
+746	              Moriarty, K. and S. Farrell, "Deprecating TLS 1.0 and TLS
+747	              1.1", BCP 195, RFC 8996, DOI 10.17487/RFC8996, March 2021,
+748	              <https://www.rfc-editor.org/info/rfc8996>.
+
+750	              Sheffer, Y., Saint-Andre, P., and T. Fossati,
+751	              "Recommendations for Secure Use of Transport Layer
+752	              Security (TLS) and Datagram Transport Layer Security
+753	              (DTLS)", BCP 195, RFC 9325, DOI 10.17487/RFC9325, November
+754	              2022, <https://www.rfc-editor.org/info/rfc9325>.
+
+756	   [RFC9110]  Fielding, R., Ed., Nottingham, M., Ed., and J. Reschke,
+757	              Ed., "HTTP Semantics", STD 97, RFC 9110,
+758	              DOI 10.17487/RFC9110, June 2022,
+759	              <https://www.rfc-editor.org/rfc/rfc9110>.
+
+761	Authors' Addresses
+
+763	   Matt Peterson
+764	   Entrust
+765	   Email: matt.peterson@entrust.com
+
+767	   Danny Zollner (editor)
+768	   Microsoft
+769	   Email: danny.zollner@microsoft.com
+770	   Anjali Sehgal
+771	   Amazon Web Services
+772	   Email: anjalisg@amazon.com
+
+
+
+
+
+
+
+
+
