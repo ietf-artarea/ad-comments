@@ -1,0 +1,4338 @@
+idnits 2.17.1 
+
+draft-ietf-netmod-rfc8407bis-25.txt:
+-(3894): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(4226): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(4230): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(4240): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+  == There are 6 instances of lines with non-ascii characters in the document.
+
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     Summary: 0 errors (**), 0 flaws (~~), 1 warning (==), 0 comments (--).
+
+--------------------------------------------------------------------------------
+
+
+2	Network Modeling                                              A. Bierman
+3	Internet-Draft                                                 YumaWorks
+4	Obsoletes: 8407 (if approved)                          M. Boucadair, Ed.
+5	Updates: 8126 (if approved)                                       Orange
+6	Intended status: Best Current Practice                             Q. Wu
+7	Expires: 7 November 2025                                          Huawei
+8	                                                              6 May 2025
+
+10	 Guidelines for Authors and Reviewers of Documents Containing YANG Data
+11	                                 Models
+12	                    draft-ietf-netmod-rfc8407bis-25
+
+14	Abstract
+
+16	   This memo provides guidelines for authors and reviewers of
+17	   specifications containing YANG modules, including IANA-maintained
+18	   modules.  Recommendations and procedures are defined, which are
+19	   intended to increase interoperability and usability of Network
+20	   Configuration Protocol (NETCONF) and RESTCONF Protocol
+21	   implementations that utilize YANG modules.  This document obsoletes
+22	   RFC 8407.
+
+24	   Also, this document updates RFC 8126 by providing additional
+25	   guidelines for writing the IANA considerations for RFCs that specify
+26	   IANA-maintained modules.
+
+28	Discussion Venues
+
+30	   This note is to be removed before publishing as an RFC.
+
+32	   Discussion of this document takes place on the Network Modeling
+33	   Working Group mailing list (netmod@ietf.org), which is archived at
+34	   https://mailarchive.ietf.org/arch/browse/netmod/.
+
+36	   Source for this draft and an issue tracker can be found at
+37	   https://github.com/boucadair/rfc8407bis.
+
+39	Status of This Memo
+
+41	   This Internet-Draft is submitted in full conformance with the
+42	   provisions of BCP 78 and BCP 79.
+
+44	   Internet-Drafts are working documents of the Internet Engineering
+45	   Task Force (IETF).  Note that other groups may also distribute
+46	   working documents as Internet-Drafts.  The list of current Internet-
+47	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+49	   Internet-Drafts are draft documents valid for a maximum of six months
+50	   and may be updated, replaced, or obsoleted by other documents at any
+51	   time.  It is inappropriate to use Internet-Drafts as reference
+52	   material or to cite them other than as "work in progress."
+
+54	   This Internet-Draft will expire on 7 November 2025.
+
+56	Copyright Notice
+
+58	   Copyright (c) 2025 IETF Trust and the persons identified as the
+59	   document authors.  All rights reserved.
+
+61	   This document is subject to BCP 78 and the IETF Trust's Legal
+62	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+63	   license-info) in effect on the date of publication of this document.
+64	   Please review these documents carefully, as they describe your rights
+65	   and restrictions with respect to this document.  Code Components
+66	   extracted from this document must include Revised BSD License text as
+67	   described in Section 4.e of the Trust Legal Provisions and are
+68	   provided without warranty as described in the Revised BSD License.
+
+70	Table of Contents
+
+72	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   4
+73	     1.1.  Changes Since RFC 8407  . . . . . . . . . . . . . . . . .   6
+74	   2.  Terminology & Notation Conventions  . . . . . . . . . . . . .   8
+75	     2.1.  NETCONF Terms . . . . . . . . . . . . . . . . . . . . . .   8
+76	     2.2.  YANG Terms  . . . . . . . . . . . . . . . . . . . . . . .   9
+77	     2.3.  Network Management Datastore Architecture (NMDA) Terms  .   9
+78	     2.4.  Requirements Notation . . . . . . . . . . . . . . . . . .  10
+79	     2.5.  YANG Data Model vs. YANG Module . . . . . . . . . . . . .  10
+80	   3.  General Documentation Guidelines  . . . . . . . . . . . . . .  11
+81	     3.1.  Module Copyright  . . . . . . . . . . . . . . . . . . . .  11
+82	     3.2.  Code Components . . . . . . . . . . . . . . . . . . . . .  11
+83	       3.2.1.  Example Modules . . . . . . . . . . . . . . . . . . .  12
+84	     3.3.  Terminology Section . . . . . . . . . . . . . . . . . . .  12
+85	     3.4.  Tree Diagrams . . . . . . . . . . . . . . . . . . . . . .  13
+86	     3.5.  Narrative Sections  . . . . . . . . . . . . . . . . . . .  13
+87	       3.5.1.  YANG Module Classification  . . . . . . . . . . . . .  14
+88	     3.6.  Definitions Section . . . . . . . . . . . . . . . . . . .  15
+89	     3.7.  Security Considerations Section . . . . . . . . . . . . .  15
+90	       3.7.1.  Security Considerations Section Template  . . . . . .  16
+91	     3.8.  IANA Considerations Section . . . . . . . . . . . . . . .  19
+92	       3.8.1.  Documents That Create a New Namespace . . . . . . . .  19
+93	       3.8.2.  Documents That Extend an Existing Namespace . . . . .  19
+94	       3.8.3.  Registration Templates  . . . . . . . . . . . . . . .  20
+95	     3.9.  References Sections . . . . . . . . . . . . . . . . . . .  21
+96	     3.10. Validation Tools  . . . . . . . . . . . . . . . . . . . .  21
+97	     3.11. Module Extraction Tools . . . . . . . . . . . . . . . . .  22
+98	     3.12. Module Usage Examples . . . . . . . . . . . . . . . . . .  22
+99	   4.  YANG Usage Guidelines . . . . . . . . . . . . . . . . . . . .  23
+100	     4.1.  Module Naming Conventions . . . . . . . . . . . . . . . .  23
+101	     4.2.  Prefixes  . . . . . . . . . . . . . . . . . . . . . . . .  24
+102	     4.3.  Identifiers . . . . . . . . . . . . . . . . . . . . . . .  25
+103	       4.3.1.  Identifier Naming Conventions . . . . . . . . . . . .  25
+104	     4.4.  Defaults  . . . . . . . . . . . . . . . . . . . . . . . .  26
+105	     4.5.  Conditional Statements  . . . . . . . . . . . . . . . . .  27
+106	     4.6.  XPath Usage . . . . . . . . . . . . . . . . . . . . . . .  31
+107	       4.6.1.  XPath Evaluation Contexts . . . . . . . . . . . . . .  31
+108	       4.6.2.  Function Library  . . . . . . . . . . . . . . . . . .  32
+109	       4.6.3.  Axes  . . . . . . . . . . . . . . . . . . . . . . . .  33
+110	       4.6.4.  Types . . . . . . . . . . . . . . . . . . . . . . . .  33
+111	       4.6.5.  Wildcards . . . . . . . . . . . . . . . . . . . . . .  34
+112	       4.6.6.  Boolean Expressions . . . . . . . . . . . . . . . . .  35
+113	     4.7.  YANG Definition Lifecycle Management  . . . . . . . . . .  36
+114	     4.8.  Module Header, Meta, and Revision Statements  . . . . . .  37
+115	     4.9.  Namespace Assignments . . . . . . . . . . . . . . . . . .  39
+116	     4.10. Top-Level Data Definitions  . . . . . . . . . . . . . . .  41
+117	     4.11. Data Types  . . . . . . . . . . . . . . . . . . . . . . .  41
+118	       4.11.1.  Fixed-Value Extensibility  . . . . . . . . . . . . .  42
+119	       4.11.2.  Patterns and Ranges  . . . . . . . . . . . . . . . .  43
+120	       4.11.3.  Enumerations and Bits  . . . . . . . . . . . . . . .  44
+121	       4.11.4.  Union Types  . . . . . . . . . . . . . . . . . . . .  44
+122	       4.11.5.  Empty and Boolean  . . . . . . . . . . . . . . . . .  46
+123	     4.12. Reusable Type Definitions . . . . . . . . . . . . . . . .  47
+124	     4.13. Reusable Groupings  . . . . . . . . . . . . . . . . . . .  47
+125	     4.14. Data Definitions  . . . . . . . . . . . . . . . . . . . .  48
+126	       4.14.1.  Non-Presence Containers  . . . . . . . . . . . . . .  49
+127	       4.14.2.  Top-Level Data Nodes . . . . . . . . . . . . . . . .  50
+128	     4.15. Operation Definitions . . . . . . . . . . . . . . . . . .  50
+129	     4.16. Notification Definitions  . . . . . . . . . . . . . . . .  51
+130	     4.17. Feature Definitions . . . . . . . . . . . . . . . . . . .  51
+131	     4.18. YANG Data Node Constraints  . . . . . . . . . . . . . . .  52
+132	       4.18.1.  Controlling Quantity . . . . . . . . . . . . . . . .  52
+133	       4.18.2.  "must" versus "when" . . . . . . . . . . . . . . . .  53
+134	     4.19. "augment" Statements  . . . . . . . . . . . . . . . . . .  53
+135	       4.19.1.  Conditional Augment Statements . . . . . . . . . . .  53
+136	       4.19.2.  Conditionally Mandatory Data Definition
+137	               Statements  . . . . . . . . . . . . . . . . . . . . .  54
+138	     4.20. Deviation Statements  . . . . . . . . . . . . . . . . . .  55
+139	     4.21. Extension Statements  . . . . . . . . . . . . . . . . . .  56
+140	     4.22. Data Correlation  . . . . . . . . . . . . . . . . . . . .  57
+141	       4.22.1.  Use of "leafref" for Key Correlation . . . . . . . .  58
+142	     4.23. Operational State . . . . . . . . . . . . . . . . . . . .  59
+143	       4.23.1.  Combining Operational State and Configuration
+144	               Data  . . . . . . . . . . . . . . . . . . . . . . . .  60
+
+146	       4.23.2.  Representing Operational Values of Configuration
+147	               Data  . . . . . . . . . . . . . . . . . . . . . . . .  60
+148	       4.23.3.  NMDA Transition Guidelines . . . . . . . . . . . . .  61
+149	     4.24. Performance Considerations  . . . . . . . . . . . . . . .  64
+150	     4.25. Open Systems Considerations . . . . . . . . . . . . . . .  65
+151	     4.26. Guidelines for Constructs Specific to YANG 1.1  . . . . .  65
+152	       4.26.1.  Importing Multiple Revisions . . . . . . . . . . . .  65
+153	       4.26.2.  Using Feature Logic  . . . . . . . . . . . . . . . .  65
+154	       4.26.3.  "anyxml" versus "anydata"  . . . . . . . . . . . . .  66
+155	       4.26.4.  "action" versus "rpc"  . . . . . . . . . . . . . . .  66
+156	     4.27. Updating YANG Modules (Published versus Unpublished)  . .  67
+157	     4.28. Defining Standard Tags  . . . . . . . . . . . . . . . . .  67
+158	     4.29. Modeling Abstract Data Structures . . . . . . . . . . . .  68
+159	     4.30. IANA-Maintained Modules . . . . . . . . . . . . . . . . .  68
+160	       4.30.1.  Context  . . . . . . . . . . . . . . . . . . . . . .  68
+161	       4.30.2.  Guidelines for IANA-Maintained Modules . . . . . . .  69
+162	       4.30.3.  Guidance for Writing the IANA Considerations for RFCs
+163	               Defining IANA-Maintained Modules  . . . . . . . . . .  71
+164	   5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  78
+165	     5.1.  YANG Modules  . . . . . . . . . . . . . . . . . . . . . .  79
+166	     5.2.  Update YANG Parameters Registry . . . . . . . . . . . . .  79
+167	     5.3.  IANA-Maintained Modules . . . . . . . . . . . . . . . . .  79
+168	   6.  Security Considerations . . . . . . . . . . . . . . . . . . .  80
+169	   7.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  80
+170	     7.1.  Normative References  . . . . . . . . . . . . . . . . . .  80
+171	     7.2.  Informative References  . . . . . . . . . . . . . . . . .  82
+172	   Appendix A.  Module Review Checklist  . . . . . . . . . . . . . .  87
+173	   Appendix B.  Template for IETF Modules  . . . . . . . . . . . . .  89
+174	   Appendix C.  Template for IANA-Maintained Modules . . . . . . . .  91
+175	   Acknowledgments . . . . . . . . . . . . . . . . . . . . . . . . .  93
+176	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  94
+
+178	1.  Introduction
+
+180	   The standardization of network configuration interfaces for use with
+181	   network configuration management protocols, such as the Network
+182	   Configuration Protocol (NETCONF) [RFC6241] and the RESTCONF Protocol
+183	   [RFC8040], requires a modular set of data models that can be reused
+184	   and extended over time.
+
+186	   This document defines a set of guidelines for documents containing
+187	   YANG 1.1 [RFC7950] and YANG 1.0 [RFC6020] data models, including
+188	   IANA-maintained modules.  YANG is used to define the data structures,
+189	   protocol operations, and notification content used within a NETCONF
+190	   and/or RESTCONF server.  YANG is also used to define abstract data
+191	   structures [RFC8791].  A NETCONF or RESTCONF server that supports a
+192	   particular YANG module will support client NETCONF and/or RESTCONF
+193	   operation requests, as indicated by the specific content defined in
+194	   the YANG module.
+
+196	   Many YANG constructs are defined as optional to use, such as the
+197	   "description" statement.  However, in order to make YANG modules more
+198	   readable and interoperable, it is desirable to define a set of
+199	   descriptive usage guidelines that entails a higher level of
+200	   compliance than the minimum level defined in the YANG specification
+201	   [RFC7950].
+
+203	   In addition, YANG allows constructs such as infinite length
+204	   identifiers and string values, or top-level mandatory nodes, that a
+205	   compliant server is not required to support.  Only constructs that
+206	   all servers are required to support can be used in IETF YANG modules.
+
+208	   This document defines usage guidelines related to the NETCONF
+209	   operations layer and NETCONF content layer, as defined in [RFC6241],
+210	   and the RESTCONF methods and RESTCONF resources, as defined in
+211	   [RFC8040].
+
+213	   These guidelines are intended to be used by authors and reviewers to
+214	   improve the readability and interoperability of published YANG data
+215	   models.
+
+217	   YANG 1.0 modules have to conform to [RFC6020] while YANG 1.1 modules
+218	   have to conform to [RFC7950].  This document adds usage guidelines in
+219	   addition to these YANG RFCs.
+
+221	   Section 4.30.3 updates [RFC8126] by providing guidance for writing
+222	   the IANA considerations for RFCs that specify IANA-maintained
+223	   modules.
+
+225	   Note that this document is not a YANG tutorial, and the reader is
+226	   expected to know the YANG data modeling language before implementing
+227	   the guidance in this document.
+
+229	      Note to the RFC Editor: Please replace "AAAA" through the document
+230	      with the RFC number assigned to this document.
+
+232	1.1.  Changes Since RFC 8407
+
+234	   The following changes have been made to the guidelines published in
+235	   [RFC8407]:
+
+237	   *  Implemented errata 5693, 5800, 6899, and 7416.
+
+239	   *  Updated the terminology.
+
+241	   *  Added a note about notation conventions.
+
+243	   *  Updated the URL of the IETF authors guidelines.
+
+245	   *  Updated the guidance so that the "file name" after the <CODE
+246	      BEGINS> tag is mandatory.
+
+248	   *  Added code markers for the security template.
+
+250	   *  Updated the YANG security considerations template to better insist
+251	      on the key secure transport features.
+
+253	   *  Added statements that the security template is not required for
+254	      modules that follow [RFC8791] or [RFC7952].
+
+256	   *  Added a statement about how to cite the RFCs that are listed in
+257	      the security template.
+
+259	   *  Added a template for IANA registrations.
+
+261	   *  Added a note that folding of the examples should be done as per
+262	      [RFC8792] conventions.
+
+264	   *  Added a recommendation about long trees.
+
+266	   *  Fixed a reference bug in Section 4.1.
+
+268	   *  Added a recommendation for the use of meaningful prefix values.
+
+270	   *  Added a note that RFC8792-folding of YANG modules can be used if
+271	      and only if built-in YANG features (e.g., break line, "+") are not
+272	      sufficient.
+
+274	   *  Added tool validation checks to ensure that YANG modules fit into
+275	      the line limits of an I-D.
+
+277	   *  Added tool validation checks of JSON-encoded examples.
+
+279	   *  Added a recommendation to ease extracting and validating examples.
+
+281	   *  Updated many examples to be aligned with the consistent
+282	      indentation recommendation (internal consistency).
+
+284	   *  Updated the IANA considerations to encourage registration requests
+285	      to indicate whether a module is maintained by IANA or not.
+
+287	   *  Added guidelines for IANA-maintained modules.
+
+289	   *  Added guidelines about the use of "YANG module" and "YANG data
+290	      model".
+
+292	   *  Elaborated the guidance for the use of values reserved for
+293	      documentation in examples.
+
+295	   *  Recommended the use of "example:" for URI examples.
+
+297	   *  Added a new section "Defining Standard Tags" (Section 4.28) to
+298	      echo the guidance in [RFC8819].
+
+300	   *  Recommended against the use of "case + when" construct in some
+301	      cases.
+
+303	   *  Added a discussion about the prefix pattern to use for example
+304	      modules.
+
+306	   *  Updated the NMDA guidance in the narrative text to highlight
+307	      modules that are not NMDA-compliant.
+
+309	   *  Added a new section about YANG module classification.
+
+311	   *  Fixed an inconsistency in Section 4.6.2 where the example mentions
+312	      identities, but uses them without their prefix as per
+313	      Section 4.6.4.
+
+315	   *  Fixed an inconsistency in Section 4.6.4 which fails to use
+316	      "derived-from-or-self()" mentioned back in Section 4.6.2.
+
+318	   *  Added a new section for modeling abstract data structures.
+
+320	   *  Added a discussion about "must + error-message" constructs for
+321	      state data.
+
+323	   *  Added text about summary of changes in revision statements.
+
+325	   *  Added a template for IANA-maintained modules.
+
+327	   *  Updated the wiki URLs to use the new structure instead of the old
+328	      trac.
+
+330	   *  Added anydata to the list of statements with mandatory description
+331	      (Section 4.14).
+
+333	   *  Fixed an error (invalid statements) in Section 4.24.
+
+335	2.  Terminology & Notation Conventions
+
+337	   Some of the templates defined in the document uses "--" to easily
+338	   identify specific instructions to the authors.  Text prefixed with
+339	   "--" must not be copied as such when using a template.  Note that for
+340	   YANG templates, "//" is used to convey such instructions.
+
+342	   The following terms are used throughout this document:
+
+344	   IANA-maintained module:  A YANG module that is maintained by IANA and
+345	      has an IANA registry associated with it (e.g., "iana-tunnel-type"
+346	      [RFC8675] or "iana-pseudowire-types" [RFC9291]).
+
+348	   IETF module:  A YANG module that is published by the IETF and which
+349	      is not maintained by IANA.
+
+351	   published:  A stable release of a module or submodule.  For example,
+352	      the "Request for Comments" described in Section 2.1 of [RFC2026]
+353	      is considered a stable publication.
+
+355	   unpublished:  An unstable release of a module or submodule.  For
+356	      example the "Internet-Draft" described in Section 2.2 of [RFC2026]
+357	      is considered an unstable publication that is a work in progress,
+358	      subject to change at any time.
+
+360	   YANG fragment:  A set of YANG statements that are not intended to
+361	      represent a complete YANG module or submodule.  These statements
+362	      are not intended for actual use, except to provide an example of
+363	      YANG statement usage.  The invalid syntax "..." is sometimes used
+364	      to indicate that additional YANG statements would be present in a
+365	      real YANG module.
+
+367	   YANG tree diagram:  A diagram representing the contents of a YANG
+368	      module, as defined in [RFC8340].  It is also called a "tree
+369	      diagram".
+
+371	2.1.  NETCONF Terms
+
+373	   The following terms are defined in [RFC6241] and are not redefined
+374	   here:
+
+376	   *  capabilities
+377	   *  client
+
+379	   *  operation
+
+381	   *  server
+
+383	2.2.  YANG Terms
+
+385	   The following terms are defined in [RFC7950] and are not redefined
+386	   here:
+
+388	   *  data node
+
+390	   *  module
+
+392	   *  namespace
+
+394	   *  submodule
+
+396	   *  version
+
+398	   *  YANG
+
+400	   *  YIN
+
+402	   Note that the term 'module' may be used as a generic term for a YANG
+403	   module or submodule.  When describing properties that are specific to
+404	   submodules, the term 'submodule' is used instead.
+
+406	2.3.  Network Management Datastore Architecture (NMDA) Terms
+
+408	   The following terms are defined in [RFC8342] and are not redefined
+409	   here:
+
+411	   *  configuration
+
+413	   *  conventional configuration datastore
+
+415	   *  datastore
+
+417	   *  operational state
+
+419	   *  operational state datastore
+
+421	2.4.  Requirements Notation
+
+423	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+424	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+425	   "OPTIONAL" in this document are to be interpreted as described in
+426	   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+427	   capitals, as shown here.
+
+429	2.5.  YANG Data Model vs. YANG Module
+
+431	   Both [RFC6020] and [RFC7950] make a distinction between the following
+432	   concepts:
+
+434	   data model:  Describes how data is represented and accessed.
+
+436	      YANG structures data models into modules for ease of use
+437	      [RFC8309].
+
+439	   module:  Defines hierarchies of schema nodes to make a self-contained
+440	      and compilable block of YANG definitions and inclusions.
+
+442	      A YANG module is typically a single ".yang" file, starting with a
+443	      "module" statement.
+
+445	      A YANG module may include any number of submodules that are stored
+446	      in separate ".yang" files starting with a "submodule" statement.
+447	      Regardless of the presence of submodules, the module and its
+448	      submodules are externally viewed as a single YANG module.
+
+450	   A YANG data model can consist (1) of a single YANG module (e.g.,
+451	   [RFC9129]) or (2) multiple YANG modules (e.g., [RFC7407]).
+
+453	   Note that the term "YANG model" is sometimes used as an abbreviation
+454	   of YANG data model.  However, that term should be avoided in favor of
+455	   YANG data model.  Likewise, "YANG data module" should be avoided.
+
+457	   Even if a YANG data model is structured as a single YANG module, YANG
+458	   data model term should be used in the title, abstract, and in the
+459	   body of the document where the overall design is described.  "YANG
+460	   module" should be used when a specific "*.yang" file is referenced.
+461	   Likewise, "YANG module" should be used when using terms related to
+462	   YANG module specifications (e.g., augmentation or deviation).
+463	   However, when extending the concepts embodied in a YANG module,
+464	   authors should refer to those as an extension to the "YANG data
+465	   model".
+
+467	3.  General Documentation Guidelines
+
+469	   YANG modules under review are likely to be contained in Internet-
+470	   Drafts (I-Ds).  All guidelines for I-D authors [ID-Guidelines] MUST
+471	   be followed.  The guidelines for RFCs should be followed and are
+472	   defined in the following: [RFC7322] (and any future RFCs that
+473	   obsolete it), [RFC-STYLE], and [RFC7841].
+
+475	   The following sections MUST be present in an I-D containing a YANG
+476	   module:
+
+478	   *  Narrative sections
+
+480	   *  Definition sections
+
+482	   *  Security Considerations section
+
+484	   *  IANA Considerations section
+
+486	   *  References section
+
+488	   There are three usage scenarios for YANG that can appear in an I-D or
+489	   RFC:
+
+491	   *  normative module or submodule
+
+493	   *  example module or submodule
+
+495	   *  example YANG fragment not part of any module or submodule
+
+497	   The guidelines in this document refer mainly to a normative module or
+498	   submodule but may be applicable to example modules and YANG fragments
+499	   as well.
+
+501	3.1.  Module Copyright
+
+503	   The module "description" statement MUST contain a reference to the
+504	   latest approved IETF Trust Copyright statement, which is available
+505	   online at:
+
+507	       <https://trustee.ietf.org/license-info/>
+
+509	3.2.  Code Components
+
+511	   Each normative YANG module or submodule contained within an I-D or
+512	   RFC is considered to be a code component.  The strings "<CODE
+513	   BEGINS>" and "<CODE ENDS>" MUST be used to identify each code
+514	   component.
+
+516	   The "<CODE BEGINS>" tag MUST be followed by a string identifying the
+517	   file name specified in Section 5.2 of [RFC7950].  The name string
+518	   form that includes the revision date SHOULD be used.  The revision
+519	   date MUST match the date used in the most recent revision of the
+520	   module.
+
+522	   The following example is for the "2016-03-20" revision of the "ietf-
+523	   foo" module:
+
+525	   <CODE BEGINS> file "ietf-foo@2016-03-20.yang"
+
+527	       module ietf-foo {
+528	         namespace "urn:ietf:params:xml:ns:yang:ietf-foo";
+529	         prefix "foo";
+530	         organization "...";
+531	         contact "...";
+532	         description "...";
+533	         revision 2016-03-20 {
+534	           description "Latest revision";
+535	           reference "RFC FFFF: Foo Protocol";
+536	         }
+537	         // ... more statements
+538	       }
+
+540	   <CODE ENDS>
+
+542	3.2.1.  Example Modules
+
+544	   Example modules are not code components.  The <CODE BEGINS>
+545	   convention MUST NOT be used for example modules.  However, example
+546	   modules MUST be validated.
+
+548	   An example module SHOULD be named using the term "example", followed
+549	   by a hyphen, followed by a descriptive name, e.g., "example-toaster".
+
+551	   See Section 4.9 regarding the namespace guidelines for example
+552	   modules.
+
+554	3.3.  Terminology Section
+
+556	   A terminology section MUST be present if any terms are defined in the
+557	   document or if any terms are imported from other documents.
+
+559	3.4.  Tree Diagrams
+
+561	   YANG tree diagrams provide a concise representation of a YANG module
+562	   and SHOULD be included to help readers understand YANG module
+563	   structure.  Guidelines on tree diagrams can be found in Section 3 of
+564	   [RFC8340].  Tree diagrams longer than one page SHOULD be included in
+565	   an appendix, i.e., not in the main body of the document.
+
+567	   If YANG tree diagrams are used, then an informative reference to the
+568	   YANG tree diagrams specification MUST be included in the document.
+569	   Refer to Section 2.2 of [RFC8349] for an example of such a reference.
+
+571	3.5.  Narrative Sections
+
+573	   The narrative part MUST include an overview section that describes
+574	   the scope and field of application of the module(s) defined by the
+575	   specification and that specifies the relationship (if any) of these
+576	   modules to other standards, particularly to standards containing
+577	   other YANG modules.  The narrative part SHOULD include one or more
+578	   sections to briefly describe the structure of the modules defined in
+579	   the specification.
+
+581	   If the module or modules defined by the specification imports
+582	   definitions from other modules (except for those defined in [RFC7950]
+583	   or [RFC6991]) or are always implemented in conjunction with other
+584	   modules, then those facts MUST be noted in the overview section; any
+585	   special interpretations of definitions in other modules MUST be noted
+586	   as well.  Refer to Section 2.3 of [RFC8349] for an example of this
+587	   overview section.
+
+589	   If the document contains major Network Management Datastore
+590	   Architecture (NMDA) exceptions or include a temporary non-NMDA module
+591	   [RFC8342], then the Introduction section should mention this fact
+592	   with the reasoning that motivated that design.  Refer to Section 4.23
+593	   for more NMDA-related guidance.  Specifically, Section 4.23.2
+594	   includes a recommendation for designers to describe and justify any
+595	   NMDA exceptions in detail as part of the module itself.
+
+597	   Consistent indentation SHOULD be used for all examples, including
+598	   YANG fragments and protocol message instance data.  If line wrapping
+599	   is done for formatting purposes, then this SHOULD be noted following
+600	   [RFC8792], as shown in the following example:
+
+602	   =============== NOTE: '\' line wrapping per RFC 8792 ================
+
+604	   <myleaf xmlns="tag:example.com,2017:example-two">this is a long \
+605	   value so the line needs to wrap to stay within 72 characters</myleaf>
+606	   Built-in YANG features (e.g., breaking line, "+") SHOULD be used to
+607	   fit a module into the line limits.  Exceptionally, RFC8792-folding of
+608	   YANG modules MAY be used if and only if built-in YANG features are
+609	   not sufficient.  A similar approach (e.g., use "--tree-line-length
+610	   69" or split a tree into subtrees) SHOULD be followed for tree
+611	   diagrams.
+
+613	3.5.1.  YANG Module Classification
+
+615	   The narrative section SHOULD include a mention about the
+616	   classification of a given model.  Such a mention is meant to ease
+617	   positioning the module in the overall operational ecosystem.
+618	   Specifically, the following types from [RFC8309] and [RFC8969] can be
+619	   used:
+
+621	   Service Model:  Describes a service and the parameters of the service
+622	      in a portable way that can be used uniformly and independent of
+623	      the equipment and operating environment.
+
+625	      Examples of service models are the L3VPN Service Model (L3SM)
+626	      [RFC8299] and the L2VPN Service Model (L2SM) [RFC8466].
+
+628	   Network Model:  Describes a network-level abstraction (or a subset of
+629	      aspects of a network infrastructure), including devices and their
+630	      subsystems, and relevant protocols operating at the link and
+631	      network layers across multiple devices.  This model corresponds to
+632	      the network configuration model discussed in [RFC8309].
+
+634	      It can be used by a network operator to allocate resources (e.g.,
+635	      tunnel resource, topology resource) for the service or schedule
+636	      resources to meet the service requirements defined in a service
+637	      model.
+
+639	      Examples of network models are the L3VPN Network Model (L3NM)
+640	      [RFC9182] or the L2VPN Network Model (L2NM) [RFC9291].
+
+642	   Device Model:  Refers to the Network Element YANG data model
+643	      described in [RFC8199] or the device configuration model discussed
+644	      in [RFC8309].
+
+646	      Device models are also used to model a function embedded in a
+647	      device (e.g., Access Control Lists (ACLs) [RFC8519]).
+
+649	      A comprehensive list of device models is provided in Appendix 4.2
+650	      of [RFC8969].
+
+652	3.6.  Definitions Section
+
+654	   This section contains the module(s) defined by the specification.
+655	   These modules SHOULD be written using the YANG 1.1 [RFC7950] syntax.
+656	   YANG 1.0 [RFC6020] syntax MAY be used if no YANG 1.1 constructs or
+657	   semantics are needed in the module.  If any of the imported YANG
+658	   modules are written using YANG 1.1, then the module MUST be written
+659	   using YANG 1.1.
+
+661	   A YIN syntax version of the module MAY also be present in the
+662	   document.  There MAY also be other types of modules present in the
+663	   document, such as Structure of Management Information Version 2
+664	   (SMIv2), which are not affected by these guidelines.
+
+666	   Note that if the module itself is considered normative and not an
+667	   example module or example YANG fragment, then all YANG statements
+668	   within a YANG module are considered normative.  The use of keywords
+669	   defined in [RFC2119] and [RFC8174] apply to YANG "description"
+670	   statements in normative modules exactly as they would in any other
+671	   normative section.
+
+673	   Example YANG modules and example YANG fragments MUST NOT contain any
+674	   normative text, including any all-uppercase reserved words from
+675	   [RFC2119] and [RFC8174].
+
+677	   Consistent indentation and formatting SHOULD be used in all YANG
+678	   statements within a module.
+
+680	   See Section 4 for guidelines on YANG usage.
+
+682	3.7.  Security Considerations Section
+
+684	   Each specification that defines one or more modules MUST contain a
+685	   section that discusses security considerations relevant to those
+686	   modules.
+
+688	   Unless the modules comply with [RFC8791] or define YANG extensions
+689	   (e.g., [RFC7952]), the security section MUST be modeled after the
+690	   latest approved template (available at
+691	   <https://wiki.ietf.org/group/ops/yang-security-guidelines>).
+692	   Section 3.7.1 contains the security considerations template.  Authors
+693	   MUST check the web page at the URL listed above in case there is a
+694	   more recent version available.
+
+696	   In particular:
+
+698	   *  Writable data nodes that could be especially disruptive if abused
+699	      MUST be explicitly listed by name, and the associated security
+700	      risks MUST be explained.
+
+702	   *  Readable data nodes that contain especially sensitive information
+703	      or that raise significant privacy concerns MUST be explicitly
+704	      listed by name, and the reasons for the sensitivity/privacy
+705	      concerns MUST be explained.
+
+707	   *  Operations (i.e., YANG "rpc" statements) that are potentially
+708	      harmful to system behavior or that raise significant privacy
+709	      concerns MUST be explicitly listed by name, and the reasons for
+710	      the sensitivity/privacy concerns MUST be explained.
+
+712	   Documents that define exclusively modules following the extension in
+713	   [RFC8791] are not required to include the security template in
+714	   Section 3.7.1.  Likewise, following the template is not required for
+715	   modules that define YANG extensions such as [RFC7952].
+
+717	3.7.1.  Security Considerations Section Template
+
+719	   <CODE BEGINS>
+720	   X.  Security Considerations
+
+722	   This section is modeled after the template described in Section 3.7
+723	   of [RFCAAAA].
+
+725	   The "<module-name>" YANG module defines a data model that is
+726	   designed to be accessed via YANG-based management protocols, such as
+727	   NETCONF [RFC6241] and RESTCONF [RFC8040]. These YANG-based management
+728	   protocols (1) have to use a secure transport layer
+729	   (e.g., SSH [RFC4252], TLS [RFC8446], and QUIC [RFC9000]) and (2) have
+730	   to use mutual authentication.
+
+732	   The Network Configuration Access Control Model (NACM) [RFC8341]
+733	   provides the means to restrict access for particular NETCONF or
+734	   RESTCONF users to a preconfigured subset of all available NETCONF or
+735	   RESTCONF protocol operations and content.
+
+737	   -- Writable nodes section:
+738	   --
+739	   -- If the data model contains any writable data nodes (those are all
+740	   -- the "config true" nodes), then include the following text:
+
+742	   There are a number of data nodes defined in this YANG module that are
+743	   writable/creatable/deletable (i.e., "config true", which is the
+744	   default).  All writable data nodes are likely to be sensitive or
+745	   vulnerable in some network environments.  Write
+746	   operations (e.g., edit-config) and delete operations to these data
+747	   nodes without proper protection or authentication can have a negative
+748	   effect on network operations.  The following subtrees and data nodes
+749	   have particular sensitivities/vulnerabilities:
+
+751	   -- If the data model contains any particularly sensitive data nodes,
+752	   -- e.g., ones that are protected by a "nacm:default-deny-write"
+753	   -- or a "nacm:default-deny-all" extensions statement, then those
+754	   -- subtrees and data nodes must be listed, with an explanation of the
+755	   -- associated security risks with a focus on how they can be
+756	   -- disruptive if abused. Otherwise, state:
+757	   --
+758	   -- "There are no particularly sensitive writable data nodes."
+
+760	   -- Readable nodes section:
+761	   --
+762	   -- If the data model contains any readable data nodes (i.e., those
+763	   -- that are "config false" nodes, but also all other nodes, because
+764	   -- they can also be read via operations like get or get-config), then
+765	   -- include the following text:
+
+767	   Some of the readable data nodes in this YANG module may be considered
+768	   sensitive or vulnerable in some network environments.  It is thus
+769	   important to control read access (e.g., via get, get-config, or
+770	   notification) to these data nodes. Specifically, the following
+771	   subtrees and data nodes have particular sensitivities/
+772	   vulnerabilities:
+
+774	   -- You must evaluate whether the data model contains any readable
+775	   -- data nodes (those are all the "config false" nodes, but also all
+776	   -- other nodes, because they can also be read via operations like get
+777	   -- or get-config) are particularly sensitive or vulnerable (e.g.,
+778	   -- if they might reveal customer information or violate personal
+779	   -- privacy laws). Typically, particularly sensitive readable
+780	   -- data nodes are ones that are protected by a
+781	   -- "nacm:default-deny-read" or a "nacm:default-deny-all" extensions
+782	   -- statement.
+783	   --
+784	   -- Otherwise, state:
+785	   -- "There are no particularly sensitive readable data nodes."
+
+787	   -- RPC/action operations section:
+788	   --
+789	   -- If the data model contains any RPC or action operations, then
+790	   -- include the following text:
+
+792	   Some of the RPC or action operations in this YANG module may be
+793	   considered sensitive or vulnerable in some network environments.
+
+795	   It is thus important to control access to these operations.
+796	   Specifically, the following operations have particular
+797	   sensitivities/ vulnerabilities:
+
+799	   -- If the data model contains any particularly sensitive RPC
+800	   -- or action operations, then those operations must be listed
+801	   -- here, along with an explanation of the associated specific
+802	   -- sensitivity or vulnerability concerns.
+803	   --
+804	   -- Otherwise, state:
+805	   -- "There are no particularly sensitive RPC or action operations."
+
+807	   -- Reusable groupings from other modules section:
+808	   --
+809	   -- If the data model reuses groupings from other modules and
+810	   -- the document that specifies these groupings also
+811	   -- includes those as data nodes, then add this text to remind
+812	   -- the specific sensitivity or vulnerability of reused nodes.
+
+814	   This YANG module uses groupings from other YANG modules that
+815	   define nodes that may be considered sensitive or vulnerable
+816	   in network environments. Refer to the Security Considerations
+817	   of <RFC-insert-numbers> for information as to which nodes may
+818	   be considered sensitive or vulnerable in network environments.
+
+820	   -- No data nodes section:
+821	   --
+822	   -- If the data model does not define any data nodes (i.e., none
+823	   -- of the above sections or readable/writable data nodes or RPCs
+824	   -- have been included), then add the following text:
+
+826	   The YANG module defines a set of identities, types, and
+827	   groupings. These nodes are intended to be reused by other YANG
+828	   modules. The module by itself does not expose any data nodes that
+829	   are writable, data nodes that contain read-only state, or RPCs.
+830	   As such, there are no additional security issues related to
+831	   the YANG module that need to be considered.
+
+833	   Modules that use the groupings that are defined in this document
+834	   should identify the corresponding security considerations. For
+835	   example, reusing some of these groupings will expose privacy-related
+836	   information (e.g., 'node-example').
+837	   <CODE ENDS>
+
+839	   Note:  [RFC8341] (or a future RFC that replaces it) MUST be listed as
+840	      normative references.
+
+842	      By default, [RFC4252], [RFC6241], [RFC8040], [RFC8446], [RFC9000],
+843	      and RFC AAAA (or future RFCs that replace any of them) are listed
+844	      as informative references unless normatively cited in other
+845	      sections of the document that specifies the YANG module.
+
+847	3.8.  IANA Considerations Section
+
+849	   In order to comply with IESG policy as set forth in
+850	   <https://www.ietf.org/id-info/checklist.html>, every I-D that is
+851	   submitted to the IESG for publication MUST contain an IANA
+852	   Considerations section.  The requirements for this section vary
+853	   depending on what actions are required of the IANA.  If there are no
+854	   IANA considerations applicable to the document, then the IANA
+855	   Considerations section will state that "This document has no IANA
+856	   actions".  Refer to the guidelines in [RFC8126] for more details.
+
+858	   Each normative YANG module MUST be registered in both the "IETF XML
+859	   Registry" [RFC3688] [IANA-XML] and the "YANG Module Names" registry
+860	   [RFC6020] [IANA-MOD-NAMES].  The registration request in the "YANG
+861	   Module Names" registry should indicate whether the module is IANA-
+862	   maintained or not.  This applies to new modules and updated modules.
+863	   An example of an update registration for the "ietf-template" module
+864	   can be found in Section 5.
+
+866	   Additional IANA considerations applicable to IANA-maintained modules
+867	   (including instructions to maintain them) are provided in
+868	   Section 4.30.3.
+
+870	3.8.1.  Documents That Create a New Namespace
+
+872	   If an I-D defines a new namespace that is to be administered by the
+873	   IANA, then the document MUST include an IANA Considerations section
+874	   that specifies how the namespace is to be administered.
+
+876	   Specifically, if any YANG module namespace statement value contained
+877	   in the document is not already registered with IANA, then a new entry
+878	   in the "ns" subregistry within the "IETF XML Registry" MUST be
+879	   requested from the IANA.
+
+881	   A registration template for new YANG modules is provided in
+882	   Section 3.8.3.1.
+
+884	3.8.2.  Documents That Extend an Existing Namespace
+
+886	   It is possible to extend an existing namespace using a YANG submodule
+887	   that belongs to an existing module already administered by IANA.  In
+888	   this case, the document containing the main module MUST be updated to
+889	   use the latest revision of the submodule.
+
+891	3.8.3.  Registration Templates
+
+893	3.8.3.1.  IANA Template for Documents Defining New YANG Modules
+
+895	   A registration template for a new module is provided below:
+
+897	    IANA is requested to register the following URI in the "ns"
+898	    subregistry within the "IETF XML Registry" [RFC3688]:
+
+900	       URI:
+901	       Registrant Contact:  The IESG.
+902	       XML: N/A; the requested URI is an XML namespace.
+
+904	    IANA is requested to register the following YANG module in the "YANG
+905	    Module Names" subregistry [RFC6020] within the "YANG Parameters"
+906	    registry.
+
+908	       Name:
+909	       Maintained by IANA?  Y/N
+910	       Namespace:
+911	       Prefix:
+912	       Reference:
+
+914	3.8.3.2.  IANA Template for Revising YANG Modules
+
+916	   A registration template for a revised module is provided below:
+
+918	    IANA is requested to update the following registration in the "ns"
+919	    subregistry within the "IETF XML Registry" [RFC3688] to reference
+920	    this document:
+
+922	       URI:
+923	       Registrant Contact:  The IESG.
+924	       XML: N/A; the requested URI is an XML namespace.
+
+926	    IANA is requested to register the following YANG module in the "YANG
+927	    Module Names" subregistry [RFC6020] within the "YANG Parameters"
+928	    registry.
+
+930	       Name:
+931	       Maintained by IANA?  Y/N
+932	       Namespace:
+933	       Prefix:
+934	       Reference:
+
+936	3.9.  References Sections
+
+938	   For every import or include statement that appears in a module
+939	   contained in the specification that identifies a module in a separate
+940	   document, a corresponding normative reference to that document MUST
+941	   appear in the Normative References section.  The reference MUST
+942	   correspond to the specific module version actually used within the
+943	   specification.
+
+945	   For every normative reference statement that appears in a module
+946	   contained in the specification that identifies a separate document, a
+947	   corresponding normative reference to that document SHOULD appear in
+948	   the Normative References section.  The reference SHOULD correspond to
+949	   the specific document version actually used within the specification.
+950	   If the reference statement identifies an informative reference that
+951	   identifies a separate document, a corresponding informative reference
+952	   to that document MAY appear in the Informative References section.
+
+954	3.10.  Validation Tools
+
+956	   All modules need to be validated before submission in an I-D.  The
+957	   'pyang' YANG compiler is freely available from GitHub:
+
+959	     <https://github.com/mbj4668/pyang>
+
+961	   If the 'pyang' compiler is used to validate a normative module, then
+962	   the "--ietf" command-line option MUST be used to identify any IETF
+963	   guideline issues.
+
+965	   If the 'pyang' compiler is used to validate an example module, then
+966	   the "--ietf" command-line option MAY be used to identify any IETF
+967	   guideline issues.
+
+969	   To ensure that a module fits into the line limits of an I-D, the
+970	   command "pyang -f yang --keep-comments --yang-line-length 69" should
+971	   be used.
+
+973	   The "yanglint" program is also freely available from GitHub.
+
+975	     <https://github.com/CESNET/libyang>
+
+977	   This tool can be used to validate XPath statements within YANG
+978	   modules.
+
+980	   To check that JSON-encoded examples [RFC7951] comply with the target
+981	   data models, programs such as "yangson" or "yanglint" should be used.
+982	   Both programs are freely available from GitHub.
+
+984	     <https://github.com/CZ-NIC/yangson>
+985	     <https://github.com/CESNET/libyang>
+
+987	3.11.  Module Extraction Tools
+
+989	   A version of 'rfcstrip' that will extract YANG modules from an I-D or
+990	   RFC is available.  The 'rfcstrip' tool that supports YANG module
+991	   extraction is freely available at:
+
+993	     <https://github.com/mbj4668/rfcstrip>
+
+995	   This tool can be used to verify that the "<CODE BEGINS>" and "<CODE
+996	   ENDS>" tags are used correctly and that the normative YANG modules
+997	   can be extracted correctly.
+
+999	   The 'xym' tool is freely available on GitHub and can be used to
+1000	   extract YANG modules from a document.
+
+1002	      <https://github.com/xym-tool/xym>
+
+1004	3.12.  Module Usage Examples
+
+1006	   Each specification that defines one or more modules SHOULD contain
+1007	   usage examples, either throughout the document or in an appendix.
+1008	   This includes example instance document snippets in an appropriate
+1009	   encoding (e.g., XML and/or JSON) to demonstrate the intended usage of
+1010	   the YANG module(s).  Examples MUST be validated.  Refer to
+1011	   Section 3.10 for tools that validate YANG modules and examples.  If
+1012	   IP addresses/prefixes are used, then a mix of either IPv4 and IPv6
+1013	   addresses/prefixes or IPv6 addresses/prefixes exclusively SHOULD be
+1014	   used in the examples.
+
+1016	   For some types (IP addresses, domain names, etc.), the IETF has
+1017	   reserved values for documentation use.  Authors SHOULD use these
+1018	   reserved values in the usage examples if these types are used.
+1019	   Examples of reserved values are listed below:
+
+1021	   *  IPv4 and IPv6 addresses/prefixes reserved for documentation are
+1022	      defined in [RFC5737] and [RFC3849].
+
+1024	   *  The Enterprise Number 32473 reserved for documentation use is
+1025	      defined in [RFC5612].
+
+1027	   *  Autonomous System Numbers (ASNs) reserved for documentation use
+1028	      are defined in [RFC5398].
+
+1030	   *  Reserved domain names for documentation are defined in [RFC2606].
+
+1032	   URI examples SHOULD be prefixed with "example:".
+
+1034	   In order to ease extraction and validation of examples, it is
+1035	   RECOMMENDED to use code markers.
+
+1037	4.  YANG Usage Guidelines
+
+1039	   Modules in IETF Standards Track specifications MUST comply with all
+1040	   syntactic and semantic requirements of YANG 1.1 [RFC7950].  See the
+1041	   exception for YANG 1.0 in Section 3.6.  The guidelines in this
+1042	   section are intended to supplement the YANG specification [RFC7950],
+1043	   which is intended to define a minimum set of conformance
+1044	   requirements.
+
+1046	   In order to promote interoperability and establish a set of practices
+1047	   based on previous experience, the following sections establish usage
+1048	   guidelines for specific YANG constructs.
+
+1050	   Only guidelines that clarify or restrict the minimum conformance
+1051	   requirements are included here.
+
+1053	4.1.  Module Naming Conventions
+
+1055	   Normative modules contained in Standards Track documents MUST be
+1056	   named according to the guidelines in the IANA Considerations section
+1057	   of [RFC6020].
+
+1059	   A distinctive word or abbreviation (e.g., protocol name or working
+1060	   group abbreviation) SHOULD be used in the module name.  If new
+1061	   definitions are being defined to extend one or more existing modules,
+1062	   then the same word or abbreviation should be reused, instead of
+1063	   creating a new one.
+
+1065	   All published module names MUST be unique.  For a YANG module
+1066	   published in an RFC, this uniqueness is guaranteed by IANA
+1067	   (Section 14 of [RFC6020]).  For unpublished modules, the authors need
+1068	   to check that no other work in progress is using the same module
+1069	   name.
+
+1071	   Example modules are non-normative and SHOULD be named with the prefix
+1072	   "example-".
+
+1074	   It is suggested that a stable module name prefix be selected that
+1075	   represents the entire organization.  All normative YANG modules
+1076	   published by the IETF MUST begin with the prefix "ietf-".  All IANA-
+1077	   maintained YANG modules MUST begin with the prefix "iana-".  Another
+1078	   standards organization, such as the IEEE, might use the prefix
+1079	   "ieee-" for all YANG modules.
+
+1081	   Once a module name is published, it MUST NOT be reused, even if the
+1082	   RFC containing the module is reclassified to "Historic" status.  A
+1083	   module name cannot be changed in YANG, and this would be treated as a
+1084	   new module, not a name change.
+
+1086	4.2.  Prefixes
+
+1088	   All YANG definitions are scoped by the module containing the
+1089	   definition being referenced.  This allows the same name to be used in
+1090	   multiple moodules, even if the names are not unique.  In the example
+1091	   below, the identifier "foo" is used in all three modules:
+
+1093	       module example-foo {
+1094	         namespace "tag:example.com,2017:example-foo";
+1095	         prefix f;
+
+1097	         container foo;
+1098	       }
+
+1100	       module example-bar {
+1101	         namespace "tag:example.com,2017:example-bar";
+1102	         prefix b;
+
+1104	         typedef foo { type uint32; }
+1105	       }
+
+1107	       module example-one {
+1108	         namespace "tag:example.com,2017:example-one";
+1109	         prefix one;
+1110	         import example-foo { prefix f; }
+1111	         import example-bar { prefix b; }
+
+1113	         augment "/f:foo" {
+1114	           leaf foo { type b:foo; }
+1115	         }
+1116	       }
+
+1118	   YANG defines the following rules for prefix usage:
+
+1120	   *  Prefixes are never used for built-in data types and YANG keywords.
+
+1122	   *  A prefix MUST be used for any external statement (i.e., a
+1123	      statement defined with the YANG "extension" statement).
+
+1125	   *  The proper module prefix MUST be used for all identifiers imported
+1126	      from other modules.
+
+1128	   *  The proper module prefix MUST be used for all identifiers included
+1129	      from a submodule.
+
+1131	   The following guidelines apply to prefix usage of the current (local)
+1132	   module:
+
+1134	   *  The local module prefix SHOULD be used instead of no prefix in all
+1135	      path expressions.
+
+1137	   *  The local module prefix MUST be used instead of no prefix in all
+1138	      "default" statements for an "identityref" or "instance-identifier"
+1139	      data type.
+
+1141	   *  The local module prefix MAY be used for references to typedefs,
+1142	      groupings, extensions, features, and identities defined in the
+1143	      module.
+
+1145	   Consistent with Section 7.1.4 of [RFC7950], the prefix defined by a
+1146	   module SHOULD be used when the module is imported, unless there is a
+1147	   conflict.
+
+1149	   Prefix values SHOULD be short but meaningful to the intended user.
+1150	   Prefix values SHOULD NOT conflict with known modules that have been
+1151	   previously published.
+
+1153	   For convenience, prefix values of example modules MAY be prefixed
+1154	   with "ex" or similar patterns.  In doing so, readers of example
+1155	   modules or tree diagrams that mix both example and standard modules
+1156	   can easily identify example parts.
+
+1158	4.3.  Identifiers
+
+1160	   All YANG identifiers in published modules MUST be between 1 and 64
+1161	   characters in length.  These include any construct specified as an
+1162	   "identifier-arg-str" token in the ABNF in Section 14 of [RFC7950].
+
+1164	4.3.1.  Identifier Naming Conventions
+
+1166	   Identifiers SHOULD follow a consistent naming pattern throughout the
+1167	   module.  Only lowercase letters, numbers, and dashes SHOULD be used
+1168	   in identifier names.  Uppercase characters, the period character, and
+1169	   the underscore character MAY be used if the identifier represents a
+1170	   well-known value that uses these characters.  YANG does not permit
+1171	   any other characters in YANG identifiers.
+
+1173	   Identifiers SHOULD include complete words and/or well-known acronyms
+1174	   or abbreviations.  Child nodes within a container or list SHOULD NOT
+1175	   replicate the parent identifier.  YANG identifiers are hierarchical
+1176	   and are only meant to be unique within the set of sibling nodes
+1177	   defined in the same module namespace.
+
+1179	   List identifiers SHOULD be singular with the surrounding container
+1180	   name plural.  Similarly, "leaf-list" identifiers SHOULD be singular.
+
+1182	   It is permissible to use common identifiers such as "name" or "id" in
+1183	   data definition statements, especially if these data nodes share a
+1184	   common data type.
+
+1186	   Identifiers SHOULD NOT carry any special semantics that identify data
+1187	   modeling properties.  Only YANG statements and YANG extension
+1188	   statements are designed to convey machine-readable data modeling
+1189	   properties.  For example, naming an object "config" or "state" does
+1190	   not change whether it is configuration data or state data.  Only
+1191	   defined YANG statements or YANG extension statements can be used to
+1192	   assign semantics in a machine-readable format in YANG.
+
+1194	4.4.  Defaults
+
+1196	   In general, it is suggested that substatements containing very common
+1197	   default values SHOULD NOT be present.  The substatements listed in
+1198	   Table 1 are commonly used with the default value, which would make
+1199	   the module difficult to read if used everywhere they are allowed.
+
+1201	                     +==============+===============+
+1202	                     | Statement    | Default Value |
+1203	                     +==============+===============+
+1204	                     | config       | true          |
+1205	                     +--------------+---------------+
+1206	                     | mandatory    | false         |
+1207	                     +--------------+---------------+
+1208	                     | max-elements | unbounded     |
+1209	                     +--------------+---------------+
+1210	                     | min-elements | 0             |
+1211	                     +--------------+---------------+
+1212	                     | ordered-by   | system        |
+1213	                     +--------------+---------------+
+1214	                     | status       | current       |
+1215	                     +--------------+---------------+
+1216	                     | yin-element  | false         |
+1217	                     +--------------+---------------+
+
+1219	                       Table 1: Statement Defaults
+
+1221	4.5.  Conditional Statements
+
+1223	   A module may be conceptually partitioned in several ways, using the
+1224	   "if-feature" and/or "when" statements.
+
+1226	   Data model designers need to carefully consider all modularity
+1227	   aspects, including the use of YANG conditional statements.
+
+1229	   If a data definition is optional, depending on server support for a
+1230	   NETCONF or RESTCONF protocol capability, then a YANG "feature"
+1231	   statement SHOULD be defined.  The defined "feature" statement SHOULD
+1232	   then be used in the conditional "if-feature" statement referencing
+1233	   the optional data definition.
+
+1235	   If any notification data, or any data definition, for a non-
+1236	   configuration data node is not mandatory, then the server may or may
+1237	   not be required to return an instance of this data node.  If any
+1238	   conditional requirements exist for returning the data node in a
+1239	   notification payload or retrieval request, they MUST be documented
+1240	   somewhere.  For example, a "when" or "if-feature" statement could
+1241	   apply to the data node, or the conditional requirements could be
+1242	   explained in a "description" statement within the data node or one of
+1243	   its ancestors (if any).
+
+1245	   If any "if-feature" statements apply to a list node, then the same
+1246	   "if-feature" statements MUST apply to any key leaf nodes for the
+1247	   list.  There MUST NOT be any "if-feature" statements applied to any
+1248	   key leafs that do not also apply to the parent list node.
+
+1250	   There SHOULD NOT be any "when" statements applied to a key leaf node.
+1251	   It is possible that a "when" statement for an ancestor node of a key
+1252	   leaf will have the exact node-set result as the key leaf.  In such a
+1253	   case, the "when" statement for the key leaf is redundant and SHOULD
+1254	   be avoided.
+
+1256	   Some modules use "case + when" construct but provide duplicated
+1257	   information (e.g., the "when" statements are constraining a single
+1258	   case in the choice as shown in the example below).  Such constructs
+1259	   with duplicated information SHOULD NOT be used.
+
+1261	       leaf type {
+1262	         type enumeration {
+1263	           enum a;
+1264	           enum b;
+1265	           enum c;
+1266	         }
+1267	         mandatory true;
+1268	       }
+1269	       choice type-choice {
+1270	         case b {
+1271	           container type-b {
+1272	             when "../type = 'b'";
+1273	             leaf foo {
+1274	               type string;
+1275	             }
+1276	           }
+1277	         }
+1278	         case c {
+1279	           container type-c {
+1280	             when "../type = 'c'";
+1281	             leaf bar {
+1282	               mandatory true;
+1283	               type string;
+1284	             }
+1285	           }
+1286	         }
+1287	       }
+
+1289	   The following example removes the duplicated information:
+
+1291	       leaf type {
+1292	         type enumeration {
+1293	           enum a;
+1294	           enum b;
+1295	           enum c;
+1296	         }
+1297	         mandatory true;
+1298	       }
+1299	       container type-b {
+1300	         when "../type = 'b'";
+1301	         leaf foo {
+1302	           type string;
+1303	         }
+1304	       }
+1305	       container type-c {
+1306	         when "../type = 'c'";
+1307	         leaf bar {
+1308	           mandatory true;
+1309	           type string;
+1310	         }
+1311	       }
+
+1313	   Note that the use of "case + when" is still useful in cases where
+1314	   complementary modelling constraints should be expressed.  See the
+1315	   example provided below.
+
+1317	       leaf type {
+1318	         type enumeration {
+1319	           enum a;
+1320	           enum b;
+1321	           enum c;
+1322	         }
+1323	       }
+1324	       choice second-type {
+1325	         mandatory true;
+1326	         case foo {
+1327	           container foo {
+1328	             presence "When present, indicates type foo";
+1329	             leaf foo-attribute {
+1330	               type string;
+1331	             }
+1332	           }
+1333	         }
+1334	         case b {
+1335	           container bar {
+1336	             when "../type = 'a' or ../type = 'b'";
+1337	             presence "When present, indicates type bar";
+1338	             leaf bar-attribute {
+1339	               type string;
+1340	             }
+1341	           }
+1342	         }
+1343	         case c {
+1344	           container baz {
+1345	             when "../type = 'c'";
+1346	             leaf baz-attribute {
+1347	               mandatory true;
+1348	               type string;
+1349	             }
+1350	           }
+1351	         }
+1352	       }
+
+1354	   Section 8.1 of [RFC7950] includes provisions for defining constraints
+1355	   on state data and specifies that a constraint must be true in a valid
+1356	   state data tree.  However, Section 5.3 of [RFC8342] softens that
+1357	   behavior by allowing semantic constraints to be violated under some
+1358	   circumstances to help to detect anomalies.  Relaxing validation
+1359	   constraints on state data is meant to reveal deviations of the
+1360	   observed behavior vs. intended behavior of a managed entity and
+1361	   hopefully trigger corrective actions by a management system.  From
+1362	   that perspective, it is RECOMMENDED to avoid defining constraints on
+1363	   state data that would hinder the detection by a management system of
+1364	   abnormal behaviors of a managed entity.
+
+1366	4.6.  XPath Usage
+
+1368	   This section describes guidelines for using the XML Path Language
+1369	   (XPath) [W3C.REC-xpath] within YANG modules.
+
+1371	4.6.1.  XPath Evaluation Contexts
+
+1373	   YANG defines five separate contexts for evaluation of XPath
+1374	   statements:
+
+1376	   1.  The "running" datastore: collection of all YANG configuration
+1377	       data nodes.  The document root is the conceptual container (e.g.,
+1378	       "config" in the "edit-config" operation), which is the parent of
+1379	       all top-level data definition statements with a "config"
+1380	       statement value of "true".
+
+1382	   2.  State data + the "running" datastore: collection of all YANG data
+1383	       nodes.  The document root is the conceptual container, parent of
+1384	       all top-level data definition statements.
+
+1386	   3.  Notification: an event notification document.  The document root
+1387	       is the notification element.
+
+1389	   4.  RPC Input: The document root is the conceptual "input" node,
+1390	       which is the parent of all RPC input parameter definitions.
+
+1392	   5.  RPC Output: The document root is the conceptual "output" node,
+1393	       which is the parent of all RPC output parameter definitions.
+
+1395	   Note that these XPath contexts cannot be mixed.  For example, a
+1396	   "when" statement in a notification context cannot reference
+1397	   configuration data.
+
+1399	       notification foo {
+1400	         leaf mtu {
+1401	           // NOT okay because when-stmt context is this notification
+1402	           when "/if:interfaces/if:interface[name='eth0']";
+1403	           type leafref {
+1404	             // Okay because path-stmt has a different context
+1405	             path "/if:interfaces/if:interface/if:mtu";
+1406	           }
+1407	         }
+1408	       }
+
+1410	   It is especially important to consider the XPath evaluation context
+1411	   for XPath expressions defined in groupings.  An XPath expression
+1412	   defined in a grouping may not be portable, meaning it cannot be used
+1413	   in multiple contexts and produce proper results.
+
+1415	   If the XPath expressions defined in a grouping are intended for a
+1416	   particular context, then this context SHOULD be identified in the
+1417	   "description" statement for the grouping.
+
+1419	4.6.2.  Function Library
+
+1421	   The "position" and "last" functions SHOULD NOT be used.  This applies
+1422	   to implicit use of the "position" function as well (e.g.,
+1423	   '//chapter[42]').  A server is only required to maintain the relative
+1424	   XML document order of all instances of a particular user-ordered list
+1425	   or leaf-list.  The "position" and "last" functions MAY be used if
+1426	   they are evaluated in a context where the context node is a user-
+1427	   ordered "list" or "leaf-list".
+
+1429	   The "id" function SHOULD NOT be used.  The "ID" attribute is not
+1430	   present in YANG documents, so this function has no meaning.  The
+1431	   XPath execution environment SHOULD return an empty string for this
+1432	   function.
+
+1434	   The "namespace-uri" and "name" functions SHOULD NOT be used.
+1435	   Expanded names in XPath are different than YANG.  A specific
+1436	   canonical representation of a YANG-expanded name does not exist.
+
+1438	   The "lang" function SHOULD NOT be used.  This function does not apply
+1439	   to YANG because there is no "lang" attribute set with the document.
+1440	   The XPath execution environment SHOULD return "false" for this
+1441	   function.
+
+1443	   The "local-name", "namespace-uri", "name", "string", and "number"
+1444	   functions SHOULD NOT be used if the argument is a node-set.  If so,
+1445	   the function result will be determined by the document order of the
+1446	   node-set.  Since this order can be different on each server, the
+1447	   function results can also be different.  Any function call that
+1448	   implicitly converts a node-set to a string will also have this issue.
+
+1450	   The "local-name" function SHOULD NOT be used to reference local names
+1451	   outside of the YANG module that defines the must or when expression
+1452	   containing the "local-name" function.  Example of a "local-name"
+1453	   function that should not be used:
+
+1455	      /*[local-name()='foo']
+
+1457	   The "derived-from-or-self" function SHOULD be used instead of an
+1458	   equality expression for identityref values.  This allows the
+1459	   identities to be conceptually augmented.
+
+1461	   Example:
+
+1463	    // assume "ex" is the prefix of the module where the identity
+1464	    // name-format-null is defined
+
+1466	    // do not use
+1467	    when "md-name-format = 'name-format-null'";
+
+1469	    // this is preferred
+1470	    when "derived-from-or-self(md-name-format, 'ex:name-format-null')";
+
+1472	4.6.3.  Axes
+
+1474	   The "attribute" and "namespace" axes are not supported in YANG and
+1475	   MAY be empty in a NETCONF or RESTCONF server implementation.
+
+1477	   The "preceding" and "following" axes SHOULD NOT be used.  These
+1478	   constructs rely on XML document order within a NETCONF or RESTCONF
+1479	   server configuration database, which may not be supported
+1480	   consistently or produce reliable results across implementations.
+1481	   Predicate expressions based on static node properties (e.g., element
+1482	   name or value, and "ancestor" or "descendant" axes) SHOULD be used
+1483	   instead.  The "preceding" and "following" axes MAY be used if
+1484	   document order is not relevant to the outcome of the expression
+1485	   (e.g., check for global uniqueness of a parameter value).
+
+1487	   The "preceding-sibling" and "following-sibling" axes SHOULD NOT be
+1488	   used; however, they MAY be used if document order is not relevant to
+1489	   the outcome of the expression.
+
+1491	   A server is only required to maintain the relative XML document order
+1492	   of all instances of a particular user-ordered list or leaf-list.  The
+1493	   "preceding-sibling" and "following-sibling" axes MAY be used if they
+1494	   are evaluated in a context where the context node is a user-ordered
+1495	   "list" or "leaf-list".
+
+1497	4.6.4.  Types
+
+1499	   Data nodes that use the "int64" and "uint64" built-in type SHOULD NOT
+1500	   be used within numeric or boolean expressions.  There are boundary
+1501	   conditions in which the translation from the YANG 64-bit type to an
+1502	   XPath number can cause incorrect results.  Specifically, an XPath
+1503	   "double" precision floating-point number cannot represent very large
+1504	   positive or negative 64-bit numbers because it only provides a total
+1505	   precision of 53 bits.  The "int64" and "uint64" data types MAY be
+1506	   used in numeric expressions if the value can be represented with no
+1507	   more than 53 bits of precision.
+
+1509	   Data modelers need to be careful not to confuse the YANG value space
+1510	   and the XPath value space.  The data types are not the same in both,
+1511	   and conversion between YANG and XPath data types SHOULD be considered
+1512	   carefully.
+
+1514	   Explicit XPath data type conversions MAY be used (e.g., "string",
+1515	   "boolean", or "number" functions), instead of implicit XPath data
+1516	   type conversions.
+
+1518	   XPath expressions that contain a literal value representing a YANG
+1519	   identity SHOULD always include the declared prefix of the module
+1520	   where the identity is defined.
+
+1522	   XPath expressions for "when" statements SHOULD NOT reference the
+1523	   context node or any descendant nodes of the context node.  They MAY
+1524	   reference descendant nodes if the "when" statement is contained
+1525	   within an "augment" statement, and the referenced nodes are not
+1526	   defined within the "augment" statement.
+
+1528	   Example:
+
+1530	   augment "/rt:active-route/rt:input/rt:destination-address" {
+1531	     when "derived-from-or-self(rt:address-family, "
+1532	        + "'v4ur:ipv4-unicast')" {
+1533	       description
+1534	         "This augment is valid only for IPv4 unicast.";
+1535	     }
+1536	     // nodes defined here within the augment-stmt
+1537	     // cannot be referenced in the when-stmt
+1538	   }
+
+1540	4.6.5.  Wildcards
+
+1542	   It is possible to construct XPath expressions that will evaluate
+1543	   differently when combined with several modules within a server
+1544	   implementation rather than when evaluated within the single module.
+1545	   This is due to augmenting nodes from other modules.
+
+1547	   Wildcard expansion is done within a server against all the nodes from
+1548	   all namespaces, so it is possible for a "must" or "when" expression
+1549	   that uses the '*' operator to always evaluate to false if processed
+1550	   within a single YANG module.  In such cases, the "description"
+1551	   statement SHOULD clarify that augmenting objects are expected to
+1552	   match the wildcard expansion.
+
+1554	      when /foo/services/*/active {
+1555	        description
+1556	          "No services directly defined in this module.
+1557	           Matches objects that have augmented the services container.";
+1558	      }
+
+1560	4.6.6.  Boolean Expressions
+
+1562	   The YANG "must" and "when" statements use an XPath boolean expression
+1563	   to define the test condition for the statement.  It is important to
+1564	   specify these expressions in a way that will not cause inadvertent
+1565	   changes in the result if the objects referenced in the expression are
+1566	   updated in future revisions of the module.
+
+1568	   For example, the leaf "foo2" must exist if the leaf "foo1" is equal
+1569	   to "one" or "three":
+
+1571	        leaf foo1 {
+1572	          type enumeration {
+1573	            enum one;
+1574	            enum two;
+1575	            enum three;
+1576	          }
+1577	        }
+
+1579	        leaf foo2 {
+1580	          // INCORRECT
+1581	          must "/f:foo1 != 'two'";
+1582	          type string;
+1583	        }
+1584	        leaf foo2 {
+1585	          // CORRECT
+1586	          must "/f:foo1 = 'one' or /f:foo1 = 'three'";
+1587	          type string;
+1588	        }
+
+1590	   In the next revision of the module, leaf "foo1" is extended with a
+1591	   new enum named "four":
+
+1593	        leaf foo1 {
+1594	          type enumeration {
+1595	            enum one;
+1596	            enum two;
+1597	            enum three;
+1598	            enum four;
+1599	          }
+1600	        }
+
+1602	   Now the first XPath expression will allow the enum "four" to be
+1603	   accepted in addition to the "one" and "three" enum values.
+
+1605	4.7.  YANG Definition Lifecycle Management
+
+1607	   The YANG status statement MUST be present within a definition if its
+1608	   value is "deprecated" or "obsolete".  The status SHOULD NOT be
+1609	   changed from "current" directly to "obsolete".  An object SHOULD be
+1610	   available for at least one year with a "deprecated" status before it
+1611	   is changed to "obsolete".
+
+1613	   The module or submodule name MUST NOT be changed, once the document
+1614	   containing the module or submodule is published.
+
+1616	   The module namespace URI value MUST NOT be changed, once the document
+1617	   containing the module is published.
+
+1619	   The revision date substatement within the import statement SHOULD be
+1620	   present if any groupings are used from the external module.
+
+1622	   The revision date substatement within the include statement SHOULD be
+1623	   present if any groupings are used from the external submodule.
+
+1625	   If an import statement is for a module from a stable source (e.g., an
+1626	   RFC for an IETF module), then a reference-stmt SHOULD be present
+1627	   within an import statement.
+
+1629	        import ietf-yang-types {
+1630	           prefix yang;
+1631	           reference "RFC 6991: Common YANG Data Types";
+1632	        }
+
+1634	   If submodules are used, then the document containing the main module
+1635	   MUST be updated so that the main module revision date is equal to or
+1636	   more recent than the revision date of any submodule that is (directly
+1637	   or indirectly) included by the main module.
+
+1639	   Definitions for future use SHOULD NOT be specified in a module.  Do
+1640	   not specify placeholder objects like the "reserved" example below:
+
+1642	       leaf reserved {
+1643	         type string;
+1644	         description
+1645	           "This object has no purpose at this time, but a future
+1646	            revision of this module might define a purpose
+1647	            for this object.";
+1648	         }
+1649	       }
+
+1651	4.8.  Module Header, Meta, and Revision Statements
+
+1653	   For published modules, the namespace MUST be a globally unique URI,
+1654	   as defined in [RFC3986].  This value is usually assigned by the IANA.
+
+1656	   The "organization" statement MUST be present.  If the module is
+1657	   contained in a document intended for IETF Standards Track status,
+1658	   then the organization SHOULD be the IETF working group (WG) chartered
+1659	   to write the document.  For other standards organizations, a similar
+1660	   approach is also suggested.
+
+1662	   The "contact" statement MUST be present.  If the module is contained
+1663	   in a document intended for Standards Track status, then the WG web
+1664	   and mailing information SHOULD be present, and the main document
+1665	   author or editor contact information SHOULD be present.  If
+1666	   additional authors or editors exist, their contact information MAY be
+1667	   present.  There is no need to include the contact information for WG
+1668	   Chairs.
+
+1670	   The "description" statement MUST be present.  For modules published
+1671	   within IETF documents, the appropriate IETF Trust Copyright text MUST
+1672	   be present, as described in Section 3.1 and contain the following
+1673	   statement:
+
+1675	      All revisions of IETF and IANA published modules can be found at
+1676	      the YANG Parameters registry: https://www.iana.org/assignments/
+1677	      yang-parameters.
+
+1679	   If the module relies on information contained in other documents,
+1680	   which are not the same documents implied by the import statements
+1681	   present in the module, then these documents MUST be identified in the
+1682	   reference statement.
+
+1684	   A "revision" statement MUST be present for each published version of
+1685	   the module.  The "revision" statement MUST have a "reference"
+1686	   substatement.  It MUST identify the published document that contains
+1687	   the module.  Modules are often extracted from their original
+1688	   documents, and it is useful for developers and operators to know how
+1689	   to find the original source document in a consistent manner.  The
+1690	   "revision" statement MAY have a "description" substatement.  For
+1691	   convenience, the description text of a new published revision may
+1692	   summarize any changes made to a module compared to the previous
+1693	   published revision.  Typically, that list is a YANG-specific subset
+1694	   of the summary of changes listing any changes made from the RFC being
+1695	   updated or obsoleted as per [ID-Guidelines].
+
+1697	   The following example shows the revision statement for a published
+1698	   YANG module:
+
+1700	      revision 2010-09-24 {
+1701	        description
+1702	          "Initial revision.";
+1703	      reference
+1704	        "RFC 6021: Common YANG Data Types";
+1705	      }
+
+1707	   The following example shows the revision statements for a published
+1708	   YANG module that updates a published module.  The new revision
+1709	   statement summarizes the changes compared to the previous published
+1710	   revision.
+
+1712	     revision 2013-07-15 {
+1713	       description
+1714	         "This revision adds the following new data types:
+1715	          - yang:yang-identifier
+1716	          - yang:hex-string
+1717	          - yang:uuid
+1718	          - yang:dotted-quad";
+1719	        reference
+1720	          "RFC 6991: Common YANG Data Types";
+1721	      }
+
+1723	      revision 2010-09-24 {
+1724	        description
+1725	          "Initial revision.";
+1726	      reference
+1727	        "RFC 6021: Common YANG Data Types";
+1728	      }
+
+1730	   For an unpublished module, a complete history of each unpublished
+1731	   module revision is not required.  That is, within a sequence of draft
+1732	   versions, only the most recent revision need be recorded in the
+1733	   module.  Do not remove or reuse a revision statement for a published
+1734	   module.  A new revision date is not required unless the module
+1735	   contents have changed.  If the module contents have changed, then the
+1736	   revision date of that new module version MUST be updated to a date
+1737	   later than that of the previous version.
+
+1739	   The following example shows the revision statements for an
+1740	   unpublished update to a published YANG module.  The latest revision
+1741	   statement of the unpublished module summarizes the changes compared
+1742	   to the previous revision.
+
+1744	     revision 2023-01-23 {
+1745	       description
+1746	        "This revision adds the following new data types:
+1747	         - yang:date-with-zone-offset
+1748	         - yang:date-no-zone
+1749	         - yang:time-with-zone-offset
+1750	         - yang:time-no-zone
+1751	         - yang:hours32
+1752	         - yang:minutes32
+1753	         - yang:seconds32
+1754	         - yang:centiseconds32
+1755	         - yang:milliseconds32
+1756	         - yang:microseconds32
+1757	         - yang:microseconds64
+1758	         - yang:nanoseconds32
+1759	         - yang:nanoseconds64
+1760	         - yang:language-tag
+1761	          The yang-identifier definition has been aligned with YANG 1.1.
+1762	          Several pattern statements have been improved.";
+1763	       reference
+1764	        "RFC YYYY: Common YANG Data Types";
+1765	     }
+
+1767	     revision 2013-07-15 {
+1768	       description
+1769	         "This revision adds the following new data types:
+1770	          - yang:yang-identifier
+1771	          - yang:hex-string
+1772	          - yang:uuid
+1773	          - yang:dotted-quad";
+1774	        reference
+1775	          "RFC 6991: Common YANG Data Types";
+1776	      }
+
+1778	      revision 2010-09-24 {
+1779	        description
+1780	          "Initial revision.";
+1781	      reference
+1782	        "RFC 6021: Common YANG Data Types";
+1783	      }
+
+1785	4.9.  Namespace Assignments
+
+1787	   It is RECOMMENDED that only valid YANG modules be included in
+1788	   documents, whether or not the modules are published yet.  This
+1789	   allows:
+
+1791	   *  the module to compile correctly instead of generating disruptive
+1792	      fatal errors.
+
+1794	   *  early implementors to use the modules without picking a random
+1795	      value for the XML namespace.
+
+1797	   *  early interoperability testing since independent implementations
+1798	      will use the same XML namespace value.
+
+1800	   Until a URI is assigned by the IANA, a proposed namespace URI MUST be
+1801	   provided for the namespace statement in a YANG module.  A value
+1802	   SHOULD be selected that is not likely to collide with other YANG
+1803	   namespaces.  Standard module names, prefixes, and URI strings already
+1804	   listed in the "YANG Module Names" registry MUST NOT be used.
+
+1806	   A standard namespace statement value SHOULD have the following form:
+
+1808	       <URN prefix string>:<module-name>
+
+1810	   The following URN prefix string SHOULD be used for published and
+1811	   unpublished YANG modules:
+
+1813	       urn:ietf:params:xml:ns:yang:
+
+1815	   The following example URNs would be valid namespace statement values
+1816	   for Standards Track modules:
+
+1818	       urn:ietf:params:xml:ns:yang:ietf-netconf-partial-lock
+
+1820	       urn:ietf:params:xml:ns:yang:ietf-netconf-state
+
+1822	       urn:ietf:params:xml:ns:yang:ietf-netconf
+
+1824	   Note that a different URN prefix string SHOULD be used for modules
+1825	   that are not Standards Track.  The string SHOULD be selected
+1826	   according to the guidelines in [RFC7950].
+
+1828	   The following URIs exemplify what might be used by modules that are
+1829	   not Standards Track.  Note that the domain "example.com" SHOULD be
+1830	   used by example modules in IETF I-Ds.  These URIs are not intended to
+1831	   be dereferenced.  They are used for module namespace identification
+1832	   only.
+
+1834	   Example URIs using URLs per [RFC3986]:
+
+1836	       https://example.com/ns/example-interfaces
+
+1838	       https://example.com/ns/example-system
+
+1840	   Example URIs using tags per [RFC4151]:
+
+1842	       tag:example.com,2017:example-interfaces
+
+1844	       tag:example.com,2017:example-system
+
+1846	4.10.  Top-Level Data Definitions
+
+1848	   The top-level data organization SHOULD be considered carefully, in
+1849	   advance.  Data model designers need to consider how the functionality
+1850	   for a given protocol or protocol family will grow over time.
+
+1852	   The separation of configuration data and operational state SHOULD be
+1853	   considered carefully.  It is sometimes useful to define separate top-
+1854	   level containers for configuration and non-configuration data.  For
+1855	   some existing top-level data nodes, configuration data was not in
+1856	   scope, so only one container representing operational state was
+1857	   created.  Refer to NMDA [RFC8342] for details.
+
+1859	   The number of top-level data nodes within a module SHOULD be
+1860	   minimized.  It is often useful to retrieve related information within
+1861	   a single subtree.  If data is too distributed, it becomes difficult
+1862	   to retrieve all at once.
+
+1864	   The names and data organization SHOULD reflect persistent
+1865	   information, such as the name of a protocol.  The name of the working
+1866	   group SHOULD NOT be used because this may change over time.
+
+1868	   A mandatory database data definition is defined as a node that a
+1869	   client must provide for the database to be valid.  The server is not
+1870	   required to provide a value.
+
+1872	   Top-level database data definitions MUST NOT be mandatory.  If a
+1873	   mandatory node appears at the top level, it will immediately cause
+1874	   the database to be invalid.  This can occur when the server boots or
+1875	   when a module is loaded dynamically at runtime.
+
+1877	4.11.  Data Types
+
+1879	   Selection of an appropriate data type (i.e., built-in type, existing
+1880	   derived type, or new derived type) is very subjective; therefore, few
+1881	   requirements can be specified on that subject.
+
+1883	   Data model designers SHOULD use the most appropriate built-in data
+1884	   type for the particular application.
+
+1886	   The signed numeric data types (i.e., "int8", "int16", "int32", and
+1887	   "int64") SHOULD NOT be used unless negative values are allowed for
+1888	   the desired semantics.
+
+1890	4.11.1.  Fixed-Value Extensibility
+
+1892	   If the set of values is fixed and the data type contents are
+1893	   controlled by a single naming authority (e.g., IANA), then an
+1894	   enumeration data type SHOULD be used.
+
+1896	       leaf foo {
+1897	         type enumeration {
+1898	           enum one;
+1899	           enum two;
+1900	         }
+1901	       }
+
+1903	   If distributed extensibility or hierarchical organization of
+1904	   enumerated values is required, then the "identityref" data type
+1905	   SHOULD be used instead of an enumeration or other built-in type.
+
+1907	       identity foo-type {
+1908	         description "Base for the extensible type";
+1909	       }
+
+1911	       identity one {
+1912	         base f:foo-type;
+1913	       }
+
+1915	       identity two {
+1916	         base f:foo-type;
+1917	       }
+
+1919	       leaf foo {
+1920	         type identityref {
+1921	           base f:foo-type;
+1922	         }
+1923	       }
+
+1925	   Note that any module can declare an identity with base "foo-type"
+1926	   that is valid for the "foo" leaf.  Identityref values are considered
+1927	   to be qualified names.
+
+1929	4.11.2.  Patterns and Ranges
+
+1931	   For string data types, if a machine-readable pattern can be defined
+1932	   for the desired semantics, then one or more pattern statements SHOULD
+1933	   be present.  A single-quoted string SHOULD be used to specify the
+1934	   pattern, since a double-quoted string can modify the content.  If the
+1935	   patterns used in a type definition have known limitations such as
+1936	   false negative or false positive matches, then these limitations
+1937	   SHOULD be documented within the typedef or data definition.
+
+1939	   The following typedef from [RFC6991] demonstrates the proper use of
+1940	   the "pattern" statement:
+
+1942	       typedef ipv4-address-no-zone {
+1943	         type inet:ipv4-address {
+1944	           pattern '[0-9\.]*';
+1945	         }
+1946	         ...
+1947	       }
+
+1949	   For string data types, if the length of the string is required to be
+1950	   bounded in all implementations, then a length statement MUST be
+1951	   present.
+
+1953	   The following typedef from [RFC6991] demonstrates the proper use of
+1954	   the "length" statement:
+
+1956	       typedef yang-identifier {
+1957	         type string {
+1958	           length "1..max";
+1959	           pattern '[a-zA-Z_][a-zA-Z0-9\-_.]*';
+1960	           pattern '.|..|[^xX].*|.[^mM].*|..[^lL].*';
+1961	         }
+1962	         ...
+1963	       }
+
+1965	   For numeric data types, if the values allowed by the intended
+1966	   semantics are different than those allowed by the unbounded intrinsic
+1967	   data type (e.g., "int32"), then a range statement SHOULD be present.
+
+1969	   The following typedef from [RFC6991] demonstrates the proper use of
+1970	   the "range" statement:
+
+1972	       typedef dscp {
+1973	         type uint8 {
+1974	           range "0..63";
+1975	         }
+1976	         ...
+1977	       }
+
+1979	4.11.3.  Enumerations and Bits
+
+1981	   For "enumeration" or "bits" data types, the semantics for each "enum"
+1982	   or "bit" SHOULD be documented.  A separate "description" statement
+1983	   (within each "enum" or "bit" statement) SHOULD be present.
+
+1985	       leaf foo {
+1986	         // INCORRECT
+1987	         type enumeration {
+1988	           enum one;
+1989	           enum two;
+1990	         }
+1991	         description
+1992	           "The foo enum...
+1993	            one: The first enum
+1994	            two: The second enum";
+1995	       }
+1996	       leaf foo {
+1997	         // CORRECT
+1998	         type enumeration {
+1999	           enum one {
+2000	             description "The first enum";
+2001	           }
+2002	           enum two {
+2003	             description "The second enum";
+2004	           }
+2005	         }
+2006	         description
+2007	           "The foo enum...  ";
+2008	       }
+
+2010	4.11.4.  Union Types
+
+2012	   The YANG "union" type is evaluated by testing a value against each
+2013	   member type in the union.  The first type definition that accepts a
+2014	   value as valid is the member type used.  In general, member types
+2015	   SHOULD be ordered from most restrictive to least restrictive types.
+
+2017	   In the following example, the "enumeration" type will never be
+2018	   matched because the preceding "string" type will match everything.
+
+2020	   Incorrect:
+
+2022	      type union {
+2023	        type string;
+2024	        type enumeration {
+2025	          enum up;
+2026	          enum down;
+2027	        }
+2028	      }
+
+2030	   Correct:
+
+2032	      type union {
+2033	        type enumeration {
+2034	          enum up;
+2035	          enum down;
+2036	        }
+2037	        type string;
+2038	      }
+
+2040	   It is possible for different member types to match, depending on the
+2041	   input encoding format.  In XML, all values are passed as string
+2042	   nodes; but in JSON, there are different value types for numbers,
+2043	   booleans, and strings.
+
+2045	   In the following example, a JSON numeric value will always be matched
+2046	   by the "int32" type, but in XML the string value representing a
+2047	   number will be matched by the "string" type.  The second version will
+2048	   match the "int32" member type no matter how the input is encoded.
+
+2050	   Incorrect:
+
+2052	      type union {
+2053	        type string;
+2054	        type int32;
+2055	      }
+
+2057	   Correct:
+
+2059	      type union {
+2060	        type int32;
+2061	        type string;
+2062	      }
+
+2064	4.11.5.  Empty and Boolean
+
+2066	   YANG provides an "empty" data type, which has one value (i.e.,
+2067	   present).  The default is "not present", which is not actually a
+2068	   value.  When used within a list key, only one value can (and must)
+2069	   exist for this key leaf.  The type "empty" SHOULD NOT be used for a
+2070	   key leaf since it is pointless.
+
+2072	   There is really no difference between a leaf of type "empty" and a
+2073	   leaf-list of type "empty".  Both are limited to one instance.  The
+2074	   type "empty" SHOULD NOT be used for a leaf-list.
+
+2076	   The advantage of using type "empty" instead of type "boolean" is that
+2077	   the default (not present) does not take up any bytes in a
+2078	   representation.  The disadvantage is that the client may not be sure
+2079	   if an empty leaf is missing because it was filtered somehow or not
+2080	   implemented.  The client may not have a complete and accurate schema
+2081	   for the data returned by the server and may not be aware of the
+2082	   missing leaf.
+
+2084	   The YANG "boolean" data type provides two values ("true" and
+2085	   "false").  When used within a list key, two entries can exist for
+2086	   this key leaf.  Default values are ignored for key leafs, but a
+2087	   default statement is often used for plain boolean leafs.  The
+2088	   advantage of the "boolean" type is that the leaf or leaf-list has a
+2089	   clear representation for both values.  The default value is usually
+2090	   not returned unless explicitly requested by the client, so no bytes
+2091	   are used in a typical representation.
+
+2093	   In general, the "boolean" data type SHOULD be used instead of the
+2094	   "empty" data type, as shown in the example below:
+
+2096	   Incorrect:
+
+2098	      leaf flag1 {
+2099	        type empty;
+2100	      }
+
+2102	   Correct:
+
+2104	      leaf flag2 {
+2105	        type boolean;
+2106	        default false;
+2107	      }
+
+2109	4.12.  Reusable Type Definitions
+
+2111	   If an appropriate derived type exists in any standard module, such as
+2112	   [RFC6991], then it SHOULD be used instead of defining a new derived
+2113	   type.
+
+2115	   If an appropriate units identifier can be associated with the desired
+2116	   semantics, then a units statement SHOULD be present.
+
+2118	   If an appropriate default value can be associated with the desired
+2119	   semantics, then a default statement SHOULD be present.
+
+2121	   If a significant number of derived types are defined, and it is
+2122	   anticipated that these data types will be reused by multiple modules,
+2123	   then these derived types SHOULD be contained in a separate module or
+2124	   submodule, to allow easier reuse without unnecessary coupling.
+
+2126	   The "description" statement MUST be present.
+
+2128	   If the type definition semantics are defined in an external document
+2129	   (other than another YANG module indicated by an import statement),
+2130	   then the reference statement MUST be present.
+
+2132	4.13.  Reusable Groupings
+
+2134	   A reusable grouping is a YANG grouping that can be imported by
+2135	   another module and is intended for use by other modules.  This is not
+2136	   the same as a grouping that is used within the module in which it is
+2137	   defined, but it happens to be exportable to another module because it
+2138	   is defined at the top level of the YANG module.
+
+2140	   The following guidelines apply to reusable groupings, in order to
+2141	   make them as robust as possible:
+
+2143	   *  Clearly identify the purpose of the grouping in the "description"
+2144	      statement.
+
+2146	   *  There are five different XPath contexts in YANG (rpc/input, rpc/
+2147	      output, notification, "config true" data nodes, and all data
+2148	      nodes).  Clearly identify which XPath contexts are applicable or
+2149	      excluded for the grouping.
+
+2151	   *  Do not reference data outside the grouping in any "path", "must",
+2152	      or "when" statements.
+
+2154	   *  Do not include a "default" substatement on a leaf or choice unless
+2155	      the value applies on all possible contexts.
+
+2157	   *  Do not include a "config" substatement on a data node unless the
+2158	      value applies on all possible contexts.
+
+2160	   *  Clearly identify any external dependencies in the grouping
+2161	      "description" statement, such as nodes referenced by an absolute
+2162	      path from a "path", "must", or "when" statement.
+
+2164	4.14.  Data Definitions
+
+2166	   The "description" statement MUST be present in the following YANG
+2167	   statements:
+
+2169	   *  anydata
+
+2171	   *  anyxml
+
+2173	   *  augment
+
+2175	   *  choice
+
+2177	   *  container
+
+2179	   *  extension
+
+2181	   *  feature
+
+2183	   *  grouping
+
+2185	   *  identity
+
+2187	   *  leaf
+
+2189	   *  leaf-list
+
+2191	   *  list
+
+2193	   *  notification
+
+2195	   *  rpc
+
+2197	   *  typedef
+
+2199	   If the data definition semantics are defined in an external document,
+2200	   (other than another YANG module indicated by an import statement),
+2201	   then a reference statement MUST be present.
+
+2203	   The "anyxml" construct may be useful to represent an HTML banner
+2204	   containing markup elements, such as "<b>" and "</b>", and MAY be used
+2205	   in such cases.  However, this construct SHOULD NOT be used if other
+2206	   YANG data node types can be used instead to represent the desired
+2207	   syntax and semantics.
+
+2209	   It has been found that the "anyxml" statement is not implemented
+2210	   consistently across all servers.  It is possible that mixed-mode XML
+2211	   will not be supported or that configuration anyxml nodes will not be
+2212	   supported.
+
+2214	   If there are referential integrity constraints associated with the
+2215	   desired semantics that can be represented with XPath, then one or
+2216	   more "must" statements SHOULD be present.
+
+2218	   For list and leaf-list data definitions, if the number of possible
+2219	   instances is required to be bounded for all implementations, then the
+2220	   max-elements statements SHOULD be present.
+
+2222	   If any "must" or "when" statements are used within the data
+2223	   definition, then the data definition "description" statement SHOULD
+2224	   describe the purpose of each one.
+
+2226	   The "choice" statement is allowed to be directly present within a
+2227	   "case" statement in YANG 1.1.  This needs to be considered carefully.
+2228	   Consider simply including the nested "choice" as additional "case"
+2229	   statements within the parent "choice" statement.  Note that the
+2230	   "mandatory" and "default" statements within a nested "choice"
+2231	   statement only apply if the "case" containing the nested "choice"
+2232	   statement is first selected.
+
+2234	   If a list defines any key leafs, then these leafs SHOULD be defined
+2235	   in order, as the first child nodes within the list.  The key leafs
+2236	   MAY be in a different order in some cases, e.g., they are defined in
+2237	   a grouping, and not inline in the list statement.
+
+2239	4.14.1.  Non-Presence Containers
+
+2241	   A non-presence container is used to organize data into specific
+2242	   subtrees.  It is not intended to have semantics within the data model
+2243	   beyond this purpose, although YANG allows it (e.g., a "must"
+2244	   statement within the non-presence container).
+
+2246	   Example using container wrappers:
+
+2248	       container top {
+2249	          container foos {
+2250	             list foo { ... }
+2251	          }
+2252	          container bars {
+2253	             list bar { ... }
+2254	          }
+2255	       }
+
+2257	   Example without container wrappers:
+
+2259	       container top {
+2260	          list foo { ... }
+2261	          list bar { ... }
+2262	       }
+
+2264	   Use of non-presence containers to organize data is a subjective
+2265	   matter similar to use of subdirectories in a file system.  Although
+2266	   these containers do not have any semantics, they can impact protocol
+2267	   operations for the descendant data nodes within a non-presence
+2268	   container, so use of these containers SHOULD be considered carefully.
+
+2270	   The NETCONF and RESTCONF protocols do not currently support the
+2271	   ability to delete all list (or leaf-list) entries at once.  This
+2272	   deficiency is sometimes avoided by use of a parent container (i.e.,
+2273	   deleting the container also removes all child entries).
+
+2275	4.14.2.  Top-Level Data Nodes
+
+2277	   Use of top-level objects needs to be considered carefully:
+
+2279	   *  top-level siblings are not ordered
+
+2281	   *  top-level siblings are not static and depend on the modules that
+2282	      are loaded
+
+2284	   *  for subtree filtering, retrieval of a top-level leaf-list will be
+2285	      treated as a content-match node for all top-level-siblings
+
+2287	   *  a top-level list with many instances may impact performance
+
+2289	4.15.  Operation Definitions
+
+2291	   If the operation semantics are defined in an external document (other
+2292	   than another YANG module indicated by an import statement), then a
+2293	   reference statement MUST be present.
+
+2295	   If the operation impacts system behavior in some way, it SHOULD be
+2296	   mentioned in the "description" statement.
+
+2298	   If the operation is potentially harmful to system behavior in some
+2299	   way, it MUST be mentioned in the Security Considerations section of
+2300	   the document.
+
+2302	4.16.  Notification Definitions
+
+2304	   The "description" statement MUST be present.
+
+2306	   If the notification semantics are defined in an external document
+2307	   (other than another YANG module indicated by an import statement),
+2308	   then a reference statement MUST be present.
+
+2310	   If the notification refers to a specific resource instance, then this
+2311	   instance SHOULD be identified in the notification data.  This is
+2312	   usually done by including "leafref" leaf nodes with the key leaf
+2313	   values for the resource instance.  For example:
+
+2315	     notification interface-up {
+2316	       description "Sent when an interface is activated.";
+2317	       leaf name {
+2318	         type leafref {
+2319	           path "/if:interfaces/if:interface/if:name";
+2320	         }
+2321	       }
+2322	     }
+
+2324	   Note that there are no formal YANG statements to identify any data
+2325	   node resources associated with a notification.  The "description"
+2326	   statement for the notification SHOULD specify if and how the
+2327	   notification identifies any data node resources associated with the
+2328	   specific event.
+
+2330	4.17.  Feature Definitions
+
+2332	   The YANG "feature" statement is used to define a label for a set of
+2333	   optional functionality within a module.  The "if-feature" statement
+2334	   is used in the YANG statements associated with a feature.  The
+2335	   description-stmt within a feature-stmt MUST specify any interactions
+2336	   with other features.
+
+2338	   The set of YANG features defined in a module should be considered
+2339	   carefully.  Very fine granular features increase interoperability
+2340	   complexity and should be avoided.  A likely misuse of the feature
+2341	   mechanism is the tagging of individual leafs (e.g., counters) with
+2342	   separate features.
+
+2344	   If there is a large set of objects associated with a YANG feature,
+2345	   then consider moving those objects to a separate module, instead of
+2346	   using a YANG feature.  Note that the set of features within a module
+2347	   is easily discovered by the reader, but the set of related modules
+2348	   within the entire YANG library is not as easy to identify.  Module
+2349	   names with a common prefix can help readers identify the set of
+2350	   related modules, but this assumes the reader will have discovered and
+2351	   installed all the relevant modules.
+
+2353	   Another consideration for deciding whether to create a new module or
+2354	   add a YANG feature is the stability of the module in question.  It
+2355	   may be desirable to have a stable base module that is not changed
+2356	   frequently.  If new functionality is placed in a separate module,
+2357	   then the base module does not need to be republished.  If it is
+2358	   designed as a YANG feature, then the module will need to be
+2359	   republished.
+
+2361	   If one feature requires implementation of another feature, then an
+2362	   "if-feature" statement SHOULD be used in the dependent "feature"
+2363	   statement.
+
+2365	   For example, feature2 requires implementation of feature1:
+
+2367	      feature feature1 {
+2368	        description "Some protocol feature";
+2369	      }
+
+2371	      feature feature2 {
+2372	        if-feature "feature1";
+2373	        description "Another protocol feature";
+2374	      }
+
+2376	4.18.  YANG Data Node Constraints
+
+2378	4.18.1.  Controlling Quantity
+
+2380	   The "min-elements" and "max-elements" statements can be used to
+2381	   control how many list or leaf-list instances are required for a
+2382	   particular data node.  YANG constraint statements SHOULD be used to
+2383	   identify conditions that apply to all implementations of the data
+2384	   model.  If platform-specific limitations (e.g., the "max-elements"
+2385	   supported for a particular list) are relevant to operations, then a
+2386	   data model definition statement (e.g., "max-ports" leaf) SHOULD be
+2387	   used to identify the limit.
+
+2389	4.18.2.  "must" versus "when"
+
+2391	   "must" and "when" YANG statements are used to provide cross-object
+2392	   referential tests.  They have very different behavior.  The "when"
+2393	   statement causes data node instances to be silently deleted as soon
+2394	   as the condition becomes false.  A false "when" expression is not
+2395	   considered to be an error.
+
+2397	   The "when" statement SHOULD be used together with "augment" or "uses"
+2398	   statements to achieve conditional model composition.  The condition
+2399	   SHOULD be based on static properties of the augmented entry (e.g.,
+2400	   list key leafs).
+
+2402	   The "must" statement causes a datastore validation error if the
+2403	   condition is false.  This statement SHOULD be used for enforcing
+2404	   parameter value restrictions that involve more than one data node
+2405	   (e.g., end-time parameter must be after the start-time parameter).
+
+2407	4.19.  "augment" Statements
+
+2409	   The YANG "augment" statement is used to define a set of data
+2410	   definition statements that will be added as child nodes of a target
+2411	   data node.  The module namespace for these data nodes will be the
+2412	   augmenting module, not the augmented module.
+
+2414	   A top-level "augment" statement SHOULD NOT be used if the target data
+2415	   node is in the same module or submodule as the evaluated "augment"
+2416	   statement.  The data definition statements SHOULD be added inline
+2417	   instead.
+
+2419	4.19.1.  Conditional Augment Statements
+
+2421	   The "augment" statement is often used together with the "when"
+2422	   statement and/or "if-feature" statement to make the augmentation
+2423	   conditional on some portion of the data model.
+
+2425	   The following example from [RFC8343] shows how a conditional
+2426	   container called "ethernet" is added to the "interface" list only for
+2427	   entries of the type "ethernetCsmacd".
+
+2429	        augment "/if:interfaces/if:interface" {
+2430	            when "if:type = 'ianaift:ethernetCsmacd'";
+
+2432	            container ethernet {
+2433	                leaf duplex {
+2434	                    ...
+2435	                }
+2436	            }
+2437	        }
+
+2439	4.19.2.  Conditionally Mandatory Data Definition Statements
+
+2441	   YANG has very specific rules about how configuration data can be
+2442	   updated in new releases of a module.  These rules allow an "old
+2443	   client" to continue interoperating with a "new server".
+
+2445	   If data nodes are added to an existing entry, the old client MUST NOT
+2446	   be required to provide any mandatory parameters that were not in the
+2447	   original module definition.
+
+2449	   It is possible to add conditional "augment" statements such that the
+2450	   old client would not know about the new condition and would not
+2451	   specify the new condition.  The conditional "augment" statement can
+2452	   contain mandatory objects only if the condition is false, unless
+2453	   explicitly requested by the client.
+
+2455	   Only a conditional "augment" statement that uses the "when" statement
+2456	   form of a condition can be used in this manner.  The YANG features
+2457	   enabled on the server cannot be controlled by the client in any way,
+2458	   so it is not safe to add mandatory augmenting data nodes based on the
+2459	   "if-feature" statement.
+
+2461	   The XPath "when" statement condition MUST NOT reference data outside
+2462	   of the target data node because the client does not have any control
+2463	   over this external data.
+
+2465	   In the following sample, it is okay to augment the "interface" entry
+2466	   with "mandatory-leaf" because the augmentation depends on support for
+2467	   "some-new-iftype".  The old client does not know about this type, so
+2468	   it would never select this type; therefore, it would not add a
+2469	   mandatory data node.
+
+2471	     module example-module {
+
+2473	       yang-version 1.1;
+2474	       namespace "tag:example.com,2017:example-module";
+2475	       prefix mymod;
+
+2477	       import iana-if-type { prefix iana; }
+2478	       import ietf-interfaces { prefix if; }
+
+2480	       identity some-new-iftype {
+2481	         base iana:iana-interface-type;
+2482	       }
+
+2484	       augment "/if:interfaces/if:interface" {
+2485	         when "if:type = 'mymod:some-new-iftype'";
+
+2487	         leaf mandatory-leaf {
+2488	           type string;
+2489	           mandatory true;
+2490	         }
+2491	       }
+2492	     }
+
+2494	   Note that this practice is safe only for creating data resources.  It
+2495	   is not safe for replacing or modifying resources if the client does
+2496	   not know about the new condition.  The YANG data model MUST be
+2497	   packaged in a way that requires the client to be aware of the
+2498	   mandatory data nodes if it is aware of the condition for this data.
+2499	   In the example above, the "some-new-iftype" identity is defined in
+2500	   the same module as the "mandatory-leaf" data definition statement.
+
+2502	   This practice is not safe for identities defined in a common module
+2503	   such as "iana-if-type" because the client is not required to know
+2504	   about "my-module" just because it knows about the "iana-if-type"
+2505	   module.
+
+2507	4.20.  Deviation Statements
+
+2509	   Per Section 7.20.3 of [RFC7950], the YANG "deviation" statement is
+2510	   not allowed to appear in IETF YANG modules, but it can be useful for
+2511	   documenting server capabilities.  Deviation statements are not
+2512	   reusable and typically not shared across all platforms.
+
+2514	   There are several reasons that deviations might be needed in an
+2515	   implementation, e.g., an object cannot be supported on all platforms,
+2516	   or feature delivery is done in multiple development phases.
+2517	   Deviation statements can also be used to add annotations to a module,
+2518	   which does not affect the conformance requirements for the module.
+
+2520	   It is suggested that deviation statements be defined in separate
+2521	   modules from regular YANG definitions.  This allows the deviations to
+2522	   be platform specific and/or temporary.
+
+2524	   The order that deviation statements are evaluated can affect the
+2525	   result.  Therefore, multiple deviation statements in the same module,
+2526	   for the same target object, SHOULD NOT be used.
+
+2528	   The "max-elements" statement is intended to describe an architectural
+2529	   limit to the number of list entries.  It is not intended to describe
+2530	   platform limitations.  It is better to use a "deviation" statement
+2531	   for the platforms that have a hard resource limit.
+
+2533	   Example documenting platform resource limits:
+
+2535	     Wrong: (max-elements in the list itself)
+
+2537	        container backups {
+2538	          list backup {
+2539	            ...
+2540	            max-elements 10;
+2541	            ...
+2542	          }
+2543	        }
+
+2545	     Correct: (max-elements in a deviation)
+
+2547	        deviation /bk:backups/bk:backup {
+2548	          deviate add {
+2549	            max-elements 10;
+2550	          }
+2551	        }
+
+2553	4.21.  Extension Statements
+
+2555	   The YANG "extension" statement is used to specify external
+2556	   definitions.  This appears in the YANG syntax as an "unknown-
+2557	   statement".  Usage of extension statements in a published module
+2558	   needs to be considered carefully.
+
+2560	   The following guidelines apply to the usage of YANG extensions:
+
+2562	   *  The semantics of the extension MUST NOT contradict any YANG
+2563	      statements.  Extensions can add semantics not covered by the
+2564	      normal YANG statements.
+
+2566	   *  The module containing the extension statement MUST clearly
+2567	      identify the conformance requirements for the extension.  It
+2568	      should be clear whether all implementations of the YANG module
+2569	      containing the extension need to also implement the extension.  If
+2570	      not, identify what conditions apply that would require
+2571	      implementation of the extension.
+
+2573	   *  The extension MUST clearly identify where it can be used within
+2574	      other YANG statements.
+
+2576	   *  The extension MUST clearly identify if YANG statements or other
+2577	      extensions are allowed or required within the extension as
+2578	      substatements.
+
+2580	4.22.  Data Correlation
+
+2582	   Data can be correlated in various ways, using common data types,
+2583	   common data naming, and common data organization.  There are several
+2584	   ways to extend the functionality of a module, based on the degree of
+2585	   coupling between the old and new functionality:
+
+2587	   inline:  update the module with new protocol-accessible objects.  The
+2588	      naming and data organization of the original objects is used.  The
+2589	      new objects are in the original module namespace.
+
+2591	   augment:  create a new module with new protocol-accessible objects
+2592	      that augment the original data structure.  The naming and data
+2593	      organization of the original objects is used.  The new objects are
+2594	      in the new module namespace.
+
+2596	   mirror:  create new objects in a new module or the original module,
+2597	      except use a new naming scheme and data location.  The naming can
+2598	      be coupled in different ways.  Tight coupling is achieved with a
+2599	      "leafref" data type, with the "require-instance" substatement set
+2600	      to "true".  This method SHOULD be used.
+
+2602	   If the new data instances are not limited to the values in use in the
+2603	   original data structure, then the "require-instance" substatement
+2604	   MUST be set to "false".  Loose coupling is achieved by using key
+2605	   leafs with the same data type as the original data structure.  This
+2606	   has the same semantics as setting the "require-instance" substatement
+2607	   to "false".
+
+2609	   The relationship between configuration and operational state has been
+2610	   clarified in NMDA [RFC8342].
+
+2612	4.22.1.  Use of "leafref" for Key Correlation
+
+2614	   Sometimes it is not practical to augment a data structure.  For
+2615	   example, the correlated data could have different keys or contain
+2616	   mandatory nodes.
+
+2618	   The following example shows the use of the "leafref" data type for
+2619	   data correlation purposes:
+
+2621	   Not preferred:
+
+2623	      list foo {
+2624	         key name;
+2625	         leaf name {
+2626	            type string;
+2627	         }
+2628	         ...
+2629	      }
+
+2631	      list foo-addon {
+2632	         key name;
+2633	         config false;
+2634	         leaf name {
+2635	            type string;
+2636	         }
+2637	         ...
+2638	      }
+
+2640	   Preferred:
+
+2642	      list foo {
+2643	         key name;
+2644	         leaf name {
+2645	            type string;
+2646	         }
+2647	         ...
+2648	      }
+
+2650	      list foo-addon {
+2651	         key name;
+2652	         config false;
+2653	         leaf name {
+2654	            type leafref {
+2655	               path "/foo/name";
+2656	               require-instance false;
+2657	            }
+2658	         }
+2659	         leaf addon {
+2660	            type string;
+2661	            mandatory true;
+2662	         }
+2663	      }
+
+2665	4.23.  Operational State
+
+2667	   The modeling of operational state with YANG has been refined over
+2668	   time.  At first, only data that has a "config" statement value of
+2669	   "false" was considered to be operational state.  This data was not
+2670	   considered to be part of any datastore, which made the YANG XPath
+2671	   definition much more complicated.
+
+2673	   Operational state is now modeled using YANG according to the NMDA
+2674	   [RFC8342] and conceptually contained in the operational state
+2675	   datastore, which also includes the operational values of
+2676	   configuration data.  There is no longer any need to duplicate data
+2677	   structures to provide separate configuration and operational state
+2678	   sections.
+
+2680	   This section describes some data modeling issues related to
+2681	   operational state and guidelines for transitioning YANG data model
+2682	   design to be NMDA compatible.
+
+2684	4.23.1.  Combining Operational State and Configuration Data
+
+2686	   If possible, operational state SHOULD be combined with its associated
+2687	   configuration data.  This prevents duplication of key leafs and
+2688	   ancestor nodes.  It also prevents race conditions for retrieval of
+2689	   dynamic entries and allows configuration and operational state to be
+2690	   retrieved together with minimal message overhead.
+
+2692	      container foo {
+2693	        ...
+2694	        // contains "config true" and "config false" nodes that have
+2695	        // no corresponding "config true" object (e.g., counters)
+2696	      }
+
+2698	4.23.2.  Representing Operational Values of Configuration Data
+
+2700	   If possible, the same data type SHOULD be used to represent the
+2701	   configured value and the operational value, for a given leaf or leaf-
+2702	   list object.
+
+2704	   Sometimes the configured value set is different than the operational
+2705	   value set for that object, for example, the "admin-status" and "oper-
+2706	   status" leafs in [RFC8343].  In this case, a separate object MAY be
+2707	   used to represent the configured and operational values.
+
+2709	   Sometimes the list keys are not identical for configuration data and
+2710	   the corresponding operational state.  In this case, separate lists
+2711	   MAY be used to represent the configured and operational values.
+
+2713	   If it is not possible to combine configuration and operational state,
+2714	   then the keys used to represent list entries SHOULD be the same type.
+2715	   The "leafref" data type SHOULD be used in operational state for key
+2716	   leafs that have corresponding configuration instances.  The "require-
+2717	   instance" statement MAY be set to "false" (in YANG 1.1 modules only)
+2718	   to indicate instances are allowed in the operational state that do
+2719	   not exist in the associated configuration data.
+
+2721	   The need to replicate objects or define different operational state
+2722	   objects depends on the data model.  It is not possible to define one
+2723	   approach that will be optimal for all data models.
+
+2725	   Designers SHOULD describe and justify any NMDA exceptions in detail,
+2726	   such as the use of separate subtrees and/or separate leafs.  The
+2727	   "description" statements for both the configuration and the
+2728	   operational state SHOULD be used for this purpose.
+
+2730	4.23.3.  NMDA Transition Guidelines
+
+2732	   YANG modules SHOULD be designed with the assumption that they will be
+2733	   used on servers supporting the operational state datastore.  With
+2734	   this in mind, YANG modules SHOULD define "config false" nodes
+2735	   wherever they make sense to the data model.  "Config false" nodes
+2736	   SHOULD NOT be defined to provide the operational value for
+2737	   configuration nodes, except when the value space of a configured and
+2738	   operational value may differ, in which case a distinct "config false"
+2739	   node SHOULD be defined to hold the operational value for the
+2740	   configured node.
+
+2742	   The following guidelines are meant to help modelers develop YANG
+2743	   modules that will maximize the utility of the model with both current
+2744	   and new implementations.
+
+2746	   New modules and modules that are not concerned with the operational
+2747	   state of configuration information SHOULD immediately be structured
+2748	   to be NMDA compatible, as described in Section 4.23.1.  This
+2749	   transition MAY be deferred if the module does not contain any
+2750	   configuration datastore objects.
+
+2752	   The remaining are options that MAY be followed during the time that
+2753	   NMDA mechanisms are being defined.
+
+2755	   (a)  Modules that require immediate support for the NMDA features
+2756	        SHOULD be structured for NMDA.  A temporary non-NMDA version of
+2757	        this type of module MAY exist, as either an existing model or a
+2758	        model created by hand or with suitable tools that mirror the
+2759	        current modeling strategies.  Both the NMDA and the non-NMDA
+2760	        modules SHOULD be published in the same document, with NMDA
+2761	        modules in the document main body and the non-NMDA modules in a
+2762	        non-normative appendix.  The use of the non-NMDA module will
+2763	        allow temporary bridging of the time period until NMDA
+2764	        implementations are available.
+
+2766	   (b)  For published models, the model should be republished with an
+2767	        NMDA-compatible structure, deprecating non-NMDA constructs.  For
+2768	        example, the "ietf-interfaces" model in [RFC7223] has been
+2769	        restructured as an NMDA-compatible model in [RFC8343].  The
+2770	        "/interfaces-state" hierarchy has been marked "status
+2771	        deprecated".  Models that mark their "/foo-state" hierarchy with
+2772	        "status deprecated" will allow NMDA-capable implementations to
+2773	        avoid the cost of duplicating the state nodes, while enabling
+2774	        non-NMDA-capable implementations to utilize them for access to
+2775	        the operational values.
+
+2777	   (c)  For models that augment models that have not been structured
+2778	        with the NMDA, the modeler will have to consider the structure
+2779	        of the base model and the guidelines listed above.  Where
+2780	        possible, such models should move to new revisions of the base
+2781	        model that are NMDA compatible.  When that is not possible,
+2782	        augmenting "state" containers SHOULD be avoided, with the
+2783	        expectation that the base model will be re-released with the
+2784	        state containers marked as deprecated.  It is RECOMMENDED to
+2785	        augment only the "/foo" hierarchy of the base model.  Where this
+2786	        recommendation cannot be followed, then any new "state" elements
+2787	        SHOULD be included in their own module.
+
+2789	4.23.3.1.  Temporary Non-NMDA Modules
+
+2791	   A temporary non-NMDA module allows a non-NMDA-aware client to access
+2792	   operational state from an NMDA-compliant server.  It contains the
+2793	   top-level "config false" data nodes that would have been defined in a
+2794	   legacy YANG module (before NMDA).
+
+2796	   A server that needs to support both NMDA and non-NMDA clients can
+2797	   advertise both the new NMDA module and the temporary non-NMDA module.
+2798	   A non-NMDA client can use separate "foo" and "foo-state" subtrees,
+2799	   except the "foo-state" subtree is located in a different (temporary)
+2800	   module.  The NMDA module can be used by a non-NMDA client to access
+2801	   the conventional configuration datastores and the deprecated <get>
+2802	   operation to access nested "config false" data nodes.
+
+2804	   To create the temporary non-NMDA model from an NMDA model, the
+2805	   following steps can be taken:
+
+2807	   *  Change the module name by appending "-state" to the original
+2808	      module name
+
+2810	   *  Change the namespace by appending "-state" to the original
+2811	      namespace value
+
+2813	   *  Change the prefix by appending "-s" to the original prefix value
+
+2815	   *  Add an import to the original module (e.g., for typedef
+2816	      definitions)
+
+2818	   *  Retain or create only the top-level nodes that have a "config"
+2819	      statement value "false".  These subtrees represent "config false"
+2820	      data nodes that were combined into the configuration subtree;
+2821	      therefore, they are not available to non-NMDA aware clients.  Set
+2822	      the "status" statement to "deprecated" for each new node.
+
+2824	   *  The module description SHOULD clearly identify the module as a
+2825	      temporary non-NMDA module
+
+2827	4.23.3.2.  Example: Create a New NMDA Module
+
+2829	   Create an NMDA-compliant module, using combined configuration and
+2830	   state subtrees, whenever possible.
+
+2832	     module example-foo {
+2833	       namespace "urn:example:params:xml:ns:yang:example-foo";
+2834	       prefix "foo";
+
+2836	       container foo {
+2837	         // configuration data child nodes
+2838	         // operational value in operational state datastore only
+2839	         // may contain "config false" nodes as needed
+2840	       }
+2841	    }
+
+2843	4.23.3.3.  Example: Convert an Old Non-NMDA Module
+
+2845	   Do not remove non-compliant objects from existing modules.  Instead,
+2846	   change the status to "deprecated".  At some point, usually after 1
+2847	   year, the status MAY be changed to "obsolete".
+
+2849	   Old Module:
+
+2851	     module example-foo {
+2852	       namespace "urn:example:params:xml:ns:yang:example-foo";
+2853	       prefix "foo";
+
+2855	       container foo {
+2856	         // configuration data child nodes
+2857	       }
+
+2859	       container foo-state {
+2860	         config false;
+2861	         // operational state child nodes
+2862	       }
+2863	    }
+
+2865	   Converted NMDA Module:
+
+2867	     module example-foo {
+2868	       namespace "urn:example:params:xml:ns:yang:example-foo";
+2869	       prefix "foo";
+
+2871	       container foo {
+2872	         // configuration data child nodes
+2873	         // operational value in operational state datastore only
+2874	         // may contain "config false" nodes as needed
+2875	         // will contain any data nodes from old foo-state
+2876	       }
+
+2878	       // keep original foo-state but change status to deprecated
+2879	       container foo-state {
+2880	         config false;
+2881	         status deprecated;
+2882	         // operational state child nodes
+2883	       }
+2884	    }
+
+2886	4.23.3.4.  Example: Create a Temporary NMDA Module
+
+2888	   Create a new module that contains the top-level operational state
+2889	   data nodes that would have been available before they were combined
+2890	   with configuration data nodes (to be NMDA compliant).
+
+2892	     module example-foo-state {
+2893	       namespace "urn:example:params:xml:ns:yang:example-foo-state";
+2894	       prefix "foo-s";
+
+2896	       // import new or converted module; not used in this example
+2897	       import example-foo { prefix foo; }
+
+2899	       container foo-state {
+2900	         config false;
+2901	         status deprecated;
+2902	         // operational state child nodes
+2903	        }
+2904	     }
+
+2906	4.24.  Performance Considerations
+
+2908	   It is generally likely that certain YANG statements require more
+2909	   runtime resources than other statements.  Although there are no
+2910	   performance requirements for YANG validation, the following
+2911	   information MAY be considered when designing YANG data models:
+
+2913	   *  Lists are generally more expensive than containers
+2914	   *  "when" statement evaluation is generally more expensive than "if-
+2915	      feature" or "choice" statements
+
+2917	   *  "must" statements are generally more expensive than "min-
+2918	      elements", "max-elements", "mandatory", or "unique" statements
+
+2920	   *  "identityref" leafs are generally more expensive than
+2921	      "enumeration" leafs
+
+2923	   *  "leafref" and "instance-identifier" types with "require-instance"
+2924	      set to "true" are generally more expensive than if "require-
+2925	      instance" is set to "false"
+
+2927	4.25.  Open Systems Considerations
+
+2929	   Only the modules imported by a particular module can be assumed to be
+2930	   present in an implementation.  An open system MAY include any
+2931	   combination of YANG modules.
+
+2933	4.26.  Guidelines for Constructs Specific to YANG 1.1
+
+2935	   The set of guidelines for YANG 1.1 will grow as operational
+2936	   experience is gained with the new language features.  This section
+2937	   contains an initial set of guidelines for new YANG 1.1 language
+2938	   features.
+
+2940	4.26.1.  Importing Multiple Revisions
+
+2942	   Standard modules SHOULD NOT import multiple revisions of the same
+2943	   module into a module.  This MAY be done if independent definitions
+2944	   (e.g., enumeration typedefs) from specific revisions are needed in
+2945	   the importing module.
+
+2947	4.26.2.  Using Feature Logic
+
+2949	   The YANG 1.1 feature logic is much more expressive than YANG 1.0.  A
+2950	   "description" statement SHOULD describe the "if-feature" logic in
+2951	   text, to help readers understand the module.
+
+2953	   YANG features SHOULD be used instead of the "when" statement, if
+2954	   possible.  Features are advertised by the server, and objects
+2955	   conditional by the "if-feature" statement are conceptually grouped
+2956	   together.  There is no such commonality supported for "when"
+2957	   statements.
+
+2959	   Features generally require less server implementation complexity and
+2960	   runtime resources than objects that use "when" statements.  Features
+2961	   are generally static (i.e., set when a module is loaded and not
+2962	   changed at runtime).  However, every client edit might cause a "when"
+2963	   statement result to change.
+
+2965	4.26.3.  "anyxml" versus "anydata"
+
+2967	   The "anyxml" statement MUST NOT be used to represent a conceptual
+2968	   subtree of YANG data nodes.  The "anydata" statement MUST be used for
+2969	   this purpose.
+
+2971	4.26.4.  "action" versus "rpc"
+
+2973	   The use of "action" statements or "rpc" statements is a subjective
+2974	   design decision.  RPC operations are not associated with any
+2975	   particular data node.  Actions are associated with a specific data
+2976	   node definition.  An "action" statement SHOULD be used if the
+2977	   protocol operation is specific to a subset of all data nodes instead
+2978	   of all possible data nodes.
+
+2980	   The same action name MAY be used in different definitions within
+2981	   different data node.  For example, a "reset" action defined with a
+2982	   data node definition for an interface might have different parameters
+2983	   than for a power supply or a VLAN.  The same action name SHOULD be
+2984	   used to represent similar semantics.
+
+2986	   The NETCONF Access Control Model (NACM) [RFC8341] does not support
+2987	   parameter-based access control for RPC operations.  The user is given
+2988	   permission (or not) to invoke the RPC operation with any parameters.
+2989	   For example, if each client is only allowed to reset their own
+2990	   interface, then NACM cannot be used.
+
+2992	   For example, NACM cannot enforce access control based on the value of
+2993	   the "interface" parameter, only the "reset" operation itself:
+
+2995	      rpc reset {
+2996	        input {
+2997	          leaf interface {
+2998	            type if:interface-ref;
+2999	            mandatory true;
+3000	            description "The interface to reset.";
+3001	          }
+3002	        }
+3003	      }
+
+3005	   However, NACM can enforce access control for individual interface
+3006	   instances, using a "reset" action.  If the user does not have read
+3007	   access to the specific "interface" instance, then it cannot invoke
+3008	   the "reset" action for that interface instance:
+
+3010	      container interfaces {
+3011	        list interface {
+3012	          ...
+3013	          action reset { }
+3014	        }
+3015	      }
+
+3017	4.27.  Updating YANG Modules (Published versus Unpublished)
+
+3019	   YANG modules can change over time.  Typically, new data model
+3020	   definitions are needed to support new features.  YANG update rules
+3021	   defined in Section 11 of [RFC7950] MUST be followed for published
+3022	   modules.  They MAY be followed for unpublished modules.
+
+3024	   The YANG update rules only apply to published module revisions.  Each
+3025	   organization will have their own way to identify published work that
+3026	   is considered to be stable and unpublished work that is considered to
+3027	   be unstable.  For example, in the IETF, the RFC document is used for
+3028	   published work, and the I-D is used for unpublished work.
+
+3030	4.28.  Defining Standard Tags
+
+3032	   [RFC8819] specifies a method for associating tags with YANG modules.
+3033	   Tags may be defined and associated at module design time, at
+3034	   implementation time, or via user administrative control.  Design-time
+3035	   tags are indicated using the module-tag extension statement.
+
+3037	   A module MAY indicate, using module-tag extension statements, a set
+3038	   of tags that are to be automatically associated with it (i.e., not
+3039	   added through configuration).
+
+3041	   module example-module {
+3042	     namespace "https://example.com/yang/example";
+3043	     prefix "ex";
+3044	     //...
+3045	     import module-tags { prefix tags; }
+
+3047	     tags:module-tag "ietf:some-new-tag";
+3048	     tags:module-tag "ietf:some-other-tag";
+3049	     // ...
+3050	   }
+3051	   Authors can use existing standard tags or use new tags defined in the
+3052	   model definition, as appropriate.  For IETF modules, new tags MUST be
+3053	   assigned in the IANA "IETF YANG Module Tags" registry within the
+3054	   "YANG Module Tags" registry [IANA-TAGS].
+
+3056	4.29.  Modeling Abstract Data Structures
+
+3058	   For contexts where YANG is used to model abstract data structures
+3059	   (e.g., protocol messages), the use of the "structure" extension
+3060	   statement [RFC8791] is RECOMMENDED compared to the "yang-data"
+3061	   extension statement [RFC8040].
+
+3063	      Examples of modules that rely upon the "structure" extension
+3064	      statement [RFC8791] are [RFC9132] or [RFC9195].
+
+3066	   Abstract data structures can be augmented using the "augment-
+3067	   structure" statement [RFC8791].
+
+3069	      Examples of modules that augment abstract data structures are
+3070	      [RFC9244] and [RFC9362].
+
+3072	4.30.  IANA-Maintained Modules
+
+3074	4.30.1.  Context
+
+3076	   IANA maintains a set of registries that are key for interoperability.
+3077	   The content of these registries are usually available using various
+3078	   formats (e.g., plain text, XML).  However, there were some confusion
+3079	   in the past about whether the content of some registries is dependent
+3080	   on a specific representation format.  For example, Section 5 of
+3081	   [RFC8892] was published to clarify that MIB and YANG modules are
+3082	   merely additional formats in which the "Interface Types (ifType)" and
+3083	   "Tunnel Types (tunnelType)" registries are available.  The MIB
+3084	   [RFC2863] and YANG modules [RFC7224][RFC8675] are not separate
+3085	   registries, and the same values are always present in all formats of
+3086	   the same registry.
+
+3088	   Also, some YANG modules include parameters and values directly in a
+3089	   module that is not maintained by IANA while these are populated in an
+3090	   IANA registry.  Such a design is suboptimal as it creates another
+3091	   source of information that may deviate from the IANA registry as new
+3092	   values are assigned or some values are deprecated.
+
+3094	   For the sake of consistency and ability to support new values while
+3095	   maintaining IANA registries as the unique authoritative source of
+3096	   information, this document encourages the use of IANA-maintained
+3097	   modules as the single source of information.
+
+3099	   The following section provides a set of guidelines for YANG module
+3100	   authors related to the design of IANA-maintained modules.  These
+3101	   guidelines are meant to leverage existing IANA registries and use
+3102	   YANG as another format to present the content of these registries
+3103	   when appropriate.
+
+3105	4.30.2.  Guidelines for IANA-Maintained Modules
+
+3107	   When designing a YANG module for a functionality governed by a
+3108	   protocol for which IANA maintains a registry, it is RECOMMENDED to
+3109	   specify an IANA-maintained module that echoes the content of that
+3110	   registry.  This is superior to including that content in an IETF-
+3111	   maintained module.
+
+3113	   When one or multiple sub-registries are available under the same
+3114	   registry, it is RECOMMENDED to define an IANA-maintained module for
+3115	   each sub-registry.  However, module designers MAY consider defining
+3116	   one single IANA-maintained module that covers all sub-registries if
+3117	   maintaining that single module is manageable (e.g., very few values
+3118	   are present or expected to be present for each sub-registry).  An
+3119	   example of such a module is documented in Section 5.2 of [RFC9132].
+
+3121	   An IANA-maintained module may use the "identityref" data type (e.g.,
+3122	   [RFC8675]) or an enumeration data type (e.g., [RFC9108]).  See
+3123	   Section 4.11.1 for a guidance on which data type to use.  The
+3124	   decision about which type to use should be made based upon specifics
+3125	   related to the intended use of the IANA-maintained module.  For
+3126	   example, identities are useful if the registry entries are organized
+3127	   hierarchically, possibly including multiple inheritances.  It is
+3128	   RECOMMENDED that the reasoning for the design choice is documented in
+3129	   the companion specification that registers an IANA-maintained module.
+3130	   For example, [RFC9244] defines an IANA-maintained module that uses
+3131	   enumerations for the following reason:
+
+3133	   |  The DOTS telemetry module (Section 11.1) uses "enumerations"
+3134	   |  rather than "identities" to define units, samples, and intervals
+3135	   |  because otherwise the namespace identifier "ietf-dots-telemetry"
+3136	   |  must be included when a telemetry attribute is included (e.g., in
+3137	   |  a mitigation efficacy update).  The use of "identities" is thus
+3138	   |  suboptimal from the standpoint of message compactness, as message
+3139	   |  compactness is one of the key requirements for DOTS signal channel
+3140	   |  messages.
+
+3142	   Designers of IANA-maintained modules MAY supply the full initial
+3143	   version of the module in a specification document that registers the
+3144	   module or only a script to be used (including by IANA) for generating
+3145	   the module (e.g., an XSLT stylesheet as in Appendix A of [RFC9108] or
+3146	   a Python script as in [RFC9645]).  For both cases, the document that
+3147	   defines an IANA-maintained module MUST include a note indicating that
+3148	   the document is only documenting the initial version of the module
+3149	   and that the authoritative version is to be retrieved from the IANA
+3150	   registry.  Also, the IANA-maintained module MUST include the
+3151	   following note indicating the RFC that registered the initial version
+3152	   of the IANA-maintained module:
+
+3154	      The initial version of this YANG module is part of RFC IIII; see
+3155	      the RFC itself for full legal notices.
+
+3157	   It is RECOMMENDED to include the URL from where to retrieve the
+3158	   recent version of the module.  When a script is used, the Internet-
+3159	   Draft that defines an IANA-maintained module SHOULD include an
+3160	   appendix with the initial full version of the module.  Including such
+3161	   an appendix in pre-RFC versions is meant to assess the correctness of
+3162	   the outcome of the supplied script.  The authors MUST include a note
+3163	   to the RFC Editor requesting that the appendix be removed before
+3164	   publication as RFC and that RFC IIII is replaced with the RFC number
+3165	   that is assigned to the document.  Initial versions of IANA-
+3166	   maintained modules that are published in RFCs may be misused despite
+3167	   the appropriate language to refer to the IANA registry to retrieve
+3168	   the up-to-date module.  This is problematic for interoperability,
+3169	   e.g., when values are deprecated or are associated with a new
+3170	   meaning.
+
+3172	     Note: [Style] provides XSLT 1.0 stylesheets and other tools for
+3173	     translating IANA registries to YANG modules.  The tools can be
+3174	     used to generate up-to-date revisions of an IANA-maintained module
+3175	     based upon the XML representation of an IANA registry.
+
+3177	   If an IANA-maintained module is imported by another module, a
+3178	   normative reference with the IANA URL from where to retrieve the
+3179	   IANA-maintained module SHOULD be included.  Although not encouraged,
+3180	   referencing the RFC that defines the initial version of the IANA
+3181	   module is acceptable in specific cases (e.g., the imported version is
+3182	   specifically the initial version, the RFC includes useful description
+3183	   about the usage of the module).
+
+3185	   Examples of IANA URLs from where to retrieve the latest version of an
+3186	   IANA-maintained module are: [IANA_BGP-L2_URL], [IANA_PW-Types_URL],
+3187	   and [IANA_BFD_URL].  "IANA_FOO_URL" is used in the following to refer
+3188	   to such URLs.  These URLs are expected to be sufficiently permanent
+3189	   and stable.  Whenever referencing a specific version of an IANA-
+3190	   maintained module is needed, then URLs such as
+3191	   [IANA_BGP-L2_URL-Revision] are used.  "IANA_FOO_URL_With_REV" is used
+3192	   in the following to refer to such URLs.
+
+3194	   A template for IANA-maintained modules is provided in Appendix C.
+
+3196	4.30.3.  Guidance for Writing the IANA Considerations for RFCs Defining
+3197	         IANA-Maintained Modules
+
+3199	   In addition to the IANA considerations in Section 3.8, the IANA
+3200	   Considerations Section of an RFC that includes an IANA-maintained
+3201	   module MUST provide the required instructions for IANA to
+3202	   automatically perform the maintenance of that IANA module.  These
+3203	   instructions describe how to proceed with updates to the IANA-
+3204	   maintained module that are triggered by a change to the authoritative
+3205	   registry.  Concretely, the IANA Considerations Section SHALL at least
+3206	   provide the following information:
+
+3208	   *  A request to IANA to add a note to the page displaying the
+3209	      information about the IANA-maintained module that new values must
+3210	      not be directly added to the module.  These values should be added
+3211	      to an authoritative IANA registry.
+
+3213	   *  A request to IANA to add a note to the authoritative IANA registry
+3214	      to indicate that any change to the registry must be reflected into
+3215	      the corresponding IANA-maintained module.  That is, any changes to
+3216	      the registry must be accompanied by an update to the corresponding
+3217	      IANA-maintained module.
+
+3219	   *  Details about the required actions (e.g., add a new "identity" or
+3220	      "enum" statement) to update the IANA-maintained module to reflect
+3221	      changes to an authoritative IANA registry.  Typically, these
+3222	      details have to include the procedure to create a new "identity"
+3223	      statement name and substatements ("base", "status", "description",
+3224	      and "reference") or a new "enum" statement and sub-statements
+3225	      ("value", "status", "description", and "reference").
+
+3227	      -  When creating a new "identity" statement name or a new "enum"
+3228	         statement, it is RECOMMENDED to mirror the name (if present) as
+3229	         recorded in the IANA registry.
+
+3231	      -  If the name in the IANA registry does not comply with the
+3232	         naming conventions listed in Section 4.3.1, the procedure MUST
+3233	         detail how IANA can generate legal identifiers from such a
+3234	         name.  Specifically, if the name begins with a number, it is
+3235	         RECOMMENDED to spell out the number when used as an identifier.
+3236	         IANA should be provided with instructions to perform such task.
+3237	         For example, authors of a module with such identifiers have to
+3238	         indicate whether:
+
+3240	         o  "3des-cbc" should be "three-des-cbc" or rather "triple-des-
+3241	            cbc" to be consistent with Section 6.3 of [RFC4253].
+
+3243	         o  "6to4" should be "sixToFour" as in [RFC7224] or "sixtofour"
+3244	            as in [RFC8675].
+
+3246	      -  If a new registration uses an identifier that does not comply
+3247	         with the naming conventions listed in Section 4.3.1, IANA
+3248	         should check if a guidance to generate legal identifiers was
+3249	         supplied in the RFC that specified the initial version of the
+3250	         module.  If no such guidance is available, IANA should check
+3251	         the latest revision of the IANA-maintained module for similar
+3252	         patterns.  If all else failed, IANA should seek advice from
+3253	         relevant registry experts (e.g., designated experts for a
+3254	         registry with Expert Review policy (Section 4.5 of [RFC8126])
+3255	         or responsible Area Director).
+
+3257	   *  A note that unassigned or reserved values must not be present in
+3258	      the IANA-maintained module.
+
+3260	   *  An instruction whether experimental values should be included in
+3261	      the IANA-maintained module.  If no instruction is provided,
+3262	      experimental values MUST NOT be listed in the IANA-maintained
+3263	      module.
+
+3265	   *  An instruction about how to generate the "revision" statement.
+
+3267	   A template for the IANA Considerations is provided in
+3268	   Section 4.30.3.1 for IANA-maintained modules with identities and
+3269	   Section 4.30.3.2 for IANA-maintained modules with enumerations.
+3270	   Authors may modify the template to reflect specifics of their modules
+3271	   (e.g., multiple registries can be listed for a single IANA-maintained
+3272	   module, no explicit description (or name) field is listed under the
+3273	   authoritative IANA registry, or the name does not comply with YANG
+3274	   naming conventions (Section 4.3.1)).
+
+3276	   An example of "revision" statements that are generated following the
+3277	   guidance in Section 4.30.3.1 is provided below:
+
+3279	     revision 2023-11-27 {
+3280	       description
+3281	         "Registered RR Type RESINFO 261.";
+3282	       reference
+3283	         "https://www.iana.org/assignments/yang-parameters/"
+3284	       + "iana-dns-class-rr-type@2023-11-27.yang";
+3285	     }
+
+3287	     revision 2023-11-08 {
+3288	       description
+3289	         "Updated description and replaced draft string reference to
+3290	          64 and 65 with RFC 9460: Service Binding and Parameter
+3291	          Specification via the DNS (SVCB and HTTPS Resource Records).";
+3292	       reference
+3293	         "RFC 9460: Service Binding and Parameter Specification via the
+3294	                    DNS (SVCB and HTTPS Resource Records)
+3295	          https://www.iana.org/assignments/yang-parameters/"
+3296	       + "iana-dns-class-rr-type@2023-11-08.yang";
+3297	     }
+
+3299	     revision 2023-04-25 {
+3300	       description
+3301	         "Updated reference for 64 and 65.";
+3302	       reference
+3303	         "https://www.iana.org/assignments/yang-parameters/"
+3304	       + "iana-dns-class-rr-type@2023-04-25.yang";
+3305	     }
+
+3307	     revision 2022-05-30 {
+3308	       description
+3309	         "Updated description, reference for 64 and 65.";
+3310	       reference
+3311	         "https://www.iana.org/assignments/yang-parameters/"
+3312	       + "iana-dns-class-rr-type@2022-05-30.yang";
+3313	     }
+
+3315	     revision 2021-08-31 {
+3316	       description
+3317	         "Initial revision.";
+3318	       reference
+3319	         "RFC 9108: YANG Types for DNS Classes and Resource Record
+3320	                    Types";
+3321	     }
+
+3323	   Duplicating the same reference at the high level and at the level of
+3324	   a new addition might be redundant.  For example, the following does
+3325	   not provide access to a specific (OLD) revision of the module when
+3326	   future revisions are made [IANA_Tunnel_Type_URL]:
+
+3328	   revision 2021-04-23 {
+3329	     description
+3330	       "Registered tunnelType 19.";
+3331	     reference
+3332	       "RFC 4301: Security Architecture for the Internet Protocol";
+3333	   }
+
+3335	   revision 2019-11-16 {
+3336	     description
+3337	       "Initial revision.";
+3338	     reference
+3339	       "RFC 8675: A YANG Data Model for Tunnel Interface Types";
+3340	   }
+
+3342	   ...
+
+3344	   identity ipsectunnelmode {
+3345	     base ift:tunnel;
+3346	     description
+3347	       "IpSec tunnel mode encapsulation.";
+3348	     reference
+3349	       "RFC 4301: Security Architecture for the Internet Protocol";
+3350	   }
+
+3352	   The following example shows how to generate the "revision" statements
+3353	   following the guidance in Section 4.30.3.1:
+
+3355	   revision 2021-04-23 {
+3356	     description
+3357	       "Registered tunnelType 19.";
+3358	     reference
+3359	       "https://www.iana.org/assignments/yang-parameters/"
+3360	     + "iana-tunnel-type@2021-04-23.yang
+3361	        RFC 4301: Security Architecture for the Internet Protocol";
+3362	   }
+
+3364	   revision 2019-11-16 {
+3365	     description
+3366	       "Initial revision.";
+3367	     reference
+3368	       "RFC 8675: A YANG Data Model for Tunnel Interface Types";
+3369	   }
+3370	   ...
+3371	   identity ipsectunnelmode {
+3372	     base ift:tunnel;
+3373	     description
+3374	       "IpSec tunnel mode encapsulation.";
+3375	     reference
+3376	       "RFC 4301: Security Architecture for the Internet Protocol";
+3377	   }
+
+3379	   The following templates are to be considered in addition to the
+3380	   required information that is provided in Section 3.8.
+
+3382	4.30.3.1.  Template for IANA-Maintained Modules with Identities
+
+3384	   <CODE BEGINS>
+3385	   This document defines the initial version of the IANA-maintained
+3386	   "iana-foo" YANG module.  The most recent version of the YANG module
+3387	   is available from the "YANG Parameters" registry
+3388	   [IANA-YANG-PARAMETERS].
+
+3390	   IANA is requested to add this note to the registry:
+
+3392	      New values must not be directly added to the "iana-foo" YANG
+3393	      module.  They must instead be added to the "foo" registry.
+
+3395	   When a value is added to the "foo" registry, a new "identity"
+3396	   statement must be added to the "iana-foo" YANG module.  The name of
+3397	   the "identity" MUST be the name as provided in the
+3398	   registry.  The "identity" statement should have the following sub-
+3399	   statements defined:
+
+3401	    "base":        Contains 'name-base-identity-defined-in-foo'.
+
+3403	    "status":      Include only if a registration has been deprecated or
+3404	                   obsoleted.  IANA "deprecated" maps to YANG status
+3405	                   "deprecated", and IANA "obsolete" maps to YANG status
+3406	                   "obsolete".
+
+3408	    "description":  Replicates the description from the registry.
+
+3410	    "reference":   Replicates the reference(s) from the registry with
+3411	                   the title of the document(s) added.
+
+3413	   Unassigned or reserved values are not present in the module.
+
+3415	   When the "iana-foo" YANG module is updated, a new "revision"
+3416	   statement with a unique revision date must be added in front of the
+3417	   existing revision statements. The "revision" statement MUST contain
+3418	   both "description" and "reference" substatements as follows.
+
+3420	   The "description" substatement captures what changed in the
+3421	   revised version. Typically, the description enumerates the changes
+3422	   such as udpates to existing entries (e.g., update a description or
+3423	   a reference) or notes which identities were added or had their status
+3424	   changed (e.g., deprecated, discouraged, or obsoleted).
+
+3426	     -- When such a description is not feasible, the description varies
+3427	     -- on how the update is triggered.
+
+3429	     -- If the update is triggered by an RFC, insert this text:
+
+3431	    The "description" substatement should include this text:
+3432	    "Applied updates as specified by RFC XXXX.".
+
+3434	     -- If the update is triggered following other IANA registration
+3435	     -- policy (Section 4 of [RFC8126]) but not all the values in the
+3436	     -- registry are covered by the same policy, insert this text:
+
+3438	    The "description" substatement should include this text:
+3439	    "Applied updates as specified by the registration policy
+3440	     <Some_IANA_policy>".
+
+3442	   The "reference" substatement points specifically to the published
+3443	   module (i.e., IANA_FOO_URL_With_REV). It may also point to an
+3444	   authoritative event triggering the update to the YANG module. In all
+3445	   cases, this event is cited from the underlying IANA registry. If the
+3446	   update is triggered by an RFC, that RFC must also be included in
+3447	   the "reference" substatement.
+
+3449	     -- If a name in the IANA registry does not comply with the
+3450	     -- YANG naming conventions, add details how IANA can generate
+3451	     -- legal identifiers. For example, if the name begins with
+3452	     -- a number, indicate a preference to spell out the number when
+3453	     -- used as an identifier.
+
+3455	   IANA is requested to add this note to [reference-to-the-iana-foo-
+3456	   registry]:
+
+3458	      When this registry is modified, the YANG module "iana-foo"
+3459	      [IANA_FOO_URL] must be updated as defined in RFC IIII.
+3460	   <CODE ENDS>
+
+3462	4.30.3.2.  Template for IANA-Maintained Modules with Enumerations
+
+3464	   <CODE BEGINS>
+3465	   This document defines the initial version of the IANA-maintained
+3466	   "iana-foo" YANG module.  The most recent version of the YANG module
+3467	   is available from the "YANG Parameters" registry
+3468	   [IANA-YANG-PARAMETERS].
+
+3470	   IANA is requested to add this note to the registry:
+
+3472	       New values must not be directly added to the "iana-foo" YANG
+3473	       module.  They must instead be added to the "foo" registry.
+
+3475	   When a value is added to the "foo" registry, a new "enum" statement
+3476	   must be added to the "iana-foo" YANG module.  The "enum" statement,
+3477	   and sub-statements thereof, should be defined:
+
+3479	    "enum":        Replicates a name from the registry.
+
+3481	    "value":       Contains the decimal value of the IANA-assigned
+3482	                   value.
+
+3484	    "status":      Is included only if a registration has been
+3485	                   deprecated or obsoleted.  IANA "deprecated" maps
+3486	                   to YANG status "deprecated", and IANA "obsolete"
+3487	                   maps to YANG status "obsolete".
+
+3489	    "description":  Replicates the description from the registry.
+
+3491	    "reference":   Replicates the reference(s) from the registry with
+3492	                   the title of the document(s) added.
+
+3494	   Unassigned or reserved values are not present in the module.
+
+3496	   When the "iana-foo" YANG module is updated, a new "revision"
+3497	   statement with a unique revision date must be added in front of the
+3498	   existing revision statements. The "revision" statement MUST contain
+3499	   both "description" and "reference" substatements as follows.
+
+3501	   The "description" substatement captures what changed in the
+3502	   revised version. Typically, the description enumerates the changes
+3503	   such as udpates to existing entries (e.g., update a description or
+3504	   a reference) or notes which "enums" were added or had their status
+3505	   changed (e.g., deprecated, discouraged, or obsoleted).
+
+3507	     -- When such a description is not feasible, the description varies
+3508	     -- on how the update is triggered.
+
+3510	     -- If the update is triggered by an RFC, insert this text:
+
+3512	    The "description" substatement should include this text:
+3513	    "Applied updates as specified by RFC XXXX.".
+
+3515	     -- If the update is triggered following other IANA registration
+3516	     -- policy (Section 4 of [RFC8126]) but not all the values in the
+3517	     -- registry are covered by the same policy, insert this text:
+
+3519	    The "description" substatement should include this text:
+3520	    "Applied updates as specified by the registration policy
+3521	     <Some_IANA_policy>".
+
+3523	   The "reference" substatement points specifically to the published
+3524	   module (i.e., IANA_FOO_URL_With_REV). It may also point to an
+3525	   authoritative event triggering the update to the YANG module. In all
+3526	   cases, this event is cited from the underlying IANA registry. If the
+3527	   update is triggered by an RFC, that RFC must also be included in
+3528	   the "reference" substatement.
+
+3530	     -- If a name in the IANA registry does not comply with the
+3531	     -- YANG naming conventions, add details how IANA can generate
+3532	     -- legal identifiers. For example, if the name begins with
+3533	     -- a number, indicate a preference to spell out the number when
+3534	     -- used as an identifier.
+
+3536	   IANA is requested to add this note to [reference-to-the-iana-foo-
+3537	   registry]:
+
+3539	       When this registry is modified, the YANG module "iana-foo"
+3540	       [IANA_FOO_URL] must be updated as defined in RFC IIII.
+3541	   <CODE ENDS>
+
+3543	5.  IANA Considerations
+3544	5.1.  YANG Modules
+
+3546	   The following registration in the "ns" subregistry of the "IETF XML
+3547	   Registry" [RFC3688] was detailed in [RFC8407].  This document
+3548	   requests IANA to update this registration to reference this document.
+
+3550	        URI: urn:ietf:params:xml:ns:yang:ietf-template
+3551	        Registrant Contact: The IESG.
+3552	        XML: N/A, the requested URI is an XML namespace.
+
+3554	   IANA is requested to register the following URI in the "ns"
+3555	   subregistry within the "IETF XML Registry" [RFC3688]:
+
+3557	      URI:  urn:ietf:params:xml:ns:yang:iana-template
+3558	      Registrant Contact:  The IESG.
+3559	      XML:  N/A; the requested URI is an XML namespace.
+
+3561	   This document requests IANA to register the following YANG modules in
+3562	   the "YANG Module Names" registry [RFC6020] within the "YANG
+3563	   Parameters" registry group.
+
+3565	      Name:  ietf-template
+3566	      Maintained by IANA?  N
+3567	      Namespace:  urn:ietf:params:xml:ns:yang:ietf-template
+3568	      Prefix:  temp
+3569	      Reference:  RFC AAAA
+
+3571	      Name:  iana-template
+3572	      Maintained by IANA?  N
+3573	      Namespace:  urn:ietf:params:xml:ns:yang:iana-template
+3574	      Prefix:  iana-foo
+3575	      Reference:  RFC AAAA
+
+3577	5.2.  Update YANG Parameters Registry
+
+3579	   Also, this document requests IANA to update the RFC8407 reference for
+3580	   the "YANG Module Names" registry under the "YANG Parameters" registry
+3581	   group to point to the RFC number that will be assigned to this
+3582	   document as it contains the template necessary for registration in
+3583	   Appendix B.
+
+3585	5.3.  IANA-Maintained Modules
+
+3587	   IANA should refer to Section 4.30.3 for information necessary to
+3588	   populate "revision" statements and "identity" and "enum"
+3589	   substatements in IANA-maintained modules.  These considerations cover
+3590	   both the creation and maintenance of an IANA-mainatined module.  In
+3591	   particular, the following should be noted:
+
+3593	   *  When an underlying registration is deprecated or obsoleted, a
+3594	      corresponding "status" substatement should be added to the
+3595	      identity or enumeration statement.
+
+3597	   *  The "reference" substatement should point specifically to the
+3598	      published module (i.e., IANA_FOO_URL_With_REV).  When the
+3599	      registration is triggered by an RFC, that RFC must also be
+3600	      included in the "reference" substatement.  It may also point to an
+3601	      authoritative event triggering the update to the YANG module.  In
+3602	      all cases, the event is cited from the underlying IANA registry.
+
+3604	   In addition, when the module is published, IANA must add the
+3605	   following notes to:
+
+3607	   The YANG Module Names registry:
+3608	      New values must not be directly added to the "iana-foo" YANG
+3609	      module.  They must instead be added to the "foo" registry.
+
+3611	   The underlying registry:
+3612	      When this registry is modified, the YANG module "iana-foo"
+3613	      [IANA_FOO_URL] must be updated as defined in RFC IIII.
+
+3615	6.  Security Considerations
+
+3617	   This document defines guidelines for NETCONF or RESTCONF content
+3618	   defined with the YANG data modeling language.  It does not introduce
+3619	   any new or increased security risks that need to be discussed.
+
+3621	7.  References
+
+3623	7.1.  Normative References
+
+3625	   [ID-Guidelines]
+3626	              IETF, "Guidelines to Authors of Internet-Drafts", n.d.,
+3627	              <https://authors.ietf.org/en/content-guidelines-overview>.
+
+3629	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+3630	              Requirement Levels", BCP 14, RFC 2119,
+3631	              DOI 10.17487/RFC2119, March 1997,
+3632	              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+3634	   [RFC3688]  Mealling, M., "The IETF XML Registry", BCP 81, RFC 3688,
+3635	              DOI 10.17487/RFC3688, January 2004,
+3636	              <https://www.rfc-editor.org/rfc/rfc3688>.
+
+3638	   [RFC3986]  Berners-Lee, T., Fielding, R., and L. Masinter, "Uniform
+3639	              Resource Identifier (URI): Generic Syntax", STD 66,
+3640	              RFC 3986, DOI 10.17487/RFC3986, January 2005,
+3641	              <https://www.rfc-editor.org/rfc/rfc3986>.
+
+3643	   [RFC5378]  Bradner, S., Ed. and J. Contreras, Ed., "Rights
+3644	              Contributors Provide to the IETF Trust", BCP 78, RFC 5378,
+3645	              DOI 10.17487/RFC5378, November 2008,
+3646	              <https://www.rfc-editor.org/rfc/rfc5378>.
+
+3648	   [RFC6020]  Bjorklund, M., Ed., "YANG - A Data Modeling Language for
+3649	              the Network Configuration Protocol (NETCONF)", RFC 6020,
+3650	              DOI 10.17487/RFC6020, October 2010,
+3651	              <https://www.rfc-editor.org/rfc/rfc6020>.
+
+3653	   [RFC6241]  Enns, R., Ed., Bjorklund, M., Ed., Schoenwaelder, J., Ed.,
+3654	              and A. Bierman, Ed., "Network Configuration Protocol
+3655	              (NETCONF)", RFC 6241, DOI 10.17487/RFC6241, June 2011,
+3656	              <https://www.rfc-editor.org/rfc/rfc6241>.
+
+3658	   [RFC7950]  Bjorklund, M., Ed., "The YANG 1.1 Data Modeling Language",
+3659	              RFC 7950, DOI 10.17487/RFC7950, August 2016,
+3660	              <https://www.rfc-editor.org/rfc/rfc7950>.
+
+3662	   [RFC7952]  Lhotka, L., "Defining and Using Metadata with YANG",
+3663	              RFC 7952, DOI 10.17487/RFC7952, August 2016,
+3664	              <https://www.rfc-editor.org/rfc/rfc7952>.
+
+3666	   [RFC8040]  Bierman, A., Bjorklund, M., and K. Watsen, "RESTCONF
+3667	              Protocol", RFC 8040, DOI 10.17487/RFC8040, January 2017,
+3668	              <https://www.rfc-editor.org/rfc/rfc8040>.
+
+3670	   [RFC8126]  Cotton, M., Leiba, B., and T. Narten, "Guidelines for
+3671	              Writing an IANA Considerations Section in RFCs", BCP 26,
+3672	              RFC 8126, DOI 10.17487/RFC8126, June 2017,
+3673	              <https://www.rfc-editor.org/rfc/rfc8126>.
+
+3675	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+3676	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+3677	              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+3679	   [RFC8341]  Bierman, A. and M. Bjorklund, "Network Configuration
+3680	              Access Control Model", STD 91, RFC 8341,
+3681	              DOI 10.17487/RFC8341, March 2018,
+3682	              <https://www.rfc-editor.org/rfc/rfc8341>.
+
+3684	   [RFC8342]  Bjorklund, M., Schoenwaelder, J., Shafer, P., Watsen, K.,
+3685	              and R. Wilton, "Network Management Datastore Architecture
+3686	              (NMDA)", RFC 8342, DOI 10.17487/RFC8342, March 2018,
+3687	              <https://www.rfc-editor.org/rfc/rfc8342>.
+
+3689	   [RFC8791]  Bierman, A., Björklund, M., and K. Watsen, "YANG Data
+3690	              Structure Extensions", RFC 8791, DOI 10.17487/RFC8791,
+3691	              June 2020, <https://www.rfc-editor.org/rfc/rfc8791>.
+
+3693	   [RFC8792]  Watsen, K., Auerswald, E., Farrel, A., and Q. Wu,
+3694	              "Handling Long Lines in Content of Internet-Drafts and
+3695	              RFCs", RFC 8792, DOI 10.17487/RFC8792, June 2020,
+3696	              <https://www.rfc-editor.org/rfc/rfc8792>.
+
+3698	   [RFC8819]  Hopps, C., Berger, L., and D. Bogdanovic, "YANG Module
+3699	              Tags", RFC 8819, DOI 10.17487/RFC8819, January 2021,
+3700	              <https://www.rfc-editor.org/rfc/rfc8819>.
+
+3702	   [W3C.REC-xpath]
+3703	              Clark, J. and S. DeRose, "XML Path Language (XPath)
+3704	              Version 1.0", W3C Recommendation REC-xpath-19991116,
+3705	              November 1999,
+3706	              <https://www.w3.org/TR/1999/REC-xpath-19991116>.
+
+3708	7.2.  Informative References
+
+3710	   [IANA-MOD-NAMES]
+3711	              IANA, "YANG Module Names",
+3712	              <https://www.iana.org/assignments/yang-parameters/>.
+
+3714	   [IANA-TAGS]
+3715	              IANA, "YANG Module Tags",
+3716	              <https://www.iana.org/assignments/yang-module-tags/>.
+
+3718	   [IANA-XML] IANA, "IETF XML Registry",
+3719	              <https://www.iana.org/assignments/xml-registry/>.
+
+3721	   [IANA-YANG-PARAMETERS]
+3722	              "YANG Parameters", n.d.,
+3723	              <https://www.iana.org/assignments/yang-parameters>.
+
+3725	   [IANA_BFD_URL]
+3726	              IANA, "iana-bfd-types YANG Module",
+3727	              <https://www.iana.org/assignments/iana-bfd-types/iana-bfd-
+3728	              types.xhtml>.
+
+3730	   [IANA_BGP-L2_URL]
+3731	              IANA, "iana-bgp-l2-encaps YANG Module",
+3732	              <https://www.iana.org/assignments/iana-bgp-l2-encaps/iana-
+3733	              bgp-l2-encaps.xhtml>.
+
+3735	   [IANA_BGP-L2_URL-Revision]
+3736	              IANA, "iana-bfd-types@2021-10-21.yang",
+3737	              <https://www.iana.org/assignments/yang-parameters/iana-
+3738	              bfd-types@2021-10-21.yang>.
+
+3740	   [IANA_PW-Types_URL]
+3741	              IANA, "iana-pseudowire-types YANG Module",
+3742	              <https://www.iana.org/assignments/iana-pseudowire-types/
+3743	              iana-pseudowire-types.xhtml>.
+
+3745	   [IANA_Tunnel_Type_URL]
+3746	              IANA, "iana-tunnel-type YANG Module",
+3747	              <https://www.iana.org/assignments/iana-tunnel-type/iana-
+3748	              tunnel-type.xhtml>.
+
+3750	   [RFC-STYLE]
+3751	              RFC Editor, "Style Guide",
+3752	              <https://www.rfc-editor.org/styleguide/>.
+
+3754	   [RFC2026]  Bradner, S., "The Internet Standards Process -- Revision
+3755	              3", BCP 9, RFC 2026, DOI 10.17487/RFC2026, October 1996,
+3756	              <https://www.rfc-editor.org/rfc/rfc2026>.
+
+3758	   [RFC2606]  Eastlake 3rd, D. and A. Panitz, "Reserved Top Level DNS
+3759	              Names", BCP 32, RFC 2606, DOI 10.17487/RFC2606, June 1999,
+3760	              <https://www.rfc-editor.org/rfc/rfc2606>.
+
+3762	   [RFC2863]  McCloghrie, K. and F. Kastenholz, "The Interfaces Group
+3763	              MIB", RFC 2863, DOI 10.17487/RFC2863, June 2000,
+3764	              <https://www.rfc-editor.org/rfc/rfc2863>.
+
+3766	   [RFC3849]  Huston, G., Lord, A., and P. Smith, "IPv6 Address Prefix
+3767	              Reserved for Documentation", RFC 3849,
+3768	              DOI 10.17487/RFC3849, July 2004,
+3769	              <https://www.rfc-editor.org/rfc/rfc3849>.
+
+3771	   [RFC4151]  Kindberg, T. and S. Hawke, "The 'tag' URI Scheme",
+3772	              RFC 4151, DOI 10.17487/RFC4151, October 2005,
+3773	              <https://www.rfc-editor.org/rfc/rfc4151>.
+
+3775	   [RFC4181]  Heard, C., Ed., "Guidelines for Authors and Reviewers of
+3776	              MIB Documents", BCP 111, RFC 4181, DOI 10.17487/RFC4181,
+3777	              September 2005, <https://www.rfc-editor.org/rfc/rfc4181>.
+
+3779	   [RFC4252]  Ylonen, T. and C. Lonvick, Ed., "The Secure Shell (SSH)
+3780	              Authentication Protocol", RFC 4252, DOI 10.17487/RFC4252,
+3781	              January 2006, <https://www.rfc-editor.org/rfc/rfc4252>.
+
+3783	   [RFC4253]  Ylonen, T. and C. Lonvick, Ed., "The Secure Shell (SSH)
+3784	              Transport Layer Protocol", RFC 4253, DOI 10.17487/RFC4253,
+3785	              January 2006, <https://www.rfc-editor.org/rfc/rfc4253>.
+
+3787	   [RFC5398]  Huston, G., "Autonomous System (AS) Number Reservation for
+3788	              Documentation Use", RFC 5398, DOI 10.17487/RFC5398,
+3789	              December 2008, <https://www.rfc-editor.org/rfc/rfc5398>.
+
+3791	   [RFC5612]  Eronen, P. and D. Harrington, "Enterprise Number for
+3792	              Documentation Use", RFC 5612, DOI 10.17487/RFC5612, August
+3793	              2009, <https://www.rfc-editor.org/rfc/rfc5612>.
+
+3795	   [RFC5737]  Arkko, J., Cotton, M., and L. Vegoda, "IPv4 Address Blocks
+3796	              Reserved for Documentation", RFC 5737,
+3797	              DOI 10.17487/RFC5737, January 2010,
+3798	              <https://www.rfc-editor.org/rfc/rfc5737>.
+
+3800	   [RFC6991]  Schoenwaelder, J., Ed., "Common YANG Data Types",
+3801	              RFC 6991, DOI 10.17487/RFC6991, July 2013,
+3802	              <https://www.rfc-editor.org/rfc/rfc6991>.
+
+3804	   [RFC7223]  Bjorklund, M., "A YANG Data Model for Interface
+3805	              Management", RFC 7223, DOI 10.17487/RFC7223, May 2014,
+3806	              <https://www.rfc-editor.org/rfc/rfc7223>.
+
+3808	   [RFC7224]  Bjorklund, M., "IANA Interface Type YANG Module",
+3809	              RFC 7224, DOI 10.17487/RFC7224, May 2014,
+3810	              <https://www.rfc-editor.org/rfc/rfc7224>.
+
+3812	   [RFC7322]  Flanagan, H. and S. Ginoza, "RFC Style Guide", RFC 7322,
+3813	              DOI 10.17487/RFC7322, September 2014,
+3814	              <https://www.rfc-editor.org/rfc/rfc7322>.
+
+3816	   [RFC7407]  Bjorklund, M. and J. Schoenwaelder, "A YANG Data Model for
+3817	              SNMP Configuration", RFC 7407, DOI 10.17487/RFC7407,
+3818	              December 2014, <https://www.rfc-editor.org/rfc/rfc7407>.
+
+3820	   [RFC7841]  Halpern, J., Ed., Daigle, L., Ed., and O. Kolkman, Ed.,
+3821	              "RFC Streams, Headers, and Boilerplates", RFC 7841,
+3822	              DOI 10.17487/RFC7841, May 2016,
+3823	              <https://www.rfc-editor.org/rfc/rfc7841>.
+
+3825	   [RFC7951]  Lhotka, L., "JSON Encoding of Data Modeled with YANG",
+3826	              RFC 7951, DOI 10.17487/RFC7951, August 2016,
+3827	              <https://www.rfc-editor.org/rfc/rfc7951>.
+
+3829	   [RFC8199]  Bogdanovic, D., Claise, B., and C. Moberg, "YANG Module
+3830	              Classification", RFC 8199, DOI 10.17487/RFC8199, July
+3831	              2017, <https://www.rfc-editor.org/rfc/rfc8199>.
+
+3833	   [RFC8299]  Wu, Q., Ed., Litkowski, S., Tomotaki, L., and K. Ogaki,
+3834	              "YANG Data Model for L3VPN Service Delivery", RFC 8299,
+3835	              DOI 10.17487/RFC8299, January 2018,
+3836	              <https://www.rfc-editor.org/rfc/rfc8299>.
+
+3838	   [RFC8309]  Wu, Q., Liu, W., and A. Farrel, "Service Models
+3839	              Explained", RFC 8309, DOI 10.17487/RFC8309, January 2018,
+3840	              <https://www.rfc-editor.org/rfc/rfc8309>.
+
+3842	   [RFC8340]  Bjorklund, M. and L. Berger, Ed., "YANG Tree Diagrams",
+3843	              BCP 215, RFC 8340, DOI 10.17487/RFC8340, March 2018,
+3844	              <https://www.rfc-editor.org/rfc/rfc8340>.
+
+3846	   [RFC8343]  Bjorklund, M., "A YANG Data Model for Interface
+3847	              Management", RFC 8343, DOI 10.17487/RFC8343, March 2018,
+3848	              <https://www.rfc-editor.org/rfc/rfc8343>.
+
+3850	   [RFC8349]  Lhotka, L., Lindem, A., and Y. Qu, "A YANG Data Model for
+3851	              Routing Management (NMDA Version)", RFC 8349,
+3852	              DOI 10.17487/RFC8349, March 2018,
+3853	              <https://www.rfc-editor.org/rfc/rfc8349>.
+
+3855	   [RFC8407]  Bierman, A., "Guidelines for Authors and Reviewers of
+3856	              Documents Containing YANG Data Models", BCP 216, RFC 8407,
+3857	              DOI 10.17487/RFC8407, October 2018,
+3858	              <https://www.rfc-editor.org/rfc/rfc8407>.
+
+3860	   [RFC8446]  Rescorla, E., "The Transport Layer Security (TLS) Protocol
+3861	              Version 1.3", RFC 8446, DOI 10.17487/RFC8446, August 2018,
+3862	              <https://www.rfc-editor.org/rfc/rfc8446>.
+
+3864	   [RFC8466]  Wen, B., Fioccola, G., Ed., Xie, C., and L. Jalil, "A YANG
+3865	              Data Model for Layer 2 Virtual Private Network (L2VPN)
+3866	              Service Delivery", RFC 8466, DOI 10.17487/RFC8466, October
+3867	              2018, <https://www.rfc-editor.org/rfc/rfc8466>.
+
+3869	   [RFC8519]  Jethanandani, M., Agarwal, S., Huang, L., and D. Blair,
+3870	              "YANG Data Model for Network Access Control Lists (ACLs)",
+3871	              RFC 8519, DOI 10.17487/RFC8519, March 2019,
+3872	              <https://www.rfc-editor.org/rfc/rfc8519>.
+
+3874	   [RFC8675]  Boucadair, M., Farrer, I., and R. Asati, "A YANG Data
+3875	              Model for Tunnel Interface Types", RFC 8675,
+3876	              DOI 10.17487/RFC8675, November 2019,
+3877	              <https://www.rfc-editor.org/rfc/rfc8675>.
+
+3879	   [RFC8892]  Thaler, D. and D. Romascanu, "Guidelines and Registration
+3880	              Procedures for Interface Types and Tunnel Types",
+3881	              RFC 8892, DOI 10.17487/RFC8892, August 2020,
+3882	              <https://www.rfc-editor.org/rfc/rfc8892>.
+
+3884	   [RFC8969]  Wu, Q., Ed., Boucadair, M., Ed., Lopez, D., Xie, C., and
+3885	              L. Geng, "A Framework for Automating Service and Network
+3886	              Management with YANG", RFC 8969, DOI 10.17487/RFC8969,
+3887	              January 2021, <https://www.rfc-editor.org/rfc/rfc8969>.
+
+3889	   [RFC9000]  Iyengar, J., Ed. and M. Thomson, Ed., "QUIC: A UDP-Based
+3890	              Multiplexed and Secure Transport", RFC 9000,
+3891	              DOI 10.17487/RFC9000, May 2021,
+3892	              <https://www.rfc-editor.org/rfc/rfc9000>.
+
+3894	   [RFC9108]  Lhotka, L. and P. Špaček, "YANG Types for DNS Classes and
+3895	              Resource Record Types", RFC 9108, DOI 10.17487/RFC9108,
+3896	              September 2021, <https://www.rfc-editor.org/rfc/rfc9108>.
+
+3898	   [RFC9129]  Yeung, D., Qu, Y., Zhang, Z., Chen, I., and A. Lindem,
+3899	              "YANG Data Model for the OSPF Protocol", RFC 9129,
+3900	              DOI 10.17487/RFC9129, October 2022,
+3901	              <https://www.rfc-editor.org/rfc/rfc9129>.
+
+3903	   [RFC9132]  Boucadair, M., Ed., Shallow, J., and T. Reddy.K,
+3904	              "Distributed Denial-of-Service Open Threat Signaling
+3905	              (DOTS) Signal Channel Specification", RFC 9132,
+3906	              DOI 10.17487/RFC9132, September 2021,
+3907	              <https://www.rfc-editor.org/rfc/rfc9132>.
+
+3909	   [RFC9182]  Barguil, S., Gonzalez de Dios, O., Ed., Boucadair, M.,
+3910	              Ed., Munoz, L., and A. Aguado, "A YANG Network Data Model
+3911	              for Layer 3 VPNs", RFC 9182, DOI 10.17487/RFC9182,
+3912	              February 2022, <https://www.rfc-editor.org/rfc/rfc9182>.
+
+3914	   [RFC9195]  Lengyel, B. and B. Claise, "A File Format for YANG
+3915	              Instance Data", RFC 9195, DOI 10.17487/RFC9195, February
+3916	              2022, <https://www.rfc-editor.org/rfc/rfc9195>.
+
+3918	   [RFC9244]  Boucadair, M., Ed., Reddy.K, T., Ed., Doron, E., Chen, M.,
+3919	              and J. Shallow, "Distributed Denial-of-Service Open Threat
+3920	              Signaling (DOTS) Telemetry", RFC 9244,
+3921	              DOI 10.17487/RFC9244, June 2022,
+3922	              <https://www.rfc-editor.org/rfc/rfc9244>.
+
+3924	   [RFC9291]  Boucadair, M., Ed., Gonzalez de Dios, O., Ed., Barguil,
+3925	              S., and L. Munoz, "A YANG Network Data Model for Layer 2
+3926	              VPNs", RFC 9291, DOI 10.17487/RFC9291, September 2022,
+3927	              <https://www.rfc-editor.org/rfc/rfc9291>.
+
+3929	   [RFC9362]  Boucadair, M. and J. Shallow, "Distributed Denial-of-
+3930	              Service Open Threat Signaling (DOTS) Signal Channel
+3931	              Configuration Attributes for Robust Block Transmission",
+3932	              RFC 9362, DOI 10.17487/RFC9362, February 2023,
+3933	              <https://www.rfc-editor.org/rfc/rfc9362>.
+
+3935	   [RFC9645]  Watsen, K., "YANG Groupings for TLS Clients and TLS
+3936	              Servers", RFC 9645, DOI 10.17487/RFC9645, October 2024,
+3937	              <https://www.rfc-editor.org/rfc/rfc9645>.
+
+3939	   [Style]    "IANA YANG", n.d., <https://github.com/llhotka/iana-yang>.
+
+3941	Appendix A.  Module Review Checklist
+
+3943	   This section is adapted from [RFC4181].
+
+3945	   The purpose of a YANG module review is to review the YANG module for
+3946	   both technical correctness and adherence to IETF documentation
+3947	   requirements.  The following checklist may be helpful when reviewing
+3948	   an I-D:
+
+3950	   *  I-D Boilerplate -- verify that the document contains the required
+3951	      I-D boilerplate (see <https://www.ietf.org/id-info/
+3952	      guidelines.html>), including the appropriate statement to permit
+3953	      publication as an RFC, and that the I-D boilerplate does not
+3954	      contain references or section numbers.
+
+3956	   *  Abstract -- verify that the abstract does not contain references,
+3957	      that it does not have a section number, and that its content
+3958	      follows the guidelines in <https://www.ietf.org/id-info/
+3959	      guidelines.html>.
+
+3961	   *  Copyright Notice -- verify that the document has the appropriate
+3962	      text regarding the rights that document contributors provide to
+3963	      the IETF Trust [RFC5378].  Verify that it contains the full IETF
+3964	      Trust copyright notice at the beginning of the document.  The IETF
+3965	      Trust Legal Provisions (TLP) can be found at:
+
+3967	      <https://trustee.ietf.org/license-info/>
+
+3969	   *  Security Considerations section -- If none of the modules in the
+3970	      document falls under the exceptions in Section 3.7 (e.g., use YANG
+3971	      data structure), verify that the section is modeled after the
+3972	      latest approved template from the Operations and Management (OPS)
+3973	      area website (see <https://wiki.ietf.org/group/ops/yang-security-
+3974	      guidelines>) and that the guidelines therein have been followed.
+
+3976	   *  IANA Considerations section -- this section must always be
+3977	      present.  For each module within the document, ensure that the
+3978	      IANA Considerations section contains entries for the following
+3979	      IANA registries:
+
+3981	      XML Namespace Registry:  Register the YANG module namespace.
+
+3983	      YANG Module Registry:  Register the YANG module name, prefix,
+3984	         namespace, and RFC number, according to the rules specified in
+3985	         [RFC6020].
+
+3987	   *  References -- verify that the references are properly divided
+3988	      between normative and informative references, that RFCs 2119 and
+3989	      8174 are included as normative references if the terminology
+3990	      defined therein is used in the document, that all references
+3991	      required by the boilerplate are present, that all YANG modules
+3992	      containing imported items are cited as normative references, and
+3993	      that all citations point to the most current RFCs, unless there is
+3994	      a valid reason to do otherwise (for example, it is okay to include
+3995	      an informative reference to a previous version of a specification
+3996	      to help explain a feature included for backward compatibility).
+3997	      Be sure citations for all imported modules are present somewhere
+3998	      in the document text (outside the YANG module).  If a YANG module
+3999	      contains reference or "description" statements that refer to an
+4000	      I-D, then the I-D is included as an informative reference.
+
+4002	   *  License -- verify that the document contains the Revised BSD
+4003	      License in each YANG module or submodule.  Some guidelines related
+4004	      to this requirement are described in Section 3.1.  Make sure that
+4005	      the correct year is used in all copyright dates.  Use the approved
+4006	      text from the latest TLP document, which can be found at:
+
+4008	      <https://trustee.ietf.org/license-info/>
+
+4010	   *  Other Issues -- check for any issues mentioned in
+4011	      <https://www.ietf.org/id-info/checklist.html> that are not covered
+4012	      elsewhere.
+
+4014	   *  Technical Content -- review the actual technical content for
+4015	      compliance with the guidelines in this document.  The use of a
+4016	      YANG module compiler is recommended when checking for syntax
+4017	      errors.  A list of freely available tools and other information,
+4018	      including formatting advice, can be found at:
+
+4020	      <https://wiki.ietf.org/group/netconf>
+
+4022	      and
+
+4024	      <https://wiki.ietf.org/group/netmod>
+
+4026	      Checking for correct syntax, however, is only part of the job.  It
+4027	      is just as important to actually read the YANG module document
+4028	      from the point of view of a potential implementor.  It is
+4029	      particularly important to check that "description" statements are
+4030	      sufficiently clear and unambiguous to allow interoperable
+4031	      implementations to be created.
+
+4033	Appendix B.  Template for IETF Modules
+
+4035	   <CODE BEGINS> file "ietf-template@2023-07-26.yang"
+4036	   module ietf-template {
+4037	     yang-version 1.1;
+
+4039	     // replace this string with a unique namespace URN value
+
+4041	     namespace "urn:ietf:params:xml:ns:yang:ietf-template";
+
+4043	     // replace this string, and try to pick a unique prefix
+
+4045	     prefix temp;
+
+4047	     // import statements here: e.g.,
+4048	     // import ietf-yang-types { prefix yang; }
+4049	     // import ietf-inet-types { prefix inet; }
+4050	     // identify the IETF working group if applicable
+
+4052	     organization
+4053	       "IETF your-wg-name (Expanded WG Name) Working Group";
+
+4055	     // update this contact statement with your info
+
+4057	     contact
+4058	       "WG Web:   <http://datatracker.ietf.org/wg/your-wg-name/>
+4059	        WG List:  <mailto:your-wg-name@ietf.org>
+
+4061	        Editor:   your-name
+4062	                  <mailto:your-email@example.com>";
+
+4064	     // replace the first sentence in this description statement.
+4065	     // replace the copyright notice with the most recent
+4066	     // version, if it has been updated since the publication
+4067	     // of this document
+
+4069	     description
+4070	       "This module defines a template for other YANG modules.
+
+4072	        Copyright (c) <insert year> IETF Trust and the persons
+4073	        identified as authors of the code.  All rights reserved.
+
+4075	        Redistribution and use in source and binary forms, with or
+4076	        without modification, is permitted pursuant to, and subject
+4077	        to the license terms contained in, the Revised BSD License
+4078	        set forth in Section 4.c of the IETF Trust's Legal Provisions
+4079	        Relating to IETF Documents
+4080	        (https://trustee.ietf.org/license-info).
+
+4082	        All revisions of IETF and IANA published modules can be found
+4083	        at the YANG Parameters registry
+4084	        (https://www.iana.org/assignments/yang-parameters).
+
+4086	        This version of this YANG module is part of RFC XXXX; see
+4087	        the RFC itself for full legal notices.";
+
+4089	     // RFC Ed.: replace XXXX/YYYY with actual RFC number and remove
+4090	     // this note
+
+4092	     // replace 'date-revision' with the module publication date
+4093	     // the format is (YYYY-MM-DD)
+
+4095	     revision date-revision {
+4096	       description
+4097	         "What changed in this revision.";
+4098	       reference
+4099	         "RFC XXXX: <Replace With Document Title>";
+4100	     }
+
+4102	     // RFC Ed.: Update with the RFC number and title
+4103	     // of the RFC that defined the initial version of
+4104	     // the module and remove this note
+
+4106	     revision date-initial {
+4107	       description
+4108	         "Initial version";
+4109	       reference
+4110	         "RFC YYYY: <Replace With Document Title>";
+4111	     }
+
+4113	     // extension statements
+4114	     // feature statements
+4115	     // identity statements
+4116	     // typedef statements
+4117	     // grouping statements
+4118	     // data definition statements
+4119	     // augment statements
+4120	     // rpc statements
+4121	     // notification statements
+4122	     // DO NOT put deviation statements in a published module
+4123	   }
+4124	   <CODE ENDS>
+
+4126	Appendix C.  Template for IANA-Maintained Modules
+
+4128	   <CODE BEGINS> file "iana-template@2023-12-08.yang"
+4129	   module iana-template {
+4130	     yang-version 1.1;
+
+4132	     // replace this string with a unique namespace URN value
+
+4134	     namespace "urn:ietf:params:xml:ns:yang:iana-template";
+
+4136	     // replace with the assigned prefix
+
+4138	     prefix iana-foo;
+
+4140	     organization
+4141	       "Internet Assigned Numbers Authority (IANA)";
+
+4143	     contact
+4144	       "Internet Assigned Numbers Authority
+
+4146	        ICANN
+4147	        12025 Waterfront Drive, Suite 300
+4148	        Los Angeles, CA 90094
+
+4150	        Tel: +1 424 254 5300
+
+4152	        <mailto:iana@iana.org>";
+
+4154	     description
+4155	       "This module defines a template for IANA-maintained modules.
+
+4157	        Copyright (c) <insert year> IETF Trust and the persons
+4158	        identified as authors of the code.  All rights reserved.
+
+4160	        Redistribution and use in source and binary forms, with or
+4161	        without modification, is permitted pursuant to, and subject to
+4162	        the license terms contained in, the Revised BSD License set
+4163	        forth in Section 4.c of the IETF Trust's Legal Provisions
+4164	        Relating to IETF Documents
+4165	        (https://trustee.ietf.org/license-info).
+
+4167	        All revisions of IETF and IANA published modules can be found
+4168	        at the YANG Parameters registry
+4169	        (https://www.iana.org/assignments/yang-parameters).
+
+4171	        The initial version of this YANG module is part of RFC IIII;
+4172	        see the RFC itself for full legal notices.
+
+4174	     // RFC Ed.: replace IIII with actual RFC number and remove
+4175	     // this note
+
+4177	     // If a script is used, complete with the script information
+
+4179	        This version of this YANG module was generated from the
+4180	        corresponding IANA registry using a <script-info>.
+
+4182	     // RFC Ed.: replace the IANA_FOO_URL and remove this note
+
+4184	        The latest version of this YANG module is available at
+4185	        <IANA_FOO_URL>.";
+
+4187	     // replace with the registry name and the URL of the IANA registry
+
+4189	     reference
+4190	       "Registry Name (URL)";
+
+4192	     // replace 'date-revision' with the module publication date
+4193	     // the format is (YYYY-MM-DD)
+
+4195	     revision date-revision {
+4196	       description
+4197	         "Indicates the list of changes per Section 4.30.3 of RFCAAAA.";
+4198	       reference
+4199	         "URL of the latest version of the module
+4200	          (if any) list the authoritative event (e.g., RFC) that
+4201	          triggered the update to the YANG module";
+4202	     }
+
+4204	     // replace 'date-initial' with the module publication date
+4205	     // the format is (YYYY-MM-DD)
+
+4207	     revision date-initial {
+4208	       description
+4209	         "Initial version";
+4210	       reference
+4211	         "URL of the published initial version of the module
+4212	          RFC IIII: RFC Title";
+
+4214	     // RFC Ed.: Update with the RFC number and title
+4215	     // of the RFC that defined the initial version of
+4216	     // the module and remove this note
+4217	     }
+
+4219	     // identity statements
+4220	     // typedef statements
+4221	   }
+4222	   <CODE ENDS>
+
+4224	Acknowledgments
+
+4226	   Thanks to Jürgen Schönwälder and Ladislav Lhotka for the discussion
+4227	   and valuable comments.  Special thanks to Ladislav Lhotka for sharing
+4228	   more context that led to the design documented in [RFC9108].
+
+4230	   Thanks to Italo Busi, Benoît Claise, Tom Petch, Randy Presuhn, Martin
+4231	   Björklund, Acee Lindem, Dale R.  Worley, Kent Watsen, Jan Lindblad,
+4232	   Qiufang Ma, Mahesh Jethanandani, Robert Wilton, and Thomas Fossati
+4233	   for the comments.
+
+4235	   Lou Berger suggested to include more details about IANA
+4236	   considerations.
+
+4238	   Section 4.28 is inspired from [RFC8819].
+
+4240	   Michal Vaško reported an inconsistency in Sections 4.6.2 and 4.6.4 of
+4241	   [RFC8407].
+
+4243	   Thanks to Xufeng Liu for reviewing the document, including providing
+4244	   YANGDOCTORS reviews.
+
+4246	   Italo Busi provided the examples of "case + when" construct.
+
+4248	   Thanks to Rach Salz and Michael Richardson for the SAAG review.
+
+4250	   Kent Watsen contributed text to the security and IANA-maintained
+4251	   module templates.
+
+4253	   Special thanks to Amanda Baber for the thoughtful and careful review
+4254	   of the document.
+
+4256	   Thanks to Qiufang Ma for the careful shepherd review.
+
+4258	   Thanks to Acee Lindem for triggering the discussion on data model vs.
+4259	   module.
+
+4261	   Thanks to Mahesh Jethanandani for the thoughtful AD review.
+
+4263	   Thanks to Christer Holmberg for the genart review, Jean Mahoney for
+4264	   the check on RPC implications, Ralf Weber for the dnsdir, and
+4265	   Giuseppe Fioccola for the opsdir review.
+
+4267	   The author of RFC 8407:  Andy Bierman
+
+4269	      YumaWorks
+
+4271	      email: andy@yumaworks.com
+
+4273	   Acknowledgments from RFC 8407:  The structure and contents of this
+4274	      document are adapted from "Guidelines for Authors and Reviewers of
+4275	      MIB Documents" [RFC4181], by C.  M.  Heard.
+
+4277	      The working group thanks Martin Bjorklund, Juergen Schoenwaelder,
+4278	      Ladislav Lhotka, Jernej Tuljak, Lou Berger, Robert Wilton, Kent
+4279	      Watsen, and William Lupton for their extensive reviews and
+4280	      contributions to this document.
+
+4282	Authors' Addresses
+
+4284	   Andy Bierman
+4285	   YumaWorks
+4286	   United States of America
+4287	   Email: andy@yumaworks.com
+
+4289	   Mohamed Boucadair (editor)
+4290	   Orange
+4291	   France
+4292	   Email: mohamed.boucadair@orange.com
+
+4294	   Qin Wu
+4295	   Huawei
+4296	   China
+4297	   Email: bill.wu@huawei.com
+
+
+
+
+
+
+
+
+
