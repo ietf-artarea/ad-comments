@@ -28,14 +28,12 @@ fi
 cp "$TEMPLATE_FILE" "$TARGET_FILE"
 
 # Check if the OS is macOS (Darwin)
-if [[ "$(uname)" == "Darwin" ]]; then
-  SED_INPLACE_OPT="-i ''"
-else
-  SED_INPLACE_OPT="-i"
-fi
-
 # Replace DRAFT with DRAFT_VERSION in the target file
-sed "$SED_INPLACE_OPT" "s/DRAFT/$DRAFT_VERSION/g" "$TARGET_FILE"
+if [[ "$(uname)" == "Darwin" ]]; then
+  sed -i '' "s/DRAFT/$DRAFT_VERSION/g" "$TARGET_FILE"
+else
+  sed -i "s/DRAFT/$DRAFT_VERSION/g" "$TARGET_FILE"
+fi
 
 # Download the URL using curl and save it to the download directory
 curl -s -o "$TARGET_DIR/idnits-report.txt" "https://author-tools.ietf.org/api/idnits?url=https://www.ietf.org/archive/id/$DRAFT_VERSION.txt&submitcheck=True"
