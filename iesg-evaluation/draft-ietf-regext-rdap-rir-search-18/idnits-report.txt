@@ -1,0 +1,1349 @@
+idnits 2.17.1 
+
+draft-ietf-regext-rdap-rir-search-18.txt:
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     No nits found.
+--------------------------------------------------------------------------------
+
+
+2	Internet Engineering Task Force                              T. Harrison
+3	Internet-Draft                                                     APNIC
+4	Intended status: Standards Track                                J. Singh
+5	Expires: 3 December 2025                                            ARIN
+6	                                                             1 June 2025
+
+8	  Registration Data Access Protocol (RDAP) Regional Internet Registry
+9	                              (RIR) Search
+10	                  draft-ietf-regext-rdap-rir-search-18
+
+12	Abstract
+
+14	   The Registration Data Access Protocol (RDAP) is used by Regional
+15	   Internet Registries (RIRs) and Domain Name Registries (DNRs) to
+16	   provide access to their resource registration information.  The core
+17	   specifications for RDAP define basic search functionality, but there
+18	   are various IP- and ASN-related search options provided by RIRs via
+19	   their Whois services for which there is no corresponding RDAP
+20	   functionality.  This document extends RDAP to support those search
+21	   options.
+
+23	Status of This Memo
+
+25	   This Internet-Draft is submitted in full conformance with the
+26	   provisions of BCP 78 and BCP 79.
+
+28	   Internet-Drafts are working documents of the Internet Engineering
+29	   Task Force (IETF).  Note that other groups may also distribute
+30	   working documents as Internet-Drafts.  The list of current Internet-
+31	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+33	   Internet-Drafts are draft documents valid for a maximum of six months
+34	   and may be updated, replaced, or obsoleted by other documents at any
+35	   time.  It is inappropriate to use Internet-Drafts as reference
+36	   material or to cite them other than as "work in progress."
+
+38	   This Internet-Draft will expire on 3 December 2025.
+
+40	Copyright Notice
+
+42	   Copyright (c) 2025 IETF Trust and the persons identified as the
+43	   document authors.  All rights reserved.
+
+45	   This document is subject to BCP 78 and the IETF Trust's Legal
+46	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+47	   license-info) in effect on the date of publication of this document.
+48	   Please review these documents carefully, as they describe your rights
+49	   and restrictions with respect to this document.  Code Components
+50	   extracted from this document must include Revised BSD License text as
+51	   described in Section 4.e of the Trust Legal Provisions and are
+52	   provided without warranty as described in the Revised BSD License.
+
+54	Table of Contents
+
+56	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
+57	     1.1.  Conventions Used in This Document . . . . . . . . . . . .   3
+58	   2.  Basic Searches  . . . . . . . . . . . . . . . . . . . . . . .   4
+59	     2.1.  Path Segments . . . . . . . . . . . . . . . . . . . . . .   4
+60	     2.2.  IP Network Search . . . . . . . . . . . . . . . . . . . .   4
+61	     2.3.  Autonomous System Number Search . . . . . . . . . . . . .   5
+62	   3.  Relation Searches . . . . . . . . . . . . . . . . . . . . . .   5
+63	     3.1.  Path Segments . . . . . . . . . . . . . . . . . . . . . .   6
+64	     3.2.  Relation Search . . . . . . . . . . . . . . . . . . . . .   7
+65	       3.2.1.  Definitions . . . . . . . . . . . . . . . . . . . . .   7
+66	       3.2.2.  Relations . . . . . . . . . . . . . . . . . . . . . .  10
+67	         3.2.2.1.  Single-Result Searches  . . . . . . . . . . . . .  11
+68	         3.2.2.2.  Multiple-Result Searches  . . . . . . . . . . . .  11
+69	     3.3.  Status  . . . . . . . . . . . . . . . . . . . . . . . . .  11
+70	     3.4.  Link Relations  . . . . . . . . . . . . . . . . . . . . .  13
+71	   4.  Responding To Searches  . . . . . . . . . . . . . . . . . . .  17
+72	     4.1.  Single-Result Searches  . . . . . . . . . . . . . . . . .  18
+73	     4.2.  Multiple-Result Searches  . . . . . . . . . . . . . . . .  18
+74	   5.  Reverse Search  . . . . . . . . . . . . . . . . . . . . . . .  20
+75	   6.  RDAP Conformance  . . . . . . . . . . . . . . . . . . . . . .  21
+76	   7.  Operational Considerations  . . . . . . . . . . . . . . . . .  22
+77	   8.  Privacy Considerations  . . . . . . . . . . . . . . . . . . .  22
+78	   9.  Security Considerations . . . . . . . . . . . . . . . . . . .  23
+79	   10. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  23
+80	     10.1.  RDAP Extensions Registry . . . . . . . . . . . . . . . .  23
+81	       10.1.1.  rirSearch1 . . . . . . . . . . . . . . . . . . . . .  23
+82	       10.1.2.  ips  . . . . . . . . . . . . . . . . . . . . . . . .  23
+83	       10.1.3.  autnums  . . . . . . . . . . . . . . . . . . . . . .  23
+84	       10.1.4.  ipSearchResults  . . . . . . . . . . . . . . . . . .  23
+85	       10.1.5.  autnumSearchResults  . . . . . . . . . . . . . . . .  24
+86	     10.2.  Link Relations Registry  . . . . . . . . . . . . . . . .  24
+87	       10.2.1.  rdap-up  . . . . . . . . . . . . . . . . . . . . . .  24
+88	       10.2.2.  rdap-down  . . . . . . . . . . . . . . . . . . . . .  24
+89	       10.2.3.  rdap-top . . . . . . . . . . . . . . . . . . . . . .  24
+90	       10.2.4.  rdap-bottom  . . . . . . . . . . . . . . . . . . . .  24
+91	       10.2.5.  rdap-active  . . . . . . . . . . . . . . . . . . . .  25
+92	     10.3.  RDAP Reverse Search Registry . . . . . . . . . . . . . .  25
+93	       10.3.1.  fn . . . . . . . . . . . . . . . . . . . . . . . . .  25
+94	       10.3.2.  handle . . . . . . . . . . . . . . . . . . . . . . .  25
+95	       10.3.3.  email  . . . . . . . . . . . . . . . . . . . . . . .  25
+96	       10.3.4.  role . . . . . . . . . . . . . . . . . . . . . . . .  26
+
+98	     10.4.  RDAP Reverse Search Mapping Registry . . . . . . . . . .  26
+99	       10.4.1.  fn . . . . . . . . . . . . . . . . . . . . . . . . .  26
+100	       10.4.2.  handle . . . . . . . . . . . . . . . . . . . . . . .  26
+101	       10.4.3.  email  . . . . . . . . . . . . . . . . . . . . . . .  26
+102	       10.4.4.  role . . . . . . . . . . . . . . . . . . . . . . . .  27
+103	   11. Implementation Status . . . . . . . . . . . . . . . . . . . .  27
+104	     11.1.  APNIC RDAP Implementation  . . . . . . . . . . . . . . .  27
+105	     11.2.  RIPE NCC RDAP Implementation . . . . . . . . . . . . . .  28
+106	   12. Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  28
+107	   13. References  . . . . . . . . . . . . . . . . . . . . . . . . .  28
+108	     13.1.  Normative References . . . . . . . . . . . . . . . . . .  28
+109	     13.2.  Informative References . . . . . . . . . . . . . . . . .  29
+110	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  30
+
+112	1.  Introduction
+
+114	   The Registration Data Access Protocol (RDAP) [RFC7480] is used by
+115	   Regional Internet Registries (RIRs) and Domain Name Registries (DNRs)
+116	   to provide access to their resource registration information.  The
+117	   core specifications for RDAP define basic search functionality, but
+118	   this is limited to domains, nameservers, and entities.  No searches
+119	   were defined for IP networks or autonomous system numbers.  In an
+120	   effort to have RDAP reach feature parity with the existing RIR Whois
+121	   [RFC3912] services in this respect, this document defines additional
+122	   search options for IP networks and autonomous system numbers.
+
+124	   While this document is in terms of RIRs and DNRs for the sake of
+125	   consistency with earlier RDAP documents such as [RFC9082] and
+126	   [RFC9083], the functionality described here may be used by any RDAP
+127	   server operator that hosts Internet Number Resource (INR) objects.
+
+129	1.1.  Conventions Used in This Document
+
+131	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+132	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+133	   "OPTIONAL" in this document are to be interpreted as described in BCP
+134	   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+135	   capitals, as shown here.
+
+137	   Indentation and whitespace in examples are provided only to
+138	   illustrate element relationships, and are not a required feature of
+139	   this protocol.
+
+141	   "..." in examples is used as shorthand for elements defined outside
+142	   of this document, as well as to abbreviate elements that are too
+143	   long.
+
+145	2.  Basic Searches
+
+147	2.1.  Path Segments
+
+149	   The new resource type path segments for basic search (similar to the
+150	   searches defined in [RFC9082] and [RFC9083]) are:
+
+152	      'ips': Used to identify an IP network search using a pattern to
+153	      match one of a set of IP network attributes.
+
+155	      'autnums': Used to identify an autonomous system number search
+156	      using a pattern to match one of a set of autonomous system number
+157	      attributes.
+
+159	   A search pattern matches a value where it equals the string
+160	   representation of the value, or where it is a match for the value in
+161	   accordance with the use of the asterisk ('*', US-ASCII value 0x2A)
+162	   character for partial string matching as defined in Section 4.1 of
+163	   [RFC9082].  For most searches, '*' may be used to match trailing
+164	   characters only, and may appear in a search only once: see the
+165	   previously-mentioned section for a complete definition of the
+166	   relevant behaviour.
+
+168	   Section 4.1 of [RFC9082] describes the use of a trailing domain label
+169	   suffix in a partial string search.  It is not necessary that servers
+170	   support this type of search pattern for the basic searches defined in
+171	   this document, since those searches do not relate to domain name
+172	   members.
+
+174	2.2.  IP Network Search
+
+176	   Syntax: ips?handle=<handle search pattern>
+
+178	   Syntax: ips?name=<name search pattern>
+
+180	   Searches for IP network (see Section 5.4 of [RFC9083]) information by
+181	   handle are specified using the form:
+
+183	   ips?handle=XXXX
+
+185	   XXXX is a search pattern representing an IP network identifier whose
+186	   syntax is specific to the registration provider.  The following URL
+187	   would be used to find information for IP networks with handles
+188	   matching the "NET-199*" pattern:
+
+190	   https://example.com/rdap/ips?handle=NET-199*
+191	   Searches for IP network (see Section 5.4 of [RFC9083]) information by
+192	   name are specified using the form:
+
+194	   ips?name=XXXX
+
+196	   XXXX is a search pattern representing an IP network identifier that
+197	   is assigned to the network registration by the registration holder.
+198	   The following URL would be used to find information for IP networks
+199	   with names matching the "NET-EXAMPLE-*" pattern:
+
+201	   https://example.com/rdap/ips?name=NET-EXAMPLE-*
+
+203	2.3.  Autonomous System Number Search
+
+205	   Syntax: autnums?handle=<handle search pattern>
+
+207	   Syntax: autnums?name=<name search pattern>
+
+209	   Searches for autonomous system number (see Section 5.5 of [RFC9083])
+210	   information by handle are specified using the form:
+
+212	   autnums?handle=XXXX
+
+214	   XXXX is a search pattern representing an autonomous system number
+215	   identifier whose syntax is specific to the registration provider.
+216	   The following URL would be used to find information for autonomous
+217	   system numbers with handles matching the "AS1*" pattern:
+
+219	   https://example.com/rdap/autnums?handle=AS1*
+
+221	   Searches for autonomous system number (see Section 5.5 of [RFC9083])
+222	   information by name are specified using the form:
+
+224	   autnums?name=XXXX
+
+226	   XXXX is a search pattern representing an autonomous system number
+227	   identifier that is assigned to the autonomous system number
+228	   registration by the registration holder.  The following URL would be
+229	   used to find information for autonomous system numbers with names
+230	   matching the "ASN-EXAMPLE-*" pattern:
+
+232	   https://example.com/rdap/autnums?name=ASN-EXAMPLE-*
+
+234	3.  Relation Searches
+
+236	   This section defines searches and link relations for finding objects
+237	   and sets of objects with respect to their position within a
+238	   hierarchy.
+
+240	3.1.  Path Segments
+
+242	   The variables used in the path segments in this section include:
+
+244	      <relation>: A relation type, as defined in Section 3.2.2 of this
+245	      document.
+
+247	      <IP address>: An IP address, as defined in Section 3.1.1 of
+248	      [RFC9082].
+
+250	      <CIDR prefix>: The first address of a CIDR block, as defined in
+251	      Section 3.1.1 of [RFC9082].
+
+253	      <CIDR length>: The prefix length for a CIDR block, as defined in
+254	      Section 3.1.1 of [RFC9082].
+
+256	      <domain name>: A fully-qualified domain name, as defined in
+257	      Section 3.1.3 of [RFC9082].
+
+259	      <autonomous system number or range>: An autonomous system number,
+260	      as defined in Section 3.1.2 of [RFC9082], or two such numbers
+261	      separated by a single hyphen ('-', US-ASCII value 0x2D), where the
+262	      second number is greater than the first.
+
+264	      <resource type search path segment>: A search path segment
+265	      corresponding to an Internet Number Resource (INR) object class
+266	      (i.e. an IP network address or range, autonomous system number or
+267	      number range, or reverse domain name).
+
+269	      <object value>: a value used to identify an object for the
+270	      purposes of a relation search relative to that object.  One of <IP
+271	      address>, <CIDR prefix> and <CIDR length> pair, <domain name>, or
+272	      <autonomous system number or range>, depending on the type of
+273	      search that is being performed.
+
+275	      <status>: an object status value, as defined in Section 4.6 of
+276	      [RFC9083].
+
+278	   The new resource type path segments for relation search (similar to
+279	   the searches defined in [RFC9082] and [RFC9083]) are:
+
+281	      'ips/rirSearch1/<relation>/<IP address>': Used to identify an IP
+282	      network search using a relation and an IP address to match a set
+283	      of IP networks.
+
+285	      'ips/rirSearch1/<relation>/<CIDR prefix>/<CIDR length>': Used to
+286	      identify an IP network search using a relation and an IP address
+287	      range to match a set of IP networks.
+
+289	      'autnums/rirSearch1/<relation>/<autonomous system number or
+290	      range>': Used to identify an autonomous system number search using
+291	      a relation and a single ASN or an ASN range to match a set of ASN
+292	      objects.
+
+294	      'domains/rirSearch1/<relation>/<domain name>': Used to identify a
+295	      reverse domain search using a relation and a reverse domain name
+296	      to match a set of reverse domains.
+
+298	3.2.  Relation Search
+
+300	   Syntax: <resource type search path
+301	   segment>/rirSearch1/<relation>/<object value>[?status=<status>]
+
+303	   The relation searches defined in this document rely on the syntax
+304	   described above.  Each search works in the same way for each object
+305	   class.
+
+307	   The rirSearch1 path segment is used in the relation search URLs in
+308	   order to provide a single namespace for those searches, and so that
+309	   other searches can be defined underneath the top-level resource type
+310	   search path segments.
+
+312	3.2.1.  Definitions
+
+314	   An INR object value may have a "parent" object and one or more
+315	   "child" objects.  The "parent" object is the next-least-specific
+316	   object that exists in the relevant registry, while the "child"
+317	   objects are the next-most-specific objects that exist in the relevant
+318	   registry.  For example, for a registry with the following IP network
+319	   objects:
+
+321	                           +--------------+
+322	                           | 192.0.2.0/24 |
+323	                           +--------------+
+324	                              /        \
+325	                 +--------------+    +----------------+
+326	                 | 192.0.2.0/25 |    | 192.0.2.128/25 |
+327	                 +--------------+    +----------------+
+328	                    /                   /          \
+329	        +--------------+   +----------------+  +----------------+
+330	        | 192.0.2.0/28 |   | 192.0.2.128/26 |  | 192.0.2.192/26 |
+331	        +--------------+   +----------------+  +----------------+
+332	           /
+333	    +--------------+
+334	    | 192.0.2.0/32 |
+335	    +--------------+
+336	                     Figure 1: Example registry objects
+
+338	   the INR object value to parent/child object relationships are:
+
+340	                   +==================+================+
+341	                   | INR object value | Parent object  |
+342	                   +==================+================+
+343	                   | 192.0.2.0/32     | 192.0.2.0/28   |
+344	                   +------------------+----------------+
+345	                   | 192.0.2.0/28     | 192.0.2.0/25   |
+346	                   +------------------+----------------+
+347	                   | 192.0.2.64/26    | 192.0.2.0/25   |
+348	                   +------------------+----------------+
+349	                   | 192.0.2.128/26   | 192.0.2.128/25 |
+350	                   +------------------+----------------+
+351	                   | 192.0.2.192/26   | 192.0.2.128/25 |
+352	                   +------------------+----------------+
+353	                   | 192.0.2.0/25     | 192.0.2.0/24   |
+354	                   +------------------+----------------+
+355	                   | 192.0.2.128/25   | 192.0.2.0/24   |
+356	                   +------------------+----------------+
+357	                   | 192.0.2.0/24     | N/A            |
+358	                   +------------------+----------------+
+
+360	                          Table 1: Parent objects
+
+362	           +==================+================================+
+363	           | INR object value | Child objects                  |
+364	           +==================+================================+
+365	           | 192.0.2.0/24     | 192.0.2.0/25, 192.0.2.128/25   |
+366	           +------------------+--------------------------------+
+367	           | 192.0.2.0/25     | 192.0.2.0/28                   |
+368	           +------------------+--------------------------------+
+369	           | 192.0.2.128/25   | 192.0.2.128/26, 192.0.2.192/26 |
+370	           +------------------+--------------------------------+
+371	           | 192.0.2.64/26    | N/A                            |
+372	           +------------------+--------------------------------+
+373	           | 192.0.2.128/26   | N/A                            |
+374	           +------------------+--------------------------------+
+375	           | 192.0.2.192/26   | N/A                            |
+376	           +------------------+--------------------------------+
+377	           | 192.0.2.0/28     | 192.0.2.0/32                   |
+378	           +------------------+--------------------------------+
+379	           | 192.0.2.0/32     | N/A                            |
+380	           +------------------+--------------------------------+
+
+382	                           Table 2: Child objects
+
+384	   (INR object values do not necessarily correspond to registry objects,
+385	   because users can provide arbitrary object values as input to the
+386	   searches defined in this document.)
+
+388	   Similarly to the parent/child object relationships, each INR object
+389	   value may have a "top" object, being the least-specific covering
+390	   object that exists in the registry, and one or more "bottom" objects,
+391	   being the most-specific objects that entirely cover the INR object
+392	   value when taken together.  Given the registry defined in the
+393	   previous paragraph, the top and bottom object relationships are:
+
+395	                    +==================+==============+
+396	                    | INR object value | Top object   |
+397	                    +==================+==============+
+398	                    | 192.0.2.0/32     | 192.0.2.0/24 |
+399	                    +------------------+--------------+
+400	                    | 192.0.2.0/28     | 192.0.2.0/24 |
+401	                    +------------------+--------------+
+402	                    | 192.0.2.64/26    | 192.0.2.0/24 |
+403	                    +------------------+--------------+
+404	                    | 192.0.2.128/26   | 192.0.2.0/24 |
+405	                    +------------------+--------------+
+406	                    | 192.0.2.192/26   | 192.0.2.0/24 |
+407	                    +------------------+--------------+
+408	                    | 192.0.2.0/25     | 192.0.2.0/24 |
+409	                    +------------------+--------------+
+410	                    | 192.0.2.128/25   | 192.0.2.0/24 |
+411	                    +------------------+--------------+
+412	                    | 192.0.2.0/24     | N/A          |
+413	                    +------------------+--------------+
+
+415	                            Table 3: Top objects
+
+417	     +==================+===========================================+
+418	     | INR object value | Bottom objects                            |
+419	     +==================+===========================================+
+420	     | 192.0.2.0/24     | 192.0.2.0/25, 192.0.2.0/28, 192.0.2.0/32, |
+421	     |                  | 192.0.2.128/26, 192.0.2.192/26            |
+422	     +------------------+-------------------------------------------+
+423	     | 192.0.2.0/25     | 192.0.2.0/25, 192.0.2.0/28, 192.0.2.0/32  |
+424	     +------------------+-------------------------------------------+
+425	     | 192.0.2.128/25   | 192.0.2.128/26, 192.0.2.192/26            |
+426	     +------------------+-------------------------------------------+
+427	     | 192.0.2.64/26    | N/A                                       |
+428	     +------------------+-------------------------------------------+
+429	     | 192.0.2.128/26   | N/A                                       |
+430	     +------------------+-------------------------------------------+
+431	     | 192.0.2.192/26   | N/A                                       |
+432	     +------------------+-------------------------------------------+
+433	     | 192.0.2.0/28     | 192.0.2.0/28, 192.0.2.0/32                |
+434	     +------------------+-------------------------------------------+
+435	     | 192.0.2.0/31     | 192.0.2.0/28, 192.0.2.0/32                |
+436	     +------------------+-------------------------------------------+
+437	     | 192.0.2.0/32     | N/A                                       |
+438	     +------------------+-------------------------------------------+
+
+440	                         Table 4: Bottom objects
+
+442	   If there are no more-specific objects for a given INR object value,
+443	   then the set of bottom objects for that INR object value will be
+444	   empty.  192.0.2.0/32 is an example of such an INR object value.
+
+446	   It is not necessarily the case that the bottom objects for a given
+447	   INR object value will be disjoint.  For example, 192.0.2.0/28's
+448	   bottom objects are 192.0.2.0/28 and 192.0.2.0/32.  192.0.2.0/32 is
+449	   included because it is one of the most-specific objects (i.e. an
+450	   object at the bottom of the object hierarchy) for 192.0.2.0/28, while
+451	   192.0.2.0/28 itself is included because it is the most-specific
+452	   object for the other addresses within the range (i.e. those aside
+453	   from 192.0.2.0/32).
+
+455	   The bottom objects for a given INR object value may include an object
+456	   that is less-specific than that INR object value.  For example,
+457	   192.0.2.0/31 is an INR object value that has a more-specific object,
+458	   being 192.0.2.0/32, so the set of bottom objects must include at
+459	   least that object.  The most-specific object that covers the residual
+460	   (i.e. 192.0.2.1/32) is 192.0.2.0/28, so it is included in the results
+461	   as well.
+
+463	3.2.2.  Relations
+464	3.2.2.1.  Single-Result Searches
+
+466	3.2.2.1.1.  "rdap-up"
+
+468	   If the server receives a search containing the relation value "rdap-
+469	   up", it will return the parent object for the specified INR object
+470	   value as though that object had been requested directly.  If no such
+471	   object exists, it will respond with a HTTP 404 (Not Found) [RFC9110]
+472	   search response.
+
+474	3.2.2.1.2.  "rdap-top"
+
+476	   If the server receives a search containing the relation value "rdap-
+477	   top", it will return the top object for the specified INR object
+478	   value as though that object had been requested directly.  If no such
+479	   object exists, it will respond with an HTTP 404 (Not Found) [RFC9110]
+480	   search response.
+
+482	3.2.2.2.  Multiple-Result Searches
+
+484	3.2.2.2.1.  "rdap-down"
+
+486	   If the server receives a search containing the relation value "rdap-
+487	   down", it will return the child objects for the specified INR object
+488	   value.  If no such objects exist, it will return an empty search
+489	   response.  Per the definitions section, this includes only immediate
+490	   child objects.
+
+492	3.2.2.2.2.  "rdap-bottom"
+
+494	   If the server receives a search containing the relation value "rdap-
+495	   bottom", it will return the bottom objects for the specified INR
+496	   object value.  If no such objects exist, it will return an empty
+497	   search response.
+
+499	3.3.  Status
+
+501	   If the "status" argument is provided, then response processing will
+502	   proceed as though all objects without the specified status had first
+503	   been removed from the database.  For example, if the registry objects
+504	   from section 3.2.1 had the following statuses:
+
+506	                       +================+==========+
+507	                       | Object         | Status   |
+508	                       +================+==========+
+509	                       | 192.0.2.0/25   | active   |
+510	                       +----------------+----------+
+511	                       | 192.0.2.128/25 | inactive |
+512	                       +----------------+----------+
+513	                       | 192.0.2.128/26 | active   |
+514	                       +----------------+----------+
+515	                       | 192.0.2.192/26 | active   |
+516	                       +----------------+----------+
+
+518	                             Table 5: Statuses
+
+520	   then a server receiving a "rdap-down" search request with the INR
+521	   object value 192.0.2.0/24 and a "status" argument of "active" would
+522	   return the objects 192.0.2.0/25, 192.0.2.128/26, and 192.0.2.192/26.
+
+524	   Status filtering is useful, for example, where the client is trying
+525	   to find the delegation from an RIR to an RIR account holder: by using
+526	   the "rdap-top" relation with a "status" of "active", the delegation
+527	   from IANA to the RIR will be ignored, and the client will receive the
+528	   delegation from the RIR to the account holder in the response
+529	   instead.
+
+531	   By default, any valid status value may be used for status filtering.
+532	   Server operators MAY opt not to support "status" filtering for the
+533	   "rdap-down" and "rdap-bottom" link relations, in which case the
+534	   server SHOULD respond with an HTTP 501 (Not Implemented) [RFC9110]
+535	   response code if it receives such a request.  Server operators MAY
+536	   also opt not to support "status" filtering for values other than
+537	   "active" for the "rdap-up" and "rdap-top" link relations, in which
+538	   case the server SHOULD respond with an HTTP 501 (Not Implemented)
+539	   [RFC9110] response code if it receives such a request.
+
+541	   While any valid status value may be used for status filtering, a
+542	   given RDAP server may make use of only a small number of those status
+543	   values for INR objects.  For example, a status value like "client
+544	   hold" would typically only be used by a DNR for a forward domain name
+545	   object.
+
+547	3.4.  Link Relations
+
+549	   Each of the relations defined in section 3.2.2 has a corresponding
+550	   link relation that can be used for a link object contained within
+551	   another RDAP object.  When constructing these link objects, the
+552	   server MUST use the corresponding search URL for the link target, or
+553	   a URL that yields the same response as for the corresponding search
+554	   as at the time of the request.  The following is an elided example of
+555	   an IPv4 response that makes use of those link relations:
+
+557	     {
+558	       "startAddress": "192.0.2.0",
+559	       "endAddress": "192.0.2.127",
+560	       ...
+561	       "links": [
+562	         ...,
+563	         {
+564	           "value": "https://example.com/rdap/ip/192.0.2.0/25",
+565	           "rel": "rdap-up",
+566	           "href": ".../rdap/ips/rirSearch1/rdap-up/192.0.2.0/25",
+567	           "type": "application/rdap+json"
+568	         },
+569	         {
+570	           "value": "https://example.com/rdap/ip/192.0.2.0/25",
+571	           "rel": "rdap-down",
+572	           "href": ".../rdap/ips/rirSearch1/rdap-down/192.0.2.0/25",
+573	           "type": "application/rdap+json"
+574	         },
+575	         {
+576	           "value": "https://example.com/rdap/ip/192.0.2.0/25",
+577	           "rel": "rdap-top",
+578	           "href": ".../rdap/ips/rirSearch1/rdap-top/192.0.2.0/25",
+579	           "type": "application/rdap+json"
+580	         },
+581	         {
+582	           "value": "https://example.com/rdap/ip/192.0.2.0/25",
+583	           "rel": "rdap-bottom",
+584	           "href": ".../rdap/ips/rirSearch1/rdap-bottom/192.0.2.0/25",
+585	           "type": "application/rdap+json"
+586	         }
+587	       ]
+588	     }
+
+590	                Figure 2: Example links in an IPv4 response
+
+592	   The following is an elided example of an IPv6 response that makes use
+593	   of the link relations:
+
+595	   {
+596	     "startAddress": "2001:db8:a::",
+597	     "endAddress": "2001:db8:a:ffff:ffff:ffff:ffff:ffff",
+598	     ...
+599	     "links": [
+600	       ...,
+601	       {
+602	         "value": "https://example.com/rdap/ip/2001:db8:a::/48",
+603	         "rel": "rdap-up",
+604	         "href": ".../rdap/ips/rirSearch1/rdap-up/2001:db8:a::/48",
+605	         "type": "application/rdap+json"
+606	       },
+607	       {
+608	         "value": "https://example.com/rdap/ip/2001:db8:a::/48",
+609	         "rel": "rdap-down",
+610	         "href": ".../rdap/ips/rirSearch1/rdap-down/2001:db8:a::/48",
+611	         "type": "application/rdap+json"
+612	       },
+613	       {
+614	         "value": "https://example.com/rdap/ip/2001:db8:a::/48",
+615	         "rel": "rdap-top",
+616	         "href": ".../rdap/ips/rirSearch1/rdap-top/2001:db8:a::/48",
+617	         "type": "application/rdap+json"
+618	       },
+619	       {
+620	         "value": "https://example.com/rdap/ip/2001:db8:a::/48",
+621	         "rel": "rdap-bottom",
+622	         "href": ".../rdap/ips/rirSearch1/rdap-bottom/2001:db8:a::/48",
+623	         "type": "application/rdap+json"
+624	       }
+625	     ]
+626	   }
+
+628	                Figure 3: Example links in an IPv6 response
+
+630	   One additional link relation, "rdap-active", is defined for denoting
+631	   a search with a "status" of "active".  No other status link relations
+632	   are defined, because the only known use cases for status filtering
+633	   involve the "rdap-up" and "rdap-top" relations and the "active"
+634	   status.  The following is an elided example of an IPv4 response that
+635	   makes use of those link relations:
+
+637	  {
+638	    "startAddress": "192.0.2.0",
+639	    "endAddress": "192.0.2.127",
+640	    ...
+641	    "links": [
+642	      ...,
+643	      {
+644	        "value": "https://example.com/rdap/ip/192.0.2.0/25",
+645	        "rel": "rdap-up rdap-active",
+646	        "href":
+647	          ".../rdap/ips/rirSearch1/rdap-up/192.0.2.0/25?status=active",
+648	        "type": "application/rdap+json"
+649	      },
+650	      {
+651	        "value": "https://example.com/rdap/ip/192.0.2.0/25",
+652	        "rel": "rdap-top rdap-active",
+653	        "href":
+654	          ".../rdap/ips/rirSearch1/rdap-top/192.0.2.0/25?status=active",
+655	        "type": "application/rdap+json"
+656	      }
+657	    ]
+658	  }
+
+660	            Figure 4: Example status links in an IPv4 response
+
+662	   The following is an elided example of an IPv6 response that makes use
+663	   of the link relations:
+
+665	 {
+666	   "startAddress": "2001:db8:a::",
+667	   "endAddress": "2001:db8:a:ffff:ffff:ffff:ffff:ffff",
+668	   ...
+669	   "links": [
+670	     ...,
+671	     {
+672	       "value": "https://example.com/rdap/ip/2001:db8:a::/48",
+673	       "rel": "rdap-up rdap-active",
+674	       "href":
+675	       ".../rdap/ips/rirSearch1/rdap-up/2001:db8:a::/48?status=active",
+676	       "type": "application/rdap+json"
+677	     },
+678	     {
+679	       "value": "https://example.com/rdap/ip/2001:db8:a::/48",
+680	       "rel": "rdap-top rdap-active",
+681	       "href":
+682	       ".../rdap/ips/rirSearch1/rdap-top/2001:db8:a::/48?status=active",
+683	       "type": "application/rdap+json"
+684	     }
+685	   ]
+686	 }
+
+688	           Figure 5: Example status links in an IPv6 response
+
+690	   "rdap-active" is used only as a link relation in a link object.  It
+691	   cannot be used as a value for <relation> in the relation search URL
+692	   defined in Section 3.2.  Section 3.3 details status filtering for
+693	   relation search URLs.
+
+695	   Since the "rdap-top" and "rdap-up" link relations resolve either to a
+696	   single object or to an HTTP 404 (Not Found) [RFC9110] response, it is
+697	   possible for a server to use a lookup URL (see Section 3.1 of
+698	   [RFC9082]) in the "href" attribute in the link object.  The following
+699	   is an elided example of an IPv4 response that uses this approach:
+
+701	        {
+702	          "startAddress": "192.0.2.0",
+703	          "endAddress": "192.0.2.127",
+704	          ...
+705	          "links": [
+706	            ...,
+707	            {
+708	              "value": "https://example.com/rdap/ip/192.0.2.0/25",
+709	              "rel": "rdap-up",
+710	              "href": "https://example.com/rdap/ip/192.0.2.0/24",
+711	              "type": "application/rdap+json"
+712	            }
+713	          ]
+714	        }
+
+716	         Figure 6: Example single-result links in an IPv4 response
+
+718	   The following is an elided example of an IPv6 response that makes use
+719	   of the approach:
+
+721	       {
+722	         "startAddress": "2001:db8:a::",
+723	         "endAddress": "2001:db8:a:ffff:ffff:ffff:ffff:ffff",
+724	         ...
+725	         "links": [
+726	           ...,
+727	           {
+728	             "value": "https://example.com/rdap/ip/2001:db8:a::/48",
+729	             "rel": "rdap-up",
+730	             "href": "https://example.com/rdap/ip/2001:db8::/32",
+731	             "type": "application/rdap+json"
+732	           }
+733	         ]
+734	       }
+
+736	         Figure 7: Example single-result links in an IPv6 response
+
+738	   Use of these link relations in responses is OPTIONAL.  The absence in
+739	   a response of a link for a specific relation does not necessarily
+740	   mean that the corresponding search will return no results.
+
+742	4.  Responding To Searches
+743	4.1.  Single-Result Searches
+
+745	   The "rdap-up" and "rdap-top" relations are single-result searches.
+746	   When processing these searches, if there is a result for the search,
+747	   the server returns that object as though it were requested directly
+748	   via a lookup URL (see Section 3.1 of [RFC9082]).  If there is no
+749	   result for the search, the server returns an HTTP 404 (Not Found)
+750	   [RFC9110] response code.
+
+752	4.2.  Multiple-Result Searches
+
+754	   The "rdap-down" and "rdap-bottom" relations are multiple-result
+755	   searches.  As with [RFC9083], responses for these searches take the
+756	   form of an array of object instances, where each instance is an
+757	   appropriate object class for the search (i.e., a search beginning
+758	   with /ips yields an array of IP network object instances, and a
+759	   search beginning with /autnums yields an array of autonomous system
+760	   number object instances).  The IP network object class is defined in
+761	   Section 5.4 of [RFC9083], and the autonomous system number object
+762	   class is defined in Section 5.5 of [RFC9083].  The object instance
+763	   arrays are contained within the response object.
+
+765	   The names of the arrays are as follows:
+
+767	      for /ips searches, the array is "ipSearchResults"; and
+
+769	      for /autnums searches, the array is "autnumSearchResults".
+
+771	   The following is an elided example of a response for an IPv4 network
+772	   search:
+
+774	   {
+775	     "rdapConformance": [ "rdap_level_0", "rirSearch1",
+776	                          "ips", "ipSearchResults", ... ],
+777	     ...
+778	     "ipSearchResults": [
+779	       {
+780	         "objectClassName": "ip network",
+781	         "handle": "XXXX-RIR",
+782	         "startAddress": "192.0.2.0",
+783	         "endAddress": "192.0.2.127",
+784	         ...
+785	       },
+786	       {
+787	         "objectClassName": "ip network",
+788	         "handle": "YYYY-RIR",
+789	         "startAddress": "192.0.2.0",
+790	         "endAddress": "192.0.2.255",
+791	         ...
+792	       }
+793	     ]
+794	   }
+
+796	                   Figure 8: IPv4 network search response
+
+798	   The following is an elided example of a response for an IPv6 network
+799	   search:
+
+801	   {
+802	     "rdapConformance": [ "rdap_level_0", "rirSearch1",
+803	                          "ips", "ipSearchResults", ... ],
+804	     ...
+805	     "ipSearchResults": [
+806	       {
+807	         "objectClassName": "ip network",
+808	         "handle": "XXXX-RIR",
+809	         "startAddress": "2001:db8:a::",
+810	         "endAddress": "2001:db8:a:ffff:ffff:ffff:ffff:ffff",
+811	         ...
+812	       },
+813	       {
+814	         "objectClassName": "ip network",
+815	         "handle": "YYYY-RIR",
+816	         "startAddress": "2001:db8::",
+817	         "endAddress": "2001:db8:ffff:ffff:ffff:ffff:ffff:ffff",
+818	         ...
+819	       }
+820	     ]
+821	   }
+822	                   Figure 9: IPv6 network search response
+
+824	   The following is an elided example of a response to an autonomous
+825	   system number search:
+
+827	   {
+828	     "rdapConformance": [ "rdap_level_0", "rirSearch1",
+829	                          "autnums", "autnumSearchResults", ... ],
+830	     ...
+831	     "autnumSearchResults": [
+832	       {
+833	         "objectClassName": "autnum",
+834	         "handle": "XXXX-RIR",
+835	         "startAutnum": 64496,
+836	         "endAutnum": 64496,
+837	         ...
+838	       },
+839	       {
+840	         "objectClassName": "autnum",
+841	         "handle": "YYYY-RIR",
+842	         "startAutnum": "64497",
+843	         "endAutnum": "64497",
+844	         ...
+845	       }
+846	     ]
+847	   }
+
+849	                       Figure 10: ASN search response
+
+851	   Responses for relation searches for reverse domain objects have the
+852	   same form as for a standard domain search response, per [RFC9083].
+
+854	   If the search can be processed by the server, but there are no
+855	   results for the search, then the server returns an HTTP 404 (Not
+856	   Found) [RFC9110] response code, with the body of the response
+857	   containing an empty results array.
+
+859	5.  Reverse Search
+
+861	   RDAP reverse search is defined by [RFC9536].  That document limits
+862	   reverse search to domains, nameservers, and entities.  This document
+863	   extends reverse search to cover IP networks and autonomous system
+864	   numbers as well.
+
+866	   If a server receives a reverse search query with a searchable
+867	   resource type (per the definition of that term in [RFC9536]) of
+868	   "ips", then the reverse search will be performed on the IP network
+869	   objects from its data store.  Similarly, if a server receives a
+870	   reverse search query with a searchable resource type of "autnums",
+871	   then the reverse search will be performed on the autonomous system
+872	   number objects from its data store.
+
+874	   Additionally, Section 10 includes requests to register new entries
+875	   for IP network and autonomous system number searches in the RDAP
+876	   Reverse Search and RDAP Reverse Search Mapping IANA registries.
+
+878	6.  RDAP Conformance
+
+880	   A server that supports the functionality specified in this document
+881	   MUST include additional string literals in the rdapConformance array
+882	   of its responses, in accordance with the following:
+
+884	   *  any response that includes an IP network basic search link, an IP
+885	      network relation search link, or an IP network reverse search link
+886	      includes the "rirSearch1" and "ips" literals;
+
+888	   *  any response for an IP network basic search request, an IP network
+889	      relation search request, or an IP network reverse search request
+890	      includes the "rirSearch1", "ips", and "ipSearchResults" literals;
+
+892	   *  any response that includes an ASN basic search link, an ASN
+893	      relation search link, or an ASN reverse search link includes the
+894	      "rirSearch1" and "autnums" literals;
+
+896	   *  any response for an ASN basic search request, an ASN relation
+897	      search request, or an ASN reverse search request includes the
+898	      "rirSearch1", "autnums", and "autnumSearchResults" literals;
+
+900	   *  any response that includes a domain relation search link includes
+901	      the "rirSearch1" literal;
+
+903	   *  any response for a domain relation search request includes the
+904	      "rirSearch1" literal; and
+
+906	   *  a response to a "/help" request includes the "rirSearch1", "ips",
+907	      "ipSearchResults", "autnums", and "autnumSearchResults" literals.
+
+909	   Although responses will generally not include all of the
+910	   rdapConformance string literals defined in this document, that is not
+911	   meant to imply that a server can support only a portion of the
+912	   functionality defined in this document.
+
+914	   The "ips", "autnums", "ipSearchResults", and "autnumSearchResults"
+915	   extension identifiers are included here due to the requirements and
+916	   recommendations set out in [RFC7480], [RFC9082], and [RFC9083].
+917	   These requirements and recommendations are such that an RDAP
+918	   extension identifier be used as a prefix in new path segments and
+919	   JSON members introduced by the extension, and those strings are used
+920	   as such as part of the basic searches defined in this document.
+921	   Furthermore, using these strings as path segments helps to increase
+922	   consistency among the basic searches for the core RDAP object
+923	   classes.
+
+925	   As with the other core object classes (entity, domain, and
+926	   nameserver), other documents may define additional reverse searches
+927	   with IP networks and ASNs as the searchable resource type by
+928	   registering those in the IANA RDAP reverse search registries.
+929	   Because a given extension identifier must correspond to a single
+930	   extension, though, any document making use of IP networks or ASNs as
+931	   the searchable resource type must also implement the functionality
+932	   described in this document.
+
+934	7.  Operational Considerations
+
+936	   When using a link object for a single-result search, a server may
+937	   replace a search URL with a lookup URL, because the behaviour of the
+938	   lookup URL is the same as for the search URL as at the time when the
+939	   response is generated.  One difference between these approaches is
+940	   that when using the lookup URL, the server is effectively performing
+941	   the search on behalf of the client as at the time of response
+942	   generation.  If there is no change to the relevant database state
+943	   between the time when the original response is generated and the time
+944	   when the client resolves the link relation target, then the search
+945	   URL and the lookup URL will lead to the same result.  However, if
+946	   there is a change to the relevant database state, then the lookup URL
+947	   may lead to a different result from that of the search URL.  Server
+948	   operators should consider which type of URL will be more effective
+949	   for their clients when implementing this specification.
+
+951	8.  Privacy Considerations
+
+953	   The search functionality defined in this document may affect the
+954	   privacy of entities in the registry (and elsewhere) in various ways:
+955	   see [RFC6973] for a general treatment of privacy in protocol
+956	   specifications, and [RFC7481] for specific discussion about privacy
+957	   threats with respect to the registration data provided by RDAP.
+958	   Server operators should be aware of the tradeoffs that result from
+959	   implementation of this functionality.
+
+961	   Many jurisdictions have laws or regulations that restrict the use of
+962	   "Personal Data", per the definition in [RFC6973].  Given that, server
+963	   operators should ascertain whether the regulatory environment in
+964	   which they operate permits implementation of the functionality
+965	   defined in this document.
+
+967	9.  Security Considerations
+
+969	   [RFC7481] describes security requirements and considerations for RDAP
+970	   generally.  Implementations SHOULD also refer to [RFC8446] and
+971	   [BCP195] for additional details.
+
+973	   [RFC9082] includes security considerations relating to object
+974	   retrieval in RDAP.  Those considerations are relevant here as well.
+
+976	10.  IANA Considerations
+
+978	10.1.  RDAP Extensions Registry
+
+980	   IANA is requested to register the following values in the RDAP
+981	   Extensions Registry (https://www.iana.org/assignments/rdap-
+982	   extensions/rdap-extensions.xhtml).
+
+984	10.1.1.  rirSearch1
+
+986	   Extension identifier:  rirSearch1
+987	   Registry operator:  Any
+988	   Published specification:  [this document]
+989	   Contact:  IETF <iesg@ietf.org>
+990	   Intended usage:  This extension identifier is used for INR-specific
+991	      search operations.
+
+993	10.1.2.  ips
+
+995	   Extension identifier:  ips
+996	   Registry operator:  Any
+997	   Published specification:  [this document]
+998	   Contact:  IETF <iesg@ietf.org>
+999	   Intended usage:  This extension identifier is used for INR-specific
+1000	      search operations.
+
+1002	10.1.3.  autnums
+
+1004	   Extension identifier:  autnums
+1005	   Registry operator:  Any
+1006	   Published specification:  [this document]
+1007	   Contact:  IETF <iesg@ietf.org>
+1008	   Intended usage:  This extension identifier is used for INR-specific
+1009	      search operations.
+
+1011	10.1.4.  ipSearchResults
+
+1013	   Extension identifier:  ipSearchResults
+1014	   Registry operator:  Any
+1015	   Published specification:  [this document]
+1016	   Contact:  IETF <iesg@ietf.org>
+1017	   Intended usage:  This extension identifier is used for INR-specific
+1018	      search operations.
+
+1020	10.1.5.  autnumSearchResults
+
+1022	   Extension identifier:  autnumSearchResults
+1023	   Registry operator:  Any
+1024	   Published specification:  [this document]
+1025	   Contact:  IETF <iesg@ietf.org>
+1026	   Intended usage:  This extension identifier is used for INR-specific
+1027	      search operations.
+
+1029	10.2.  Link Relations Registry
+
+1031	   IANA is requested to register the following values in the Link
+1032	   Relations Registry (https://www.iana.org/assignments/link-relations/
+1033	   link-relations.xhtml).
+
+1035	10.2.1.  rdap-up
+
+1037	   Relation Name:  rdap-up
+1038	   Description:  Refers to an RDAP parent object in a hierarchy of
+1039	      objects.
+1040	   Reference:  [this document]
+
+1042	10.2.2.  rdap-down
+
+1044	   Relation Name:  rdap-down
+1045	   Description:  Refers to a set of RDAP child objects in a hierarchy of
+1046	      objects.
+1047	   Reference:  [this document]
+
+1049	10.2.3.  rdap-top
+
+1051	   Relation Name:  rdap-top
+1052	   Description:  Refers to the topmost RDAP parent object in a hierarchy
+1053	      of objects.
+1054	   Reference:  [this document]
+
+1056	10.2.4.  rdap-bottom
+
+1058	   Relation Name:  rdap-bottom
+1059	   Description:  Refers to the set of child RDAP objects that do not
+1060	      themselves have child objects, in a hierarchy of objects.
+1061	   Reference:  [this document]
+
+1063	10.2.5.  rdap-active
+
+1065	   Relation Name:  rdap-active
+1066	   Description:  The target is for an RDAP RIR search that filters for
+1067	      the status "active".
+1068	   Reference:  [this document]
+
+1070	10.3.  RDAP Reverse Search Registry
+
+1072	   IANA is requested to register the following entries in the RDAP
+1073	   Reverse Search (https://www.iana.org/assignments/rdap-reverse-search/
+1074	   rdap-reverse-search.xhtml) registry.
+
+1076	10.3.1.  fn
+
+1078	   Property:  fn
+1079	   Description:  The server supports the IP/autnum search based on the
+1080	      full name (a.k.a formatted name) of an associated entity.
+1081	   Searchable Resource Type:  ips, autnums
+1082	   Related Resource Type:  entity
+1083	   Registrant:  IETF
+1084	   Contact Information:  iesg@ietf.org
+1085	   Reference:  [this document]
+
+1087	10.3.2.  handle
+
+1089	   Property:  handle
+1090	   Description:  The server supports the IP/autnum search based on the
+1091	      handle of an associated entity.
+1092	   Searchable Resource Type:  ips, autnums
+1093	   Related Resource Type:  entity
+1094	   Registrant:  IETF
+1095	   Contact Information:  iesg@ietf.org
+1096	   Reference:  [this document]
+
+1098	10.3.3.  email
+
+1100	   Property:  email
+1101	   Description:  The server supports the IP/autnum search based on the
+1102	      email address of an associated entity.
+1103	   Searchable Resource Type:  ips, autnums
+1104	   Related Resource Type:  entity
+1105	   Registrant:  IETF
+1106	   Contact Information:  iesg@ietf.org
+1107	   Reference:  [this document]
+
+1109	10.3.4.  role
+
+1111	   Property:  role
+1112	   Description:  The server supports the IP/autnum search based on the
+1113	      role of an associated entity.
+1114	   Searchable Resource Type:  ips, autnums
+1115	   Related Resource Type:  entity
+1116	   Registrant:  IETF
+1117	   Contact Information:  iesg@ietf.org
+1118	   Reference:  [this document]
+
+1120	10.4.  RDAP Reverse Search Mapping Registry
+
+1122	   IANA is requested to register the following entries in the RDAP
+1123	   Reverse Search Mapping (https://www.iana.org/assignments/rdap-
+1124	   reverse-search-mapping/rdap-reverse-search-mapping.xhtml) registry.
+
+1126	10.4.1.  fn
+
+1128	   Property:  fn
+1129	   Property Path:  $.entities[*].vcardArray[1][?(@[0]=='fn')][3]
+1130	   Searchable Resource Type:  ips, autnums
+1131	   Related Resource Type:  entity
+1132	   Registrant:  IETF
+1133	   Contact Information:  iesg@ietf.org
+1134	   Reference:  [this document]
+
+1136	10.4.2.  handle
+
+1138	   Property:  handle
+1139	   Property Path:  $.entities[*].handle
+1140	   Searchable Resource Type:  ips, autnums
+1141	   Related Resource Type:  entity
+1142	   Registrant:  IETF
+1143	   Contact Information:  iesg@ietf.org
+1144	   Reference:  [this document]
+
+1146	10.4.3.  email
+
+1148	   Property:  email
+1149	   Property Path:  $.entities[*].vcardArray[1][?(@[0]=='email')][3]
+1150	   Searchable Resource Type:  ips, autnums
+1151	   Related Resource Type:  entity
+1152	   Registrant:  IETF
+1153	   Contact Information:  iesg@ietf.org
+1154	   Reference:  [this document]
+
+1156	10.4.4.  role
+
+1158	   Property:  role
+1159	   Property Path:  $.entities[*].roles
+1160	   Searchable Resource Type:  ips, autnums
+1161	   Related Resource Type:  entity
+1162	   Registrant:  IETF
+1163	   Contact Information:  iesg@ietf.org
+1164	   Reference:  [this document]
+
+1166	11.  Implementation Status
+
+1168	      |  Note to the RFC Editor - remove this section before
+1169	      |  publication, as well as the reference to RFC 7942.
+
+1171	   This section records the status of known implementations of the
+1172	   protocol defined by this specification at the time of posting of this
+1173	   Internet-Draft, and is based on a proposal described in [RFC7942].
+1174	   The description of implementations in this section is intended to
+1175	   assist the IETF in its decision processes in progressing drafts to
+1176	   RFCs.  Please note that the listing of any individual implementation
+1177	   here does not imply endorsement by the IETF.  Furthermore, no effort
+1178	   has been spent to verify the information presented here that was
+1179	   supplied by IETF contributors.  This is not intended as, and must not
+1180	   be construed to be, a catalogue of available implementations or their
+1181	   features.  Readers are advised to note that other implementations may
+1182	   exist.
+
+1184	   According to [RFC7942], "this will allow reviewers and working groups
+1185	   to assign due consideration to documents that have the benefit of
+1186	   running code, which may serve as evidence of valuable experimentation
+1187	   and feedback that have made the implemented protocols more mature.
+1188	   It is up to the individual working groups to use this information as
+1189	   they see fit".
+
+1191	11.1.  APNIC RDAP Implementation
+
+1193	   *  Responsible Organization: Asia-Pacific Network Information Centre
+1194	      (APNIC)
+1195	   *  Location: https://github.com/APNIC-net/rdap-rmp-demo/tree/rir-
+1196	      search
+1197	   *  Description: This implementation includes support for the various
+1198	      searches and responses described in this document.
+1199	   *  Level of Maturity: This is a proof-of-concept implementation.
+1200	   *  Coverage: This implementation includes all of the features
+1201	      described in this specification.
+1202	   *  Contact Information: Tom Harrison, tomh@apnic.net
+
+1204	11.2.  RIPE NCC RDAP Implementation
+
+1206	   *  Responsible Organization: RIPE NCC
+1207	   *  Location: https://github.com/RIPE-NCC/whois
+1208	   *  Description: This implementation includes support for several of
+1209	      the searches and responses as at version 14 of this document.
+1210	   *  Level of Maturity: This is a production implementation.
+1211	   *  Coverage: This implementation includes IP and domain relation
+1212	      searches, as well as the links that correspond to those searches.
+1213	   *  Contact Information: Ed Shryane, eshryane@ripe.net
+
+1215	12.  Acknowledgements
+
+1217	   The authors wish to thank Mario Loffredo, Andy Newton, Antoin
+1218	   Verschuren, James Gould, Scott Hollenbeck, Orie Steele, Russ Housley,
+1219	   John Levine, Stewart Bryant, Mark Nottingham, Mohamed Boucadair, and
+1220	   Deb Cooley for document review and associated comments.
+
+1222	13.  References
+
+1224	13.1.  Normative References
+
+1226	   [BCP195]   Best Current Practice 195,
+1227	              <https://www.rfc-editor.org/info/bcp195>.
+1228	              At the time of writing, this BCP comprises the following:
+
+1230	              Moriarty, K. and S. Farrell, "Deprecating TLS 1.0 and TLS
+1231	              1.1", BCP 195, RFC 8996, DOI 10.17487/RFC8996, March 2021,
+1232	              <https://www.rfc-editor.org/info/rfc8996>.
+
+1234	              Sheffer, Y., Saint-Andre, P., and T. Fossati,
+1235	              "Recommendations for Secure Use of Transport Layer
+1236	              Security (TLS) and Datagram Transport Layer Security
+1237	              (DTLS)", BCP 195, RFC 9325, DOI 10.17487/RFC9325, November
+1238	              2022, <https://www.rfc-editor.org/info/rfc9325>.
+
+1240	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+1241	              Requirement Levels", BCP 14, RFC 2119,
+1242	              DOI 10.17487/RFC2119, March 1997,
+1243	              <https://www.rfc-editor.org/info/rfc2119>.
+
+1245	   [RFC7481]  Hollenbeck, S. and N. Kong, "Security Services for the
+1246	              Registration Data Access Protocol (RDAP)", STD 95,
+1247	              RFC 7481, DOI 10.17487/RFC7481, March 2015,
+1248	              <https://www.rfc-editor.org/info/rfc7481>.
+
+1250	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+1251	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+1252	              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+1254	   [RFC8446]  Rescorla, E., "The Transport Layer Security (TLS) Protocol
+1255	              Version 1.3", RFC 8446, DOI 10.17487/RFC8446, August 2018,
+1256	              <https://www.rfc-editor.org/info/rfc8446>.
+
+1258	   [RFC9082]  Hollenbeck, S. and A. Newton, "Registration Data Access
+1259	              Protocol (RDAP) Query Format", STD 95, RFC 9082,
+1260	              DOI 10.17487/RFC9082, June 2021,
+1261	              <https://www.rfc-editor.org/info/rfc9082>.
+
+1263	   [RFC9083]  Hollenbeck, S. and A. Newton, "JSON Responses for the
+1264	              Registration Data Access Protocol (RDAP)", STD 95,
+1265	              RFC 9083, DOI 10.17487/RFC9083, June 2021,
+1266	              <https://www.rfc-editor.org/info/rfc9083>.
+
+1268	   [RFC9110]  Fielding, R., Ed., Nottingham, M., Ed., and J. Reschke,
+1269	              Ed., "HTTP Semantics", STD 97, RFC 9110,
+1270	              DOI 10.17487/RFC9110, June 2022,
+1271	              <https://www.rfc-editor.org/info/rfc9110>.
+
+1273	   [RFC9536]  Loffredo, M. and M. Martinelli, "Registration Data Access
+1274	              Protocol (RDAP) Reverse Search", RFC 9536,
+1275	              DOI 10.17487/RFC9536, April 2024,
+1276	              <https://www.rfc-editor.org/info/rfc9536>.
+
+1278	13.2.  Informative References
+
+1280	   [RFC3912]  Daigle, L., "WHOIS Protocol Specification", RFC 3912,
+1281	              DOI 10.17487/RFC3912, September 2004,
+1282	              <https://www.rfc-editor.org/info/rfc3912>.
+
+1284	   [RFC6973]  Cooper, A., Tschofenig, H., Aboba, B., Peterson, J.,
+1285	              Morris, J., Hansen, M., and R. Smith, "Privacy
+1286	              Considerations for Internet Protocols", RFC 6973,
+1287	              DOI 10.17487/RFC6973, July 2013,
+1288	              <https://www.rfc-editor.org/info/rfc6973>.
+
+1290	   [RFC7480]  Newton, A., Ellacott, B., and N. Kong, "HTTP Usage in the
+1291	              Registration Data Access Protocol (RDAP)", STD 95,
+1292	              RFC 7480, DOI 10.17487/RFC7480, March 2015,
+1293	              <https://www.rfc-editor.org/info/rfc7480>.
+
+1295	   [RFC7942]  Sheffer, Y. and A. Farrel, "Improving Awareness of Running
+1296	              Code: The Implementation Status Section", BCP 205,
+1297	              RFC 7942, DOI 10.17487/RFC7942, July 2016,
+1298	              <https://www.rfc-editor.org/info/rfc7942>.
+
+1300	Authors' Addresses
+
+1302	   Tom Harrison
+1303	   Asia Pacific Network Information Centre
+1304	   6 Cordelia St
+1305	   South Brisbane QLD 4101
+1306	   Australia
+1307	   Email: tomh@apnic.net
+
+1309	   Jasdip Singh
+1310	   American Registry for Internet Numbers
+1311	   PO Box 232290
+1312	   Centreville, VA 20120
+1313	   United States of America
+1314	   Email: jasdips@arin.net
+
+
+
+
+
+
+
+
+
