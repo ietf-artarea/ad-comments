@@ -1,0 +1,693 @@
+idnits 2.17.1 
+
+draft-ietf-regext-rdap-geofeed-12.txt:
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     No nits found.
+--------------------------------------------------------------------------------
+
+
+2	Registration Protocols Extensions (regext)                      J. Singh
+3	Internet-Draft                                                      ARIN
+4	Intended status: Standards Track                             T. Harrison
+5	Expires: 4 December 2025                                           APNIC
+6	                                                             2 June 2025
+
+8	  Registration Data Access Protocol (RDAP) Extension for Geofeed Data
+9	                   draft-ietf-regext-rdap-geofeed-12
+
+11	Abstract
+
+13	   This document defines a new Registration Data Access Protocol (RDAP)
+14	   extension, "geofeed1", for indicating that an RDAP server hosts
+15	   geofeed URLs for its IP network objects.  It also defines a new media
+16	   type and a new link relation type for the associated link objects
+17	   included in responses.
+
+19	Status of This Memo
+
+21	   This Internet-Draft is submitted in full conformance with the
+22	   provisions of BCP 78 and BCP 79.
+
+24	   Internet-Drafts are working documents of the Internet Engineering
+25	   Task Force (IETF).  Note that other groups may also distribute
+26	   working documents as Internet-Drafts.  The list of current Internet-
+27	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+29	   Internet-Drafts are draft documents valid for a maximum of six months
+30	   and may be updated, replaced, or obsoleted by other documents at any
+31	   time.  It is inappropriate to use Internet-Drafts as reference
+32	   material or to cite them other than as "work in progress."
+
+34	   This Internet-Draft will expire on 4 December 2025.
+
+36	Copyright Notice
+
+38	   Copyright (c) 2025 IETF Trust and the persons identified as the
+39	   document authors.  All rights reserved.
+
+41	   This document is subject to BCP 78 and the IETF Trust's Legal
+42	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+43	   license-info) in effect on the date of publication of this document.
+44	   Please review these documents carefully, as they describe your rights
+45	   and restrictions with respect to this document.  Code Components
+46	   extracted from this document must include Revised BSD License text as
+47	   described in Section 4.e of the Trust Legal Provisions and are
+48	   provided without warranty as described in the Revised BSD License.
+
+50	Table of Contents
+
+52	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+53	   2.  Specification . . . . . . . . . . . . . . . . . . . . . . . .   3
+54	     2.1.  Media Type for a Geofeed Link . . . . . . . . . . . . . .   3
+55	     2.2.  Geofeed Link  . . . . . . . . . . . . . . . . . . . . . .   4
+56	     2.3.  Extension Identifier  . . . . . . . . . . . . . . . . . .   4
+57	     2.4.  Example . . . . . . . . . . . . . . . . . . . . . . . . .   5
+58	   3.  Operational Considerations  . . . . . . . . . . . . . . . . .   6
+59	   4.  Privacy Considerations  . . . . . . . . . . . . . . . . . . .   7
+60	   5.  Security Considerations . . . . . . . . . . . . . . . . . . .   7
+61	   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   7
+62	     6.1.  RDAP Extensions Registry  . . . . . . . . . . . . . . . .   8
+63	     6.2.  Link Relations Registry . . . . . . . . . . . . . . . . .   8
+64	     6.3.  Media Types Registry  . . . . . . . . . . . . . . . . . .   8
+65	     6.4.  Structured Syntax Suffixes Registry . . . . . . . . . . .   9
+66	   7.  Implementation Status . . . . . . . . . . . . . . . . . . . .   9
+67	     7.1.  RIPE NCC  . . . . . . . . . . . . . . . . . . . . . . . .  10
+68	   8.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  10
+69	   9.  Change History  . . . . . . . . . . . . . . . . . . . . . . .  10
+70	     9.1.  Changes from 00 to 01 . . . . . . . . . . . . . . . . . .  10
+71	     9.2.  Changes from 01 to 02 . . . . . . . . . . . . . . . . . .  11
+72	     9.3.  Changes from 02 to 03 . . . . . . . . . . . . . . . . . .  11
+73	     9.4.  Changes from 03 to 04 . . . . . . . . . . . . . . . . . .  11
+74	     9.5.  Changes from 04 to 05 . . . . . . . . . . . . . . . . . .  11
+75	     9.6.  Changes from 05 to 06 . . . . . . . . . . . . . . . . . .  11
+76	     9.7.  Changes from 06 to 07 . . . . . . . . . . . . . . . . . .  12
+77	     9.8.  Changes from 07 to 08 . . . . . . . . . . . . . . . . . .  12
+78	     9.9.  Changes from 08 to 09 . . . . . . . . . . . . . . . . . .  12
+79	     9.10. Changes from 09 to 10 . . . . . . . . . . . . . . . . . .  12
+80	     9.11. Changes from 10 to 11 . . . . . . . . . . . . . . . . . .  12
+81	     9.12. Changes from 11 to 12 . . . . . . . . . . . . . . . . . .  12
+82	   10. References  . . . . . . . . . . . . . . . . . . . . . . . . .  12
+83	     10.1.  Normative References . . . . . . . . . . . . . . . . . .  12
+84	     10.2.  Informative References . . . . . . . . . . . . . . . . .  13
+85	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  15
+
+87	1.  Introduction
+
+89	   [RFC8805] and [RFC9632] detail the IP geolocation feed (commonly
+90	   known as 'geofeed') file format and associated access mechanisms.
+91	   While [RFC9632] describes how a registry can make geofeed URLs
+92	   available by way of a Routing Policy Specification Language (RPSL)
+93	   [RFC2622] service, the Regional Internet Registries (RIRs) have
+94	   deployed Registration Data Access Protocol (RDAP) ([RFC7480],
+95	   [RFC7481], [RFC9082], [RFC9083]) services as successors for RPSL for
+96	   Internet number resource registrations, and maintaining feature
+97	   parity between the two services supports client transition from RPSL
+98	   to RDAP in this context.  To that end, this document specifies how
+99	   geofeed URLs can be accessed through RDAP.  It defines a new RDAP
+100	   extension, "geofeed1", for indicating that an RDAP server hosts
+101	   geofeed URLs for its IP network objects, as well as a new media type
+102	   and a new link relation type for the associated link objects.
+
+104	   Fetching and making use of geofeed data is out of scope for the
+105	   purposes of this document.  See [RFC8805] and [RFC9632] for further
+106	   details.
+
+108	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+109	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+110	   "OPTIONAL" in this document are to be interpreted as described in BCP
+111	   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+112	   capitals, as shown here.
+
+114	   Indentation and whitespace in examples are provided only to
+115	   illustrate element relationships, and are not a required feature of
+116	   this specification.
+
+118	   "..." in examples is used as shorthand for elements defined outside
+119	   of this document.
+
+121	2.  Specification
+
+123	2.1.  Media Type for a Geofeed Link
+
+125	   [RFC9632] requires a geofeed file to be a UTF-8 [RFC3629] comma-
+126	   separated values (CSV) file, with a series of "#" comments at the end
+127	   for the optional Resource Public Key Infrastructure (RPKI, [RFC6480])
+128	   signature.  At first glance, the "text/csv" media type seems like a
+129	   good candidate for a geofeed file, since it supports the "#" comments
+130	   needed for including the RPKI signature.
+
+132	   However, although the CSV geofeed data could be viewed directly by a
+133	   user such that the "text/csv" media type was appropriate, the most
+134	   common use case will involve it being processed by some sort of
+135	   application first, in order to facilitate subsequent IP address
+136	   lookup operations.  Therefore, using a new "application" media type
+137	   with a "geofeed" subtype (Section 4.2.5 of [RFC6838]) for the geofeed
+138	   data is preferable to using "text/csv".
+
+140	   To that end, this document registers a new "application/geofeed+csv"
+141	   media type in the IANA Media Types Registry (see Section 6.3), and a
+142	   new "+csv" suffix in the IANA Structured Syntax Suffixes Registry
+143	   (see Section 6.4).
+
+145	2.2.  Geofeed Link
+
+147	   An RDAP server that hosts geofeed URLs for its IP network objects
+148	   (Section 5.4 of [RFC9083]) may include link objects for those geofeed
+149	   URLs in IP network objects in its responses.  These link objects are
+150	   added to the "links" member of each object (Section 4.2 of
+151	   [RFC9083]).
+
+153	   In RDAP, the "value", "rel", and "href" JSON members are required for
+154	   any link object.  Additionally, for a geofeed link object, the "type"
+155	   JSON member is RECOMMENDED.  The geofeed-specific components of a
+156	   link object are like so:
+
+158	   *  "rel" -- The link relation type is set to "geofeed".  This is a
+159	      new link relation type for IP geolocation feed data, registered in
+160	      the IANA Link Relations Registry (see Section 6.2) by this
+161	      document.
+162	   *  "href" -- The target URL is set to the HTTPS URL of the geofeed
+163	      file (Section 6 of [RFC9632]) for an IP network.
+164	   *  "type" -- "application/geofeed+csv" (see Section 2.1).
+
+166	   An IP network object returned by an RDAP server MAY contain zero or
+167	   more geofeed link objects, though typically an IP network will have
+168	   either no such link objects or only one.  The scenario where more
+169	   than one geofeed link object could be returned is when the server is
+170	   able to represent that data in multiple languages.  In such a case,
+171	   the server SHOULD provide "hreflang" members for the geofeed link
+172	   objects.  Except for the multiple-languages scenario, the server
+173	   SHOULD NOT return more than one geofeed link object.
+
+175	2.3.  Extension Identifier
+
+177	   This document defines a new extension identifier, "geofeed1", for use
+178	   by servers that host geofeed URLs for their IP network objects and
+179	   include geofeed URL link objects in their responses to clients in
+180	   accordance with Section 2.2.  A server that uses this extension
+181	   identifier MUST include it in the "rdapConformance" array
+182	   (Section 4.1 of [RFC9083]) for any lookup or search response
+183	   containing an IP network object, as well as in the help response.
+184	   Here is an elided example for this inclusion:
+
+186	   {
+187	       "rdapConformance": [ "rdap_level_0", "geofeed1", ... ],
+188	       ...
+189	   }
+190	   If the server includes "geofeed1" in the "rdapConformance" array,
+191	   then for any response concerning a particular IP network object for
+192	   which the server possesses a geofeed URL and is able to return it to
+193	   the client, the server MUST include a corresponding geofeed link
+194	   object in the response.
+
+196	   An RDAP server may make use of the "application/geofeed+csv" media
+197	   type and the "geofeed" link relation defined in this specification in
+198	   its responses without including the "geofeed1" extension identifier
+199	   in those responses, because RDAP servers are free to use any
+200	   registered media type or link relation in a standard response without
+201	   implementing any particular extension.  The additional value of
+202	   including the extension identifier in the "rdapConformance" array is
+203	   that it signals to the client that the server hosts geofeed URLs for
+204	   its IP network objects.  This is useful where a client receives an IP
+205	   network object without a geofeed link object, because in that case
+206	   the client can infer that no geofeed data is available for that
+207	   object, since the server would have provided it if it were available.
+
+209	   Although a server may use registered media types in its link objects
+210	   without any restrictions, it is useful to define new RDAP extensions
+211	   for those media types in order for the server to communicate to
+212	   clients that it will make data for that type accessible, in the same
+213	   way that the server does with the "geofeed1" extension identifier.
+
+215	2.4.  Example
+
+217	   The following is an elided example of an IP network object with a
+218	   geofeed link object:
+
+220	   {
+221	       "objectClassName": "ip network",
+222	       "handle": "XXXX-RIR",
+223	       "startAddress": "2001:db8::",
+224	       "endAddress": "2001:db8:0:ffff:ffff:ffff:ffff:ffff",
+225	       "ipVersion": "v6",
+226	       "name": "NET-RTR-1",
+227	       "type": "DIRECT ALLOCATION",
+228	       "country": "AU",
+229	       "parentHandle": "YYYY-RIR",
+230	       "status": [ "active" ],
+231	       "links":
+232	        [
+233	           {
+234	               "value": "https://example.net/ip/2001:db8::/48",
+235	               "rel": "self",
+236	               "href": "https://example.net/ip/2001:db8::/48",
+237	               "type": "application/rdap+json"
+238	           },
+239	           {
+240	               "value": "https://example.net/ip/2001:db8::/48",
+241	               "rel": "geofeed",
+242	               "href": "https://example.com/geofeed",
+243	               "type": "application/geofeed+csv"
+244	           },
+245	           ...
+246	       ],
+247	       ...
+248	   }
+
+250	3.  Operational Considerations
+
+252	   When an RDAP client performs an IP network lookup, per Section 3.1.1
+253	   of [RFC9082], the RDAP server is required to return the most-specific
+254	   IP network object that covers the IP address range provided by the
+255	   client.  That IP network object may not have an associated geofeed
+256	   link, but it is possible that a less-specific IP network object does
+257	   have such a link.  Clients attempting to retrieve geofeed data for a
+258	   given IP address range via RDAP should consider whether to retrieve
+259	   the parent object for the initial response (and so on, recursively)
+260	   in the event that the initial response does not contain geofeed data.
+261	   Conversely, server operators should consider interface options for
+262	   resource holders in order to support the provisioning of geofeed
+263	   links for all networks covered by the associated data.
+
+265	   It is common for a resource holder to maintain a single geofeed file
+266	   containing the geofeed data for all of their resources.  The resource
+267	   holder then updates each of their network object registrations to
+268	   refer to that single geofeed file.  As with geofeed references in
+269	   inetnum objects (per [RFC9632]), clients who find a geofeed link
+270	   object within an IP network object and opt to retrieve the data from
+271	   the associated link MUST ignore any entry where the entry's IP
+272	   address range is outside the IP network object's address range.
+
+274	   Section 3.2 of [RFC8805] recommends that consumers of geofeed data
+275	   verify that the publisher of the data is authoritative for the
+276	   relevant resources.  The RDAP bootstrap process ([RFC9224]) helps
+277	   clients with this recommendation, since a client following that
+278	   process will be directed to the RDAP server that is able to make
+279	   authoritative statements about the disposition of the relevant
+280	   resources.
+
+282	   To prevent undue load on RDAP and geofeed servers, clients fetching
+283	   geofeed data using these mechanisms MUST NOT do frequent real-time
+284	   lookups.  See Section 6 of [RFC9632] for further details.
+
+286	4.  Privacy Considerations
+
+288	   All the privacy considerations from Section 7 of [RFC9632] apply to
+289	   this document.  In particular, the service provider publishing the
+290	   geofeed file MUST take care not to expose the location of any
+291	   individual.
+
+293	   Many jurisdictions have laws or regulations that restrict the use of
+294	   "personal data", per the definition in [RFC6973].  Given that,
+295	   registry operators should ascertain whether the regulatory
+296	   environment in which they operate permits implementation of the
+297	   functionality defined in this document.
+
+299	5.  Security Considerations
+
+301	   Section 6 of [RFC9632] documents several security considerations that
+302	   are equally relevant in the RDAP context.
+
+304	   A geofeed file MUST be referenced with an HTTPS URL, per Section 6 of
+305	   [RFC9632].  The geofeed file may also contain an RPKI signature, per
+306	   Section 5 of [RFC9632].
+
+308	   Besides that, this document does not introduce any new security
+309	   considerations past those already discussed in the RDAP protocol
+310	   specifications ([RFC7481], [RFC9560]).
+
+312	6.  IANA Considerations
+313	6.1.  RDAP Extensions Registry
+
+315	   IANA is requested to register the following value in the RDAP
+316	   Extensions Registry at [RDAP-EXTENSIONS]:
+
+318	   *  Extension identifier: geofeed1
+319	   *  Registry operator: Any
+320	   *  Published specification: This document.
+321	   *  Contact: IETF, iesg@ietf.org
+322	   *  Intended usage: This extension describes a method to access the IP
+323	      geolocation feed data through RDAP.
+
+325	6.2.  Link Relations Registry
+
+327	   IANA is requested to register the following value in the Link
+328	   Relations Registry at [LINK-RELATIONS]:
+
+330	   *  Relation Name: geofeed
+331	   *  Description: Refers to a resource with IP geofeed location
+332	      information related to the link context.
+333	   *  Reference: This document.
+
+335	6.3.  Media Types Registry
+
+337	   IANA is requested to register the following value in the Media Types
+338	   Registry at [MEDIA-TYPES]:
+
+340	   *  Type name: application
+341	   *  Subtype name: geofeed+csv
+342	   *  Required parameters: N/A
+343	   *  Optional parameters: "charset" is an optional parameter for "text/
+344	      csv", but it is not used for "application/geofeed+csv" because the
+345	      geofeed content is always in UTF-8 (Section 2.1 of [RFC8805]).
+346	   *  Encoding considerations: See Section 2 of [RFC9632].
+347	   *  Security considerations: See Section 5 of this document.
+348	   *  Interoperability considerations: There are no known
+349	      interoperability problems regarding this media format.
+350	   *  Published specification: This document.
+351	   *  Applications that use this media type: Implementations of the
+352	      Registration Data Access Protocol (RDAP) Extension for Geofeed
+353	      Data.  Furthermore, any application that processes the CSV geofeed
+354	      data.
+355	   *  Additional information: This media type is a product of the IETF
+356	      REGEXT Working Group.  The REGEXT charter, information on the
+357	      REGEXT mailing list, and other documents produced by the REGEXT
+358	      Working Group can be found at [REGEXT].
+359	   *  Person & email address to contact for further information: REGEXT
+360	      Working Group, regext@ietf.org
+
+362	   *  Intended usage: COMMON
+363	   *  Restrictions on usage: None
+364	   *  Authors: Tom Harrison, Jasdip Singh
+365	   *  Author/Change controller: IETF
+366	   *  Provisional Registration: No
+
+368	6.4.  Structured Syntax Suffixes Registry
+
+370	   IANA is requested to register the following value in the Structured
+371	   Syntax Suffixes Registry at [STRUCTURED-SYNTAX-SUFFIXES]:
+
+373	   *  Name: Comma-Separated Values (CSV)
+
+375	   *  +suffix: +csv
+
+377	   *  References: [RFC4180], [RFC7111]
+
+379	   *  Encoding Considerations: Same as "text/csv".
+
+381	   *  Interoperability Considerations: Same as "text/csv".
+
+383	   *  Fragment Identifier Considerations:
+
+385	      The syntax and semantics of fragment identifiers specified for
+386	      +csv SHOULD be as specified for "text/csv".
+
+388	      The syntax and semantics for fragment identifiers for a specific
+389	      "xxx/yyy+csv" SHOULD be processed as follows:
+
+391	      For cases defined in +csv, where the fragment identifier resolves
+392	      per the +csv rules, then as specified for +csv.
+
+394	      For cases defined in +csv, where the fragment identifier does not
+395	      resolve per the +csv rules, then as specified for "xxx/yyy+csv".
+
+397	      For cases not defined in +csv, then as specified for "xxx/
+398	      yyy+csv".
+
+400	   *  Security Considerations: Same as "text/csv".
+
+402	   *  Contact: IETF, iesg@ietf.org
+
+404	   *  Author/Change controller: IETF
+
+406	7.  Implementation Status
+
+408	   (Remove this section before publication.)
+409	   This section records the status of known implementations of the
+410	   protocol defined by this specification at the time of posting of this
+411	   Internet-Draft, and is based on a proposal described in [RFC7942].
+412	   The description of implementations in this section is intended to
+413	   assist the IETF in its decision processes in progressing drafts to
+414	   RFCs.  Please note that the listing of any individual implementation
+415	   here does not imply endorsement by the IETF.  Furthermore, no effort
+416	   has been spent to verify the information presented here that was
+417	   supplied by IETF contributors.  This is not intended as, and must not
+418	   be construed to be, a catalog of available implementations or their
+419	   features.  Readers are advised to note that other implementations may
+420	   exist.
+
+422	   According to RFC 7942, "this will allow reviewers and working groups
+423	   to assign due consideration to documents that have the benefit of
+424	   running code, which may serve as evidence of valuable experimentation
+425	   and feedback that have made the implemented protocols more mature.
+426	   It is up to the individual working groups to use this information as
+427	   they see fit".
+
+429	7.1.  RIPE NCC
+
+431	   *  Responsible Organization: RIPE NCC
+432	   *  Location: https://docs.db.ripe.net/Release-Notes/#ripe-database-
+433	      release-1-110 (https://docs.db.ripe.net/Release-Notes/#ripe-
+434	      database-release-1-110)
+435	   *  Description: An RDAP server returning geofeed data.
+436	   *  Level of Maturity: This is a production implementation.
+437	   *  Coverage: This implementation covers all the features described in
+438	      version 01 of this specification.
+439	   *  Contact Information: Ed Shryane, eshryane@ripe.net
+
+441	8.  Acknowledgements
+
+443	   Mark Kosters provided initial support and encouragement for this
+444	   work, along with the [RFC9632] authors.  Gavin Brown suggested using
+445	   a web link instead of a simple URL string to specify a geofeed file
+446	   URL.  Andy Newton, James Gould, Scott Hollenbeck, Mario Loffredo,
+447	   Orie Steele, Alexey Melnikov, Mark Nottingham, Rifaat Shekh-Yusuf,
+448	   Dale R.  Worley, Dhruv Dhody, and Mohamed Boucadair provided valuable
+449	   feedback for this document.
+
+451	9.  Change History
+
+453	   (Remove this section before publication.)
+
+455	9.1.  Changes from 00 to 01
+456	   *  Now using a web link instead of a simple URL string to specify a
+457	      geofeed file URL.
+458	   *  Renamed the extension as "geofeed1" instead of "geofeedv1".
+459	   *  Introduced the new "geo" link relation type.
+460	   *  Introduced the new "application/geofeed+csv" media type.
+
+462	9.2.  Changes from 01 to 02
+
+464	   *  Updated the "Requirements Language" section for examples.
+465	   *  Added an example for RDAP conformance.
+466	   *  Updated the rationale for using the new "application/geofeed+csv"
+467	      media type.
+468	   *  Updated the "Applications that use this media type" section for
+469	      the "application/geofeed+csv" registration.
+
+471	9.3.  Changes from 02 to 03
+
+473	   *  Removed "value" and "hreflang" explanations from the "Geofeed
+474	      Link" section.  Further, clarified the cardinality of geofeed link
+475	      objects.
+476	   *  Updated extensibility verbiage in the "Media Type for a Geofeed
+477	      Link" section.
+478	   *  In the "Example" section, updated the domain in "href" of the
+479	      geofeed link object to contrast with the domain in "value" to
+480	      highlight that "href" is for a geofeed file hosted at a network
+481	      operator site whereas "value" is for an IP network object from an
+482	      RDAP server.
+483	   *  Removed the "Redaction" section since the geofeed files are public
+484	      to start with.
+485	   *  Added URLs for various IANA registries.
+
+487	9.4.  Changes from 03 to 04
+
+489	   *  Updated the criteria for including the extension identifier in
+490	      "rdapConformance".
+
+492	9.5.  Changes from 04 to 05
+
+494	   *  Made various editorial changes.
+
+496	9.6.  Changes from 05 to 06
+
+498	   *  The extension identifier inclusion is now a must.
+499	   *  Added the "Operational Considerations" section to clarify the
+500	      geofeed file and IP networks relationship, as well as how RDAP
+501	      Bootstrap helps with a recommendation from RFC 8805.
+502	   *  Updated the "Privacy Considerations" section to clarify the
+503	      service provider responsibility.
+
+505	9.7.  Changes from 06 to 07
+
+507	   *  Updated the extension identifier text so as to clarify that the
+508	      media type and link relation can be used independently of that
+509	      identifier.
+
+511	9.8.  Changes from 07 to 08
+
+513	   *  Added the "Implementation Status" section.
+514	   *  Updated references.
+
+516	9.9.  Changes from 08 to 09
+
+518	   *  Incorporated feedback from the AD review.
+519	   *  Incorporated feedback from the media type review.
+520	   *  RFCs 4180, 7111, and 8805 are now normative references.
+521	   *  Made minor editorial changes.
+
+523	9.10.  Changes from 09 to 10
+
+525	   *  Incorporated feedback from the IESG review.
+
+527	9.11.  Changes from 10 to 11
+
+529	   *  Incorporated feedback from the IESG review.
+
+531	9.12.  Changes from 11 to 12
+
+533	   *  Incorporated feedback from the IESG review.
+
+535	10.  References
+
+537	10.1.  Normative References
+
+539	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+540	              Requirement Levels", BCP 14, RFC 2119,
+541	              DOI 10.17487/RFC2119, March 1997,
+542	              <https://www.rfc-editor.org/info/rfc2119>.
+
+544	   [RFC3629]  Yergeau, F., "UTF-8, a transformation format of ISO
+545	              10646", STD 63, RFC 3629, DOI 10.17487/RFC3629, November
+546	              2003, <https://www.rfc-editor.org/info/rfc3629>.
+
+548	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+549	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+550	              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+552	   [RFC9082]  Hollenbeck, S. and A. Newton, "Registration Data Access
+553	              Protocol (RDAP) Query Format", STD 95, RFC 9082,
+554	              DOI 10.17487/RFC9082, June 2021,
+555	              <https://www.rfc-editor.org/info/rfc9082>.
+
+557	   [RFC9083]  Hollenbeck, S. and A. Newton, "JSON Responses for the
+558	              Registration Data Access Protocol (RDAP)", STD 95,
+559	              RFC 9083, DOI 10.17487/RFC9083, June 2021,
+560	              <https://www.rfc-editor.org/info/rfc9083>.
+
+562	   [RFC9224]  Blanchet, M., "Finding the Authoritative Registration Data
+563	              Access Protocol (RDAP) Service", STD 95, RFC 9224,
+564	              DOI 10.17487/RFC9224, March 2022,
+565	              <https://www.rfc-editor.org/info/rfc9224>.
+
+567	   [RFC9632]  Bush, R., Candela, M., Kumari, W., and R. Housley,
+568	              "Finding and Using Geofeed Data", RFC 9632,
+569	              DOI 10.17487/RFC9632, August 2024,
+570	              <https://www.rfc-editor.org/info/rfc9632>.
+
+572	10.2.  Informative References
+
+574	   [LINK-RELATIONS]
+575	              IANA, "Link Relations",
+576	              <https://www.iana.org/assignments/link-relations/>.
+
+578	   [MEDIA-TYPES]
+579	              IANA, "Media Types",
+580	              <https://www.iana.org/assignments/media-types/>.
+
+582	   [RDAP-EXTENSIONS]
+583	              IANA, "RDAP Extensions",
+584	              <https://www.iana.org/assignments/rdap-extensions/>.
+
+586	   [REGEXT]   IETF, "Registration Protocols Extensions",
+587	              <https://datatracker.ietf.org/wg/regext/>.
+
+589	   [RFC2622]  Alaettinoglu, C., Villamizar, C., Gerich, E., Kessens, D.,
+590	              Meyer, D., Bates, T., Karrenberg, D., and M. Terpstra,
+591	              "Routing Policy Specification Language (RPSL)", RFC 2622,
+592	              DOI 10.17487/RFC2622, June 1999,
+593	              <https://www.rfc-editor.org/info/rfc2622>.
+
+595	   [RFC4180]  Shafranovich, Y., "Common Format and MIME Type for Comma-
+596	              Separated Values (CSV) Files", RFC 4180,
+597	              DOI 10.17487/RFC4180, October 2005,
+598	              <https://www.rfc-editor.org/info/rfc4180>.
+
+600	   [RFC6480]  Lepinski, M. and S. Kent, "An Infrastructure to Support
+601	              Secure Internet Routing", RFC 6480, DOI 10.17487/RFC6480,
+602	              February 2012, <https://www.rfc-editor.org/info/rfc6480>.
+
+604	   [RFC6838]  Freed, N., Klensin, J., and T. Hansen, "Media Type
+605	              Specifications and Registration Procedures", BCP 13,
+606	              RFC 6838, DOI 10.17487/RFC6838, January 2013,
+607	              <https://www.rfc-editor.org/info/rfc6838>.
+
+609	   [RFC6973]  Cooper, A., Tschofenig, H., Aboba, B., Peterson, J.,
+610	              Morris, J., Hansen, M., and R. Smith, "Privacy
+611	              Considerations for Internet Protocols", RFC 6973,
+612	              DOI 10.17487/RFC6973, July 2013,
+613	              <https://www.rfc-editor.org/info/rfc6973>.
+
+615	   [RFC7111]  Hausenblas, M., Wilde, E., and J. Tennison, "URI Fragment
+616	              Identifiers for the text/csv Media Type", RFC 7111,
+617	              DOI 10.17487/RFC7111, January 2014,
+618	              <https://www.rfc-editor.org/info/rfc7111>.
+
+620	   [RFC7480]  Newton, A., Ellacott, B., and N. Kong, "HTTP Usage in the
+621	              Registration Data Access Protocol (RDAP)", STD 95,
+622	              RFC 7480, DOI 10.17487/RFC7480, March 2015,
+623	              <https://www.rfc-editor.org/info/rfc7480>.
+
+625	   [RFC7481]  Hollenbeck, S. and N. Kong, "Security Services for the
+626	              Registration Data Access Protocol (RDAP)", STD 95,
+627	              RFC 7481, DOI 10.17487/RFC7481, March 2015,
+628	              <https://www.rfc-editor.org/info/rfc7481>.
+
+630	   [RFC7942]  Sheffer, Y. and A. Farrel, "Improving Awareness of Running
+631	              Code: The Implementation Status Section", BCP 205,
+632	              RFC 7942, DOI 10.17487/RFC7942, July 2016,
+633	              <https://www.rfc-editor.org/info/rfc7942>.
+
+635	   [RFC8805]  Kline, E., Duleba, K., Szamonek, Z., Moser, S., and W.
+636	              Kumari, "A Format for Self-Published IP Geolocation
+637	              Feeds", RFC 8805, DOI 10.17487/RFC8805, August 2020,
+638	              <https://www.rfc-editor.org/info/rfc8805>.
+
+640	   [RFC9560]  Hollenbeck, S., "Federated Authentication for the
+641	              Registration Data Access Protocol (RDAP) Using OpenID
+642	              Connect", RFC 9560, DOI 10.17487/RFC9560, April 2024,
+643	              <https://www.rfc-editor.org/info/rfc9560>.
+
+645	   [STRUCTURED-SYNTAX-SUFFIXES]
+646	              IANA, "Structured Syntax Suffixes",
+647	              <https://www.iana.org/assignments/media-type-structured-
+648	              suffix/>.
+
+650	Authors' Addresses
+
+652	   Jasdip Singh
+653	   ARIN
+654	   Email: jasdips@arin.net
+
+656	   Tom Harrison
+657	   APNIC
+658	   Email: tomh@apnic.net
+
+
+
+
+
+
+
+
+
