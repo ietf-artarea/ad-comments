@@ -75,7 +75,7 @@ or a few persons acting in their individual capacity?
 574	   servers that answer authoritatively, SPoF avoidance, etc - but not
 575	   enforce these.
 
-It is always helpful to be much specific about these checks, otherwise we
+It is always helpful to be specific about these checks, otherwise we
 shouldn't expect that they will be done. Can a non-exhaustive list of checks
 be specified?
 
@@ -106,6 +106,17 @@ again? Does the DE verify the identity of the requestor for a change request?
 
 As there is no interoperability consideration for storing this info in DNS or not storing it in DNS, this should
 be a non-normative MAY.
+
+### Expected use of EPP
+
+771	   circumstances.  It is expected registry-registrar activity will use
+772	   the Extensible Provisioning Protocol (EPP) [STD69].  The registry
+
+Why is this expected? The IETF is working the RESTful Provisioning Protocol, which may end up
+being more appropriate.
+
+As DETs have their own problem space, simple re-use of both EPP/RPP and RDAP may not be enough,
+and it should be expected that extensions are needed for both.
 
 ### ICAO
 
