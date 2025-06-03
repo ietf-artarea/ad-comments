@@ -33,7 +33,7 @@ Why is DNSSEC only RECOMMENDED? Why isn't this a MUST?
 765	   entity (i.e. an entity that self-signed it certificate as part of the
 766	   HHIT RRType) MUST use DNSSEC.
 
-Under what circumstatances is it acceptable that a DPS not be used and
+Under what circumstances is it acceptable that a DPS not be used and
 published when using DNSSEC? If there are none, this sounds like a MUST.
 
 ### SHOULD provide WHOIS
@@ -58,9 +58,15 @@ Additionally, why is this a SHOULD? Can it be a MUST?
 565	   ie the IPv6 addresses for its DET address space.
 
 As liaising can just be exchanging emails with a stranger on the Internet,
-can this be made more specific? Otherwise there does not seem to be much assurance
+can this be made more specific? Otherwise, there does not seem to be much assurance
 that the delegation cannot go to an imposter. Can the DE be requested to
 verify the identity of the requestor using common and reasonable methods?
+
+I am also concerned that a person acting as a DE would be taking on non-trivial
+amounts of liability if they are expected to reduce the possibility of delegation
+to imposters. There are risks in accidentally accepting requests from imposters
+and denying requests to authentic requestors. Is the DE expected to be a person
+or a few persons acting in their individual capacity?
 
 ### Technical Checks
 
