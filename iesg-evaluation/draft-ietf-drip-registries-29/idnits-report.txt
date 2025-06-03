@@ -1,0 +1,1506 @@
+idnits 2.17.1 
+
+draft-ietf-drip-registries-29.txt:
+-(563): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(564): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+  == There are 5 instances of lines with non-ascii characters in the document.
+
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     Summary: 0 errors (**), 0 flaws (~~), 1 warning (==), 0 comments (--).
+
+--------------------------------------------------------------------------------
+
+
+2	drip Working Group                                  A. Wiethuechter, Ed.
+3	Internet-Draft                                        AX Enterprize, LLC
+4	Intended status: Standards Track                                 J. Reid
+5	Expires: 22 November 2025                                       RTFM llp
+6	                                                             21 May 2025
+
+8	               DRIP Entity Tags in the Domain Name System
+9	                     draft-ietf-drip-registries-29
+
+11	Abstract
+
+13	   This document describes the discovery and management of DRIP Entity
+14	   Tags (DETs) in DNS.  Authoritative Name Servers, with DRIP specific
+15	   DNS structures and standard DNS methods, are the Public Information
+16	   Registries for DETs and their related metadata.
+
+18	Status of This Memo
+
+20	   This Internet-Draft is submitted in full conformance with the
+21	   provisions of BCP 78 and BCP 79.
+
+23	   Internet-Drafts are working documents of the Internet Engineering
+24	   Task Force (IETF).  Note that other groups may also distribute
+25	   working documents as Internet-Drafts.  The list of current Internet-
+26	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+28	   Internet-Drafts are draft documents valid for a maximum of six months
+29	   and may be updated, replaced, or obsoleted by other documents at any
+30	   time.  It is inappropriate to use Internet-Drafts as reference
+31	   material or to cite them other than as "work in progress."
+
+33	   This Internet-Draft will expire on 22 November 2025.
+
+35	Copyright Notice
+
+37	   Copyright (c) 2025 IETF Trust and the persons identified as the
+38	   document authors.  All rights reserved.
+
+40	   This document is subject to BCP 78 and the IETF Trust's Legal
+41	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+42	   license-info) in effect on the date of publication of this document.
+43	   Please review these documents carefully, as they describe your rights
+44	   and restrictions with respect to this document.  Code Components
+45	   extracted from this document must include Revised BSD License text as
+46	   described in Section 4.e of the Trust Legal Provisions and are
+47	   provided without warranty as described in the Revised BSD License.
+
+49	Table of Contents
+
+51	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+52	     1.1.  General Concept . . . . . . . . . . . . . . . . . . . . .   4
+53	     1.2.  Scope . . . . . . . . . . . . . . . . . . . . . . . . . .   4
+54	   2.  Terminology . . . . . . . . . . . . . . . . . . . . . . . . .   4
+55	     2.1.  Required Terminology  . . . . . . . . . . . . . . . . . .   4
+56	     2.2.  Additional Definitions  . . . . . . . . . . . . . . . . .   4
+57	   3.  DET Hierarchy in DNS  . . . . . . . . . . . . . . . . . . . .   5
+58	     3.1.  Use of Existing DNS Models  . . . . . . . . . . . . . . .   6
+59	       3.1.1.  DNS Model Considerations for DIMEs  . . . . . . . . .   6
+60	   4.  Public Information Registry . . . . . . . . . . . . . . . . .   8
+61	   5.  Resource Records  . . . . . . . . . . . . . . . . . . . . . .   9
+62	     5.1.  HHIT Resource Record  . . . . . . . . . . . . . . . . . .   9
+63	       5.1.1.  Text Representation . . . . . . . . . . . . . . . . .  10
+64	       5.1.2.  Field Descriptions  . . . . . . . . . . . . . . . . .  10
+65	     5.2.  UAS Broadcast RID Resource Record . . . . . . . . . . . .  11
+66	       5.2.1.  Text Representation . . . . . . . . . . . . . . . . .  11
+67	       5.2.2.  Field Descriptions  . . . . . . . . . . . . . . . . .  11
+68	   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  13
+69	     6.1.  DET Prefix Delegation . . . . . . . . . . . . . . . . . .  13
+70	     6.2.  IANA DRIP Registry  . . . . . . . . . . . . . . . . . . .  14
+71	       6.2.1.  DRIP RAA Allocations  . . . . . . . . . . . . . . . .  14
+72	       6.2.2.  HHIT Entity Type  . . . . . . . . . . . . . . . . . .  15
+73	   7.  Security Considerations . . . . . . . . . . . . . . . . . . .  18
+74	     7.1.  DNS Operational & Registration Considerations . . . . . .  18
+75	     7.2.  DET & Public Key Exposure . . . . . . . . . . . . . . . .  19
+76	   8.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  20
+77	   9.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  20
+78	     9.1.  Normative References  . . . . . . . . . . . . . . . . . .  20
+79	     9.2.  Informative References  . . . . . . . . . . . . . . . . .  21
+80	   Appendix A.  Example Zone Files & RRType Contents . . . . . . . .  24
+81	     A.1.  Example RAA . . . . . . . . . . . . . . . . . . . . . . .  24
+82	       A.1.1.  Authentication HHIT . . . . . . . . . . . . . . . . .  25
+83	       A.1.2.  Delegation of HDA . . . . . . . . . . . . . . . . . .  26
+84	     A.2.  Example HDA . . . . . . . . . . . . . . . . . . . . . . .  26
+85	       A.2.1.  Authentication & Issue HHITs  . . . . . . . . . . . .  26
+86	       A.2.2.  Registratant HHIT & BRID  . . . . . . . . . . . . . .  30
+87	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  35
+
+89	1.  Introduction
+
+91	   Registries are fundamental to Unmanned Aircraft System (UAS) Remote
+92	   Identification (RID).  Only very limited operational information can
+93	   be sent via Broadcast RID, but extended information is sometimes
+94	   needed.  The most essential element of information from RID is the
+95	   UAS ID, the unique key for lookup of extended information in relevant
+96	   registries (see Figure 1; Figure 4 of [RFC9434]).
+
+98	  ***************                                        ***************
+99	  *    UAS1     *                                        *     UAS2    *
+100	  *             *                                        *             *
+101	  * +--------+  *                 DAA/V2V                *  +--------+ *
+102	  * |   UA   o--*----------------------------------------*--o   UA   | *
+103	  * +--o--o--+  *                                        *  +--o--o--+ *
+104	  *    |  |     *   +------+      Lookups     +------+   *     |  |    *
+105	  *    |  |     *   | GPOD o------.    .------o PSOD |   *     |  |    *
+106	  *    |  |     *   +------+      |    |      +------+   *     |  |    *
+107	  *    |  |     *                 |    |                 *     |  |    *
+108	  * C2 |  |     *     V2I      ************     V2I      *     |  | C2 *
+109	  *    |  '-----*--------------*          *--------------*-----'  |    *
+110	  *    |        *              *          *              *        |    *
+111	  *    |        o====Net-RID===*          *====Net-RID===o        |    *
+112	  * +--o--+     *              * Internet *              *     +--o--+ *
+113	  * | GCS o-----*--------------*          *--------------*-----o GCS | *
+114	  * +-----+     * Registration *          * Registration *     +-----+ *
+115	  *             * (and UTM)    *          * (and UTM)    *             *
+116	  ***************              ************              ***************
+117	                                 |  |  |
+118	                  +----------+   |  |  |   +----------+
+119	                  | Public   o---'  |  '---o Private  |
+120	                  | Registry |      |      | Registry |
+121	                  +----------+      |      +----------+
+122	                                 +--o--+
+123	                                 | DNS |
+124	                                 +-----+
+
+126	  DAA:  Detect And Avoid
+127	  GPOD: General Public Observer Device
+128	  PSOD: Public Safety Observer Device
+129	  V2I:  Vehicle-to-Infrastructure
+130	  V2V:  Vehicle-to-Vehicle
+
+132	      Figure 1: Global UAS RID Usage Scenario (Figure 4 of RFC9434)
+
+134	   When a DRIP Entity Tag (DET) [RFC9374] is used as the UAS ID in RID,
+135	   extended information can be retrieved from a DRIP Identity Management
+136	   Entity (DIME), which manages registration of and associated lookups
+137	   from DETs.  In this document it is assumed the DIME is a function of
+138	   UAS Service Suppliers (USS) (Appendix A.2 of [RFC9434]) but a DIME
+139	   can be independent or handled by another entity as well.
+
+141	1.1.  General Concept
+
+143	   DRIP Entity Tags (DETs) embed a hierarchy scheme which is mapped onto
+144	   the Domain Name System (DNS) [STD13].  DIMEs enforce registration and
+145	   information access of data associated with a DET while also providing
+146	   the trust inherited from being a member of the hierarchy.  Other
+147	   identifiers and their methods are out of scope for this document.
+
+149	   Authoritative Name Servers of the DNS provide the public information
+150	   such as the cryptographic keys, endorsements and certificates of DETs
+151	   and pointers to private information resources.  Cryptographic
+152	   (public) keys are used to authenticate anything signed by a DET, such
+153	   as in the Authentication defined in [RFC9575] for Broadcast RID.
+154	   Endorsements and certificates are used to endorse the claim of being
+155	   part of the hierarchy.
+
+157	   This document does not specify AAA mechanisms used by Private
+158	   Information Registries to store and protect Personally Identifiable
+159	   Information (PII).
+
+161	1.2.  Scope
+
+163	   The scope of this document is the DNS registration of DETs with the
+164	   DNS delegation of the reverse domain of IPv6 Prefix, assigned by IANA
+165	   for DETs 2001:30::/28 and RRsets used to handle DETs.
+
+167	2.  Terminology
+
+169	2.1.  Required Terminology
+
+171	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+172	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+173	   "OPTIONAL" in this document are to be interpreted as described in BCP
+174	   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+175	   capitals, as shown here.
+
+177	2.2.  Additional Definitions
+
+179	   This document makes use of the terms and abbreviations (e.g., USS)
+180	   defined in Section 2.2 of [RFC9153].  Other terms and abbreviations
+181	   (e.g., DRIP Identity Management Entity (DIME) and Endorsement) are
+182	   from Section 2 of [RFC9434], while others (e.g., Registered Assigning
+183	   Authority (RAA) and HHIT Domain Authority (HDA)) are from Section 2
+184	   of [RFC9374].
+
+186	3.  DET Hierarchy in DNS
+
+188	   [RFC9374] defines the HHIT and further specifies an instance of them
+189	   used for UAS RID called DETs.  The HHIT/DET is a 128-bit value that
+190	   is as an IPv6 address intended primarily as an identifier rather than
+191	   locator.  Its format is in Figure 2, shown here for reference, and
+192	   further information is in [RFC9374].
+
+194	    +-------------+--------------+---------------+-------------+
+195	    | IPv6 Prefix | Hierarchy ID | HHIT Suite ID | ORCHID Hash |
+196	    | (28 bits)   | (28 bits)    | (8 bits)      | (64 bits)   |
+197	    +-------------+--------------+---------------+-------------+
+198	                 /                \
+199	                /                  \
+200	               /                    \-----------------------------\
+201	              /                                                    \
+202	             /                                                      \
+203	            +--------------------------------+-----------------------+
+204	            | Registered Assigning Authority | HHIT Domain Authority |
+205	            | (14 bits)                      | (14 bits)             |
+206	            +--------------------------------+-----------------------+
+
+208	                    Figure 2: DRIP Entity Tag Breakdown
+
+210	   [RFC9374] assigns the IPv6 prefix 2001:30::/28 for DETs.  Its
+211	   corresponding domain name for reverse lookups is
+212	   3.0.0.1.0.0.2.ip6.arpa.. The IAB has administrative control of this
+213	   domain name.
+
+215	   Due to the nature of the hierarchy split and its relationship to
+216	   nibble reversing of the IPv6 address, the upper level of hierarchy
+217	   (i.e., Registered Assigning Authority (RAA)) "borrows" the upper two
+218	   bits of their respective HHIT Domain Authority (HDA) space for DNS
+219	   delegation.  As such the IPv6 prefix of RAAs are 2001:3x:xxx0::/44
+220	   and HDAs are 2001:3x:xxxy:yy00::/56 with respective nibble reverse
+221	   domains of x.x.x.x.3.0.0.1.0.0.2.ip6.arpa. and
+222	   y.y.y.x.x.x.x.3.0.0.1.0.0.2.ip6.arpa..
+
+224	   This document preallocates a subset of RAAs based on the ISO 3166-1
+225	   Numeric Nation Code [ISO3166-1].  This is to support the initial use
+226	   case of DETs in UAS RID on an international level.  See Section 6.2.1
+227	   for the RAA allocations.
+
+229	   The HDA values of 0, 4096, 8192 and 12288 are reserved for
+230	   operational use of an RAA (a by-product of the above mentioned
+231	   borrowing of bits), specifically when to register with the apex and
+232	   endorse delegations of HDAs in their namespace.
+
+234	   The administration, management and policy for the operation of a DIME
+235	   at any level in the hierarchy (Apex, RAA or HDA) is out of scope for
+236	   this document.  For RAAs or DETs allocated on a per-country basis,
+237	   these considerations should be be determined by the appropriate
+238	   national authorities, presumably the Civil Aviation Authority (CAA).
+
+240	3.1.  Use of Existing DNS Models
+
+242	   DRIP relies on the DNS and as such roughly follows the registrant-
+243	   registrar-registry model.  In the UAS ecosystem, the registrant would
+244	   be the end user who owns/controls the Unmanned Aircraft.  They are
+245	   ultimately responsible for the DET and any other information that
+246	   gets published in the DNS.  Registrants use agents known as
+247	   registrars to manage their interactions with the registry.
+248	   Registrars typically provide optional additional services such as DNS
+249	   hosting.
+
+251	   The registry maintains a database of the registered domain names and
+252	   their related metadata such as the contact details for domain name
+253	   holder and the relevant registrar.  The registry provides DNS service
+254	   for the zone apex which contains delegation information for domain
+255	   names.  Registries generally provide services such as WHOIS [RFC3912]
+256	   or RDAP [STD95] to publish metadata about the registered domain names
+257	   and their registrants and registrars.
+
+259	   Registrants have contracts with registrars who in turn have contracts
+260	   with registries.  Payments follow this model too: the registrant buys
+261	   services from a registrar who pays for services provided by the
+262	   registry.
+
+264	   By definition, there can only be one registry for a domain name.
+265	   Since that registry is a de facto monopoly, the scope of its
+266	   activities is usually kept to a minimum to reduce the potential for
+267	   market distortions or anti-competitive practices.  A registry can
+268	   have an arbitrary number of registrars who compete with each other on
+269	   price, service and customer support.
+
+271	3.1.1.  DNS Model Considerations for DIMEs
+272	     Apex
+273	     Registry/Registrar
+274	     (IANA)
+275	                              +=========================+
+276	                              | 3.0.0.1.0.0.2.ip6.arpa. |
+277	                              +============o============+
+278	                                           |
+279	     --------------------------------------|-------------------------
+280	     National                              |
+281	     Registries/Registrars                 |
+282	     (RAA)                                 |
+283	                                           |
+284	             +--------------+--------------o-+---------------+
+285	             |              |                |               |
+286	       +=====o====+    +====o=====+    +=====o====+    +=====o====+
+287	       | 0.0.0.0. |    | 1.0.0.0. |    | 2.0.0.0. |    | 3.0.0.0. |
+288	       +====o=====+    +====o=====+    +====o=====+    +====o=====+
+289	                                            |
+290	     ---------------------------------------|------------------------
+291	     Local                                  |
+292	     Registries/Registrars                  |
+293	     (HDA)                                  |
+294	                                            |
+295	             +--------------+---------------o--------...-----+
+296	             |              |               |                |
+297	       +=====o====+    +====o=====+    +====o=====+    +=====o====+
+298	       |  1.0.0.  |    |  2.0.0.  |    |  3.0.0.  |    |  f.f.f.  |
+299	       +====o=====+    +=====o====+    +====o=====+    +====o=====+
+300	                                            |
+301	     ---------------------------------------|------------------------
+302	     Local                                  |
+303	     Registrants                            |
+304	                      +=====================o================+
+305	                      | x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.5.0. |
+306	                      +======================================+
+
+308	                      Figure 3: Example DRIP DNS Model
+
+310	   While the registrant-registrar-registry model is mature and well
+311	   understood, it may not be appropriate for DRIP registrations in some
+312	   circumstances.  It could add costs and complexity; developing
+313	   policies and contracts as outlined above.  On the other hand,
+314	   registries and registrars offer customer service/support and can
+315	   provide the supporting infrastructure for reliable DNS and WHOIS or
+316	   RDAP service.
+
+318	   Another approach could be to handle DRIP registrations in a
+319	   comparable way to how IP address space gets provisioned.  Here,
+320	   blocks of addresses get delegated to a "trusted" third party,
+321	   typically an ISP, who then issues IP addresses to its customers.  For
+322	   DRIP, blocks of IP addresses could be delegated from the
+323	   3.0.0.1.0.0.2.ip6.arpa. domain (reverse domain of prefix allocated by
+324	   [RFC9374]) to an entity chosen by the appropriate Civil Aviation
+325	   Authority (CAA).  This third party would be responsible for the
+326	   corresponding DNS and WHOIS or RDAP infrastructure for these IP
+327	   address blocks.  They would also provision the Hierarchical Host
+328	   Identity Tag (HHIT, [RFC9374]) records for these IP addresses.  In
+329	   principle a manufacturer or vendor of UAS devices could provide that
+330	   role.  This is shown as an example in Figure 3.
+
+332	   Dynamic DRIP registration is another possible solution, for example
+333	   when the operator of a UAS device registers its corresponding HHIT
+334	   record and other resources before a flight and deletes them
+335	   afterwards.  This may be feasible in controlled environments with
+336	   well-behaved actors.  However, this approach may not scale since each
+337	   device is likely to need credentials for updating the IT
+338	   infrastructure which provisions the DNS.
+
+340	   Registration policies (pricing, renewals, registrar and registrant
+341	   agreements, etc.) will need to be developed.  These considerations
+342	   should be determined by the CAA, perhaps in consultation with local
+343	   stakeholders to assess the cost-benefits of these approaches (and
+344	   others).  All of these are out of scope for this document.  The
+345	   specifics for the UAS RID use case are detailed in the rest of
+346	   document.
+
+348	4.  Public Information Registry
+
+350	   Per [RFC9434] all information classified as public is stored in the
+351	   DNS, specifically Authoritative Name Servers, to satisfy REG-1 from
+352	   [RFC9153].
+
+354	   Authoritative Name Servers use domain names as identifiers and data
+355	   is stored in Resource Records (RR) with associated RRTypes.  This
+356	   document defines two new RRTypes, one for HHIT metadata (HHIT,
+357	   Section 5.1) and another for UAS Broadcast RID information (BRID,
+358	   Section 5.2).  The former RRType is particularly important as it
+359	   contains a URI (as part of the certificate) that points to Private
+360	   Information resources.
+
+362	   DETs, being IPv6 addresses, are to be under ip6.arpa. (nibble
+363	   reversed per convention) and MUST resolve to an HHIT RRType.
+364	   Depending on local circumstances or additional use cases other
+365	   RRTypes MAY be present.  For UAS RID the BRID RRType MUST be present
+366	   to provide the Broadcast Endorsements (BEs) defined in
+367	   Section 3.1.2.1 of [RFC9575].
+
+369	   DNSSEC is strongly RECOMMENDED.  When a DIME decides to use DNSSEC
+370	   they SHOULD define a framework for cryptographic algorithms and key
+371	   management [RFC6841].  This may be influenced by frequency of
+372	   updates, size of the zone, and policies.
+
+374	   UAS specific information, such as physical characteristics, MAY also
+375	   be stored in DNS but is out of scope for this document.
+
+377	   A DET IPv6 address gets mapped into domain names using the scheme
+378	   defined in [STD88].  However DNS lookups of these names query for
+379	   HHIT and/or BRID resource records rather than the PTR resource
+380	   records conventionally used in reverse lookups of IP addresses.  For
+381	   example, the HHIT resource record for the DET 2001:30::1 would be
+382	   returned from a DNS lookup for the HHIT QTYPE for 1.0.0.0.0.0.0.0.0.0
+383	   .0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.3.0.0.1.0.0.2.ip6.arpa..
+
+385	   The HHIT RRType provides the public key for signature verification
+386	   and URIs via the certificate.  The BRID RRType provides static
+387	   Broadcast RID information such as the Broadcast Endorsements sent
+388	   following [RFC9575].
+
+390	5.  Resource Records
+
+392	5.1.  HHIT Resource Record
+
+394	   The HHIT Resource Record (HHIT, RRType 67) is a metadata record for
+395	   various bits of HHIT specific information that isn't available in the
+396	   pre-existing HIP RRType.  The HHIT RRType does not replace the HIP
+397	   RRType.  The primary advantage of the HHIT RRType over the existing
+398	   RRType is the mandatory inclusion of a certificate containing an
+399	   entity's public key signed by the registrar, or other trust anchor,
+400	   to confirm registration.
+
+402	   The data MUST be encoded in CBOR [RFC8949] bytes.  The CDDL [RFC8610]
+403	   of the data is provided in Figure 4.
+
+405	5.1.1.  Text Representation
+
+407	   The data are represented in base64 [RFC4648] and may be divided into
+408	   any number of white-space-separated substrings, down to single base64
+409	   digits, which are concatenated to obtain the full object.  These
+410	   substrings can span lines using the standard parenthesis.  Note that
+411	   the data has internal subfields but these do not appear in the master
+412	   file representation; only a single logical base64 string will appear.
+
+414	5.1.1.1.  Presentation Representation
+
+416	   The data MAY, for display purposes only, be represented using the
+417	   Extended Diagnostic Notation as defined in Appendix G of [RFC8610].
+
+419	5.1.2.  Field Descriptions
+
+421	   hhit-rr = [
+422	       hhit-entity-type: uint,
+423	       hid-abbreviation: tstr .size(15),
+424	       canonical-registration-cert: bstr
+425	   ]
+
+427	                      Figure 4: HHIT Wire Format CDDL
+
+429	   All fields of the HHIT RRType MUST be included to be properly formed.
+
+431	   HHIT Entity Type:  The HHIT Entity Type field is a number with values
+432	      defined in Section 6.2.2.  It is envisioned that there may be many
+433	      types of HHITs in use.  In some cases, it may be helpful to
+434	      understand the HHITs role in the ecosystem like described in
+435	      [drip-dki].  This field provides such context.  This field MAY
+436	      provide a signal of additional information and/or different
+437	      handling of the data beyond what is defined in this document.
+
+439	   HID Abbreviation:  The HID Abbreviation field is a string that
+440	      provides an abbreviation to the HID structure of a DET for display
+441	      devices.  The convention for such abbreviations is a matter of
+442	      local policy.  Absent of such a policy, this field MUST be filled
+443	      with the four character hexadecimal representations of the RAA and
+444	      HDA (in that order) with a separator character such as a space.
+445	      For example, a DET with an RAA value of 10 and HDA value of 20
+446	      would be abbreviated as: 000A 0014.
+
+448	   Canonical Registration Certificate:  The Canonical Registration
+449	      Certificate field is for a certificate endorsing registration of
+450	      the DET.  It MUST be encoded as X.509 DER [RFC5280].  This
+451	      certificate MAY be self-signed when the entity is acting as a root
+452	      of trust (i.e., an apex).  Such self-signed behavior is defined by
+453	      policy, such as in [drip-dki], and is out of scope for this
+454	      document.
+
+456	5.2.  UAS Broadcast RID Resource Record
+
+458	   The UAS Broadcast RID Resource Record (BRID, RRType 68) is a format
+459	   to hold public information typically sent of the UAS Broadcast RID
+460	   that is static.  It can act as a data source if information is not
+461	   received over Broadcast RID or for cross validation.  The primary
+462	   function for DRIP is the inclusion of one or more Broadcast
+463	   Endorsements as defined in [RFC9575] in the auth field.  These
+464	   Endorsements are generated by the registrar upon successful
+465	   registration and broadcast by the entity.
+
+467	   The data MUST be encoded in CBOR [RFC8949] bytes.  The CDDL [RFC8610]
+468	   of the data is provided in Figure 5.
+
+470	5.2.1.  Text Representation
+
+472	   The data are represented in base64 [RFC4648] and may be divided into
+473	   any number of white-space-separated substrings, down to single base64
+474	   digits, which are concatenated to obtain the full object.  These
+475	   substrings can span lines using the standard parenthesis.  Note that
+476	   the data has internal subfields but these do not appear in the master
+477	   file representation; only a single logical base64 string will appear.
+
+479	5.2.1.1.  Presentation Representation
+
+481	   The data MAY, for display purposes only, be represented using the
+482	   Extended Diagnostic Notation as defined in Appendix G of [RFC8610].
+483	   All byte strings longer than a length of 20 SHOULD be displayed as
+484	   base64 when possible.
+
+486	5.2.2.  Field Descriptions
+487	   bcast-rr = {
+488	       uas_type => nibble-field,
+489	       uas_ids => [+ uas-id-grp],
+490	       ? auth => [+ auth-grp],
+491	       ? self_id => self-grp,
+492	       ? area => area-grp,
+493	       ? classification => classification-grp,
+494	       ? operator_id => operator-grp
+495	   }
+496	   uas-id-grp = [
+497	       id_type: &uas-id-types,
+498	       uas_id: bstr .size(20)
+499	   ]
+500	   auth-grp = [
+501	       a_type: &auth-types,
+502	       a_data: bstr .size(1..362)
+503	   ]
+504	   area-grp = [
+505	       area_count: 1..255,
+506	       area_radius: float,  # in decameters
+507	       area_floor: float,   # wgs84-hae in meters
+508	       area_ceiling: float  # wgs84-hae in meters
+509	   ]
+510	   classification-grp = [
+511	       class_type: 0..8,
+512	       class: nibble-field,
+513	       category: nibble-field
+514	   ]
+515	   self-grp = [
+516	       desc_type: 0..255,
+517	       description: tstr .size(23)
+518	   ]
+519	   operator-grp = [
+520	       operator_id_type: 0..255,
+521	       operator_id: bstr .size(20)
+522	   ]
+523	   uas-id-types = (none: 0, serial: 1, session_id: 4)
+524	   auth-types = (none: 0, specific_method: 5)
+525	   nibble-field = 0..15
+526	   uas_type = 0
+527	   uas_ids = 1
+528	   auth = 2
+529	   self_id = 3
+530	   area = 4
+531	   classification = 5
+532	   operator_id = 6
+
+534	                      Figure 5: BRID Wire Format CDDL
+
+536	   The field names and their general typing are borrowed from the ASTM
+537	   [F3411] data dictionary (Table 1 and Table 2).  See that document for
+538	   additional context and background information on aviation
+539	   application-specific interpretation of the field semantics.  The
+540	   explicitly enumerated values included in the CDDL above are relevant
+541	   to DRIP for its operation.  Other values may be valid but are outside
+542	   the scope of DRIP operation.  Application-specific fields, such as
+543	   UAS Type are transported and authenticated by DRIP but are regarded
+544	   as opaque user data to DRIP.
+
+546	6.  IANA Considerations
+
+548	6.1.  DET Prefix Delegation
+
+550	   This document requests that IANA manage delegations in the
+551	   3.0.0.1.0.0.2.ip6.arpa. domain.  The IAB is requested to appoint a
+552	   Designated Expert (DE) to coordinate these delegations and liaise
+553	   with IANA and CAAs as appropriate.
+
+555	   The DE will check delegation requests for DET address space that get
+556	   submitted to IANA.  Since there is no control over who submits these
+557	   delegation requests or the address space they refer to, a degree of
+558	   checking is necessary.  The DE will liaise with IANA on the outcome
+559	   of these checks.
+
+561	   For delegation requests relating to a country’s DET address space,
+562	   the DE will liaise with that country’s CAA to verify these requests
+563	   are genuine.  This will ensure delegations don’t go to impostors and
+564	   the CAA is aware about what’s being done with its National Resources,
+565	   ie the IPv6 addresses for its DET address space.
+
+567	   Parts of the DET address space are allocated for experimental use.
+568	   The DE is expected to process these delegation requests on a first-
+569	   come, first-served basis.  They would not need engagement with ICAO
+570	   or CAAs.
+
+572	   The DE will have the discretion to perform minimal technical checks
+573	   on delegations - for instance that there are at least two name
+574	   servers that answer authoritatively, SPoF avoidance, etc - but not
+575	   enforce these.
+
+577	   The DE will be expected to liaise with IANA to develop a DNSSEC
+578	   Practice Statement for delegations in 3.0.0.1.0.2.ipv6.arpa. if/when
+579	   there’s a demand for DNSSEC deployment for DRIP.
+
+581	6.2.  IANA DRIP Registry
+
+583	6.2.1.  DRIP RAA Allocations
+
+585	   This document requests a new registry for RAA Allocations under the
+586	   DRIP registry group (https://www.iana.org/assignments/drip/
+587	   drip.xhtml) to be managed by IANA.
+
+589	   RAA Allocations:  a 14-bit value used to represent RAAs.  Future
+590	      additions to this registry are to be made through Expert Review
+591	      (Section 4.5 of [RFC8126]).  The following values/ranges are
+592	      defined:
+
+594	           +===============+======================+===========+
+595	           | RAA Value(s)  | Allocation           | Reference |
+596	           +===============+======================+===========+
+597	           | 0 - 3         | Reserved             | N/A       |
+598	           +---------------+----------------------+-----------+
+599	           | 4 - 3999      | ISO 3166-1 Countries | This RFC  |
+600	           +---------------+----------------------+-----------+
+601	           | 4000 - 15359  | Unallocated          | N/A       |
+602	           +---------------+----------------------+-----------+
+603	           | 15360 - 16383 | Experimental Use     | This RFC  |
+604	           +---------------+----------------------+-----------+
+
+606	                                 Table 1
+
+608	   To support DNS delegation in ip6.arpa. a single RAA is given 4
+609	   delegations by borrowing the upper two bits of HDA space (see
+610	   Figure 6 for an example).  This enables a clean nibble boundary in
+611	   DNS to delegate from (i.e., the prefix 2001:3x:xxx0::/44).  These
+612	   HDAs (0, 4096, 8192 and 12288) are reserved for the RAA.
+
+614	 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 0 0 0 0 0 0 0 0 0 0
+615	 2 2 2 2 2 2 2 2 1 1 1 1 1 1 1 1 1 1 9 8 7 6 5 4 3 2 1 0
+616	+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+617	|           0           | x |         RAA=16376         |
+618	+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+619	    0   |   0   |   0   |   0   |   E   |   F   |   F     HDA=0,x=00
+620	    0   |   0   |   0   |   1   |   E   |   F   |   F     HDA=4096,x=01
+621	    0   |   0   |   0   |   2   |   E   |   F   |   F     HDA=8192,x=10
+622	    0   |   0   |   0   |   3   |   E   |   F   |   F     HDA=12288,x=11
+
+624	             Figure 6: Example Bit Borrowing of RAA=16376
+
+626	   The mapping between ISO 3166-1 Numeric Nation Codes and RAAs is
+627	   specified as a CSV file on GitHub (https://github.com/ietf-wg-drip/
+628	   draft-ietf-drip-registries/blob/main/iso3166-raa.csv).  Each Nation
+629	   is assigned four RAAs that are left to the national authority for
+630	   their purpose.  For RAAs under this range, a shorter prefix of
+631	   2001:3x:xx00::/40 MAY be delegated to each CAA, which covers all 4
+632	   RAAs (and reserved HDAs) assigned to them.
+
+634	6.2.1.1.  Expert Guidance
+
+636	   A request for a value and/or range is judged on the specific
+637	   application of its use (i.e., like the ISO 3166 range for UAS).
+638	   Common applications should reuse existing allocated space if possible
+639	   before allocation of a new value/range.
+
+641	   Single point allocations are allowed to individual entities but it is
+642	   recommended that allocations are made in groupings of 4 to maintain a
+643	   cleaner nibble boundary.
+
+645	6.2.1.2.  Registration Form
+
+647	   For registration the following template is to be used:
+
+649	   *  Allocation Title.
+
+651	   *  Contact Information: contact point such as email or person
+652	      operating allocation.
+
+654	   *  Reference: public document reference for allocation, containing
+655	      required information to register for HDAs under it.
+
+657	6.2.2.  HHIT Entity Type
+
+659	   This document requests a new registry for HHIT Entity Type under the
+660	   DRIP registry group (https://www.iana.org/assignments/drip/
+661	   drip.xhtml).
+
+663	   HHIT Entity Type:  numeric, field of the HHIT RRType to encode the
+664	      HHIT Entity Type.  This is broken into three ranges and future
+665	      additions to this registry are as follows:
+
+667	   +========================+==========================================+
+668	   | Range                  | Registration Mechanism                   |
+669	   +========================+==========================================+
+670	   | 0 - 4294967295         | Expert Review (Section 4.5               |
+671	   |                        | of [RFC8126])                            |
+672	   +------------------------+------------------------------------------+
+673	   | 4294967296 -           | First Come First Served                  |
+674	   | 18446744069414584319   | (Section 4.4 of [RFC8126])               |
+675	   +------------------------+------------------------------------------+
+676	   | 18446744069414584320 - | Experimental Use                         |
+677	   | 18446744073709551615   |                                          |
+678	   +------------------------+------------------------------------------+
+
+680	                                  Table 2
+
+682	   The following values are defined by this document:
+
+684	    +=========+===========================================+===========+
+685	    | Value   | HHIT Type                                 | Reference |
+686	    +=========+===========================================+===========+
+687	    | 0       | Not Defined                               | This RFC  |
+688	    +---------+-------------------------------------------+-----------+
+689	    | 1       | DRIP Identity Management Entity (DIME)    | This RFC  |
+690	    +---------+-------------------------------------------+-----------+
+691	    | 2 - 4   | Reserved                                  | This RFC  |
+692	    +---------+-------------------------------------------+-----------+
+693	    | 5       | Apex                                      | This RFC  |
+694	    +---------+-------------------------------------------+-----------+
+695	    | 6 - 8   | Reserved                                  | This RFC  |
+696	    +---------+-------------------------------------------+-----------+
+697	    | 9       | Registered Assigning Authority (RAA)      | This RFC  |
+698	    +---------+-------------------------------------------+-----------+
+699	    | 10 - 12 | Reserved                                  | This RFC  |
+700	    +---------+-------------------------------------------+-----------+
+701	    | 13      | HHIT Domain Authority (HDA)               | This RFC  |
+702	    +---------+-------------------------------------------+-----------+
+703	    | 14 - 15 | Reserved                                  | This RFC  |
+704	    +---------+-------------------------------------------+-----------+
+705	    | 16      | Uncrewed Aircraft (UA)                    | This RFC  |
+706	    +---------+-------------------------------------------+-----------+
+707	    | 17      | Ground Control Station (GCS)              | This RFC  |
+708	    +---------+-------------------------------------------+-----------+
+709	    | 18      | Uncrewed Aircraft System (UAS)            | This RFC  |
+710	    +---------+-------------------------------------------+-----------+
+711	    | 19      | Remote Identification (RID) Module        | This RFC  |
+712	    +---------+-------------------------------------------+-----------+
+713	    | 20      | Pilot                                     | This RFC  |
+714	    +---------+-------------------------------------------+-----------+
+715	    | 21      | Operator                                  | This RFC  |
+716	    +---------+-------------------------------------------+-----------+
+717	    | 22      | Discovery & Synchronization Service (DSS) | This RFC  |
+718	    +---------+-------------------------------------------+-----------+
+719	    | 23      | UAS Service Supplier (USS)                | This RFC  |
+720	    +---------+-------------------------------------------+-----------+
+721	    | 24      | Network RID Service Provider (SP)         | This RFC  |
+722	    +---------+-------------------------------------------+-----------+
+723	    | 25      | Network RID Display Provider (DP)         | This RFC  |
+724	    +---------+-------------------------------------------+-----------+
+725	    | 26      | Supplemental Data Service Provider (SDSP) | This RFC  |
+726	    +---------+-------------------------------------------+-----------+
+
+728	                                  Table 3
+
+730	6.2.2.1.  Expert Guidance
+
+732	   Justification should be provided if there is an existing allocation
+733	   that could be used.  Future additions to this registry MUST NOT be
+734	   allowed if they can be covered under an existing registration.
+
+736	6.2.2.2.  Registration Template
+
+738	   For registration the following template is to be used:
+
+740	   *  HHIT Type: title (and optional abbreviation) to be used for the
+741	      requested value.
+
+743	   *  Reference: public document allocating the value and any additional
+744	      information such as semantics.  This can be a URL pointing to an
+745	      Internet-Draft, IETF RFC, or web-page.
+
+747	   For registration in the FCFS range, a point of contact MUST also be
+748	   provided (if not part of the reference).
+
+750	7.  Security Considerations
+
+752	7.1.  DNS Operational & Registration Considerations
+
+754	   The Registrar and Registry are commonly used concepts in the DNS.
+755	   These components interface the DIME into the DNS hierarchy and thus
+756	   operation SHOULD follow best common practices, specifically in
+757	   security (such as running DNSSEC) as appropriate.  The following RFC
+758	   provide suitable guidance: [RFC7720], [RFC4033], [RFC4034],
+759	   [RFC4035], [RFC5155], [RFC8945], [RFC2182], [RFC4786], [RFC3007].
+
+761	   If DNSSEC is used, a DNSSEC Practice Statement SHOULD be developed
+762	   and published.  It SHOULD explain how DNSSEC has been deployed and
+763	   what security measures are in place.  [RFC6841] documents a Framework
+764	   for DNSSEC Policies and DNSSEC Practice Statements.  A self-signed
+765	   entity (i.e. an entity that self-signed it certificate as part of the
+766	   HHIT RRType) MUST use DNSSEC.
+
+768	   The interfaces and protocol specifications for registry-registrar
+769	   interactions are intentionally not specified in this document.  These
+770	   will depend on nationally defined policy and prevailing local
+771	   circumstances.  It is expected registry-registrar activity will use
+772	   the Extensible Provisioning Protocol (EPP) [STD69].  The registry
+773	   SHOULD provide a lookup service such as WHOIS [RFC3912] or RDAP
+774	   [STD95] to publish public information about registered domain names.
+
+776	   Decisions about DNS or registry best practices and other operational
+777	   matters that influence security SHOULD be made by the CAA, ideally in
+778	   consultation with local stakeholders.
+
+780	   The guidance above is intended to reduce the likelihood of
+781	   interoperability problems and minimize security and stability
+782	   concerns.  For instance, validation and authentication of DNS
+783	   responses depends on DNSSEC.  If this is not used, entities using
+784	   DRIP will be vulnerable to DNS spoofing attacks and could be exposed
+785	   to bogus data.  DRIP DNS responses that have not been validated by
+786	   DNSSEC could contain bogus data which have the potential to create
+787	   serious security problems and operational concerns for DRIP entities.
+788	   These threats include denial of service attacks, replay attacks,
+789	   impersonation or cloning of UAVs, hijacking of DET registrations,
+790	   injection of corrupt metadata and compromising established trust
+791	   architecture/relationships.  Some regulatory and legal considerations
+792	   are expected to be simplified by providing a lookup service for
+793	   access to public information about registered domain names for DETs.
+
+795	   When DNSSEC is not in use, due to the length of the ORCHID hash
+796	   selected for DETs (Section 7.5 of [RFC9374]), clients MUST "walk" the
+797	   tree of certificates locating each certificate by performing DNS
+798	   lookups of HHIT RRTypes for each DET verifying inclusion into the
+799	   hierarchy.  The collection of these certificates (which provide both
+800	   signature protection from the parent entity and the public key of the
+801	   entity) is the only way without DNSSEC to prove valid registration.
+802	   The data within the BRID RRType has no direct endorsement when not
+803	   protected by DNSSEC.  The contents of the BRID RRType auth key,
+804	   containing the Endorsements, SHOULD be validated, similiar to the
+805	   certificates mentioned previously.
+
+807	7.2.  DET & Public Key Exposure
+
+809	   DETs are built upon asymmetric keys.  As such the public key must be
+810	   revealed to enable clients to perform signature verifications.
+811	   [RFC9374] security considerations cover various attacks on such keys.
+812	   While unlikely, the forging of a corresponding private key is
+813	   possible if given enough time (and computational power).
+
+815	   When practical, it is RECOMMENDED that no RRTypes under a DET's
+816	   specific domain name be published unless and until it is required for
+817	   use by other parties.  Such action would cause at least the HHIT
+818	   RRType to not be in DNS, protecting the public key in the certificate
+819	   from being exposed before its needed.  The combination of this "just
+820	   in time" publishing mechanism and DNSSEC is out of scope for this
+821	   document.
+
+823	   Optimally this requires that the UAS somehow signal the DIME that a
+824	   flight using a Specific Session ID will soon be underway or complete.
+825	   It may also be facilitated under UTM if the USS (which may or may not
+826	   be a DIME) signals when a given operation using a Session ID goes
+827	   active.
+
+829	8.  Acknowledgements
+
+831	   Thanks to Stuart Card (AX Enterprize, LLC) and Bob Moskowitz (HTT
+832	   Consulting, LLC) for their early work on the DRIP registries concept.
+833	   Their early contributions laid the foundations for the content and
+834	   processes of this architecture and document.
+
+836	9.  References
+
+838	9.1.  Normative References
+
+840	   [F3411]    ASTM International, "Standard Specification for Remote ID
+841	              and Tracking", ASTM F3411-22A, DOI 10.1520/F3411-22A, July
+842	              2022, <https://www.astm.org/f3411-22a.html>.
+
+844	   [ISO3166-1]
+845	              International Standards Organization (ISO), "Codes for the
+846	              representation of names of countries and their
+847	              subdivisions", ISO 3166-1:2020, August 2020,
+848	              <https://www.iso.org/iso-3166-country-codes.html>.
+
+850	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+851	              Requirement Levels", BCP 14, RFC 2119,
+852	              DOI 10.17487/RFC2119, March 1997,
+853	              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+855	   [RFC4648]  Josefsson, S., "The Base16, Base32, and Base64 Data
+856	              Encodings", RFC 4648, DOI 10.17487/RFC4648, October 2006,
+857	              <https://www.rfc-editor.org/rfc/rfc4648>.
+
+859	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+860	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+861	              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+863	   [RFC8949]  Bormann, C. and P. Hoffman, "Concise Binary Object
+864	              Representation (CBOR)", STD 94, RFC 8949,
+865	              DOI 10.17487/RFC8949, December 2020,
+866	              <https://www.rfc-editor.org/rfc/rfc8949>.
+
+868	   [RFC9374]  Moskowitz, R., Card, S., Wiethuechter, A., and A. Gurtov,
+869	              "DRIP Entity Tag (DET) for Unmanned Aircraft System Remote
+870	              ID (UAS RID)", RFC 9374, DOI 10.17487/RFC9374, March 2023,
+871	              <https://www.rfc-editor.org/rfc/rfc9374>.
+
+873	9.2.  Informative References
+
+875	   [drip-dki] Moskowitz, R. and S. W. Card, "The DRIP DET public Key
+876	              Infrastructure", Work in Progress, Internet-Draft, draft-
+877	              ietf-drip-dki-08, 22 April 2025,
+878	              <https://datatracker.ietf.org/doc/html/draft-ietf-drip-
+879	              dki-08>.
+
+881	   [RFC2182]  Elz, R., Bush, R., Bradner, S., and M. Patton, "Selection
+882	              and Operation of Secondary DNS Servers", BCP 16, RFC 2182,
+883	              DOI 10.17487/RFC2182, July 1997,
+884	              <https://www.rfc-editor.org/rfc/rfc2182>.
+
+886	   [RFC3007]  Wellington, B., "Secure Domain Name System (DNS) Dynamic
+887	              Update", RFC 3007, DOI 10.17487/RFC3007, November 2000,
+888	              <https://www.rfc-editor.org/rfc/rfc3007>.
+
+890	   [RFC3912]  Daigle, L., "WHOIS Protocol Specification", RFC 3912,
+891	              DOI 10.17487/RFC3912, September 2004,
+892	              <https://www.rfc-editor.org/rfc/rfc3912>.
+
+894	   [RFC4033]  Arends, R., Austein, R., Larson, M., Massey, D., and S.
+895	              Rose, "DNS Security Introduction and Requirements",
+896	              RFC 4033, DOI 10.17487/RFC4033, March 2005,
+897	              <https://www.rfc-editor.org/rfc/rfc4033>.
+
+899	   [RFC4034]  Arends, R., Austein, R., Larson, M., Massey, D., and S.
+900	              Rose, "Resource Records for the DNS Security Extensions",
+901	              RFC 4034, DOI 10.17487/RFC4034, March 2005,
+902	              <https://www.rfc-editor.org/rfc/rfc4034>.
+
+904	   [RFC4035]  Arends, R., Austein, R., Larson, M., Massey, D., and S.
+905	              Rose, "Protocol Modifications for the DNS Security
+906	              Extensions", RFC 4035, DOI 10.17487/RFC4035, March 2005,
+907	              <https://www.rfc-editor.org/rfc/rfc4035>.
+
+909	   [RFC4786]  Abley, J. and K. Lindqvist, "Operation of Anycast
+910	              Services", BCP 126, RFC 4786, DOI 10.17487/RFC4786,
+911	              December 2006, <https://www.rfc-editor.org/rfc/rfc4786>.
+
+913	   [RFC5155]  Laurie, B., Sisson, G., Arends, R., and D. Blacka, "DNS
+914	              Security (DNSSEC) Hashed Authenticated Denial of
+915	              Existence", RFC 5155, DOI 10.17487/RFC5155, March 2008,
+916	              <https://www.rfc-editor.org/rfc/rfc5155>.
+
+918	   [RFC5280]  Cooper, D., Santesson, S., Farrell, S., Boeyen, S.,
+919	              Housley, R., and W. Polk, "Internet X.509 Public Key
+920	              Infrastructure Certificate and Certificate Revocation List
+921	              (CRL) Profile", RFC 5280, DOI 10.17487/RFC5280, May 2008,
+922	              <https://www.rfc-editor.org/rfc/rfc5280>.
+
+924	   [RFC6841]  Ljunggren, F., Eklund Lowinder, AM., and T. Okubo, "A
+925	              Framework for DNSSEC Policies and DNSSEC Practice
+926	              Statements", RFC 6841, DOI 10.17487/RFC6841, January 2013,
+927	              <https://www.rfc-editor.org/rfc/rfc6841>.
+
+929	   [RFC7720]  Blanchet, M. and L. Liman, "DNS Root Name Service Protocol
+930	              and Deployment Requirements", BCP 40, RFC 7720,
+931	              DOI 10.17487/RFC7720, December 2015,
+932	              <https://www.rfc-editor.org/rfc/rfc7720>.
+
+934	   [RFC8126]  Cotton, M., Leiba, B., and T. Narten, "Guidelines for
+935	              Writing an IANA Considerations Section in RFCs", BCP 26,
+936	              RFC 8126, DOI 10.17487/RFC8126, June 2017,
+937	              <https://www.rfc-editor.org/rfc/rfc8126>.
+
+939	   [RFC8610]  Birkholz, H., Vigano, C., and C. Bormann, "Concise Data
+940	              Definition Language (CDDL): A Notational Convention to
+941	              Express Concise Binary Object Representation (CBOR) and
+942	              JSON Data Structures", RFC 8610, DOI 10.17487/RFC8610,
+943	              June 2019, <https://www.rfc-editor.org/rfc/rfc8610>.
+
+945	   [RFC8945]  Dupont, F., Morris, S., Vixie, P., Eastlake 3rd, D.,
+946	              Gudmundsson, O., and B. Wellington, "Secret Key
+947	              Transaction Authentication for DNS (TSIG)", STD 93,
+948	              RFC 8945, DOI 10.17487/RFC8945, November 2020,
+949	              <https://www.rfc-editor.org/rfc/rfc8945>.
+
+951	   [RFC9153]  Card, S., Ed., Wiethuechter, A., Moskowitz, R., and A.
+952	              Gurtov, "Drone Remote Identification Protocol (DRIP)
+953	              Requirements and Terminology", RFC 9153,
+954	              DOI 10.17487/RFC9153, February 2022,
+955	              <https://www.rfc-editor.org/rfc/rfc9153>.
+
+957	   [RFC9434]  Card, S., Wiethuechter, A., Moskowitz, R., Zhao, S., Ed.,
+958	              and A. Gurtov, "Drone Remote Identification Protocol
+959	              (DRIP) Architecture", RFC 9434, DOI 10.17487/RFC9434, July
+960	              2023, <https://www.rfc-editor.org/rfc/rfc9434>.
+
+962	   [RFC9575]  Wiethuechter, A., Ed., Card, S., and R. Moskowitz, "DRIP
+963	              Entity Tag (DET) Authentication Formats and Protocols for
+964	              Broadcast Remote Identification (RID)", RFC 9575,
+965	              DOI 10.17487/RFC9575, June 2024,
+966	              <https://www.rfc-editor.org/rfc/rfc9575>.
+
+968	   [STD13]    Internet Standard 13,
+969	              <https://www.rfc-editor.org/info/std13>.
+970	              At the time of writing, this STD comprises the following:
+
+972	              Mockapetris, P., "Domain names - concepts and facilities",
+973	              STD 13, RFC 1034, DOI 10.17487/RFC1034, November 1987,
+974	              <https://www.rfc-editor.org/info/rfc1034>.
+
+976	              Mockapetris, P., "Domain names - implementation and
+977	              specification", STD 13, RFC 1035, DOI 10.17487/RFC1035,
+978	              November 1987, <https://www.rfc-editor.org/info/rfc1035>.
+
+980	   [STD69]    Internet Standard 69,
+981	              <https://www.rfc-editor.org/info/std69>.
+982	              At the time of writing, this STD comprises the following:
+
+984	              Hollenbeck, S., "Extensible Provisioning Protocol (EPP)",
+985	              STD 69, RFC 5730, DOI 10.17487/RFC5730, August 2009,
+986	              <https://www.rfc-editor.org/info/rfc5730>.
+
+988	              Hollenbeck, S., "Extensible Provisioning Protocol (EPP)
+989	              Domain Name Mapping", STD 69, RFC 5731,
+990	              DOI 10.17487/RFC5731, August 2009,
+991	              <https://www.rfc-editor.org/info/rfc5731>.
+
+993	              Hollenbeck, S., "Extensible Provisioning Protocol (EPP)
+994	              Host Mapping", STD 69, RFC 5732, DOI 10.17487/RFC5732,
+995	              August 2009, <https://www.rfc-editor.org/info/rfc5732>.
+
+997	              Hollenbeck, S., "Extensible Provisioning Protocol (EPP)
+998	              Contact Mapping", STD 69, RFC 5733, DOI 10.17487/RFC5733,
+999	              August 2009, <https://www.rfc-editor.org/info/rfc5733>.
+
+1001	              Hollenbeck, S., "Extensible Provisioning Protocol (EPP)
+1002	              Transport over TCP", STD 69, RFC 5734,
+1003	              DOI 10.17487/RFC5734, August 2009,
+1004	              <https://www.rfc-editor.org/info/rfc5734>.
+
+1006	   [STD88]    Internet Standard 88,
+1007	              <https://www.rfc-editor.org/info/std88>.
+1008	              At the time of writing, this STD comprises the following:
+
+1010	              Thomson, S., Huitema, C., Ksinant, V., and M. Souissi,
+1011	              "DNS Extensions to Support IP Version 6", STD 88,
+1012	              RFC 3596, DOI 10.17487/RFC3596, October 2003,
+1013	              <https://www.rfc-editor.org/info/rfc3596>.
+
+1015	   [STD95]    Internet Standard 95,
+1016	              <https://www.rfc-editor.org/info/std95>.
+1017	              At the time of writing, this STD comprises the following:
+
+1019	              Newton, A., Ellacott, B., and N. Kong, "HTTP Usage in the
+1020	              Registration Data Access Protocol (RDAP)", STD 95,
+1021	              RFC 7480, DOI 10.17487/RFC7480, March 2015,
+1022	              <https://www.rfc-editor.org/info/rfc7480>.
+
+1024	              Hollenbeck, S. and N. Kong, "Security Services for the
+1025	              Registration Data Access Protocol (RDAP)", STD 95,
+1026	              RFC 7481, DOI 10.17487/RFC7481, March 2015,
+1027	              <https://www.rfc-editor.org/info/rfc7481>.
+
+1029	              Hollenbeck, S. and A. Newton, "Registration Data Access
+1030	              Protocol (RDAP) Query Format", STD 95, RFC 9082,
+1031	              DOI 10.17487/RFC9082, June 2021,
+1032	              <https://www.rfc-editor.org/info/rfc9082>.
+
+1034	              Hollenbeck, S. and A. Newton, "JSON Responses for the
+1035	              Registration Data Access Protocol (RDAP)", STD 95,
+1036	              RFC 9083, DOI 10.17487/RFC9083, June 2021,
+1037	              <https://www.rfc-editor.org/info/rfc9083>.
+
+1039	              Blanchet, M., "Finding the Authoritative Registration Data
+1040	              Access Protocol (RDAP) Service", STD 95, RFC 9224,
+1041	              DOI 10.17487/RFC9224, March 2022,
+1042	              <https://www.rfc-editor.org/info/rfc9224>.
+
+1044	Appendix A.  Example Zone Files & RRType Contents
+
+1046	   An example zone file ip6.arpa., run by IANA, is not shown.  It would
+1047	   contain NS RRTypes to delegate to a respective RAA.  To avoid any
+1048	   future collisions with production deployments an apex of
+1049	   ip6.example.com. is used instead of ip6.arpa.. All hexadecimal
+1050	   strings in the examples are broken into the lengths of a word, for
+1051	   document formatting purposes.
+
+1053	   The RAA of RAA=16376, HDA=0 and HDA of RAA=16376, HDA=10 were used in
+1054	   the examples.
+
+1056	A.1.  Example RAA
+1057	A.1.1.  Authentication HHIT
+
+1059	   $ORIGIN 5.0.0.0.0.0.e.f.f.3.0.0.1.0.0.2.ip6.example.com.
+1060	   7.b.0.a.1.9.e.1.7.5.1.a.0.6.e.5. IN HHIT (
+1061	       gwppM2ZmOCAwMDAwWQFGMIIBQjCB9aAD
+1062	       AgECAgE1MAUGAytlcDArMSkwJwYDVQQD
+1063	       DCAyMDAxMDAzZmZlMDAwMDA1NWU2MGEx
+1064	       NTcxZTkxYTBiNzAeFw0yNTA0MDkyMDU2
+1065	       MjZaFw0yNTA0MDkyMTU2MjZaMB0xGzAZ
+1066	       BgNVBAMMEkRSSVAtUkFBLUEtMTYzNzYt
+1067	       MDAqMAUGAytlcAMhAJmQ1bBLcqGAZtQJ
+1068	       K1LH1JlPt8Fr1+jB9ED/qNBP8eE/o0ww
+1069	       SjAPBgNVHRMBAf8EBTADAQH/MDcGA1Ud
+1070	       EQEB/wQtMCuHECABAD/+AAAFXmChVx6R
+1071	       oLeGF2h0dHBzOi8vcmFhLmV4YW1wbGUu
+1072	       Y29tMAUGAytlcANBALUPjhIB3rwqXQep
+1073	       r9/VDB+hhtwuWZIw1OUkEuDrF6DCkgc7
+1074	       5widXnXa5/uDfdKL7dZ83mPHm2Tf32Dv
+1075	       b8AzEw8=
+1076	   )
+
+1078	                   Figure 7: RAA Auth HHIT RRType Example
+
+1080	   [
+1081	       10,  # Reserved (RAA Auth from DKI)
+1082	       "3ff8 0000",
+1083	       h'308201423081F5A00302010202013530
+1084	       0506032B6570302B312930270603550403
+1085	       0C20323030313030336666653030303030
+1086	       3535653630613135373165393161306237
+1087	       301E170D3235303430393230353632365A
+1088	       170D3235303430393231353632365A301D
+1089	       311B301906035504030C12445249502D52
+1090	       41412D412D31363337362D30302A300506
+1091	       032B65700321009990D5B04B72A18066D4
+1092	       092B52C7D4994FB7C16BD7E8C1F440FFA8
+1093	       D04FF1E13FA34C304A300F0603551D1301
+1094	       01FF040530030101FF30370603551D1101
+1095	       01FF042D302B87102001003FFE0000055E
+1096	       60A1571E91A0B7861768747470733A2F2F
+1097	       7261612E6578616D706C652E636F6D3005
+1098	       06032B6570034100B50F8E1201DEBC2A5D
+1099	       07A9AFDFD50C1FA186DC2E599230D4E524
+1100	       12E0EB17A0C292073BE7089D5E75DAE7FB
+1101	       837DD28BEDD67CDE63C79B64DFDF60EF6F
+1102	       C033130F'
+1103	   ]
+1104	   Certificate:
+1105	       Data:
+1106	           Version: 3 (0x2)
+1107	           Serial Number: 53 (0x35)
+1108	           Signature Algorithm: ED25519
+1109	           Issuer: CN = 2001003ffe0000055e60a1571e91a0b7
+1110	           Validity
+1111	               Not Before: Apr  9 20:56:26 2025 GMT
+1112	               Not After : Apr  9 21:56:26 2025 GMT
+1113	           Subject: CN = DRIP-RAA-A-16376-0
+1114	           Subject Public Key Info:
+1115	               Public Key Algorithm: ED25519
+1116	                   ED25519 Public-Key:
+1117	                   pub:
+1118	                       99:90:d5:b0:4b:72:a1:80:66:d4:09:2b:52:c7:d4:
+1119	                       99:4f:b7:c1:6b:d7:e8:c1:f4:40:ff:a8:d0:4f:f1:
+1120	                       e1:3f
+1121	           X509v3 extensions:
+1122	               X509v3 Basic Constraints: critical
+1123	                   CA:TRUE
+1124	               X509v3 Subject Alternative Name: critical
+1125	                   IP Address:2001:3F:FE00:5:5E60:A157:1E91:A0B7,
+1126	                   URI:https://raa.example.com
+1127	       Signature Algorithm: ED25519
+1128	       Signature Value:
+1129	           b5:0f:8e:12:01:de:bc:2a:5d:07:a9:af:df:d5:0c:1f:a1:86:
+1130	           dc:2e:59:92:30:d4:e5:24:12:e0:eb:17:a0:c2:92:07:3b:e7:
+1131	           08:9d:5e:75:da:e7:fb:83:7d:d2:8b:ed:d6:7c:de:63:c7:9b:
+1132	           64:df:df:60:ef:6f:c0:33:13:0f
+
+1134	      Figure 8: 2001:3f:fe00:5:5e60:a157:1e91:a0b7 Decoded HHIT RRType
+1135	                            CBOR and Certificate
+
+1137	A.1.2.  Delegation of HDA
+
+1139	   $ORIGIN c.d.f.f.3.0.0.1.0.0.2.ip6.example.com.
+1140	   a.0.0. IN NS ns1.hda-10.example.com
+
+1142	                      Figure 9: HDA Delegation Example
+
+1144	A.2.  Example HDA
+
+1146	A.2.1.  Authentication & Issue HHITs
+1147	   $ORIGIN 5.0.a.0.0.0.e.f.f.3.0.0.1.0.0.2.ip6.example.com.
+1148	   0.a.9.0.7.2.4.d.5.4.e.e.5.1.6.6.5.0. IN HHIT (
+1149	       gw5pM2ZmOCAwMDBhWQFHMIIBQzCB9qAD
+1150	       AgECAgFfMAUGAytlcDArMSkwJwYDVQQD
+1151	       DCAyMDAxMDAzZmZlMDAwMDA1NWU2MGEx
+1152	       NTcxZTkxYTBiNzAeFw0yNTA0MDkyMTAz
+1153	       MTlaFw0yNTA0MDkyMjAzMTlaMB4xHDAa
+1154	       BgNVBAMME0RSSVAtSERBLUEtMTYzNzYt
+1155	       MTAwKjAFBgMrZXADIQDOaB424RQa61YN
+1156	       bna8eWt7fLRU5GPMsfEt4wo4AQGAP6NM
+1157	       MEowDwYDVR0TAQH/BAUwAwEB/zA3BgNV
+1158	       HREBAf8ELTArhxAgAQA//gAKBWYV7kXU
+1159	       JwmghhdodHRwczovL3JhYS5leGFtcGxl
+1160	       LmNvbTAFBgMrZXADQQAhMpOSOmgMkJY1
+1161	       f+B9nTgawUjK4YEERBtczMknHDkOowX0
+1162	       ynbaLN60TYe9hqN6+CJ3SN8brJke3hpM
+1163	       gorvhDkJ
+1164	   )
+1165	   8.2.e.6.5.2.b.6.7.3.4.d.e.0.6.2.5.0. IN HHIT (
+1166	       gw9pM2ZmOCAwMDBhWQFHMIIBQzCB9qAD
+1167	       AgECAgFYMAUGAytlcDArMSkwJwYDVQQD
+1168	       DCAyMDAxMDAzZmZlMDAwYTA1NjYxNWVl
+1169	       NDVkNDI3MDlhMDAeFw0yNTA0MDkyMTA1
+1170	       MTRaFw0yNTA0MDkyMjA1MTRaMB4xHDAa
+1171	       BgNVBAMME0RSSVAtSERBLUktMTYzNzYt
+1172	       MTAwKjAFBgMrZXADIQCCM/2utQaLwUhZ
+1173	       0ROg7fz43AeBTj3Sdl5rW4LgTQcFl6NM
+1174	       MEowDwYDVR0TAQH/BAUwAwEB/zA3BgNV
+1175	       HREBAf8ELTArhxAgAQA//gAKBSYO1Ddr
+1176	       JW4ohhdodHRwczovL2hkYS5leGFtcGxl
+1177	       LmNvbTAFBgMrZXADQQBa8lZyftxHJqDF
+1178	       Vgv4Rt+cMUmc8aQwet4UZdO3yQOB9uq4
+1179	       sLVAScaZCWjC0nmeRkgVRhize1esfyi3
+1180	       RRU44IAE
+1181	   )
+
+1183	               Figure 10: HDA Auth/Issue HHIT RRType Example
+
+1185	   [
+1186	       14,  # Reserved (HDA Auth from DKI)
+1187	       "3ff8 000a",
+1188	       h'308201433081F6A00302010202015F30
+1189	       0506032B6570302B312930270603550403
+1190	       0C20323030313030336666653030303030
+1191	       3535653630613135373165393161306237
+1192	       301E170D3235303430393231303331395A
+1193	       170D3235303430393232303331395A301E
+1194	       311C301A06035504030C13445249502D48
+1195	       44412D412D31363337362D3130302A3005
+1196	       06032B6570032100CE681E36E1141AEB56
+1197	       0D6E76BC796B7B7CB454E463CCB1F12DE3
+1198	       0A380101803FA34C304A300F0603551D13
+1199	       0101FF040530030101FF30370603551D11
+1200	       0101FF042D302B87102001003FFE000A05
+1201	       6615EE45D42709A0861768747470733A2F
+1202	       2F7261612E6578616D706C652E636F6D30
+1203	       0506032B6570034100213293923A680C90
+1204	       96357FE07D9D381AC148CAE18104441B5C
+1205	       CCC9271C390EA305F4CA76DA2CDEB44D87
+1206	       BD86A37AF8227748DF1BAC991EDE1A4C82
+1207	       8AEF843909'
+1208	   ]
+
+1210	   Certificate:
+1211	       Data:
+1212	           Version: 3 (0x2)
+1213	           Serial Number: 95 (0x5f)
+1214	           Signature Algorithm: ED25519
+1215	           Issuer: CN = 2001003ffe0000055e60a1571e91a0b7
+1216	           Validity
+1217	               Not Before: Apr  9 21:03:19 2025 GMT
+1218	               Not After : Apr  9 22:03:19 2025 GMT
+1219	           Subject: CN = DRIP-HDA-A-16376-10
+1220	           Subject Public Key Info:
+1221	               Public Key Algorithm: ED25519
+1222	                   ED25519 Public-Key:
+1223	                   pub:
+1224	                       ce:68:1e:36:e1:14:1a:eb:56:0d:6e:76:bc:79:6b:
+1225	                       7b:7c:b4:54:e4:63:cc:b1:f1:2d:e3:0a:38:01:01:
+1226	                       80:3f
+1227	           X509v3 extensions:
+1228	               X509v3 Basic Constraints: critical
+1229	                   CA:TRUE
+1230	               X509v3 Subject Alternative Name: critical
+1231	                   IP Address:2001:3F:FE00:A05:6615:EE45:D427:9A0,
+1232	                   URI:https://raa.example.com
+1233	       Signature Algorithm: ED25519
+1234	       Signature Value:
+1235	           21:32:93:92:3a:68:0c:90:96:35:7f:e0:7d:9d:38:1a:c1:48:
+1236	           ca:e1:81:04:44:1b:5c:cc:c9:27:1c:39:0e:a3:05:f4:ca:76:
+1237	           da:2c:de:b4:4d:87:bd:86:a3:7a:f8:22:77:48:df:1b:ac:99:
+1238	           1e:de:1a:4c:82:8a:ef:84:39:09
+
+1240	      Figure 11: 2001:3f:fe00:a05:6615:ee45:d427:9a0 Decoded Auth HHIT
+1241	                        RRType CBOR and Certificate
+
+1243	   [
+1244	       15,  # Reserved (HDA Issue from DKI)
+1245	       "3ff8 000a",
+1246	       h'308201433081F6A00302010202015830
+1247	       0506032B6570302B312930270603550403
+1248	       0C20323030313030336666653030306130
+1249	       3536363135656534356434323730396130
+1250	       301E170D3235303430393231303531345A
+1251	       170D3235303430393232303531345A301E
+1252	       311C301A06035504030C13445249502D48
+1253	       44412D492D31363337362D3130302A3005
+1254	       06032B65700321008233FDAEB5068BC148
+1255	       59D113A0EDFCF8DC07814E3DD2765E6B5B
+1256	       82E04D070597A34C304A300F0603551D13
+1257	       0101FF040530030101FF30370603551D11
+1258	       0101FF042D302B87102001003FFE000A05
+1259	       260ED4376B256E28861768747470733A2F
+1260	       2F6864612E6578616D706C652E636F6D30
+1261	       0506032B65700341005AF256727EDC4726
+1262	       A0C5560BF846DF9C31499CF1A4307ADE14
+1263	       65D3B7C90381F6EAB8B0B54049C6990968
+1264	       C2D2799E4648154618B37B57AC7F28B745
+1265	       1538E08004'
+1266	   ]
+
+1268	   Certificate:
+1269	       Data:
+1270	           Version: 3 (0x2)
+1271	           Serial Number: 88 (0x58)
+1272	           Signature Algorithm: ED25519
+1273	           Issuer: CN = 2001003ffe000a056615ee45d42709a0
+1274	           Validity
+1275	               Not Before: Apr  9 21:05:14 2025 GMT
+1276	               Not After : Apr  9 22:05:14 2025 GMT
+1277	           Subject: CN = DRIP-HDA-I-16376-10
+1278	           Subject Public Key Info:
+1279	               Public Key Algorithm: ED25519
+1280	                   ED25519 Public-Key:
+1281	                   pub:
+1282	                       82:33:fd:ae:b5:06:8b:c1:48:59:d1:13:a0:ed:fc:
+1283	                       f8:dc:07:81:4e:3d:d2:76:5e:6b:5b:82:e0:4d:07:
+1284	                       05:97
+1285	           X509v3 extensions:
+1286	               X509v3 Basic Constraints: critical
+1287	                   CA:TRUE
+1288	               X509v3 Subject Alternative Name: critical
+1289	                   IP Address:2001:3F:FE00:A05:260E:D437:6B25:6E28,
+1290	                   URI:https://hda.example.com
+
+1292	       Signature Algorithm: ED25519
+1293	       Signature Value:
+1294	           5a:f2:56:72:7e:dc:47:26:a0:c5:56:0b:f8:46:df:9c:31:49:
+1295	           9c:f1:a4:30:7a:de:14:65:d3:b7:c9:03:81:f6:ea:b8:b0:b5:
+1296	           40:49:c6:99:09:68:c2:d2:79:9e:46:48:15:46:18:b3:7b:57:
+1297	           ac:7f:28:b7:45:15:38:e0:80:04
+
+1299	       Figure 12: 2001:3f:fe00:a05:260e:d437:6b25:6e28 Decoded Issue
+1300	                      HHIT RRType CBOR and Certificate
+
+1302	A.2.2.  Registratant HHIT & BRID
+1303	   $ORIGIN 5.0.a.0.0.0.e.f.f.3.0.0.1.0.0.2.ip6.example.com.
+1304	   2.b.6.c.b.4.a.9.9.6.4.2.8.0.3.1. IN HHIT (
+1305	       gxJpM2ZmOCAwMDBhWQEYMIIBFDCBx6AD
+1306	       AgECAgFUMAUGAytlcDArMSkwJwYDVQQD
+1307	       DCAyMDAxMDAzZmZlMDAwYTA1MjYwZWQ0
+1308	       Mzc2YjI1NmUyODAeFw0yNTA0MDkyMTEz
+1309	       MDBaFw0yNTA0MDkyMjEzMDBaMAAwKjAF
+1310	       BgMrZXADIQDJLi+dl+iWD5tfFlT4sJA5
+1311	       +drcW88GHqxPDOp56Oh3+qM7MDkwNwYD
+1312	       VR0RAQH/BC0wK4cQIAEAP/4ACgUTCCRp
+1313	       mkvGsoYXaHR0cHM6Ly9oZGEuZXhhbXBs
+1314	       ZS5jb20wBQYDK2VwA0EA0DbcdngC7/BB
+1315	       /aLjZmLieo0ZFCDbd/KIxAy+3X2KtT4J
+1316	       todVxRMPAkN6o008gacbNfTG8p9npEcD
+1317	       eYhesl2jBQ==
+1318	   )
+1319	   2.b.6.c.b.4.a.9.9.6.4.2.8.0.3.1. IN BRID (
+1320	       owAAAYIEUQEgAQA//gAKBRMIJGmaS8ay
+1321	       AogFWIkB+t72Zwrt9mcgAQA//gAABV5g
+1322	       oVcekaC3mZDVsEtyoYBm1AkrUsfUmU+3
+1323	       wWvX6MH0QP+o0E/x4T8gAQA//gAABV5g
+1324	       oVcekaC3vC9m1JguvXt7W2o4wxPumaT1
+1325	       IP3TQN3fQP28hpInSIlsSwq8UCNjm2ad
+1326	       7pdTvm2EqfOJQNPKClvRZm4qTO5FDAVY
+1327	       iQGX4PZnp+72ZyABAD/+AAoFZhXuRdQn
+1328	       CaDOaB424RQa61YNbna8eWt7fLRU5GPM
+1329	       sfEt4wo4AQGAPyABAD/+AAAFXmChVx6R
+1330	       oLfv3q+mLRB3ya5TmjY8+3CzdoDZT9RZ
+1331	       +XpN5hDiA6JyyxBJvUewxLzPNhTXQp8v
+1332	       ED71XAE82tMmt3fB4zbzWNQLBViJAQrh
+1333	       9mca7/ZnIAEAP/4ACgUmDtQ3ayVuKIIz
+1334	       /a61BovBSFnRE6Dt/PjcB4FOPdJ2Xmtb
+1335	       guBNBwWXIAEAP/4ACgVmFe5F1CcJoIjy
+1336	       CriJCxAyAWTOHPmlHL02MKSpsHviiTze
+1337	       qwBH9K/Rrz41CYix9HazAIOAZO8FcfU5
+1338	       M+WLLJZoaQWBHnMbTQwFWIkB3OL2Z+zw
+1339	       9mcgAQA//gAKBRMIJGmaS8ayyS4vnZfo
+1340	       lg+bXxZU+LCQOfna3FvPBh6sTwzqeejo
+1341	       d/ogAQA//gAKBSYO1DdrJW4ogOfc8jTi
+1342	       mYLmTOOyFZoUx2jOOwtB1jnqUJr6bYaw
+1343	       MoPrR3MlKGBGWsVz1yXNqUURoCqYdwsY
+1344	       e61vd5i6YJqnAQ==
+1345	   )
+
+1347	               Figure 13: Registrant HHIT/BRID RRType Example
+
+1349	   [
+1350	       18,  # Uncrewed Aircraft System (UAS)
+1351	       "3ff8 000a",
+1352	       h'308201143081C7A00302010202015430
+1353	       0506032B6570302B312930270603550403
+1354	       0C20323030313030336666653030306130
+1355	       3532363065643433373662323536653238
+1356	       301E170D3235303430393231313330305A
+1357	       170D3235303430393232313330305A3000
+1358	       302A300506032B6570032100C92E2F9D97
+1359	       E8960F9B5F1654F8B09039F9DADC5BCF06
+1360	       1EAC4F0CEA79E8E877FAA33B3039303706
+1361	       03551D110101FF042D302B87102001003F
+1362	       FE000A05130824699A4BC6B28617687474
+1363	       70733A2F2F6864612E6578616D706C652E
+1364	       636F6D300506032B6570034100D036DC76
+1365	       7802EFF041FDA2E36662E27A8D191420DB
+1366	       77F288C40CBEDD7D8AB53E09B68755C513
+1367	       0F02437AA34D3C81A71B35F4C6F29F67A4
+1368	       470379885EB25DA305'
+1369	   ]
+
+1371	   Certificate:
+1372	       Data:
+1373	           Version: 3 (0x2)
+1374	           Serial Number: 84 (0x54)
+1375	           Signature Algorithm: ED25519
+1376	           Issuer: CN = 2001003ffe000a05260ed4376b256e28
+1377	           Validity
+1378	               Not Before: Apr  9 21:13:00 2025 GMT
+1379	               Not After : Apr  9 22:13:00 2025 GMT
+1380	           Subject:
+1381	           Subject Public Key Info:
+1382	               Public Key Algorithm: ED25519
+1383	                   ED25519 Public-Key:
+1384	                   pub:
+1385	                       c9:2e:2f:9d:97:e8:96:0f:9b:5f:16:54:f8:b0:90:
+1386	                       39:f9:da:dc:5b:cf:06:1e:ac:4f:0c:ea:79:e8:e8:
+1387	                       77:fa
+1388	           X509v3 extensions:
+1389	               X509v3 Subject Alternative Name: critical
+1390	                   IP Address:2001:3F:FE00:A05:1308:2469:9A4B:C6B2,
+1391	                   URI:https://hda.example.com
+1392	       Signature Algorithm: ED25519
+1393	       Signature Value:
+1394	           d0:36:dc:76:78:02:ef:f0:41:fd:a2:e3:66:62:e2:7a:8d:19:
+1395	           14:20:db:77:f2:88:c4:0c:be:dd:7d:8a:b5:3e:09:b6:87:55:
+1396	           c5:13:0f:02:43:7a:a3:4d:3c:81:a7:1b:35:f4:c6:f2:9f:67:
+
+1398	           a4:47:03:79:88:5e:b2:5d:a3:05
+
+1400	        Figure 14: 2001:3f:fe00:a05:1308:2469:9a4b:c6b2 Decoded HHIT
+1401	                        RRType CBOR and Certificate
+
+1403	   {
+1404	       0: 0,
+1405	       1: [4, h'012001003FFE000A05130824699A4BC6B2'],
+1406	       2: [
+1407	           5,
+1408	           h'01FADEF6670AEDF6672001003FFE0000
+1409	           055E60A1571E91A0B79990D5B04B72A180
+1410	           66D4092B52C7D4994FB7C16BD7E8C1F440
+1411	           FFA8D04FF1E13F2001003FFE0000055E60
+1412	           A1571E91A0B7BC2F66D4982EBD7B7B5B6A
+1413	           38C313EE99A4F520FDD340DDDF40FDBC86
+1414	           922748896C4B0ABC5023639B669DEE9753
+1415	           BE6D84A9F38940D3CA0A5BD1666E2A4CEE
+1416	           450C',
+1417	           5,
+1418	           h'0197E0F667A7EEF6672001003FFE000A
+1419	           056615EE45D42709A0CE681E36E1141AEB
+1420	           560D6E76BC796B7B7CB454E463CCB1F12D
+1421	           E30A380101803F2001003FFE0000055E60
+1422	           A1571E91A0B7EFDEAFA62D1077C9AE539A
+1423	           363CFB70B37680D94FD459F97A4DE610E2
+1424	           03A272CB1049BD47B0C4BCCF3614D7429F
+1425	           2F103EF55C013CDAD326B777C1E336F358
+1426	           D40B',
+1427	           5,
+1428	           h'010AE1F6671AEFF6672001003FFE000A
+1429	           05260ED4376B256E288233FDAEB5068BC1
+1430	           4859D113A0EDFCF8DC07814E3DD2765E6B
+1431	           5B82E04D0705972001003FFE000A056615
+1432	           EE45D42709A088F20AB8890B10320164CE
+1433	           1CF9A51CBD3630A4A9B07BE2893CDEAB00
+1434	           47F4AFD1AF3E350988B1F476B300838064
+1435	           EF0571F53933E58B2C96686905811E731B
+1436	           4D0C',
+1437	           5,
+1438	           h'01DCE2F667ECF0F6672001003FFE000A
+1439	           05130824699A4BC6B2C92E2F9D97E8960F
+1440	           9B5F1654F8B09039F9DADC5BCF061EAC4F
+1441	           0CEA79E8E877FA2001003FFE000A05260E
+1442	           D4376B256E2880E7DCF234E29982E64CE3
+1443	           B2159A14C768CE3B0B41D639EA509AFA6D
+1444	           86B03283EB4773252860465AC573D725CD
+1445	           A94511A02A98770B187BAD6F7798BA609A
+1446	           A701'
+1447	       ]
+1448	   }
+1449	        Figure 15: 2001:3f:fe00:a05:1308:2469:9a4b:c6b2 Decoded BRID
+1450	                                RRType CBOR
+
+1452	Authors' Addresses
+
+1454	   Adam Wiethuechter (editor)
+1455	   AX Enterprize, LLC
+1456	   4947 Commercial Drive
+1457	   Yorkville, NY 13495
+1458	   United States of America
+1459	   Email: adam.wiethuechter@axenterprize.com
+
+1461	   Jim Reid
+1462	   RTFM llp
+1463	   St Andrews House
+1464	   382 Hillington Road, Glasgow Scotland
+1465	   G51 4BL
+1466	   United Kingdom
+1467	   Email: jim@rfc1035.com
+
+
+
+
+
+
+
+
+
