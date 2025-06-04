@@ -10,10 +10,16 @@ CC @anewton1998
 * "Handling Ballot Positions":
   - https://ietf.org/about/groups/iesg/statements/handling-ballot-positions/
 
+Many thanks to Christian Amsüss for his review of the CBOR/CDDL aspects of this document.
+
 ## Discuss
 
 As noted in https://www.ietf.org/blog/handling-iesg-ballot-positions/,
 a DISCUSS ballot is just a request to have a discussion on the following topics.
+
+Some of my DISCUSS questions overlap with Roman's concerns. When replying, if
+answers to my questions can be found in your response to Roman, please feel free
+to reference your response instead of repeating the same information. 
 
 ### DNSSEC
 
@@ -62,11 +68,17 @@ can this be made more specific? Otherwise, there does not seem to be much assura
 that the delegation cannot go to an imposter. Can the DE be requested to
 verify the identity of the requestor using common and reasonable methods?
 
+I share many of the concerns asked by Roman in his DISCUSS.
 I am also concerned that a person acting as a DE would be taking on non-trivial
 amounts of liability if they are expected to reduce the possibility of delegation
 to imposters. There are risks in accidentally accepting requests from imposters
 and denying requests to authentic requestors. Is the DE expected to be a person
 or a few persons acting in their individual capacity?
+
+Overall, the process of maintaining contacts with many registries, including
+government organizations, the standing/authority such interaction may require,
+and all the other logistical and political requirements necessary to conduct
+this work are probably more than one person can handle.
 
 ### Technical Checks
 
