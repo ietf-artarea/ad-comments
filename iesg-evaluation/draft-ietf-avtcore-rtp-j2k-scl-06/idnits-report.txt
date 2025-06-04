@@ -1,0 +1,1537 @@
+idnits 2.17.1 
+
+draft-ietf-avtcore-rtp-j2k-scl-06.txt:
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     No nits found.
+--------------------------------------------------------------------------------
+
+
+2	Audio/Video Transport Core Maintenance                P.-A. Lemieux, Ed.
+3	Internet-Draft                                   Sandflow Consulting LLC
+4	Intended status: Standards Track                           D. S. Taubman
+5	Expires: 3 November 2025                   University of New South Wales
+6	                                                              2 May 2025
+
+8	   RTP Payload Format for sub-codestream latency JPEG 2000 streaming
+9	                   draft-ietf-avtcore-rtp-j2k-scl-06
+
+11	Abstract
+
+13	   This RTP payload format defines the streaming of a video signal
+14	   encoded as a sequence of JPEG 2000 codestreams.  The format allows
+15	   sub-codestream latency, such that the first RTP packet for a given
+16	   codestream can be emitted before the entire codestream is available.
+
+18	Status of This Memo
+
+20	   This Internet-Draft is submitted in full conformance with the
+21	   provisions of BCP 78 and BCP 79.
+
+23	   Internet-Drafts are working documents of the Internet Engineering
+24	   Task Force (IETF).  Note that other groups may also distribute
+25	   working documents as Internet-Drafts.  The list of current Internet-
+26	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+28	   Internet-Drafts are draft documents valid for a maximum of six months
+29	   and may be updated, replaced, or obsoleted by other documents at any
+30	   time.  It is inappropriate to use Internet-Drafts as reference
+31	   material or to cite them other than as "work in progress."
+
+33	   This Internet-Draft will expire on 3 November 2025.
+
+35	Copyright Notice
+
+37	   Copyright (c) 2025 IETF Trust and the persons identified as the
+38	   document authors.  All rights reserved.
+
+40	   This document is subject to BCP 78 and the IETF Trust's Legal
+41	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+42	   license-info) in effect on the date of publication of this document.
+43	   Please review these documents carefully, as they describe your rights
+44	   and restrictions with respect to this document.  Code Components
+45	   extracted from this document must include Revised BSD License text as
+46	   described in Section 4.e of the Trust Legal Provisions and are
+47	   provided without warranty as described in the Revised BSD License.
+
+49	Table of Contents
+
+51	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
+52	   2.  Requirements Language . . . . . . . . . . . . . . . . . . . .   4
+53	   3.  Media format description  . . . . . . . . . . . . . . . . . .   4
+54	   4.  Video signal description  . . . . . . . . . . . . . . . . . .   6
+55	   5.  Payload Format  . . . . . . . . . . . . . . . . . . . . . . .   6
+56	     5.1.  General . . . . . . . . . . . . . . . . . . . . . . . . .   6
+57	     5.2.  RTP Fixed Header Usage  . . . . . . . . . . . . . . . . .   8
+58	     5.3.  Main Packet Payload Header  . . . . . . . . . . . . . . .   9
+59	     5.4.  Body Packet Payload Header  . . . . . . . . . . . . . . .  15
+60	   6.  JPEG 2000 codestream  . . . . . . . . . . . . . . . . . . . .  17
+61	     6.1.  General . . . . . . . . . . . . . . . . . . . . . . . . .  17
+62	   7.  Sender requirements . . . . . . . . . . . . . . . . . . . . .  17
+63	     7.1.  Main Packet . . . . . . . . . . . . . . . . . . . . . . .  17
+64	     7.2.  RTP Packet filtering  . . . . . . . . . . . . . . . . . .  18
+65	     7.3.  Resync point  . . . . . . . . . . . . . . . . . . . . . .  18
+66	     7.4.  PTSTAMP field . . . . . . . . . . . . . . . . . . . . . .  18
+67	     7.5.  RES field . . . . . . . . . . . . . . . . . . . . . . . .  18
+68	     7.6.  Extra information . . . . . . . . . . . . . . . . . . . .  19
+69	     7.7.  Reserved values . . . . . . . . . . . . . . . . . . . . .  19
+70	     7.8.  Extension values  . . . . . . . . . . . . . . . . . . . .  19
+71	     7.9.  Code-block caching  . . . . . . . . . . . . . . . . . . .  19
+72	   8.  Receiver  . . . . . . . . . . . . . . . . . . . . . . . . . .  20
+73	     8.1.  PTSTAMP . . . . . . . . . . . . . . . . . . . . . . . . .  20
+74	     8.2.  QUAL  . . . . . . . . . . . . . . . . . . . . . . . . . .  20
+75	     8.3.  RES . . . . . . . . . . . . . . . . . . . . . . . . . . .  20
+76	     8.4.  Extra information . . . . . . . . . . . . . . . . . . . .  23
+77	     8.5.  Reserved values . . . . . . . . . . . . . . . . . . . . .  24
+78	     8.6.  Extension values  . . . . . . . . . . . . . . . . . . . .  24
+79	     8.7.  Code-block caching  . . . . . . . . . . . . . . . . . . .  24
+80	   9.  Media Type  . . . . . . . . . . . . . . . . . . . . . . . . .  24
+81	     9.1.  General . . . . . . . . . . . . . . . . . . . . . . . . .  24
+82	     9.2.  Definition  . . . . . . . . . . . . . . . . . . . . . . .  25
+83	   10. Mapping to the Session Description Protocol (SDP) . . . . . .  28
+84	   11. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  28
+85	   12. Security considerations . . . . . . . . . . . . . . . . . . .  28
+86	   13. References  . . . . . . . . . . . . . . . . . . . . . . . . .  28
+87	     13.1.  Normative References . . . . . . . . . . . . . . . . . .  28
+88	     13.2.  Informative References . . . . . . . . . . . . . . . . .  30
+89	   Appendix A.  Pixel formats  . . . . . . . . . . . . . . . . . . .  31
+90	   Appendix B.  Signal formats . . . . . . . . . . . . . . . . . . .  32
+91	   Appendix C.  Sample formats . . . . . . . . . . . . . . . . . . .  33
+92	   Appendix D.  Summary of Changes (Informative) . . . . . . . . . .  33
+93	     D.1.  Introduction  . . . . . . . . . . . . . . . . . . . . . .  33
+94	     D.2.  Changes from draft-ietf-avtcore-rtp-j2k-scl-00  . . . . .  33
+95	     D.3.  Changes from draft-ietf-avtcore-rtp-j2k-scl-01  . . . . .  33
+96	     D.4.  Changes from draft-ietf-avtcore-rtp-j2k-scl-02  . . . . .  33
+
+98	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  34
+
+100	1.  Introduction
+
+102	   The real-time transport protocol (RTP), which is specified in
+103	   [RFC3550], provides end-to-end network transport functions for
+104	   transmitting real-time data, but does not define the characteristics
+105	   of the data itself (the payload), which varies across applications
+106	   and is defined in companion RTP payload format documents.
+
+108	   This RTP payload format specifies the streaming of a video signal
+109	   encoded as a sequence of JPEG 2000 codestreams (see Section 3 for a
+110	   primer on the structure of JPEG 2000 codestreams).  JPEG 2000 is a
+111	   flexible image codec that support resolution and quality scalability,
+112	   lossy to lossless coding, non-iterative optimal rate control, and
+113	   high-dynamic range, multi-channel and sub-sampled images.  These
+114	   features have made it a mainstay in high-performance applications,
+115	   including medical geo-spatial, archival, cinema, studio post-
+116	   production and TV production.
+
+118	   In addition to supporting a variety of frame scanning techniques
+119	   (progressive, interlaced and progressive segmented frame) and image
+120	   characteristics, the payload format supports real-time image
+121	   transmission (live streaming), where image content is encoded,
+122	   transmitted and decoded continuously as it is being produced and with
+123	   minimal latency.  Target applications include real-time TV production
+124	   over IP ([ov2110-0]), remote presence, surveillance, etc.
+125	   Specifically:
+
+127	   *  the payload format allows sub-codestream latency such that the
+128	      first RTP packet of a given codestream to be emitted before the
+129	      entire codestream is available.  Specifically, the payload format
+130	      does not rely on the JPEG 2000 PLM and PLT marker segments for
+131	      recovery after RTP Packet loss since these markers can only be
+132	      written after the codestream is complete and are thus incompatible
+133	      with sub-codestream latency.  Instead, the payload format includes
+134	      payload header fields (ORDH, ORDB, POS and PID) that indicates
+135	      whether the RTP packet contains a resynchronization (resync) point
+136	      and how a recipient can restart codestream processing from that
+137	      resync point.  This contrasts with [RFC5371], which also specifies
+138	      an RTP payload format for JPEG 2000, but relies on codestream
+139	      structures that cannot be emitted until the entire codestream is
+140	      available.
+
+142	   *  as in [RFC4175], the payload header contains an extension (ESEQ)
+143	      to the standard 16-bit RTP sequence number, enabling the payload
+144	      format to accommodate high data rates without ambiguity.  This is
+145	      necessary as the standard sequence number will roll over very
+146	      quickly for high data rates likely to be encountered in this
+147	      application.  For example, the standard sequence number will roll
+148	      over in 0.5 seconds with a 1-Gbps video stream with RTP Packet
+149	      sizes of at least 1000 octets, which can be a problem for
+150	      detecting loss and out-of-order RTP packets particularly in
+151	      instances where the round-trip time is greater than the roll over
+152	      period (0.5 seconds in this example).
+
+154	   *  the payload header optionally contains a temporal offset (PTSTAMP)
+155	      relative to the first RTP Packet with the same value of RTP
+156	      timestamp field (Section 5.2).  The higher resolution of PTSTAMP
+157	      compared to the timestamp allows receivers to recover the sender's
+158	      clock more rapidly.
+
+160	   In addition to support for sub-codestream latency and high-precision
+161	   sender clock recovery, the payload format improves on [RFC5371] by
+162	   supporting:
+
+164	   *  code-block caching for screen content (see Section 7.9);
+
+166	   *  progressive-segmented frame (PsF) video support (see Appendix B;
+167	      and
+
+169	   *  explicit colorspace signaling (see Section 5.3.
+
+171	   Finally, the payload format also makes use of the unique scalability
+172	   features of JPEG 2000 to allow a network agent or recipient to
+173	   discard resolutions levels and/or quality layers merely by inspecting
+174	   RTP Packet headers (QUAL and RES fields), without having to parse the
+175	   underlying codestream (see Section 7.2).
+
+177	2.  Requirements Language
+
+179	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+180	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+181	   "OPTIONAL" in this document are to be interpreted as described in BCP
+182	   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+183	   capitals, as shown here.
+
+185	3.  Media format description
+
+187	   The following summarizes the structure of the JPEG 2000 codestream,
+188	   which is specified in detail at [jpeg2000-1].
+
+190	   NOTE: as described at Section 6, a JPEG 2000 codestream allows
+191	   capabilities defined in any part of the JPEG 2000 family of
+192	   standards, including those specified in [jpeg2000-2] and
+193	   [jpeg2000-15].
+
+195	   JPEG 2000 represents an image as one or more components, each
+196	   uniformly sampled on a common rectangular reference grid.  For
+197	   example, an image can consist of the customary Y (luma), C_b (blue-
+198	   difference chroma), and C_r (red-difference chroma) components, with
+199	   the C_b and C_r being sub-sampled by a factor of two compared to the
+200	   Y component.
+
+202	   An image can be further divided into contiguous rectangular tiles
+203	   that are each independently coded and decoded.
+
+205	   JPEG 2000 codes each image as a standalone codestream.  Each
+206	   codestream consists of (i) marker segments, which contain coding
+207	   parameters and metadata, and (ii) coded data.
+
+209	   The codestream starts with an SOC marker segment and ends with an EOC
+210	   marker segment.  The main header of the codestream consists of marker
+211	   segments between the SOC and first SOT marker segment and contains
+212	   information that applies to the codestream in its entirety.  It is
+213	   generally impossible to decode a codestream without its main header.
+
+215	   The rest of the codestream consists of additional marker segments
+216	   (tile-part headers) interleaved with coded image data.
+
+218	   At the heart of JPEG 2000 coding is the wavelet transform, which
+219	   decomposes the image into successive resolution levels, with each
+220	   level related to the next one by a spatial factor of two, i.e., each
+221	   successive resolution level has half the horizontal and half the
+222	   vertical resolution of the previous one.
+
+224	   The coded image data ultimately consists of code-blocks, each
+225	   containing coded samples belonging to a rectangular (spatial) region
+226	   within one resolution level of one component.  Code-blocks are
+227	   further collected into precincts, which, accordingly, represents
+228	   code-blocks belonging to a spatial region within one resolution level
+229	   of one component.
+
+231	   The image coded data can be arranged into several progression orders,
+232	   which dictates which aspect of the image appears first in the
+233	   codestream (in terms of byte offset).  The progression orders are
+234	   parameterized according to:
+
+236	   Position (P)  The first lines of the image come before the last lines
+237	      of the image.
+
+239	   Component (C)  The first component of the image come before the last
+240	      component of the image.
+
+242	   Resolution Level (R)  The information needed to reconstruct the lower
+243	      spatial resolutions of the image come before the information
+244	      needed to reconstruct the higher spatial resolutions of the image.
+
+246	   Quality Layer (L)  The information needed to reconstruct the most-
+247	      significant bits of each sample come before the information needed
+248	      to reconstruct the least-significant bit of each sample.
+
+250	   For example, in the PRCL progression order, the information needed to
+251	   reconstruct the first lines of the image come before that needed to
+252	   reconstruct the last lines of the image and, within a collection of
+253	   lines, the information needed to reconstruct the lower spatial
+254	   resolutions of the image come before the information needed to
+255	   reconstruct the higher spatial resolutions.  This progression order
+256	   is particular useful for sub-frame latency operations.
+
+258	4.  Video signal description
+
+260	   This RTP payload format supports three distinct video frame scanning
+261	   techniques:
+
+263	   *  Progressive frame
+
+265	   *  Interlaced frame, where each frame consists of two fields.  Field
+266	      1 occurs temporarily before Field 2.  The height in lines of each
+267	      field is half the height of the image.
+
+269	   *  Progressive segmented frame (PsF), where each frame consists of
+270	      two segments.  Segment 1 contains the odd lines (1, 3, 5, 7,...)
+271	      of a frame and Segment 2 contains the even lines (2, 4, 6, 8,...)
+272	      of the same frame, where lines from the top of the frame to the
+273	      bottom of the frame are numbered sequentially starting at 1.
+
+275	   All frames are scanned left to right, top to bottom.
+
+277	5.  Payload Format
+
+279	5.1.  General
+280	   <--------------- Codestream (image) -------------->
+281	   |                                                 |
+282	   <----- Extended Header ----->                     |
+283	   |                           |                     |
+284	   +-----+-//-+-----+-//-+-----+--------//-----+-----+-----+---------
+285	   | SOC | .. | SOT | .. | SOD | ............. | EOC |  P  | SOC  ...
+286	   +-----+-//-+-----+-//-+-----+--------//-----+-----+-----+---------
+287	   |          |                                            |
+288	   <----------> Main header                                |
+289	   |                                                       |
+290	   +------------------------------+------+--//-+-----------+---------
+291	   |             Main             | Body | ... |    Body   | Main ...
+292	   +------------------------------+------+--//-+-----------+---------
+293	   |                              |
+294	   <--------- RTP Packet --------->
+
+296	   SOC = Start of codestream marker
+297	   SOD = Start of data marker
+298	   SOT = Start of tile-part marker
+299	   EOC = End of codestream marker
+300	   P = (Optional) padding bytes
+
+302	       Figure 1: Packetization of a sequence of JPEG 2000 codestreams
+303	                              (not to scale).
+
+305	   Each RTP packet, as specified at [RFC3550], is either a Main Packet
+306	   or a Body Packet.
+
+308	   A Main Packet consists of the following ordered sequence of
+309	   structures concatenated without gaps:
+
+311	   *  the RTP Fixed Header;
+
+313	   *  a Main Packet Payload Header, as specified at Section 5.3; and
+
+315	   *  the payload, which consists of a JPEG 2000 codestream fragment.
+
+317	   A Body Packet consists of the following ordered sequence of
+318	   structures concatenated without gaps:
+
+320	   *  the RTP Fixed Header;
+
+322	   *  a Body Packet Payload Header, as specified at Section 5.4; and
+
+324	   *  the payload, which consists of a JPEG 2000 codestream fragment.
+
+326	   When concatenated, the sequence of JPEG 2000 codestream fragments
+327	   emitted by the sender MUST be a sequence of JPEG 2000 codestreams
+328	   where two successive JPEG 2000 codestreams MAY be separated by one or
+329	   more arbitrary padding bytes (see Figure 1).
+
+331	   The JPEG 2000 codestreams MUST conform to Section 6.
+
+333	   The padding bytes MUST be ignored by the recipient.
+
+335	   NOTE 1: Padding bytes can be used to achieve constant bit rate
+336	   transmission.
+
+338	   A JPEG 2000 codestream fragment, and thus an RTP Packet, does not
+339	   necessarily contain complete JPEG 2000 packets, as defined in
+340	   [jpeg2000-1].
+
+342	   A JPEG 2000 codestream Extended Header consists of the bytes between,
+343	   and including, the SOC marker and the first SOD marker.
+
+345	   NOTE 2: The concept of JPEG 2000 codestream Extended Header is
+346	   specific to this document, and is distinct from the JPEG 2000
+347	   codestream main header which is defined in [jpeg2000-1].  The
+348	   codestream main header consists of the bytes between, and including,
+349	   the SOC marker and the first SOT marker.  The codestream main header
+350	   is a subset of the codestream Extended Header (see Figure 1).
+
+352	   The payload of a Body Packet MUST NOT contain any bytes of the JPEG
+353	   2000 codestream Extended Header.
+
+355	   The payload of a Main Packet MUST contain at least one byte of the
+356	   JPEG 2000 codestream Extended Header and MAY contain bytes other than
+357	   those of the JPEG 2000 codestream Extended Header.
+
+359	   A payload MUST NOT contain bytes from more than one JPEG 2000
+360	   codestream.
+
+362	5.2.  RTP Fixed Header Usage
+
+364	   The following RTP header fields have a specific meaning in the
+365	   context of this payload format:
+
+367	   marker
+368	      1  The payload contains an EOC marker.
+
+370	      0  Otherwise
+
+372	   timestamp
+373	      The timestamp is the presentation time of the image to which the
+374	      payload belongs.
+
+376	      The timestamp clock rate is 90 kHz.
+
+378	      The timestamp of successive progressive frames MUST advance at
+379	      regular increments based on the instantaneous video frame rate.
+
+381	      The timestamp of Field 1 of successive interlaced frames MUST
+382	      advance at regular increments based on the instantaneous video
+383	      frame rate, and the Timestamp of Field 2 MUST be offset from the
+384	      timestamp of Field 1 by one half of the instantaneous frame
+385	      period.
+
+387	      The timestamp of both segments of a progressive segmented frame
+388	      MUST be equal.
+
+390	      timestamp of all RTP packets of a given image MUST be equal.
+
+392	   sequence number
+393	      The low-order bits of the RTP sequence number.
+
+395	      The higher order bits of the RTP sequence number are contained in
+396	      the ESEQ field, which is specified at Section 5.3.
+
+398	      The RTP sequence number is calculated as follows:
+
+400	      ESEQ * 65536 + sequence number
+
+402	5.3.  Main Packet Payload Header
+
+404	   Figure 2 specifies the structure of the payload header.  Fields are
+405	   interpreted as unsigned binary integers in network order.
+
+407	    0                   1                   2                   3
+408	    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+409	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+410	   |MH | TP  |ORDH |P|XTRAC|        PTSTAMP        |     ESEQ      |
+411	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+412	   |R|S|C| RSVD  |*|    PRIMS      |    TRANS      |      MAT      |
+413	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+414	   |                              XTRAB                            |
+415	   |                               ...                             |
+416	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+418	   * RANGE
+
+420	           Figure 2: Structure of the Main Packet Payload Header
+
+422	   MH (Codestream Main Header Presence)
+423	      0
+424	         The RTP Packet is a Body Packet.
+
+426	      1
+427	         The RTP Packet is a Main Packet and the codestream has more
+428	         than one Main Packet.  The next RTP Packet is a Main Packet.
+
+430	      2
+431	         The RTP Packet is a Main Packet and the codestream has more
+432	         than one Main Packet.  The next RTP Packet is a Body Packet.
+
+434	      3
+435	         The RTP Packet is a Main Packet and the codestream has exactly
+436	         one Main Packet.
+
+438	   TP (Image Type)
+439	      Indicates the scanning structure of the image to which the payload
+440	      belongs.
+
+442	      0
+443	         Progressive frame.
+
+445	      1
+446	         Field 1 of an interlaced frame, where the first line of the
+447	         field is the first line of the frame.
+
+449	      2
+450	         Field 2 of an interlaced frame, where the first line of the
+451	         field is the second line of the frame.
+
+453	      3
+454	         Field 1 of an interlaced frame, where the first line of the
+455	         field is the second line of the frame.
+
+457	      4
+458	         Field 2 of an interlaced frame, where the first line of the
+459	         field is the first line of the frame.
+
+461	      5
+462	         Segment 1 of a progressive segmented frame, where the first
+463	         line of the image is the first line of the frame.
+
+465	      6
+466	         Segment 2 of a progressive segmented frame, where the first
+467	         line of the image is the second line of the frame.
+
+469	      7
+470	         Extension value.  See Section 8.6 and Section 7.8.
+
+472	   ORDH (Progression Order [Main Packet])
+473	      Specifies the progression order used by the codestream and whether
+474	      resync points are signaled.
+
+476	      0
+477	         Resync points are not necessarily signaled.  The progression
+478	         order can vary over the codestream.
+
+480	      1
+481	         The progression order is LRCP for the entire codestream.  The
+482	         first resync point is specified in every Body Packet that
+483	         contains one or more resync points.
+
+485	      2
+486	         The progression order is RLCP for the entire codestream.  The
+487	         first resync point is specified in every Body Packet that
+488	         contains one or more resync points.
+
+490	      3
+491	         The progression order is RPCL for the entire codestream.  The
+492	         first resync point is specified in every Body Packet that
+493	         contains one or more resync points.
+
+495	      4
+496	         The progression order is PCRL for the entire codestream.  The
+497	         first resync point is specified in every Body Packet that
+498	         contains one or more resync points.
+
+500	      5
+501	         The progression order is CPRL for the entire codestream.  The
+502	         first resync point is specified in every Body Packet that
+503	         contains one or more resync points.
+
+505	      6
+506	         The progression order is PRCL for the entire codestream.  The
+507	         first resync point is specified in every Body Packet that
+508	         contains one or more resync points.
+
+510	      7
+511	         The progression order can vary over the codestream.  The first
+512	         resync point is specified in every Body Packet that contains
+513	         one or more resync points.
+
+515	      ORDH MUST be 0 if the codestream consists of more than one tile.
+
+517	      NOTE: Only ORDH = 4 and ORDH = 6 allow sub-codestream latency
+518	      streaming.
+
+520	      NOTE: Progression order PRCL is defined in [jpeg2000-2].  The
+521	      other progression orders are specified in [jpeg2000-1].
+
+523	   P (Precision Timestamp Presence)
+524	      0
+525	         PTSTAMP is not used.
+
+527	      1
+528	         PTSTAMP is used.
+
+530	   XTRAC (Extension Payload Length)
+531	      Length, in multiples of 4 bytes, of the XTRAB field.
+
+533	   PTSTAMP (Precision Timestamp)
+534	      PTSTAMP = (timestamp + TOFF) mod 4096, if P = 1 in the Main Packet
+535	      of this codestream.
+
+537	      TOFF is the transmission time of this RTP Packet, in the timebase
+538	      of the timestamp clock and relative to the first RTP packet with
+539	      the same timestamp value.
+
+541	      TOFF = 0 in the first RTP Packet with the same timestamp value.
+
+543	      PTSTAMP = 0, if P = 0 in the Main Packet of this codestream.
+
+545	      NOTE: As described at Section 7.4 and Section 8.1, PTSTAMP is
+546	      intended to improve clock recovery at the receiver and only
+547	      applies when the transmission time of two consecutive RTP packets
+548	      with identical timestamp fields differ by no more than 45 ms =
+549	      4095/90,000.  [RFC5450] provides addresses the general case when a
+550	      RTP packet is transmitted at a time other than its nominal
+551	      transmission time.
+
+553	   ESEQ (Extended Sequence Number)
+554	      The high order bits of the RTP sequence number.
+
+556	      Section 5.2 specifies the low-order bits of the RTP sequence
+557	      number and the formula to compute the RTP sequence number
+
+559	   R (Codestream Main Header Reuse)
+560	      Determines whether Main Packet and codestream main header
+561	      information can be reused across codestreams.
+
+563	      1
+564	         All Main Packets in this stream, as identified by its SSRC
+565	         value:
+
+567	         *  MUST have identical Main Packet Payload Headers, with the
+568	            exception of their TP, MH, ESEQ and PTSTAMP fields;
+
+570	         *  MUST contain the same codestream main header information,
+571	            with the exception of the SOT and COM marker segments, and
+572	            any pointer marker segments; and
+
+574	         *  MUST NOT contain bytes other than Extended Header bytes.
+
+576	      0
+577	         Otherwise
+
+579	   S (Parameterized Colorspace Presence)
+580	      0
+581	         Component colorimetry is not specified, and left to the session
+582	         or the application.
+
+584	         PRIMS, TRANS and MAT and RANGE MUST be zero.
+
+586	      1
+587	         Component colorimetry is specified by the PRIMS, TRANS and MAT
+588	         and RANGE fields.
+
+590	         The codestream components MUST conform to one of the
+591	         combinations at Table 1.
+
+593	           +===================================+====================+
+594	           | Combination name                  | Component index    |
+595	           |                                   +====+=====+=====+===+
+596	           |                                   | 0  | 1   | 2   | 3 |
+597	           +===================================+====+=====+=====+===+
+598	           | Y                                 | Y  |     |     |   |
+599	           +===================================+----+-----+-----+---+
+600	           | YA                                | Y  | A   |     |   |
+601	           +===================================+----+-----+-----+---+
+602	           | RGB                               | R  | G   | B   |   |
+603	           +===================================+----+-----+-----+---+
+604	           | RGBA                              | R  | G   | B   | A |
+605	           +===================================+----+-----+-----+---+
+606	           | YCbCr                             | Y  | C_B | C_R |   |
+607	           +===================================+----+-----+-----+---+
+608	           | YCbCrA                            | Y  | C_B | C_R | A |
+609	           +===================================+----+-----+-----+---+
+610	           | The channel A is an opacity channel.  The minimum      |
+611	           | sample value (0) indicates a completely transparent    |
+612	           | sample, and the maximum sample value (as determined by |
+613	           | the bit depth of the codestream component) indicates a |
+614	           | completely opaque sample.  The opacity channel MUST    |
+615	           | map to a component with unsigned samples.              |
+616	           +--------------------------------------------------------+
+
+618	               Table 1: Mapping of codestream components to color
+619	                                    channels
+
+621	   C (Code-block Caching Usage)
+622	      0
+623	         Code-block caching is not in use.
+
+625	      1
+626	         Code-block caching is in use.
+
+628	         R MUST be equal to 1.
+
+630	   RSVD (Reserved)
+631	      Reserved value.  See Section 8.5 and Section 7.7.
+
+633	   RANGE (Video Full Range Usage)
+634	      Value of the VideoFullRangeFlag specified in [rec-itu-t-h273]
+
+636	   PRIMS (Color Primaries)
+637	      One of the ColourPrimaries values specified in [rec-itu-t-h273]
+
+639	   TRANS (Transfer Characteristics)
+640	      One of the TransferCharacteristics values specified in
+641	      [rec-itu-t-h273]
+
+643	   MAT (Color Matrix Coefficients)
+644	      One of the MatrixCoefficients values specified in [rec-itu-t-h273]
+
+646	   XTRAB (Extension Payload)
+647	      Allows the contents of the Main Packet Payload Header to be
+648	      extended in the future.  See Section 8.4 and Section 7.6.
+
+650	5.4.  Body Packet Payload Header
+
+652	   Figure 3 specifies the structure of the Body Packet Payload Header.
+653	   Fields are interpreted as unsigned binary integers in network order.
+
+655	    0                   1                   2                   3
+656	    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+657	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+658	   |MH | TP  |RES  |*|QUAL |       PTSTAMP         |     ESEQ      |
+659	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+660	   |         POS           |                  PID                  |
+661	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+663	   * ORDB
+
+665	           Figure 3: Structure of the Body Packet Payload Header
+
+667	   MH
+668	      See Section 5.3.
+
+670	   TP
+671	      See Section 5.3.
+
+673	   RES (Resolution Levels)
+674	      0
+675	         The payload can contribute to all resolution levels.
+
+677	      Otherwise
+678	         The payload contains at least one byte of one JPEG 2000 packet
+679	         belonging to resolution level (N_L + RES - 7) but does not
+680	         contain any byte of any JPEG 2000 packet belonging to lower
+681	         resolution levels.  N_L is the number of decomposition levels
+682	         of the codestream.
+
+684	   ORDB (Progression Order [Body Packet]
+685	      0
+686	         No resync point is specified for the payload.
+
+688	      1
+689	         The payload contains a resync point.
+
+691	      ORDB MUST be 0 is the codestream consists of more than one tile.
+
+693	   QUAL (Quality Layers)
+694	      0
+695	         The payload can contribute to all quality layers.
+
+697	      Otherwise
+698	         The payload contributes only to quality layer index QUAL or
+699	         above.
+
+701	   PTSTAMP
+702	      See Section 5.3.
+
+704	   ESEQ
+705	      See Section 5.3.
+
+707	   POS (Resync Point Offset)
+708	      Byte offset from the start of the payload to the first byte of the
+709	      resync point belonging to the precinct identified by PID.
+
+711	      POS MUST be 0 if ORDB = 0.
+
+713	   PID (Precinct Identifier)
+714	      Unique identifier of the precinct of the resync point.
+
+716	      PID = c + s * num_components
+
+718	      where:
+
+720	      *  _c_ is the index (starting from 0) of the image component to
+721	         which the precinct belongs;
+
+723	      *  _s_ is a sequence number which identifies the precinct within
+724	         its tile-component; and
+
+726	      *  _num_components_ is the number of components of the codestream.
+
+728	      If PID is present, the payload MUST NOT contain codestream bytes
+729	      from more than one precinct.
+
+731	      PID MUST be 0 if ORDB = 0.
+
+733	      NOTE: PID is identical to precinct identifier I specified in
+734	      [jpeg2000-9].
+
+736	6.  JPEG 2000 codestream
+
+738	6.1.  General
+
+740	   A JPEG 2000 codestream consists of the bytes between, and including,
+741	   the SOC and EOC markers, as defined in [jpeg2000-1].
+
+743	   The JPEG 2000 codestream MAY include capabilities beyond those
+744	   specified at [jpeg2000-1], including those specified in [jpeg2000-2]
+745	   and [jpeg2000-15].
+
+747	   NOTE: The Rsiz parameter and CAP marker segments of each JPEG 2000
+748	   codestream contain detailed information on the capabilities necessary
+749	   to decode the codestream.
+
+751	   NOTE: The caps media type parameter defined in Section 9.2 allows
+752	   applications to signal required device capabilities.
+
+754	   NOTE: The block coder specified at [jpeg2000-15] improves throughput
+755	   and reduces latency compared to the original arithmetic block coder
+756	   defined in [jpeg2000-1].
+
+758	   For interlaced or progressive segmented frames, the height specified
+759	   in the JPEG 2000 main header MUST be the height in lines of the field
+760	   or the segment, respectively.
+
+762	   If any decomposition level involves only horizontal decomposition
+763	   then no decomposition level MUST involve only vertical decomposition;
+764	   and conversely, if any decomposition level involves only vertical
+765	   decomposition then no decomposition level MUST involve only
+766	   horizontal decomposition.
+
+768	7.  Sender requirements
+
+770	7.1.  Main Packet
+
+772	   Only Main Packets MAY contain bytes of the JPEG 2000 codestream
+773	   Extended Header.
+
+775	   The sender MUST either emit a single Main Packet with MH = 3, or one
+776	   or more Main Packets with MH = 1 followed by a single Main Packet
+777	   with MH = 2.
+
+779	   The Main Packet Payload Headers fields MUST be identical in all Main
+780	   Packet of a given codestream, with the exception of:
+
+782	   *  MH;
+783	   *  ESEQ; and
+
+785	   *  PTSTAMP.
+
+787	7.2.  RTP Packet filtering
+
+789	   A network agent MAY strip out RTP Packet from a codestream that are
+790	   of no interest to a particular client, e.g., based on a resolution or
+791	   a spatial region of interest.
+
+793	7.3.  Resync point
+
+795	   A resync point is the first byte of JPEG 2000 packet header data for
+796	   a precinct and for which PID < 2^24.
+
+798	   NOTE: Resync points cannot be specified if the codestream consists of
+799	   more than one tile (ORDB and ORDH are both equal to zero).
+
+801	   NOTE: A resync point can be used by a receiver to process a
+802	   codestream even if earlier RTP packets in the codestream have been
+803	   corrupted, lost or deliberately discarded by a network agent.  As a
+804	   corollary, resync points can be used by a network agent to discard
+805	   RTP packets that are not relevant to a given rendering resolution or
+806	   region of interest.  Resync points play a role similar to pointer
+807	   marker segments, albeit tailored for high bandwidth low latency
+808	   streaming applications.
+
+810	7.4.  PTSTAMP field
+
+812	   A sender SHOULD set P = 1, but only if it can generate PTSTAMP
+813	   accurately.
+
+815	   PTSTAMP can be derived from the same clock that is used to produce
+816	   the 32-bit timestamp field in the RTP fixed header.  Specifically, a
+817	   sender maintains, at least conceptually, a 32-bit counter that is
+818	   incremented by a 90kHz clock.  The counter is sampled at the point in
+819	   time when each RTP Packet is transmitted and the 12 LSBs of the
+820	   sample are stored in the PTSTAMP field.
+
+822	   If P = 1, then the transmission time TOFF (as defined at Section 5.3)
+823	   for two consecutive RTP packets with identical timestamp fields MUST
+824	   NOT differ by more than 4095.
+
+826	7.5.  RES field
+
+828	   A sender SHOULD set RES > 0 whenever possible.
+
+830	   NOTE: While a sender can always safely set RES = 0, this makes it
+831	   more difficult to discard RTP packets based on resolution, as
+832	   described at Section 8.3.
+
+834	7.6.  Extra information
+
+836	   The sender MUST set the value of XTRAC to 0.
+
+838	   Future edition of this specification can permit other values.
+
+840	7.7.  Reserved values
+
+842	   The sender MUST set reserved values to 0.
+
+844	   Future edition of this specification can specify other values such
+845	   that these values can be ignored by receivers that conform to this
+846	   specification.
+
+848	7.8.  Extension values
+
+850	   A sender MUST NOT use an extension value.
+
+852	7.9.  Code-block caching
+
+854	   This section applies only if C = 1.
+
+856	   A sender can improve bandwidth efficiency by only occasionally
+857	   transmitting code-blocks corresponding to static portions of the
+858	   video and otherwise transmitting empty code-blocks.  When C = 1, and
+859	   as described at Section 8.7, a receiver maintains a simple cache of
+860	   previously received code-blocks, which it uses to replace empty code-
+861	   blocks.
+
+863	   A sender alone determines which and when code-blocks are replaced
+864	   with empty code-blocks.
+
+866	   The sender cannot however determine with certainty the state of the
+867	   receiver's cache: some code-blocks might have been lost in transit,
+868	   the sender doesn't know exactly when the receiver started processing
+869	   the stream, etc.
+
+871	   A code-block is _empty_ if:
+
+873	   *  it does not contribute code-bytes as specified in the parent JPEG
+874	      2000 packet header; or
+
+876	   *  if the code-block conforms to [jpeg2000-15], contains an HT
+877	      cleanup segment and the first two bytes of the Magsgn byte-stream
+878	      are between 0xFF80 and 0xFF8F.
+
+880	   NOTE: the last condition allows the encoder to insert padding bytes
+881	   to achieve a constant bit rate even when a code-block does not
+882	   contribute code-bytes, as suggested at [jpeg2000-15], F.4.
+
+884	8.  Receiver
+
+886	8.1.  PTSTAMP
+
+888	   Receivers can use PTSTAMP values to accelerate sender clock recovery
+889	   since PTSTAMP typically updates more regularly than timestamp.
+
+891	8.2.  QUAL
+
+893	   A receiver can discard RTP packets where QUAL > N if it is interested
+894	   in reconstructing an image that only incorporates quality layers N
+895	   and below.
+
+897	8.3.  RES
+
+899	   The JPEG 2000 coding process decomposes an image using a sequence of
+900	   discrete wavelet transforms (DWT) stages.
+
+902	   +===============+============+=============+===========+============+
+903	   | Decomposition | Resolution | Sub-bands   | Keep all  | ... to     |
+904	   | level         | level      |             | Body      | decode an  |
+905	   |               |            |             | Packets   | image with |
+906	   |               |            |             | with RES  | at most    |
+907	   |               |            |             | equal to  | these      |
+908	   |               |            |             | or less   | dimensions |
+909	   |               |            |             | than      |            |
+910	   |               |            |             | this      |            |
+911	   |               |            |             | value...  |            |
+912	   +===============+============+=============+===========+============+
+913	   | 1             | 5          | HL1,LH1,HH1 | 7         | W x H      |
+914	   +---------------+------------+-------------+-----------+------------+
+915	   | 2             | 4          | HL2,LH2,HH2 | 6         | (W/2) x    |
+916	   |               |            |             |           | (H/2)      |
+917	   +---------------+------------+-------------+-----------+------------+
+918	   | 3             | 3          | HL3,LH3,HH3 | 5         | (W/4) x    |
+919	   |               |            |             |           | (H/4)      |
+920	   +---------------+------------+-------------+-----------+------------+
+921	   | 4             | 2          | HL4,LH4,HH4 | 4         | (W/8) x    |
+922	   |               |            |             |           | (H/8)      |
+923	   +---------------+------------+-------------+-----------+------------+
+924	   | 5             | 1          | HL5,LH5,HH5 | 3         | (W/16) x   |
+925	   |               |            |             |           | (H/16)     |
+926	   +---------------+------------+-------------+-----------+------------+
+927	   | 5             | 0          | LL5         | 2         | (W/32) x   |
+928	   |               |            |             |           | (H/32)     |
+929	   +---------------+------------+-------------+-----------+------------+
+
+931	      Table 2: Optional discarding of Body Packets based on the value
+932	     of the RES field when decoding a reduced resolution image, in the
+933	      case where N_L = 5 and all DWT stages consist of both horizontal
+934	      and vertical transforms.  The image has nominal width and height
+935	                                 of W x H.
+
+937	   Table 2 illustrates the case where each DWT stage consists of both
+938	   horizontal and vertical transforms, which is the only mode supported
+939	   in [jpeg2000-1].  The first stage transforms the image into (i) the
+940	   image at half-resolution (LL1 sub-bands) and (ii) residual high-
+941	   frequency data (HH1, LH1, HL1 sub-bands).  The second stage
+942	   transforms the image at half-resolution (LL1 sub-bands) into the
+943	   image at quarter resolution (LL2 sub-bands) and residual high-
+944	   frequency data (HH2, LH2, HL2 sub-bands).  This process is repeated
+945	   N_L times, where N_L is the number of decomposition levels as defined
+946	   in the COD and COC marker segments of the codestream.
+
+948	   The decoding process reconstructs the image by reversing the coding
+949	   process, starting with the lowest resolution image stored in the
+950	   codestream (LL_(N_L)).
+
+952	   As a result, it is possible to reconstruct a lower resolution of the
+953	   image by stopping the decoding process at a selected stage.  For
+954	   example, in order to reconstruct the image at quarter resolution
+955	   (LL2), only sub-bands with index greater than 2, e.g., HL3, LH3, HH3,
+956	   HL4, LH4, HH4, etc., are necessary.  In other words, a receiver that
+957	   wishes to reconstruct an image at quarter resolution could discard
+958	   all RTP packets where RES >= 6 since those RTP packets can only
+959	   contribute to HL1, LH1, HH1, HL2, LH2 and HH2 sub-bands.
+
+961	   In the case where all DWT stages consist of both horizontal and
+962	   vertical transforms, the maximum decodable resolution is reduced by a
+963	   factor of 2^(7 - N) if all Body Packets where RES > N are discarded.
+
+965	   +===============+============+=============+===========+============+
+966	   | Decomposition | Resolution | Sub-bands   | Keep all  | ... to     |
+967	   | level         | level      |             | Body      | decode an  |
+968	   |               |            |             | Packets   | image with |
+969	   |               |            |             | with RES  | at most    |
+970	   |               |            |             | equal to  | these      |
+971	   |               |            |             | or less   | dimensions |
+972	   |               |            |             | than      |            |
+973	   |               |            |             | this      |            |
+974	   |               |            |             | value...  |            |
+975	   +===============+============+=============+===========+============+
+976	   | 1             | 5          | HL1,LH1,HH1 | 7         | W x H      |
+977	   +---------------+------------+-------------+-----------+------------+
+978	   | 2             | 4          | HL2,LH2,HH2 | 6         | (W/2) x    |
+979	   |               |            |             |           | (H/2)      |
+980	   +---------------+------------+-------------+-----------+------------+
+981	   | 3             | 3          | HX3         | 5         | (W/4) x    |
+982	   |               |            |             |           | (H/2)      |
+983	   +---------------+------------+-------------+-----------+------------+
+984	   | 4             | 2          | HX4         | 4         | (W/8) x    |
+985	   |               |            |             |           | (H/2)      |
+986	   +---------------+------------+-------------+-----------+------------+
+987	   | 5             | 1          | HX5         | 3         | (W/16) x   |
+988	   |               |            |             |           | (H/2)      |
+989	   +---------------+------------+-------------+-----------+------------+
+990	   | 5             | 0          | LX5         | 2         | (W/32) x   |
+991	   |               |            |             |           | (H/2)      |
+992	   +---------------+------------+-------------+-----------+------------+
+
+994	      Table 3: Optional discarding of Body Packets based on the value
+995	     of the RES field when decoding a reduced resolution image, in the
+996	     case where N_L = 5 and some DWT stages consist of only horizontal
+997	       transforms.  The image has nominal width and height of W x H.
+
+999	   Table 3 illustrates the case where some of DWT stage consist of only
+1000	   horizontal transforms, as specified at Annex F of [jpeg2000-2].
+
+1002	   A receiver can therefore discard all Body Packets where RES is
+1003	   greater than some threshold value if it is interested in decoding an
+1004	   image with its resolution reduced by a factor determined by the
+1005	   threshold value, as illustrated in Table 2 and Table 3.
+
+1007	8.4.  Extra information
+
+1009	   The receiver MUST accept values XTRAC other than 0 and MUST ignore
+1010	   the value of XTRAB, whose length is given by XTRAC.
+
+1012	   Future edition of this specification can specify XTRAB contents such
+1013	   that this content can be ignored by receivers that conform to this
+1014	   specification.
+
+1016	8.5.  Reserved values
+
+1018	   The receiver MUST ignore the value of reserved values.
+
+1020	8.6.  Extension values
+
+1022	   The receiver MUST discard an RTP packet that contains any extension
+1023	   value.
+
+1025	8.7.  Code-block caching
+
+1027	   This section applies only if C = 1.
+
+1029	   When C = 1, and as specified in Section 7.9, the sender can improve
+1030	   bandwidth efficiency by only occasionally transmitting code-blocks
+1031	   corresponding to static portions of the video and otherwise
+1032	   transmitting empty code-blocks, as defined at Section 7.9.
+
+1034	   When decoding a codestream, and for each code-block in the
+1035	   codestream:
+
+1037	   *  if the code-block in the codestream is empty, the receiver MUST
+1038	      replace it with a matching code-block from the cache, if one
+1039	      exists; or
+
+1041	   *  if the code-block in the codestream is not empty, the receiver
+1042	      MUST replace any matching code-block from the cache with the code-
+1043	      block in the codestream.
+
+1045	   Two code-blocks are _matching_ if the following characteristics are
+1046	   identical for both: spatial coordinates, resolution level, component,
+1047	   sub-band and value of the TP field of the parent RTP packet.
+
+1049	9.  Media Type
+
+1051	9.1.  General
+
+1053	   This RTP payload format is identified using the media type defined at
+1054	   Section 9.2, which is registered in accordance with [RFC4855] and
+1055	   using the template of [RFC6838].
+
+1057	9.2.  Definition
+
+1059	   Type name
+1060	      video
+
+1062	   Subtype name
+1063	      jpeg2000-scl
+
+1065	   Required parameters
+1066	      None
+
+1068	   Optional parameters
+1069	      pixel
+1070	         Specifies the pixel format used by the video sequence.
+
+1072	         The parameter MUST be a URI-reference as specified in
+1073	         [RFC3986].
+
+1075	         If the parameter is a relative-ref as specified in [RFC3986],
+1076	         then it MUST be equal to one of the pixel formats specified in
+1077	         Table 4 and the RTP header and payload MUST conform with the
+1078	         characteristics of that pixel format.
+
+1080	         If the parameter is not a relative-ref, the specification of
+1081	         the pixel format is left to the application that defined the
+1082	         URI.
+
+1084	         If the parameter is not specified, the pixel format is
+1085	         unspecified.
+
+1087	      sample
+1088	         Specifies the format of the samples in each component of the
+1089	         codestream.
+
+1091	         The parameter MUST be a URI-reference as specified in
+1092	         [RFC3986].
+
+1094	         If the parameter is a relative-ref as specified in [RFC3986],
+1095	         then it MUST be equal to one of the formats specified in
+1096	         Appendix C and the stream MUST conform with the characteristics
+1097	         of that format.
+
+1099	         If the parameter is not a relative-ref, the specification of
+1100	         the sample format is left to the application that defined the
+1101	         URI.
+
+1103	         If the parameter is not specified, the sample format is
+1104	         unspecified.
+
+1106	      width
+1107	         Maximum width in pixels of each image.  Integer between 0 and
+1108	         4,294,967,295.
+
+1110	         The parameter MUST be a sequence of 1 or more digits.
+
+1112	         If the parameter is not specified, the maximum width is
+1113	         unspecified.
+
+1115	      height
+1116	         Maximum height in pixels of each image.  Integer between 0 and
+1117	         4,294,967,295.
+
+1119	         The parameter MUST be a sequence of 1 or more digits.
+
+1121	         If the parameter is not specified, the maximum height is
+1122	         unspecified.
+
+1124	      signal
+1125	         Specifies the sequence of image types.
+
+1127	         The parameter MUST be a URI-reference as specified in
+1128	         [RFC3986].
+
+1130	         If the parameter is a relative-ref as specified in [RFC3986],
+1131	         then it MUST be equal to one of the signal formats specified in
+1132	         Appendix B and the image sequence MUST conform to that signal
+1133	         format.
+
+1135	         If the parameter is not a relative-ref, the specification of
+1136	         the pixel format is left to the application that defined the
+1137	         URI.
+
+1139	         If the parameter is not specified, the stream consists of an
+1140	         arbitrary sequence of image types.
+
+1142	      caps
+1143	         The parameters contains a list of sets of constraints to which
+1144	         the stream conforms, with each set of constraints identified
+1145	         using an absolute-URI defined by an application.
+
+1147	         The parameter MUST conform to the uri-list syntax expressed
+1148	         using ABNF ([RFC5234]):
+
+1150	           uri-list = absolute-URI *(";" absolute-URI)
+
+1152	         Each absolute-URI MUST NOT contain any ";" character.
+
+1154	         The application that defines the absolute-URI MUST associate it
+1155	         with a set of constraints to which the stream conforms.  Such
+1156	         constraints can, for example, include the maximum height and
+1157	         width of images.
+
+1159	         If the parameter is not specified, constraints, beyond those
+1160	         specified in this document, are unspecified.
+
+1162	      cache
+1163	         The value of the parameter MUST be either false or true.
+
+1165	         If the parameter is true, the field C MAY be 0 or 1; otherwise
+1166	         the field C MUST be 0.
+
+1168	         If the parameter is not specified, then the parameter is equal
+1169	         to false.
+
+1171	   Encoding considerations
+1172	      This media type is framed and binary, see Section 4.8 of
+1173	      [RFC6838].
+
+1175	   Security considerations
+1176	      See Section 12.
+
+1178	   Interoperability considerations
+1179	      The RTP stream is a sequence of JPEG 2000 images.  An
+1180	      implementation that conforms to the family of JPEG 2000 standards
+1181	      can decode and attempt to display each image.
+
+1183	   Published specification
+1184	      This document
+
+1186	   Applications that use this media type
+1187	      video streaming and communication
+
+1189	   Person and email address to contact for further information
+1190	      Pierre-Anthony Lemieux <pal@sandflow.com>
+
+1192	   Intended usage
+1193	      COMMON
+
+1195	   Restrictions on Usage
+1196	      This media type depends on RTP framing, and hence is only defined
+1197	      for use with RTP as specified at [RFC3550].  Transport within
+1198	      other framing protocols is not defined at the time.
+
+1200	   Author
+1201	      Pierre-Anthony Lemieux (mailto:pal@sandflow.com)
+
+1203	   Change controller
+1204	      IETF Audio/Video Transport Core Maintenance Working Group
+1205	      delegated from the IESG.
+
+1207	10.  Mapping to the Session Description Protocol (SDP)
+
+1209	   The mapping of the payload format media type and its parameters to
+1210	   SDP, as specified in [RFC8866] MUST be done according to Section 3 of
+1211	   [RFC4855].
+
+1213	11.  IANA Considerations
+
+1215	   This memo requests that IANA registers the content type specified at
+1216	   Section 9.
+
+1218	12.  Security considerations
+
+1220	   RTP packets using the payload format specified in this document are
+1221	   subject to the security considerations discussed in [RFC3550] , and
+1222	   in any applicable RTP profile such as [RFC3551], [RFC4585],
+1223	   [RFC3711], [RFC5124].  However, as [RFC7202] discusses, it is not an
+1224	   RTP payload format's responsibility to discuss or mandate what
+1225	   solutions are used to meet the basic security goals like
+1226	   confidentiality, integrity, and source authenticity for RTP in
+1227	   general.  This responsibility lays on anyone using RTP in an
+1228	   application.  They can find guidance on available security mechanisms
+1229	   and important considerations in [RFC7201].  Applications SHOULD use
+1230	   one or more appropriate strong security mechanisms.  The rest of this
+1231	   Security Considerations section discusses the security impacting
+1232	   properties of the payload format itself.
+
+1234	   This RTP payload format and its media decoder do not exhibit any
+1235	   significant non-uniformity in the receiver-side computational
+1236	   complexity for RTP Packet processing, and thus are unlikely to pose a
+1237	   denial-of-service threat due to the receipt of pathological data.
+1238	   Nor does the RTP payload format contain any active content.
+
+1240	   Security considerations related to the JPEG 2000 codestream contained
+1241	   in the payload are discussed at Section 3 of [RFC3745].
+
+1243	13.  References
+
+1245	13.1.  Normative References
+
+1247	   [jpeg2000-1]
+1248	              ITU-T, "Recommendation ITU-T T.800, JPEG 2000 image coding
+1249	              system: Core coding system", June 2019.
+
+1251	   [jpeg2000-2]
+1252	              ITU-T, "Recommendation ITU-T T.801, JPEG 2000 image coding
+1253	              system: Extensions", June 2021.
+
+1255	   [jpeg2000-15]
+1256	              ITU-T, "Recommendation ITU-T T.814, JPEG 2000 image coding
+1257	              system: High-throughput JPEG 2000", June 2019.
+
+1259	   [rec-itu-t-h273]
+1260	              ITU-T, "Recommendation ITU-T H.273, Coding-independent
+1261	              code points for video signal type identification", July
+1262	              2021.
+
+1264	   [jpeg2000-9]
+1265	              ITU-T, "JPEG 2000 image coding system: Interactivity
+1266	              tools, APIs and protocols", January 2005.
+
+1268	   [RFC3550]  Schulzrinne, H., Casner, S., Frederick, R., and V.
+1269	              Jacobson, "RTP: A Transport Protocol for Real-Time
+1270	              Applications", STD 64, RFC 3550, DOI 10.17487/RFC3550,
+1271	              July 2003, <https://www.rfc-editor.org/info/rfc3550>.
+
+1273	   [RFC8866]  Begen, A., Kyzivat, P., Perkins, C., and M. Handley, "SDP:
+1274	              Session Description Protocol", RFC 8866,
+1275	              DOI 10.17487/RFC8866, January 2021,
+1276	              <https://www.rfc-editor.org/info/rfc8866>.
+
+1278	   [RFC4855]  Casner, S., "Media Type Registration of RTP Payload
+1279	              Formats", RFC 4855, DOI 10.17487/RFC4855, February 2007,
+1280	              <https://www.rfc-editor.org/info/rfc4855>.
+
+1282	   [RFC3986]  Berners-Lee, T., Fielding, R., and L. Masinter, "Uniform
+1283	              Resource Identifier (URI): Generic Syntax", STD 66,
+1284	              RFC 3986, DOI 10.17487/RFC3986, January 2005,
+1285	              <https://www.rfc-editor.org/info/rfc3986>.
+
+1287	   [RFC5234]  Crocker, D., Ed. and P. Overell, "Augmented BNF for Syntax
+1288	              Specifications: ABNF", STD 68, RFC 5234,
+1289	              DOI 10.17487/RFC5234, January 2008,
+1290	              <https://www.rfc-editor.org/info/rfc5234>.
+
+1292	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+1293	              Requirement Levels", BCP 14, RFC 2119,
+1294	              DOI 10.17487/RFC2119, March 1997,
+1295	              <https://www.rfc-editor.org/info/rfc2119>.
+
+1297	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+1298	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+1299	              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+1301	13.2.  Informative References
+
+1303	   [ov2110-0] SMPTE, "Professional Media Over Managed IP Networks,
+1304	              Roadmap for the 2110 Document Suite", 4 December 2018.
+
+1306	   [RFC5371]  Futemma, S., Itakura, E., and A. Leung, "RTP Payload
+1307	              Format for JPEG 2000 Video Streams", RFC 5371,
+1308	              DOI 10.17487/RFC5371, October 2008,
+1309	              <https://www.rfc-editor.org/info/rfc5371>.
+
+1311	   [RFC4175]  Gharai, L. and C. Perkins, "RTP Payload Format for
+1312	              Uncompressed Video", RFC 4175, DOI 10.17487/RFC4175,
+1313	              September 2005, <https://www.rfc-editor.org/info/rfc4175>.
+
+1315	   [RFC6838]  Freed, N., Klensin, J., and T. Hansen, "Media Type
+1316	              Specifications and Registration Procedures", BCP 13,
+1317	              RFC 6838, DOI 10.17487/RFC6838, January 2013,
+1318	              <https://www.rfc-editor.org/info/rfc6838>.
+
+1320	   [RFC3551]  Schulzrinne, H. and S. Casner, "RTP Profile for Audio and
+1321	              Video Conferences with Minimal Control", STD 65, RFC 3551,
+1322	              DOI 10.17487/RFC3551, July 2003,
+1323	              <https://www.rfc-editor.org/info/rfc3551>.
+
+1325	   [RFC4585]  Ott, J., Wenger, S., Sato, N., Burmeister, C., and J. Rey,
+1326	              "Extended RTP Profile for Real-time Transport Control
+1327	              Protocol (RTCP)-Based Feedback (RTP/AVPF)", RFC 4585,
+1328	              DOI 10.17487/RFC4585, July 2006,
+1329	              <https://www.rfc-editor.org/info/rfc4585>.
+
+1331	   [RFC3711]  Baugher, M., McGrew, D., Naslund, M., Carrara, E., and K.
+1332	              Norrman, "The Secure Real-time Transport Protocol (SRTP)",
+1333	              RFC 3711, DOI 10.17487/RFC3711, March 2004,
+1334	              <https://www.rfc-editor.org/info/rfc3711>.
+
+1336	   [RFC5124]  Ott, J. and E. Carrara, "Extended Secure RTP Profile for
+1337	              Real-time Transport Control Protocol (RTCP)-Based Feedback
+1338	              (RTP/SAVPF)", RFC 5124, DOI 10.17487/RFC5124, February
+1339	              2008, <https://www.rfc-editor.org/info/rfc5124>.
+
+1341	   [RFC7201]  Westerlund, M. and C. Perkins, "Options for Securing RTP
+1342	              Sessions", RFC 7201, DOI 10.17487/RFC7201, April 2014,
+1343	              <https://www.rfc-editor.org/info/rfc7201>.
+
+1345	   [RFC7202]  Perkins, C. and M. Westerlund, "Securing the RTP
+1346	              Framework: Why RTP Does Not Mandate a Single Media
+1347	              Security Solution", RFC 7202, DOI 10.17487/RFC7202, April
+1348	              2014, <https://www.rfc-editor.org/info/rfc7202>.
+
+1350	   [RFC3745]  Singer, D., Clark, R., and D. Lee, "MIME Type
+1351	              Registrations for JPEG 2000 (ISO/IEC 15444)", RFC 3745,
+1352	              DOI 10.17487/RFC3745, April 2004,
+1353	              <https://www.rfc-editor.org/info/rfc3745>.
+
+1355	   [RFC5450]  Singer, D. and H. Desineni, "Transmission Time Offsets in
+1356	              RTP Streams", RFC 5450, DOI 10.17487/RFC5450, March 2009,
+1357	              <https://www.rfc-editor.org/info/rfc5450>.
+
+1359	Appendix A.  Pixel formats
+
+1361	   Table 4 defines pixel formats.
+
+1363	    +=============+=======+=======+=======+=======+===+=====+=========+
+1364	    | NAME        | SAMP  | COMPS | TRANS | PRIMS |MAT| VFR | Mapping |
+1365	    |             |       |       |       |       |   |     | in      |
+1366	    |             |       |       |       |       |   |     | Table 1 |
+1367	    +=============+=======+=======+=======+=======+===+=====+=========+
+1368	    | rgb444sdr   | 4:4:4 | RGB   | 1     | 1     |0  | 0,  | RGB     |
+1369	    |             |       |       |       |       |   | 1   |         |
+1370	    +-------------+-------+-------+-------+-------+---+-----+---------+
+1371	    | rgb444wcg   | 4:4:4 | RGB   | 1     | 9     |0  | 0,  | RGB     |
+1372	    |             |       |       |       |       |   | 1   |         |
+1373	    +-------------+-------+-------+-------+-------+---+-----+---------+
+1374	    | rgb444pq    | 4:4:4 | RGB   | 16    | 9     |0  | 0,  | RGB     |
+1375	    |             |       |       |       |       |   | 1   |         |
+1376	    +-------------+-------+-------+-------+-------+---+-----+---------+
+1377	    | rgb444hlg   | 4:4:4 | RGB   | 18    | 9     |0  | 0,  | RGB     |
+1378	    |             |       |       |       |       |   | 1   |         |
+1379	    +-------------+-------+-------+-------+-------+---+-----+---------+
+1380	    | ycbcr420sdr | 4:2:0 | YCbCr | 1     | 1     |1  | 0   | YCbCr   |
+1381	    +-------------+-------+-------+-------+-------+---+-----+---------+
+1382	    | ycbcr422sdr | 4:2:2 | YCbCr | 1     | 1     |1  | 0   | YCbCr   |
+1383	    +-------------+-------+-------+-------+-------+---+-----+---------+
+1384	    | ycbcr422wcg | 4:2:2 | YCbCr | 1     | 9     |9  | 0   | YCbCr   |
+1385	    +-------------+-------+-------+-------+-------+---+-----+---------+
+1386	    | ycbcr422pq  | 4:2:2 | YCbCr | 16    | 9     |9  | 0   | YCbCr   |
+1387	    +-------------+-------+-------+-------+-------+---+-----+---------+
+1388	    | ycbcr422hlg | 4:2:2 | YCbCr | 18    | 9     |9  | 0   | YCbCr   |
+1389	    +-------------+-------+-------+-------+-------+---+-----+---------+
+
+1391	                       Table 4: Defined pixel formats
+
+1393	   Each pixel format is characterized by the following:
+
+1395	   NAME
+1396	      Identifies the pixel format
+
+1398	   COMPS
+1399	      RGB  Each codestream contains exactly three components, associated
+1400	         with the R, G and B color channels, in order.
+
+1402	      YCbCr  Each codestream contains exactly three components,
+1403	         associated with the Y, C_b and C_r color channels, in order.
+
+1405	   SAMP
+1406	      4:2:0  The C_b and C_r color channels are subsampled horizontally
+1407	         and vertically by 1/2.
+
+1409	      4:2:2  The C_b and C_r color channels are subsampled horizontally
+1410	         by 1/2.
+
+1412	      4:4:4  No color channels are sub-sampled.
+
+1414	   TRANS
+1415	      Identifies the transfer characteristics allowed by the pixel
+1416	      format, as defined at [rec-itu-t-h273]
+
+1418	   PRIMS
+1419	      Identifies the color primaries allowed by the pixel format, as
+1420	      defined at [rec-itu-t-h273]
+
+1422	   MAT
+1423	      Identifies the matrix coefficients allowed by the pixel format, as
+1424	      defined at [rec-itu-t-h273]
+
+1426	   VFR
+1427	      Allows values of the VideoFullRangeFlag defined at
+1428	      [rec-itu-t-h273]
+
+1430	Appendix B.  Signal formats
+
+1432	   prog
+1433	      The stream MUST only consist of a sequence of progressive frames.
+
+1435	   psf
+1436	      Progressive segmented frame (PsF) stream.  The stream MUST only
+1437	      consist of an alternating sequence of first segment and second
+1438	      segment.
+
+1440	   tff
+1441	      Interlaced stream.  The stream MUST only consist of an alternating
+1442	      sequence of first field and second field, where the first line of
+1443	      the first field is the first line of the frame.
+
+1445	   bff
+1446	      Interlaced stream.  The stream MUST only consist of an alternating
+1447	      sequence of first field and second field, where the first line of
+1448	      the first field is the second line of the frame.
+
+1450	Appendix C.  Sample formats
+
+1452	   8
+1453	      All components consist of unsigned 8-bit integer samples.
+
+1455	   10
+1456	      All components consist of unsigned 10-bit integer samples.
+
+1458	   12
+1459	      All components consist of unsigned 12-bit integer samples.
+
+1461	   16
+1462	      All components consist of unsigned 16-bit integer samples.
+
+1464	Appendix D.  Summary of Changes (Informative)
+
+1466	D.1.  Introduction
+
+1468	   This Appendix summarizes substantive changes across revisions of this
+1469	   specification.  This summary is informative and not intended to be
+1470	   exhaustive.
+
+1472	D.2.  Changes from draft-ietf-avtcore-rtp-j2k-scl-00
+
+1474	   *  Allow multi-tile images in a single stream, in addition to
+1475	      allowing multi-tile images to be transmitted as multiple single-
+1476	      tile streams.
+
+1478	   *  Fix incorrect TRANS values.
+
+1480	D.3.  Changes from draft-ietf-avtcore-rtp-j2k-scl-01
+
+1482	   *  Removed signaling for the transmission of multi-tile images as
+1483	      multiple single-tile image streams (the tile media type
+1484	      parameter).
+
+1486	D.4.  Changes from draft-ietf-avtcore-rtp-j2k-scl-02
+1487	   *  Removed request for registration in the deprecated IANA registry
+1488	      for RTP Payload Format MIME types.
+
+1490	Authors' Addresses
+
+1492	   Pierre-Anthony Lemieux (editor)
+1493	   Sandflow Consulting LLC
+1494	   San Mateo, CA
+1495	   United States of America
+1496	   Email: pal@sandflow.com
+
+1498	   David Scott Taubman
+1499	   University of New South Wales
+1500	   Sydney
+1501	   Australia
+1502	   Email: d.taubman@unsw.edu.au
+
+
+
+
+
+
+
+
+
