@@ -1,0 +1,1264 @@
+idnits 2.17.1 
+
+draft-ietf-6lo-prefix-registration-12.txt:
+-(1182): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+  == There is 1 instance of lines with non-ascii characters in the document.
+
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     Summary: 0 errors (**), 0 flaws (~~), 1 warning (==), 0 comments (--).
+
+--------------------------------------------------------------------------------
+
+
+2	6lo                                                      P. Thubert, Ed.
+3	Internet-Draft                                               4 June 2025
+4	Updates: 4861, 6550, 6553, 8505, 8928, 8929,
+5	         9010 (if approved)
+6	Intended status: Standards Track
+7	Expires: 6 December 2025
+
+9	              IPv6 Neighbor Discovery Prefix Registration
+10	                 draft-ietf-6lo-prefix-registration-12
+
+12	Abstract
+
+14	   This document updates IPv6 Neighbor Discovery (RFC 4861) and the
+15	   6LoWPAN extensions (RFC 8505, RFC 8928, RFC 8929) to enable a node
+16	   that owns or is directly connected to a prefix to register that
+17	   prefix to neighbor routers.  The registration indicates that the
+18	   registered prefix can be reached via the advertising node without a
+19	   loop.  The unicast prefix registration allows to request neighbor
+20	   router(s) to redistribute the prefix in another routing domain
+21	   regardless of the routing protocol used in that domain.  This
+22	   document extends Routing Protocol for Low-Power and Lossy Networks
+23	   (RPL) (RFC 6550, RFC 6553, and RFC 9010) to enable a 6LoWPAN Router
+24	   (6LR) to inject the registered prefix in RPL.
+
+26	Status of This Memo
+
+28	   This Internet-Draft is submitted in full conformance with the
+29	   provisions of BCP 78 and BCP 79.
+
+31	   Internet-Drafts are working documents of the Internet Engineering
+32	   Task Force (IETF).  Note that other groups may also distribute
+33	   working documents as Internet-Drafts.  The list of current Internet-
+34	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+36	   Internet-Drafts are draft documents valid for a maximum of six months
+37	   and may be updated, replaced, or obsoleted by other documents at any
+38	   time.  It is inappropriate to use Internet-Drafts as reference
+39	   material or to cite them other than as "work in progress."
+
+41	   This Internet-Draft will expire on 6 December 2025.
+
+43	Copyright Notice
+
+45	   Copyright (c) 2025 IETF Trust and the persons identified as the
+46	   document authors.  All rights reserved.
+
+48	   This document is subject to BCP 78 and the IETF Trust's Legal
+49	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+50	   license-info) in effect on the date of publication of this document.
+51	   Please review these documents carefully, as they describe your rights
+52	   and restrictions with respect to this document.  Code Components
+53	   extracted from this document must include Revised BSD License text as
+54	   described in Section 4.e of the Trust Legal Provisions and are
+55	   provided without warranty as described in the Revised BSD License.
+
+57	Table of Contents
+
+59	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
+60	   2.  Terminology . . . . . . . . . . . . . . . . . . . . . . . . .   5
+61	     2.1.  Requirements Language . . . . . . . . . . . . . . . . . .   6
+62	     2.2.  References  . . . . . . . . . . . . . . . . . . . . . . .   6
+63	     2.3.  Acronyms and Initialisms  . . . . . . . . . . . . . . . .   6
+64	     2.4.  New terms . . . . . . . . . . . . . . . . . . . . . . . .   7
+65	   3.  Overview  . . . . . . . . . . . . . . . . . . . . . . . . . .   8
+66	   4.  Amending RFC 4861 . . . . . . . . . . . . . . . . . . . . . .   9
+67	   5.  Extending RFC 7400  . . . . . . . . . . . . . . . . . . . . .   9
+68	   6.  Updating RFC 6550 . . . . . . . . . . . . . . . . . . . . . .  10
+69	   7.  Updating RFC 8505 . . . . . . . . . . . . . . . . . . . . . .  11
+70	     7.1.  New P-Field value . . . . . . . . . . . . . . . . . . . .  11
+71	     7.2.  New EARO Prefix Length Field and F flag . . . . . . . . .  11
+72	     7.3.  New EDAR Prefix Length Field  . . . . . . . . . . . . . .  13
+73	     7.4.  Amending the Registration Operation . . . . . . . . . . .  14
+74	   8.  Updating RFC 9010 . . . . . . . . . . . . . . . . . . . . . .  16
+75	   9.  Updating RFC 8928 . . . . . . . . . . . . . . . . . . . . . .  17
+76	   10. Extending RFC 8929  . . . . . . . . . . . . . . . . . . . . .  18
+77	   11. Security Considerations . . . . . . . . . . . . . . . . . . .  18
+78	   12. Operational Considerations  . . . . . . . . . . . . . . . . .  18
+79	     12.1.  Partially Upgraded Networks  . . . . . . . . . . . . . .  19
+80	     12.2.  Application to RPL-Based Route-Over LLNs . . . . . . . .  19
+81	     12.3.  Application to a Shared Link . . . . . . . . . . . . . .  21
+82	     12.4.  Application to a Hub Link with Stub Spokes . . . . . . .  22
+83	   13. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  23
+84	     13.1.  Updated P-Field Registry . . . . . . . . . . . . . . . .  23
+85	     13.2.  New 6LoWPAN Capability Bit . . . . . . . . . . . . . . .  23
+86	   14. Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .  24
+87	   15. Normative References  . . . . . . . . . . . . . . . . . . . .  24
+88	   16. Informative References  . . . . . . . . . . . . . . . . . . .  26
+89	   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  27
+
+91	1.  Introduction
+
+93	   The design of Low Power and Lossy Networks (LLNs) is generally
+94	   focused on saving energy, which is the most constrained resource of
+95	   all.  Other design constraints, such as a limited memory capacity,
+96	   duty cycling of the LLN devices and low-power lossy transmissions,
+97	   derive from that primary concern.  The radio (both transmitting or
+98	   simply listening) is a major energy drain and the LLN protocols must
+99	   be adapted to allow the nodes to remain sleeping with the radio
+100	   turned off at most times.
+
+102	   Examples of LLNs include hub-and-spoke access links such as (Low-
+103	   Power) Wi-Fi [IEEE80211] and Bluetooth (Low Energy) [IEEE802151],
+104	   Mesh-Under networks where the routing operation is handled at Layer-
+105	   2, and Route-Over networks such as the Wi-SUN [WI-SUN] and 6TiSCH
+106	   [RFC9030] mesh networks, which leverage 6LoWPAN [RFC4919][RFC6282]
+107	   and RPL [RFC6550] over [IEEE802154].
+
+109	   LLNs and constrained devices are the original domain of
+110	   application    for 6LoWPAN protocols.  It is thus a foremost concern,
+111	   when designing    those protocols, to minimize energy spendings.  In
+112	   non-LLN    environments where lowering carbon emissions is also a
+113	   priority, it    could make sense to apply the 6LoWPAN designs and
+114	   extend some of the    6LoWPAN protocols.  The general design points
+115	   include:
+
+117	   *  Placing the protocol complexity in the less-constrained routers to
+118	      simplify the host implementation and avoid expanding the control
+119	      traffic to all nodes.
+
+121	   *  Using host-triggered operations to enable transient disconnections
+122	      with the routers, e.g., to conserve power (sleep), but also to
+123	      cope with inconsistent connectivity.
+
+125	   This translates into:
+
+127	   *  Stateful proactively-built knowledge in the routers that is
+128	      available at any point of time.
+
+130	   *  Unicast host to router operations triggered by the host and its
+131	      applications.
+
+133	   *  Minimal use of asynchronous L2-broadcast operations that would
+134	      keep the host awake and listening with no application-level need
+135	      to do so.
+
+137	   The "Routing Protocol for Low Power and Lossy Networks" [RFC6550]
+138	   (RPL) provides IPv6 [RFC8200] routing services within such
+139	   constraints.  To save signaling and routing state in constrained
+140	   networks, the RPL routing is only performed along a Destination-
+141	   Oriented Directed Acyclic Graph (DODAG) that is optimized to reach a
+142	   Root node, as opposed to along the shortest path between 2 peers,
+143	   whatever that would mean in each LLN.
+
+145	   The classical Neighbor Discovery (IPv6 ND) Protocol (NDP) [RFC4861]
+146	   [RFC4862] was defined for serial links and shared transit media such
+147	   as Ethernet at a time when L2-broadcast was cheap on those media
+148	   while memory for neighbor cache was expensive.  It was thus designed
+149	   as a reactive protocol that relies on caching and multicast
+150	   operations for the Address Resolution (AR, aka Address Discovery or
+151	   Address Lookup) and Duplicate Address Detection (DAD) of IPv6 unicast
+152	   addresses.  Those multicast operations typically impact every node
+153	   on-link when at most one is really targeted, which is a waste of
+154	   energy, and imply that all nodes are awake to hear the request, which
+155	   is inconsistent with power saving (sleeping) modes.
+
+157	   The "Architecture and Framework for IPv6 over Non-Broadcast Access"
+158	   (NBMA) [I-D.ietf-6man-ipv6-over-wireless] introduces an evolution of
+159	   IPv6 ND towards a proactive AR method.  Because the IPv6 model for
+160	   NBMA depends on a routing protocol to reach inside the Subnet, the
+161	   IPv6 ND extension for NBMA is referred to as Subnet Neighbor
+162	   Discovery (SND).  SND is based on work done in the context of IoT,
+163	   known as 6LoWPAN ND.  As opposed to the classical IPv6 ND Protocol,
+164	   this evolution follows the energy conservation principles discussed
+165	   above:
+
+167	   *  The original 6LoWPAN ND, "Neighbor Discovery Optimizations for
+168	      6LoWPAN networks" [RFC6775], was introduced to avoid the excessive
+169	      use of multicast messages and enable IPv6 ND for operations over
+170	      energy-constrained nodes.  [RFC6775] changes the classical IPv6 ND
+171	      model to proactively establish the Neighbor Cache Entry (NCE)
+172	      associated to the unicast address of a 6LoWPAN Node (6LN) in the
+173	      6LoWPAN Router(s) (6LRs) that serve it.  To that effect, [RFC6775]
+174	      defines a new Address Registration Option (ARO) that is placed in
+175	      unicast Neighbor Solicitation (NS) and Neighbor Advertisement (NA)
+176	      messages between the 6LN and the 6LRs.
+
+178	   *  "Registration Extensions for 6LoWPAN Neighbor Discovery" [RFC8505]
+179	      updates [RFC6775] into a generic Address Registration mechanism
+180	      that can be used to access services such as routing and ND proxy
+181	      [RFC8929] and introduces the Extended Address Registration Option
+182	      (EARO) for that purpose.  This provides a routing-protocol-
+183	      agnostic method for a host to request that the router injects a
+184	      unicast IPv6 address in the local routing protocol and provide
+185	      return reachability for that address.
+
+187	   *  "IPv6 Neighbor Discovery Multicast Address Listener Subscription"
+188	      [RFC9685] updates [RFC8505] to enable a listener to subscribe to
+189	      an IPv6 anycast or multicast address; the draft also extends
+190	      [RFC9010] to enable the 6LR to inject the anycast and multicast
+191	      addresses in RPL.  Similarly, this specification extends [RFC8505]
+192	      and [RFC9010] to add the capability for the 6LN to register
+193	      unicast prefixes as opposed to addresses, and to signal in a
+194	      routing-protocol-independent fashion to the 6LR that it is
+195	      expected to redistribute the prefixes.
+
+197	   This specification extends the above registration and subscription
+198	   methods to enable a node to register a unicast prefix to the routing
+199	   system and get it injected in the routing protocol.  As with
+200	   [RFC8505], the prefix registration is agnostic to the routing
+201	   protocol in which the router injects the prefix, and the router is
+202	   agnostic to the method that was used to allocate the prefix to the
+203	   node.  The energy conservation principles in [RFC8505] are retained
+204	   as well, meaning that the node does not have to send or expect
+205	   asynchronous multicast messages.
+
+207	   It can be noted that an energy-conserving node is not necessarily a
+208	   router, so even when advertising a prefix, it is a design choice not
+209	   to use Router Advertisement (RA) messages that would make the node
+210	   appear as a router to peer nodes.  From the design principles above,
+211	   it is clearly a design choice not to leverage broadcasts from or to
+212	   the node, or complex state machines in the node.  It is also a design
+213	   choice to use and extend the EARO as opposed to the Route Information
+214	   Option (RIO) [RFC4191] because the RIO is not intended to inject
+215	   routes in routing, and is lacking related control information like
+216	   the R bit in the EARO.  Additionally, an RA with RIO cannot be
+217	   trusted for a safe injection in the routing protocol for the lack of
+218	   the equivalent of the Registration Ownership Verifier (ROVR)
+219	   [RFC8928] in the EARO.
+
+221	2.  Terminology
+222	2.1.  Requirements Language
+
+224	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+225	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+226	   "OPTIONAL" in this document are to be interpreted as described in BCP
+227	   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+228	   capitals, as shown here.
+
+230	   In addition, the terms "Extends" and "Amends" are used as a more
+231	   specific term for "Updates" per [I-D.kuehlewind-update-tag] section 3
+232	   as follows:
+
+234	   *Amends/Amended by:*  This tag pair is used with an amending RFC that
+235	          changes the amended RFC.  This could include bug fixes,
+236	          behavior changes etc.  This is intended to specify mandatory
+237	          changes to the protocol.  The goal of this tag pair is to
+238	          signal to anyone looking to implement the amended RFC that
+239	          they MUST also implement the amending RFC.
+240	   *Extends/Extended by:*  This tag pair is used with an extending RFC
+241	          that defines an optional addition to the extended RFC.  This
+242	          can be used by documents that use existing extension points or
+243	          clarifications that do not change existing protocol behavior.
+244	          This signals to implementers and protocol designers that there
+245	          are changes to the extended RFC that they need to consider but
+246	          not necessarily implement.
+
+248	2.2.  References
+
+250	   This document uses terms and concepts that are discussed in:
+
+252	   *  "Neighbor Discovery for IP version 6" [RFC4861]
+
+254	   *  "IPv6 Stateless Address Autoconfiguration" [RFC4862],
+
+256	   *  Neighbor Discovery Optimization for IPv6 over Low-Power Wireless
+257	      Personal Area Networks (6LoWPANs) [RFC6775], as well as
+
+259	   *  "Registration Extensions for 6LoWPAN Neighbor Discovery" [RFC8505]
+260	      and
+
+262	   *  "Using RPI Option Type, Routing Header for Source Routes, and
+263	      IPv6-in-IPv6 Encapsulation in the RPL Data Plane" [RFC9008].
+
+265	2.3.  Acronyms and Initialisms
+
+267	   This document uses the following abbreviations:
+
+269	   *6CIO:*  (6LoWPAN) Capability Indication Option [RFC7400]
+270	   *6LN:*  (6LoWPAN) Node [RFC6775]
+271	   *6LR:*  (6LoWPAN) Router [RFC6775]
+272	   *ARO:*  Address Registration Option [RFC6775]
+273	   *DAD:*  Duplicate Address Detection [RFC4861]
+274	   *DAO:*  Destination Advertisement Object [RFC6550]
+275	   *DODAG:*  Destination-Oriented Directed Acyclic Graph
+276	   *EARO:*  Extended Address Registration Option [RFC8505]
+277	   *EDAC:*  Extended Duplicate Address Confirmation [RFC8505]
+278	   *EDAR:*  Extended Duplicate Address Request [RFC8505]
+279	   *ESS:*  Extended Service Set [IEEE80211]
+280	   *IPAM:*  IP Address Management
+281	   *LLN:*  Low-Power and Lossy Network
+282	   *LLA:*  Link Layer Address
+283	   *LoWPAN:*  Low-Rate Personal Area Network [IEEE802154]
+284	   *MAC:*  Medium Access Control
+285	   *NA:*  Neighbor Advertisement (message) [RFC4861]
+286	   *NBMA:*  Non-Broadcast Multi-Access (full mesh)
+287	   *NCE:*  Neighbor Cache Entry [RFC4861]
+288	   *ND:*  Neighbor Discovery (protocol)
+289	   *NDP:*  Neighbor Discovery Protocol
+290	   *NS:*  Neighbor Solicitation (message) [RFC4861]
+291	   *ROVR:*  Registration Ownership Verifier (pronounced "rover")
+292	      [RFC8505]
+293	   *RPL:*  IPv6 Routing Protocol for LLNs (pronounced "ripple")
+294	      [RFC6550]
+295	   *RA:*  Router Advertisement (message) [RFC4861]
+296	   *RS:*  Router Solicitation (message) [RFC4861]
+297	   *RTO:*  RPL Target Option [RFC6550]
+298	   *SLLAO:*  Source Link-Layer Address Option [RFC4861]
+299	   *TID:*  Transaction ID [RFC8505]
+300	   *TIO:*  Transit Information Option [RFC6550]
+301	   *TLLAO:*  Target Link-Layer Address Option [RFC4861]
+302	   SND:  Subnet Neighbor Discovery (protocol)
+
+304	2.4.  New terms
+
+306	   This document introduces the following terms:
+
+308	   *Origin:*  The node that issued the prefix advertisement, either in
+309	          the form of a NS(EARO) or as a DAO(TIO, RTO)
+310	   *Merge:*  The action of receiving multiple anycast or multicast
+311	          advertisements, either internally from self, in the form of a
+312	          NS(EARO), or as a DAO(TIO, RTO), and generating a single
+313	          DAO(TIO, RTO).  The 6RPL router maintains a state per origin
+314	          for each advertised address, and merges the advertisements for
+315	          all subscriptions for the same address in a single
+316	          advertisement.  A RPL router that merges then becomes the
+317	          origin of the merged advertisement and uses its own values for
+318	          the Path Sequence and ROVR fields.
+
+320	3.  Overview
+
+322	   This specification inherits from [RFC6550], [RFC8505], and [RFC9010]
+323	   to register prefixes as opposed to addresses.  Unless specified
+324	   otherwise therein, the behavior of the 6LBR that acts as RPL Root, of
+325	   the intermediate routers down the RPL graph, of the 6LRs that act as
+326	   access routers and of the 6LNs that are the RPL-unaware destinations,
+327	   is the same as for unicast addresses.  In particular, forwarding a
+328	   packet happens as specified in section 11 of [RFC6550], including
+329	   loop avoidance and detection, though in the case of multicast
+330	   multiple copies might be generated.
+
+332	   [RFC8505] is a pre-requisite to this specification.  A node that
+333	   implements this MUST also implement [RFC8505].  This specification
+334	   does not introduce a new option; it modifies existing options and
+335	   updates the associated behaviors to enable the Registration for
+336	   prefixes as an extension to [RFC8505].
+
+338	   This specification updates the P-Field introduced in [RFC9685] for
+339	   use in EARO, DAR, and RTO, with the new value of 3 to indicate the
+340	   registration of a prefix, as detailed in Section 7.2.  With this
+341	   extension, the 6LN can now express its willingness to receive the
+342	   traffic for all addresses in the range of a prefix, using the P-Field
+343	   value of 3 in the EARO to signal that the registration is for such
+344	   prefix.  Multiple 6LNs acting as border routers to the same external
+345	   network or as access routers to the same subnet may register the same
+346	   prefix to the same 6LR or to different 6LRs.
+
+348	   If the R flag is set in the registration of one or more 6LNs for the
+349	   same prefix, then, according to its redistribution policy, the 6LR
+350	   MUST redistribute the prefix in the routing protocol(s) (e.g., RPL)
+351	   that it participates to.  The duration of the redistribution is based
+352	   on the longest registration lifetime across the non-expired received
+353	   registrations for the prefix.
+
+355	   Examples of use-cases where this specification may apply include
+356	   virtual links, shared links, and hub links as shown in Section 12.3
+357	   and Section 12.4, respectively.  More generally, the 6LN may be a
+358	   router running a different routing protocol in an external network,
+359	   e.g., a stub network, and acting as a border router.  Using the
+360	   prefix registration method enables to decouple the routing protocol
+361	   in the 6LN from the routing protocol that the 6LRs run in the main
+362	   LLN and provide signaling to stimulate the redistribution.
+
+364	4.  Amending RFC 4861
+
+366	   [RFC4861] expects that the NS/NA exchange is for a unicast address,
+367	   which is indicated in the Target Address field of the ND message.
+368	   This specification Amends [RFC4861] by allowing a 6LN to advertise a
+369	   prefix in the Target Address field when the NS or NA message is used
+370	   for a registration, per section 5.5 of [RFC8505]; in that case, the
+371	   prefix length is indicated in the EARO of the NS message, overloading
+372	   the field that is used in the NA response for the Status.
+
+374	5.  Extending RFC 7400
+
+376	   This specification Extends "6LoWPAN-GHC: Generic Header Compression
+377	   for IPv6 over Low-Power Wireless Personal Area Networks (6LoWPANs)"
+378	   [RFC7400] by defining a new capability bit for use in the 6CIO.
+379	   [RFC7400] was already extended by [RFC8505] for use in IPv6 ND
+380	   messages.
+
+382	   The new "Registration for prefixes Supported" (F) flag indicates to
+383	   the 6LN that the 6LR accepts IPv6 prefix registrations as specified
+384	   in this document and will ensure that packets for the addresses that
+385	   match this prefix will be routed to the 6LNs that registered the
+386	   prefix, and the route to the prefix will be redistributed if the R
+387	   flag is set to 1.
+
+389	   Figure 1 illustrates the F flag in its position (16, counting 0 to 47
+390	   in network order in the 48-bit array).
+
+392	   - to be confirmed by IANA
+
+394	   - and updated by RFC Editor if needed.
+
+396	       0                   1                   2                   3
+397	       0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+398	      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+399	      |     Type      |   Length = 1  | Experimental  |X|A|D|L|B|P|E|G|
+400	      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+401	      |F|                         Unassigned                          |
+402	      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+404	                  Figure 1: New Capability Bit in the 6CIO
+
+406	   New Option Field:
+
+408	   *F:*  1-bit flag, set to 1 to indicate "Registration for prefixes
+409	      Supported"
+
+411	6.  Updating RFC 6550
+
+413	   [RFC6550] uses the Path Sequence in the Transit Information Option
+414	   (TIO) to retain only the freshest unicast route and remove stale
+415	   ones, e.g., in the case of mobility.  [RFC9010] copies the TID from
+416	   the EARO into the Path Sequence, and the ROVR field into the
+417	   associated RPL Target Option (RTO).  This way, it is possible to
+418	   identify both the registering node and the order of registration in
+419	   RPL for each individual advertisement, so the most recent path and
+420	   lifetime values are used.
+
+422	   [RFC9685] requires the use of the ROVR field as the indication of the
+423	   origin of a Target advertisement in the RPL DAO messages, as
+424	   specified in section 6.1 of [RFC9010].  For anycast and multicast
+425	   advertisements (in NS or DAO messages), multiple origins may
+426	   subscribe to the same address, in which case the multiple
+427	   advertisements from the different or unknown origins are merged by
+428	   the common parent; in that case, the common parent becomes the origin
+429	   of the merged advertisements and uses its own ROVR value.  On the
+430	   other hand, a parent that propagates an advertisement from a single
+431	   origin uses the original ROVR in the propagated RTO, as it does for
+432	   unicast address advertisements, so the origin is recognized across
+433	   multiple hops.
+
+435	   This specification Extends [RFC6550] to require that, for prefix
+436	   routes, the Path Sequence is used between and only between
+437	   advertisements for the same Target and from the same origin (i.e.,
+438	   with the same ROVR value); in that case, only the freshest
+439	   advertisement is retained.  But the freshness comparison cannot apply
+440	   if the origin is not determined (i.e., the origin did not support
+441	   this specification).
+
+443	   [RFC6550] uses the Path Lifetime in the TIO to indicate the remaining
+444	   time for which the advertisement is valid for unicast route
+445	   determination, and a Path Lifetime value of 0 invalidates that route.
+446	   [RFC9010] maps the Address Registration lifetime in the EARO and the
+447	   Path Lifetime in the TIO so they are comparable when both forms of
+448	   advertisements are received.
+
+450	   The RPL router that merges multiple advertisements for the same
+451	   prefix uses and advertises the longest remaining lifetime across all
+452	   the origins of the advertisements for that prefix.  When the lifetime
+453	   expires, the router sends a no-path DAO (i.e., the lifetime is 0)
+454	   using the same value for ROVR value as for the previous
+455	   advertisements, that is either itself or the single descendant that
+456	   advertised the Target.
+
+458	   Note that the Registration Lifetime, TID and ROVR fields are also
+459	   placed in the EDAR message so the state created by EDAR is also
+460	   comparable with that created upon an NS(EARO) or a DAO message.  For
+461	   simplicity the text below mentions only NS(EARO) but applies also to
+462	   EDAR.
+
+464	7.  Updating RFC 8505
+
+466	   This specification Extends the EARO and EDAR messages to enable the
+467	   registration of prefixes and Amends the Registration operation in the
+468	   case of a prefix, in particular from the standpoint of the 6LR, e.g.,
+469	   to enable the Registration of overlapping prefixes.
+
+471	7.1.  New P-Field value
+
+473	   [RFC9685] defines a 2-bits P-Field with values from 0 to 2, and
+474	   reserves value 3.  This specification defines value 3 for the
+475	   P-Field, and uses it to signal that the Registered Address is a
+476	   prefix.  When the P-Field is set to 3, the receiver installs a route
+477	   to the prefix via the sender's address used as source address in the
+478	   NS(EARO) registration message.
+
+480	   This specification assigns the value of 3, resulting in the complete
+481	   table as follows:
+
+483	             +-------+--------------------------------------+
+484	             | Value | Meaning                              |
+485	             +-------+--------------------------------------+
+486	             | *0*   | Registration for a Unicast Address   |
+487	             +-------+--------------------------------------+
+488	             | *1*   | Registration for a Multicast Address |
+489	             +-------+--------------------------------------+
+490	             | *2*   | Registration for an Anycast Address  |
+491	             +-------+--------------------------------------+
+492	             | *3*   | Registration for a Unicast prefix    |
+493	             +-------+--------------------------------------+
+
+495	                         Table 1: P-Field Values
+
+497	7.2.  New EARO Prefix Length Field and F flag
+
+499	   Section 4.1 of [RFC8505] defines the EARO as an extension to the ARO
+500	   option defined in [RFC6775].
+
+502	   The Status field that is used only when the EARO is placed in an NA
+503	   message.  This specification repurposes that field to carry the
+504	   prefix length when the EARO is placed in an NS message as illustrated
+505	   in Figure 2.  The prefix length is expressed as 7 bits and the most
+506	   significant bit of the field is reserved.  A 7-bit value of 0 is
+507	   understood as a truncated 128, meaning that this registration is for
+508	   an address as opposed to a prefix.  This approach is backward
+509	   compatible with [RFC8505] and spans both addresses and prefixes.
+
+511	   This specification adds a new F flag to signal that the Registered
+512	   Prefix is topologically correct through the Registering Node.  This
+513	   means that the Registering Node relays packets that are sourced in
+514	   the Registered Prefix to the outside, in accordance with "Network
+515	   Ingress Filtering" [BCP38] .  The receiver forwards packets to the
+516	   Registering Node address when the source address of the packets
+517	   derives from the Registered Prefix.  Note that to avoid loops, the
+518	   receiver must be in the inside so packets sent by the sender towards
+519	   the outside may never reach the receiver.  The notion of inside and
+520	   outside are administratively defined, e.g., inside is a particular
+521	   Layer-2 network such as an Ethernet fabric.
+
+523	   When the F flag is not set, the Registering Node owns the prefix and
+524	   will deliver packets to the destination if the destination address
+525	   derives from the prefix.  Conversely, if the F flag is set, the
+526	   Registering Node will forward traffic whose source address derives
+527	   from the Registered Prefix into a network location (e.g., to an ISP
+528	   Provider Edge) where this source address is topologically correct
+529	   (e.g., derives from a prefix assigned by that ISP).  The F flag is
+530	   encoded in the most significant bit of the EARO Status field when the
+531	   Status field is used to transport a Prefix Length as shown in
+532	   Figure 2.
+
+534	      0                   1                   2                   3
+535	      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+536	     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+537	     |     Type      |     Length    |F|Prefix Length|    Opaque     |
+538	     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+539	     |r|C| P | I |R|T|     TID       |     Registration Lifetime     |
+540	     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+541	     |                                                               |
+542	    ...                            ROVR                             ...
+543	     |                                                               |
+544	     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+546	            Figure 2: EARO Option Format for Use in NS Messages
+
+548	   New and updated Option Fields:
+
+550	   *F:*  1-bit flag; set to 1 to indicate that the sender expects other
+551	      routers to forward packets to self when the packets are sourced
+552	      within the registered prefix.
+
+554	   *Prefix Length:*  7-bit integer; this field contains a prefix length
+555	      expressed in bits if the P-Field is set to 3 and the EARO is
+556	      placed in an NS message.  In that case the value MUST be between
+557	      16 and 120, both included.  The field contains a Status if the
+558	      EARO is placed in an NA message regardless of the setting of the P
+559	      flag.  In all other cases it is reserved, so it MUST be set to 0
+560	      by the sender and ignored by the receiver.
+
+562	   *r (reserved):*  1-bit reserved field; it MUST be set to zero by the
+563	      sender and MUST be ignored by the receiver.
+
+565	7.3.  New EDAR Prefix Length Field
+
+567	   This specification adds the new value of 3 to the P-Field to signal
+568	   that the Registered Address is a prefix.  When that is the case, the
+569	   prefix is assumed to be less than 120 bits long, padded with zeros up
+570	   to 120 bits, and the remaining 8 bits are dedicated to the prefix
+571	   length.
+
+573	   Figure 3 illustrates the EDAR message when the value of the P-Field
+574	   is 3.
+
+576	      0                   1                   2                   3
+577	      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+578	     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+579	     |     Type      |CodePfx|CodeSfx|          Checksum             |
+580	     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+581	     |P=3| Reserved  |     TID       |     Registration Lifetime     |
+582	     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+583	     |                                                               |
+584	    ...                          ROVR                               ...
+585	     |                                                               |
+586	     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+587	     |                                                               |
+588	     +                           Prefix                              +
+589	     |                                                               |
+590	     +                 (up to 120 bits, padded with 0s)              +
+591	     |                                                               |
+592	     +                                               +-+-+-+-+-+-+-+-+
+593	     |                                               |r|Prefix Length|
+594	     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+596	                 Figure 3: EDAR Message Format with P == 3
+
+598	   New and updated Option Fields:
+
+600	   *Reserved:*  6-bit field; reserved, MUST be set to 0 and ignored by
+601	      the receiver
+
+603	   *Prefix:*  15 bytes field; carries up to 120 bits of prefix, and MUST
+604	      be padded with zeros.  The padding MUST be overwritten with zeros
+605	      when the prefix is being used by the receiver.
+
+607	   *r:*  1-bit field; reserved, MUST be set to 0 and ignored by the
+608	      receiver
+
+610	   *Prefix Length:*  7-bit integer; signals the length of the prefix, in
+611	      bits.  The value MUST be at least 16 and at most 120.
+
+613	7.4.  Amending the Registration Operation
+
+615	   With [RFC8505]:
+
+617	   *  A router that expects to reboot may send a final RA message, upon
+618	      which nodes should register elsewhere or redo the registration to
+619	      the same router upon reboot.  In all other cases, a node reboot is
+620	      silent.  When the node comes back to life, existing registration
+621	      state might be lost if it was not safely stored, e.g., in
+622	      persistent memory.
+
+624	   *  Only unicast addresses can be registered.
+
+626	   *  The 6LN must register all its Unique Local Addresses (ULAs) and
+627	      Global Unicast Addresses (GUAs) with a NS(EARO).
+
+629	   *  The 6LN may set the R flag in the EARO to obtain return
+630	      reachability services by the 6LR, e.g., through ND proxy
+631	      operations, or by injecting the route in a route-over subnet.
+
+633	   *  The 6LR maintains a registration state per Registered Address,
+634	      including an NCE with the Link Layer Address (LLA) of the
+635	      Registered Node (the 6LN here).
+
+637	   The operation for registering prefixes is similar as for addresses
+638	   from the perspective of the 6LN, but shows important differences on
+639	   the router side, which maintains a separate state for each origin and
+640	   merges them in its own advertisements.  This specification adds the
+641	   following behavior, similar to that introduced by [RFC9685] for
+642	   multicast addresses:
+
+644	   *  The ARO Status indicating a "Registration Refresh Request" applies
+645	      to prefixes as well.
+
+647	      This status is used in asynchronous NA(EARO) messages to indicate
+648	      to peer 6LNs that they are requested to reregister all addresses
+649	      and prefixes that were previously registered to the originating
+650	      node.  The NA message MAY be sent to a unicast or a multicast
+651	      link-scope address and SHOULD be contained within the L2 range
+652	      where nodes may effectively have registered/subscribed to this
+653	      router, e.g., a radio broadcast domain to preserve energy and
+654	      spectrum.
+
+656	      A device that wishes to refresh its state, e.g., upon reboot if it
+657	      may have lost some registration state, SHOULD send an asynchronous
+658	      NA(EARO) with this new status value.  That asynchronous NA(ARO)
+659	      SHOULD be sent to the all-nodes link-scope multicast address
+660	      (ff02::1) and Target MUST be set to the link-local address that
+661	      was exposed previously by this node to accept registrations, and
+662	      the TID MUST be set to 0; the ROVR field MUST be set to all zeroes
+663	      and ignored by the receiver.
+
+665	      In an environment with unreliable transmissions, the multicast
+666	      NA(EARO) message may be resent in a fast sequence, in which case
+667	      the TID is incremented each time.  A 6LN that has recently
+668	      processed the NA(EARO) indicating a "Registration Refresh Request"
+669	      ignores the additional NA(EARO) also indicating a "Registration
+670	      Refresh Request" within the duration of the fast sequence.  That
+671	      duration depends on the environment and has to be configured.  By
+672	      default, it is of 10 seconds.
+
+674	   *  Registration for prefixes is now supported.  The value of 3 in the
+675	      P-Field of the EARO and the EDAR message signals when the
+676	      registration is for a prefix as opposed to an address.  DAD for
+677	      prefixes and addresses becomes a prefix overlap match.  Whether
+678	      overlapping addresses and prefixes may be registered is a network
+679	      policy decision and out of scope.  The same prefix may be injected
+680	      twice (multiple routes) as long as they use the same value of the
+681	      ROVR.
+
+683	      Overlaps may be desirable.  It may happen for instance that a
+684	      router or a proxy (see Section 10) registers a prefix or an
+685	      aggregation while a host using an address from that prefix or a
+686	      prefix from that aggregation also registers its piece.
+
+688	      In case of an overlapping registration, the longest prefix match
+689	      wins, meaning that if the network policy allows for overlapping
+690	      registrations, then the routes for the registered prefixes are
+691	      installed towards the node that registered with the longest prefix
+692	      match, all the way to /128.
+
+694	   *  If the 6LR acts as a border router to external prefixes or owns
+695	      the prefixes entirely, it SHOULD register all those prefixes on
+696	      all interfaces from which it might be needed to relay traffic to
+697	      that prefix.  It MUST set the P-Field in the EARO to 3 for those
+698	      prefixes, and the set R flag to receive the traffic associated to
+699	      the prefixes.  It MAY refrain from registering a prefix on one
+700	      interface if that prefix is already successfully registered on
+701	      another interface, or the router handled the EDAR / EDAC flow by
+702	      itself, to ensure that the prefix ownership is known and validated
+703	      by the 6LBR.  Additionally, if the router expect to receive
+704	      traffic for that prefix on that interface, it needs to ensure that
+705	      the prefix is advertised some other way, e.g., over a routing
+706	      protocol such as RPL.
+
+708	   *  The 6LN MAY set the R flag in the EARO to request the 6LR to
+709	      redistribute the prefix on other links using a routing protocol.
+710	      The 6LR MUST NOT reregister that prefix to yet another router
+711	      unless loops are avoided some way, e.g., following a tree
+712	      structure.
+
+714	   *  The 6LR and the 6LBR are extended to accept more than one
+715	      registration for the same prefix, since multiple 6LNs may register
+716	      it.  The ROVR in the EARO identifies uniquely a registration
+717	      within the namespace of the Registered Prefix.
+
+719	   *  The 6LR MUST maintain a registration state per tuple (IPv6 prefix/
+720	      length, ROVR) for all registered prefixes.  It SHOULD notify the
+721	      6LBR with an EDAR message, unless it determined that the 6LBR is
+722	      legacy and does not support this specification (see Section 5).
+723	      In turn, the 6LBR MUST maintain a registration state per tuple
+724	      (IPv6 prefix, ROVR) for all prefixes.
+
+726	8.  Updating RFC 9010
+
+728	   With [RFC9010]:
+
+730	   *  The 6LR injects only unicast routes in RPL.
+
+732	   *  Upon a registration with the R flag set to 1 in the EARO, the 6LR
+733	      injects the address in the RPL unicast support.
+
+735	   *  Upon receiving a packet directed to a unicast address for which it
+736	      has an active registration, the 6LR delivers the packet as a
+737	      unicast layer-2 frame to the LLA of the node that registered the
+738	      unicast address.
+
+740	   This specification adds the following behavior:
+
+742	   *  Upon a registration with the R flag set to 1 and the P-Field set
+743	      to 3 in the EARO, the 6LR injects the prefix in RPL using a prefix
+744	      RTO.  The P-Field in the RTP MUST be set to 3.
+
+746	   *  Upon receiving a packet directed to an address that derives from a
+747	      prefix for which it has at least one registration, the 6LR
+748	      delivers a copy of the packet as a unicast layer-2 frame to the
+749	      LLA of exactly one of the nodes that registered to that prefix,
+750	      using the longest prefix match derivation to find the best 6LN.
+
+752	9.  Updating RFC 8928
+
+754	   Address-Protected Neighbor Discovery for Low-Power and Lossy Networks
+755	   [RFC8928] was defined to protect the ownership of unicast IPv6
+756	   addresses that are registered with [RFC8505].
+
+758	   With [RFC8928], it is possible for a node to autoconfigure a pair of
+759	   public and private keys and use them to sign the registration of
+760	   addresses that are either autoconfigured or obtained through other
+761	   methods.
+
+763	   The first hop router (the 6LR) can then validate a registration and
+764	   perform source address validation on packets coming from the sender
+765	   node (the 6LN).
+
+767	   As multiple nodes may register the same prefix, the method specified
+768	   in [RFC8928] cannot be used with node-local autoconfigured keypairs,
+769	   which protect a single ownership only.
+
+771	   For a prefix, as for an anycast or a multicast address, it is still
+772	   possible to leverage [RFC8928] to enforce the right to register.  If
+773	   [RFC8928] is used, a keypair MUST be created and associated with the
+774	   prefix before the prefix is deployed, and a ROVR MUST be generated
+775	   from that keypair as specified in [RFC8928].  The prefix and the ROVR
+776	   MUST then be installed in the 6LBR at the first registration, or by
+777	   an external mechanism such as IP Address Management (IPAM) or DHCPv6
+778	   snooping prior to the first registration.  This way, the 6LBR can
+779	   recognize the prefix on the future registrations and validate the
+780	   right to register based on the ROVR.
+
+782	   The keypair MUST then be provisioned in each node that needs to
+783	   register the prefix or a prefix within, so the node can follow the
+784	   steps in [RFC8928] to register the prefix.
+
+786	   Upon receiving an NA message with the status set to 5 "Validation
+787	   Requested", the node that registered the address or prefix performs
+788	   the proof of ownership based on that longest prefix match.
+
+790	10.  Extending RFC 8929
+
+792	   "IPv6 Backbone Router" [RFC8929] defines a proxy operation whereby a
+793	   6LoWPAN Border Router (6LBR) may impersonate a 6LN when performing an
+794	   address registration.  In that case, [RFC8505] messages are used as
+795	   is, with one change that the SLLAO in the proxied NS(EARO) messages
+796	   indicates the Registering Node (the 6LBR) as opposed to the
+797	   Registered Node (the 6LN).  See figure 5 of [RFC8929] for an example
+798	   of proxy operation by the 6LBR, which generates an NS(EARO) upon
+799	   receiving an EDAR message.
+
+801	   This specification Extends that proxy operation with the updates in
+802	   [RFC9685] and this on the formats and content of the EARO, the EDAR,
+803	   and the EDAC messages, to support the P-Field and the signaling of
+804	   prefixes.  The proxy MUST use the P-Field as received in the EDAR or
+805	   NS(EARO) message to generate the proxied NS(EARO), and it MUST use
+806	   the exact same prefix and prefix length as received in the case of a
+807	   prefix registration.
+
+809	11.  Security Considerations
+
+811	   This specification extends [RFC8505], and the security section of
+812	   that document also applies to this document.  In particular, the link
+813	   layer SHOULD be sufficiently protected to prevent rogue access, else
+814	   a rogue node with physical Access to the network may inject packets
+815	   and perform an attack from within.
+
+817	   Section 9 leverages [RFC8928] to prevent a rogue node to register a
+818	   unicast address that it does not own.  The mechanism could be
+819	   extended to anycast and multicast addresses if the values of the ROVR
+820	   they use are known in advance, but how this is done is not in scope
+821	   for this specification.  One way would be to authorize in advance the
+822	   ROVR of the valid users.  A less preferred way could be to
+823	   synchronize the ROVR and TID values across the valid registering
+824	   nodes as a preshared key material.
+
+826	   In the latter case, it could be possible to update the keys
+827	   associated to a prefix in all the 6LNs, but the flow is not clearly
+828	   documented and may not complete in due time for all nodes in LLN use
+829	   cases.  It may be simpler to install an all-new address with new keys
+830	   over a period of time, and switch the traffic to that address when
+831	   the migration is complete.
+
+833	12.  Operational Considerations
+834	12.1.  Partially Upgraded Networks
+
+836	   In a brown field use case, a mix of devices that support only
+837	   [RFC8505], [RFC8505] and [RFC9685], and all of the above plus this,
+838	   may coexist.  Different cases may occur:
+
+840	   *  A legacy 6LN will not register prefixes and the service will be
+841	      the same when the network is upgraded.
+
+843	   *  A legacy 6LR will not set the F flag in the 6CIO and an upgraded
+844	      6LN will not register prefixes with that router, though it may
+845	      with other 6LRs that do support this specification.
+
+847	   *  Upon an EDAR message, a legacy 6LBR may not realize that the
+848	      address being registered comes with a whole prefix, and return
+849	      that it is duplicate in the EDAC status.  The 6LR MUST ignore a
+850	      duplicate status in the EDAR for prefixes.
+
+852	12.2.  Application to RPL-Based Route-Over LLNs
+
+854	   This specification also extends [RFC6550] and [RFC9010] in the case
+855	   of a route-over multilink subnet based on the RPL routing protocol,
+856	   to add multicast ingress replication in Non-Storing Mode and anycast
+857	   support in both Storing and Non-Storing modes.  A 6LR that implements
+858	   the RPL extensions specified therein MUST also implement [RFC9010].
+
+860	   Figure 4 illustrates the classical situation of an LLN as a single
+861	   IPv6 Subnet, with a 6LoWPAN Border Router (6LBR) that acts as Root
+862	   for RPL operations and as Address Registrar for 6LowPAN ND.
+
+864	            .- -- .
+865	         .-(        ).
+866	        (   Internet   )
+867	       (___.________.___)
+868	                 |
+869	      ---+-------+--
+870	         |
+871	       +--------+
+872	       |  6LBR  |
+873	       | (Root) |
+874	       +--------+
+875	       o   o  o  o
+876	         o   o  o
+877	    o  o  o       o  o  o
+878	    o  o  o  LLN   o   +-------+
+879	      o  o          o  |  6LR  | RPL Router
+880	      o o    o   o     +-------+
+881	      o  o    o  o          +-------+  RPL
+882	             o              |  6LN  |  leaf
+883	                            +-------+  L
+
+885	     o : LLN node
+
+887	                     Figure 4: RPL-Based Route-Over LLN
+
+889	   A RPL leaf L acting as a 6LN registers its addresses and prefixes to
+890	   a RPL router acting as a 6LR, using a layer-2 unicast NS message with
+891	   an EARO as specified in [RFC8505] and [RFC9685].  Note that a RPL
+892	   leaf acting as 6LN may still be a border router for another routing
+893	   protocol, an access router for an IP link, or a virtual Router
+894	   serving virtual machines or applications within the same physical
+895	   node.  Note also that a RPL-aware Leaf would preferably leverage RPL
+896	   directly to inject routes, to fully leverage the routing protocol.
+897	   The registration state is periodically renewed by the Registering
+898	   Node (the 6LN), before the lifetime indicated in the EARO expires (at
+899	   the 6LR).  As for unicast IPv6 addresses, the 6LR uses an Extended
+900	   Duplicate Address Request/Confirmation (EDAR/EDAC) exchange with the
+901	   6LBR to notify the 6LBR of the presence of the listeners.  With this
+902	   specification, a router that owns a prefix or provides reachability
+903	   to an external prefix but is not a RPL router can also register those
+904	   prefixes with the R flag set, to enable reachability to the Prefix
+905	   within the RPL domain.
+
+907	12.3.  Application to a Shared Link
+
+909	   A shared link is a situation where more than one prefix is deployed
+910	   over a L2 link (say a switched Ethernet fabric, or a Wi-Fi Extended
+911	   Service Set (ESS) federating multiple Access Points (APs)), and not
+912	   necessarily all nodes are aware of all prefixes.  Figure 5 depicts
+913	   such a situation, with 2 routers 6LR1 and 6LR2 that own respective
+914	   prefixes P1:: and P2::, and expose those in their RA messages over
+915	   the same link.  Note that the shared link maybe operated with any
+916	   combination of NDP and SND as discussed in section 7 of
+917	   [I-D.ietf-6man-ipv6-over-wireless].
+
+919	            .- -- .
+920	         .-(        ).
+921	        (   Internet   )
+922	       (___.________.___)
+923	             |
+924	        +----+--+          +-------+
+925	        | P1::a |          | P2::b |
+926	        | 6LR1  |          | 6LR2  |
+927	        +---+---+          +---+---+
+928	            |                  |
+929	     ----+--+------+---------+-+-------+---------+----
+930	         |         |         |         |         |
+931	      +--+--+   +--+--+   +--+--+   +--+--+   +--+--+
+932	      |P1::c|   |P2::d|   |P2::e|   |P1::f|   |P1::g|
+933	      +-----+   +-----+   +-----+   +-----+   +-----+
+
+935	                           Figure 5: Shared Link
+
+937	   Say that 6LR1 is the router providing access to the outside, and 6LR2
+938	   is aware of 6LR1 as its default gateway.  With this specification,
+939	   6LR2 registers P2:: to 6LR1 and 6LR1 installs a route to P2:: via
+940	   6LR2.  This way, addresses that derive from P2:: can still be reached
+941	   via 6LR1 and then 6LR2.  6LR2 may then leverage ICMP Redirect
+942	   messages [RFC4861] to shorten the path between 6LR1 and the nodes
+943	   that own those addresses.
+
+945	   If P2 was delegated by 6LR1, e.g., using the "Dynamic Host
+946	   Configuration Protocol for IPv6" [RFC8415] (DHCPv6), then the
+947	   expectation is that 6LR1 aggregates P1:: and P2:: in its
+948	   advertisements to the outside, and there is no need to set the R
+949	   flag.  But unless 6LR2 knows about such a situation, e.g., through
+950	   configuration, 6LR2 SHOULD set the R flag requesting 6LR1 to
+951	   advertise P2:: so as to obtain reachability.
+
+953	12.4.  Application to a Hub Link with Stub Spokes
+
+955	   A hub link is a situation where stub links are deployed around a
+956	   backbone and interconnected by routers.  Figure 6 depicts such a
+957	   situation, with one router 6LR1 serving the hub link and at least one
+958	   router like 6LR2 and 6LR3 providing connectivity from the stub links
+959	   to the hub link.  In this example, say that there is one prefix on
+960	   each link, P1:: on the hub link and P2:: and P3:: on the stub links.
+
+962	      +-----+   +-----+   +-----+       +-----+
+963	      |P2::s|   |P2::d|   |P2::e|       |P2::f|
+964	      +--+--+   +--+--+   +--+--+       +--+--+
+965	         |         |         |             |
+966	     ----+----+----+---------+--STUB-LINK--+-----
+967	              |
+968	          +---+---+              +-------+
+969	          | P2::r |              |       |        .- --..
+970	          | 6LR2  |              | 6LR1  +---- .-(       ).
+971	          | P1::b |              | P1::a |   (   Internet  )
+972	          +---+---+              +---+---+  (___._______.___)
+973	              |                      |              |
+974	     -------+-+---------+--HUB-LINK--+-----+--      |
+975	            |           |                  |        |
+976	        +---+---+    +--+--+           +---+---+    |
+977	        | P1::c |    |P1::n|           | P1::q |    |
+978	        | 6LR3  |    +-----+           | 6LR4  +----+
+979	        | P3::m |                      | P3::a |
+980	        +---+---+                      +---+---+
+981	            |                              |
+982	     ----+--+------+---------+--STUB-LINK--+-+-----
+983	         |         |         |               |
+984	      +--+--+   +--+--+   +--+--+         +--+--+
+985	      |P3::h|   |P3::i|   |P3::j|         |P3::k|
+986	      +-----+   +-----+   +-----+         +-----+
+
+988	                          Figure 6: Hub and Stubs
+
+990	   As before, say that 6LR1 is the router providing access to the
+991	   outside, and 6LR2 is aware of 6LR1 as its default gateway.  With this
+992	   specification, 6LR2 registers P2:: to 6LR1 and 6LR1 installs a route
+993	   to P2:: via 6LR2.  This way, nodes on the stub link behind 6LR2 that
+994	   derive their addresses from P2:: can still be reached via 6LR1 and
+995	   then 6LR2.  The same goes for 6LR3 and any other routers serving stub
+996	   links.
+
+998	   If P2 was delegated by 6LR1, then the expectation is that 6LR1
+999	   aggregates P1:: and P2:: in its advertisements to the outside, and
+1000	   there is no need to set the R flag.  But unless 6LR2 knows about such
+1001	   a situation, e.g., through configuration, 6LR2 SHOULD set the R flag
+1002	   requesting 6LR1 to advertise P2:: so as to obtain reachability.
+
+1004	   In this example, routers 6LR3 and 6LR4 both connect to the same stub
+1005	   link where subnet P3 is installed.  They may both register P3 to
+1006	   6LR1, and 6LR1 will apply its own load balancing logic to use either
+1007	   of the routers.
+
+1009	13.  IANA Considerations
+
+1011	   Note to RFC Editor, to be removed: please replace "This RFC"
+1012	   throughout this document by the RFC number for this specification
+1013	   once it is allocated.
+
+1015	   IANA is requested to make changes under the "Internet Control Message
+1016	   Protocol version 6 (ICMPv6) Parameters" [IANA.ICMP] and the "Routing
+1017	   Protocol for Low Power and Lossy Networks (RPL)" [IANA.RPL] registry
+1018	   groupings, as follows:
+
+1020	13.1.  Updated P-Field Registry
+
+1022	   This specification updates the P-Field introduced in [RFC9685] to
+1023	   assign the value of 3, which is the only remaining unassigned value
+1024	   for the 2-bit field.  To that effect, IANA is requested to update the
+1025	   "P-Field values" registry under the heading "Internet Control Message
+1026	   Protocol version 6 (ICMPv6) Parameters" as indicated in Table 2:
+
+1028	             +-------+---------------------------+-----------+
+1029	             | Value | Meaning                   | Reference |
+1030	             +-------+---------------------------+-----------+
+1031	             | *3*   | Registration for a prefix | This RFC  |
+1032	             +-------+---------------------------+-----------+
+
+1034	                         Table 2: New P-Field value
+
+1036	13.2.  New 6LoWPAN Capability Bit
+
+1038	   IANA is requested to make an addition to the "6LoWPAN Capability
+1039	   Bits" [IANA.ICMP.6CIO] registry under the heading "Internet Control
+1040	   Message Protocol version 6 (ICMPv6) Parameters" as indicated in
+1041	   Table 3:
+
+1043	        +------------------+--------------------------+-----------+
+1044	        | Capability Bit   | Meaning                  | Reference |
+1045	        +------------------+--------------------------+-----------+
+1046	        | *16 (suggested)* | F flag: Registration for | This RFC  |
+1047	        |                  | prefixes Supported (F)   |           |
+1048	        +------------------+--------------------------+-----------+
+
+1050	                    Table 3: New 6LoWPAN Capability Bit
+
+1052	14.  Acknowledgments
+
+1054	   Many thanks to Dave Thaler and Dan Romascanu for their early reviews,
+1055	   Adnan Rashid for all his contributions, and Eric Vyncke for his in-
+1056	   depth AD review.  Many thanks as well to the reviewers of the IETF
+1057	   last call and IESG rounds, Shuping Peng, Mohamed Boucadair, Paul
+1058	   Wouters, Ketan Talaulikar, ...
+
+1060	15.  Normative References
+
+1062	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+1063	              Requirement Levels", BCP 14, RFC 2119,
+1064	              DOI 10.17487/RFC2119, March 1997,
+1065	              <https://www.rfc-editor.org/info/rfc2119>.
+
+1067	   [RFC4861]  Narten, T., Nordmark, E., Simpson, W., and H. Soliman,
+1068	              "Neighbor Discovery for IP version 6 (IPv6)", RFC 4861,
+1069	              DOI 10.17487/RFC4861, September 2007,
+1070	              <https://www.rfc-editor.org/info/rfc4861>.
+
+1072	   [RFC4862]  Thomson, S., Narten, T., and T. Jinmei, "IPv6 Stateless
+1073	              Address Autoconfiguration", RFC 4862,
+1074	              DOI 10.17487/RFC4862, September 2007,
+1075	              <https://www.rfc-editor.org/info/rfc4862>.
+
+1077	   [RFC6550]  Winter, T., Ed., Thubert, P., Ed., Brandt, A., Hui, J.,
+1078	              Kelsey, R., Levis, P., Pister, K., Struik, R., Vasseur,
+1079	              JP., and R. Alexander, "RPL: IPv6 Routing Protocol for
+1080	              Low-Power and Lossy Networks", RFC 6550,
+1081	              DOI 10.17487/RFC6550, March 2012,
+1082	              <https://www.rfc-editor.org/info/rfc6550>.
+
+1084	   [RFC6775]  Shelby, Z., Ed., Chakrabarti, S., Nordmark, E., and C.
+1085	              Bormann, "Neighbor Discovery Optimization for IPv6 over
+1086	              Low-Power Wireless Personal Area Networks (6LoWPANs)",
+1087	              RFC 6775, DOI 10.17487/RFC6775, November 2012,
+1088	              <https://www.rfc-editor.org/info/rfc6775>.
+
+1090	   [RFC7400]  Bormann, C., "6LoWPAN-GHC: Generic Header Compression for
+1091	              IPv6 over Low-Power Wireless Personal Area Networks
+1092	              (6LoWPANs)", RFC 7400, DOI 10.17487/RFC7400, November
+1093	              2014, <https://www.rfc-editor.org/info/rfc7400>.
+
+1095	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+1096	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+1097	              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+1099	   [RFC8200]  Deering, S. and R. Hinden, "Internet Protocol, Version 6
+1100	              (IPv6) Specification", STD 86, RFC 8200,
+1101	              DOI 10.17487/RFC8200, July 2017,
+1102	              <https://www.rfc-editor.org/info/rfc8200>.
+
+1104	   [RFC8505]  Thubert, P., Ed., Nordmark, E., Chakrabarti, S., and C.
+1105	              Perkins, "Registration Extensions for IPv6 over Low-Power
+1106	              Wireless Personal Area Network (6LoWPAN) Neighbor
+1107	              Discovery", RFC 8505, DOI 10.17487/RFC8505, November 2018,
+1108	              <https://www.rfc-editor.org/info/rfc8505>.
+
+1110	   [RFC8928]  Thubert, P., Ed., Sarikaya, B., Sethi, M., and R. Struik,
+1111	              "Address-Protected Neighbor Discovery for Low-Power and
+1112	              Lossy Networks", RFC 8928, DOI 10.17487/RFC8928, November
+1113	              2020, <https://www.rfc-editor.org/info/rfc8928>.
+
+1115	   [RFC8929]  Thubert, P., Ed., Perkins, C.E., and E. Levy-Abegnoli,
+1116	              "IPv6 Backbone Router", RFC 8929, DOI 10.17487/RFC8929,
+1117	              November 2020, <https://www.rfc-editor.org/info/rfc8929>.
+
+1119	   [RFC9010]  Thubert, P., Ed. and M. Richardson, "Routing for RPL
+1120	              (Routing Protocol for Low-Power and Lossy Networks)
+1121	              Leaves", RFC 9010, DOI 10.17487/RFC9010, April 2021,
+1122	              <https://www.rfc-editor.org/info/rfc9010>.
+
+1124	   [RFC9685]  Thubert, P., Ed., "Listener Subscription for IPv6 Neighbor
+1125	              Discovery Multicast and Anycast Addresses", RFC 9685,
+1126	              DOI 10.17487/RFC9685, November 2024,
+1127	              <https://www.rfc-editor.org/info/rfc9685>.
+
+1129	   [IANA.ICMP]
+1130	              IANA, "IANA Registry for ICMPv6", IANA,
+1131	              https://www.iana.org/assignments/icmpv6-parameters/
+1132	              icmpv6-parameters.xhtml.
+
+1134	   [IANA.ICMP.6CIO]
+1135	              IANA, "IANA Registry for the 6LoWPAN Capability Bits",
+1136	              IANA, https://www.iana.org/assignments/icmpv6-parameters/
+1137	              icmpv6-parameters.xhtml#sixlowpan-capability-bits.
+
+1139	   [IANA.RPL] IANA, "IANA Registry for the RPL",
+1140	              IANA, https://www.iana.org/assignments/rpl/rpl.xhtml.
+
+1142	16.  Informative References
+
+1144	   [BCP38]    Ferguson, P. and D. Senie, "Network Ingress Filtering:
+1145	              Defeating Denial of Service Attacks which employ IP Source
+1146	              Address Spoofing", BCP 38, RFC 2827, DOI 10.17487/RFC2827,
+1147	              May 2000, <https://www.rfc-editor.org/info/rfc2827>.
+
+1149	   [RFC4191]  Draves, R. and D. Thaler, "Default Router Preferences and
+1150	              More-Specific Routes", RFC 4191, DOI 10.17487/RFC4191,
+1151	              November 2005, <https://www.rfc-editor.org/info/rfc4191>.
+
+1153	   [RFC4919]  Kushalnagar, N., Montenegro, G., and C. Schumacher, "IPv6
+1154	              over Low-Power Wireless Personal Area Networks (6LoWPANs):
+1155	              Overview, Assumptions, Problem Statement, and Goals",
+1156	              RFC 4919, DOI 10.17487/RFC4919, August 2007,
+1157	              <https://www.rfc-editor.org/info/rfc4919>.
+
+1159	   [RFC6282]  Hui, J., Ed. and P. Thubert, "Compression Format for IPv6
+1160	              Datagrams over IEEE 802.15.4-Based Networks", RFC 6282,
+1161	              DOI 10.17487/RFC6282, September 2011,
+1162	              <https://www.rfc-editor.org/info/rfc6282>.
+
+1164	   [RFC9008]  Robles, M.I., Richardson, M., and P. Thubert, "Using RPI
+1165	              Option Type, Routing Header for Source Routes, and IPv6-
+1166	              in-IPv6 Encapsulation in the RPL Data Plane", RFC 9008,
+1167	              DOI 10.17487/RFC9008, April 2021,
+1168	              <https://www.rfc-editor.org/info/rfc9008>.
+
+1170	   [RFC8415]  Mrugalski, T., Siodelski, M., Volz, B., Yourtchenko, A.,
+1171	              Richardson, M., Jiang, S., Lemon, T., and T. Winters,
+1172	              "Dynamic Host Configuration Protocol for IPv6 (DHCPv6)",
+1173	              RFC 8415, DOI 10.17487/RFC8415, November 2018,
+1174	              <https://www.rfc-editor.org/info/rfc8415>.
+
+1176	   [RFC9030]  Thubert, P., Ed., "An Architecture for IPv6 over the Time-
+1177	              Slotted Channel Hopping Mode of IEEE 802.15.4 (6TiSCH)",
+1178	              RFC 9030, DOI 10.17487/RFC9030, May 2021,
+1179	              <https://www.rfc-editor.org/info/rfc9030>.
+
+1181	   [I-D.kuehlewind-update-tag]
+1182	              Kühlewind, M. and S. Krishnan, "Definition of new tags for
+1183	              relations between RFCs", Work in Progress, Internet-Draft,
+1184	              draft-kuehlewind-update-tag-04, 12 July 2021,
+1185	              <https://datatracker.ietf.org/doc/html/draft-kuehlewind-
+1186	              update-tag-04>.
+
+1188	   [I-D.ietf-6man-ipv6-over-wireless]
+1189	              Thubert, P. and M. Richardson, "Architecture and Framework
+1190	              for IPv6 over Non-Broadcast Access", Work in Progress,
+1191	              Internet-Draft, draft-ietf-6man-ipv6-over-wireless-08, 19
+1192	              May 2025, <https://datatracker.ietf.org/doc/html/draft-
+1193	              ietf-6man-ipv6-over-wireless-08>.
+
+1195	   [IEEE802154]
+1196	              IEEE standard for Information Technology, "IEEE Std
+1197	              802.15.4, Part. 15.4: Wireless Medium Access Control (MAC)
+1198	              and Physical Layer (PHY) Specifications for Low-Rate
+1199	              Wireless Personal Area Networks".
+
+1201	   [IEEE80211]
+1202	              IEEE standard for Information Technology, "IEEE Standard
+1203	              802.11 - IEEE Standard for Information Technology -
+1204	              Telecommunications and information exchange between
+1205	              systems Local and metropolitan area networks - Specific
+1206	              requirements - Part 11: Wireless LAN Medium Access Control
+1207	              (MAC) and Physical Layer (PHY) Specifications.",
+1208	              <https://ieeexplore.ieee.org/document/9363693>.
+
+1210	   [WI-SUN]   "Wi-SUN Alliance", <https://wi-sun.org/>.
+
+1212	   [IEEE802151]
+1213	              IEEE standard for Information Technology, "IEEE Standard
+1214	              for Information Technology - Telecommunications and
+1215	              Information Exchange Between Systems - Local and
+1216	              Metropolitan Area Networks - Specific Requirements. - Part
+1217	              15.1: Wireless Medium Access Control (MAC) and Physical
+1218	              Layer (PHY) Specifications for Wireless Personal Area
+1219	              Networks (WPANs)".
+
+1221	Author's Address
+
+1223	   Pascal Thubert (editor)
+1224	   06330 Roquefort-les-Pins
+1225	   France
+1226	   Email: pascal.thubert@gmail.com
+
+
+
+
+
+
+
+
+
