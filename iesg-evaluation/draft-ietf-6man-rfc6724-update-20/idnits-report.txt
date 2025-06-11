@@ -1,0 +1,966 @@
+idnits 2.17.1 
+
+draft-ietf-6man-rfc6724-update-20.txt:
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     No nits found.
+--------------------------------------------------------------------------------
+
+
+2	6MAN                                                         N. Buraglio
+3	Internet-Draft                                   Energy Sciences Network
+4	Updates: 6724 (if approved)                                     T. Chown
+5	Intended status: Standards Track                                    Jisc
+6	Expires: 14 November 2025                                      J. Duncan
+7	                                                        Tachyon Dynamics
+8	                                                             13 May 2025
+
+10	  Prioritizing known-local IPv6 ULAs through address selection policy
+11	                   draft-ietf-6man-rfc6724-update-20
+
+13	Abstract
+
+15	   This document draws on several years of operational experience to
+16	   update the recommended process of Default Address Selection for
+17	   Internet Protocol Version 6 (IPv6) defined in RFC6724, defining the
+18	   concept of "known-local" Unique Local Address (ULA) prefixes that
+19	   enable ULA-to-ULA communications within fd00::/8 to become preferred
+20	   over both IPv4-IPv4 and GUA-to-GUA (Global Unicast Addresses) for
+21	   local use.  The document defines the means by which nodes can both
+22	   identify and insert such prefixes into their address selection policy
+23	   table.  It also clarifies the mandatory, unconditional requirement
+24	   for support for Rule 5.5 defined in Section 5 of RFC6724 and demotes
+25	   the preference for 6to4 addresses.  These changes to default behavior
+26	   improve supportability of common use cases, including automatic /
+27	   unmanaged scenarios, and makes preference for IPv6 over IPv4
+28	   consistent in local site networks for both ULA and GUA prefixes.  It
+29	   is recognized that some less common deployment scenarios may require
+30	   explicit configuration or custom changes to achieve desired
+31	   operational parameters.
+
+33	Status of This Memo
+
+35	   This Internet-Draft is submitted in full conformance with the
+36	   provisions of BCP 78 and BCP 79.
+
+38	   Internet-Drafts are working documents of the Internet Engineering
+39	   Task Force (IETF).  Note that other groups may also distribute
+40	   working documents as Internet-Drafts.  The list of current Internet-
+41	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+43	   Internet-Drafts are draft documents valid for a maximum of six months
+44	   and may be updated, replaced, or obsoleted by other documents at any
+45	   time.  It is inappropriate to use Internet-Drafts as reference
+46	   material or to cite them other than as "work in progress."
+
+48	   This Internet-Draft will expire on 14 November 2025.
+
+50	Copyright Notice
+
+52	   Copyright (c) 2025 IETF Trust and the persons identified as the
+53	   document authors.  All rights reserved.
+
+55	   This document is subject to BCP 78 and the IETF Trust's Legal
+56	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+57	   license-info) in effect on the date of publication of this document.
+58	   Please review these documents carefully, as they describe your rights
+59	   and restrictions with respect to this document.  Code Components
+60	   extracted from this document must include Revised BSD License text as
+61	   described in Section 4.e of the Trust Legal Provisions and are
+62	   provided without warranty as described in the Revised BSD License.
+
+64	Table of Contents
+
+66	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
+67	   2.  Terminology . . . . . . . . . . . . . . . . . . . . . . . . .   4
+68	   3.  Operational Issues Regarding Preference for IPv4 addresses over
+69	           ULAs  . . . . . . . . . . . . . . . . . . . . . . . . . .   4
+70	   4.  Preference of 6to4 addresses  . . . . . . . . . . . . . . . .   6
+71	   5.  Adjustments to RFC 6724 . . . . . . . . . . . . . . . . . . .   7
+72	     5.1.  Policy Table Update . . . . . . . . . . . . . . . . . . .   7
+73	     5.2.  Rule 5.5  . . . . . . . . . . . . . . . . . . . . . . . .   7
+74	     5.3.  Automatic insertion of known-local ULA prefixes into the
+75	           policy table  . . . . . . . . . . . . . . . . . . . . . .   8
+76	   6.  Configuration of the default policy table . . . . . . . . . .  10
+77	   7.  Intended behaviors  . . . . . . . . . . . . . . . . . . . . .  10
+78	     7.1.  GUA-GUA preferred over IPv4-IPv4  . . . . . . . . . . . .  11
+79	     7.2.  GUA-GUA preferred over ULA-ULA  . . . . . . . . . . . . .  11
+80	     7.3.  Known-local ULA - Known-local ULA preferred over
+81	           GUA-GUA . . . . . . . . . . . . . . . . . . . . . . . . .  11
+82	     7.4.  Known-local ULA-ULA preferred over IPv4-IPv4  . . . . . .  12
+83	     7.5.  IPv4-IPv4 preferred over ULA-GUA  . . . . . . . . . . . .  12
+84	   8.  Discussion of ULA source with GUA or remote ULA
+85	           destination . . . . . . . . . . . . . . . . . . . . . . .  12
+86	     8.1.  The ULA Label and its Precedence  . . . . . . . . . . . .  13
+87	     8.2.  Happy Eyeballs  . . . . . . . . . . . . . . . . . . . . .  14
+88	     8.3.  Try the Next Address  . . . . . . . . . . . . . . . . . .  14
+89	   9.  Following ULA operational guidelines in RFC4193 . . . . . . .  15
+90	     9.1.  Filtering ULA-source addresses at site borders  . . . . .  15
+91	     9.2.  Avoid using ULA addresses in the global DNS . . . . . . .  15
+92	   10. The practicalities of implementing address selection
+93	           support . . . . . . . . . . . . . . . . . . . . . . . . .  16
+94	   11. Limitations of RFC6724  . . . . . . . . . . . . . . . . . . .  16
+95	   12. Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  17
+96	   13. Implementation Status . . . . . . . . . . . . . . . . . . . .  17
+97	   14. Security Considerations . . . . . . . . . . . . . . . . . . .  17
+98	   15. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  18
+99	   16. Summary of changes and additional text since RFC6724  . . . .  18
+100	   17. References  . . . . . . . . . . . . . . . . . . . . . . . . .  18
+101	     17.1.  Normative References . . . . . . . . . . . . . . . . . .  18
+102	     17.2.  Informative References . . . . . . . . . . . . . . . . .  19
+103	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  20
+
+105	1.  Introduction
+
+107	   Since its publication in 2012, Default Address Selection for Internet
+108	   Protocol Version 6 (IPv6) [RFC6724] has become an important mechanism
+109	   by which nodes can perform address selection, deriving the most
+110	   appropriate source and destination address pair to use from a
+111	   candidate set by following the procedures defined in the RFC.  Part
+112	   of the process involves the use of a policy table, where the
+113	   precedence and labels for address prefixes are listed, and for which
+114	   a default policy table is defined.
+
+116	   It was always expected that the default policy table may need to be
+117	   changed based on operational experience; section 2.1 says "It is
+118	   important that implementations provide a way to change the default
+119	   policies as more experience is gained" and points to the examples in
+120	   Section 10, which include Section 10.6 where a ULA example is
+121	   presented.
+
+123	   This document is written on the basis of such operational experience,
+124	   in particular for scenarios where ULAs are used for their intended
+125	   purpose as stated in [RFC4193], i.e., they are designed to be routed
+126	   within a local site and by default not advertised, used or received
+127	   from external locations to that site.  The document defines how
+128	   preference for ULAs may be elevated for appropriate, common
+129	   scenarios.
+
+131	   To support the preference to use ULA address pairs over both IPv4 and
+132	   GUA address pairs for local intra-site scenarios, the concept of a
+133	   "known-local" ULA address is introduced.  This document describes the
+134	   means for nodes to determine ULA prefixes that are known to be local
+135	   to the site they are operating in and to insert those prefixes into
+136	   their policy table with a label that differs from general ULA
+137	   prefixes.  This capability allows nodes to prefer ULA-ULA
+138	   communication locally, but still use GUA-GUA address pairs for
+139	   external communication, and importantly avoid selecting a ULA source
+140	   to talk to a non-local ULA destination.
+
+142	   This document also reinforces the text in Section 5 of RFC6724 to
+143	   require support for Rule 5.5.
+
+145	   RFC4193 defines ULAs within fc00::/7, where the L bit, as detailed in
+146	   Section 3.1, is set to 1 for locally assigned (generated) prefixes,
+147	   with L=0 as yet undefined.  The use of known-locals as described in
+148	   this document therefore applies to the currently used ULA prefixes
+149	   under fd00::/8, where the prefixes conform to the definition in
+150	   Section 3.1 of [RFC4193].
+
+152	   The overall goal of this update is to improve behavior for common
+153	   scenarios, and to assist in the phasing out of use of IPv4, while
+154	   noting that some specific scenarios may still require explicit
+155	   configuration.
+
+157	   An IPv6 deployment, whether enterprise, residential or other, may use
+158	   combinations of IPv6 GUAs, IPv6 ULAs, IPv4 globals, IPv4 RFC1918
+159	   addresses, and may or may not use some form of NAT.  However, this
+160	   document makes no comment or recommendation on how ULAs are used, or
+161	   on the use of NAT in an IPv6 network.
+
+163	2.  Terminology
+
+165	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+166	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+167	   "OPTIONAL" in this document are to be interpreted as described in
+168	   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+169	   capitals, as shown here.
+
+171	   GUA: Global Unicast Addresses as defined in [RFC3587]
+
+173	   ULA: Unique Local Addresses as defined in [RFC4193]
+
+175	   Known-local ULA: A ULA prefix that an individual organization/site
+176	   has determined to be local to a given node/network
+
+178	   RA: IPv6 Router Advertisement as defined in [RFC4861]
+
+180	   PIO: IPv6 Prefix Information Option as defined in [RFC4861]
+
+182	   SLAAC: IPv6 Stateless Address Auto-configuration [RFC4862]
+
+184	3.  Operational Issues Regarding Preference for IPv4 addresses over ULAs
+
+186	   With multi-addressing being the norm for IPv6, more so where nodes
+187	   are dual-stack, the ability for a node to pick an appropriate address
+188	   pair for communication is very important.
+
+190	   Where getaddrinfo() as referenced in [RFC3493], or a comparable API
+191	   is used, the sorting behavior should take into account both the
+192	   source addresses of the requesting node as well as the destination
+193	   addresses returned, and sort the candidate address pairs following
+194	   the procedures defined in RFC6724.
+
+196	   The current default policy table leads to preference for use of IPv6
+197	   GUAs over IPv4 globals, which is widely considered preferential
+198	   behavior to support greater use of IPv6 in dual-stack environments.
+199	   This helps in allowing sites to phase out IPv4 as its evidenced use
+200	   becomes ever lower.
+
+202	   However, there are two issues with preference, or rather non-
+203	   preference, for ULAs as originally defined in RFC6724.
+
+205	   One is that the same default policy table also puts IPv6 ULAs below
+206	   all IPv4 addresses, including [RFC1918] addresses, such that
+207	   IPv4-IPv4 address pairs are favored over ULA-ULA address pairs.  For
+208	   many site operators this behavior will be counter-intuitive, given
+209	   the IPv6 GUA preference, and may create difficulties with respect to
+210	   planning, operational, and security implications for environments
+211	   where ULA addresses are used in IPv4/IPv6 dual-stack network
+212	   scenarios.  The expected default prioritization of known-local IPv6
+213	   traffic over IPv4 by default, as happens with IPv6 GUA addresses,
+214	   does not happen for ULAs.
+
+216	   As a result, the use of ULAs is not a viable option for dual-stack
+217	   networking transition planning, large scale network modeling, network
+218	   lab environments or other modes of large scale networking that run
+219	   both IPv4 and IPv6 concurrently with the expectation that IPv6 will
+220	   be preferred by default.  Local preference of ULAs over IPv4 is thus
+221	   important to assist operators in phasing out IPv4 from dual-stack
+222	   environments and is an important enabler for sites seeking to move
+223	   from dual-stack to IPv6-only networking.
+
+225	   The other issue is that where nodes in a dual-stack site are
+226	   addressed from both ULA and GUA prefixes, RFC6724 will see GUA-GUA
+227	   address pairs chosen over ULA-ULA.  One goal of ULA addresses was to
+228	   allow local communications to be independent of the availability of
+229	   external connectivity and addresses, such that persistent ULAs can be
+230	   used even when the global prefix made available to a site is
+231	   withdrawn or changes.
+
+233	   This document therefore introduces two changes to RFC6724 to support
+234	   a node implementing elevated or differential preference for known-
+235	   local ULAs, i.e., ULAs within a common local network, over both IPv4
+236	   and IPv6 GUAs.
+
+238	   The first change is an update to the default policy table to elevate
+239	   the preference for ULAs prefixes such that ULAs, like GUAs, carry a
+240	   higher precedence than all IPv4 addresses, making IPv6 precedence
+241	   over IPv4 consistent for both ULAs and GUAs.
+
+243	   The second change is the introduction of the concept of known-local
+244	   ULAs.  RFC6724 includes a method by which nodes MAY provide more
+245	   fine-grained support for further elevating the preference for
+246	   specific ULA prefixes, while leaving other general ULA prefixes at
+247	   the precedence described in the previous paragraph.  This document
+248	   elevates the requirement for specific ULA prefixes to be inserted
+249	   into the policy table to be a MUST, but only for observed prefixes
+250	   that are known to be local, i.e., known-local ULAs.  Nodes
+251	   implementing this behavior will see ULA prefixes known to be local to
+252	   the node's site having precedence over IPv4 addresses and also over
+253	   IPv6 GUA addresses, such that they can use ULA addresses
+254	   independently of global prefixes within their site and continue to
+255	   use GUA-GUA address pairs to talk to destinations external to their
+256	   site.
+
+258	   These changes aim to improve the default handling of address
+259	   selection for common cases, and unmanaged / automatic scenarios
+260	   rather than those where DHCPv6 is deployed.  The changes are
+261	   discussed in more detail in the following sections, with a further
+262	   section providing a summary of the proposed updates.
+
+264	4.  Preference of 6to4 addresses
+
+266	   The anycast prefix for 6to4 relays was formally deprecated by
+267	   [RFC7526] in 2015, and since that time the use of 6to4 addresses has
+268	   further declined, with very little evidence of its use on the public
+269	   internet.  Note that RFC7526 does not deprecate the 6to4 IPv6 prefix
+270	   2002::/16, it only deprecates the 6to4 Relay IPv4 prefix.
+
+272	   This document therefore demotes the precedence of the 6to4 prefix in
+273	   the policy table to the same precedence as carried by the Teredo
+274	   prefix.  Leaving this entry in the default table will cause no
+275	   problems and will help if any deployments still exist, and ensure
+276	   6to4 prefixes are differentiated from general GUAs.
+
+278	   The discussion regarding the adding of 6to4 site prefixes in section
+279	   10.7 of RFC6724 remains valid.
+
+281	5.  Adjustments to RFC 6724
+
+283	   This document makes three specific changes to RFC6724: first to
+284	   update the default policy table, second to change Rule 5.5 on
+285	   preferring addresses in a prefix advertised by the next-hop to a
+286	   MUST, and third to require that nodes MUST insert observed known-
+287	   local ULA prefixes into their policy table.
+
+289	5.1.  Policy Table Update
+
+291	   This update alters the default policy table listed in Rule 2.1 of RFC
+292	   6724.
+
+294	   It should be noted the order of rows in the policy table is of no
+295	   consequence and only the precedence value is relevant.
+
+297	   The table below reflects the current RFC6724 state on the left, and
+298	   the updated state defined by this RFC on the right:
+
+300	                    RFC6724                               Updated
+301	Prefix       Precedence Label        Prefix        Precedence Label
+302	::1/128              50     0        ::1/128               50     0
+303	                                     $known_local/48       45    14 (**)
+304	::/0                 40     1        ::/0                  40     1
+305	::ffff:0:0/96        35     4        ::ffff:0:0/96         20     4 (*)
+306	2002::/16            30     2        2002::/16              5     2 (*)
+307	2001::/32             5     5        2001::/32              5     5
+308	fc00::/7              3    13        fc00::/7              30    13 (*)
+309	::/96                 1     3        ::/96                  1     3
+310	fec0::/10             1    11        fec0::/10              1    11
+311	3ffe::/16             1    12        3ffe::/16              1    12
+
+313	(*) value(s) changed in update
+314	(**) $known_local = the ULA Known-Local /48 IPv6 prefix(es) (if any)
+315	with precedence and labels per the rules in Sec 5.3
+
+317	   The update moves 2002::/16 to de-preference its status in line with
+318	   [RFC7526] and moves the precedence of fc00::/7 above legacy IPv4,
+319	   with ::ffff:0:0/96 now set to precedence 20.
+
+321	5.2.  Rule 5.5
+
+323	   The heuristic for address selection defined in Rule 5.5 of Section 5
+324	   of RFC6724 to prefer addresses in a prefix advertised by a next-hop
+325	   router has proven to be very useful.
+
+327	   The text in RFC6724 states that the Rules MUST be followed in order,
+328	   but also includes a discussion note under Rule 5.5 that says that an
+329	   IPv6 implementation is not required to remember which next-hops
+330	   advertised which prefixes and thus that Rule 5.5 is only applicable
+331	   to implementations that track this information.
+
+333	   This document removes that exception and elevates the requirement to
+334	   prefer addresses in a prefix advertised by a next-hop router to a
+335	   MUST for all nodes.
+
+337	   This change means that an IPv6 implementation will need to remember
+338	   which next-hops advertised which prefixes [RFC8028], despite the
+339	   conceptual models of IPv6 hosts in Section 5 of [RFC4861] and
+340	   Section 3 of [RFC4191] having no such requirement.
+
+342	5.3.  Automatic insertion of known-local ULA prefixes into the policy
+343	      table
+
+345	   Section 2.1 of RFC6724 states that "an implementation MAY
+346	   automatically add additional site-specific rows to the default table
+347	   based on its configured addresses, such as for Unique Local Addresses
+348	   (ULAs)", but it provides no detail on how such behavior might be
+349	   implemented.
+
+351	   If a node can determine which ULA prefix(es) are known to be local,
+352	   it can provide differential treatment for those over general ULAs,
+353	   and insert these into the policy table at a higher precedence than
+354	   GUAs while keeping all general ULA prefixes to a lower precedence.
+
+356	   This document thus elevates the MAY requirement above for insertion
+357	   to a MUST for the specific case of known-local ULAs.
+
+359	   These known-local ULA prefixes are inferred from ULA addresses
+360	   assigned to interfaces or learned from Prefix Information Options
+361	   (PIOs) in Router Advertisements (RAs) [RFC4861] received on any
+362	   interface regardless of how the PIO flags are set.  Further, they are
+363	   learned from Route Information Options (RIOs) in RAs received on any
+364	   interface by Type C hosts that process RIOs, as defined in [RFC4191].
+
+366	   Section 3.1 of RFC4193 only defines ULA prefixes where the L-bit is
+367	   set to 1, i.e., prefixes under fd00::/8 where the prefix is locally
+368	   assigned or generated.  The use of ULAs where L=0, i.e., prefixes
+369	   under fc00::/8, is currently undefined.
+
+371	   The following rules define how the learnt known-local ULA prefixes
+372	   under fd00::/8 are inserted into the address selection policy table
+373	   for a node, through a conceptual list of known-local prefixes.
+
+375	   1.  Any RIO or PIO that is delivered in an RA in which the "SNAC
+376	       Router" RA header flag bit [SNACBIT] is set MUST be ignored when
+377	       considering the following rules.
+
+379	   2.  RIOs from within fd00::/8 are considered the preferred
+380	       information source for determining known-local ULAs and should
+381	       override other conflicting information or assumptions from other
+382	       sources, including PIOs.
+
+384	   3.  RIOs within fd00::/8 that are of length /40 or longer MUST be
+385	       added to the known-local ULA list.  RIOs for shorter prefixes
+386	       MUST NOT be used to insert known-local ULA entries in the address
+387	       selection policy table
+
+389	   4.  PIOs received within fd00::/8 that are not already in the node's
+390	       known-local ULA list MUST be added to the list with an assumed
+391	       prefix length of /48, regardless of how the PIO flags are set.
+
+393	   5.  ULA interface addresses from within fd00::/8, particularly ones
+394	       not created by SLAAC, and not already covered by the known-local
+395	       ULA list MUST be added to the list with an assumed prefix length
+396	       of /48.  However, as with rule 1, if the ULA interface address
+397	       was generated on the basis of a PIO that has only been seen in
+398	       RAs in which the SNAC router flag bit is set, this ULA prefix
+399	       MUST NOT be used as described in this rule (rule 5).
+
+401	   6.  When inserting known-local ULA entries into the policy table,
+402	       they MUST have a label of 14 (rather than the default ULA label
+403	       of 13) and a precedence of 45.
+
+405	   7.  Entries MUST be removed from the known-local ULA list and the
+406	       Policy Table when the announced RIOs or PIOs are deprecated, or
+407	       an interface address is removed, and there is no covering RIO or
+408	       PIO.
+
+410	   When support is added for the insertion of known-local ULA prefixes
+411	   into the current policy table it MUST default to on, but a mechanism
+412	   SHOULD be supported to administratively toggle the behavior off and
+413	   on.
+
+415	   Tools that display a node's current policy table MUST show all
+416	   currently inserted known-local ULA prefixes.
+
+418	   The identification and insertion of known-local prefixes under
+419	   fc00::/8 is currently not defined.
+
+421	   Note that a practical limit exists on the number of RIOs and PIOs
+422	   that can be placed into a single RA.  Therefore, there is a practical
+423	   limit to the number of known-local ULAs that can be expressed on a
+424	   single network and the number of ULA prefixes that can automatically
+425	   be preferred over IPv4 and GUA prefixes within the policy table.
+426	   This limit is unlikely to impact most networks, especially
+427	   residential and other small unmanaged networks that automatically
+428	   generate ULA prefixes.
+
+430	   Section 4 of RFC4191 says "Routers SHOULD NOT send more than 17 Route
+431	   Information Options in Router Advertisements per link.  This
+432	   arbitrary bound is meant to reinforce that relatively few and
+433	   carefully selected routes should be advertised to hosts."  The exact
+434	   limit will depend on other Options that are used.  So while this is
+435	   not the practical limit discussed above, operators MUST take extra
+436	   care not to cause the RA size to exceed the MTU when filling the RA
+437	   with RA Options when exceeding this limit.
+
+439	   Note that in the case of Rule 2 above it would be expected that ULA
+440	   prefixes being included in the known-local prefix list be compliant
+441	   with Section 3 of RFC4193 (i.e., /48 in size) but the above rule is
+442	   pragmatic in that it allows the use of ULA prefixes from /48 to /40
+443	   in length.  Most networks use ("are expected to use") /48 prefixes as
+444	   per RFC4193.  However, it is possible that in some circumstances a
+445	   larger managed enterprise may wish to use a shorter prefix (e.g., to
+446	   simplify management, filtering rules, etc, and to overcome the issue
+447	   with the number of RIOs an RA can carry as described in the above
+448	   paragraph).  However, such non-compliant use of ULAs may be
+449	   problematic in other ways, e.g., carrying an increased risk of
+450	   collision with other ULA prefixes, where you might be using someone
+451	   else's compliant prefix because shorter prefixes have a lower chance
+452	   to be globally unique.
+
+454	6.  Configuration of the default policy table
+
+456	   As stated in Section 2.1 of RFC6724 "IPv6 implementations SHOULD
+457	   support configurable address selection via a mechanism at least as
+458	   powerful as the policy tables defined here".
+
+460	   Based on operational experience to date, it is important that node
+461	   policy tables can be changed once deployed to support future emerging
+462	   use cases.  This update thus re-states the importance of such
+463	   configurability.
+
+465	7.  Intended behaviors
+
+467	   In this section we review the intended default behaviors after this
+468	   update is applied.
+
+470	7.1.  GUA-GUA preferred over IPv4-IPv4
+
+472	   This is the current behavior, and remains unaltered.  The rationale
+473	   is to promote use of IPv6 GUAs in dual-stack environments.
+
+475	7.2.  GUA-GUA preferred over ULA-ULA
+
+477	   This is the current behavior, and remains unaltered for the general
+478	   case.
+
+480	   However, where a ULA prefix is determined to be local, and added as a
+481	   known-local ULA prefix to a node's address selection policy table,
+482	   communications to addresses in other known-local ULA prefixes will
+483	   prefer ULA-ULA address pairs to GUA-GUA (matching label, higher
+484	   precedence).
+
+486	7.3.  Known-local ULA - Known-local ULA preferred over GUA-GUA
+
+488	   As described in the previous case, this document elevates preference
+489	   for use of ULAs over GUAs in cases where the ULA prefix(es) in use
+490	   can be determined to be local to a site or organization.
+
+492	   By only adapting this behavior for known-local ULAs, a node will not
+493	   select a ULA source to talk to a non-local ULA destination and will
+494	   instead correctly use GUA-GUA.
+
+496	   Nodes not yet implementing this RFC will continue to use GUA-GUA over
+497	   ULA-ULA for all cases.
+
+499	   As an example, consider a site that uses prefixes ULA1::/48,
+500	   ULA2::/48 and GUA1::/48.
+
+502	   Host A has address ULA1::1 and GUA1:1::1 Host B has address ULA2::1
+503	   and GUA1:2::1
+
+505	   Both ULA prefixes have been determined to be known-local through
+506	   RIOs.  Perhaps ULA2 is reachable within the site, but its prefix is
+507	   not in direct use at host A.
+
+509	   If host A sends to host B the candidate pairs are ULA1::1 - ULA2::1
+510	   and GUA1::1::1 - GUA1:2::1.
+
+512	   In this case ULA1::1 - ULA2::1 wins because of matching labels (both
+513	   14) and higher precedence than GUA (45 vs 40).
+
+515	   If host A were to send to a host C with addresses ULA3::1 (where
+516	   ULA3::/48 has not been learned to be a known-local prefix) and
+517	   GUA2:1::1, host A would use the GUA address pair for the
+518	   communication as the GUAs have matching labels (both 1) where the
+519	   known-local ULA and general ULA do not (14 and 13 respectively).
+
+521	7.4.  Known-local ULA-ULA preferred over IPv4-IPv4
+
+523	   This update changes previous behavior for this case.  RFC6724 as
+524	   originally defined would lead to IPv4 being preferred over ULAs,
+525	   which is contrary to the spirit of the IPv6 GUA preference over IPv4,
+526	   and to the goal of removing evidenced use of IPv4 in a dual-stack
+527	   site before transitioning to IPv6-only.
+
+529	   This document elevates the precedence of known-local ULAs above IPv4,
+530	   so known-local ULA-ULA address pairs will be chosen over IPv4-IPv4
+531	   pairs (matching label, higher precedence).
+
+533	7.5.  IPv4-IPv4 preferred over ULA-GUA
+
+535	   An IPv6 ULA address will only be preferred over an IPv4 address if
+536	   both IPv6 ULA source and destination addresses are available.  With
+537	   Rule 5 of Section 6 of RFC6724 and the ULA-specific label added in
+538	   [RFC6724] (which was not present in [RFC3484]) an IPv4 source and
+539	   destination will be preferred over an IPv6 ULA source and an IPv6 GUA
+540	   destination address, even though generally known-local IPv6 ULA
+541	   addresses are preferred over IPv4 in the policy table as proposed in
+542	   this update.  The IPv4 matching label trumps ULA-GUA.
+
+544	8.  Discussion of ULA source with GUA or remote ULA destination
+
+546	   In this section we present a discussion on the scenarios where a ULA
+547	   source may be communicating with a GUA or ULA destination.
+
+549	   A potential problem exists when a ULA source attempts to communicate
+550	   with GUA or remote ULA destinations.  In these scenarios, the ULA
+551	   source as stated earlier is by default intended for communication
+552	   only with the local network, meaning an individual site, several
+553	   sites that are part of the same organization, or multiple sites
+554	   across cooperating organizations, as detailed in [RFC4193].  As a
+555	   result, most GUA and ULA destinations are not attached to the same
+556	   local network as the ULA source and are, therefore, not reachable
+557	   from the ULA source.
+
+559	   Scenario 1: ULA source and GUA destination
+560	   When only a ULA source is available for communication with GUA
+561	   destinations, this generally implies no connectivity to the IPv6
+562	   Internet is available.  Otherwise, a GUA source would have been made
+563	   available and selected for use with GUA destinations.  As a result,
+564	   the ULA source will typically fail when it attempts to communicate
+565	   with most GUA destinations.  However, corner cases exist where the
+566	   ULA source will not fail, such as when GUA destinations are attached
+567	   to the same local network as the ULA source.
+
+569	   Scenario 2: ULA source and remote ULA destination
+
+571	   Receiving a DNS response for a ULA destination that is not attached
+572	   to the local network, in other words, a remote ULA destination, is
+573	   considered a misconfiguration in most cases, or at least this
+574	   contradicts the operational guidelines provided in Section 4.4 of
+575	   RFC4193.  Nevertheless, this can occur, and the ULA source will
+576	   typically fail when it attempts to communicate with ULA destinations
+577	   that are not attached to the same local network as the ULA source.
+578	   This case provides a rationale for implementing support for known-
+579	   local ULA prefix insertion in the policy table, such that
+580	   differential behavior can be applied for known-local versus general
+581	   ULA prefixes.
+
+583	   The remainder of this section discusses several complementary
+584	   mechanisms involved with these scenarios.
+
+586	8.1.  The ULA Label and its Precedence
+
+588	   RFC6724 added (in obsoleting RFC3484) a separate label for ULAs (the
+589	   whole range, under fc00::/7), whose default precedence is raised by
+590	   this update.  This separate label interacts with Rule 5 of Section 6
+591	   of RFC6724, which says:
+
+593	   Rule 5: Prefer matching label.
+
+595	   If Label(Source(DA)) = Label(DA) and Label(Source(DB)) <> Label(DB),
+596	   then prefer DA.
+
+598	   Similarly, if Label(Source(DA)) <> Label(DA) and Label(Source(DB)) =
+599	   Label(DB), then prefer DB.
+
+601	   In the first scenario, the ULA source label, whether known-local or
+602	   not, will not match the GUA destination label.  Therefore, an IPv4
+603	   destination, if available, will be preferred over a GUA destination
+604	   with a ULA source, even though the GUA destination has higher
+605	   precedence than the IPv4 destination in the policy table.  This means
+606	   the IPv4 destination will be moved up in the list of destinations
+607	   over the GUA destination with the ULA source.
+
+609	   If the ULA (fc00::/7) label is removed from the policy table, a GUA
+610	   destination with a ULA source will be preferred over an IPv4
+611	   destination, as GUA and ULA will be part of the same label (for
+612	   ::/0).
+
+614	   In the second scenario, if the ULA source has been recognized as
+615	   being within a known-local prefix that has been inserted into the
+616	   address selection policy table, then the known-local ULA source and
+617	   general ULA destination will have different labels, and therefore
+618	   IPv4 communication will be preferred.
+
+620	   If the ULA source has not been recognized as known-local, e.g., if
+621	   the insertion of known-local prefixes into the policy table has been
+622	   administratively disabled, its general ULA label will match the
+623	   general ULA destination label and therefore, whether part of the
+624	   local network or not, the ULA destination will be preferred over an
+625	   IPv4 destination.
+
+627	8.2.  Happy Eyeballs
+
+629	   Regardless of the preference resulting from the above discussion,
+630	   Happy Eyeballs version 1 [RFC6555] or version 2 [RFC8305], if
+631	   implemented, will try both the GUA or ULA destination with the ULA
+632	   source and the IPv4 destination and source pairings.  The ULA source
+633	   will typically fail to communicate with most GUA or remote ULA
+634	   destinations, and IPv4 will be preferred if IPv4 connectivity is
+635	   available unless the GUA or ULA destinations are attached to the same
+636	   local network as the ULA source.
+
+638	8.3.  Try the Next Address
+
+640	   As stated in Section 2 of RFC6724:
+
+642	   "Well-behaved applications SHOULD NOT simply use the first address
+643	   returned from an API such as getaddrinfo() and then give up if it
+644	   fails.  For many applications, it is appropriate to iterate through
+645	   the list of addresses returned from getaddrinfo() until a working
+646	   address is found.  For other applications, it might be appropriate to
+647	   try multiple addresses in parallel (e.g., with some small delay in
+648	   between) and use the first one to succeed."
+
+650	   Therefore, when an IPv4 destination is preferred over GUA or ULA
+651	   destinations, IPv4 will likely succeed if IPv4 connectivity is
+652	   available, and the GUA or ULA destination may only be tried if Happy
+653	   Eyeballs is implemented.
+
+655	   On the other hand, if the GUA or ULA destination with the ULA source
+656	   is preferred, the ULA source will typically fail to communicate with
+657	   GUA or ULA destinations that are not connected to the same local
+658	   network.  However, if the operational guidelines in Section 4.3 of
+659	   RFC4193 are followed, recognizing this failure can be accelerated,
+660	   and transport layer timeouts (e.g., TCP) can be avoided.  The
+661	   guidelines will cause a Destination Unreachable ICMPv6 Error to be
+662	   received by the source device, signaling the next address in the list
+663	   to be tried, as discussed above.
+
+665	9.  Following ULA operational guidelines in RFC4193
+
+667	   This section re-emphasizes two important operational requirements
+668	   stated in [RFC4193] that should be followed by operators.
+
+670	9.1.  Filtering ULA-source addresses at site borders
+
+672	   Section 4.3 states "Site border routers and firewalls should be
+673	   configured to not forward any packets with Local IPv6 source or
+674	   destination addresses outside the site, unless they have been
+675	   explicitly configured with routing information about specific /48 or
+676	   longer Local IPv6 prefixes".
+
+678	   And further that "Site border routers should respond with the
+679	   appropriate ICMPv6 Destination Unreachable message to inform the
+680	   source that the packet was not forwarded".
+
+682	   As stated in the above discussion, such ICMPv6 messages can assist in
+683	   fast failover for TCP connections.
+
+685	9.2.  Avoid using ULA addresses in the global DNS
+
+687	   Section 4.3 of RFC4193 states that "AAAA and PTR records for locally
+688	   assigned local IPv6 addresses are not recommended being installed in
+689	   the global DNS."
+
+691	   This is particularly important given the general method presented in
+692	   this document elevates the priority for ULAs above IPv4.  However,
+693	   where support for insertion of known-local prefixes is implemented,
+694	   such "rogue" ULAs in the global DNS are no longer a concern for
+695	   address selection as they would have the lowest precedence.
+
+697	10.  The practicalities of implementing address selection support
+
+699	   As with most adjustments to standards, and using the introduction of
+700	   RFC6724 as a measuring stick, the updates defined in this document
+701	   will likely take several years to become common enough for consistent
+702	   behavior within most operating systems.  At the time of writing, it
+703	   has been over 10 years since RFC6724 has been published but we
+704	   continue to see existing commercial and open source operating systems
+705	   exhibiting RFC3484 (or other) behavior.
+
+707	   While it should be noted that RFC6724 defines a solution to adjust
+708	   the address preference selection table that is functional
+709	   theoretically, operationally the solution is operating system
+710	   dependent and in practice policy table changes cannot be signaled by
+711	   any currently deployed network mechanism.  While RFC7078 defines such
+712	   a DHCPv6 option, there are few if any implementations.  This lack of
+713	   an intra-protocol or network-based ability to adjust address
+714	   selection preference, along with the inability to adjust a notable
+715	   number of operating systems either programmatically or manually,
+716	   renders operational scalability of such a mechanism challenging.
+
+718	   It is especially important to note this behavior in the long
+719	   lifecycle equipment that exists in industrial control and operational
+720	   technology environments due to their very long mean time to
+721	   replacement/lifecycle.
+
+723	11.  Limitations of RFC6724
+
+725	   The procedures defined in RFC6724 do not give optimal results for all
+726	   scenarios.  As stated in the introduction, the aim of this update is
+727	   to improve the behavior for the most common scenarios.
+
+729	   It is widely recognized in the IETF 6man WG that the whole 3484/6724/
+730	   getaddrinfo() model is fundamentally inadequate for optimal address
+731	   selection.  A model that considers address pairs directly, rather
+732	   than sorting on destination addresses with the best source for that
+733	   address, would be preferable, but beyond the scope of this document.
+
+735	   To simplify address selection, operators may instead look to deploy
+736	   IPv6-only and/or may choose to only use GUA addresses and no ULA
+737	   addresses.  Other approaches to reduce the use of IPv4, e.g., through
+738	   use of DHCPv4 Option 108 as defined in [RFC8925] as part of an "IPv6
+739	   Mostly" deployment model, also helps simplify address selection for
+740	   nodes.
+
+742	12.  Acknowledgements
+
+744	   The authors would like to acknowledge the valuable input and
+745	   contributions of the 6man WG including (in alphabetic order) Erik
+746	   Auerswald, Dale Carder, Brian Carpenter, Tom Coffeen, Lorenzo
+747	   Colitti, Chris Cummings, David Farmer (in particular for the ULA to
+748	   GUA/ULA discussion text, and discussion of using the specific
+749	   fd00::/8 prefix for known-locals), Bob Hinden, Scott Hogg, Ed Horley,
+750	   Ted Lemon, Jen Linkova, Michael Richardson, Kyle Rose, Nathan
+751	   Sherrard, Ole Troan, Eduard Vasilenko, Eric Vyncke, Paul Wefel,
+752	   Timothy Winters, and XiPeng Xiao.
+
+754	13.  Implementation Status
+
+756	   This section should be removed before publication as an RFC.
+
+758	   There are two known implementations of the ULA known-local preference
+759	   mechanism.  The first implementation was created by Lorenzo Colitti
+760	   at Google as a prototype solution, with public code available for
+761	   reference on their android platform available to the public
+762	   [ANDROID].  It was last updated in April of 2024, and does not
+763	   include the capability to listen for RIO/PIO changes, but does
+764	   support adding the ULA prefix learned on the interface to the known-
+765	   local preference.
+
+767	   The second implementation was written by Jeremy Duncan at Tachyon
+768	   Dynamics and made available as open source, reference prototype code
+769	   available [RAIO-ULA-PY].  This implementation includes a full
+770	   implementation written in python, including the capability to listen
+771	   to RIO and PIO on the wire and adjust ULA known-local prefixes as
+772	   needed.  It was last updated in May of 2024.
+
+774	14.  Security Considerations
+
+776	   There are no direct security considerations in this document.
+
+778	   The mixed preference for IPv6 over IPv4 from the default policy table
+779	   in RFC 6724 represents a potential security issue, given an operator
+780	   may expect ULAs to be used when in practice RFC 1918 addresses are
+781	   used instead.
+
+783	   The requirements of RFC 4193, stated earlier in this document, should
+784	   be followed for optimal behavior.
+
+786	   Operators should be mindful of cases where communicating nodes have
+787	   differing behaviors for address selection, e.g., RFC 3484 behavior,
+788	   RFC 6724, the updated RFC 6724 behavior defined here, some other non-
+789	   IETF-standardized behavior, or even no mechanism.  There may thus be
+790	   inconsistent behavior for communications initiated in each direction
+791	   between two nodes.  Ultimately all nodes should be made compliant to
+792	   the updated specification described in this document.
+
+794	15.  IANA Considerations
+
+796	   None.
+
+798	16.  Summary of changes and additional text since RFC6724
+
+800	   This section should be removed before publication as an RFC.
+
+802	   *  Introduced concept of known-locals and rules for their insertion/
+803	      removal in the table.
+
+805	   *  Changed default policy table to move fc00::/7 to precedence 30,
+806	      above legacy IPv4.
+
+808	   *  Changed default policy table to move the 6to4 address block
+809	      2002::/16 to the same precedence as the Teredo prefix.
+
+811	   *  Changed ::ffff:0:0/96 to precedence 20.
+
+813	   *  Changed Rule 5.5 to a MUST support.
+
+815	   *  Defined the concept of known-local ULA prefixes for currently
+816	      defined RFC4193 ULAs with L=1 under fd00::/8, how they may be
+817	      learnt, and the MUST requirement to insert them into the policy
+818	      table.
+
+820	   *  Added text clarifying intended behaviors.
+
+822	   *  Added text discussing ULA to GUA/ULA case.
+
+824	   *  Added text for the security section.
+
+826	   *  Added text to account for SNAC bit.
+
+828	17.  References
+
+830	17.1.  Normative References
+
+832	   [RFC6724]  Thaler, D., Ed., Draves, R., Matsumoto, A., and T. Chown,
+833	              "Default Address Selection for Internet Protocol Version 6
+834	              (IPv6)", RFC 6724, DOI 10.17487/RFC6724, September 2012,
+835	              <https://www.rfc-editor.org/info/rfc6724>.
+
+837	   [RFC8028]  Baker, F. and B. Carpenter, "First-Hop Router Selection by
+838	              Hosts in a Multi-Prefix Network", RFC 8028,
+839	              DOI 10.17487/RFC8028, November 2016,
+840	              <https://www.rfc-editor.org/info/rfc8028>.
+
+842	   [RFC4861]  Narten, T., Nordmark, E., Simpson, W., and H. Soliman,
+843	              "Neighbor Discovery for IP version 6 (IPv6)", RFC 4861,
+844	              DOI 10.17487/RFC4861, September 2007,
+845	              <https://www.rfc-editor.org/info/rfc4861>.
+
+847	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+848	              Requirement Levels", BCP 14, RFC 2119,
+849	              DOI 10.17487/RFC2119, March 1997,
+850	              <https://www.rfc-editor.org/info/rfc2119>.
+
+852	   [RFC4191]  Draves, R. and D. Thaler, "Default Router Preferences and
+853	              More-Specific Routes", RFC 4191, DOI 10.17487/RFC4191,
+854	              November 2005, <https://www.rfc-editor.org/info/rfc4191>.
+
+856	   [RFC4193]  Hinden, R. and B. Haberman, "Unique Local IPv6 Unicast
+857	              Addresses", RFC 4193, DOI 10.17487/RFC4193, October 2005,
+858	              <https://www.rfc-editor.org/info/rfc4193>.
+
+860	   [RFC7526]  Troan, O. and B. Carpenter, Ed., "Deprecating the Anycast
+861	              Prefix for 6to4 Relay Routers", BCP 196, RFC 7526,
+862	              DOI 10.17487/RFC7526, May 2015,
+863	              <https://www.rfc-editor.org/info/rfc7526>.
+
+865	   [SNACBIT]  "SNAC Router Flag in ICMPv6 Router Advertisement
+866	              Messages", n.d., <https://datatracker.ietf.org/doc/draft-
+867	              ietf-6man-snac-router-ra-flag/>.
+
+869	   [ANDROID]  "Optionally prefer known-local ULAs in Android", n.d.,
+870	              <https://r.android.com/3046000>.
+
+872	   [RAIO-ULA-PY]
+873	              "Python known-local ULA implementation", n.d.,
+874	              <https://github.com/jeremy-duncan/raio_ula>.
+
+876	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+877	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+878	              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+880	17.2.  Informative References
+
+882	   [RFC1918]  Rekhter, Y., Moskowitz, B., Karrenberg, D., de Groot, G.
+883	              J., and E. Lear, "Address Allocation for Private
+884	              Internets", BCP 5, RFC 1918, DOI 10.17487/RFC1918,
+885	              February 1996, <https://www.rfc-editor.org/info/rfc1918>.
+
+887	   [RFC6555]  Wing, D. and A. Yourtchenko, "Happy Eyeballs: Success with
+888	              Dual-Stack Hosts", RFC 6555, DOI 10.17487/RFC6555, April
+889	              2012, <https://www.rfc-editor.org/info/rfc6555>.
+
+891	   [RFC8305]  Schinazi, D. and T. Pauly, "Happy Eyeballs Version 2:
+892	              Better Connectivity Using Concurrency", RFC 8305,
+893	              DOI 10.17487/RFC8305, December 2017,
+894	              <https://www.rfc-editor.org/info/rfc8305>.
+
+896	   [RFC3587]  Hinden, R., Deering, S., and E. Nordmark, "IPv6 Global
+897	              Unicast Address Format", RFC 3587, DOI 10.17487/RFC3587,
+898	              August 2003, <https://www.rfc-editor.org/info/rfc3587>.
+
+900	   [RFC8925]  Colitti, L., Linkova, J., Richardson, M., and T.
+901	              Mrugalski, "IPv6-Only Preferred Option for DHCPv4",
+902	              RFC 8925, DOI 10.17487/RFC8925, October 2020,
+903	              <https://www.rfc-editor.org/info/rfc8925>.
+
+905	   [RFC3484]  Draves, R., "Default Address Selection for Internet
+906	              Protocol version 6 (IPv6)", RFC 3484,
+907	              DOI 10.17487/RFC3484, February 2003,
+908	              <https://www.rfc-editor.org/info/rfc3484>.
+
+910	   [RFC4862]  Thomson, S., Narten, T., and T. Jinmei, "IPv6 Stateless
+911	              Address Autoconfiguration", RFC 4862,
+912	              DOI 10.17487/RFC4862, September 2007,
+913	              <https://www.rfc-editor.org/info/rfc4862>.
+
+915	   [RFC3493]  Gilligan, R., Thomson, S., Bound, J., McCann, J., and W.
+916	              Stevens, "Basic Socket Interface Extensions for IPv6",
+917	              RFC 3493, DOI 10.17487/RFC3493, February 2003,
+918	              <https://www.rfc-editor.org/info/rfc3493>.
+
+920	Authors' Addresses
+
+922	   Nick Buraglio
+923	   Energy Sciences Network
+924	   Email: buraglio@forwardingplane.net
+
+926	   Tim Chown
+927	   Jisc
+928	   Email: Tim.Chown@jisc.ac.uk
+929	   Jeremy Duncan
+930	   Tachyon Dynamics
+931	   Email: jduncan@tachyondynamics.com
+
+
+
+
+
+
+
+
+

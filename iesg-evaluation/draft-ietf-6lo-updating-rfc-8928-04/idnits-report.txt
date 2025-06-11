@@ -1,0 +1,366 @@
+idnits 2.17.1 
+
+draft-ietf-6lo-updating-rfc-8928-04.txt:
+-(13): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+  == There are 2 instances of lines with non-ascii characters in the document.
+
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     Summary: 0 errors (**), 0 flaws (~~), 1 warning (==), 0 comments (--).
+
+--------------------------------------------------------------------------------
+
+
+2	6lo                                                           P. Thubert
+3	Internet-Draft
+4	Updates: 8928 (if approved)                                    A. Rashid
+5	Intended status: Standards Track                     Politecnico di Bari
+6	Expires: 20 November 2025                                    19 May 2025
+
+8	                       Fixing the C-Flag in EARO
+9	                  draft-ietf-6lo-updating-rfc-8928-04
+
+11	Abstract
+
+13	   This document updates RFC 8928, “Address-Protected Neighbor Discovery
+14	   for Low-Power and Lossy Networks” (AP-ND), by updating the bit
+15	   position for the C-flag in the Extended Address Registration Option
+16	   (EARO) and registering it with IANA.
+
+18	Status of This Memo
+
+20	   This Internet-Draft is submitted in full conformance with the
+21	   provisions of BCP 78 and BCP 79.
+
+23	   Internet-Drafts are working documents of the Internet Engineering
+24	   Task Force (IETF).  Note that other groups may also distribute
+25	   working documents as Internet-Drafts.  The list of current Internet-
+26	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+28	   Internet-Drafts are draft documents valid for a maximum of six months
+29	   and may be updated, replaced, or obsoleted by other documents at any
+30	   time.  It is inappropriate to use Internet-Drafts as reference
+31	   material or to cite them other than as "work in progress."
+
+33	   This Internet-Draft will expire on 20 November 2025.
+
+35	Copyright Notice
+
+37	   Copyright (c) 2025 IETF Trust and the persons identified as the
+38	   document authors.  All rights reserved.
+
+40	   This document is subject to BCP 78 and the IETF Trust's Legal
+41	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+42	   license-info) in effect on the date of publication of this document.
+43	   Please review these documents carefully, as they describe your rights
+44	   and restrictions with respect to this document.  Code Components
+45	   extracted from this document must include Revised BSD License text as
+46	   described in Section 4.e of the Trust Legal Provisions and are
+47	   provided without warranty as described in the Revised BSD License.
+
+49	Table of Contents
+
+51	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+52	   2.  Terminology . . . . . . . . . . . . . . . . . . . . . . . . .   2
+53	     2.1.  Requirements Language . . . . . . . . . . . . . . . . . .   2
+54	     2.2.  References  . . . . . . . . . . . . . . . . . . . . . . .   2
+55	     2.3.  Acronyms  . . . . . . . . . . . . . . . . . . . . . . . .   3
+56	   3.  Updating RFC 8928 . . . . . . . . . . . . . . . . . . . . . .   3
+57	   4.  Security Considerations . . . . . . . . . . . . . . . . . . .   5
+58	   5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   5
+59	     5.1.  Bit Position of the C-flag  . . . . . . . . . . . . . . .   5
+60	   6.  Normative References  . . . . . . . . . . . . . . . . . . . .   5
+61	   7.  Informative References  . . . . . . . . . . . . . . . . . . .   7
+62	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .   7
+
+64	1.  Introduction
+
+66	   The Address-Protected Neighbor Discovery for Low-Power and Lossy
+67	   Networks (AP-ND) [RFC8928] defined the C-flag in EARO.  It is used to
+68	   indicate that the Registration Ownership Verifier (ROVR) field
+69	   contains a Crypto-ID and that the 6LoWPAN Node (6LN) may be
+70	   challenged for ownership of the registered address.  Initially
+71	   [RFC8928] defined the C-flag in the EARO in bit position 3; later
+72	   [RFC9685] defined the P-field in bits 2 and 3 of the EARO flags field
+73	   with proper IANA registration, causing an overlap with Figure 1 of
+74	   [RFC8928] which depicts the location of the C-flag.
+
+76	   This specification updates [RFC8928] by repositioning the C-flag as
+77	   bit 1 of the EARO flags field, thereby preventing conflicts.
+
+79	2.  Terminology
+
+81	2.1.  Requirements Language
+
+83	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+84	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+85	   "OPTIONAL" in this document are to be interpreted as described in BCP
+86	   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+87	   capitals, as shown here.
+
+89	2.2.  References
+
+91	   This document uses terms and concepts that are discussed in Neighbor
+92	   Discovery (ND) for IPv6 [RFC4861], [RFC4862] and Subnet ND [RFC6775],
+93	   [RFC8505] [RFC8928], [RFC8929] [RFC9685], and
+94	   [I-D.ietf-6lo-prefix-registration].
+
+96	2.3.  Acronyms
+
+98	   This document uses the following abbreviations:
+
+100	   *6LN:*  6LoWPAN Node
+101	   *EARO:*  Extended Address Registration Option
+102	   *ND:*  Neighbor Discovery
+103	   *RATInd:*  Registered Address Type Indicator
+104	   *ROVR:*  Registration Ownership Verifier
+
+106	3.  Updating RFC 8928
+
+108	   [RFC8928] incorrectly refers to the Extended Address Registration
+109	   Option (EARO) as the Enhanced Address Registration Option.  This
+110	   specification corrects this terminology throughout the document.
+
+112	   In [RFC8928], the C-flag is specified in the EARO flags field at bit
+113	   position 3 (as depicted in the Figure 1 of [RFC8928]); however,
+114	   [RFC8928] fails to register its position with IANA.  Later, [RFC9685]
+115	   defined the P-field in bits 2 and 3 of the EARO flags field and
+116	   obtained proper IANA registration, but this introduced an overlap
+117	   with the representation in [RFC8928].  To resolve the conflict, this
+118	   specification updates [RFC8928] by repositioning the C-flag to bit 1
+119	   of the EARO flags field, thereby avoiding the overlapping
+120	   definitions.
+
+122	   Figure 1 below replaces Figure 1 in [RFC8928] in the case of an EARO
+123	   used in an NS message.
+
+125	      0                   1                   2                   3
+126	      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+127	     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+128	     |     Type      |     Length    |F|Prefix Length|    Opaque     |
+129	     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+130	     |r|C| P | I |R|T|     TID       |     Registration Lifetime     |
+131	     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+132	     |                                                               |
+133	    ...            Registration Ownership Verifier (ROVR)           ...
+134	     |                  (64, 128, 192, or 256 bits)                  |
+135	     |                                                               |
+136	     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+138	      Figure 1: Extended Address Registration Option (EARO) Format for
+139	                             use in NS messages
+
+141	   Figure 2 below replaces Figure 1 in [RFC8928] in the case of an EARO
+142	   used in an NA message.  The difference between the two formats is in
+143	   the usage of bits 16 to 23.
+
+145	      0                   1                   2                   3
+146	      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+147	     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+148	     |     Type      |     Length    | r |  Status   |    Opaque     |
+149	     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+150	     |r|C| P | I |R|T|     TID       |     Registration Lifetime     |
+151	     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+152	     |                                                               |
+153	    ...            Registration Ownership Verifier (ROVR)           ...
+154	     |                  (64, 128, 192, or 256 bits)                  |
+155	     |                                                               |
+156	     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+158	      Figure 2: Extended Address Registration Option (EARO) Format for
+159	                             use in NA messages
+
+161	   Option fields of interest for this specification:
+
+163	   *Type:*  33
+
+165	   *Length:*  Defined in [RFC8505].
+
+167	   *F:*  Defined in [I-D.ietf-6lo-prefix-registration]
+
+169	   *Prefix Length*  Defined in [I-D.ietf-6lo-prefix-registration]
+
+171	   *Status:*  6-bit unsigned integer.  This field is used in NA(EARO)
+172	      response messages only to indicate the status of a registration.
+173	      This field is defined in [RFC8505] and resized by [RFC9010].  The
+174	      values for the Status field are available in [IANA.ICMP.ARO.STAT].
+175	      This field MUST be set to 0 in NS(EARO) messages unless the
+176	      registration is for a prefix, in which case the F-flag is set and
+177	      the prefix length is provided.
+
+179	   *Opaque:*  Defined in [RFC8505]
+
+181	   *r (reserved):*  1-bit reserved field in NS(EARO) and NA(EARO) as
+182	      depicted in Figure 1 and Figure 2.  2-bit reserved field (most
+183	      significant bits of Status filed) in NA(EARO) as depicted in
+184	      Figure 2.  All reserved field MUST be set to zero by the sender
+185	      and MUST be ignored by the receiver.
+
+187	   *C:*  1-bit flag, moved from its position in Figure 1 of [RFC8928].
+188	      It is set to indicate that the ROVR field contains a Crypto-ID and
+189	      that the 6LN MAY be challenged for ownership.
+
+191	   *P:*  2-bit field for Registered Address Type Indicator (RATInd).
+
+193	      Indicates whether the registered address is unicast, multicast, or
+194	      anycast, or derived from the unicast prefix that is being
+195	      registered.  Used to transport the RATInd in different protocols.
+196	      The values for the RATInd field are available in
+197	      [IANA.ICMP.ARO.P-FIELD].
+
+199	   *I:*  Defined in [RFC8505]
+
+201	   *R:*  Defined in [RFC8505]
+
+203	   *T:*  Defined in [RFC8505]
+
+205	   *TID (Transaction ID):*  Defined in [RFC8505]
+
+207	   *Registration Lifetime:*  Defined in [RFC8505]
+
+209	   *Registration Ownership Verifier (ROVR):*  Defined in [RFC8505].
+210	      Variable length field, used to verify who "owns" a registered IPv6
+211	      address.  When the C-flag is set, this field contains a Crypto-ID
+212	      [RFC8928].
+
+214	4.  Security Considerations
+
+216	   This specification does not introduce any new security considerations
+217	   beyond those already discussed in [RFC8928] and [RFC8505].
+
+219	5.  IANA Considerations
+
+221	5.1.  Bit Position of the C-flag
+
+223	   This specification updates the location of the C-flag introduced in
+224	   [RFC8928] to position it as bit 1 in the EARO flags field.  IANA is
+225	   requested to reference this RFC in addition to [RFC8928] when
+226	   updating the "Address Registration Option Flags" [IANA.ICMP.ARO.FLG]
+227	   registry under the heading "Internet Control Message Protocol version
+228	   6 (ICMPv6) Parameters" as specified in Table 1:
+
+230	            +---------------+---------+-----------------------+
+231	            | EARO flag     | Meaning | Reference             |
+232	            +---------------+---------+-----------------------+
+233	            | 1 (suggested) | C-Flag  | RFC This and RFC 8928 |
+234	            +---------------+---------+-----------------------+
+
+236	                    Table 1: Bit Position of the C-flag
+
+238	6.  Normative References
+
+240	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+241	              Requirement Levels", BCP 14, RFC 2119,
+242	              DOI 10.17487/RFC2119, March 1997,
+243	              <https://www.rfc-editor.org/info/rfc2119>.
+
+245	   [RFC4861]  Narten, T., Nordmark, E., Simpson, W., and H. Soliman,
+246	              "Neighbor Discovery for IP version 6 (IPv6)", RFC 4861,
+247	              DOI 10.17487/RFC4861, September 2007,
+248	              <https://www.rfc-editor.org/info/rfc4861>.
+
+250	   [RFC4862]  Thomson, S., Narten, T., and T. Jinmei, "IPv6 Stateless
+251	              Address Autoconfiguration", RFC 4862,
+252	              DOI 10.17487/RFC4862, September 2007,
+253	              <https://www.rfc-editor.org/info/rfc4862>.
+
+255	   [RFC6775]  Shelby, Z., Ed., Chakrabarti, S., Nordmark, E., and C.
+256	              Bormann, "Neighbor Discovery Optimization for IPv6 over
+257	              Low-Power Wireless Personal Area Networks (6LoWPANs)",
+258	              RFC 6775, DOI 10.17487/RFC6775, November 2012,
+259	              <https://www.rfc-editor.org/info/rfc6775>.
+
+261	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+262	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+263	              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+265	   [RFC8505]  Thubert, P., Ed., Nordmark, E., Chakrabarti, S., and C.
+266	              Perkins, "Registration Extensions for IPv6 over Low-Power
+267	              Wireless Personal Area Network (6LoWPAN) Neighbor
+268	              Discovery", RFC 8505, DOI 10.17487/RFC8505, November 2018,
+269	              <https://www.rfc-editor.org/info/rfc8505>.
+
+271	   [RFC8928]  Thubert, P., Ed., Sarikaya, B., Sethi, M., and R. Struik,
+272	              "Address-Protected Neighbor Discovery for Low-Power and
+273	              Lossy Networks", RFC 8928, DOI 10.17487/RFC8928, November
+274	              2020, <https://www.rfc-editor.org/info/rfc8928>.
+
+276	   [RFC9010]  Thubert, P., Ed. and M. Richardson, "Routing for RPL
+277	              (Routing Protocol for Low-Power and Lossy Networks)
+278	              Leaves", RFC 9010, DOI 10.17487/RFC9010, April 2021,
+279	              <https://www.rfc-editor.org/info/rfc9010>.
+
+281	   [RFC9685]  Thubert, P., Ed., "Listener Subscription for IPv6 Neighbor
+282	              Discovery Multicast and Anycast Addresses", RFC 9685,
+283	              DOI 10.17487/RFC9685, November 2024,
+284	              <https://www.rfc-editor.org/info/rfc9685>.
+
+286	   [I-D.ietf-6lo-prefix-registration]
+287	              Thubert, P., "IPv6 Neighbor Discovery Prefix
+288	              Registration", Work in Progress, Internet-Draft, draft-
+289	              ietf-6lo-prefix-registration-10, 17 April 2025,
+290	              <https://datatracker.ietf.org/doc/html/draft-ietf-6lo-
+291	              prefix-registration-10>.
+
+293	   [IANA.ICMP.ARO.FLG]
+294	              IANA, "IANA Registry for the Address Registration Option
+295	              Flags", IANA, https://www.iana.org/assignments/icmpv6-
+296	              parameters/icmpv6-parameters.xhtml#icmpv6-adress-
+297	              registration-option-flags.
+
+299	   [IANA.ICMP.ARO.STAT]
+300	              IANA, "IANA Registry for the Address Registration Option
+301	              Status Value", IANA, https://www.iana.org/assignments/
+302	              icmpv6-parameters/icmpv6-parameters.xhtml#address-
+303	              registration.
+
+305	   [IANA.ICMP.ARO.P-FIELD]
+306	              IANA, "IANA Registry for the Address Registration Option
+307	              Status Value", IANA, https://www.iana.org/assignments/
+308	              icmpv6-parameters/icmpv6-parameters.xhtml#p-field-values.
+
+310	7.  Informative References
+
+312	   [RFC8929]  Thubert, P., Ed., Perkins, C.E., and E. Levy-Abegnoli,
+313	              "IPv6 Backbone Router", RFC 8929, DOI 10.17487/RFC8929,
+314	              November 2020, <https://www.rfc-editor.org/info/rfc8929>.
+
+316	Authors' Addresses
+
+318	   Pascal Thubert
+319	   06330 Roquefort-les-Pins
+320	   France
+321	   Email: pascal.thubert@gmail.com
+
+323	   Adnan Rashid
+324	   Politecnico di Bari
+325	   Via Edoardo Orabona 4
+326	   70126 Bari
+327	   Italy
+328	   Email: adnan.rashid@poliba.it
+
+
+
+
+
+
+
+
+
