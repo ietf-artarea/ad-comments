@@ -1,0 +1,3469 @@
+idnits 2.17.1 
+
+draft-ietf-scim-device-model-14.txt:
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+  == There is 1 instance of lines with non-ascii characters in the document.
+
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     Summary: 0 errors (**), 0 flaws (~~), 1 warning (==), 0 comments (--).
+
+--------------------------------------------------------------------------------
+
+
+2	Network Working Group                                         M. Shahzad
+3	Internet-Draft                                                  H. Iqbal
+4	Intended status: Standards Track         North Carolina State University
+5	Expires: 21 November 2025                                        E. Lear
+6	                                                           Cisco Systems
+7	                                                             20 May 2025
+
+9	               Device Schema Extensions to the SCIM model
+10	                    draft-ietf-scim-device-model-14
+
+12	Abstract
+
+14	   The initial core schema for SCIM (System for Cross Identity
+15	   Management) was designed for provisioning users.  This memo specifies
+16	   schema extensions that enables provisioning of devices, using various
+17	   underlying bootstrapping systems, such as Wi-fi Easy Connect, FIDO
+18	   device onboarding vouchers, BLE passcodes, and MAC authenticated
+19	   bypass.
+
+21	Status of This Memo
+
+23	   This Internet-Draft is submitted in full conformance with the
+24	   provisions of BCP 78 and BCP 79.
+
+26	   Internet-Drafts are working documents of the Internet Engineering
+27	   Task Force (IETF).  Note that other groups may also distribute
+28	   working documents as Internet-Drafts.  The list of current Internet-
+29	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+31	   Internet-Drafts are draft documents valid for a maximum of six months
+32	   and may be updated, replaced, or obsoleted by other documents at any
+33	   time.  It is inappropriate to use Internet-Drafts as reference
+34	   material or to cite them other than as "work in progress."
+
+36	   This Internet-Draft will expire on 21 November 2025.
+
+38	Copyright Notice
+
+40	   Copyright (c) 2025 IETF Trust and the persons identified as the
+41	   document authors.  All rights reserved.
+
+43	   This document is subject to BCP 78 and the IETF Trust's Legal
+44	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+45	   license-info) in effect on the date of publication of this document.
+46	   Please review these documents carefully, as they describe your rights
+47	   and restrictions with respect to this document.  Code Components
+48	   extracted from this document must include Revised BSD License text as
+49	   described in Section 4.e of the Trust Legal Provisions and are
+50	   provided without warranty as described in the Revised BSD License.
+
+52	Table of Contents
+
+54	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
+55	     1.1.  Why SCIM for devices? . . . . . . . . . . . . . . . . . .   4
+56	     1.2.  Protocol Participants . . . . . . . . . . . . . . . . . .   5
+57	     1.3.  Schema Description  . . . . . . . . . . . . . . . . . . .   6
+58	     1.4.  Schema Representation . . . . . . . . . . . . . . . . . .   6
+59	     1.5.  Terminology . . . . . . . . . . . . . . . . . . . . . . .   6
+60	   2.  ResourceType Device . . . . . . . . . . . . . . . . . . . . .   6
+61	     2.1.  Common Attributes . . . . . . . . . . . . . . . . . . . .   6
+62	   3.  SCIM Core Device Schema . . . . . . . . . . . . . . . . . . .   7
+63	     3.1.  Singular Attributes . . . . . . . . . . . . . . . . . . .   7
+64	   4.  Device Groups . . . . . . . . . . . . . . . . . . . . . . . .   8
+65	   5.  Resource Type EndpointApp . . . . . . . . . . . . . . . . . .   9
+66	   6.  SCIM EndpointApp Schema . . . . . . . . . . . . . . . . . . .   9
+67	     6.1.  Common Attributes . . . . . . . . . . . . . . . . . . . .   9
+68	     6.2.  Singular Attributes . . . . . . . . . . . . . . . . . . .   9
+69	     6.3.  Complex Attributes  . . . . . . . . . . . . . . . . . . .  10
+70	       6.3.1.  certificateInfo . . . . . . . . . . . . . . . . . . .  10
+71	   7.  SCIM Device Extensions  . . . . . . . . . . . . . . . . . . .  12
+72	     7.1.  BLE Extension . . . . . . . . . . . . . . . . . . . . . .  12
+73	       7.1.1.  Singular Attributes . . . . . . . . . . . . . . . . .  13
+74	       7.1.2.  Multivalued Attributes  . . . . . . . . . . . . . . .  14
+75	       7.1.3.  BLE Pairing Method Extensions . . . . . . . . . . . .  14
+76	     7.2.  Wi-Fi Easy Connect Extension  . . . . . . . . . . . . . .  20
+77	       7.2.1.  Singular Attributes . . . . . . . . . . . . . . . . .  20
+78	       7.2.2.  Multivalued Attributes  . . . . . . . . . . . . . . .  20
+79	     7.3.  Ethernet MAB Extension  . . . . . . . . . . . . . . . . .  22
+80	       7.3.1.  Single Attribute  . . . . . . . . . . . . . . . . . .  23
+81	     7.4.  FIDO Device Onboard Extension . . . . . . . . . . . . . .  24
+82	       7.4.1.  Single Attribute  . . . . . . . . . . . . . . . . . .  24
+83	     7.5.  Zigbee Extension  . . . . . . . . . . . . . . . . . . . .  25
+84	       7.5.1.  Singular Attribute  . . . . . . . . . . . . . . . . .  25
+85	       7.5.2.  Multivalued Attribute . . . . . . . . . . . . . . . .  26
+86	     7.6.  The Endpoint Applications Extension Schema  . . . . . . .  27
+87	       7.6.1.  Singular Attributes . . . . . . . . . . . . . . . . .  27
+88	       7.6.2.  Multivalued Attribute . . . . . . . . . . . . . . . .  27
+89	   8.  Schema JSON Representation  . . . . . . . . . . . . . . . . .  29
+90	     8.1.  Resource Schema . . . . . . . . . . . . . . . . . . . . .  30
+91	     8.2.  Device Core Schema JSON . . . . . . . . . . . . . . . . .  30
+92	     8.3.  EndpointApp Schema JSON . . . . . . . . . . . . . . . . .  31
+93	     8.4.  BLE Extension Schema JSON . . . . . . . . . . . . . . . .  33
+94	     8.5.  DPP Extension Schema JSON . . . . . . . . . . . . . . . .  38
+95	     8.6.  Ethernet MAB Extension Schema JSON  . . . . . . . . . . .  40
+96	     8.7.  FDO Extension Schema JSON . . . . . . . . . . . . . . . .  41
+97	     8.8.  Zigbee Extension Schema JSON  . . . . . . . . . . . . . .  42
+98	     8.9.  EndpointAppsExt JSON Extension Schema . . . . . . . . . .  43
+99	     8.10. Representation of Schema  . . . . . . . . . . . . . . . .  45
+100	   9.  Security Considerations . . . . . . . . . . . . . . . . . . .  53
+101	     9.1.  SCIM operations . . . . . . . . . . . . . . . . . . . . .  53
+102	       9.1.1.  Unauthorized Object Creation  . . . . . . . . . . . .  54
+103	     9.2.  Object Deletion . . . . . . . . . . . . . . . . . . . . .  54
+104	     9.3.  Read operations . . . . . . . . . . . . . . . . . . . . .  54
+105	     9.4.  Update Operations . . . . . . . . . . . . . . . . . . . .  54
+106	     9.5.  Higher level protection for certain systems . . . . . . .  55
+107	     9.6.  Logging . . . . . . . . . . . . . . . . . . . . . . . . .  55
+108	   10. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  55
+109	     10.1.  New Schemas  . . . . . . . . . . . . . . . . . . . . . .  55
+110	     10.2.  Device Schema Extensions . . . . . . . . . . . . . . . .  55
+111	   11. Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .  56
+112	   12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  56
+113	     12.1.  Normative References . . . . . . . . . . . . . . . . . .  57
+114	     12.2.  Informative References . . . . . . . . . . . . . . . . .  58
+115	   Appendix A.  Changes from Earlier Versions  . . . . . . . . . . .  58
+116	   Appendix B.  OpenAPI representation . . . . . . . . . . . . . . .  59
+117	     B.1.  Device Core Schema OpenAPI Representation . . . . . . . .  59
+118	     B.2.  EndpointApp Schema OpenAPI Representation . . . . . . . .  61
+119	     B.3.  BLE Extension Schema OpenAPI Representation . . . . . . .  64
+120	     B.4.  DPP Extension Schema OpenAPI Representation . . . . . . .  68
+121	     B.5.  Ethernet MAB Extension Schema OpenAPI Representation  . .  70
+122	     B.6.  FDO Extension Schema OpenAPI Representation . . . . . . .  71
+123	     B.7.  Zigbee Extension Schema OpenAPI Representation  . . . . .  71
+124	     B.8.  EndpointAppsExt Extension Schema OpenAPI
+125	           Representation  . . . . . . . . . . . . . . . . . . . . .  72
+126	   Appendix C.  Fido Device Onboarding Example Flow  . . . . . . . .  74
+127	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  76
+
+129	1.  Introduction
+
+131	   The Internet of Things presents a management challenge in many
+132	   dimensions.  One of them is the ability to onboard and manage large
+133	   number of devices.  There are many models for bootstrapping trust
+134	   between devices and network deployments.  Indeed it is expected that
+135	   different manufacturers will make use of different methods.
+
+137	   SCIM (System for Cross Identity Management) [RFC7643] [RFC7644]
+138	   defines a protocol and a schema for provisioning of users.  However,
+139	   it can easily be extended to provision device credentials and other
+140	   attributes into a network.  The protocol and core schema were
+141	   designed to permit just such extensions.  Bulk operations are
+142	   supported.  This is good because often devices are procured in bulk.
+
+144	   A primary purpose of this specification is to provision the network
+145	   for onboarding and communications access to and from devices within a
+146	   local deployment based on the underlying capabilities of those
+147	   devices.  The underlying security mechanisms of some devices range
+148	   from non-existent such as the Bluetooth Low Energy (BLE) "Just Works"
+149	   pairing method to a robust FIDO Device Onboard (FDO) mechanism.
+150	   Information from the SCIM server is dispatched to control functions
+151	   based on selected schema extensions to enable these communications
+152	   within a network.  The SCIM database is therefore essentially
+153	   equivalent to a network's Authentication, Authorization, and
+154	   Accounting (AAA) database, and should be carefully treated as such.
+
+156	1.1.  Why SCIM for devices?
+
+158	   Some might ask why SCIM is well suited for this purpose and not, for
+159	   example, NETCONF [RFC6241] or RESTCONF [RFC8040] with YANG [RFC7950].
+160	   After all, there are all sorts of existing models available.  The
+161	   answer is four fold: - First, NETCONF and RESTCONF focus on
+162	   *configuration* rather than provisioning. - Second, SCIM is designed
+163	   with inter-domain provisioning in mind.  The use of HTTP as a
+164	   substrate permits both user-based authentication for local
+165	   provisioning applications, as well as OAUTH or certificate- based
+166	   authentication.  the inter-domain nature of these operations does not
+167	   expose local policy, which itself must be (and often is) configured
+168	   with other APIs, many of which are not standardized. - SCIM is also a
+169	   familiar tool within the enterprise enviroment, used extensively to
+170	   configure federated user accounts.  (Amusingly, one author noted a
+171	   billboard in San Francisco highlighting a SCIM as part of a product
+172	   capability.) - Finally, once one chooses a vehicle such as SCIM, one
+173	   is beholden to its data model.  The SCM data model is articulated in
+174	   [RFC7643].
+
+176	   This taken together with the fact that end devices are not intended
+177	   to be *directly* configured leave us with SCIM as the best standard
+178	   option.
+
+180	1.2.  Protocol Participants
+
+182	   In the normal SCIM model, it was presumed that large federated
+183	   deployments would be SCIM clients who provision and remove employees
+184	   and contractors as they enter and depart those deployments, and
+185	   federated services such as sales, payment, or conferencing services
+186	   would be the servers.
+
+188	   In the device model, the roles are reversed, and may be somewhat more
+189	   varied.  A deployment network management system gateway (NMS gateway)
+190	   plays the role of the server, receiving information about devices
+191	   that are expected to be connected to its network.  That server will
+192	   apply appropriate local policies regarding whether/how the device
+193	   should be connected.
+
+195	   The client may be one of a number of entities:
+
+197	   *  A vendor who is authorized to add devices to a network as part of
+198	      a sales transaction.  This is similar to the sales integration
+199	      sometimes envisioned by Bootstrapping Remote Key Infrastructure
+200	      (BRSKI) [RFC8995].
+
+202	   *  A client application that administrators or employees use to add,
+203	      remove, or get information about devices.  An example might be an
+204	      tablet or phone app that scans Wi-fi Easy Connect QR codes.
+
+206	                               +-----------------------------------+
+207	                               |                                   |
+208	       +-----------+   Request |  +---------+                      |
+209	       | onboarding|------------->|  SCIM   |                      |
+210	       |    app    |<-------------| Server  |                      |
+211	       +-----------+  Ctrl Endpt  +---------+                      |
+212	                               |                                   |
+213	       +-----------+           |  +------------+         +-------+ |
+214	       |  Control  |...........|..|    ALG     |.........|device | |
+215	       |    App    |           |  +------------+         +-------+ |
+216	       +-----------+           |                                   |
+217	                               |                                   |
+218	                               +-----------------------------------+
+
+220	                        Figure 1: Basic Architecture
+
+222	   In Figure 1, the onboarding app provides the device particulars.  As
+223	   part of the response, the SCIM server might provide additional
+224	   information, especially in the case of non-IP devices, where an
+225	   application-layer gateway may need to be used to communicate with the
+226	   device.  The control endpoint is one among a number of objects that
+227	   may be returned.
+
+229	1.3.  Schema Description
+
+231	   RFC 7643 does not prescribe a language to describe a schema.  We have
+232	   chosen the JSON schema language [JSONSChema] for this purpose.  The
+233	   use of XML for SCIM devices is not supported.
+
+235	   Several additional schemas specify specific onboarding mechanisms,
+236	   such as BLE and Wi-fi Easy Connect.
+
+238	1.4.  Schema Representation
+
+240	   Attributes defined in the device core schema and extensions comprise
+241	   characteristics and SCIM datatypes defined in Sections 2.2 and 2.3 of
+242	   the [RFC7643].  This specifciation does not define new
+243	   characteristics and datatypes for the SCIM attributes.
+
+245	1.5.  Terminology
+
+247	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+248	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+249	   "OPTIONAL" in this document are to be interpreted as described in BCP
+250	   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+251	   capitals, as shown here.
+
+253	2.  ResourceType Device
+
+255	   A new resource type 'Device' is specified.  The "ResourceType" schema
+256	   specifies the metadata about a resource type (see section 6 of
+257	   [RFC7643]).  It comprises a core device schema and several extension
+258	   schemas.  The core schema provides a minimal resource representation,
+259	   whereas extension schemas extend the core schema depending on the
+260	   device's capability.  The JSON schema for Device resource type is in
+261	   Section 8.1.
+
+263	2.1.  Common Attributes
+
+265	   The Device schema contains three common attributes as defined in the
+266	   [RFC7643].
+
+268	   id
+
+270	   An id is a required and unique attribute of the device core schema
+271	   (see section 3.1 of [RFC7643]).
+
+273	   externalID
+
+275	   An externalID is an optional attribute (see section 3.1 of
+276	   [RFC7643]).
+
+278	   meta
+
+280	   Meta is a complex attribute and is required (see section 3.1 of
+281	   [RFC7643]).
+
+283	3.  SCIM Core Device Schema
+
+285	   The core device schema provides the minimal representation of a
+286	   resource "Device".  It contains only those attributes that any device
+287	   may need, and only one attribute is required.  The core schema for
+288	   "Device" is identified using the schema URI:
+289	   "urn:ietf:params:scim:schemas:core:2.0:Device".  The following
+290	   attributes are defined in the device core schema.
+
+292	3.1.  Singular Attributes
+
+294	   displayName
+
+296	   This attribute is of type "string" and provides a human-readable name
+297	   for a device.  It is intended to be displayed to end-users and should
+298	   be suitable for that purpose.  The attribute is not required, and is
+299	   not case-sensitive.  It may be modified and SHOULD be returned by
+300	   default.  No uniqueness constraints are imposed on this attribute.
+
+302	   active
+
+304	   The "active" attribute is of type "boolean" and is a mutable
+305	   attribute, and is required.  If set to TRUE, it means that this
+306	   device is intended to be operational.  Attempts to control or access
+307	   a device where this value is set to FALSE may fail.  For example,
+308	   when used in conjunction with NIPC [I-D.brinckman-nipc], commands
+309	   such as connect, disconnect, subscribe that control app sends to the
+310	   controller for the devices any command coming from the control app
+311	   for the device will be rejected by the controller.
+
+313	   mudUrl
+
+315	   The mudUrl attribute represents the URL to the MUD file associated
+316	   with this device.  This attribute is optional and mutable.  The
+317	   mudUrl value is case sensitive and not unique.  When present, this
+318	   attribute may be used as described in [RFC8520].  This attribute is
+319	   case sensitive and returned by default.
+
+321	     +=============+=======+=====+=======+=========+========+========+
+322	     | Attribute   | Multi | Req | Case  | Mutable | Return | Unique |
+323	     |             | Value |     | Exact |         |        |        |
+324	     +=============+=======+=====+=======+=========+========+========+
+325	     | displayName | F     | F   | F     | RW      | Def    | None   |
+326	     +-------------+-------+-----+-------+---------+--------+--------+
+327	     | active      | F     | T   | F     | RW      | Def    | None   |
+328	     +-------------+-------+-----+-------+---------+--------+--------+
+329	     | mudUrl      | F     | F   | T     | RW      | Def    | None   |
+330	     +-------------+-------+-----+-------+---------+--------+--------+
+
+332	       Table 1: Characteristics of device schema attributes.  (Req =
+333	          Required, T = True, F = False, RW = ReadWrite, and Def =
+334	                                  Default)
+
+336	   An example of a device SCIM object is as follows:
+
+338	   <CODE BEGINS>
+339	   {
+340	           "schemas": ["urn:ietf:params:scim:schemas:core:2.0:Device"],
+341	           "id": "e9e30dba-f08f-4109-8486-d5c6a3316111",
+342	           "displayName": "BLE Heart Monitor",
+343	           "active": true,
+344	           "meta": {
+345	             "resourceType": "Device",
+346	         "created": "2022-01-23T04:56:22Z",
+347	             "lastModified": "2022-05-13T04:42:34Z",
+348	             "version": "W\/\"a330bc54f0671c9\"",
+349	             "location": "https://example.com/v2/Device/e9e30dba-f08f
+350	                -4109-8486-d5c6a3316111"
+351	           }
+352	   }
+353	   <CODE ENDS>
+
+355	   The schema for the device is presented in JSON format in
+356	   Section Section 8.2, while the openAPI representation is provided in
+357	   Section Appendix B.1.
+
+359	4.  Device Groups
+
+361	   Device groups are created using the SCIM groups as defined in
+362	   [RFC7643] Section 4.2.
+
+364	5.  Resource Type EndpointApp
+
+366	   This section defines a new resource type, 'EndpointApp'.  The
+367	   "ResourceType" schema specifies the metadata about a resource type
+368	   (see section 6 of [RFC7643]).  The resource "EndpointApp" represents
+369	   client applications that can control and/or receive data from the
+370	   devices.  The JSON schema for EndpointApp resource type is in
+371	   Section 8.1.
+
+373	   The attributes comprising EndpointsApp are listed in Section 6.  The
+374	   "EndpointApp" are included in the endpoint applications extension
+375	   ("endpointAppsExt") Section 7.6.
+
+377	6.  SCIM EndpointApp Schema
+
+379	   The EndpointApp schema is used to authorize clients control or
+380	   telemetry services for clients.  The schema identifies the
+381	   application and how clients are to authenticate to the various
+382	   services.
+
+384	   The schema for "EndpointApp" is identified using the schema URI:
+385	   "urn:ietf:params:scim:schemas:core:2.0:EndpointApp".  The following
+386	   attributes are defined in this schema.
+
+388	6.1.  Common Attributes
+
+390	   The EndpointApp schema contains three common attributes as defined in
+391	   the [RFC7643].
+
+393	6.2.  Singular Attributes
+
+395	   applicationType
+
+397	   This attribute is of type "string" and represents the type of
+398	   application.  It will only contain two values; 'deviceControl' or
+399	   'telemetry'. 'deviceControl' is the application that sends commands
+400	   to control the device. 'telemetry' is the application that receives
+401	   data from the device.  The attribute is required, and is not case-
+402	   sensitive.  The attribute is readOnly and should be returned by
+403	   default.  No uniqueness constraints are imposed on this attribute.
+
+405	   applicationName
+
+407	   The "applicationName" attribute is of type "string" and represents a
+408	   human readable name for the application.  This attribute is required
+409	   and mutable.  The attribute should be returned by default and there
+410	   is no uniqueness contraint on the attribute.
+
+412	   clientToken
+
+414	   This attribute type string contains a token that the client will use
+415	   to authenticate itself.  Each token may be a string up to 500
+416	   characters in length.  It is not mutable, read-only, generated if no
+417	   certificateInfo object is provisioned, case sensitive and returned by
+418	   default if it exists.  The SCIM server should expect that client
+419	   tokens will be shared by the SCIM client with other components within
+420	   the client's infrastructure.
+
+422	6.3.  Complex Attributes
+
+424	6.3.1.  certificateInfo
+
+426	   It is the complex attribute that contains x509 certificate's subject
+427	   name and root CA information associated with application clients that
+428	   will connect for purposes of device control or telemetry.
+
+430	   rootCA
+
+432	   This is the base64 encoding a trust anchor certificate as described
+433	   in [rfc4648] Section 4.  This trust anchor is applicable for
+434	   certificates used for client application access.  The object is not
+435	   required, singular, case sensitive, and read/write.  If not present,
+436	   a set of trust anchors MUST be configured out of band.
+
+438	   subjectName
+
+440	   If present, this field may contain one of two names:
+
+442	   *  a distinguished name as that will be present in the certificate
+443	      subject field, as de scribed in Section 4.1.2.4 of [RFC5280]; or
+
+445	   *  or a dnsName as part of a subjectAlternateName as described in
+446	      Section 4.2.1.6 of [RFC5280].
+
+448	   In the latter case, servers validating such certificates SHALL reject
+449	   connections when name of the peer as resolved by a DNS reverse lookup
+450	   does not match the dnsName in the certificate.  If multiple dnsNames
+451	   are present, it is left to server implementations to address any
+452	   authorization conflicts associated with those names.  This attribute
+453	   is not required, read write, singular and NOT case sensitive.
+
+455	    +=================+=======+===+=======+=========+========+========+
+456	    | Attribute       | Multi |Req| Case  | Mutable | Return | Unique |
+457	    |                 | Value |   | Exact |         |        |        |
+458	    +=================+=======+===+=======+=========+========+========+
+459	    | applicationType | F     |T  | F     | R       | Def    | None   |
+460	    +-----------------+-------+---+-------+---------+--------+--------+
+461	    | applicationName | F     |T  | F     | RW      | Def    | None   |
+462	    +-----------------+-------+---+-------+---------+--------+--------+
+463	    | clientToken     | F     |F  | T     | R       | N      | None   |
+464	    +-----------------+-------+---+-------+---------+--------+--------+
+465	    | certificateInfo | F     |F  | F     | RW      | Def    | None   |
+466	    +-----------------+-------+---+-------+---------+--------+--------+
+467	    | rootCA          | F     |F  | T     | RW      | Def    | None   |
+468	    +-----------------+-------+---+-------+---------+--------+--------+
+469	    | subjectName     | F     |T  | T     | RW      | Def    | None   |
+470	    +-----------------+-------+---+-------+---------+--------+--------+
+
+472	         Table 2: Characteristics of EndpointApp schema attributes.
+473	          (Req = Required, T = True, F = False, R = ReadOnly, RW =
+474	        ReadWrite, Manuf = Manufacturer, N = No, and Def = Default)
+
+476	   Note that either clientToken and certificateInfo are used for the
+477	   authentication of the application.  If certificateInfo is NOT present
+478	   when an endpointApp is object created, then the server SHOULD return
+479	   a clientToken.  Otherwise, if the server accepts the certificateInfo
+480	   object for authentication, it SHOULD NOT return a clientToken.  If
+481	   the server accepts and produces a clientToken, then control and
+482	   telemetry servers MUST validate both.  The SCIM client will know that
+483	   this is the case based on the SCIM object that is returned.
+
+485	   certificateInfo is preferred in situations where client functions are
+486	   federated such that different clients may connect for different
+487	   purposes.
+
+489	   <CODE BEGINS>
+490	   {
+491	     "schemas": ["urn:ietf:params:scim:schemas:core:2.0:EndpointApp"],
+492	     "id": "e9e30dba-f08f-4109-8486-d5c6a3316212",
+493	     "applicationType": "deviceControl",
+494	     "applicationName": "Device Control App 1",
+495	     "certificateInfo": {
+496	         "rootCA" : "MIIBIjAN...",
+497	         "subjectName": "wwww.example.com"
+498	     },
+499	     "meta": {
+500	       "resourceType": "EndpointApp",
+501	       "created": "2022-01-23T04:56:22Z",
+502	       "lastModified": "2022-05-13T04:42:34Z",
+503	       "version": "W\/\"a330bc54f0671c9\"",
+504	       "location": "https://example.com/v2/EndpointApp/e9e30dba-f08f
+505	          -4109-8486-d5c6a3316212"
+506	     }
+507	   }
+508	   <CODE ENDS>
+
+510	   The schema for the endpointApp is presented in JSON format in
+511	   Section Section 8.3, while the openAPI representation is provided in
+512	   Section Appendix B.2.
+
+514	7.  SCIM Device Extensions
+
+516	   SCIM provides various extension schemas, their attributes, JSON
+517	   representation, and example object.  The core schema is extended with
+518	   a new resource type, as described in Section 8.1.  No
+519	   schemaExtensions list is specified in that definition.  Instead, an
+520	   IANA registry is created, where all values for "required" are set to
+521	   false.  All extensions to the Device schema MUST be registered via
+522	   IANA, as described in Section 10.2.  The schemas below demonstrate
+523	   how this model is to work.  All the SCIM Server related Schema URIs
+524	   are valid only with Device resource types.
+
+526	7.1.  BLE Extension
+
+528	   This schema extends the device schema to represent the devices
+529	   supporting BLE.  The extension is identified using the following
+530	   schema URI:
+
+532	   urn:ietf:params:scim:schemas:extension:ble:2.0:Device
+
+534	   The attributes are as follows:
+
+536	7.1.1.  Singular Attributes
+
+538	   deviceMacAddress
+
+540	   A string value that represent a public MAC address assigned by the
+541	   manufacturer.  It is a unique 48-bit value.  Ir is required, case
+542	   insensitive, and it is mutable and return as default.  The regex
+543	   pattern is the following:
+
+545	   ^[0-9A-Fa-f]{2}(:[0-9A-Fa-f]{2}){5}$
+
+547	   isRandom
+
+549	   A boolean flag taken from the BLE core specification, 5.3.  If FALSE,
+550	   the device is using a public MAC address.  If TRUE, the device uses a
+551	   random address.  If an Idenifying Resolving Key (IRK) is present, the
+552	   address represents a resolvable private address.  Otherwise, the
+553	   address is assumed to be a random static address.  Non-resolvable
+554	   private addresses are not supported by this specification.  This
+555	   attribute is not required.  It is mutable, and is returned by
+556	   default.  The default value is FALSE.
+
+558	   separateBroadcastAddress
+
+560	   When present, this address is used for broadcasts/advertisements.
+561	   This value MUST NOT be set when an IRK is provided.  Its form is the
+562	   same as deviceMacAddress.  It is not required, multivalued, mutable,
+563	   and returned by default.
+
+565	   irk
+
+567	   A string value that specifies the identity resolving key (IRK), which
+568	   is unique to each device.  It is used to resolve private random
+569	   address.  It should only be provisioned when isRandom is TRUE.  It is
+570	   mutable and never returned.  For more information about the use of
+571	   the IRK, see Section 5.4.5 of [BLE54].
+
+573	   mobility
+
+575	   A boolean attribute to enable BLE device mobility.  If set to TRUE,
+576	   the device could be expected to move within a network of APs.  For
+577	   example, BLE device is connected with AP-1 and moves out of range but
+578	   comes in range of AP-2, it will be disconnected with AP-1 and
+579	   connects with AP-2.  It is returned by default and mutable.
+
+581	7.1.2.  Multivalued Attributes
+
+583	   versionSupport
+
+585	   A multivalued attribute that provides all the BLE versions supported
+586	   by the device in the form of an array.  For example, [4.1, 4.2, 5.0,
+587	   5.1, 5.2, 5.3].  It is required, mutable, and return as default.
+
+589	   pairingMethods
+
+591	   An array of pairing methods associated with the BLE device.  The
+592	   pairing methods may require sub-attributes, such as key/password, for
+593	   the device pairing process.  To enable the scalability of pairing
+594	   methods in the future, they are represented as extensions to
+595	   incorporate various attributes that are part of the respective
+596	   pairing process.  Pairing method extensions are nested inside the BLE
+597	   extension.  It is required, case sensitive, mutable, and returned by
+598	   default.
+
+600	7.1.3.  BLE Pairing Method Extensions
+
+602	   The details on pairing methods and their associated attributes are in
+603	   section 2.3 of [BLE54].  This memo defines extensions for four
+604	   pairing methods that are nested insided the BLE extension schema.
+605	   Each extension contains the common attributes Section 2.1.  These
+606	   extension are as follows:
+
+608	   (i) pairingNull extension is identified using the following schema
+609	   URI:
+
+611	   urn:ietf:params:scim:schemas:extension:pairingNull:2.0:Device
+
+613	   pairingNull does not have any attribute.  It allows pairing for BLE
+614	   devices that do not require a pairing method.
+
+616	   (ii) pairingJustWorks extension is identified using the following
+617	   schema URI:
+
+619	   urn:ietf:params:scim:schemas:extension:pairingJustWorks:2.0:Device
+
+621	   Just works pairing method does not require a key to pair devices.
+622	   For completeness, the key attribute is included and is set to 'null'.
+623	   Key attribute is required, immutable, and returned by default.
+
+625	   (iii) pairingPassKey extension is identified using the following
+626	   schema URI:
+
+628	   urn:ietf:params:scim:schemas:extension:pairingPassKey:2.0:Device
+629	   The passkey pairing method requires a 6-digit key to pair devices.
+630	   This extension has one singular integer attribute, "key", which is
+631	   required, mutable and returned by default.  The key pattern is as
+632	   follows:
+
+634	   ^[0-9]{6}$
+
+636	   (iv) pairingOOB extension is identified using the following schema
+637	   URI:
+
+639	   urn:ietf:params:scim:schemas:extension:pairingOOB:2.0:Device
+
+641	   The out-of-band pairing method includes three singular attributes,
+642	   i.e., key, randomNumber, and confirmationNumber.
+
+644	   key
+
+646	   The key is string value, required and received from out-of-bond
+647	   sources such as NFC.  It is case sensitive, mutable, and returned by
+648	   default.
+
+650	   randomNumber
+
+652	   This attribute represents a nonce added to the key.  It is an integer
+653	   value that is a required attribute.  It is mutable and returned by
+654	   default.
+
+656	   confirmationNumber
+
+658	   An integer which some solutions require in RESTful message exchange.
+659	   It is not required.  It is mutable and returned by default if it
+660	   exists.
+
+662	   +==================+=======+===+=======+=========+========+========+
+663	   | Attribute        | Multi |Req| Case  | Mutable | Return | Unique |
+664	   |                  | Value |   | Exact |         |        |        |
+665	   +==================+=======+===+=======+=========+========+========+
+666	   | deviceMacAddress | F     |T  | F     | RW      | Def    | Manuf  |
+667	   +------------------+-------+---+-------+---------+--------+--------+
+668	   | isRandom         | F     |T  | F     | RW      | Def    | None   |
+669	   +------------------+-------+---+-------+---------+--------+--------+
+670	   | sepBroadcastAdd  | T     |F  | F     | RW      | Def    | None   |
+671	   +------------------+-------+---+-------+---------+--------+--------+
+672	   | irk              | F     |F  | F     | WO      | Nev    | Manuf  |
+673	   +------------------+-------+---+-------+---------+--------+--------+
+674	   | versionSupport   | T     |T  | F     | RW      | Def    | None   |
+675	   +------------------+-------+---+-------+---------+--------+--------+
+676	   | mobility         | F     |F  | F     | RW      | Def    | None   |
+677	   +------------------+-------+---+-------+---------+--------+--------+
+678	   | pairingMethods   | T     |T  | T     | RW      | Def    | None   |
+679	   +------------------+-------+---+-------+---------+--------+--------+
+
+681	       Table 3: Characteristics of BLE extension schema attributes.
+682	      sepBroadcastAdd is short for separateBroadcastAddress.  (Req =
+683	      Required, T = True, F = False, RW = ReadWrite, WO=Write Only,
+684	          Def = Default, Nev = Never, and Manuf = Manufacturer).
+
+686	   An example of a device object with BLE extension is as follows:
+
+688	   <CODE BEGINS>
+689	   {
+690	     "schemas": ["urn:ietf:params:scim:schemas:core:2.0:Device",
+691	        "urn:ietf:params:scim:schemas:extension:ble:2.0:Device"],
+
+693	     "id": "e9e30dba-f08f-4109-8486-d5c6a3316111",
+694	     "displayName": "BLE Heart Monitor",
+695	     "active": true,
+696	     "urn:ietf:params:scim:schemas:extension:ble:2.0:Device" : {
+697	       "versionSupport": ["5.3"],
+698	       "deviceMacAddress": "2C:54:91:88:C9:E2",
+699	       "isRandom": false,
+700	       "separateBroadcastAddress": ["AA:BB:88:77:22:11", "AA:BB:88:77
+701	          :22:12"],
+702	       "mobility": true,
+703	       "pairingMethods": ["urn:ietf:params:scim:schemas:extension
+704	          :pairingPassKey:2.0:Device"],
+705	       "urn:ietf:params:scim:schemas:extension:pairingPassKey:2.0
+706	          :Device" : {
+707	         "key": 123456
+708	       }
+709	     },
+710	     "meta": {
+711	       "resourceType": "Device",
+712	         "created": "2022-01-23T04:56:22Z",
+713	       "lastModified": "2022-05-13T04:42:34Z",
+714	       "version": "W\/\"a330bc54f0671c9\"",
+715	       "location": "https://example.com/v2/Device/e9e30dba-f08f-4109
+716	          -8486-d5c6a3316111"
+717	     }
+718	   }
+719	   <CODE ENDS>
+
+721	   In the above example, the pairing method is "pairingPassKey", which
+722	   implies that this BLE device pairs using only a passkey.  In another
+723	   example below, the pairing method is "pairingOOB", denoting that this
+724	   BLE device uses the out-of-band pairing method.
+
+726	   <CODE BEGINS>
+727	   {
+728	     "schemas": ["urn:ietf:params:scim:schemas:core:2.0:Device",
+729	        "urn:ietf:params:scim:schemas:extension:ble:2.0:Device"],
+
+731	     "id": "e9e30dba-f08f-4109-8486-d5c6a3316111",
+732	     "displayName": "BLE Heart Monitor",
+733	     "active": true,
+734	     "urn:ietf:params:scim:schemas:extension:ble:2.0:Device" : {
+735	       "versionSupport": ["5.3"],
+736	       "deviceMacAddress": "2C:54:91:88:C9:E2",
+737	       "isRandom": false,
+738	       "separateBroadcastAddress": ["AA:BB:88:77:22:11", "AA:BB:88:77
+739	          :22:12"],
+740	       "mobility": true,
+741	       "pairingMethods": ["urn:ietf:params:scim:schemas:extension
+742	          :pairingOOB:2.0:Device"],
+743	       "urn:ietf:params:scim:schemas:extension:pairingOOB:2.0:Device":
+744	           {
+745	         "key": "TheKeyvalueRetrievedFromOOB",
+746	         "randomNumber": 238796813516896
+747	       }
+748	     },
+749	     "meta": {
+750	       "resourceType": "Device",
+751	         "created": "2022-01-23T04:56:22Z",
+752	       "lastModified": "2022-05-13T04:42:34Z",
+753	       "version": "W\/\"a330bc54f0671c9\"",
+754	       "location": "https://example.com/v2/Device/e9e30dba-f08f-4109
+755	          -8486-d5c6a3316111"
+756	     }
+757	   }
+758	   <CODE ENDS>
+
+760	   However, a device can have more than one pairing method.  Support for
+761	   multiple pairing methods is also provided by the multi-valued
+762	   attribute pairingMethods.  In the example below, the BLE device can
+763	   pair with both passkey and OOB pairing methods.
+
+765	   <CODE BEGINS>
+766	   {
+767	     "schemas": ["urn:ietf:params:scim:schemas:core:2.0:Device",
+768	        "urn:ietf:params:scim:schemas:extension:ble:2.0:Device"],
+
+770	     "id": "e9e30dba-f08f-4109-8486-d5c6a3316111",
+771	     "displayName": "BLE Heart Monitor",
+772	     "active": true,
+773	     "urn:ietf:params:scim:schemas:extension:ble:2.0:Device" : {
+774	       "versionSupport": ["5.3"],
+775	       "deviceMacAddress": "2C:54:91:88:C9:E2",
+776	       "isRandom": false,
+777	       "separateBroadcastAddress": ["AA:BB:88:77:22:11", "AA:BB:88:77
+778	          :22:12"],
+779	       "mobility": true,
+780	       "pairingMethods": ["urn:ietf:params:scim:schemas:extension
+781	          :pairingPassKey:2.0:Device",
+782	           "urn:ietf:params:scim:schemas:extension:pairingOOB:2.0
+783	              :Device"],
+784	       "urn:ietf:params:scim:schemas:extension:pairingPassKey:2.0
+785	          :Device" : {
+786	         "key": 123456
+787	       },
+788	       "urn:ietf:params:scim:schemas:extension:pairingOOB:2.0:Device":
+789	           {
+790	         "key": "TheKeyvalueRetrievedFromOOB",
+791	         "randomNumber": 238796813516896
+792	       }
+793	     },
+794	     "meta": {
+795	       "resourceType": "Device",
+796	         "created": "2022-01-23T04:56:22Z",
+797	       "lastModified": "2022-05-13T04:42:34Z",
+798	       "version": "W\/\"a330bc54f0671c9\"",
+799	       "location": "https://example.com/v2/Device/e9e30dba-f08f-4109
+800	          -8486-d5c6a3316111"
+801	     }
+802	   }
+803	   <CODE ENDS>
+
+805	   The schema for the BLE extension is presented in JSON format in
+806	   Section Section 8.4, while the openAPI representation is provided in
+807	   Section Appendix B.3.
+
+809	7.2.  Wi-Fi Easy Connect Extension
+
+811	   A schema that extends the device schema to enable Wi-Fi Easy Connect
+812	   (otherwise known as Device Provisioning Protocol or DPP).  Throughout
+813	   this specification we use the term DPP.  The extension is identified
+814	   using the following schema URI:
+
+816	   urn:ietf:params:scim:schemas:extension:dpp:2.0:Device
+
+818	   The attributes in this extension are adopted from [DPP2].  The
+819	   attributes are as follows:
+
+821	7.2.1.  Singular Attributes
+
+823	   dppVersion
+
+825	   An integer that represents the version of DPP the device supports.
+826	   This attribute is required, case insensitive, mutable, and returned
+827	   by default.
+
+829	   bootstrapKey
+
+831	   A string value representing an Elliptic-Curve Diffie-Hellman (ECDH)
+832	   public key.  The base64 encoded lengths for P-256, P-384, and P-521
+833	   are 80, 96, and 120 characters.  This attribute is required, case-
+834	   sensitive, mutable, and returned by default.
+
+836	   deviceMacAddress
+
+838	   The manufacturer assigns the MAC address stored as string.  It is a
+839	   unique 48-bit value.  This attribute is optional, case insensitive,
+840	   mutable, and returned by default.  The regex pattern is as follows:
+
+842	   ^[0-9A-Fa-f]{2}(:[0-9A-Fa-f]{2}){5}$
+
+844	   serialNumber
+
+846	   An alphanumeric serial number, stored as string, may also be passed
+847	   as bootstrapping information.  This attribute is optional, case
+848	   insensitive, mutable, and returned by default.
+
+850	7.2.2.  Multivalued Attributes
+
+852	   bootstrappingMethod
+
+854	   It is the array of strings of all the bootstrapping methods available
+855	   on the enrollee device.  For example, [QR, NFC].  This attribute is
+856	   optional, case insensitive, mutable, and returned by default.
+
+858	   classChannel
+
+860	   This attribute is an array of strings of global operating class and
+861	   channel shared as bootstrapping information.  It is formatted as
+862	   class/channel.  For example, ['81/1','115/36'].  This attribute is
+863	   optional, case insensitive, mutable, and returned by default.
+
+865	    +=====================+=====+===+=====+=========+========+========+
+866	    | Attribute           |Multi|Req|Case | Mutable | Return | Unique |
+867	    |                     |Value|   |Exact|         |        |        |
+868	    +=====================+=====+===+=====+=========+========+========+
+869	    | dppVersion          |F    |T  |F    | RW      | Def    | None   |
+870	    +---------------------+-----+---+-----+---------+--------+--------+
+871	    | bootstrapKey        |F    |T  |T    | WO      | Nev    | None   |
+872	    +---------------------+-----+---+-----+---------+--------+--------+
+873	    | deviceMacAddress    |F    |F  |F    | RW      | Def    | Manuf  |
+874	    +---------------------+-----+---+-----+---------+--------+--------+
+875	    | serialNumber        |F    |F  |F    | RW      | Def    | None   |
+876	    +---------------------+-----+---+-----+---------+--------+--------+
+877	    | bootstrappingMethod |T    |F  |F    | RW      | Def    | None   |
+878	    +---------------------+-----+---+-----+---------+--------+--------+
+879	    | classChannel        |T    |F  |F    | RW      | Def    | None   |
+880	    +---------------------+-----+---+-----+---------+--------+--------+
+
+882	        Table 4: Characteristics of DPP extension schema attributes.
+883	         (Req = Required, T = True, F = False, RW = ReadWrite, WO =
+884	            Write Only, Def = Default, Nev = Never, and Manuf =
+885	                               Manufacturer).
+
+887	   An example of a device object with DPP extension is below:
+
+889	   <CODE BEGINS>
+890	   {
+891	           "schemas": ["urn:ietf:params:scim:schemas:core:2.0:Device",
+892	                    "urn:ietf:params:scim:schemas:extension:dpp:2.0
+893	                       :Device"],
+
+895	           "id": "e9e30dba-f08f-4109-8486-d5c6a3316111",
+896	           "displayName": "WiFi Heart Monitor",
+897	           "active": true,
+898	           "urn:ietf:params:scim:schemas:extension:dpp:2.0:Device" : {
+899	                   "dppVersion": 2,
+900	                   "bootstrappingMethod": ["QR"],
+901	                   "bootstrapKey":
+902	                       "MDkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDIgADURzxmt
+903	                      tZoIRIPWGoQMV00XHWCAQIhXruVWOz0NjlkIA=",
+904	                   "deviceMacAddress": "2C:54:91:88:C9:F2",
+905	                   "classChannel": ["81/1", "115/36"],
+906	                   "serialNumber": "4774LH2b4044"
+907	           },
+
+909	           "meta": {
+910	             "resourceType": "Device",
+911	         "created": "2022-01-23T04:56:22Z",
+912	             "lastModified": "2022-05-13T04:42:34Z",
+913	             "version": "W\/\"a330bc54f0671c9\"",
+914	             "location": "https://example.com/v2/Device/e9e30dba-f08f
+915	                -4109-8486-d5c6a3316111"
+916	           }
+917	   }
+918	   <CODE ENDS>
+
+920	   The schema for the DPP extension is presented in JSON format in
+921	   Section Section 8.5, while the openAPI representation is provided in
+922	   Section Appendix B.4.
+
+924	7.3.  Ethernet MAB Extension
+
+926	   This extension enables a legacy means of (very) weak authentication,
+927	   known as MAC Authenticated Bypass (MAB), that is supported in many
+928	   wired ethernet solutions.  If the MAC address is known, then the
+929	   device may be permitted (perhaps limited) access.  The extension is
+930	   identified by the following URI:
+
+932	   urn:ietf:params:scim:schemas:extension:ethernet-mab:2.0:Device
+
+934	7.3.1.  Single Attribute
+
+936	   This extension has a singular attribute:
+
+938	   deviceMacAddress
+
+940	   This is the Ethernet address to be provisioned onto the network.  It
+941	   takes the identical form as found in both the BLE and DPP extensions.
+
+943	   +==================+=======+===+=======+=========+========+========+
+944	   | Attribute        | Multi |Req| Case  | Mutable | Return | Unique |
+945	   |                  | Value |   | Exact |         |        |        |
+946	   +==================+=======+===+=======+=========+========+========+
+947	   | deviceMacAddress | F     |T  | F     | RW      | Def    | None   |
+948	   +------------------+-------+---+-------+---------+--------+--------+
+
+950	     Table 5: Characteristics of MAB extension schema attributes (Req
+951	        = Required, T = True, F = False, RW = ReadWrite, and Def =
+952	                                 Default)
+
+954	   An example of a device object with EthernetMAB extension is shown
+955	   below:
+
+957	   <CODE BEGINS>
+958	   {
+959	     "schemas": ["urn:ietf:params:scim:schemas:core:2.0:Device",
+960	        "urn:ietf:params:scim:schemas:extension:ethernet-mab:2.0
+961	           :Device"],
+
+963	     "id": "e9e30dba-f08f-4109-8486-d5c6a3316111",
+964	     "displayName": "Some random Ethernet Device",
+965	     "active": true,
+966	     "urn:ietf:params:scim:schemas:extension:ethernet-mab:2.0:Device"
+967	        : {
+968	       "deviceMacAddress": "2C:54:91:88:C9:E2"
+969	     },
+
+971	     "meta": {
+972	       "resourceType": "Device",
+973	         "created": "2022-01-23T04:56:22Z",
+974	       "lastModified": "2022-05-13T04:42:34Z",
+975	       "version": "W\/\"a330bc54f0671c9\"",
+976	       "location": "https://example.com/v2/Device/e9e30dba-f08f-4109
+977	          -8486-d5c6a3316111"
+978	     }
+979	   }
+980	   <CODE ENDS>
+981	   The schema for the EthernetMAB extension is presented in JSON format
+982	   in Section Section 8.6, while the openAPI representation is provided
+983	   in Section Appendix B.5.
+
+985	7.4.  FIDO Device Onboard Extension
+
+987	   This extension specifies a voucher to be used by the FDO Device
+988	   Onboard (FDO) protocols [FDO11] to complete a trusted transfer of
+989	   ownership and control of the device to the environment.  The SCIM
+990	   server MUST know how to process the voucher, either directly or by
+991	   forwarding it along to an owner process as defined in the FDO
+992	   specification.
+
+994	   urn:ietf:params:scim:schemas:extension:fido-device-onboard:2.0:Device
+
+996	7.4.1.  Single Attribute
+
+998	   This extension has a singular attribute:
+
+1000	   fdoVoucher
+
+1002	   The voucher is formated as a PEM-encoded object in accordance with
+1003	   [FDO11].
+
+1005	     +============+=======+=====+=======+=========+========+========+
+1006	     | Attribute  | Multi | Req | Case  | Mutable | Return | Unique |
+1007	     |            | Value |     | Exact |         |        |        |
+1008	     +============+=======+=====+=======+=========+========+========+
+1009	     | fdoVoucher | F     | T   | F     | WO      | Nev    | None   |
+1010	     +------------+-------+-----+-------+---------+--------+--------+
+
+1012	       Table 6: Characteristics of FDO extension schema attributes
+1013	        (Req = Required, T = True, F = False, WO = WriteOnly, and
+1014	                               Nev = Never)
+
+1016	   An example of a device object with FDO extension is shown below:
+
+1018	   <CODE BEGINS>
+1019	   {
+1020	     "schemas": ["urn:ietf:params:scim:schemas:core:2.0:Devices",
+1021	        "urn:ietf:params:scim:schemas:extension:fido-device-onboard
+1022	           :2.0:Devices"],
+
+1024	     "id": "e9e30dba-f08f-4109-8486-d5c6a3316111",
+1025	     "displayName": "Some random Ethernet Device",
+1026	     "active": true,
+1027	     "urn:ietf:params:scim:schemas:extension:fido-device-onboard:2.0
+1028	        :Devices" : {
+1029	        "fdoVoucher": "{... voucher ...}"
+1030	     },
+
+1032	     "meta": {
+1033	       "resourceType": "Device",
+1034	         "created": "2022-01-23T04:56:22Z",
+1035	       "lastModified": "2022-05-13T04:42:34Z",
+1036	       "version": "W\/\"a330bc54f0671c9\"",
+1037	       "location": "https://example.com/v2/Device/e9e30dba-f08f-4109
+1038	          -8486-d5c6a3316111"
+1039	     }
+1040	   }
+1041	   <CODE ENDS>
+
+1043	   The schema for the FDO extension is presented in JSON format in
+1044	   Section Section 8.7, while the openAPI representation is provided in
+1045	   Section Appendix B.6.
+
+1047	7.5.  Zigbee Extension
+
+1049	   A schema that extends the device schema to enable the provisioning of
+1050	   Zigbee devices.  The extension is identified using the following
+1051	   schema URI:
+
+1053	   urn:ietf:params:scim:schemas:extension:zigbee:2.0:Device
+
+1055	   It has one singular attribute and one multivalued attribute.  The
+1056	   attributes are as follows:
+
+1058	7.5.1.  Singular Attribute
+
+1060	   deviceEui64Address
+
+1062	   An EUI-64 (Extended Unique Identifier) device address stored as
+1063	   string.  This attribute is required, case insensitive, mutable, and
+1064	   returned by default.  The regex pattern is as follows:
+
+1066	   ^[0-9A-Fa-f]{2}(:[0-9A-Fa-f]{2}){7}$
+
+1068	7.5.2.  Multivalued Attribute
+
+1070	   versionSupport
+
+1072	   An array of strings of all the Zigbee versions supported by the
+1073	   device.  For example, [3.0].  This attribute is required, case
+1074	   insensitive, mutable, and returned by default.
+
+1076	   +====================+=====+===+=======+=========+========+========+
+1077	   | Attribute          |Multi|Req| Case  | Mutable | Return | Unique |
+1078	   |                    |Value|   | Exact |         |        |        |
+1079	   +====================+=====+===+=======+=========+========+========+
+1080	   | deviceEui64Address |F    |T  | F     | RW      | Def    | None   |
+1081	   +--------------------+-----+---+-------+---------+--------+--------+
+1082	   | versionSupport     |T    |T  | F     | RW      | Def    | None   |
+1083	   +--------------------+-----+---+-------+---------+--------+--------+
+
+1085	     Table 7: Characteristics of Zigbee extension schema attributes.
+1086	     (Req = Required, T = True, F = False, RW = ReadWrite, and Def =
+1087	                                 Default)
+
+1089	   An example of a device object with Zigbee extension is shown below:
+
+1091	   <CODE BEGINS>
+1092	   {
+1093	     "schemas": ["urn:ietf:params:scim:schemas:core:2.0:Device",
+1094	        "urn:ietf:params:scim:schemas:extension:zigbee:2.0:Device"],
+
+1096	     "id": "e9e30dba-f08f-4109-8486-d5c6a3316111",
+1097	     "displayName": "Zigbee Heart Monitor",
+1098	     "active": true,
+1099	     "urn:ietf:params:scim:schemas:extension:zigbee:2.0:Device" : {
+1100	       "versionSupport": ["3.0"],
+1101	       "deviceEui64Address": "50:32:5F:FF:FE:E7:67:28"
+1102	     },
+
+1104	     "meta": {
+1105	       "resourceType": "Device",
+1106	         "created": "2022-01-23T04:56:22Z",
+1107	       "lastModified": "2022-05-13T04:42:34Z",
+1108	       "version": "W\/\"a330bc54f0671c9\"",
+1109	       "location": "https://example.com/v2/Device/e9e30dba-f08f-4109
+1110	          -8486-d5c6a3316111"
+1111	     }
+1112	   }
+1113	   <CODE ENDS>
+1114	   The schema for the Zigbee extension is presented in JSON format in
+1115	   Section Section 8.8, while the openAPI representation is provided in
+1116	   Section Appendix B.7.
+
+1118	7.6.  The Endpoint Applications Extension Schema
+
+1120	   Sometimes non-IP devices such as those using BLE or Zigbee require an
+1121	   application gateway interface to manage them.  SCIM clients MUST NOT
+1122	   specify this to describe native IP-based devices.
+
+1124	   endpointAppsExt provides the list application that connect to
+1125	   enterprise gateway.  The endpointAppsExt has one multivalued
+1126	   attribute and two singular attributes.  The extension is identified
+1127	   using the following schema URI:
+
+1129	   urn:ietf:params:scim:schemas:extension:endpointAppsExt:2.0:Device
+
+1131	7.6.1.  Singular Attributes
+
+1133	   deviceControlEnterpriseEndpoint
+
+1135	   Device control apps use this URL of the enterprise endpoint to reach
+1136	   the enterprise gateway.  When the enterprise receives the SCIM object
+1137	   from the onboarding app, it adds this attribute to it and sends it
+1138	   back as a response to the onboarding app.  This attribute is
+1139	   required, case-sensitive, mutable, and returned by default.  The
+1140	   uniqueness is enforced by the enterprise.
+
+1142	   telemetryEnterpriseEndpoint
+
+1144	   Telemetry apps use this URL of the enterprise endpoint to reach the
+1145	   enterprise gateway.  When the enterprise receives the SCIM object
+1146	   from the onboarding app, it adds this attribute to it and sends it
+1147	   back as a response to the onboarding app.  This attribute is
+1148	   optional, case-sensitive, mutable, and returned by default.  The
+1149	   uniqueness is enforced by the enterprise.  An implementation MUST
+1150	   generate an exception if telemetryEnterpriseEndpoint is not returned
+1151	   and telemetry is required for the proper functioning of a device.
+
+1153	7.6.2.  Multivalued Attribute
+
+1155	   applications
+
+1157	   This is a complex multivalued attribute.  It represents a list of
+1158	   endpoint applications i.e., deviceControl and telemetry.  Each entry
+1159	   in the list comprises two attributes including "value" and "$ref".
+
+1161	   value
+1162	   It is the identifier of the endpoint application formated as UUID.
+1163	   It is same as the common attribute "$id" of the resource
+1164	   "endpointApp".  It is read/write, required, case insensitive and
+1165	   returned by default.
+
+1167	   $ref
+
+1169	   It is the reference to the respective endpointApp resource object
+1170	   stored in the SCIM server.  It is readOnly, required, case sensitive
+1171	   and returned by default.
+
+1173	   +====================+=====+===+=======+=========+========+========+
+1174	   | Attribute          |Multi|Req| Case  | Mutable | Return | Unique |
+1175	   |                    |Value|   | Exact |         |        |        |
+1176	   +====================+=====+===+=======+=========+========+========+
+1177	   | devContEntEndpoint |F    |T  | T     | R       | Def    | Ent    |
+1178	   +--------------------+-----+---+-------+---------+--------+--------+
+1179	   | telEntEndpoint     |F    |F  | T     | R       | Def    | Ent    |
+1180	   +--------------------+-----+---+-------+---------+--------+--------+
+1181	   | applications       |T    |T  | F     | RW      | Def    | None   |
+1182	   +--------------------+-----+---+-------+---------+--------+--------+
+1183	   | value              |F    |T  | F     | RW      | Def    | None   |
+1184	   +--------------------+-----+---+-------+---------+--------+--------+
+1185	   | $ref               |F    |T  | F     | R       | Def    | None   |
+1186	   +--------------------+-----+---+-------+---------+--------+--------+
+
+1188	       Table 8: Characteristics of EndpointAppsExt extension schema
+1189	           attributes.  DevContEntEndpoint represents attribute
+1190	      deviceControlEnterpriseEndpoint and telEntEndpoint represents
+1191	       telemetryEnterpriseEndpoint.  (Req = Required, T = True, F =
+1192	     False, R = ReadOnly, RW = ReadWrite, Ent = Enterprise, and Def =
+1193	                                Default).
+
+1195	   An example of a device object with endpointAppsExt extension is
+1196	   below:
+
+1198	   <CODE BEGINS>
+1199	   {
+1200	     "schemas": ["urn:ietf:params:scim:schemas:core:2.0:Device",
+1201	        "urn:ietf:params:scim:schemas:extension:ble:2.0:Device",
+1202	        "urn:ietf:params:scim:schemas:extension:endpointAppsExt:2.0
+1203	           :Device"],
+1204	     "id": "e9e30dba-f08f-4109-8486-d5c6a3316111",
+1205	     "displayName": "BLE Heart Monitor",
+1206	     "active": true,
+1207	     "urn:ietf:params:scim:schemas:extension:ble:2.0:Device" : {
+1208	       "versionSupport": ["5.3"],
+1209	       "deviceMacAddress": "2C:54:91:88:C9:E2",
+1210	       "isRandom": false,
+1211	       "separateBroadcastAddress": ["AA:BB:88:77:22:11", "AA:BB:88:77
+1212	          :22:12"],
+1213	       "mobility": false,
+1214	       "pairingMethods": [
+1215	           "urn:ietf:params:scim:schemas:extension:pairingPassKey:2.0
+1216	              :Device"],
+1217	       "urn:ietf:params:scim:schemas:extension:pairingPassKey:2.0
+1218	          :Device" : {
+1219	         "key": 123456
+1220	       }
+1221	     },
+1222	     "urn:ietf:params:scim:schemas:extension:endpointAppsExt:2.0
+1223	        :Device": {
+1224	       "applications": [
+1225	         {
+1226	           "value" : "e9e30dba-f08f-4109-8486-d5c6a3316212",
+1227	           "$ref" : "https://example.com/v2/EndpointApp/e9e30dba-f08f
+1228	              -4109-8486-d5c6a3316212"
+1229	         },
+1230	         {
+1231	           "value" : "e9e30dba-f08f-4109-8486-d5c6a3316333",
+1232	           "$ref" : "https://example.com/v2/EndpointApp/e9e30dba-f08f
+1233	              -4109-8486-d5c6a3316333"
+1234	         }
+1235	       ],
+1236	         "deviceControlEnterpriseEndpoint": "https
+1237	            ://example.com/device_control_app_endpoint/",
+1238	         "telemetryEnterpriseEndpoint": "https
+1239	            ://example.com/telemetry_app_endpoint/"
+1240	     },
+1241	     "meta": {
+1242	       "resourceType": "Device",
+1243	         "created": "2022-01-23T04:56:22Z",
+1244	       "lastModified": "2022-05-13T04:42:34Z",
+1245	       "version": "W\/\"a330bc54f0671c9\"",
+1246	       "location": "https://example.com/v2/Device/e9e30dba-f08f-4109
+1247	          -8486-d5c6a3316111"
+1248	     }
+1249	   }
+1250	   <CODE ENDS>
+
+1252	   The schema for the endpointAppsExt extension along with BLE extension
+1253	   is presented in JSON format in Section Section 8.9, while the openAPI
+1254	   representation is provided in Section Appendix B.8.
+
+1256	8.  Schema JSON Representation
+1257	8.1.  Resource Schema
+
+1259	   <CODE BEGINS>
+1260	   [
+1261	     {
+1262	       "schemas": ["urn:ietf:params:scim:schemas:core:2.0
+1263	          :ResourceType"],
+1264	       "id": "Device",
+1265	       "name": "Device",
+1266	       "endpoint": "/Devices",
+1267	       "description": "Device Account",
+1268	       "schema": "urn:ietf:params:scim:schemas:core:2.0:Device",
+1269	       "meta": {
+1270	         "location": "https://example.com/v2/ResourceTypes/Device",
+1271	         "resourceType": "ResourceType"
+1272	       }
+1273	     },
+1274	     {
+1275	       "schemas": ["urn:ietf:params:scim:schemas:core:2.0
+1276	          :ResourceType"],
+1277	       "id": "EndpointApp",
+1278	       "name": "EndpointApp",
+1279	       "endpoint": "/EndpointApp",
+1280	       "description": "Endpoint application such as device control and
+1281	           telemetry.",
+1282	       "schema": "urn:ietf:params:scim:schemas:core:2.0:EndpointApp",
+1283	       "meta": {
+1284	         "location": "https
+1285	            ://example.com/v2/ResourceTypes/EndpointApp",
+1286	         "resourceType": "ResourceType"
+1287	       }
+1288	     }
+1289	   ]
+1290	   <CODE ENDS>
+
+1292	8.2.  Device Core Schema JSON
+
+1294	   <CODE BEGINS>
+1295	   {
+1296	     "id": "urn:ietf:params:scim:schemas:core:2.0:Device",
+1297	     "name": "Device",
+1298	     "description": "Device account",
+1299	     "attributes" : [
+1300	       {
+1301	         "name": "displayName",
+1302	         "type": "string",
+1303	         "description": "Human readable name of the device, suitable
+1304	             for displaying to end-users. For example, 'BLE Heart
+1305	             Monitor' etc.",
+1306	         "multivalues": false,
+1307	         "required": false,
+1308	         "caseExact": false,
+1309	         "mutability": "readWrite",
+1310	         "returned": "default",
+1311	         "uniqueness": "none"
+1312	       },
+1313	       {
+1314	         "name": "active",
+1315	         "type": "boolean",
+1316	         "description": "A mutable boolean value indicating the device
+1317	             administrative status. If set TRUE, the commands (such as
+1318	             connect, disconnect, subscribe) that control app sends to
+1319	             the controller for the devices will be processeed by the
+1320	             controller. If set FALSE, any command comming from the
+1321	             control app for the device will be rejected by the
+1322	             controller.",
+1323	         "multivalues": false,
+1324	         "required": true,
+1325	         "caseExact": false,
+1326	         "mutability": "readWrite",
+1327	         "returned": "default",
+1328	         "uniqueness": "none"
+1329	       },
+1330	       {
+1331	         "name": "mudUrl",
+1332	         "type": "reference",
+1333	         "description": "A URL to MUD file of the device (RFC 8520).",
+1334	         "multivalues": false,
+1335	         "required": false,
+1336	         "caseExact": true,
+1337	         "mutability": "readWrite",
+1338	         "returned": "default",
+1339	         "uniqueness": "none"
+1340	       }
+1341	     ],
+1342	     "meta" : {
+1343	       "resourceType" : "Schema",
+1344	       "location" :
+1345	         "/v2/Schemas/urn:ietf:params:scim:schemas:core:2.0:Device"
+1346	     }
+1347	   }
+1348	   <CODE ENDS>
+
+1350	8.3.  EndpointApp Schema JSON
+1351	   <CODE BEGINS>
+1352	   {
+1353	     "id": "urn:ietf:params:scim:schemas:core:2.0:EndpointApp",
+1354	     "name": "EndpointApp",
+1355	     "description": "Endpoint application and their credentials",
+1356	     "attributes" : [
+1357	       {
+1358	         "name": "applicationType",
+1359	         "type": "string",
+1360	         "description": "This attribute will only contain two values;
+1361	             'deviceControl' or 'telemetry'.",
+1362	         "multivalues": false,
+1363	         "required": true,
+1364	         "caseExact": false,
+1365	         "mutability": "readOnly",
+1366	         "returned": "default",
+1367	         "uniqueness": "none"
+1368	       },
+1369	       {
+1370	         "name": "applicationName",
+1371	         "type": "string",
+1372	         "description": "Human readable name of the application.",
+1373	         "multivalues": false,
+1374	         "required": true,
+1375	         "caseExact": false,
+1376	         "mutability": "readWrite",
+1377	         "returned": "default",
+1378	         "uniqueness": "none"
+1379	       },
+1380	       {
+1381	         "name": "certificateInfo",
+1382	         "type": "complex",
+1383	         "description": "Contains x509 certificate's subject name and
+1384	             root CA information associated with the device control or
+1385	             telemetry app.",
+1386	         "multivalues": false,
+1387	         "required": false,
+1388	         "caseExact": false,
+1389	         "mutability": "readWrite",
+1390	         "returned": "default",
+1391	         "uniqueness": "none",
+1392	         "subAttributes" : [
+1393	           {
+1394	             "name" : "rootCA",
+1395	             "type" : "string",
+1396	             "description" : "The base64 encoding of the DER encoding
+1397	                 of the CA certificate",
+1398	             "multiValued" : false,
+1399	             "required" : false,
+1400	             "caseExact" : true,
+1401	             "mutability" : "readWrite",
+1402	             "returned" : "default",
+1403	             "uniqueness" : "none"
+1404	           },
+1405	           {
+1406	             "name" : "subjectName",
+1407	             "type" : "string",
+1408	             "description" : "A Common Name (CN) of the form of CN =
+1409	                 dnsName",
+1410	             "multiValued" : false,
+1411	             "required" : true,
+1412	             "caseExact" : true,
+1413	             "mutability" : "readWrite",
+1414	             "returned" : "default",
+1415	             "uniqueness" : "none"
+1416	           }
+1417	         ]
+1418	       },
+1419	       {
+1420	         "name": "clientToken",
+1421	         "type": "string",
+1422	         "description": "This attribute contains a token that the
+1423	             client will use to authenticate itself.  Each token may
+1424	             be a string up to 500 characters in length.",
+1425	         "multivalues": false,
+1426	         "required": false,
+1427	         "caseExact": true,
+1428	         "mutability": "readOnly",
+1429	         "returned": "default",
+1430	         "uniqueness": "none"
+1431	       }
+1432	     ],
+1433	     "meta" : {
+1434	       "resourceType" : "Schema",
+1435	       "location" :
+1436	         "/v2/Schemas/urn:ietf:params:scim:schemas:core:2.0:Device"
+1437	     }
+1438	   }
+1439	   <CODE ENDS>
+
+1441	8.4.  BLE Extension Schema JSON
+1442	   <CODE BEGINS>
+1443	   [
+1444	     {
+1445	       "id": "urn:ietf:params:scim:schemas:extension:ble:2.0:Device",
+1446	       "name": "bleExtension",
+1447	       "description": "Ble extension for device account",
+1448	       "attributes" : [
+1449	         {
+1450	           "name": "versionSupport",
+1451	           "type": "string",
+1452	           "description": "Provides a list of all the BLE versions
+1453	               supported by the device. For example, [4.1, 4.2, 5.0,
+1454	               5.1, 5.2, 5.3].",
+1455	           "multivalues": true,
+1456	           "required": true,
+1457	           "caseExact": false,
+1458	           "mutability": "readWrite",
+1459	           "returned": "default",
+1460	           "uniqueness": "none"
+1461	         },
+1462	         {
+1463	           "name": "deviceMacAddress",
+1464	           "type": "string",
+1465	           "pattern": "^[0-9A-Fa-f]{2}(:[0-9A-Fa-f]{2}){5}$",
+1466	           "description": "A unique public MAC address assigned by the
+1467	               manufacturer.",
+1468	           "multivalues": false,
+1469	           "required": true,
+1470	           "caseExact": false,
+1471	           "mutability": "readWrite",
+1472	           "returned": "default",
+1473	           "uniqueness": "Manufacturer"
+1474	         },
+1475	         {
+1476	           "name": "isRandom",
+1477	           "type": "boolean",
+1478	             "description": "The isRandom flag is taken from the BLE
+1479	                 core specifications 5.3. If TRUE, device is using a
+1480	                 random address.  Default value is false.",
+1481	           "multivalues": false,
+1482	           "required": false,
+1483	           "caseExact": false,
+1484	           "mutability": "readWrite",
+1485	           "returned": "default",
+1486	           "uniqueness": "none"
+1487	         },
+1488	         {
+1489	           "name": "separateBroadcastAddress",
+1490	           "type": "string",
+1491	           "description": "When present, this address is used for
+1492	               broadcasts/advertisements.  This value MUST NOT be set
+1493	               when an IRK is provided.  Its form is the same as
+1494	               deviceMa`cAddress.",
+1495	           "multivalues": true,
+1496	           "required": false,
+1497	           "caseExact": false,
+1498	           "mutability": "readWrite",
+1499	           "returned": "default",
+1500	           "uniqueness": "none"
+1501	         },
+1502	         {
+1503	           "name": "irk",
+1504	           "type": "string",
+1505	           "description": "Identity resolving key, which is unique for
+1506	               every device. It is used to resolve random address.
+1507	               This value MUST NOT be set when
+1508	               separateBroadcastAddress is set.",
+1509	           "multivalues": false,
+1510	           "required": false,
+1511	           "caseExact": false,
+1512	           "mutability": "readWrite",
+1513	           "returned": "default",
+1514	           "uniqueness": "Manufacturer"
+1515	         },
+1516	         {
+1517	           "name": "mobility",
+1518	           "type": "bool",
+1519	           "description": "If set to True, the BLE device will
+1520	               automatically connect to the closest AP. For example,
+1521	               BLE device is connected with AP-1 and moves out of
+1522	               range but comes in range of AP-2, it will be
+1523	               disconnected with AP-1 and connects with AP-2.",
+1524	           "multivalues": false,
+1525	           "required": false,
+1526	           "caseExact": false,
+1527	           "mutability": "readWrite",
+1528	           "returned": "default",
+1529	           "uniqueness": "none"
+1530	         },
+1531	         {
+1532	           "name": "pairingMethods",
+1533	           "type": "string",
+1534	           "description": "List of pairing methods associated with the
+1535	               ble device, stored as schema URI.",
+1536	           "multivalues": true,
+1537	           "required": true,
+1538	           "caseExact": true,
+1539	           "mutability": "readWrite",
+1540	           "returned": "default",
+1541	           "uniqueness": "none"
+1542	         }
+1543	       ],
+1544	       "meta" : {
+1545	         "resourceType" : "Schema",
+1546	         "location" : "/v2/Schemas/urn:ietf:params:scim:schemas
+1547	            :extension:ble:2.0:Device"
+1548	       }
+1549	     },
+1550	     {
+1551	       "id": "urn:ietf:params:scim:schemas:extension:pairingNull:2.0
+1552	          :Device",
+1553	       "name": "nullPairing",
+1554	       "description": "Null pairing method for ble. It is included for
+1555	           the devices that do not have a pairing method.",
+1556	       "meta" : {
+1557	         "resourceType" : "Schema",
+1558	         "location" : "/v2/Schemas/urn:ietf:params:scim:schemas
+1559	            :extension:pairingNull:2.0:Device"
+1560	       }
+1561	     },
+1562	     {
+1563	       "id": "urn:ietf:params:scim:schemas:extension:pairingJustWorks
+1564	          :2.0:Device",
+1565	       "name": "pairingJustWorks",
+1566	       "description": "Just works pairing method for ble.",
+1567	       "attributes" : [
+1568	         {
+1569	           "name": "key",
+1570	           "type": "integer",
+1571	           "description": "Just works does not have any key value. For
+1572	               completeness, it is added with a key value 'null'.",
+1573	           "multivalues": false,
+1574	           "required": true,
+1575	           "caseExact": false,
+1576	           "mutability": "immutable",
+1577	           "returned": "default",
+1578	           "uniqueness": "none"
+1579	         }
+1580	       ],
+1581	       "meta" : {
+1582	         "resourceType" : "Schema",
+1583	         "location" : "/v2/Schemas/urn:ietf:params:scim:schemas
+1584	            :extension:pairingJustWorks:2.0:Device"
+1585	       }
+
+1587	     },
+1588	     {
+1589	       "id": "urn:ietf:params:scim:schemas:extension:pairingPassKey
+1590	          :2.0:Device",
+1591	       "name": "pairingPassKey",
+1592	       "description": "Pass key pairing method for ble.",
+1593	       "attributes" : [
+1594	         {
+1595	           "name": "key",
+1596	           "type": "integer",
+1597	           "description": "A six digit passkey for ble device. The
+1598	               pattern of key is ^[0-9]{6}$.",
+1599	           "multivalues": false,
+1600	           "required": true,
+1601	           "caseExact": false,
+1602	           "mutability": "readWrite",
+1603	           "returned": "default",
+1604	           "uniqueness": "none"
+1605	         }
+1606	       ],
+1607	       "meta" : {
+1608	         "resourceType" : "Schema",
+1609	         "location" : "/v2/Schemas/urn:ietf:params:scim:schemas
+1610	            :extension:pairingPassKey:2.0:Device"
+1611	       }
+1612	     },
+1613	     {
+1614	       "id": "urn:ietf:params:scim:schemas:extension:pairingOOB:2.0
+1615	          :Device",
+1616	       "name": "pairingOOB",
+1617	       "description": "Pass key pairing method for ble.",
+1618	       "attributes" : [
+1619	         {
+1620	           "name": "key",
+1621	           "type": "string",
+1622	           "description": "A key value retrieved from out of band
+1623	               source such as NFC.",
+1624	           "multivalues": false,
+1625	           "required": true,
+1626	           "caseExact": true,
+1627	           "mutability": "readWrite",
+1628	           "returned": "default",
+1629	           "uniqueness": "none"
+1630	         },
+1631	         {
+1632	           "name": "randomNumber",
+1633	           "type": "integer",
+1634	           "description": "Nonce added to the key.",
+1635	           "multivalues": false,
+1636	           "required": true,
+1637	           "caseExact": false,
+1638	           "mutability": "readWrite",
+1639	           "returned": "default",
+1640	           "uniqueness": "none"
+1641	         },
+1642	         {
+1643	           "name": "confirmationNumber",
+1644	           "type": "integer",
+1645	           "description": "Some solutions require confirmation number
+1646	               in RESTful message exchange.",
+1647	           "multivalues": false,
+1648	           "required": false,
+1649	           "caseExact": false,
+1650	           "mutability": "readWrite",
+1651	           "returned": "default",
+1652	           "uniqueness": "none"
+1653	         }
+1654	       ],
+1655	       "meta" : {
+1656	         "resourceType" : "Schema",
+1657	         "location" : "/v2/Schemas/urn:ietf:params:scim:schemas
+1658	            :extension:pairingOOB:2.0:Device"
+1659	       }
+1660	     }
+1661	   ]
+1662	   <CODE ENDS>
+
+1664	8.5.  DPP Extension Schema JSON
+
+1666	   <CODE BEGINS>
+1667	   {
+1668	       "id": "urn:ietf:params:scim:schemas:extension:dpp:2.0:Device",
+1669	       "name": "dppExtension",
+1670	       "description": "Device extension schema for Wi-Fi Easy Connect
+1671	           / Device Provisioning Protocol (DPP)",
+1672	       "attributes" : [
+1673	         {
+1674	           "name": "dppVersion",
+1675	           "type": "integer",
+1676	           "description": "Version of DPP this device supports.",
+1677	           "multivalues": false,
+1678	           "required": true,
+1679	           "caseExact": false,
+1680	           "mutability": "readWrite",
+1681	           "returned": "default",
+1682	           "uniqueness": "none"
+
+1684	         },
+1685	         {
+1686	           "name": "bootstrappingMethod",
+1687	           "type": "string",
+1688	           "description": "The list of all the bootstrapping methods
+1689	               available on the enrollee device. For example, [QR,
+1690	               NFC].",
+1691	           "multivalues": true,
+1692	           "required": false,
+1693	           "caseExact": false,
+1694	           "mutability": "readWrite",
+1695	           "returned": "default",
+1696	           "uniqueness": "none"
+1697	         },
+1698	         {
+1699	           "name": "bootstrapKey",
+1700	           "type": "string",
+1701	           "description": "A base64-encoded Elliptic-Curve Diffie
+1702	              -Hellman public key (may be P-256, P-384, or P-521).",
+1703	           "multivalues": false,
+1704	           "required": true,
+1705	           "caseExact": true,
+1706	           "mutability": "readWrite",
+1707	           "returned": "default",
+1708	           "uniqueness": "none"
+1709	         },
+1710	         {
+1711	           "name": "deviceMacAddress",
+1712	           "type": "string",
+1713	           "pattern": "^[0-9A-Fa-f]{2}(:[0-9A-Fa-f]{2}){5}$",
+1714	           "description": "A unique public MAC address assigned by the
+1715	               manufacturer.",
+1716	           "multivalues": false,
+1717	           "required": false,
+1718	           "caseExact": false,
+1719	           "mutability": "readWrite",
+1720	           "returned": "default",
+1721	           "uniqueness": "Manufacturer"
+1722	         },
+1723	         {
+1724	           "name": "classChannel",
+1725	           "type": "string",
+1726	           "description": "A list of global operating class and
+1727	               channel shared as bootstrapping information. It is
+1728	               formatted as class/channel. For example, '81/1',
+1729	               '115/36'.",
+1730	           "multivalues": true,
+1731	           "required": false,
+1732	           "caseExact": false,
+1733	           "mutability": "readWrite",
+1734	           "returned": "default",
+1735	           "uniqueness": "none"
+1736	         },
+1737	         {
+1738	           "name": "serialNumber",
+1739	           "type": "string",
+1740	           "description": "An alphanumeric serial number that may also
+1741	               be passed as bootstrapping information.",
+1742	           "multivalues": false,
+1743	           "required": false,
+1744	           "caseExact": false,
+1745	           "mutability": "readWrite",
+1746	           "returned": "default",
+1747	           "uniqueness": "none"
+1748	         }
+
+1750	       ],
+1751	       "meta" : {
+1752	         "resourceType" : "Schema",
+1753	         "location" : "/v2/Schemas/urn:ietf:params:scim:schemas
+1754	            :extension:dpp:2.0:Device"
+1755	       }
+1756	     }
+1757	   <CODE ENDS>
+
+1759	8.6.  Ethernet MAB Extension Schema JSON
+1760	   <CODE BEGINS>
+1761	   {
+1762	     "id": "urn:ietf:params:scim:schemas:extension:ethernet-mab:2.0
+1763	        :Device",
+1764	     "name": "ethernetMabExtension",
+1765	     "description": "Device extension schema for MAC authentication
+1766	         Bypass.",
+1767	     "attributes" : [
+1768	         {
+1769	           "name": "deviceMacAddress",
+1770	           "type": "string",
+1771	           "pattern": "^[0-9A-Fa-f]{2}(:[0-9A-Fa-f]{2}){5}$",
+1772	           "description": "A MAC address assigned by the manufacturer",
+1773	           "multivalues": false,
+1774	           "required": true,
+1775	           "caseExact": false,
+1776	           "mutability": "readWrite",
+1777	           "returned": "default",
+1778	           "uniqueness": "Manufacturer"
+1779	         }
+1780	     ],
+1781	     "meta" : {
+1782	       "resourceType" : "Schema",
+1783	       "location" : "/v2/Schemas/urn:ietf:params:scim:schemas
+1784	          :extension:ethernet-mab:2.0:Device"
+1785	     }
+1786	   }
+1787	   <CODE ENDS>
+
+1789	8.7.  FDO Extension Schema JSON
+1790	   <CODE BEGINS>
+1791	   {
+1792	     "id": "urn:ietf:params:scim:schemas:extension:fido-device-onboard
+1793	        :2.0:Devices",
+1794	     "name": "FDOExtension",
+1795	     "description": "Device extension schema for FIDO Device Onboard
+1796	        (FDO).",
+1797	     "attributes" : [
+1798	         {
+1799	           "name": "fdoVoucher",
+1800	           "type": "string",
+1801	           "description": "A voucher as defined in the FDO
+1802	               specification",
+1803	           "multivalues": false,
+1804	           "required": true,
+1805	           "caseExact": false,
+1806	           "mutability": "readWrite",
+1807	           "returned": "default",
+1808	           "uniqueness": "Manufacturer"
+1809	         }
+1810	     ],
+1811	     "meta" : {
+1812	       "resourceType" : "Schema",
+1813	       "location" : "/v2/Schemas/urn:ietf:params:scim:schemas
+1814	          :extension:fido-device-onboard:2.0:Devices"
+1815	     }
+1816	   }
+1817	   <CODE ENDS>
+
+1819	8.8.  Zigbee Extension Schema JSON
+1820	   <CODE BEGINS>
+1821	   {
+1822	     "id": "urn:ietf:params:scim:schemas:extension:zigbee:2.0:Device",
+1823	     "name": "zigbeeExtension",
+1824	     "description": "Device extension schema for zigbee.",
+1825	     "attributes" : [
+1826	       {
+1827	         "name": "versionSupport",
+1828	         "type": "string",
+1829	         "description": "Provides a list of all the zigbee versions
+1830	             supported by the device. For example, [3.0].",
+1831	         "multivalues": true,
+1832	         "required": true,
+1833	         "caseExact": false,
+1834	         "mutability": "readWrite",
+1835	         "returned": "default",
+1836	         "uniqueness": "none"
+1837	       },
+1838	       {
+1839	         "name": "deviceEui64Address",
+1840	         "type": "string",
+1841	         "pattern": "^[0-9A-Fa-f]{2}(:[0-9A-Fa-f]{2}){7}$",
+1842	         "description": "The EUI-64 (Extended Unique Identifier)
+1843	             device address.",
+1844	         "multivalues": false,
+1845	         "required": true,
+1846	         "caseExact": false,
+1847	         "mutability": "readWrite",
+1848	         "returned": "default",
+1849	         "uniqueness": "none"
+1850	       }
+1851	     ],
+1852	     "meta" : {
+1853	       "resourceType" : "Schema",
+1854	       "location" : "/v2/Schemas/urn:ietf:params:scim:schemas
+1855	          :extension:zigbee:2.0:Device"
+1856	     }
+1857	   }
+1858	   <CODE ENDS>
+
+1860	8.9.  EndpointAppsExt JSON Extension Schema
+
+1862	   <CODE BEGINS>
+1863	   {
+1864	     "id": "urn:ietf:params:scim:schemas:extension:endpointAppsExt:2.0
+1865	        :Device",
+1866	     "name": "endpointAppsExt",
+1867	     "description": "Extension for partner endpoint applications that
+1868	         can onboard, control, and communicate with the device.",
+1869	     "attributes" : [
+1870	       {
+1871	         "name": "applications",
+1872	         "type": "complex",
+1873	         "description": "Includes references to two types of
+1874	             application that connect with entrprise, i.e.,
+1875	             deviceControl and telemetry.",
+1876	         "multivalues": true,
+1877	         "required": true,
+1878	         "caseExact": false,
+1879	         "mutability": "readWrite",
+1880	         "returned": "default",
+1881	         "uniqueness": "none",
+1882	         "subAttributes" : [
+1883	           {
+1884	             "name" : "value",
+1885	             "type" : "string",
+1886	             "description" : "The identifier of the endpointApp.",
+1887	             "multiValued" : false,
+1888	             "required" : true,
+1889	             "caseExact" : false,
+1890	             "mutability" : "readWrite",
+1891	             "returned" : "default",
+1892	             "uniqueness" : "none"
+1893	           },
+1894	           {
+1895	             "name" : "$ref",
+1896	             "type" : "reference",
+1897	             "referenceTypes" : "EndpointApps",
+1898	             "description" : "The URI of the corresponding
+1899	                 'EndpointApp' resource which will control or obtain
+1900	                 data from the device.",
+1901	             "multiValued" : false,
+1902	             "required" : false,
+1903	             "caseExact" : true,
+1904	             "mutability" : "readOnly",
+1905	             "returned" : "default",
+1906	             "uniqueness" : "none"
+1907	           }
+1908	         ]
+1909	       },
+1910	       {
+1911	         "name": "deviceControlEnterpriseEndpoint",
+1912	         "type": "reference",
+1913	         "description": "The URL of the enterprise endpoint which
+1914	             device control apps use to reach enterprise network
+1915	             gateway.",
+
+1917	         "multivalues": false,
+1918	         "required": true,
+1919	         "caseExact": true,
+1920	         "mutability": "readOnly",
+1921	         "returned": "default",
+1922	         "uniqueness": "Enterprise"
+1923	       },
+1924	       {
+1925	         "name": "telemetryEnterpriseEndpoint",
+1926	         "type": "reference",
+1927	         "description": "The URL of the enterprise endpoint which
+1928	             telemetry apps use to reach enterprise network gateway.",
+1929	         "multivalues": false,
+1930	         "required": false,
+1931	         "caseExact": true,
+1932	         "mutability": "readOnly",
+1933	         "returned": "default",
+1934	         "uniqueness": "Enterprise"
+1935	       }
+1936	     ],
+1937	     "meta" : {
+1938	       "resourceType" : "Schema",
+1939	       "location" : "/v2/Schemas/urn:ietf:params:scim:schemas
+1940	          :extension:endpointAppsExt:2.0:Device"
+1941	     }
+1942	   }
+1943	   <CODE ENDS>
+
+1945	8.10.  Representation of Schema
+
+1947	   The following is the JSON representation of the Schema.  Implementors
+1948	   MUST NOT vary from the schema definitions in their implementations.
+1949	   They may choose not to implement a particular extension, but if they
+1950	   do, they MUST implement all mandatory elements, and they must
+1951	   implement optional elements as specified.
+
+1953	   <CODE BEGINS>
+1954	   {
+1955	     "id" : "urn:ietf:params:scim:schemas:core:2.0:Schema",
+1956	     "name" : "Schema",
+1957	     "description" : "Specifies the schema that describes a SCIM
+1958	         schema",
+1959	     "attributes" : [
+1960	       {
+1961	         "name" : "id",
+1962	         "type" : "string",
+1963	         "multiValued" : false,
+1964	         "description" : "The unique URI of the schema. When
+1965	             applicable, service providers MUST specify the URI.",
+1966	         "required" : true,
+1967	         "caseExact" : false,
+1968	         "mutability" : "readOnly",
+1969	         "returned" : "default",
+1970	         "uniqueness" : "none"
+1971	       },
+1972	       {
+1973	         "name" : "name",
+1974	         "type" : "string",
+1975	         "multiValued" : false,
+1976	         "description" : "The schema's human-readable name.  When
+1977	             applicable, service providers MUST specify the name,
+1978	             e.g., 'Device'.",
+1979	         "required" : true,
+1980	         "caseExact" : false,
+1981	         "mutability" : "readOnly",
+1982	         "returned" : "default",
+1983	         "uniqueness" : "none"
+1984	       },
+1985	       {
+1986	         "name" : "description",
+1987	         "type" : "string",
+1988	         "multiValued" : false,
+1989	         "description" : "Human-readable description of the schema,
+1990	             e.g., 'Device account'.",
+1991	         "required" : false,
+1992	         "caseExact" : false,
+1993	         "mutability" : "readOnly",
+1994	         "returned" : "default",
+1995	         "uniqueness" : "none"
+1996	       },
+1997	       {
+1998	         "name" : "attributes",
+1999	         "type" : "complex",
+2000	         "multiValued" : true,
+2001	         "description" : "A complex attribute that includes the
+2002	             attributes of a schema.",
+2003	         "required" : true,
+2004	         "mutability" : "readOnly",
+2005	         "returned" : "default",
+2006	         "subAttributes" : [
+2007	           {
+2008	             "name" : "name",
+2009	             "type" : "string",
+2010	             "multiValued" : false,
+2011	             "description" : "The attribute's name, e.g.,
+2012	                 'displayName'.",
+
+2014	             "required" : true,
+2015	             "caseExact" : true,
+2016	             "mutability" : "readOnly",
+2017	             "returned" : "default",
+2018	             "uniqueness" : "none"
+2019	           },
+2020	           {
+2021	             "name" : "type",
+2022	             "type" : "string",
+2023	             "multiValued" : false,
+2024	             "description" : "The attribute's data type. Valid values
+2025	                 include 'string', 'complex', 'boolean', 'decimal',
+2026	                 'integer', 'dateTime', 'reference'.",
+2027	             "required" : true,
+2028	             "caseExact" : false,
+2029	             "mutability" : "readOnly",
+2030	             "returned" : "default",
+2031	             "uniqueness" : "none",
+2032	             "canonicalValues" : [
+2033	               "string",
+2034	               "complex",
+2035	               "boolean",
+2036	               "decimal",
+2037	               "integer",
+2038	               "dateTime",
+2039	               "reference"
+2040	             ]
+2041	           },
+2042	           {
+2043	             "name" : "multiValued",
+2044	             "type" : "boolean",
+2045	             "multiValued" : false,
+2046	             "description" : "A Boolean value indicating an
+2047	                 attribute's plurality.",
+2048	             "required" : true,
+2049	             "mutability" : "readOnly",
+2050	             "returned" : "default"
+2051	           },
+2052	           {
+2053	             "name" : "description",
+2054	             "type" : "string",
+2055	             "multiValued" : false,
+2056	             "description" : "A human-readable description of the
+2057	                 attribute.",
+2058	             "required" : true,
+2059	             "caseExact" : false,
+2060	             "mutability" : "readOnly",
+2061	             "returned" : "default",
+2062	             "uniqueness" : "none"
+2063	           },
+2064	           {
+2065	             "name" : "required",
+2066	             "type" : "boolean",
+2067	             "multiValued" : false,
+2068	             "description" : "A boolean value indicating whether or
+2069	               not the attribute is required.",
+2070	             "required" : true,
+2071	             "mutability" : "readOnly",
+2072	             "returned" : "default"
+2073	           },
+2074	           {
+2075	             "name" : "canonicalValues",
+2076	             "type" : "string",
+2077	             "multiValued" : true,
+2078	             "description" : "A collection of canonical values.  When
+2079	                 applicable, service providers MUST specify the
+2080	                 canonical types, e.g., mutability of an attribute,
+2081	                 return type, uniqueness.",
+2082	             "required" : false,
+2083	             "caseExact" : true,
+2084	             "mutability" : "readOnly",
+2085	             "returned" : "default",
+2086	             "uniqueness" : "none"
+2087	           },
+2088	           {
+2089	             "name" : "caseExact",
+2090	             "type" : "boolean",
+2091	             "multiValued" : false,
+2092	             "description" : "A Boolean value indicating whether or
+2093	                 not a string attribute is case sensitive.",
+2094	             "required" : false,
+2095	             "mutability" : "readOnly",
+2096	             "returned" : "default"
+2097	           },
+2098	            {
+2099	             "name" : "mutability",
+2100	             "type" : "string",
+2101	             "multiValued" : false,
+2102	             "description" : "Indicates whether or not an attribute is
+2103	                 modifiable.",
+2104	             "required" : false,
+2105	             "caseExact" : true,
+2106	             "mutability" : "readOnly",
+2107	             "returned" : "default",
+2108	             "uniqueness" : "none",
+2109	             "canonicalValues" : [
+2110	               "readOnly",
+2111	               "readWrite",
+2112	               "immutable",
+2113	               "writeOnly"
+2114	             ]
+2115	           },
+2116	           {
+2117	             "name" : "returned",
+2118	             "type" : "string",
+2119	             "multiValued" : false,
+2120	             "description" : "Indicates when an attribute is returned
+2121	                 in a response (e.g., to a query).",
+2122	             "required" : false,
+2123	             "caseExact" : true,
+2124	             "mutability" : "readOnly",
+2125	             "returned" : "default",
+2126	             "uniqueness" : "none",
+2127	             "canonicalValues" : [
+2128	               "always",
+2129	               "never",
+2130	               "default",
+2131	               "request"
+2132	             ]
+2133	           },
+2134	           {
+2135	             "name" : "uniqueness",
+2136	             "type" : "string",
+2137	             "multiValued" : false,
+2138	             "description" : "Indicates how unique a value must be.",
+2139	             "required" : false,
+2140	             "caseExact" : true,
+2141	             "mutability" : "readOnly",
+2142	             "returned" : "default",
+2143	             "uniqueness" : "none",
+2144	             "canonicalValues" : [
+2145	               "none",
+2146	               "Enterprise",
+2147	               "Manufacturer"
+2148	             ]
+2149	           },
+2150	           {
+2151	             "name" : "referenceTypes",
+2152	             "type" : "string",
+2153	             "multiValued" : false,
+2154	             "description" : "Used only with an attribute of type
+2155	                 'reference'.  Specifies a SCIM resourceType that a
+2156	                 reference attribute MAY refer to, e.g.,
+2157	                 'EndpointApp'.",
+
+2159	             "required" : false,
+2160	             "caseExact" : true,
+2161	             "mutability" : "readOnly",
+2162	             "returned" : "default",
+2163	             "uniqueness" : "none"
+2164	           },
+2165	           {
+2166	             "name" : "subAttributes",
+2167	             "type" : "complex",
+2168	             "multiValued" : true,
+2169	             "description" : "Used to define the sub-attributes of a
+2170	                 complex attribute.",
+2171	             "required" : false,
+2172	             "mutability" : "readOnly",
+2173	             "returned" : "default",
+2174	             "subAttributes" : [
+2175	               {
+2176	                 "name" : "name",
+2177	                 "type" : "string",
+2178	                 "multiValued" : false,
+2179	                 "description" : "The attribute's name.",
+2180	                 "required" : true,
+2181	                 "caseExact" : true,
+2182	                 "mutability" : "readOnly",
+2183	                 "returned" : "default",
+2184	                 "uniqueness" : "none"
+2185	               },
+2186	               {
+2187	                 "name" : "type",
+2188	                 "type" : "string",
+2189	                 "multiValued" : false,
+2190	                 "description" : "The attribute's data type. Valid
+2191	                     values include 'string', 'complex', 'boolean',
+2192	                     'decimal', 'integer', 'dateTime', 'reference'.",
+2193	                 "required" : true,
+2194	                 "caseExact" : false,
+2195	                 "mutability" : "readOnly",
+2196	                 "returned" : "default",
+2197	                 "uniqueness" : "none",
+2198	                 "canonicalValues" : [
+2199	                   "string",
+2200	                   "complex",
+2201	                   "boolean",
+2202	                   "decimal",
+2203	                   "integer",
+2204	                   "dateTime",
+2205	                   "reference"
+2206	                 ]
+
+2208	               },
+2209	               {
+2210	                 "name" : "multiValued",
+2211	                 "type" : "boolean",
+2212	                 "multiValued" : false,
+2213	                 "description" : "A Boolean value indicating an
+2214	                     attribute's plurality.",
+2215	                 "required" : true,
+2216	                 "mutability" : "readOnly",
+2217	                 "returned" : "default"
+2218	               },
+2219	               {
+2220	                 "name" : "description",
+2221	                 "type" : "string",
+2222	                 "multiValued" : false,
+2223	                 "description" : "A human-readable description of the
+2224	                     attribute.",
+2225	                 "required" : true,
+2226	                 "caseExact" : false,
+2227	                 "mutability" : "readOnly",
+2228	                 "returned" : "default",
+2229	                 "uniqueness" : "none"
+2230	               },
+2231	               {
+2232	                 "name" : "required",
+2233	                 "type" : "boolean",
+2234	                 "multiValued" : false,
+2235	                 "description" : "A boolean value indicating whether
+2236	                     or not the attribute is required.",
+2237	                 "required" : true,
+2238	                 "mutability" : "readOnly",
+2239	                 "returned" : "default"
+2240	               },
+2241	               {
+2242	                 "name" : "canonicalValues",
+2243	                 "type" : "string",
+2244	                 "multiValued" : true,
+2245	                 "description" : "A collection of canonical values.
+2246	                     When applicable, service providers MUST specify
+2247	                     the canonical types, e.g., mutability of an
+2248	                     attribute, return type, uniqueness.",
+2249	                 "required" : false,
+2250	                 "caseExact" : true,
+2251	                 "mutability" : "readOnly",
+2252	                 "returned" : "default",
+2253	                 "uniqueness" : "none"
+2254	               },
+2255	               {
+2256	                 "name" : "caseExact",
+2257	                 "type" : "boolean",
+2258	                 "multiValued" : false,
+2259	                 "description" : "A Boolean value indicating whether
+2260	                     or not a string attribute is case sensitive.",
+2261	                 "required" : false,
+2262	                 "mutability" : "readOnly",
+2263	                 "returned" : "default"
+2264	               },
+2265	               {
+2266	                 "name" : "mutability",
+2267	                 "type" : "string",
+2268	                 "multiValued" : false,
+2269	                 "description" : "Indicates whether or not an
+2270	                     attribute is modifiable.",
+2271	                 "required" : false,
+2272	                 "caseExact" : true,
+2273	                 "mutability" : "readOnly",
+2274	                 "returned" : "default",
+2275	                 "uniqueness" : "none",
+2276	                 "canonicalValues" : [
+2277	                   "readOnly",
+2278	                   "readWrite",
+2279	                   "immutable",
+2280	                   "writeOnly"
+2281	                 ]
+2282	               },
+2283	               {
+2284	                 "name" : "returned",
+2285	                 "type" : "string",
+2286	                 "multiValued" : false,
+2287	                 "description" : "Indicates when an attribute is
+2288	                     returned in a response (e.g., to a query).",
+2289	                 "required" : false,
+2290	                 "caseExact" : true,
+2291	                 "mutability" : "readOnly",
+2292	                 "returned" : "default",
+2293	                 "uniqueness" : "none",
+2294	                 "canonicalValues" : [
+2295	                   "always",
+2296	                   "never",
+2297	                   "default",
+2298	                   "request"
+2299	                 ]
+2300	               },
+2301	               {
+2302	                 "name" : "uniqueness",
+2303	                 "type" : "string",
+2304	                 "multiValued" : false,
+2305	                 "description" : "Indicates how unique a value must
+2306	                     be.",
+2307	                 "required" : false,
+2308	                 "caseExact" : true,
+2309	                 "mutability" : "readOnly",
+2310	                 "returned" : "default",
+2311	                 "uniqueness" : "none",
+2312	                 "canonicalValues" : [
+2313	                   "none",
+2314	                   "Enterprise",
+2315	                   "Manufacturer"
+2316	                 ]
+2317	               },
+2318	               {
+2319	                 "name" : "referenceTypes",
+2320	                 "type" : "string",
+2321	                 "multiValued" : false,
+2322	                 "description" : "Used only with an attribute of type
+2323	                     'reference'.  Specifies a SCIM resourceType that
+2324	                     a reference attribute MAY refer to, e.g.,
+2325	                     'EndpointApp'.",
+2326	                 "required" : false,
+2327	                 "caseExact" : true,
+2328	                 "mutability" : "readOnly",
+2329	                 "returned" : "default",
+2330	                 "uniqueness" : "none"
+2331	               }
+2332	             ]
+2333	           }
+2334	         ]
+2335	       }
+2336	     ]
+2337	   }
+2338	   <CODE ENDS>
+
+2340	9.  Security Considerations
+
+2342	   Because provisioning operations permit device access to a network,
+2343	   each SCIM client MUST be appropriately authenticated.
+
+2345	9.1.  SCIM operations
+
+2347	   An attacker that has authenticated to a trusted SCIM client could
+2348	   manipulate portions of the SCIM database.  To be clear on the risks,
+2349	   we discuss each operation below:
+
+2351	9.1.1.  Unauthorized Object Creation
+
+2353	   An attacker that is authenticated could attempt to add elements that
+2354	   the enterprise would not normally permit on a network.  For instance,
+2355	   an enterprise may not wish specific devices that have well-known
+2356	   vulnerabilities to be introduced to their environment.  To mitigate
+2357	   the attack, network administrators should layer additional policies
+2358	   regarding what devices are permitted on the network.
+
+2360	   An attacker that gains access to SCIM could attempt to add an IP-
+2361	   based device that itself attempts unauthorized access, effectively
+2362	   acting as a Bot.  Network administrators SHOULD establish appropriate
+2363	   access-control policies that follow the principle of least privilege
+2364	   to mitigate this attack.
+
+2366	9.2.  Object Deletion
+
+2368	   Once granted, even if the object is removed, the server may or may
+2369	   not act on that removal.  The deletion of the object is a signal of
+2370	   intent by the application that it no longer expects the device to be
+2371	   on the network.  It is strictly up to the SCIM server and its back
+2372	   end policy to decide whether or not to revoke access to the
+2373	   infrastructure.  It is RECOMMENDED that SCIM delete operations
+2374	   trigger a workflow in accordance with local network policy.
+
+2376	9.3.  Read operations
+
+2378	   Read operations are necessary in order for an application to sync its
+2379	   state to know what devices it is expected to manage.  An attacker
+2380	   with access to SCIM objects may gain access to the devices
+2381	   themselves.  To prevent one SCIM client from interfering with devices
+2382	   that it has no business managing, only clients that have created
+2383	   objects or those they authorize SHOULD have the ability to read those
+2384	   objects.
+
+2386	9.4.  Update Operations
+
+2388	   Update operations may be necessary if a device has been modified in
+2389	   some way.  Attackers with update access may be able to disable
+2390	   network access to devices or device access to networks.  To avoid
+2391	   this, the same access control policy for read operations is
+2392	   RECOMMENDED here.
+
+2394	9.5.  Higher level protection for certain systems
+
+2396	   Devices provisioned with this model may be completely controlled by
+2397	   the administrator of the SCIM server, depending on how those systems
+2398	   are defined.  For instance, if BLE passkeys are provided, the device
+2399	   can be connected to, and perhaps paired with.  If the administrator
+2400	   of the SCIM client does not wish the network to have complete access
+2401	   to the device, the device itself MUST support finer levels of access
+2402	   control and additional authentication mechanisms.  Any additional
+2403	   security must be provided at higher application layers.  For example,
+2404	   if client applications wish to keep private information to and from
+2405	   the device, they should encrypt that information over-the-top.
+
+2407	9.6.  Logging
+
+2409	   An attacker could learn what devices are on a network by examining
+2410	   SCIM logs.  Due to the sensitive nature of SCIM operations, logs
+2411	   SHOULD be encrypted both on the disk and in transit.
+
+2413	10.  IANA Considerations
+
+2415	10.1.  New Schemas
+
+2417	   The IANA is requested to add the following additions to the "SCIM
+2418	   Schema URIs for Data Resources" registry as follows:
+
+2420	     +====================================+=============+============+
+2421	     | URN                                | Name        | Reference  |
+2422	     +====================================+=============+============+
+2423	     | urn:ietf:params:scim:schemas:core: | Core Device | This memo, |
+2424	     | 2.0:Device                         | Schema      | Section 3  |
+2425	     +------------------------------------+-------------+------------+
+2426	     | urn:ietf:params:scim:schemas:core: | Endpoint    | This memo, |
+2427	     | 2.0:EndpointApp                    | Application | Section 6  |
+2428	     +------------------------------------+-------------+------------+
+
+2430	                                  Table 9
+
+2432	   Note that the line break in URNs should be removed, as should this
+2433	   comment.
+
+2435	10.2.  Device Schema Extensions
+
+2437	   IANA is requested to create the following extensions: as described in
+2438	   Section 7:
+
+2440	   +================================+=============+========+==========+
+2441	   | URN                            | Description |Resource|Reference |
+2442	   |                                |             |Type    |          |
+2443	   +================================+=============+========+==========+
+2444	   | urn:ietf:params:scim:          | BLE         |Device  |This memo,|
+2445	   | schemas:extension:             | Extension   |        |Section   |
+2446	   | ble:2.0:Device                 |             |        |7.1       |
+2447	   +--------------------------------+-------------+--------+----------+
+2448	   | urn:ietf:params:scim:          | Ethernet    |Device  |This memo,|
+2449	   | schemas:extension: ethernet-   | MAB         |        |Section   |
+2450	   | mab:2.0:Device                 |             |        |7.3       |
+2451	   +--------------------------------+-------------+--------+----------+
+2452	   | urn:ietf:params:scim:          | FIDO Device |Device  |This memo,|
+2453	   | schemas:extension: fido-       | Onboard     |        |Section   |
+2454	   | device-onboard:2.0:Device      |             |        |7.4       |
+2455	   +--------------------------------+-------------+--------+----------+
+2456	   | urn:ietf:params:scim:          | Wi-fi Easy  |Device  |This memo,|
+2457	   | schemas:extension:             | Connect     |        |Section   |
+2458	   | dpp:2.0:Device                 |             |        |7.2       |
+2459	   +--------------------------------+-------------+--------+----------+
+2460	   | urn:ietf:params:scim:          | Application |Device  |This memo,|
+2461	   | schemas:extension:             | Endpoint    |        |Section   |
+2462	   | endpointAppsExt:2.0:Device     | Extension   |        |7.1.3     |
+2463	   +--------------------------------+-------------+--------+----------+
+2464	   | urn:ietf:params:scim:          | Just Works  |Device  |This memo,|
+2465	   | schemas:extension:             | Auth BLE    |        |Section   |
+2466	   | pairingJustWorks:2.0:Device    |             |        |7.1.3     |
+2467	   +--------------------------------+-------------+--------+----------+
+2468	   | urn:ietf:params:scim:          | Out of Band |Device  |This memo,|
+2469	   | schemas:extension:             | Pairing for |        |Section   |
+2470	   | pairingOOB:2.0:Device          | BLE         |        |7.1.3     |
+2471	   +--------------------------------+-------------+--------+----------+
+2472	   | urn:ietf:params:scim:          | Passkey     |Device  |This memo,|
+2473	   | schemas:extension:             | Pairing for |        |Section   |
+2474	   | pairingPassKey:2.0:Device      | BLE         |        |7.1.3     |
+2475	   +--------------------------------+-------------+--------+----------+
+
+2477	                                 Table 10
+
+2479	11.  Acknowledgments
+
+2481	   The authors would like to thank Bart Brinckman, Rohit Mohan, Lars
+2482	   Streubesand, Christian Amsüss, Jason Livingwood, Mike Ounsworth,
+2483	   Monty Wiseman, Geoffrey Cooper, Paulo Jorge N.  Correia, and Phil
+2484	   Hunt for their reviews, and Nick Ross for his contribution to the
+2485	   Appendix.
+
+2487	12.  References
+2488	12.1.  Normative References
+
+2490	   [BLE54]    Bluetooth SIG, "Bluetooth Core Specification, Version
+2491	              5.4", 2023.
+
+2493	   [DPP2]     Wi-Fi Alliance, "Wi-Fi Easy Connect Specification, Version
+2494	              2.0", 2020.
+
+2496	   [FDO11]    FIDO Alliance, "FIDO Device Onboard Specification 1.1",
+2497	              April 2022.
+
+2499	   [JSONSChema]
+2500	              Wright, A., Ed., Andrews, H. A., Ed., Hutton, B., Ed., and
+2501	              G. Dennis, "JSON Schema- A Media Type for Describing JSON
+2502	              Documents", December 2022,
+2503	              <https://json-schema.org/draft/2020-12/json-schema-core>.
+
+2505	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+2506	              Requirement Levels", BCP 14, RFC 2119,
+2507	              DOI 10.17487/RFC2119, March 1997,
+2508	              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+2510	   [rfc4648]  Josefsson, S., "The Base16, Base32, and Base64 Data
+2511	              Encodings", RFC 4648, DOI 10.17487/RFC4648, October 2006,
+2512	              <https://www.rfc-editor.org/rfc/rfc4648>.
+
+2514	   [RFC5280]  Cooper, D., Santesson, S., Farrell, S., Boeyen, S.,
+2515	              Housley, R., and W. Polk, "Internet X.509 Public Key
+2516	              Infrastructure Certificate and Certificate Revocation List
+2517	              (CRL) Profile", RFC 5280, DOI 10.17487/RFC5280, May 2008,
+2518	              <https://www.rfc-editor.org/rfc/rfc5280>.
+
+2520	   [RFC7643]  Hunt, P., Ed., Grizzle, K., Wahlstroem, E., and C.
+2521	              Mortimore, "System for Cross-domain Identity Management:
+2522	              Core Schema", RFC 7643, DOI 10.17487/RFC7643, September
+2523	              2015, <https://www.rfc-editor.org/rfc/rfc7643>.
+
+2525	   [RFC7644]  Hunt, P., Ed., Grizzle, K., Ansari, M., Wahlstroem, E.,
+2526	              and C. Mortimore, "System for Cross-domain Identity
+2527	              Management: Protocol", RFC 7644, DOI 10.17487/RFC7644,
+2528	              September 2015, <https://www.rfc-editor.org/rfc/rfc7644>.
+
+2530	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+2531	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+2532	              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+2534	   [RFC8520]  Lear, E., Droms, R., and D. Romascanu, "Manufacturer Usage
+2535	              Description Specification", RFC 8520,
+2536	              DOI 10.17487/RFC8520, March 2019,
+2537	              <https://www.rfc-editor.org/rfc/rfc8520>.
+
+2539	12.2.  Informative References
+
+2541	   [I-D.brinckman-nipc]
+2542	              Brinckman, B., Mohan, R., and B. Sanford, "An Application
+2543	              Layer Interface for Non-IP device control (NIPC)", Work in
+2544	              Progress, Internet-Draft, draft-brinckman-nipc-01, 21
+2545	              April 2024, <https://datatracker.ietf.org/doc/html/draft-
+2546	              brinckman-nipc-01>.
+
+2548	   [RFC6241]  Enns, R., Ed., Bjorklund, M., Ed., Schoenwaelder, J., Ed.,
+2549	              and A. Bierman, Ed., "Network Configuration Protocol
+2550	              (NETCONF)", RFC 6241, DOI 10.17487/RFC6241, June 2011,
+2551	              <https://www.rfc-editor.org/rfc/rfc6241>.
+
+2553	   [RFC7950]  Bjorklund, M., Ed., "The YANG 1.1 Data Modeling Language",
+2554	              RFC 7950, DOI 10.17487/RFC7950, August 2016,
+2555	              <https://www.rfc-editor.org/rfc/rfc7950>.
+
+2557	   [RFC8040]  Bierman, A., Bjorklund, M., and K. Watsen, "RESTCONF
+2558	              Protocol", RFC 8040, DOI 10.17487/RFC8040, January 2017,
+2559	              <https://www.rfc-editor.org/rfc/rfc8040>.
+
+2561	   [RFC8995]  Pritikin, M., Richardson, M., Eckert, T., Behringer, M.,
+2562	              and K. Watsen, "Bootstrapping Remote Secure Key
+2563	              Infrastructure (BRSKI)", RFC 8995, DOI 10.17487/RFC8995,
+2564	              May 2021, <https://www.rfc-editor.org/rfc/rfc8995>.
+
+2566	Appendix A.  Changes from Earlier Versions
+
+2568	   [RFC Editor to remove this section.]
+
+2570	   Draft 13: * post IANA and IETF LC
+
+2572	   Drafts 10-12: * additional WGLC and shepherd comments
+
+2574	   Draft -09: * last call comments, bump BLE version, add
+2575	   acknowledgments.  * Also, recapture Rohit comments and those of
+2576	   Christian.
+
+2578	   Drafts 04-08: * Lots of cleanup * Security review responses * Removal
+2579	   of a tab * Dealing with certificate stuff
+2580	   Draft -03: * Add MAB, FDO * Some grammar improvements * fold OpenAPI
+2581	   * IANA considerations
+
+2583	   Draft -02: * Clean up examples * Move openapi to appendix Draft -01:
+
+2585	   *  Doh!  We forgot the core device scheme!
+
+2587	   Draft -00:
+
+2589	   *  Initial revision
+
+2591	Appendix B.  OpenAPI representation
+
+2593	   The following sections are provided for informational purposes.
+
+2595	B.1.  Device Core Schema OpenAPI Representation
+
+2597	   OpenAPI representation of device core schema is as follows:
+
+2599	   <CODE BEGINS>
+2600	   components:
+2601	     schemas:
+2602	       Device:
+2603	         title: Device
+2604	         description: Device account
+2605	         type: object
+2606	         properties:
+2607	           displayName:
+2608	             type: string
+2609	             description: "Human readable name of the device, suitable
+2610	                           for displaying to end-users. For example,
+2611	                          'BLE Heart Monitor' etc."
+2612	             nullable: true
+2613	             readOnly: false
+2614	             writeOnly: false
+2615	           active:
+2616	             type: boolean
+2617	             description: A mutable boolean value indicating the device
+2618	                          administrative status. If set TRUE, the
+2619	                          commands (such as connect, disconnect,
+2620	                          subscribe) that control app sends to the
+2621	                          controller for the devices will be processeed
+2622	                          by the controller.  If set FALSE, any command
+2623	                          comming from the control app for the device
+2624	                          will be rejected by the controller.
+2625	             nullable: false
+2626	             readOnly: false
+2627	             writeOnly: false
+
+2629	           mudUrl:
+2630	             type: string
+2631	             format: uri
+2632	             description: A URL to MUD file of the device (RFC 8520).
+2633	                 It
+2634	                          is added for future use. Current usage is not
+2635	                          defined yet.
+2636	             nullable: true
+2637	             readOnly: false
+2638	             writeOnly: false
+2639	         required:
+2640	           - active
+2641	         additionalProperties: false
+2642	         allOf:
+2643	           - $ref: '#/components/schemas/CommonAttributes'
+2644	       CommonAttributes:
+2645	         type: object
+2646	         properties:
+2647	           schemas:
+2648	             type: array
+2649	             items:
+2650	               type: string
+2651	               enum:
+2652	                 - urn:ietf:params:scim:schemas:core:2.0:Device
+2653	             description: The list of schemas that define the resource.
+2654	             nullable: false
+2655	           id:
+2656	             type: string
+2657	             format: uri
+2658	             description: The unique identifier for a resource.
+2659	             nullable: false
+2660	             readOnly: true
+2661	             writeOnly: false
+2662	           externalId:
+2663	             type: string
+2664	             description: An identifier for the resource that is
+2665	                 defined
+2666	                          by the provisioning client.
+2667	             nullable: true
+2668	             readOnly: false
+2669	             writeOnly: false
+2670	           meta:
+2671	             type: object
+2672	             readOnly: true
+2673	             properties:
+2674	               resourceType:
+2675	                 type: string
+2676	                 description: The name of the resource type of the
+2677	                              resource.
+2678	                 nullable: false
+2679	                 readOnly: true
+2680	                 writeOnly: false
+2681	               location:
+2682	                 type: string
+2683	                 format: uri
+2684	                 description: The URI of the resource being returned.
+2685	                 nullable: false
+2686	                 readOnly: true
+2687	                 writeOnly: false
+2688	               created:
+2689	                 type: string
+2690	                 format: date-time
+2691	                 description: The date and time the resource was added
+2692	                              to the service provider.
+2693	                 nullable: false
+2694	                 readOnly: true
+2695	                 writeOnly: false
+2696	               lastModified:
+2697	                 type: string
+2698	                 format: date-time
+2699	                 description: The most recent date and time that the
+2700	                              details of this resource were updated at
+2701	                              the service provider.
+2702	                 nullable: false
+2703	                 readOnly: true
+2704	                 writeOnly: false
+2705	               version:
+2706	                 type: string
+2707	                 description: The version of the resource.
+2708	                 nullable: true
+2709	                 readOnly: true
+2710	                 writeOnly: false
+2711	             additionalProperties: false
+2712	   <CODE ENDS>
+
+2714	B.2.  EndpointApp Schema OpenAPI Representation
+
+2716	   OpenAPI representation of endpointApp schema is as follows:
+
+2718	   <CODE BEGINS>
+2719	   components:
+2720	     schemas:
+2721	       EndpointApp:
+2722	         title: EndpointApp
+2723	         description: Endpoint application resource
+2724	         type: object
+2725	         properties:
+2726	           applicationType:
+2727	             type: string
+2728	             description: "This attribute will only contain two values;
+2729	                          'deviceControl' or 'telemetry'."
+2730	             nullable: false
+2731	             readOnly: false
+2732	             writeOnly: false
+
+2734	           applicationName:
+2735	             type: string
+2736	             description: Human readable name of the application.
+2737	             nullable: false
+2738	             readOnly: false
+2739	             writeOnly: false
+
+2741	         required:
+2742	           - applicationType
+2743	           - applicationName
+
+2745	         additionalProperties: true
+2746	         oneOf:
+2747	           - $ref: '#/components/schemas/clientToken'
+2748	           - $ref: '#/components/schemas/certificateInfo'
+
+2750	         allOf:
+2751	           - $ref: '#/components/schemas/CommonAttributes'
+
+2753	       clientToken:
+2754	         type: string
+2755	         description: "This attribute contains a token that the client
+2756	                       will use to authenticate itself. Each token may
+2757	                       be a string up to 500 characters in length."
+2758	         nullable: true
+2759	         readOnly: true
+2760	         writeOnly: false
+
+2762	       certificateInfo:
+2763	         type: object
+2764	         description: "Contains x509 certificate's subject name and
+2765	                       root CA information associated with the device
+2766	                       control or telemetry app."
+2767	         properties:
+2768	           rootCA:
+2769	             type: string
+2770	             description: "The base64 encoding of a trust anchor
+2771	                           certificate,as per RFC 4648 Section 4."
+2772	             nullable: false
+2773	             readOnly: false
+2774	             writeOnly: false
+
+2776	           subjectName:
+2777	             type: string
+2778	             description: "Also known as the Common Name (CN), the
+2779	                           Subject Name is a field in the X.509
+2780	                           certificate that identifies the primary
+2781	                           domain or IP address for which the
+2782	                           certificate is issued."
+2783	             nullable: false
+2784	             readOnly: false
+2785	             writeOnly: false
+
+2787	         required:
+2788	         - subjectName
+
+2790	       CommonAttributes:
+2791	         type: object
+2792	         properties:
+2793	           schemas:
+2794	             type: array
+2795	             items:
+2796	               type: string
+2797	               enum:
+2798	                 - urn:ietf:params:scim:schemas:core:2.0:EndpointApp
+2799	             description: The list of schemas that define the resource.
+2800	             nullable: false
+2801	           id:
+2802	             type: string
+2803	             format: uri
+2804	             description: The unique identifier for a resource.
+2805	             nullable: false
+2806	             readOnly: true
+2807	             writeOnly: false
+2808	           meta:
+2809	             type: object
+2810	             readOnly: true
+2811	             properties:
+2812	               resourceType:
+2813	                 type: string
+2814	                 description: The name of the resource type of the
+2815	                              resource.
+2816	                 nullable: false
+2817	                 readOnly: true
+2818	                 writeOnly: false
+2819	               location:
+2820	                 type: string
+2821	                 format: uri
+2822	                 description: The URI of the resource being returned.
+2823	                 nullable: false
+2824	                 readOnly: true
+2825	                 writeOnly: false
+2826	               created:
+2827	                 type: string
+2828	                 format: date-time
+2829	                 description: The date and time the resource was added
+2830	                              to the service provider.
+2831	                 nullable: false
+2832	                 readOnly: true
+2833	                 writeOnly: false
+2834	               lastModified:
+2835	                 type: string
+2836	                 format: date-time
+2837	                 description: The most recent date and time that the
+2838	                              details of this resource were updated at
+2839	                              the service provider.
+2840	                 nullable: false
+2841	                 readOnly: true
+2842	                 writeOnly: false
+2843	               version:
+2844	                 type: string
+2845	                 description: The version of the resource.
+2846	                 nullable: true
+2847	                 readOnly: true
+2848	                 writeOnly: false
+2849	             additionalProperties: false
+2850	   <CODE ENDS>
+
+2852	B.3.  BLE Extension Schema OpenAPI Representation
+
+2854	   OpenAPI representation of BLE extension schema is as follows:
+
+2856	   <CODE BEGINS>
+2857	   components:
+2858	     schemas:
+2859	       BleDevice:
+2860	         type: object
+2861	         description: BLE Device schema.
+2862	         properties:
+2863	           schemas:
+2864	             type: array
+2865	             items:
+2866	               type: string
+2867	               enum:
+2868	                 - urn:ietf:params:scim:schemas:extension:ble:2.0
+2869	                    :Device
+2870	           urn:ietf:params:scim:schemas:extension:ble:2.0:Device:
+2871	             $ref: '#/components/schemas/BleDeviceExtension'
+2872	             required: true
+2873	       BleDeviceExtension:
+2874	         type: object
+2875	         properties:
+2876	           versionSupport:
+2877	             type: array
+2878	             items:
+2879	               type: string
+2880	             description: Provides a list of all the BLE versions
+2881	                          supported by the device. For example,
+2882	                          [4.1, 4.2, 5.0, 5.1, 5.2, 5.3].
+2883	             nullable: false
+2884	             readOnly: false
+2885	             writeOnly: false
+
+2887	           deviceMacAddress:
+2888	             type: string
+2889	             description: It is the public MAC address assigned by the
+2890	                          manufacturer. It is unique 48 bit value. The
+2891	                          regex pattern is
+2892	                          ^[0-9A-Fa-f]{2}(:[0-9A-Fa-f]{2}){5}.
+2893	             nullable: false
+2894	             readOnly: false
+2895	             writeOnly: false
+
+2897	           isRandom:
+2898	             type: boolean
+2899	             description: AddressType flag is taken from the BLE core
+2900	                          specifications 5.3. If FALSE, the device is
+2901	                          using public MAC address. If TRUE, device is
+2902	                          using a random address.
+2903	             nullable: false
+2904	             readOnly: false
+2905	             writeOnly: false
+
+2907	           separateBroadcastAddress:
+2908	             type: string
+2909	             description: "When present, this address is used for
+2910	                           broadcasts/advertisements.  This value MUST
+2911	                               NOT
+2912	                           be set when an IRK is provided.  Its form is
+2913	                           the same as deviceMa`cAddress."
+2914	             nullable: false
+2915	             readOnly: false
+2916	             writeOnly: false
+
+2918	           irk:
+2919	             type: string
+2920	             description: Identity resolving key, which is unique for
+2921	                          every device. It is used to resolve random
+2922	                          address.
+2923	             nullable: true
+2924	             readOnly: false
+2925	             writeOnly: true
+2926	           mobility:
+2927	             type: boolean
+2928	             description: If set to True, the BLE device will
+2929	                          automatically connect to the closest AP. For
+2930	                          example, BLE device is connected with AP-1
+2931	                              and
+2932	                          moves out of range but comes in range of AP
+2933	                             -2,
+2934	                          it will be disconnected with AP-1 and
+2935	                              connects
+2936	                          with AP-2.
+2937	             nullable: false
+2938	             readOnly: false
+2939	             writeOnly: false
+2940	           pairingMethods:
+2941	             type: array
+2942	             items:
+2943	               type: string
+2944	             description: List of pairing methods associated with the
+2945	                          ble device, stored as schema URI.
+2946	             nullable: true
+2947	             readOnly: false
+2948	             writeOnly: false
+2949	           urn:ietf:params:scim:schemas:extension:pairingNull:2.0
+2950	              :Device:
+2951	             $ref: '#/components/schemas/NullPairing'
+2952	             required: false
+2953	           urn:ietf:params:scim:schemas:extension:pairingJustWorks:2.0
+2954	              :Device:
+2955	             $ref: '#/components/schemas/PairingJustWorks'
+2956	             required: false
+2957	           urn:ietf:params:scim:schemas:extension:pairingPassKey:2.0
+2958	              :Device:
+2959	             $ref: '#/components/schemas/PairingPassKey'
+2960	             required: false
+2961	           urn:ietf:params:scim:schemas:extension:pairingOOB:2.0
+2962	              :Device:
+2963	             $ref: '#/components/schemas/PairingOOB'
+2964	             required: false
+2965	         required:
+
+2967	           - versionSupport
+2968	           - deviceMacAddress
+2969	           - AddressType
+2970	           - pairingMethods
+2971	         additionalProperties: false
+
+2973	       NullPairing:
+2974	         type: object
+
+2976	       PairingJustWorks:
+2977	         type: object
+2978	         description: Just works pairing method for ble
+2979	         properties:
+2980	           key:
+2981	             type: integer
+2982	             description: Just works does not have any key value. For
+2983	                          completeness, it is added with a key value
+2984	                          'null'.
+2985	             nullable: false
+2986	             readOnly: false
+2987	             writeOnly: false
+2988	         required:
+2989	           - key
+
+2991	       PairingPassKey:
+2992	         type: object
+2993	         description: Pass key pairing method for ble
+2994	         properties:
+2995	           key:
+2996	             type: integer
+2997	             description: A six digit passkey for ble device.
+2998	                          The pattern of key is ^[0-9]{6}$.
+2999	             nullable: false
+3000	             readOnly: false
+3001	             writeOnly: true
+3002	         required:
+3003	           - key
+
+3005	       PairingOOB:
+3006	         type: object
+3007	         description: Out-of-band pairing method for BLE
+3008	         properties:
+3009	           key:
+3010	             type: string
+3011	             description: The OOB key value for ble device.
+3012	             nullable: false
+3013	             readOnly: false
+3014	             writeOnly: false
+
+3016	           randomNumber:
+3017	             type: integer
+3018	             description: Nonce added to the key
+3019	             nullable: false
+3020	             readOnly: false
+3021	             writeOnly: true
+3022	           confirmationNumber:
+3023	             type: integer
+3024	             description: Some solutions require a confirmation number
+3025	                          in the RESTful message exchange.
+3026	             nullable: true
+3027	             readOnly: false
+3028	             writeOnly: true
+3029	         required:
+3030	           - key
+3031	           - randomNumber
+3032	   <CODE ENDS>
+
+3034	B.4.  DPP Extension Schema OpenAPI Representation
+
+3036	   OpenAPI representation of DPP extension schema is as follows:
+
+3038	   <CODE BEGINS>
+3039	   components:
+3040	     schemas:
+3041	       DppDevice:
+3042	         type: object
+3043	         description: Wi-Fi Easy Connect (DPP) device extension schema
+3044	         properties:
+3045	           schemas:
+3046	             type: array
+3047	             items:
+3048	               type: string
+3049	               enum:
+3050	                 - urn:ietf:params:scim:schemas:extension:dpp:2.0
+3051	                    :Device
+3052	           urn:ietf:params:scim:schemas:extension:dpp:2.0:Device:
+3053	             $ref: '#/components/schemas/DppDeviceExtension'
+3054	             required: true
+3055	       DppDeviceExtension:
+3056	         type: object
+3057	         properties:
+3058	           dppVersion:
+3059	             type: integer
+3060	             description: Version of DPP this device supports.
+3061	             nullable: false
+3062	             readOnly: false
+3063	             writeOnly: false
+
+3065	           bootstrappingMethod:
+3066	             type: array
+3067	             items:
+3068	               type: string
+3069	             description: The list of all the bootstrapping methods
+3070	                          available on the enrollee device. For
+3071	                          example, [QR, NFC].
+3072	             nullable: true
+3073	             readOnly: false
+3074	             writeOnly: false
+3075	           bootstrapKey:
+3076	             type: string
+3077	             description: An Elliptic-Curve Diffie Hellman
+3078	                          (ECDH) public key. The base64 encoded length
+3079	                          for P-256, P-384, and P-521 is 80, 96, and
+3080	                              120
+3081	                          characters.
+3082	             nullable: false
+3083	             readOnly: false
+3084	             writeOnly: true
+3085	           deviceMacAddress:
+3086	             type: string
+3087	             description: The MAC address assigned by the manufacturer.
+3088	                          The regex pattern is
+3089	                          ^[0-9A-Fa-f]{2}(:[0-9A-Fa-f]{2}){5}.
+3090	             nullable: false
+3091	             readOnly: false
+3092	             writeOnly: false
+3093	           classChannel:
+3094	             type: array
+3095	             items:
+3096	               type: string
+3097	             description: A list of global operating class and channel
+3098	                          shared as bootstrapping information. It is
+3099	                          formatted as class/channel. For example,
+3100	                          '81/1', '115/36'.
+3101	             nullable: false
+3102	             readOnly: false
+3103	             writeOnly: false
+3104	           serialNumber:
+3105	             type: string
+3106	             description: An alphanumeric serial number that may also
+3107	                 be
+3108	                          passed as bootstrapping information.
+3109	             nullable: false
+3110	             readOnly: false
+3111	             writeOnly: false
+3112	         required:
+
+3114	           - dppVersion
+3115	           - bootstrapKey
+3116	         additionalProperties: false
+3117	   <CODE ENDS>
+
+3119	B.5.  Ethernet MAB Extension Schema OpenAPI Representation
+
+3121	   OpenAPI representation of Ethernet MAB extension schema is as
+3122	   follows:
+
+3124	   <CODE BEGINS>
+3125	   components:
+3126	     schemas:
+3127	       EthernetMABDevice:
+3128	         type: object
+3129	         description: Ethernet MAC Authenticated Bypass
+3130	         properties:
+3131	           schemas:
+3132	             type: array
+3133	             items:
+3134	               type: string
+3135	               enum:
+3136	                 - urn:ietf:params:scim:schemas:extension:ethernet-mab
+3137	                    :2.0:Device
+3138	           urn:ietf:params:scim:schemas:extension:ethernet-mab:2.0
+3139	              :Device:
+3140	             $ref: '#/components/schemas/EthernetMABDeviceExtension'
+3141	             required: true
+3142	       EthernetMABDeviceExtension:
+3143	         type: object
+3144	         properties:
+3145	           deviceMacAddress:
+3146	             type: string
+3147	             description: It is the public MAC address assigned by the
+3148	                          manufacturer. It is unique 48 bit value. The
+3149	                          regex pattern is
+3150	                          ^[0-9A-Fa-f]{2}(:[0-9A-Fa-f]{2}){5}.
+3151	             nullable: false
+3152	             readOnly: false
+3153	             writeOnly: false
+3154	         required:
+3155	           - deviceMacAddress
+3156	         description: Device extension schema for Ethernet-MAB
+3157	   <CODE ENDS>
+
+3159	B.6.  FDO Extension Schema OpenAPI Representation
+
+3161	   OpenAPI representation of FDO extension schema is as follows:
+
+3163	   <CODE BEGINS>
+3164	   components:
+3165	     schemas:
+3166	       FDODevice:
+3167	         type: object
+3168	         description: FIDO Device Onboarding Extension
+3169	         properties:
+3170	           schemas:
+3171	             type: array
+3172	             items:
+3173	               type: string
+3174	               enum:
+3175	                 - urn:ietf:params:scim:schemas:extension:fido-device
+3176	                    -onboard:2.0:Devices
+3177	           urn:ietf:params:scim:schemas:extension:fido-device-onboard
+3178	              :2.0:Devices:
+3179	             $ref: '#/components/schemas/FDODeviceExtension'
+3180	             required: true
+3181	       FDODeviceExtension:
+3182	         type: object
+3183	         properties:
+3184	           fdoVoucher:
+3185	             type: string
+3186	             description: A FIDO Device Onboard (FDO) Voucher
+3187	             nullable: false
+3188	             readOnly: false
+3189	             writeOnly: false
+3190	         required:
+3191	           - fdoVoucher
+3192	         description: Device Extension for a FIDO Device Onboard (FDO)
+3193	   <CODE ENDS>
+
+3195	B.7.  Zigbee Extension Schema OpenAPI Representation
+
+3197	   OpenAPI representation of zigbee extension schema is as follows:
+
+3199	   <CODE BEGINS>
+3200	   components:
+3201	     schemas:
+3202	       ZigbeeDevice:
+3203	         type: object
+3204	         description: Zigbee Device schema.
+3205	         properties:
+3206	           schemas:
+3207	             type: array
+3208	             items:
+3209	               type: string
+3210	               enum:
+3211	                 - urn:ietf:params:scim:schemas:extension:zigbee:2.0
+3212	                    :Device
+3213	           urn:ietf:params:scim:schemas:extension:zigbee:2.0:Device:
+3214	             $ref: '#/components/schemas/ZigbeeDeviceExtension'
+3215	             required: true
+3216	       ZigbeeDeviceExtension:
+3217	         type: object
+3218	         properties:
+3219	           versionSupport:
+3220	             type: array
+3221	             items:
+3222	               type: string
+3223	             description: Provides a list of all the Zigbee versions
+3224	                          supported by the device. For example, [3.0].
+3225	             nullable: false
+3226	             readOnly: false
+3227	             writeOnly: false
+3228	           deviceEui64Address:
+3229	             type: string
+3230	             description: The EUI-64 (Extended Unique Identifier)
+3231	                 device
+3232	                          address. The regex pattern is
+3233	                          ^[0-9A-Fa-f]{16}$.
+3234	             nullable: false
+3235	             readOnly: false
+3236	             writeOnly: false
+3237	         required:
+3238	           - versionSupport
+3239	           - deviceEui64Address
+3240	         description: Device extension schema for Zigbee.
+3241	   <CODE ENDS>
+
+3243	B.8.  EndpointAppsExt Extension Schema OpenAPI Representation
+
+3245	   OpenAPI representation of endpoint Apps extension schema is as
+3246	   follows:
+
+3248	   <CODE BEGINS>
+3249	   components:
+3250	     schemas:
+3251	       EndpointAppsExt:
+3252	         type: object
+3253	         properties:
+3254	           applications:
+3255	             $ref: '#/components/schemas/applications'
+
+3257	           deviceControlEnterpriseEndpoint:
+3258	             type: string
+3259	             format: url
+3260	             description: The URL of the enterprise endpoint which
+3261	                 device
+3262	                          control apps use to reach enterprise network
+3263	                          gateway.
+3264	             nullable: false
+3265	             readOnly: true
+3266	             writeOnly: false
+
+3268	           telemetryEnterpriseEndpoint:
+3269	             type: string
+3270	             format: url
+3271	             description: The URL of the enterprise endpoint which
+3272	                          telemetry apps use to reach enterprise
+3273	                              network
+3274	                          gateway.
+3275	             nullable: false
+3276	             readOnly: true
+3277	             writeOnly: false
+
+3279	         required:
+3280	           - applications
+3281	           - deviceControlEnterpriseEndpoint
+
+3283	       applications:
+3284	         type: array
+3285	         items:
+3286	           value:
+3287	             type: string
+3288	             description: The identifier of the endpointApp.
+3289	             nullable: false
+3290	             readOnly: false
+3291	             writeOnly: false
+3292	           ref:
+3293	             type: string
+3294	             format: uri
+3295	             description: The URI of the corresponding 'EndpointApp'
+3296	                         resource which will control or obtain data
+3297	                             from
+3298	                         the device.
+3299	             nullable: false
+3300	             readOnly: true
+3301	             writeOnly: false
+3302	         required:
+3303	           - value
+3304	           - ref
+3305	   <CODE ENDS>
+
+3307	Appendix C.  Fido Device Onboarding Example Flow
+
+3309	   The following diagrams are included to demonstrate how FDO can be
+3310	   used.  In this first diagram, a device is onboarded not only to the
+3311	   device owner process, but also to the AAA server for initial
+3312	   onboarding.  The voucher contains a device certificate that is used
+3313	   by the AAA system for authentication.
+
+3315	    ,------.               ,------.               ,-------.
+3316	    |SCIM  |               |SCIM  |               |Owner  |   ,---.
+3317	    |Client|               |Server|               |Service|   |AAA|
+3318	    `---+--'               `---+--'               `---+---'   `-+-'
+3319	   ,------------------------------!.                  |         |
+3320	   |voucher contains              |_\                 |         |
+3321	   |an X.509 cert chain             |                 |         |
+3322	   `--------------------------------'                 |         |
+3323	        |1 POST [FDO(voucher)] |                      |         |
+3324	        |/HTTP                 |                      |         |
+3325	        |--------------------->|                      |         |
+3326	        |                      |                      |         |
+3327	        |                      |----.                 |         |
+3328	        |                      |    | 2 Recover X.509 |         |
+3329	        |                      |<---' cert chain      |         |
+3330	        |                      |      from voucher    |         |
+3331	        |                      |                      |         |
+3332	        |                      |                      |         |
+3333	        |                      |3 Add device(voucher) |         |
+3334	        |                      |/HTTP                 |         |
+3335	        |                      |--------------------->|         |
+3336	        |                      |                      |         |
+3337	        |                      |     4 200 "ok"       |         |
+3338	        |                      |<---------------------|         |
+3339	        |                      |                      |         |
+3340	        |                      |            5 add identity      |
+3341	        |                      |------------------------------->|
+3342	        |                      |                      |         |
+3343	        |                      |              6 200 "ok"        |
+3344	        |                      |<-------------------------------|
+3345	        |                      |                      |         |
+3346	        |     7 200 "ok"       |                      |         |
+3347	        |<---------------------|                      |         |
+3348	        |                      |                      |         |
+3349	        |                      |                      |         |
+
+3351	   After this flow is complete, the device can then first provisionally
+3352	   onboard, and then later receive a trust anchor through FDO's TO2
+3353	   process.  This is shown below.
+
+3355	  ,-------.                          ,------.
+3356	  |Owner  |          ,---.           |Access|           ,------.
+3357	  |Service|          |AAA|           |Point |           |Device|
+3358	  `---+---'          `-+-'           `---+--'           `---+--'
+3359	      |                |                 |        ,------------------!.
+3360	      |                |                 |        |Device configured |_\
+3361	      |                |                 |        |with well-known     |
+3362	      |                |                 |        |RCOI and for trust  |
+3363	      |                |                 |        |on first use        |
+3364	      |                |                 |        `--------------------'
+3365	      |                |        ,---------------!.          |
+3366	      |                |        |WLAN configured|_\         |
+3367	      |                |        |with well-known  |         |
+3368	      |                |        |RCOI             |         |
+3369	      |                |        `-----------------'         |
+3370	      |                |                 | 1 EAP-TLS/EAPOL  |
+3371	      |                |                 |<-----------------|
+3372	      |                |                 |                  |
+3373	      |                |2 EAP-TLS/Radius |                  |
+3374	      |                |<----------------|                  |
+3375	      |                |                 |                  |
+3376	      |                |            ,--------------------------!.
+3377	      |                |            |Device skips              |_\
+3378	      |                |            |server authentication       |
+3379	      |                |            `----------------------------'
+3380	      |                |3 Result=Success |                  |
+3381	      |                |---------------->|                  |
+3382	      |                |                 |                  |
+3383	      |            ,-----------------------!.               |
+3384	      |            |Limited access         |_\              |
+3385	      |            |for now                  |              |
+3386	      |            `-------------------------'              |
+3387	      |                |                 |4 Result=Success  |
+3388	      |                |                 |----------------->|
+3389	      |                |                 |                  |
+3390	      |                |    5 FDO TO2    |                  |
+3391	      |<----------------------------------------------------|
+3392	      |                |                 |                  |
+3393	 ,-------------------------------------------------------------!.
+3394	 |FSIM, Runtime SSID,                                          |_\
+3395	 |Credentials incl.                                              |
+3396	 |local trust anchor                                             |
+3397	 `---------------------------------------------------------------'
+3398	      |                |                 | 6 dissasociate   |
+3399	      |                |                 |<-----------------|
+3400	      |                |                 |                  |
+3401	      |                |                 |7 EAP-TLS w/ LSC  |
+3402	      |                |                 |<-----------------|
+3403	      |                |                 |                  |
+3404	      |                |                 |                  |
+3405	      .                .        etc      .                  .
+
+3407	Authors' Addresses
+3408	   Muhammad Shahzad
+3409	   North Carolina State University
+3410	   Department of Computer Science
+3411	   890 Oval Drive
+3412	   Campus Box 8206
+3413	   Raleigh, NC,  27695-8206
+3414	   United States of America
+3415	   Email: mshahza@ncsu.edu
+
+3417	   Hassan Iqbal
+3418	   North Carolina State University
+3419	   Department of Computer Science
+3420	   890 Oval Drive
+3421	   Campus Box 8206
+3422	   Raleigh, NC,  27695-8206
+3423	   United States of America
+3424	   Email: hassaniqbal931@gmail.com
+
+3426	   Eliot Lear
+3427	   Cisco Systems
+3428	   Richtistrasse 7
+3429	   CH-8304 Wallisellen
+3430	   Switzerland
+3431	   Phone: +41 44 878 9200
+3432	   Email: lear@cisco.com
+
+
+
+
+
+
+
+
+
