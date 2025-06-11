@@ -1,0 +1,3054 @@
+idnits 2.17.1 
+
+draft-ietf-ippm-capacity-protocol-19.txt:
+-(2919): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+  == There are 4 instances of lines with non-ascii characters in the document.
+
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     Summary: 0 errors (**), 0 flaws (~~), 1 warning (==), 0 comments (--).
+
+--------------------------------------------------------------------------------
+
+
+2	Network Working Group                                      L. Ciavattone
+3	Internet-Draft                                                 AT&T Labs
+4	Intended status: Standards Track                                 R. Geib
+5	Expires: 13 December 2025                               Deutsche Telekom
+6	                                                            11 June 2025
+
+8	           Test Protocol for One-way IP Capacity Measurement
+9	                  draft-ietf-ippm-capacity-protocol-19
+
+11	Abstract
+
+13	   This document addresses the problem of protocol support for measuring
+14	   Network Capacity metrics specified by RFC 9097.  The Method of
+15	   Measurement discussed there requires a feedback channel from the
+16	   receiver to control the sender's transmission rate in near-real-time.
+17	   This document defines the UDP Speed Test Protocol for conducting RFC
+18	   9097 and other related measurements.
+
+20	Status of This Memo
+
+22	   This Internet-Draft is submitted in full conformance with the
+23	   provisions of BCP 78 and BCP 79.
+
+25	   Internet-Drafts are working documents of the Internet Engineering
+26	   Task Force (IETF).  Note that other groups may also distribute
+27	   working documents as Internet-Drafts.  The list of current Internet-
+28	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+30	   Internet-Drafts are draft documents valid for a maximum of six months
+31	   and may be updated, replaced, or obsoleted by other documents at any
+32	   time.  It is inappropriate to use Internet-Drafts as reference
+33	   material or to cite them other than as "work in progress."
+
+35	   This Internet-Draft will expire on 13 December 2025.
+
+37	Copyright Notice
+
+39	   Copyright (c) 2025 IETF Trust and the persons identified as the
+40	   document authors.  All rights reserved.
+
+42	   This document is subject to BCP 78 and the IETF Trust's Legal
+43	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+44	   license-info) in effect on the date of publication of this document.
+45	   Please review these documents carefully, as they describe your rights
+46	   and restrictions with respect to this document.  Code Components
+47	   extracted from this document must include Revised BSD License text as
+48	   described in Section 4.e of the Trust Legal Provisions and are
+49	   provided without warranty as described in the Revised BSD License.
+
+51	Table of Contents
+
+53	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
+54	     1.1.  Terminology . . . . . . . . . . . . . . . . . . . . . . .   4
+55	     1.2.  Requirements Language . . . . . . . . . . . . . . . . . .   4
+56	   2.  Scope, Goals, and Applicability . . . . . . . . . . . . . . .   4
+57	   3.  Protocol Overview . . . . . . . . . . . . . . . . . . . . . .   5
+58	   4.  Parameters, Security Operations, and Optional Checksum  . . .  10
+59	     4.1.  Parameters and Definitions  . . . . . . . . . . . . . . .  10
+60	     4.2.  Security Mode Operations  . . . . . . . . . . . . . . . .  10
+61	       4.2.1.  Mode 0: Optional Unauthenticated Mode . . . . . . . .  11
+62	       4.2.2.  Mode 1: Required Authenticated Mode . . . . . . . . .  11
+63	       4.2.3.  Mode 2: Optional Authenticated Mode for Data Phase  .  12
+64	       4.2.4.  Mode 3: Optional Encryption of Control and Status . .  13
+65	     4.3.  Key Management  . . . . . . . . . . . . . . . . . . . . .  15
+66	       4.3.1.  Key Derivation Function (KDF) . . . . . . . . . . . .  16
+67	     4.4.  Configuration of Network Functions with Stateful
+68	           Filtering . . . . . . . . . . . . . . . . . . . . . . . .  18
+69	     4.5.  Optional Checksum . . . . . . . . . . . . . . . . . . . .  18
+70	   5.  Test Setup Request and Response . . . . . . . . . . . . . . .  19
+71	     5.1.  Client Generates Test Setup Request . . . . . . . . . . .  19
+72	     5.2.  Server Test Setup Request Processing and Response
+73	           Generation  . . . . . . . . . . . . . . . . . . . . . . .  22
+74	       5.2.1.  Test Setup Request Processing - Rejection . . . . . .  22
+75	       5.2.2.  Test Setup Request Processing - Acceptance  . . . . .  26
+76	     5.3.  Setup Response Processing at the Client . . . . . . . . .  28
+77	   6.  Test Activation Request and Response  . . . . . . . . . . . .  29
+78	     6.1.  Client Generates Test Activation Request  . . . . . . . .  29
+79	     6.2.  Server Processes Test Activation Request and Generates
+80	           Response  . . . . . . . . . . . . . . . . . . . . . . . .  34
+81	       6.2.1.  Server Rejects or Modifies Request  . . . . . . . . .  34
+82	       6.2.2.  Server Accepts Request and Generates Response . . . .  35
+83	     6.3.  Client Processes Test Activation Response . . . . . . . .  36
+84	   7.  Test Stream Transmission and Measurement Feedback Messages  .  37
+85	     7.1.  Test Packet PDU and Roles . . . . . . . . . . . . . . . .  37
+86	     7.2.  Status PDU  . . . . . . . . . . . . . . . . . . . . . . .  42
+87	   8.  Stopping a Test . . . . . . . . . . . . . . . . . . . . . . .  49
+88	   9.  Operational considerations for the Measurement Method . . . .  50
+89	     9.1.  Notes on Interface Meahurements . . . . . . . . . . . . .  50
+
+91	   10. Security Considerations . . . . . . . . . . . . . . . . . . .  51
+92	   11. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  52
+93	     11.1.  New System Port Number Assignment  . . . . . . . . . . .  52
+94	     11.2.  New KeyTable KDF . . . . . . . . . . . . . . . . . . . .  53
+95	     11.3.  New UDPSTP Registry Group  . . . . . . . . . . . . . . .  53
+96	       11.3.1.  PDU Identifier Registry  . . . . . . . . . . . . . .  53
+97	       11.3.2.  Protocol Version Registry  . . . . . . . . . . . . .  54
+98	       11.3.3.  Test Setup PDU Modifier Bitmap Registry  . . . . . .  55
+99	       11.3.4.  Test Setup PDU Authentication Mode Registry  . . . .  55
+100	       11.3.5.  Test Setup PDU Command Response Field Registry . . .  56
+101	       11.3.6.  Test Activation PDU Command Request Registry . . . .  58
+102	       11.3.7.  Test Activation PDU Modifier Bitmap Registry . . . .  58
+103	       11.3.8.  Test Activation PDU Rate Adjustment Algo.
+104	               Registry  . . . . . . . . . . . . . . . . . . . . . .  59
+105	       11.3.9.  Test Activation PDU Command Response Field
+106	               Registry  . . . . . . . . . . . . . . . . . . . . . .  60
+107	     11.4.  Guidelines for the Designated Experts  . . . . . . . . .  61
+108	   12. KDF Example (OpenSSL) . . . . . . . . . . . . . . . . . . . .  61
+109	   13. Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .  63
+110	   14. References  . . . . . . . . . . . . . . . . . . . . . . . . .  63
+111	     14.1.  Normative References . . . . . . . . . . . . . . . . . .  63
+112	     14.2.  Informative References . . . . . . . . . . . . . . . . .  65
+113	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  66
+
+115	1.  Introduction
+
+117	   The performance community has seen development of Informative Bulk
+118	   Transport Capacity definitions in [RFC3148] for Framework for Bulk
+119	   Transport Capacity (BTC) [RFC5136] for Network Capacity and Maximum
+120	   IP-layer Capacity, and the Experimental metric definitions and
+121	   methods in [RFC8337], Model-Based Metrics for BTC.
+
+123	   This document specifies the UDP Speed Test Protocol (UDPSTP) enabling
+124	   the measurement of Network Capacity metrics as defined by [RFC9097].
+125	   The Method of Measurement discussed there deploys a feedback channel
+126	   from the receiver to control the sender's transmission rate in near-
+127	   real-time.
+
+129	   This protocol supports measurement features which weren't available
+130	   by TCP based speed tests and standard measurement protocols like One
+131	   Way Active Measurement Protocol (OWAMP) [RFC4656], Two-Way Active
+132	   Measurement Protocol (TWAMP) [RFC5357] and Simple Two-Way Active
+133	   Measurement Protocol (STAMP) [RFC8762] prior to this work.  The
+134	   controlled Bulk Capacity measurement or Speed Test, respectively, is
+135	   based on UDP rather than TCP.  The bulk measurement load is
+136	   unidirectional.  These specifications did support creation of
+137	   asymmetric traffic in combination with some two-way communication, as
+138	   supported by TWAMP and STAMP, when work on UDPST started.  Further,
+139	   two-way communications of TWAMP and STAMP are limited to reflection
+140	   or unidirectional load properties, but lack support for closed loop
+141	   feedback operation.  The latter enables limiting congestion of a
+142	   bottleneck, whose capacity is measured, to a short time range.
+143	   Support of such a control loop is the main purpose of the UDPST
+144	   Protocol.
+
+146	   Apart from measurement functionality, the UDPSTP security features
+147	   have been developed following guidance given by the IETF Security
+148	   Area and the resulting specification is compliant with state-of-the-
+149	   art security implementations.  This is a secondary improvement
+150	   reached by the UDPST Protocol and may simplify its reuse for other
+151	   measurement purposes.
+
+153	1.1.  Terminology
+
+155	   Downstream UDP Speed Test: a client initiated Network Capacity
+156	   measurement between a server acting as sender and a client acting as
+157	   receiver.
+
+159	   Upstream UDP Speed Test: a client initiated measurement of Network
+160	   Capacity measurement between a client acting as a sender and a server
+161	   acting as receiver.
+
+163	1.2.  Requirements Language
+
+165	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+166	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+167	   "OPTIONAL" in this document are to be interpreted as described in BCP
+168	   14 [RFC2119], [RFC8174] when, and only when, they appear in all
+169	   capitals, as shown here.
+
+171	2.  Scope, Goals, and Applicability
+
+173	   The scope of this document is to define a protocol to measure the
+174	   Maximum IP-Layer Capacity metric according to the Method of
+175	   Measurement standardized by Section 8 of [RFC9097].  Some aspects of
+176	   this protocol and end-host configuration can lead to support of
+177	   additional forms of measurement, such as application emulation
+178	   enabled by creative use of the load rate adjustment algorithm.
+
+180	   The goal is to harmonize the specified IP-Layer Capacity metric and
+181	   method across the industry, and this protocol supports the
+182	   specifications of IETF and other Standards Development Organizations
+183	   (SDO's; see, e.g., [TR-471]).
+
+185	   The primary application of the protocol described here is the same as
+186	   in Section 2 of [RFC7497] where:
+
+188	   *  The access portion of the network is the focus of this problem
+189	      statement.  The user typically subscribes to a service with
+190	      bidirectional access partly described by rates in bits per second.
+
+192	   UDPSTP is a client-based protocol.  It may be applied by consumers to
+193	   measure their own access bandwidth.  Consumers may prefer a cross-
+194	   domain measurement architecture for this purpose.  UDPSTP may be
+195	   deployed in Large-Scale Measurement of Broadband Performance
+196	   environments (LMAP, see [RFC7497]), another cross-domain deployment.
+197	   A network operator may support operation and maintenance by UDPST, a
+198	   typical intra-domain deployment.  All these deployments require or
+199	   benefit from trust into the results, which are ensured by
+200	   authenticated communication.  As an option enabling measurements
+201	   controlled by very low-end devices in a lab or limited domain
+202	   [RFC8799], unauthenticated operation may be implemented (but may be
+203	   operated in exactly that case).
+
+205	3.  Protocol Overview
+
+207	   All messages defined by this document SHALL use UDP transport.
+
+209	   The remainder of this section gives an informative overview of the
+210	   communication protocol between two test endpoints (without expressing
+211	   requirements or elaborating on the authentication and encryption
+212	   aspects).
+
+214	   One endpoint takes the role of server, listening for connection
+215	   requests on a standard UDP Speed Test Protocol port number from the
+216	   other endpoint, the client.
+
+218	   The client requires configuration of a test direction parameter
+219	   (upstream or downstream test, where the client performs the role of
+220	   sender or receiver, respectively) as well as the hostname or IP
+221	   address(es) of the server(s) in order to begin the setup and
+222	   configuration exchanges with the server(s).  By default, the client
+223	   uses the single, standard UDPSTP port number per connection (see
+224	   Section 5).  If the default port number is not used, the client may
+225	   require configuration of the control port number used by each server.
+226	   This would be the case, if multiple server instances (processes)
+227	   operate on one or more machines.
+
+229	   Additionally, multi-connection (multi-flow) testing is supported by
+230	   the protocol.  Each connection is independent and attempts to
+231	   maximize its own individual traffic rate.  For multi-connection
+232	   tests, a single client process would replicate the connection setup
+233	   and test procedure multiple times (once for each flow) to one or more
+234	   server instances.  The server instance(s) would process each
+235	   connection independently, as if they were coming from separate
+236	   clients.  It shall be the responsibility of the client process to
+237	   manage the inter-related connections: handling the individual
+238	   connection setup successes and failures, cleaning up connections
+239	   during a test (should some fail) as well as aggregate the individual
+240	   test results into an overall set of performance statistics.  Fields
+241	   in the Setup Request (mcIndex, mcCount, and mcIdent, see Section 6.1)
+242	   are used to both differentiate and associate the multiple connections
+243	   that comprise a single test.
+
+245	   The protocol uses UDP transport [RFC0768] with two connection phases
+246	   (Control and Data).  The exchanges 1 and 2 (see below) constitute the
+247	   Control phase, while exchanges 3 and 4 constitute the Data phase.  In
+248	   this document, the term message and the term Protocol Data Unit, or
+249	   PDU ([RFC5044]) are used interchangeably.
+
+251	   1.  Test Setup Request and Response: If a server instance is
+252	       identified with a host name that resolves to both IPv4/IPv6
+253	       addresses, it is recommended to use the first address returned in
+254	       the name resolution response - regardless, whether it's IPv4 or
+255	       IPv6.  Thus, the decision on the preferred IP address family is
+256	       left to the DNS operator.  Support for separate IPv4 and IPv6
+257	       measurements or an IPv4 and IPv6 multi connection setup are left
+258	       for future improvement.  The client then requests to begin a test
+259	       by communicating its protocol version, intended security mode,
+260	       and datagram size support.  The server either confirms matching a
+261	       configuration or rejects the connection request.  If the request
+262	       is accepted, the server provides a unique ephemeral port number
+263	       for each test connection, allowing further communication.  In a
+264	       multi-connection setup, distinct UDP port numbers may be assigned
+265	       with each Setup Response from a server instance.  Distinct UDP
+266	       port numbers are assigned, if all Setup Response messages
+267	       originate from the same server in that case.
+
+269	   2.  Test Activation Request and Response: after having received a
+270	       confirmation of the configuration by a server, the client
+271	       composes a request conveying parameters such as the testing
+272	       direction, the duration of the test interval and test sub-
+273	       intervals, and various thresholds (for a detailed discussion, see
+274	       [RFC9097] and [TR-471]).  The server then chooses to accept,
+275	       ignore or modify any of the test parameters, and communicates the
+276	       set that will be used unless the client rejects the
+277	       modifications.  Note that the client assumes that the Test
+278	       Activation exchange has opened any co-located firewalls and
+279	       network address/port translators for the test connection (in
+280	       response to the Request packet on the ephemeral port number) and
+281	       the traffic that follows.  See [RFC9097] for a more detailed
+282	       discussion of firewall and NAT related features.  If the Test
+283	       Activation Request is rejected or fails, the client assumes that
+284	       the firewall will close the address/port number pinhole entry
+285	       after the firewall's configured idle traffic timeout.
+
+287	   3.  Test Stream Transmission and Measurement Feedback Messages:
+288	       Testing proceeds with one endpoint sending Load PDUs and the
+289	       other endpoint receiving the Load PDUs and sending frequent
+290	       status messages to communicate status and transmission conditions
+291	       there.  The data in the feedback messages, whether received from
+292	       the client or when being sent to the client, is input to a load
+293	       rate adjustment algorithm at the server which controls future
+294	       sending rates at either end.  The choice to locate the load rate
+295	       adjustment algorithm at the server, regardless of transmission
+296	       direction, means that the algorithm can be updated more easily at
+297	       a host within the network, and at a fewer number of hosts than
+298	       the number of clients.  Note, that this mode of operation also
+299	       helps to keep the pinhole (or mapping, respecitvely) active at
+300	       on-path stateful devices.  UDPSTP is at least partially compliant
+301	       to section 3.1 of [RFC8085]: the bottleneck is congested, but
+302	       pending congestion is avoided by limiting the duration of that
+303	       congestion to the minimum required to determine the bottleneck
+304	       capacity.
+
+306	   4.  Stopping the Test: When the specified test duration has been
+307	       reached, the server initiates the exchange to stop the test by
+308	       setting a STOP indication in its outgoing Load PDUs or Status
+309	       Feedback messages.  After being received, the client acknowledges
+310	       it by also setting a STOP indication in its outgoing Load PDUs or
+311	       Status Feedback messages.  A graceful connection termination at
+312	       each end then follows.  Since the Load PDUs and Status Feedback
+313	       messages are used, this exchange is considered a sub-exchange of
+314	       3.  If the Test traffic stops or the communication path fails,
+315	       the client assumes that the firewall will close the address/port
+316	       number combination after the firewall's configured idle traffic
+317	       timeout.
+
+319	   5.  Both the client and server react to unexpected interruptions in
+320	       the Control or Data phase, respectively.  Watchdog timers limit
+321	       the time a server or client will wait before stopping all traffic
+322	       and terminating a test.
+
+324	   Figure 1 provides an example exchange of control and measurement PDUs
+325	   for both a downstream and upstream UDP Speed Tests (always client
+326	   initiated):
+
+328	                =========== Downstream Test ===========
+329	   +---------+                                           +---------+
+330	   | Client  |          Test Setup Request ----->        |  Server |
+331	   +---------+                                           +---------+
+332	               <----- Test Setup Response (Accept)
+333	               <----- Null Request PDU
+
+335	                      Test Activation Request ----->
+
+337	               <----- Test Activation Response (Accept)
+
+339	               <----- Load PDUs
+
+341	                         Status Feedback PDUs ----->
+
+343	             After expiry of server's test duration timer...
+
+345	               <----- Load PDU (TEST_ACT_STOP)
+
+347	              Status Feedback PDU (TEST_ACT_STOP) ----->
+
+349	                ============ Upstream Test ============
+350	   +---------+                                           +---------+
+351	   | Client  |          Test Setup Request ----->        |  Server |
+352	   +---------+                                           +---------+
+353	               <----- Test Setup Response (Accept)
+354	               <----- Null Request PDU
+
+356	                      Test Activation Request ----->
+
+358	               <----- Test Activation Response (Accept)
+
+360	                         Load PDUs ----->
+
+362	               <----- Status Feedback PDUs
+
+364	             After expiry of server's test duration timer...
+
+366	               <----- Status Feedback PDU (TEST_ACT_STOP)
+
+368	                       Load PDU (TEST_ACT_STOP) ----->
+
+370	               Figure 1: Successful UDPSTP Message Exchanges
+
+372	4.  Parameters, Security Operations, and Optional Checksum
+
+374	   Security and checksum operation aren't covered by [RFC9097], which
+375	   only defines the Method of Measurement.  This section adds the
+376	   operational specification related to security and optional checksum.
+377	   Due to the additional complexities, and loss of the direct Layer 3 to
+378	   Layer 4 mapping of packets to datagrams, it is recommended that Layer
+379	   3 fragmentation be avoided.  A simplified approach is to choose the
+380	   default datagram size small enough to prevent fragmentation.  MTU
+381	   size detection prior to a test is out of scope of this document.  A
+382	   method for a path MTU size discovery, as for example proposed by
+383	   [RFC8899], is left for future design and implementation.  Unless IP
+384	   fragmentation is expected and is one of the attributes being
+385	   measured, the IPv4 DF bit SHOULD be set for all tests.
+
+387	4.1.  Parameters and Definitions
+
+389	   Please refer to Section 4 of [RFC9097] for an overview of Parameters
+390	   related to the Maximum IP-Layer Capacity Metric and Method.  A set of
+391	   error-codes to support debugging are provided in Section 11.3.5.
+
+393	4.2.  Security Mode Operations
+
+395	   There are four security modes of operation, one unauthenticated mode,
+396	   two authenticated modes and a fourth adding encryption.  Operational
+397	   support of unauthenticated and authenticated modes MUST be mutually
+398	   exclusive.  Once the modes requiring or optionally adding
+399	   authentication or encryption are implemented and configured locally,
+400	   the unauthenticated mode must be disabled.  The four modes are:
+
+402	   1.  An OPTIONAL Unauthenticated mode for all messages shall only be
+403	       allowed when all other modes requiring authentication (or Partial
+404	       Encryption) are unavailable for use.  This mode is only intended
+405	       for a lab or limited domain [RFC8799] hosting very low-end
+406	       devices lacking accurate clock synchronization (see Section 2).
+
+408	   2.  A REQUIRED mode with authentication during the Control phase
+409	       (Test Setup and Test Activation exchanges).  This mode may be
+410	       preferred to perform infrequent reliable measurements, typically
+411	       initiated by consumers or for operator OAM purposes (see
+412	       Section 2).
+
+414	   3.  An OPTIONAL mode with the additional authentication of the Status
+415	       Feedback messages during the Data phase.  This mode may be
+416	       preferred to perform infrequent reliable measurements, typically
+417	       initiated by consumers or for operator OAM purposes (see
+418	       Section 2).
+
+420	   4.  An OPTIONAL mode that adds encryption, prior to authentication,
+421	       of the Control phase exchanges and the Status Feedback messages.
+422	       This mode is optional, as Performance measurements don't
+423	       transport application data and encryption has impact on or at
+424	       least may impact performance measurements (especially on very
+425	       low-end devices).  Encryption preserves privacy, and may be of
+426	       interest for Large-Scale Measurement of Broadband Performance
+427	       environments (LMAP, see Section 2).
+
+429	   The requirements discussed hereafter refer to the PDUs in sections 5
+430	   and 6 below, primarily the authMode, keyId, authUnixTime, initVector,
+431	   and authDigest fields.  The roles in this section have been
+432	   generalized so that the requirements for the PDU sender and receiver
+433	   can be re-used and referred to by other sections within this
+434	   document.  Each successive mode increases security, but comes with
+435	   additional performance impacts and complexity.  The protocol is used
+436	   with unsubstantial payload and it may operate on very low-end
+437	   devices.  Offering the flexibility of various security operation
+438	   modes allows for adoption of available end-device resources.  In
+439	   general, an active measurement technique as the one defined by this
+440	   document is better suited to protect the privacy of those involved in
+441	   measurements [RFC7594].
+
+443	4.2.1.  Mode 0: Optional Unauthenticated Mode
+
+445	   In this mode, all PDU senders SHALL set the keyId, authUnixTime, the
+446	   initVector, and the authDigest fields of all related packets to zero.
+
+448	   Any errors (configuration miss-match between client and server) found
+449	   in the Test Setup exchange or the Test Activation exchange SHOULD
+450	   result in silent rejection (no further packets sent on the address/
+451	   port pairs).  The exception is when the testing hosts have been
+452	   configured for troubleshooting control phase failures and rejection
+453	   messages will aid in the process.
+
+455	4.2.2.  Mode 1: Required Authenticated Mode
+
+457	   In this mode, the client and the server SHALL be configured to use
+458	   one of a number of shared secret keys, designated via the numeric
+459	   keyId field (see Section 4.3).  This key SHALL be used as input to
+460	   the KDF (Key Derivation Function), as specified in Section 4.3.1, to
+461	   obtain the actual keys used by the client and server for
+462	   authentication.
+
+464	   During the Control phase, the sender SHALL read the current system
+465	   (wall-clock) time and populate the authUnixTime field and next
+466	   calculate the 32-octet HMAC-SHA-256 hash of the entire PDU according
+467	   to section 6 of [RFC6234] (with initVector and authDigest preset to
+468	   all zeroes).  The authDigest field is filled by the result, then the
+469	   packet is sent to the receiver.  The value in the authUnixTime field
+470	   is a 32-bit time stamp and a 10-second tolerance window (+/- 5
+471	   seconds) SHALL be used by the receiver to distinguish a subsequent
+472	   replay of a PDU.  See Table 2 of [TR-471] for a recommended timestamp
+473	   resolution.
+
+475	   Upon reception, the receiver SHALL validate the message PDU for
+476	   correct length, validity of authDigest, immediacy of authUnixTime,
+477	   and expected formatting (PDU-specific fields are also checked, such
+478	   as protocol version).  Validation of the authDigest requires that it
+479	   will be extracted from the PDU and the field zeroed prior to the HMAC
+480	   calculation used for comparison (see section 7.2 of [RFC9145]).
+
+482	   If the validation fails, the receiver SHOULD NOT continue with the
+483	   Control phase and implement silent rejection (no further packets sent
+484	   on the address/port pairs).  The exception is when the testing hosts
+485	   have been configured for troubleshooting Control phase failures and
+486	   rejection messages will aid in the process.
+
+488	   If the validation succeeds, the receiver SHALL continue with the
+489	   Control phase and compose a successful response or a response
+490	   indicating the error conditions identified (if any).
+
+492	   This process SHALL be executed for the request and response in the
+493	   Test Setup exchange, including the Null Request (Section 5) and the
+494	   Test Activation exchange (Section 6).
+
+496	4.2.3.  Mode 2: Optional Authenticated Mode for Data Phase
+
+498	   This mode incorporates Authenticated mode 1.  When using the optional
+499	   authentication during the Data phase, authentication SHALL also be
+500	   applied to the Status Feedback PDU (see Section 7.2).  The client
+501	   sends the Status PDU in a downstream test, and the server sends it in
+502	   an upstream test.
+
+504	   The Status PDU sender SHALL read the current system (wall-clock) time
+505	   and populate the authUnixTime field, then calculate the authDigest
+506	   field of the entire Status PDU (with the initVector and authDigest
+507	   field set to all zeroes) and send the packet to the receiver.  The
+508	   values of authUnixTime field and authDigest field are determined as
+509	   defined by Section 4.2.2.
+
+511	   Upon reception, the receiver SHALL validate the message PDU for
+512	   correct length, validity of authDigest, immediacy of authUnixTime,
+513	   and expected formatting (PDU-specific fields are also checked, such
+514	   as protocol version).  Validation of the authDigest will require that
+515	   it be extracted from the PDU and the field zeroed prior to the HMAC
+516	   calculation used for comparison.
+
+518	   If the authentication validation fails, the receiver SHALL ignore the
+519	   message.  If the watchdog timer expires (due to successive failed
+520	   validations), the test session will prematurely terminate (no further
+521	   load traffic SHALL be transmitted).
+
+523	   If this optional mode has not been selected, then the keyId,
+524	   authUnixTime, initVector, and authDigest fields of the Status PDU
+525	   (see Section 7.2) SHALL be set to all zeroes.
+
+527	4.2.4.  Mode 3: Optional Encryption of Control and Status
+
+529	   This mode incorporates authentication mode 2 after encryption of all
+530	   fields prior to the authMode field.  This is done for all Control and
+531	   Status Feedback messages.  The encryption algorithm only provides
+532	   encryption and relies on the existing authentication mechanism to
+533	   provide integrity protection.  Adding encryption to prior
+534	   authentication allows re-using code of optional authentication mode,
+535	   and additionally allows re-using several protocol fields.  Still,
+536	   both authentication and encryption are provided.  See sections 5 to 7
+537	   for the field format.
+
+539	   When using the optional Encryption, the process SHALL be applied to
+540	   the Test Setup Request, the Test Setup Response, the Null Request (if
+541	   applicable), the Test Activation Request, the Test Activation
+542	   Response, and the Status PDU.  The client sends the Status PDU in a
+543	   downstream test and the server sends it in an upstream test.
+
+545	   In the OPTIONAL Encryption mode, the client and the server SHALL be
+546	   configured to use one of a number of shared secret keys (see keyId).
+547	   This key SHALL be used as input to the KDF, as specified in
+548	   Section 4.3.1, to obtain the actual keys used by the client and
+549	   server for encryption.
+
+551	   The following encryption specifications SHALL be used for this:
+
+553	   1.  Advanced Encryption Standard, AES, according to Federal
+554	       Information Processing Standards Publication 197 [FIPS-197]
+
+556	   2.  Cipher Block Chaining (CBC) [CBC]
+
+558	   3.  Key size of 128 bits (fixed block size of 128 bits)
+559	   The encrypted portion of each PDU SHALL contain the padding required
+560	   to maintain a multiple of the AES CBC block size of 16 octets.  As
+561	   such, any library functions used for encryption and decryption SHALL
+562	   have padding disabled (to maintain an equal encrypted and unencrypted
+563	   length).  In OpenSSL for example, this can be accomplished via
+564	   "EVP_CIPHER_CTX_set_padding(ctx,0)".
+
+566	   The sender SHALL populate the initVector field with a
+567	   cryptographically random 16-octet Initialization Vector (IV), see
+568	   [RFC4086].  The IV, in conjunction with the KDF encryption key
+569	   (derived from the shared secret key), SHALL be used to encrypt the
+570	   header up to, but not including, the authMode field.  The shared
+571	   secret key is designated via the keyId field.  The sender SHALL then
+572	   read the current system (wall-clock) time and populate the
+573	   authUnixTime field and then calculate (and populate) the authDigest,
+574	   for the entire PDU, in the same manner as specified with
+575	   Authentication modes 1 and 2.  Finally, the sender SHALL send the
+576	   packet with partially encrypted PDU to the receiver.
+
+578	   Upon reception, the receiver SHALL validate the message PDU for
+579	   correct length, validity of authDigest, and immediacy of
+580	   authUnixTime.  Validation of the authDigest will require that it be
+581	   extracted from the PDU and the field zeroed prior to the HMAC
+582	   calculation used for comparison.  If the PDU validation succeeds, the
+583	   receiver SHALL then decrypt the initial portion of the PDU using the
+584	   included IV and KDF encryption key derived from the shared secret key
+585	   (designated by the keyId).  Finally, the PDU-specific fields that
+586	   control the test are validated and processed.
+
+588	   If the PDU validation fails in the Control phase, the receiver SHOULD
+589	   NOT continue with current exchange and implement silent rejection (no
+590	   further packets sent on the address/port pairs).  The exception is
+591	   when the testing hosts have been configured for troubleshooting
+592	   Control phase failures and rejection messages will aid in the
+593	   process.
+
+595	   If the validation succeeds in the Control phase, the receiver SHALL
+596	   continue with the current exchange and compose a successful response
+597	   or a response indicating the error conditions identified.  The
+598	   response PDU SHALL be encrypted and authenticated as described above
+599	   using a new random 16-octet IV.  The packet with partially encrypted
+600	   PDU SHALL be sent back to the originator.
+
+602	   This process SHALL be executed for the request and response in the
+603	   Test Setup exchange, including the Null Request (Section 5) and the
+604	   Test Activation exchange (Section 6).
+
+606	   If the PDU validation fails for a Status PDU, the receiver SHALL
+607	   ignore the message.  If the watchdog timer expires (due to successive
+608	   failed validations), the test session will prematurely terminate (no
+609	   further load traffic SHALL be transmitted).
+
+611	4.3.  Key Management
+
+613	   Section 2 of [RFC7210] specifies a conceptual database for long-lived
+614	   cryptographic keys.  The key table SHALL be used with the REQUIRED
+615	   authentication mode and the OPTIONAL authentication mode (using the
+616	   same key).  The same key table and key SHALL also be used with the
+617	   OPTIONAL Encryption mode, when utilized.  For both authentication and
+618	   encryption, this key SHALL only be used as input to the KDF,
+619	   specified in Section 4.3.1, to derive the actual keys used for
+620	   authentication and encryption processing.  Key rotation and related
+621	   management specifics are beyond the scope of this document.
+
+623	   The key table SHALL have (at least) the following fields, referring
+624	   to Section 2 of [RFC7210]:
+
+626	   *  AdminKeyName
+
+628	   *  LocalKeyName
+
+630	   *  KDF
+
+632	   *  AlgID
+
+634	   *  Key
+
+636	   *  SendLifetimeStart
+
+638	   *  SendLifetimeEnd
+
+640	   *  AcceptLifetimeStart
+
+642	   *  AcceptLifetimeEnd
+
+644	   The LocalKeyName SHALL be determined from the corresponding keyId
+645	   field in the PDUs that follow.
+
+647	4.3.1.  Key Derivation Function (KDF)
+
+649	   A Key Derivation Function (KDF) is a one-way function that provides
+650	   cryptographic separation of key material.  The protocol requires a
+651	   KDF to securely derive cryptographic keys used for authentication and
+652	   encryption of protocol messages.  The inclusion of a KDF ensures that
+653	   keys are generated in a standardized, cryptographically secure
+654	   manner, reducing the risk of key compromise and enabling
+655	   interoperability across implementations.  The benefits of using a KDF
+656	   include:
+
+658	   *  Security: A KDF produces keys with high entropy, resistant to
+659	      brute-force and related-key attacks, ensuring robust protection
+660	      for protocol communications.
+
+662	   *  Flexibility: The KDF allows derivation of multiple keys from a
+663	      single shared secret, supporting distinct keys for client and
+664	      server authentication and encryption.
+
+666	   *  Standardization: By adhering to established cryptographic
+667	      standards, the KDF ensures compatibility with existing security
+668	      frameworks and facilitates implementation audits.
+
+670	   *  Efficiency: The KDF enables efficient key generation without
+671	      requiring additional key exchange mechanisms, minimizing protocol
+672	      overhead.
+
+674	   The KDF algorithm SHALL be a Key Derivation Function in Counter Mode,
+675	   as specified in Section 4.1 of [NIST800-108].  This algorithm uses a
+676	   counter-based mechanism to generate key material from a shared
+677	   secret, ensuring deterministic and secure key derivation.  The
+678	   Pseudorandom Function (PRF) used in the KDF SHALL be HMAC-SHA-256, as
+679	   defined in section 6 of [RFC6234].  IANA is asked to assign “HMAC-
+680	   SHA-256” as a new KeyTable KDF (Section 11.2).
+
+682	   The KDF SHALL use the following parameters:
+
+684	   *  Kin (Key-derivation key): The shared key as identified by the
+685	      keyId field in the PDU.
+
+687	   *  Label: The fixed string "UDPSTP" (without quotes), encoded as a
+688	      UTF-8 string, used to bind the derived keys to this specific
+689	      protocol.
+
+691	   *  Context: The UTF-8 string representation of the authUnixTime field
+692	      received in the very first Setup Request PDU sent from the client
+693	      to the server.  This ensures that the derived keys are unique to
+694	      the session and tied to the temporal context of the initial setup
+695	      exchange.  The authUnixTime field serves as a nonce and is
+696	      protected from modification by the HMAC-SHA-256 hash present in
+697	      the authDigest field.
+
+699	   *  r: The length of the binary encoding of the counter SHALL be 32
+700	      (bits).
+
+702	   The total derived key material SHALL be 96 octets (768 bits) in
+703	   length.  The key material SHALL be structured as follows, from most
+704	   significant bit (MSB) to least significant bit (LSB):
+
+706	   *  Client Authentication Key: 256 bits (32 octets), used for
+707	      authenticating messages sent by the client.
+
+709	   *  Server Authentication Key: 256 bits (32 octets), used for
+710	      authenticating messages sent by the server.
+
+712	   *  Client Encryption Key: 128 bits (16 octets), used for encrypting
+713	      messages sent by the client.
+
+715	   *  Server Encryption Key: 128 bits (16 octets), used for encrypting
+716	      messages sent by the server.
+
+718	   This structure ensures that the derived keys are sufficient for
+719	   securing both authentication and encryption operations within the
+720	   protocol, while maintaining clear separation of function and
+721	   directionality.
+
+723	   If authentication of the initial Setup Request PDU received by the
+724	   server fails, due to an invalid authDigest field, any and all derived
+725	   keying material and keys SHALL be considered invalid.
+
+727	   The key material derived from the initial Setup Request PDU, either
+728	   at the client prior to transmission or at the server upon reception,
+729	   SHALL be used for all subsequent PDUs sent between them for that test
+730	   connection.  As such, the KDF is only required to be executed once by
+731	   the client and server for each test connection.
+
+733	   Section 12, Figure 12 provides a code snippet demonstrating
+734	   derivation of the specified keys from key material using the OpenSSL
+735	   cryptographic library.  Specifically, the high-level Key-Based
+736	   EVP_KDF implementation (EVP_KDF-KB, Key-Based Envelope Key-
+737	   Distribution Function), see [EVP_KDF-KB] for details.
+
+739	4.4.  Configuration of Network Functions with Stateful Filtering
+
+741	   Successful interaction with a local firewall assumes the firewall to
+742	   be configured allowing a host to open a bidirectional connection
+743	   using unique source and destination addresses as well as port numbers
+744	   by sending a packet using that 4-tuple for a given transport
+745	   protocol.  The client's interaction with its firewall depends on this
+746	   configuration.
+
+748	   The firewall at the server MUST be configured with an open pinhole
+749	   for the server IP address and standard UDP port of the server.  All
+750	   messages sent by the client to the server use this standard UDP port.
+
+752	   The server uses one ephemeral UDP port per test connection.  Assuming
+753	   that the firewall administration at the server does not allow an open
+754	   UDP ephemeral port range, then the server MUST send a Null Request to
+755	   the client from the ephemeral port communicated to the client in the
+756	   Test Setup Response.  The Null Request may not reach the client: it
+757	   may be discarded by the client's firewall.
+
+759	   If the server firewall administration allows an open UDP ephemeral
+760	   port range, then the Null Request is not strictly necessary.
+761	   However, the availability of an open port range policy cannot be
+762	   assumed.
+
+764	   Network Address Translators (NATs) are expected to offer support of a
+765	   wider set of operational configurations as compared to Firewalls.
+766	   Specifications covering NAT behaviour apart from the above are out of
+767	   scope of this document, as are combined implementations of NAT and
+768	   Firewalls too.
+
+770	4.5.  Optional Checksum
+
+772	   All of the PDUs exchanged between the client and server support a
+773	   header checksum that covers the various fields in the UDPST PDU
+774	   (excluding the Payload Content of the Load PDU and, to be clear, also
+775	   the IP- and UDP-header).  This checksum is intended for environments
+776	   where UDP data integrity may be uncertain.  This includes situations
+777	   where the standard UDP checksum is disabled or a nonstandard network
+778	   API is in use (things typically done to improve performance on low-
+779	   end devices).  The calculation is the same as the 16-bit one's
+780	   complement Internet checksum used in the IPv4 packet header (see
+781	   section 3.1 of [RFC0791]).
+
+783	   If a PDU sender is populating the checkSum field, it SHALL do so
+784	   after the PDU is built but prior to any authentication or encryption
+785	   processing (i.e., all fields starting with authMode are zeroed).  The
+786	   PDU receiver SHALL subsequently verify the PDU checksum whenever
+787	   checksum processing has been configured.  Verification requires that
+788	   all fields starting with authMode are zeroed prior to the checksum
+789	   calculation used to verify the PDU.
+
+791	   Because of its redundancy when authentication is being used, it is
+792	   OPTIONAL for a PDU sender to utilize the checkSum field whenever the
+793	   authDigest field is also utilized.  However, because authentication
+794	   is not applicable to the Load PDU, the checkSum field SHALL be
+795	   utilized by the sender whenever UDP data integrity may be uncertain
+796	   (as outlined above).
+
+798	5.  Test Setup Request and Response
+
+800	5.1.  Client Generates Test Setup Request
+
+802	   The client SHALL begin the Control phase exchanges by sending a Test
+803	   Setup Request message to the server's (standard) control port.  This
+804	   standard UDPSTP port number is utilized for each connection of a
+805	   multi-connection test (assuming each server to have a distinct IP
+806	   address and/or a client to have one or more distinct IP adresses,
+807	   respectively).
+
+809	   The client SHALL simultaneously start a test initiation timer so that
+810	   if the Control phase fails to complete Test Setup and Test Activation
+811	   exchanges in the allocated time, the client software SHALL exit
+812	   (close the UDP socket and indicate an error message to the user).
+813	   Lost messages result in a Test Setup and Test Activation failure.
+814	   The test initiation timer MAY reuse the test termination timeout
+815	   value.
+
+817	   The watchdog timeout is configured as a 1-second interval to trigger
+818	   a warning message that the received traffic has stopped.  The test
+819	   termination timeout is based on the watchdog interval, and implements
+820	   a wait time of 2 additional seconds before triggering a non-graceful
+821	   termination.
+
+823	   The UDP PDU format layout SHALL be as follows (big-endian AB,
+824	   starting by most significant byte ending by least significant byte):
+
+826	   0                   1                   2                   3
+827	   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+828	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+829	   |            pduId              |          protocolVer          |
+830	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+831	   |    mcIndex    |    mcCount    |            mcIdent            |
+832	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+833	   |  cmdRequest   | cmdResponse   |         maxBandwidth          |
+834	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+835	   |           testPort            |modifierBitmap |   reserved1   |
+836	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+837	   |           checkSum            |           reserved2           |
+838	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+839	   |                                                               |
+840	   |                      padding (12 octets)                      |
+841	   |                                                               |
+842	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+843	   |   authMode    |     keyId     |        reserved-auth1         |
+844	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+845	   |                         authUnixTime                          |
+846	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+847	   .                     initVector (16-octet)                    .
+848	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+849	   .                     authDigest (32-octet)                    .
+850	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+852	                      Figure 2: Test Setup PDU Layout
+
+854	   Additional details regarding the Setup Request and Response fields
+855	   are as follows:
+
+857	   pduId: A two-octet field.  IANA is asked to assign the value hex
+858	   0xACE1 (Section 11.3.1).
+
+860	   protocolVer: A two-octet field, identifying the actual protocol
+861	   version.  IANA is asked to assign only one initial value, 20
+862	   (Section 11.3.2).
+
+864	   mcIndex: The index of a connection relative to all connections that
+865	   make up a single test (starting at 0, incremented by 1 per
+866	   connection).  It is used to differentiate separate connections within
+867	   a multi-connection test.  An implementation may restrict the number
+868	   of connections supported for a single test to a value smaller or
+869	   equal to 255.
+
+871	   mcCount: The total count of attempted connections.
+
+873	   mcIdent: A pseudorandom non-zero identifier (via a Random Number
+874	   Generator, source port number,...) that is common to all connections
+875	   of a single test.  It is used by clients/servers to associate
+876	   separate connections within a multi-connection test.
+
+878	   cmdRequest: Is set to CHSR_CREQ_SETUPREQ to indicate a Setup request
+879	   message.  Note that CHSR_CREQ_NONE remains unused.
+
+881	   cmdResponse: All Request PDUs always have a Command Response of
+882	   XXXX_CRSP_NONE.
+
+884	   maxBandwith: When this field is non-zero, it is a specification of
+885	   the maximum bit rate the client expects to send or receive during the
+886	   requested test in Mbps.  The server compares this value to its
+887	   currently available configured limit for test admission control.
+888	   This field MAY be used for rate-limiting the maximum rate the server
+889	   should attempt.  The maxBandwidth field's most significant bit, the
+890	   CHSR_USDIR_BIT, is set to 0 by default to indicate "downstream" and
+891	   has to be set to 1 to indicate "upstream".
+
+893	   testPort: Set to zero in the Test Setup Request and populated by the
+894	   server in the Test Setup Response.  It contains the UDP ephemeral
+895	   port number on the server that the client has to use for the Test
+896	   Activation Request and subsequent Load or Status PDUs.
+
+898	   modifierBitmap: this document only assigns two bits in this bitmap,
+899	   see Section 11.3.3:
+
+901	   CHSR_JUMBO_STATUS  Above a sending rate of 1Gbps, allow datagram
+902	      sizes that result in Jumbo Frames (with a max IP packet size of
+903	      9000 bytes).  Up to a sending rate of 1Gbps, or for all sending
+904	      rates if CHSR_JUMBO_STATUS is not set, datagram sizes SHALL NOT
+905	      produce an IP packet size greater than 1250 bytes (unless
+906	      CHSR_TRADITIONAL_MTU is also set).
+
+908	   CHSR_TRADITIONAL_MTU  Allow datagram sizes, at any sending rate, that
+909	      can result in a Traditional IP packet size of 1500 bytes.
+910	      Effectively increasing the default non-Jumbo maximum from 1250
+911	      bytes to 1500 bytes.
+
+913	   Other bit positions are left unassigned by this document.
+
+915	   reserved1: This field MUST be set to 0 and it MUST be ignored on
+916	   receipt.
+
+918	   checkSum: An optional checksum of the entire PDU (see Section 4.5 for
+919	   guidance).  The calculation is done with the fields checksum,
+920	   authMode and those following after authMode set to zero.
+
+922	   reserved2: This field MUST be set to 0 and it MUST be ignored on
+923	   receipt.
+
+925	   authMode: The authMode field currently has four values assigned (see
+926	   Section 11.3.4).  One of these has to be set (see Section 4.2 for
+927	   requirements and details of operation):
+
+929	   AUTHMODE_0:  Optional Unauthenticated mode
+
+931	   AUTHMODE_1:  Required Authentication for Control phase
+
+933	   AUTHMODE_2:  Optional Authentication for Control and Data phase
+934	      (Status Feedback PDU only)
+
+936	   AUTHMODE_3:  Optional Encrypted mode
+
+938	   A range of 60 through 63 is reserved for experimentation.  IANA is
+939	   asked to create a registry for the assigned values; see the IANA
+940	   Considerations Section.
+
+942	   keyId: This is a localKeyName, the numeric key identifier for a key
+943	   in the shared key table.
+
+945	   reserved-auth1: This field MUST be set to 0 and it MUST be ignored on
+946	   receipt.  Identical usage of reserved-auth1 field across all PDUs in
+947	   a future UDPSTP version allows it to keep the security functionality
+948	   identical in each PDU.
+
+950	   authUnixTime: A 32-bit time stamp of the current system (wall-clock)
+951	   time since the Unix Epoch on January 1st, 1970 at UTC.
+
+953	   initVector: This field contains the 16-octet random IV used for
+954	   Encryption mode.  A new random 16-octet IV SHALL be used each time
+955	   encryption is performed.
+
+957	   authDigest: This field contains the 32-octet HMAC-SHA-256 hash that
+958	   covers the entire PDU.
+
+960	5.2.  Server Test Setup Request Processing and Response Generation
+
+962	   This section describes the processes at the server to evaluate the
+963	   Test Setup Request and determine the next steps.
+
+965	5.2.1.  Test Setup Request Processing - Rejection
+
+967	   When the server receives the Setup Request, it SHALL:
+
+969	   *  verify the size of the Setup Request message and if correct
+970	      evaluate the authMode field,
+
+972	   *  if operating in one of the Authenticated modes, validate the Setup
+973	      Request message by checking the authDigest as prescribed in
+974	      Section 4.2.2, and
+
+976	   *  if operating in the Encryption mode, use the client encryption key
+977	      from the KDF (derived from the keyId designated key) and the IV to
+978	      decrypt the Setup Request message up to the authMode field using
+979	      the method prescribed in Section 4.2.4
+
+981	   Then, the server evaluates the other fields in the protocol header,
+982	   such as the protocol version, the PDU ID (to validate the type of
+983	   message), the maximum Bandwidth requested for the test, and the
+984	   modifierBitmap for use of options such as Jumbo datagram status and
+985	   Traditional MTU (1500 bytes).
+
+987	   If the client has selected options for:
+
+989	   *  Jumbo datagram support (modifierBitmap),
+
+991	   *  Traditional MTU (modifierBitmap),
+
+993	   *  Authentication mode (authMode)
+
+995	   that do not match the server configuration, the server MUST reject
+996	   the Setup Request.
+
+998	   If the Setup Request must be rejected, the conditions below determine
+999	   whether the server sends a response:
+
+1001	   *  In Authenticated modes, if the authDigest is valid, a Test Setup
+1002	      Response SHALL be sent back to the client with a corresponding
+1003	      command response value indicating the reason for the rejection.
+1004	      If operating in the Encryption mode, the server SHALL proceed per
+1005	      Section 4.2.4, else the server SHALL proceed per Section 4.2.2.
+
+1007	   *  In Authenticated modes, if the authDigest is invalid, then the
+1008	      Test Setup Request SHOULD fail silently.  The exception is for
+1009	      operations support: server administrators using authentication are
+1010	      permitted to send a Setup Response to support operations and
+1011	      troubleshooting.
+
+1013	   *  If Unauthenticated mode is selected, the Test Setup Request SHALL
+1014	      fail silently.
+
+1016	   The additional, non-authentication circumstances when a server SHALL
+1017	   NOT communicate the appropriate Command Response code for an error
+1018	   condition (fail silently) are when:
+
+1020	   1.  the Setup Request PDU size is not equal to the 'struct
+1021	       controlHdrSR' size shown in Figure 3,
+
+1023	   2.  the PDU ID is not 0xACE1 (Test Setup PDU), or
+
+1025	   3.  a directed attack has been detected,
+
+1027	   in which case the server will allow setup attempts to terminate
+1028	   silently.  Attack detection is beyond the scope of this
+1029	   specification.
+
+1031	   When the server replies to a Test Setup Request message, the Test
+1032	   Setup Response PDU is structured identically to the Request PDU and
+1033	   SHALL retain the original values received in it, with the following
+1034	   exceptions:
+
+1036	   *  The cmdRequest field is set to CHSR_CREQ_SETUPRSP, indicating a
+1037	      response.
+
+1039	   *  The cmdResponse field is set to an error code (starting at
+1040	      cmdResponse 2, Bad Protocol Version, see Section 11.3.5),
+1041	      indicating the reason for rejection.  If cmdResponse indicates a
+1042	      bad protocol version (CHSR_CRSP_BADVER), the protocolVer field is
+1043	      also updated to indicate the current expected version.
+
+1045	   *  The PDU is encrypted up to the authMode field using a new random
+1046	      IV, if doing encryption.
+
+1048	   *  The authUnixTime field is updated to the current system (wall-
+1049	      clock) time and the authDigest is recalculated, if doing
+1050	      authentication.
+
+1052	   The Setup Request/Response message PDU SHALL be organized as follows:
+
+1054	   <CODE BEGINS>
+1055	   //
+1056	   // Control header for UDP payload of Setup Request/Response PDUs
+1057	   //
+1058	   struct controlHdrSR {
+1059	   #define CHSR_ID 0xACE1
+1060	           uint16_t pduId;   // PDU ID
+1061	   #define PROTOCOL_VER 20
+1062	           uint16_t protocolVer; // Protocol version
+1063	           uint8_t mcIndex;      // Multi-connection index
+1064	           uint8_t mcCount;      // Multi-connection count
+1065	           uint16_t mcIdent;     // Multi-connection identifier
+1066	   #define CHSR_CREQ_NONE     0
+1067	   #define CHSR_CREQ_SETUPREQ 1   // Setup request
+1068	   #define CHSR_CREQ_SETUPRSP 2   // Setup response
+1069	           uint8_t cmdRequest;    // Command request
+1070	   #define CHSR_CRSP_NONE     0   // (used with request)
+1071	   #define CHSR_CRSP_ACKOK    1   // Acknowledgment
+1072	   #define CHSR_CRSP_BADVER   2   // Bad version
+1073	   #define CHSR_CRSP_BADJS    3   // Jumbo setting mismatch
+1074	   #define CHSR_CRSP_AUTHNC   4   // Auth. not configured
+1075	   #define CHSR_CRSP_AUTHREQ  5   // Auth. required
+1076	   #define CHSR_CRSP_AUTHINV  6   // Auth. (mode) invalid
+1077	   #define CHSR_CRSP_AUTHFAIL 7   // Auth. failure
+1078	   #define CHSR_CRSP_AUTHTIME 8   // Auth. time invalid
+1079	   #define CHSR_CRSP_NOMAXBW  9   // Max bandwidth required
+1080	   #define CHSR_CRSP_CAPEXC   10  // Capacity exceeded
+1081	   #define CHSR_CRSP_BADTMTU  11  // Trad. MTU mismatch
+1082	   #define CHSR_CRSP_MCINVPAR 12  // Multi-conn. invalid params
+1083	   #define CHSR_CRSP_CONNFAIL 13  // Conn. allocation failure
+1084	           uint8_t cmdResponse;   // Command response
+1085	   #define CHSR_USDIR_BIT 0x8000  // Upstream direction bit
+1086	           uint16_t maxBandwidth; // Required bandwidth in Mbps
+1087	           uint16_t testPort;     // Test port on server
+1088	   #define CHSR_JUMBO_STATUS    0x01
+1089	   #define CHSR_TRADITIONAL_MTU 0x02
+1090	           uint8_t modifierBitmap; // Modifier bitmap
+1091	           uint8_t reserved1;      // (reserved for alignment)
+1092	           uint16_t checkSum;      // Header checksum
+1093	           uint16_t reserved2;     // (reserved for alignment)
+1094	           //
+1095	           uint8_t padding[12]; // Padding for encryption
+1096	           // ========== Encryption ends here ==========
+1097	   #define AUTHMODE_0 0 // Mode 0: Unauthenticated
+1098	   #define AUTHMODE_1 1 // Mode 1: Authenticated Control
+1099	   #define AUTHMODE_2 2 // Mode 2: Authenticated Control+Status
+1100	   #define AUTHMODE_3 3 // Mode 3: Encrypted+Auth Control+Status
+1101	           uint8_t authMode;        // Authentication mode
+1102	           uint8_t keyId;           // Key ID in shared table
+1103	           uint16_t reserved-auth1; // (reserved for alignment)
+1104	           uint32_t authUnixTime;   // Authentication time stamp
+1105	   #define AUTH_IV_LENGTH 16        // Initialization Vector length
+1106	           uint8_t initVector[AUTH_IV_LENGTH]     // IV
+1107	   #define AUTH_DIGEST_LENGTH 32    // SHA-256 digest length
+1108	           uint8_t authDigest[AUTH_DIGEST_LENGTH] // HMAC
+1109	   };
+1110	   #define SHA256_KEY_LEN 32 // Authentication key length
+1111	   #define AES128_KEY_LEN 16 // Encryption key length
+1112	   <CODE ENDS>
+
+1114	                          Figure 3: Test Setup PDU
+
+1116	5.2.2.  Test Setup Request Processing - Acceptance
+
+1118	   If the server finds that the Setup Request matches its configuration
+1119	   and is otherwise acceptable, the server SHALL initiate a new
+1120	   connection to receive the Test Activation Request from the client,
+1121	   using a new UDP socket allocated from the UDP ephemeral port range.
+1122	   This new socket will also be used for the subsequent Load and Status
+1123	   PDUs that are part of testing (with the port number communicated back
+1124	   to the client in testPort field of the Test Setup Response).  Then,
+1125	   the server SHALL start a watchdog timer (to terminate the new
+1126	   connection if the client goes silent) and SHALL send the Test Setup
+1127	   Response back to the client.  The watchdog timer is set to the same
+1128	   values as on the Client side (see Section 5)
+
+1130	   When the server replies to the Test Setup Request message, the Test
+1131	   Setup Response PDU is structured identically to the Request PDU and
+1132	   SHALL retain the original values received in it, with the following
+1133	   exceptions:
+
+1135	   *  The cmdRequest field is set to CHSR_CREQ_SETUPRSP, indicating a
+1136	      response.
+
+1138	   *  The cmdResponse field is set to CHSR_CRSP_ACKOK, indicating an
+1139	      acknowledgment.
+
+1141	   *  The testPort field is set to the ephemeral port number to be used
+1142	      for the client's Test Activation Request and all subsequent
+1143	      communication.
+
+1145	   *  The PDU is encrypted up to the authMode field using a new random
+1146	      IV, if doing encryption.
+
+1148	   *  The authUnixTime field is updated to the current system (wall-
+1149	      clock) time and the authDigest is recalculated, if doing
+1150	      authentication.
+
+1152	   Finally, the new UDP connection associated with the new socket and
+1153	   port are made ready, and the server awaits further communication
+1154	   there.
+
+1156	   To ensure that a server's local firewall will successfully allow
+1157	   packets received for the new ephemeral port, the server SHALL
+1158	   immediately send a Null Request with the corresponding values
+1159	   including the source and destination IP addresses and port numbers.
+1160	   The source port SHALL be the new ephemeral port.  This operation
+1161	   allows communication to the server even when the server's local
+1162	   firewall prohibits open ranges of ephemeral ports.  The packet is not
+1163	   expected to arrive successfully at the client if the client-side
+1164	   firewall blocks unexpected traffic.  If the Null Request arrives at
+1165	   the client, it is a confirmation that further exchanges are possible
+1166	   on the new port-pair (but this is not strictly necessary).  Note that
+1167	   there is no response to a Null Request.
+
+1169	   The UDP PDU format layout SHALL be as follows (big-endian AB):
+
+1171	   0                   1                   2                   3
+1172	   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+1173	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1174	   |            pduId              |          protocolVer          |
+1175	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1176	   |  cmdRequest   |  cmdResponse  |           checkSum            |
+1177	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1178	   |                      padding (8 octets)                       |
+1179	   |                                                               |
+1180	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1181	   |   authMode    |     keyId     |          reserved1a           |
+1182	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1183	   |                         authUnixTime                          |
+1184	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1185	   .                     initVector (16-octet)                    .
+1186	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1187	   .                     authDigest (32-octet)                    .
+1188	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+1190	                     Figure 4: Null Request PDU Layout
+
+1192	   Additional details regarding the Null Request fields are as follows:
+
+1194	   pduId: A two-octet field.  IANA is asked to assign the value hex
+1195	   0xDEAD (Section 11.3.1).
+
+1197	   cmdRequest: Is set to CHNR_CREQ_NULLREQ indicating a Null Request
+1198	   message.
+
+1200	   cmdResponse: Is set to CHNR_CRSP_NONE.
+
+1202	   checkSum: An optional checksum of the PDU (see Section 4.5 for
+1203	   guidance).  The calculation is done with the checkSum field, and all
+1204	   fields starting with authMode, set to zero.
+
+1206	   If a Test Activation Request is not subsequently received from the
+1207	   client on the new ephemeral port number before the watchdog timer
+1208	   expires, the server SHALL close the socket and deallocate the
+1209	   associated resources.
+
+1211	   The Null Request message PDU SHALL be organized as follows:
+
+1213	   <CODE BEGINS>
+1214	   //
+1215	   // Control header for UDP payload of Null Request PDU
+1216	   //
+1217	   struct controlHdrNR {
+1218	   #define CHNR_ID 0xDEAD
+1219	           uint16_t pduId;       // PDU ID
+1220	           uint16_t protocolVer; // Protocol version
+1221	   #define CHNR_CREQ_NONE    0
+1222	   #define CHNR_CREQ_NULLREQ 1  // Null request
+1223	           uint8_t cmdRequest;  // Command request
+1224	   #define CHNR_CRSP_NONE 0     // (used with request)
+1225	           uint8_t cmdResponse; // Command response
+1226	           uint16_t checkSum;   // Header checksum
+1227	           //
+1228	           uint8_t padding[8];  // Padding for encryption
+1229	           // ========== Encryption ends here ==========
+1230	           uint8_t authMode;        // Authentication mode
+1231	           uint8_t keyId;           // Key ID in shared table
+1232	           uint16_t reserved-auth1; // (reserved for alignment)
+1233	           uint32_t authUnixTime;   // Authentication time stamp
+1234	           uint8_t initVector[AUTH_IV_LENGTH]     // IV
+1235	           uint8_t authDigest[AUTH_DIGEST_LENGTH] // HMAC
+1236	   };
+1237	   <CODE ENDS>
+
+1239	                         Figure 5: Null Request PDU
+
+1241	5.3.  Setup Response Processing at the Client
+
+1243	   When the client receives the Test Setup Response message, it SHALL:
+
+1245	   *  verify the size of the Setup Response message and if correct
+1246	      interrogate the authMode field,
+
+1248	   *  if operating in one of the Authenticated modes, validate the Setup
+1249	      Response message by checking the authDigest as prescribed in
+1250	      Section 4.2.2,
+
+1252	   *  if operating in the Encryption mode, use the server encryption key
+1253	      from the KDF (derived from the keyId designated key) and the IV to
+1254	      decrypt the Setup Response message up to the authMode field using
+1255	      the method prescribed in Section 4.2.4,
+
+1257	   and then proceed to evaluate the other fields in the protocol,
+1258	   beginning with the protocol version, PDU ID (to validate the type of
+1259	   message), and cmdRequest for the role of the message, which MUST be
+1260	   Test Setup Response, CHSR_CREQ_SETUPRSP, as indicated by Figure 3.
+
+1262	   If the cmdResponse value indicates an error (values greater than
+1263	   CHSR_CRSP_ACKOK) the client SHALL display/report a relevant message
+1264	   to the user or management process and exit.  If the client receives a
+1265	   Command Response code that is not equal to one of the codes defined,
+1266	   the client MUST terminate the connection and terminate operation of
+1267	   the current Setup Request.  If the Command Server Response code value
+1268	   indicates success (CHSR_CRSP_ACKOK), the client SHALL compose a Test
+1269	   Activation Request with all the test parameters it desires, such as
+1270	   the test direction, the test duration, etc., as described below.
+
+1272	6.  Test Activation Request and Response
+
+1274	   This section is divided according to the sending and processing of
+1275	   the client, server, and again at the client.
+
+1277	6.1.  Client Generates Test Activation Request
+
+1279	   Upon a successful setup exchange, the client SHALL compose and send
+1280	   the Test Activation Request to the UDP port number the server
+1281	   communicated in the Test Setup Response (the new ephemeral port, and
+1282	   not the standard UDPSTP port).
+
+1284	   The UDP PDU format layout is as follows (big-endian AB):
+
+1286	   0                   1                   2                   3
+1287	   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+1288	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1289	   |                          txInterval1                          |
+1290	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1291	   |                          udpPayload1                          |
+1292	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1293	   |                          burstSize1                           |
+1294	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1295	   |                          txInterval2                          |
+1296	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1297	   |                          udpPayload2                          |
+1298	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1299	   |                          burstSize2                           |
+1300	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1301	   |                           udpAddon2                           |
+1302	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+1304	   0                   1                   2                   3
+1305	   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+1306	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1307	   |            pduId              |          protocolVer          |
+1308	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1309	   |  cmdRequest   | cmdResponse   |           lowThresh           |
+1310	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1311	   |         upperThresh           |           trialInt            |
+1312	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1313	   |         testIntTime           |   reserved1   |   dscpEcn     |
+1314	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1315	   |         srIndexConf           |  useOwDelVar  |highSpeedDelta |
+1316	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1317	   |         slowAdjThresh         |         seqErrThresh          |
+1318	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1319	   | ignoreOooDup  |modifierBitmap |  rateAdjAlgo  |   reserved2   |
+1320	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1321	   .                      srStruct (28 octets)                     .
+1322	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1323	   |        subIntPeriod           |           checkSum            |
+1324	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1325	   |                      padding (4 octets)                       |
+1326	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1327	   |   authMode    |     keyId     |        reserved-auth1         |
+1328	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1329	   |                         authUnixTime                          |
+1330	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1331	   .                     initVector (16-octet)                    .
+1332	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1333	   .                     authDigest (32-octet)                    .
+1334	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+1336	                    Figure 6: Test Activation PDU Layout
+
+1338	   Fields are populated based on default values or command-line options.
+1339	   Authentication and encryption modes follow the same methodology as
+1340	   with the Setup Request and Response.
+
+1342	   pduId: A two-octet field.  IANA is asked to assign the value hex
+1343	   0xACE2 (Section 11.3.1).
+
+1345	   cmdRequest: Is set to CHTA_CREQ_TESTACTUS to indicate an upstream
+1346	   test activation or alternatively to CHTA_CREQ_TESTACTDS to indicate a
+1347	   downstream test activation.  Note that CHTA_CREQ_NONE remains unused.
+1348	   See Section 11.3.6.
+
+1350	   cmdResponse: three CHTA_CRSP_<Indication> values are defined, see
+1351	   Figure 7.
+
+1353	   lowThresh, upperThresh: see Table 3 of [TR-471].
+
+1355	   trialInt: Status Feedback / trial interval [ms].  The test interval
+1356	   Delta_t is subdivided into a number of sub-intervals dt, and each
+1357	   sub-interval is further divided into a number of trial intervals (see
+1358	   [TR-471]).  Starts by 1 and is continuosly incremented during a
+1359	   single test interval (testIntTime).
+
+1361	   testIntTime: see TestInterval, Table 3 of [TR-471].
+
+1363	   dscpEcn: The Load PDU Differentiated Services and ECN Fields as
+1364	   specified by section 5 of [RFC3168].  Note that the DiffServ
+1365	   Codepoint (DSCP) is denoted by the 6 most significant bits.  The DSCP
+1366	   field specified by [TR-471] is a subset of the dscpEcn field.
+
+1368	   useOwDelVar: Boolean, see EnableIPDV in Table 1 of [TR-471].
+
+1370	   highSpeedDelta, slowAdjThresh, seqErrThresh: see Appendix A of
+1371	   [RFC9097].
+
+1373	   ignoreOooDup: Boolean, see ReordDupIgnoreEnable in Table 3 of
+1374	   [TR-471].
+
+1376	   srIndexConf: The requested Configured Sending Rate Table index, used
+1377	   in a Test Activation Request, of the desired fixed or starting
+1378	   sending rate (depending on whether CHTA_SRIDX_ISSTART is cleared or
+1379	   set respectively).  Because a value of zero is a valid fixed or
+1380	   starting sending rate index, the field SHALL be set to its maximum
+1381	   (CHTA_SRIDX_DEF) when requesting the default behavior of the server
+1382	   (starting the selected load rate adjustment algorithm at its minimum/
+1383	   zero index).  This SHALL be equivalent to setting srIndexConf to zero
+1384	   and setting the CHTA_SRIDX_ISSTART bit.
+
+1386	   rateAdjAlgo: The applied Load Rate Adjustment Algorithm, see
+1387	   Section 11.3.8.
+
+1389	   modifierBitmap: this document only assigns two bits in this bitmap,
+1390	   see Section 11.3.7:
+
+1392	   CHTA_SRIDX_ISSTART  Treat srIndexConf as the starting sending rate to
+1393	      be used by the load rate adjustment algorithm
+
+1395	   CHTA_RAND_PAYLOAD  Randomize the Payload Content beyond the Load PDU
+1396	      header
+
+1398	   Other bit positions are left unassigned by this document.
+
+1400	   Sending Rate structure (srStruct), used by the server in a Test
+1401	   Activation Response for an upstream test, to communicate the
+1402	   (initial) Load PDU transmission parameters the client SHALL use.  For
+1403	   a Test Activation Request or a downstream test, this structure SHALL
+1404	   be zeroed.  Two sets of periodic transmission parameters are
+1405	   available, allowing for dual independent transmitters (to support a
+1406	   high degree of rate granularity).  The fields are defined as follows:
+
+1408	   txInterval1 and txInterval2: load rate transmit interval in [us].  A
+1409	   100 us granularity is recommended for optimal rate selection.
+
+1411	   udpPayload1 and udpPayload2: load rate UDP payload in [byte].
+
+1413	   burstSize1 and burstSize2: load rate burst size by a dimensionless
+1414	   number (of datagrams).
+
+1416	   udpAddon2: the size of a single Load PDU to be sent at the end of the
+1417	   txInterval2 send sequence, even when udpPayload2 or burstSize2 are
+1418	   zero and result in no transmission of their own.
+
+1420	   subIntPeriod: Test Sub-interval period in [ms], see dt
+1421	   (TestSubInterval) in Table 1 of [TR-471], default 1000 ms.
+
+1423	   checkSum: An optional checksum of the entire PDU ( see Section 4.5
+1424	   for guidance).  The calculation is done with the checkSum field, and
+1425	   all fields starting with authMode, set to zero.
+
+1427	   The Test Activation Request/Response message PDU (as well as the
+1428	   included Sending Rate structure) SHALL be organized as follows:
+
+1430	   <CODE BEGINS>
+1431	   //
+1432	   // Sending rate structure for a single row of transmission parameters
+1433	   //
+1434	   struct sendingRate {
+1435	           uint32_t txInterval1; // Transmit interval (us)
+1436	           uint32_t udpPayload1; // UDP payload (bytes)
+1437	           uint32_t burstSize1;  // UDP burst size per interval
+1438	           uint32_t txInterval2; // Transmit interval (us)
+1439	           uint32_t udpPayload2; // UDP payload (bytes)
+1440	           uint32_t burstSize2;  // UDP burst size per interval
+1441	           uint32_t udpAddon2;   // UDP add-on (bytes)
+1442	   };
+1443	   //
+1444	   // Control header for UDP payload of Test Act. Request/Response PDUs
+1445	   //
+1446	   struct controlHdrTA {
+1447	   #define CHTA_ID 0xACE2
+1448	           uint16_t pduId;       // PDU ID
+1449	           uint16_t protocolVer; // Protocol version
+1450	   #define CHTA_CREQ_NONE      0
+1451	   #define CHTA_CREQ_TESTACTUS 1 // Test activation upstream
+1452	   #define CHTA_CREQ_TESTACTDS 2 // Test activation downstream
+1453	           uint8_t cmdRequest;   // Command request
+1454	   #define CHTA_CRSP_NONE     0  // (used with request)
+1455	   #define CHTA_CRSP_ACKOK    1  // Acknowledgment
+1456	   #define CHTA_CRSP_BADPARAM 2  // Bad/invalid test params
+1457	           uint8_t cmdResponse;  // Command response
+1458	           uint16_t lowThresh;   // Low delay variation threshold (ms)
+1459	           uint16_t upperThresh; // Upper delay variation threshold (ms)
+1460	           uint16_t trialInt;    // Status Feedback/trial interval (ms)
+1461	           uint16_t testIntTime; // Test interval time (sec)
+1462	           uint8_t reserved1;    // (reserved for alignment)
+1463	           uint8_t dscpEcn;      // DiffServ and ECN field for testing
+1464	   #define CHTA_SRIDX_DEF UINT16_MAX // Request default server search
+1465	           uint16_t srIndexConf; // Configured Sending Rate Table index
+1466	           uint8_t useOwDelVar;  // Use one-way delay, not RTT (BOOL)
+1467	           uint8_t highSpeedDelta; // High-speed row adjustment delta
+1468	           uint16_t slowAdjThresh; // Slow rate adjustment threshold
+1469	           uint16_t seqErrThresh;  // Sequence error threshold
+1470	           uint8_t ignoreOooDup;   // Ignore Out-of-Order/Dup (BOOL)
+1471	   #define CHTA_SRIDX_ISSTART 0x01 // Use srIndexConf as starting index
+1472	   #define CHTA_RAND_PAYLOAD  0x02 // Randomize payload
+1473	           uint8_t modifierBitmap; // Modifier bitmap
+1474	   #define CHTA_RA_ALGO_B   0   // Algorithm B
+1475	   #define CHTA_RA_ALGO_C   1   // Algorithm C
+1476	           uint8_t rateAdjAlgo; // Rate adjust. algorithm
+1477	           uint8_t reserved2;   // (reserved for alignment)
+1478	           struct sendingRate srStruct; // Sending rate structure
+1479	           uint16_t subIntPeriod;       // Sub-interval period (msec)
+1480	           uint16_t checkSum;   // Header checksum
+1481	           //
+1482	           uint8_t padding[4];  // Padding for encryption
+1483	           // ========== Encryption ends here ==========
+1484	           uint8_t authMode;        // Authentication mode
+1485	           uint8_t keyId;           // Key ID in shared table
+1486	           uint16_t reserved-auth1; // (reserved for alignment)
+1487	           uint32_t authUnixTime;   // Authentication time stamp
+1488	           uint8_t initVector[AUTH_IV_LENGTH]     // IV
+1489	           uint8_t authDigest[AUTH_DIGEST_LENGTH] // HMAC
+1490	   };
+1491	   <CODE ENDS>
+
+1493	                       Figure 7: Test Activation PDU
+
+1495	6.2.  Server Processes Test Activation Request and Generates Response
+
+1497	   After the server receives the Test Activation Request on the new
+1498	   connection, it MUST choose to accept, ignore or modify any of the
+1499	   test parameters.  When the server replies to the Test Activation
+1500	   Request message, the Test Activation Response PDU is structured
+1501	   identically to the Request PDU and SHALL retain the original values
+1502	   received in it unless they are explicitly coerced to a server
+1503	   acceptable value.
+
+1505	6.2.1.  Server Rejects or Modifies Request
+
+1507	   When evaluating the Test Activation Request, the server MAY allow the
+1508	   client to specify its own fixed or starting send rate via
+1509	   srIndexConf.
+
+1511	   Alternatively, the server MAY enforce a maximum limit of the fixed or
+1512	   starting send rate which the client can successfully request.  If the
+1513	   client's Test Activation Request exceeds the server's configured
+1514	   maximum, the server MUST either reject the request or coerce the
+1515	   value to the configured maximum bit rate, and communicate that
+1516	   maximum to the client in the Test Activation Response.  The client
+1517	   can of course choose to end the test, as appropriate.
+
+1519	   Other parameters where the server has the OPTION to coerce the client
+1520	   to use values other than those in the Test Activation Request are
+1521	   (grouped by role):
+
+1523	   *  Load rate adjustment algorithm: lowThresh, upperThresh,
+1524	      useOwDelayVar, highSpeedDelta, slowAdjThresh, seqErrThresh,
+1525	      highSpeedDelta, ignoreOooDup, rateAdjAlgo.
+
+1527	   *  Test duration/intervals: trialInt, testIntTime, subIntPeriod
+
+1529	   *  Packet marking: dscpEcn
+
+1531	   Coercion is a step towards performing a test with the server-
+1532	   configured values; even though the client might prefer certain
+1533	   values, the server gives the client an opportunity to run a test with
+1534	   different values than the preferred set.  In these cases, the Command
+1535	   Response value SHALL be CHTA_CRSP_ACKOK.
+
+1537	   Note that the server also has the option of completely rejecting the
+1538	   request and sending back an appropriate cmdResponse field value
+1539	   (currently only CHTA_CRSP_BADPARAM, see Section 11.3.9).
+
+1541	   Whether this error response is sent or not depends on the Security
+1542	   mode of operation and the outcome of authDigest validation.
+
+1544	   If the Test Activation Request must be rejected (due to the Command
+1545	   Response value being CHTA_CRSP_BADPARAM), and
+
+1547	   *  In Authenticated modes, if the authDigest is valid, a Test
+1548	      Activation Response SHALL be sent back to the client with a
+1549	      corresponding command response value indicating the reason for the
+1550	      rejection.  If operating in the Encryption mode, the server SHALL
+1551	      follow the requirements of Section 4.2.4, else the server SHALL
+1552	      follow the requirements of Section 4.2.2.
+
+1554	   *  In Authenticated modes, if the authDigest is invalid, then the
+1555	      Test Activation Request SHOULD fail silently.  The exception is
+1556	      for operations support: server administrators using Authentication
+1557	      are permitted to send a Setup Response to support operations and
+1558	      troubleshooting.
+
+1560	   *  If Unauthenticated mode is selected, the Test Activation Request
+1561	      SHALL fail silently.
+
+1563	   The additional, non-authentication circumstances when a server SHALL
+1564	   NOT communicate the appropriate Command Response code for an error
+1565	   condition (fail silently) are when:
+
+1567	   1.  the Test Activation Request PDU size is not equal to the 'struct
+1568	       controlHdrTA' size shown in Figure 7,
+
+1570	   2.  the PDU ID is not 0xACE2 (Test Activation PDU), or
+
+1572	   3.  a directed attack has been detected,
+
+1574	   in which case the server will allow Test Activation Requests to
+1575	   terminate silently.  Attack detection is beyond the scope of this
+1576	   specification.
+
+1578	6.2.2.  Server Accepts Request and Generates Response
+
+1580	   When the server sends the Test Activation Response, it SHALL set the
+1581	   cmdResponse field to CHTA_CRSP_ACKOK (see Section 11.3.9)
+
+1583	   If the client has requested an upstream test, the server SHALL:
+
+1585	   *  include the transmission parameters from the first row of the
+1586	      Sending Rate Table in the Sending Rate structure (if requested by
+1587	      srIndexConf having been set to CHTA_SRIDX_DEF), or
+
+1589	   *  include the transmission parameters from the designated Configured
+1590	      Sending Rate Table index (srIndexConf) of the Sending Rate
+1591	      Table where, if CHTA_SRIDX_ISSTART is set in modifierBitmap, this
+1592	      will be used as the starting rate for the load rate adjustment
+1593	      algorithm, else it will be considered a fixed rate test.
+
+1595	   When generating the Test Activation Response (acceptance) for a
+1596	   downstream test, the server SHALL set all octets of the Sending Rate
+1597	   structure to zero.
+
+1599	   If activation continues, the server prepares the new connection for
+1600	   an upstream OR downstream test.
+
+1602	   In the case of an upstream test, the server SHALL prepare to use a
+1603	   single timer to send Status PDUs at the specified interval.  For a
+1604	   downstream test, the server SHALL prepare to utilize dual timers to
+1605	   send Load PDUs based on
+
+1607	   *  the transmission parameters directly from the first row of the
+1608	      Sending Rate Table (if requested by srIndexConf having been set to
+1609	      CHTA_SRIDX_DEF), or
+
+1611	   *  the transmission parameters from the designated Configured Sending
+1612	      Rate Table index (srIndexConf) of the Sending Rate Table where, if
+1613	      CHTA_SRIDX_ISSTART is set in modifierBitmap, this will be used as
+1614	      the starting rate for the load rate adjustment algorithm, else it
+1615	      will be considered a fixed rate test.
+
+1617	   The server SHALL then send the Test Activation Response back to the
+1618	   client, update the watchdog timer with a new timeout value, and set a
+1619	   test duration timer to eventually stop the test.
+
+1621	6.3.  Client Processes Test Activation Response
+
+1623	   When the client receives the Test Activation Response, it SHALL:
+
+1625	   *  If operating in an Authenticated mode, check the message PDU for
+1626	      validity via the authDigest field and acceptable immediacy via the
+1627	      authUnixTime field.  If validated, and if operating in the
+1628	      Encryption mode, decrypt the PDU using the included IV and the
+1629	      server encryption key from the KDF (derived from the keyId
+1630	      designated shared key).  Finally, check the PDU for general
+1631	      formatting, such as protocol version, and any PDU-specific fields
+1632	      that control the test.
+
+1634	   When the client receives the (vetted) Test Activation Response, it
+1635	   first checks the command response value.
+
+1637	   If the client receives a Test Activation cmdResponse field value that
+1638	   indicates an error, the client SHALL display/report a relevant
+1639	   message to the user or management process and exit.
+
+1641	   If the client receives a Test Activation cmdResponse field value that
+1642	   is not equal to one of the codes defined in Section 11.3.9, the
+1643	   client MUST terminate the connection and terminate operation of the
+1644	   current setup procedure.
+
+1646	   If the client receives a Test Activation Command Response value that
+1647	   indicates success (CHTA_CRSP_ACKOK, see Section 11.3.9), the client
+1648	   SHALL update its configuration to use any test parameters modified by
+1649	   the server.  If the setup parameters coerced by the server are not
+1650	   acceptable to the client, the client ends the test.
+
+1652	   To finalize an accepted test activation, the client SHALL prepare its
+1653	   connection for either an upstream test with dual timers set to send
+1654	   Load PDUs (based on the starting transmission parameters sent by the
+1655	   server), OR a downstream test with a single timer to send Status PDUs
+1656	   at the specified interval.
+
+1658	   Then, the client SHALL stop the test initiation timer and start a
+1659	   watchdog timer to detect if the server goes quiet.
+
+1661	   The connection is now ready for testing.
+
+1663	7.  Test Stream Transmission and Measurement Feedback Messages
+
+1665	   This section describes the data phase of the protocol.  The roles of
+1666	   sender and receiver vary depending on whether the direction of
+1667	   testing is from server to client, or the reverse.
+
+1669	7.1.  Test Packet PDU and Roles
+
+1671	   Testing proceeds with one endpoint sending Load PDUs, based on
+1672	   transmission parameters from the Sending Rate Table, and the other
+1673	   endpoint sending Status Feedback messages to communicate the traffic
+1674	   conditions at the receiver.  When the server is sending Status
+1675	   Feedback messages, they will also contain the latest transmission
+1676	   parameters from the Sending Rate Table that the client SHALL use.
+
+1678	   The watchdog timer at the receiver SHALL be reset each time a PDU is
+1679	   received.  See non-graceful test stop in Section 8 for handling the
+1680	   watchdog timeout expiration at each endpoint.
+
+1682	   When the server is sending Load PDUs in the role of sender, it SHALL
+1683	   use the transmission parameters directly from the Sending Rate
+1684	   Table via the index that is currently selected (which was indirectly
+1685	   based on the feedback in its received Status Feedback messages).
+
+1687	   However, when the client is sending Load PDUs in the role of sender,
+1688	   it SHALL use the discreet transmission parameters that were
+1689	   communicated by the server in its periodic Status Feedback messages
+1690	   (and not referencing a Sending Rate Table directly).  This approach
+1691	   allows the server to control the individual sending rates as well as
+1692	   the algorithm used to decide when and how to adjust the rate.
+
+1694	   The server uses a load rate adjustment algorithm which evaluates
+1695	   measurements taken locally at the Load PDU receiver.  When the client
+1696	   is the receiver, the information is communicated to the server via
+1697	   the periodic Status Feedback messages.  When the server is the
+1698	   receiver, the information is used directly (although it is also
+1699	   communicated to the client via its periodic Status Feedback
+1700	   messages).  This approach is unique to this protocol; it provides the
+1701	   ability to search for the Maximum IP Capacity and specify specific
+1702	   sender behaviors that is absent from other testing tools.  Although
+1703	   the algorithm depends on the protocol, it is not part of the protocol
+1704	   per se.
+
+1706	   The default algorithm (B, see [Y.1540]) has three paths to its
+1707	   decision on the next sending rate:
+
+1709	   1.  When there are no impairments present (no sequence errors and low
+1710	       delay variation), resulting in a sending rate increase.
+
+1712	   2.  When there are low impairments present (no sequence errors but
+1713	       higher levels of delay variation), the same sending rate is
+1714	       maintained.
+
+1716	   3.  When the impairment levels are above the thresholds set for this
+1717	       purpose and "congestion" is inferred, resulting in a sending rate
+1718	       decrease.
+
+1720	   Algorithm B also has two modes for increasing/decreasing the sending
+1721	   rate:
+
+1723	   *  A high-speed mode (fast) to achieve high sending rates quickly,
+1724	      but also back-off quickly when "congestion" is inferred from the
+1725	      measurements.  Consecutive feedback intervals that have a supra-
+1726	      threshold count of sequence number anomalies and/or contain an
+1727	      upper delay variation threshold exception in all of the
+1728	      consecutive intervals are sufficient to declare "congestion"
+1729	      within a test.  The threshold of consecutive feedback intervals
+1730	      SHALL be configurable with a default of 3 intervals.
+
+1732	   *  A single-step (slow) mode where all rate adjustments use the
+1733	      minimum increase or decrease of one step in the sending rate
+1734	      table.  The single step mode continues after the first inference
+1735	      of "congestion" from measured impairments.
+
+1737	   An OPTIONAL load rate adjustment algorithm (designated C) has been
+1738	   defined in [TR-471].  Algorithm C operation and modes are similar to
+1739	   B, but C uses multiplicative increases in the fast mode to reach the
+1740	   Gigabit range quickly and adds the possibility to re-try the fast
+1741	   mode during a test (which improves the measurement accuracy in
+1742	   dynamic or error-prone access, such as radio access).
+
+1744	   On the other hand, the test configuration MAY use a fixed sending
+1745	   rate requested by the client, using the field srIndexConf.
+
+1747	   The client MAY communicate the desired fixed rate in its test
+1748	   activation request.  The reasons to conduct a fixed-rate test include
+1749	   stable measurement at the maximum determined by the load rate
+1750	   adjustment algorithm, or the desire to test at a known subscribed
+1751	   rate without searching.
+
+1753	   The UDP PDU format layout SHALL be as follows (big-endian AB):
+
+1755	   0                   1                   2                   3
+1756	   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+1757	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1758	   |            pduId              |   testAction  |   rxStopped   |
+1759	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1760	   |                           lpduSeqNo                           |
+1761	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1762	   |           udpPayload          |           spduSeqErr          |
+1763	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1764	   |                          spduTime_sec                         |
+1765	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1766	   |                         spduTime_nsec                         |
+1767	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1768	   |                          lpduTime_sec                         |
+1769	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1770	   |                         lpduTime_nsec                         |
+1771	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1772	   |         rttRespDelay          |           checkSum            |
+1773	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1774	   .                       Payload Content...                      .
+1775	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+1777	                         Figure 8: Load PDU Layout
+
+1779	   Specific details regarding Load PDU fields are as follows:
+
+1781	   pduId: A two-octet field.  IANA is asked to assign the value hex
+1782	   0xBEEF (Section 11.3.1).
+
+1784	   testAction: Designates the current test action as either
+1785	   TEST_ACT_TEST (testing in progress), TEST_ACT_STOP1 (first phase of
+1786	   graceful termination, used locally by server), or TEST_ACT_STOP2
+1787	   (second phase of graceful termination, sent by server and
+1788	   reciprocated by client).  See Section 8 for additional information on
+1789	   test termination.
+
+1791	   rxStopped: A boolean (0 or 1) used to indicate to the remote endpoint
+1792	   that local receive traffic (either Load or Status PDUs) has stopped.
+1793	   All outgoing Load or Status PDUs SHALL continue to assert this
+1794	   indication until traffic is received again, or the test is
+1795	   terminated.  The time threshold to trigger this condition is expected
+1796	   to be a reasonable fraction of the watchdog timeout (a default of one
+1797	   second is recommended).
+
+1799	   lpduSeqNo: Load PDU sequence number (starting at 1).  Used to
+1800	   determine loss, out-of-order, and duplicates.
+
+1802	   udpPayload: The total payload size of the UDP datagram including the
+1803	   Load PDU message header and Payload Content (i.e., what the UDP
+1804	   socket read function would return).  This field allows the Load PDU
+1805	   receiver to maintain accurate receive statistics if utilizing receive
+1806	   truncation (only requesting the Load PDU message header octets from
+1807	   the protocol stack).
+
+1809	   spduSeqErr: Status PDU loss count, as seen by the Load PDU sender.
+1810	   This is determined by the Status PDU sequence number (spduSeqNo) in
+1811	   the most recently received Status PDU.  Used to communicate to the
+1812	   Load PDU receiver that return traffic (in the unloaded direction) is
+1813	   being lost.
+
+1815	   spduTime_sec/spduTime_nsec: A copy of the most recent spduTime_sec/
+1816	   spduTime_nsec from the last Status PDU received.  Used for RTT
+1817	   measurements made by the Load PDU receiver.
+
+1819	   lpduTime_sec/lpduTime_nsec: The local send time of the Load PDU.
+1820	   Used for one-way delay variation measurements made by the Load PDU
+1821	   receiver.
+
+1823	   rttRespDelay: RTT response delay, used to "adjust" raw RTT.  On the
+1824	   Load PDU sender, it is the number of milliseconds from reception of
+1825	   the most recent Status PDU (when the latest spduTime_sec/
+1826	   spduTime_nsec was obtained) to the transmission of the Load PDU
+1827	   (where the previously obtained spduTime_sec/spduTime_nsec is
+1828	   returned).  When the Load PDU receiver is calculating RTT, by
+1829	   subtracting the copied Status PDU send time (in the Load PDU) from
+1830	   the local Load PDU receive time, this value is subtracted from the
+1831	   raw RTT to correct for any response delay due to Load PDU scheduling.
+
+1833	   checkSum: An optional checksum of only the Load PDU header (see
+1834	   Section 4.5 for guidance).  The checksum does not cover the Payload
+1835	   Content.  The calculation is done with the checkSum field set to
+1836	   zero.
+
+1838	   Payload Content: All zeroes, all ones, or a pseudorandom binary
+1839	   sequence.
+
+1841	   The Load PDU SHALL be organized as follows (followed by any payload
+1842	   content):
+
+1844	   <CODE BEGINS>
+1845	   //
+1846	   // Load header for UDP payload of Load PDUs
+1847	   //
+1848	   struct loadHdr {
+1849	   #define LOAD_ID 0xBEEF
+1850	           uint16_t pduId;  // PDU ID
+1851	   #define TEST_ACT_TEST  0 // Test active
+1852	   #define TEST_ACT_STOP1 1 // Stop indication used locally by server
+1853	   #define TEST_ACT_STOP2 2 // Stop indication exchanged with client
+1854	           uint8_t testAction;  // Test action
+1855	           uint8_t rxStopped;   // Receive traffic stopped (BOOL)
+1856	           uint32_t lpduSeqNo;  // Load PDU sequence number
+1857	           uint16_t udpPayload; // UDP payload (bytes)
+1858	           uint16_t spduSeqErr; // Status PDU sequence error count
+1859	           uint32_t spduTime_sec;  // Send time in last rx'd status PDU
+1860	           uint32_t spduTime_nsec; // Send time in last rx'd status PDU
+1861	           uint32_t lpduTime_sec;  // Send time of this load PDU
+1862	           uint32_t lpduTime_nsec; // Send time of this load PDU
+1863	           uint16_t rttRespDelay;  // Response delay for RTT (ms)
+1864	           uint16_t checkSum;      // Header checksum
+1865	   };
+1866	   <CODE ENDS>
+
+1868	                             Figure 9: Load PDU
+
+1870	7.2.  Status PDU
+
+1872	   The Load PDU receiver SHALL send a Status PDU to the sender during a
+1873	   test at the configured feedback interval, after at least one Load PDU
+1874	   has been received (when there is something to provide status on).  In
+1875	   test scenarios with long delays between client and server, it is
+1876	   possible for the Status PDU send timer to fire before the first Load
+1877	   PDU arrives.  In these cases, the Status PDU SHALL NOT be sent.
+
+1879	   The watchdog timer at the Load PDU sender SHALL be reset each time a
+1880	   Status PDU is received.  See non-graceful test stop in Section 8 for
+1881	   handling the watchdog timeout expiration at each endpoint.
+
+1883	   The UDP PDU format layout SHALL be as follows (big-endian AB):
+
+1885	   0                   1                   2                   3
+1886	   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+1887	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1888	   |                          rxDatagrams                          |
+1889	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1890	   |                            rxBytes                            |
+1891	   |                                                               |
+1892	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1893	   |                           deltaTime                           |
+1894	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1895	   |                           seqErrLoss                          |
+1896	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1897	   |                           seqErrOoo                           |
+1898	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1899	   |                           seqErrDup                           |
+1900	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1901	   |                          delayVarMin                          |
+1902	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1903	   |                          delayVarMax                          |
+1904	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1905	   |                          delayVarSum                          |
+1906	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1907	   |                          delayVarCnt                          |
+1908	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1909	   |                         rttVarMinimum                         |
+1910	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1911	   |                         rttVarMaximum                         |
+1912	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1913	   |                           accumTime                           |
+1914	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+1916	   0                   1                   2                   3
+1917	   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+1918	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1919	   |             pduId             |   testAction  |   rxStopped   |
+1920	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1921	   |                           spduSeqNo                           |
+1922	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1923	   .                      srStruct (28 octets)                     .
+1924	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1925	   |                          subIntSeqNo                          |
+1926	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1927	   .                      sisSav (56 octets)                       .
+1928	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1929	   |                           seqErrLoss                          |
+1930	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1931	   |                           seqErrOoo                           |
+1932	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1933	   |                           seqErrDup                           |
+1934	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1935	   |                         clockDeltaMin                         |
+1936	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1937	   |                          delayVarMin                          |
+1938	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1939	   |                          delayVarMax                          |
+1940	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1941	   |                          delayVarSum                          |
+1942	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1943	   |                          delayVarCnt                          |
+1944	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1945	   |                          rttMinimum                           |
+1946	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1947	   |                         rttVarSample                          |
+1948	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1949	   |  delayMinUpd  |   reserved1   |           checkSum            |
+1950	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1951	   |                          tiDeltaTime                          |
+1952	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1953	   |                         tiRxDatagrams                         |
+1954	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1955	   |                           tiRxBytes                           |
+1956	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1957	   |                         spduTime_sec                          |
+1958	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1959	   |                         spduTime_nsec                         |
+1960	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1961	   |   authMode    |     keyId     |        reserved-auth1         |
+1962	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1963	   |                         authUnixTime                          |
+1964	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1965	   .                     initVector (16-octet)                    .
+1966	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+1967	   .                     authDigest (32-octet)                    .
+1968	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+1970	                        Figure 10: Status PDU Layout
+
+1972	   Note that the Sending Rate structure is defined in Section 6.
+
+1974	   The primary role of the Status Feedback message is to communicate to
+1975	   the Load PDU sender the traffic conditions at the Load PDU receiver.
+1976	   While the Sub-Interval Statistics structure (sisSav) covers the most
+1977	   recently saved (completed) sub-interval, similar fields directly in
+1978	   the Status PDU itself cover the most recent trial interval (the time
+1979	   period between Status Feedback messages, completed by this Status
+1980	   PDU).  Both sets of statistics SHALL always be populated by the Load
+1981	   PDU receiver, regardless of role (client or server).
+
+1983	   Details on the Status PDU measurement fields are provided in
+1984	   [RFC9097].  Additional information regarding fields not defined
+1985	   previously are as follows:
+
+1987	   pduId: A two-octet field.  IANA is asked to assign the value hex
+1988	   0xFEED (Section 11.3.1).
+
+1990	   spduSeqNo: Status PDU sequence number (starting at 1).  Used by the
+1991	   Load PDU sender to detect Status PDU loss (in the unloaded
+1992	   direction).  The loss count is communicated back to the Load PDU
+1993	   receiver via spduSeqErr in subsequent Load PDUs.
+
+1995	   subIntSeqNo: Sub-interval sequence number (starting at 1) that
+1996	   corresponds to the statistics provided in sisSav, for the last saved
+1997	   (completed) sub-interval.
+
+1999	   sisSav: Sub-interval statistics saved (completed) for the most recent
+2000	   sub-interval (as designated by the subIntSeqNo).  These consist of
+2001	   the following fields:
+
+2003	   rxDatagrams/rxBytes/deltaTime: Sub-interval received datagram and
+2004	   byte counts as well as the exact duration of the sub-interval in
+2005	   microseconds.  Used to calculate the received traffic rate for the
+2006	   sub-interval.  The rxBytes field is a 64-bit value to prevent
+2007	   overflow at high speeds.
+
+2009	   seqErrLoss/seqErrOoo/seqErrDup: Loss, out-of-order, and duplicate
+2010	   totals.  Available for both the sub-interval and trial interval, it
+2011	   is a breakout of the SeqErrors count in Table 3 of [TR-471].
+2012	   seqErrOoo and seqErrDup are realized by comparing sequence numbers.
+2013	   A lookback list of the last n sequence numbers received is used as
+2014	   the basis.  Each Load PDU sequence number is checked against this
+2015	   lookback.  The number n may depend on the implementation and on
+2016	   typical characteristics of environments, where UDPST is deployed
+2017	   (like mobile networks or Wi-Fi).  Currently, a default sequence
+2018	   number interval of n=32 has been chosen.  Specifically for seqErrOoo,
+2019	   each successively received higher seqno sets the next-expected-seqno
+2020	   to seqno+1 and anything below that is considered out-of-order (i.e.,
+2021	   delayed).  For example, given the sequence 93, 94, 95, 100, 96, 97,
+2022	   101, 98, 99, 102, 103, ... reception of 96, 97, 98, and 99 would not
+2023	   increment the next-expected-seqno and would all be considered out-of-
+2024	   order.
+
+2026	   delayVarMin/delayVarMax/delayVarSum/delayVarCnt: The one-way delay
+2027	   variation measurements of all received Load PDUs (where avg = sum/
+2028	   cnt).  For each Load PDU received, the send time (lpduTime_sec/
+2029	   lpduTime_nsec) is subtracted from the local receive time, which is
+2030	   then normalized by subtracting the current clockDeltaMin.  Available
+2031	   for both the sub-interval and trial interval.
+
+2033	   rttVarMinimum/rttVarMaximum (in sisSav): The minimum and maximum RTT
+2034	   delay variation (rttVarSample) in the sub-interval designated by the
+2035	   subIntSeqNo.
+
+2037	   accumTime: The accumulated time of the test in milliseconds, based on
+2038	   the duration of each sub-interval.  Equivalent to the sum of each
+2039	   deltaTime (although in ms) sent in each Status PDU during the test.
+
+2041	   clockDeltaMin: The minimum clock delta (difference) since the
+2042	   beginning of the test.  Obtained by subtracting the send time of each
+2043	   Load PDU (lpduTime_sec/lpduTime_nsec) from the local time that it was
+2044	   received.  This value is initialized with the first Load PDU received
+2045	   and is updated with each subsequent one to maintain a current (and
+2046	   continuously updated) minimum.  If the endpoint clocks are
+2047	   sufficiently synchronized, this will be the minimum one-way delay in
+2048	   milliseconds.  Otherwise, this value may be negative, but still valid
+2049	   for one-way delay variation measurements for the default test
+2050	   duration (default is 10 [s]).  If the test duration is extended to a
+2051	   range of minutes, where significant clock drift can occur,
+2052	   synchronized (or at least well-disciplined) clocks may be required.
+
+2054	   rttMinimum (in Status PDU): The minimum "adjusted" RTT measured since
+2055	   the beginning of the test.  See rttRespDelay regarding "adjusted"
+2056	   measurements.  RTT is obtained by subtracting the copied
+2057	   spduTime_sec/spduTime_nsec in the received Load PDU from the local
+2058	   time at which it was received.  This minimum SHALL be kept current
+2059	   (and continuously updated) via each Load PDU received with an updated
+2060	   spduTime_sec/spduTime_nsec.  This value MUST be positive.  Before an
+2061	   initial value can be established, and because zero is itself valid,
+2062	   it SHALL be set to STATUS_NORTT when communicated in the Status PDU.
+
+2064	   rttVarSample: The most recent "adjusted" RTT delay variation
+2065	   measurement.  See rttRespDelay regarding "adjusted" measurements.
+2066	   RTT delay variation is obtained by subtracting the current (and
+2067	   continuously updated) "adjusted" RTT minimum, communicated as
+2068	   rttMinimum (in Status PDU), from each "adjusted" RTT measurement
+2069	   (which is itself obtained by subtracting the copied spduTime_sec/
+2070	   spduTime_nsec in the received Load PDU from the local time at which
+2071	   it was received).  Note that while one-way delay variation is
+2072	   measured for every Load PDU received, RTT delay variation is only
+2073	   sampled via the Status PDU sent and the very next Load PDU received
+2074	   with the corresponding updated spduTime_sec/spduTime_nsec.  When a
+2075	   new value is unavailable (possibly due to packet loss), and because
+2076	   zero is itself valid, it SHALL be set to STATUS_NORTT when
+2077	   communicated in the Status PDU.
+
+2079	   delayMinUpd: Boolean (0 or 1) indicating that the clockDeltaMin and/
+2080	   or rttMinimum (in Status PDU), as measured by the Load PDU receiver,
+2081	   has been updated.
+
+2083	   checkSum: An optional checksum of the entire PDU (see Section 4.5 for
+2084	   guidance).  The calculation is done with the checkSum field, and all
+2085	   fields starting with authMode, set to zero.
+
+2087	   tiDeltaTime/tiRxDatagrams/tiRxBytes: The trial interval time in
+2088	   microseconds, along with the received datagram and byte counts.  Used
+2089	   to calculate the received traffic rate for the trial interval.
+
+2091	   spduTime_sec/spduTime_nsec: The local transmit time of the Status
+2092	   PDU.  Expected to be copied into spduTime_sec/spduTime_nsec in
+2093	   subsequent Load PDUs after being received by the Load PDU sender.
+2094	   Used for RTT measurements.
+
+2096	   The authentication, encryption, and checksum fields and their
+2097	   operation are as defined previously in Section 4.
+
+2099	   The Status Feedback message PDU (as well as the included Sub-Interval
+2100	   Statistics structure) SHALL be organized as follows:
+
+2102	   <CODE BEGINS>
+2103	   //
+2104	   // Sub-interval statistics structure for received traffic information
+2105	   //
+2106	   struct subIntStats {
+2107	           uint32_t rxDatagrams; // Received datagrams
+2108	           uint64_t rxBytes;     // Received bytes (64 bits)
+2109	           uint32_t deltaTime;   // Time delta (us)
+2110	           uint32_t seqErrLoss;  // Loss sum
+2111	           uint32_t seqErrOoo;   // Out-of-Order sum
+2112	           uint32_t seqErrDup;   // Duplicate sum
+2113	           uint32_t delayVarMin; // Delay variation minimum (ms)
+2114	           uint32_t delayVarMax; // Delay variation maximum (ms)
+2115	           uint32_t delayVarSum; // Delay variation sum (ms)
+2116	           uint32_t delayVarCnt; // Delay variation count
+2117	           uint32_t rttMinimum;  // Minimum round-trip time (ms)
+2118	           uint32_t rttMaximum;  // Maximum round-trip time (ms)
+2119	           uint32_t accumTime;   // Accumulated time (ms)
+2120	   };
+2121	   //
+2122	   // Status feedback header for UDP payload of status PDUs
+2123	   //
+2124	   struct statusHdr {
+2125	   #define STATUS_ID 0xFEED
+2126	           uint16_t pduId;     // PDU ID
+2127	           uint8_t testAction; // Test action
+2128	           uint8_t rxStopped;  // Receive traffic stopped (BOOL)
+2129	           uint32_t spduSeqNo; // Status PDU sequence number
+2130	           struct sendingRate srStruct; // Sending rate structure
+2131	           uint32_t subIntSeqNo;        // Sub-interval sequence number
+2132	           struct subIntStats sisSav;   // Sub-interval saved stats
+2133	           uint32_t seqErrLoss;    // Loss sum
+2134	           uint32_t seqErrOoo;     // Out-of-Order sum
+2135	           uint32_t seqErrDup;     // Duplicate sum
+2136	           uint32_t clockDeltaMin; // Clock delta minimum (ms)
+2137	           uint32_t delayVarMin;   // Delay variation minimum (ms)
+2138	           uint32_t delayVarMax;   // Delay variation maximum (ms)
+2139	           uint32_t delayVarSum;   // Delay variation sum (ms)
+2140	           uint32_t delayVarCnt;   // Delay variation count
+2141	   #define STATUS_NORTT UINT32_MAX // No RTT data/value
+2142	           uint32_t rttMinimum;    // Min round-trip time sampled (ms)
+2143	           uint32_t rttVarSample;  // Last round-trip time sample (ms)
+2144	           uint8_t delayMinUpd;    // Delay minimum(s) updated (BOOL)
+2145	           uint8_t reserved1;      // (reserved for alignment)
+2146	           uint16_t checkSum;      // Header checksum
+2147	           uint32_t tiDeltaTime;   // Trial interval delta time (us)
+2148	           uint32_t tiRxDatagrams; // Trial interval receive datagrams
+2149	           uint32_t tiRxBytes;     // Trial interval receive bytes
+2150	           uint32_t spduTime_sec;  // Send time of this status PDU
+2151	           uint32_t spduTime_nsec; // Send time of this status PDU
+2152	           //
+2153	           // ========== Encryption ends here ==========
+2154	           uint8_t authMode;        // Authentication mode
+2155	           uint8_t keyId;           // Key ID in shared table
+2156	           uint16_t reserved-auth1; // (reserved for alignment)
+2157	           uint32_t authUnixTime;   // Authentication time stamp
+2158	           uint8_t initVector[AUTH_IV_LENGTH]     // IV
+2159	           uint8_t authDigest[AUTH_DIGEST_LENGTH] // HMAC
+2160	   };
+2161	   <CODE ENDS>
+
+2163	                           Figure 11: Status PDU
+
+2165	8.  Stopping a Test
+
+2167	   When the test duration timer (testIntTime) on the server expires, it
+2168	   SHALL set the local connection test action to TEST_ACT_STOP1 (phase 1
+2169	   of graceful termination).  This is simply a non-reversible state
+2170	   awaiting the next message(s) to be sent from the server.  During this
+2171	   time, any received Load or Status PDUs are processed normally.
+
+2173	   Upon transmission of the next Load or Status PDUs, the server SHALL
+2174	   set the local connection test action to TEST_ACT_STOP2 (phase 2 of
+2175	   graceful termination) and mark any outgoing PDUs with a testAction
+2176	   value of TEST_ACT_STOP2.  While in this state, the server MAY reduce
+2177	   any Load PDU bursts to a size of one.
+
+2179	   When the client receives a Load or Status PDU with the TEST_ACT_STOP2
+2180	   indication, it SHALL finalize testing, display the test results, and
+2181	   also mark its local connection with a test action of TEST_ACT_STOP2
+2182	   (so that any PDUs subsequently received can be ignored).
+
+2184	   With the test action of the client's connection set to
+2185	   TEST_ACT_STOP2, the very next expiry of a send timer, for either a
+2186	   Load or Status PDU, SHALL result in it and any subsequent PDUs to be
+2187	   sent with a testAction value of TEST_ACT_STOP2 (as confirmation to
+2188	   the server).  While in this state, the client MAY reduce any Load PDU
+2189	   bursts to a size of one.  The client SHALL then schedule an immediate
+2190	   end time for the connection.
+
+2192	   When the server receives the TEST_ACT_STOP2 confirmation in the Load
+2193	   or Status PDU, the server SHALL schedule an immediate end time for
+2194	   the connection which closes the socket and deallocates the associated
+2195	   resources.  The TEST_ACT_STOP2 exchange constitutes a graceful
+2196	   termination of the test.
+
+2198	   In a non-graceful test stop due to path failure, the watchdog
+2199	   timeouts at each endpoint will expire (sometimes at one endpoint
+2200	   first), notifications in logs, STDOUT, and/or formatted output SHALL
+2201	   be made, and the endpoint SHALL schedule an immediate end time for
+2202	   the connection.
+
+2204	   If an attacker clears the TEST_ACT_STOP2 indication, then the
+2205	   configured test duration timer (testIntTime) at the server and client
+2206	   SHALL take precedence and the endpoint SHALL schedule an immediate
+2207	   end time for the connection.
+
+2209	9.  Operational considerations for the Measurement Method
+
+2211	   The architecture of the method requires two cooperating hosts
+2212	   operating in the roles of Src (test packet sender) and Dst
+2213	   (receiver), with a measured path and return path between them.
+
+2215	   The nominal duration of a measurement interval at the Destination,
+2216	   parameter testIntTime, MUST be constrained in a production network,
+2217	   since this is an active test method and it will likely cause
+2218	   congestion on the Src to Dst host path during a test.
+
+2220	   It is RECOMMENDED to locate test endpoints as close to the intended
+2221	   measured link(s) as practical.  The testing operator MUST set a value
+2222	   for the MaxHops Parameter, based on the expected path length.  This
+2223	   Parameter can keep measurement traffic from straying too far beyond
+2224	   the intended path.
+
+2226	   It is obviously counterproductive to run more than one independent
+2227	   and concurrent test (regardless of the number of flows in the test
+2228	   stream) attempting to measure the maximum capacity on a single path.
+2229	   The number of concurrent, independent tests of a path SHALL be
+2230	   limited to one.
+
+2232	   The load rate adjustment algorithm's scope is limited to helping
+2233	   determine the Maximum IP-Layer Capacity in the context of an
+2234	   infrequent, diagnostic, short-term measurement.  It is RECOMMENDED to
+2235	   discontinue non-measurement traffic that shares a subscriber's
+2236	   dedicated resources while testing: measurements may not be accurate,
+2237	   and throughput of competing elastic traffic may be greatly reduced.
+
+2239	   See section 8 of [RFC9097] for a discussion of the method of
+2240	   measurement beyond purely operational aspects.
+
+2242	9.1.  Notes on Interface Measurements
+
+2244	   Additional measurements may be useful in specific circumstances.  For
+2245	   example, interface byte counters measured by a client at a
+2246	   residential gateway are possible when the client application has
+2247	   access to an interface that sees all traffic to/from a service
+2248	   subscriber's location.  Adding a byte counter at the client for
+2249	   download or upload directions could be used to measure total traffic
+2250	   and possibly detect when non-test traffic is present (and using
+2251	   capacity).  The client may not have the CPU cycles available to count
+2252	   both the interface traffic and IP-layer Capacity simultaneously, so
+2253	   this form of diagnostic measurement may not be possible.
+
+2255	10.  Security Considerations
+
+2257	   Active metrics and measurements have a long history of security
+2258	   considerations.  The security considerations that apply to any active
+2259	   measurement of live paths are relevant here.  See [RFC4656] and
+2260	   [RFC5357].
+
+2262	   When considering privacy of those involved in measurement or those
+2263	   whose traffic is measured, the sensitive information available to
+2264	   potential observers is greatly reduced when using active techniques
+2265	   which are within this scope of work.  Passive observations of user
+2266	   traffic for measurement purposes raise many privacy issues.  We refer
+2267	   the reader to the privacy considerations described in the Large Scale
+2268	   Measurement of Broadband Performance (LMAP) Framework [RFC7594],
+2269	   which covers active and passive techniques.
+
+2271	   There are some new considerations for Capacity measurement as
+2272	   described in this document.
+
+2274	   1.  Cooperating client and server hosts and agreements to test the
+2275	       path between the hosts are REQUIRED.  Hosts perform in either the
+2276	       server or client roles.  One way to assure a cooperative
+2277	       agreement employs the optional Authorization mode through the use
+2278	       of the authDigest field and the known identity associated with
+2279	       the shared key used to create the authDigest field via the KDF.
+2280	       Other means are also possible, such as access control lists at
+2281	       the server.
+
+2283	   2.  It is REQUIRED to have a user client-initiated setup handshake
+2284	       between cooperating hosts that allows firewalls to control
+2285	       inbound unsolicited UDP traffic which either goes to a control
+2286	       port or to ephemeral ports that are only created as needed.
+2287	       Firewalls protecting each host can both continue to do their job
+2288	       normally.
+
+2290	   3.  Client-server authentication and integrity protection for
+2291	       feedback messages conveying measurements is RECOMMENDED.  To
+2292	       accommodate different host limitations and testing circumstances,
+2293	       different modes of operation are available, as described in
+2294	       Section 4 above.
+
+2296	   4.  Hosts MUST limit the number of simultaneous tests to avoid
+2297	       resource exhaustion and inaccurate results.
+
+2299	   5.  Senders MUST be rate-limited.  This can be accomplished using a
+2300	       pre-built table defining all the offered sending rates that will
+2301	       be supported.  The default and optional load rate adjustment
+2302	       algorithm results in "ramp up" from the lowest rate in the table.
+
+2304	       Optionally, the server could utilize the maxBandwidth field (and
+2305	       CHSR_USDIR_BIT bit) in the Setup Request from the client to limit
+2306	       the maximum that it will attempt to achieve.
+
+2308	   6.  Service subscribers with limited data volumes who conduct
+2309	       extensive capacity testing might experience the effects of
+2310	       Service Provider controls on their service.  Testing with the
+2311	       Service Provider's measurement hosts SHOULD be limited in
+2312	       frequency and/or overall volume of test traffic (for example, the
+2313	       range of test interval duration values should be limited).
+
+2315	   One specific attack that has been recognized is an on-path attack on
+2316	   the testAction field where the attacker would set or clear the STOP
+2317	   indication.  Setting the indication in successive packets terminates
+2318	   the test prematurely, with no threat to the Internet but annoyance
+2319	   for the testers.  If an attacker clears the STOP indication, the
+2320	   mitigation relies on knowledge of the test duration at the client and
+2321	   server, where these hosts cease all traffic when the specified test
+2322	   duration is complete.
+
+2324	   Authentication and encryption methods and requirements steadily
+2325	   evolve.  Alternate encryption and/or authentication modes provide for
+2326	   algorithm agility by defining a new Mode, whose support is indicated
+2327	   by an assigning a suitable "Test Setup PDU Authentication Mode
+2328	   Registry" value (see Section 11.3.4 ).
+
+2330	11.  IANA Considerations
+
+2332	   This document requests IANA to assign a User/Registered UDP port for
+2333	   the Test Setup exchange in the Control phase of protocol operation,
+2334	   and to create a new registry group for the UDP Speed Test Protocol
+2335	   (UDPSTP).
+
+2337	11.1.  New System Port Number Assignment
+
+2339	   IANA will allocate the following service name to the "Service Name
+2340	   and Transport Protocol Port Number Registry" registry:
+
+2342	   Service:  udpst-control
+
+2344	   Transport Protocol:  UDP
+
+2346	   Assignee:  IESG <iesg@ietf.org>
+
+2348	   Contact:  IETF Chair <chair@ietf.org>
+
+2350	   Description:  UDP-based IP-Layer Capacity and performance measurement
+2351	      protocol
+
+2353	   Reference:  This RFC, RFCYYYY.  The protocol uses IP-Layer Unicast.
+2354	      The assignment of a single port number is requested to help
+2355	      configure firewalls and other port-based systems for access
+2356	      control prior to negotiating dynamic ports between client and
+2357	      server.
+
+2359	   Port Number:  <PORTNUM> of the IANA User Port range (1024-49151)
+
+2361	11.2.  New KeyTable KDF
+
+2363	   IANA will allocate the following KDF to the existing list of
+2364	   KeyTable KDFs (see https://www.iana.org/assignments/keytable/
+2365	   keytable.xhtml#kdf).
+
+2367	   KDF             Description                    Reference
+2368	   ===============================================================
+2369	   HMAC-SHA-256    HMAC using the SHA-256 hash    [RFC6234]
+
+2371	11.3.  New UDPSTP Registry Group
+
+2373	   IANA will create the following registry in a new registry group
+2374	   called "UDP Speed Test Protocol (UDPSTP)":
+
+2376	   Registration Procedure: see below
+
+2378	   Reference: <This RFC>
+
+2380	   Experts: <To be set at publication>
+
+2382	11.3.1.  PDU Identifier Registry
+
+2384	   IANA will create the "PDU Identifier" registry under the "UDP Speed
+2385	   Test Protocol (UDPSTP)" registry group.  Every UDPSTP PDU contains a
+2386	   two octet pduId field identifying the role and format of the PDU that
+2387	   follows.  The code points in this registry are allocated according to
+2388	   the registration procedures [RFC8126] described in Table 1.
+
+2390	   Range(Hex)             Registration Procedures
+2391	   ===============================================================
+2392	   0xFFFF and 0x0000      Reserved
+
+2394	   0x8000-0xFFFE          Expert Review
+
+2396	   0x0001-0x7F00          First Come, First Served
+
+2398	   0x7F01-0x7FE0          Experimental
+
+2400	   0x7FE1-0x7FFF          Private Use
+2401	   Table 1: Registration procedures for the PDU Identifier registry
+
+2403	   Initially, IANA will assign the "PDU Identifier" registry with the
+2404	   values in Table 2:
+
+2406	   Value    Description           Reference
+2407	   ===================================================
+2408	   0xACE1   Test Setup PDU        <this RFC>
+
+2410	   0xACE2   Test Activation PDU   <this RFC>
+
+2412	   0xDEAD   Null PDU              <this RFC>
+
+2414	   0xBEEF   Load PDU              <this RFC>
+
+2416	   0xFEED   Status Feedback PDU   <this RFC>
+
+2418	   Table 2: Initial PDU Identifier Values
+
+2420	11.3.2.  Protocol Version Registry
+
+2422	   IANA will create the "Protocol Version" registry under the "UDP Speed
+2423	   Test Protocol (UDPSTP)" registry group.  UDPST Protocol Test Setup
+2424	   Request, Test Setup Response and Test Activation Request PDUs contain
+2425	   a two octet protocolVer field, identifying the version of the
+2426	   protocol in use.  The code points in this registry are allocated
+2427	   according to the registration procedures [RFC8126] described in
+2428	   Table 3.
+
+2430	   Range(Decimal)         Registration Procedures
+2431	   ===============================================================
+2432	   0-19                   Reserved
+
+2434	   20-40960               IETF Review
+
+2436	   40961-53248            First Come, First Served
+
+2438	   53249-65534            Experimental
+
+2440	   65535                  Reserved
+
+2442	   Table 3: Registration procedures for the Protocol Version registry
+
+2444	   Initially, IANA will assign the decimal value 20 listed in Table 4 in
+2445	   the "Protocol Version" registry:
+
+2447	   Value  Description            Reference
+2448	   ================================================
+2449	   20     Protocol version 20    <this RFC>
+
+2451	   Table 4: Initial Protocol Version value
+
+2453	11.3.3.  Test Setup PDU Modifier Bitmap Registry
+
+2455	   IANA will create the "Test Setup PDU Modifier Bitmap" registry under
+2456	   the "UDP Speed Test Protocol (UDPSTP)" registry group.  The Test
+2457	   Setup PDU layout contains a modifierBitmap field.  The bitmaps in
+2458	   this registry are allocated according to the registration procedures
+2459	   [RFC8126] described in Table 5.
+
+2461	   Range(Bitmap)          Registration Procedures
+2462	   ===============================================================
+2463	   00000000-01111111      IETF Review
+
+2465	   10000000               Reserved
+
+2467	   Table 5: Registration procedures for the Test Setup PDU Modifier
+2468	   Bitmap Registry
+
+2470	   Initially, IANA will assign the bitmap values defined by Table 6 in
+2471	   the "Test Setup PDU Modifier Bitmap" registry.
+
+2473	   Value  Description             Reference
+2474	   ===============================================================
+2475	   0x00   No modifications        <this RFC>
+
+2477	   0x01   Allow Jumbo datagram    <this RFC>
+2478	          sizes above sending
+2479	          rates of 1Gbps
+
+2481	   0x02   Use Traditional MTU     <this RFC>
+2482	          (1500 bytes with
+2483	          IP-header)
+
+2485	   Table 6: Initial Test Setup PDU Modifier Bitmap values
+
+2487	11.3.4.  Test Setup PDU Authentication Mode Registry
+
+2489	   IANA will create the "Test Setup PDU Authentication Mode" registry
+2490	   under the "UDP Speed Test Protocol (UDPSTP)" registry group.  The
+2491	   Test Setup PDU layout contains an authMode field.  The code points in
+2492	   this registry are allocated according to the registration procedures
+2493	   [RFC8126] described in Table 7.
+
+2495	   Range(Decimal)         Registration Procedures
+2496	   ===============================================================
+2497	   0-59                   IETF Review
+
+2499	   60-63                  Experimental
+
+2501	   64-255                 Reserved
+
+2503	   Table 7: Registration procedures for the Test Setup PDU
+2504	   Authentication Mode registry
+
+2506	   Initially, IANA will assign the decimal values defined by Table 8 in
+2507	   the "Test Setup PDU Authentication Mode" registry.
+
+2509	   Value   Description                    Reference
+2510	   ===============================================================
+2511	   0       Optional Unauthenticated mode  <this RFC>
+
+2513	   1       Required authentication        <this RFC>
+2514	           for the Control phase
+
+2516	   2       Optional authentication for    <this RFC>
+2517	           the Data phase, in addition
+2518	           to the Control phase
+
+2520	   3       Optional encrypted mode        <this RFC>
+
+2522	   Table 8: Initial Test Setup PDU Authentication Mode values
+
+2524	11.3.5.  Test Setup PDU Command Response Field Registry
+
+2526	   IANA will create the "Test Setup PDU Command Response Field" registry
+2527	   under the "UDP Speed Test Protocol (UDPSTP)" registry group.  The
+2528	   Test Setup PDU layout contains a cmdResponse field.  The code points
+2529	   in this registry are allocated according to the registration
+2530	   procedures [RFC8126] described in Table 9.
+
+2532	   Range(Decimal)         Registration Procedures
+2533	   ===============================================================
+2534	   0-127                  IETF Review
+
+2536	   128-239                First Come, First Served
+
+2538	   240-249                Experimental
+
+2540	   250-254                Private Use
+
+2542	   255                    Reserved
+2543	   Table 9: Registration procedures for the Test Setup PDU Command
+2544	   Response Field Registry
+
+2546	   Initially, IANA will assign the decimal values defined by Table 10 in
+2547	   the "Test Setup PDU Command Response Field" registry.
+
+2549	   Value   Description                    Reference
+2550	   ===============================================================
+2551	   0       None (used by                  <this RFC>
+2552	           client in Request)
+
+2554	   1       Acknowledgment                 <this RFC>
+
+2556	   2       Bad Protocol Version           <this RFC>
+
+2558	   3       Invalid Jumbo datagram         <this RFC>
+2559	           option
+
+2561	   4       Unexpected Authentication      <this RFC>
+2562	           in Setup Request
+
+2564	   5       Authentication missing         <this RFC>
+2565	           in Setup Request
+
+2567	   6       Invalid authentication         <this RFC>
+2568	           method
+
+2570	   7       Authentication failure         <this RFC>
+
+2572	   8       Authentication time is         <this RFC>
+2573	           invalid in Setup Request
+
+2575	   9       No Maximum test Bit rate       <this RFC>
+2576	           specified
+
+2578	   10      Server Maximum Bit rate        <this RFC>
+2579	           exceeded
+
+2581	   11      MTU option does not match      <this RFC>
+2582	           server
+
+2584	   12      Multi-connection parameters    <this RFC>
+2585	           rejected by server
+
+2587	   13      Connection allocation          <this RFC>
+2588	           failure on server
+
+2590	   Table 10: Initial Test Setup PDU Command Response Field values
+
+2592	11.3.6.  Test Activation PDU Command Request Registry
+
+2594	   IANA will create the "Test Activation PDU Command Request" registry
+2595	   under the "UDP Speed Test Protocol (UDPSTP)" registry group.  The
+2596	   Test Setup PDU layout contains a cmdRequest field.  The code points
+2597	   in this registry are allocated according to the registration
+2598	   procedures [RFC8126] described in Table 11.
+
+2600	   Range(Decimal)         Registration Procedures
+2601	   ===============================================================
+2602	   0-127                  IETF Review
+
+2604	   128-239                First Come, First Served
+
+2606	   240-249                Experimental
+
+2608	   250-254                Private Use
+
+2610	   255                    Reserved
+
+2612	   Table 11: Registration procedures for the Test Activation PDU Command
+2613	   Request registry
+
+2615	   Initially, IANA will assign the decimal values defined by Table 12 in
+2616	   the "Test Activation PDU Command Request" registry.
+
+2618	   Value   Description                   Reference
+2619	   ===============================================================
+2620	   0       No Request                    <this RFC>
+
+2622	   1       Request test in Upstream      <this RFC>
+2623	           direction (client to server)
+
+2625	   2       Request test in Downstream    <this RFC>
+2626	           direction (server to client)
+
+2628	   Table 12: Initial Test Activation PDU Command Request values
+
+2630	11.3.7.  Test Activation PDU Modifier Bitmap Registry
+
+2632	   IANA will create the "Test Activation PDU Modifier Bitmap" registry
+2633	   under the "UDP Speed Test Protocol (UDPSTP)" registry group.  The
+2634	   Test Activation PDU layout (also) contains a modifierBitmap field.
+2635	   The bitmaps in this registry are allocated according to the
+2636	   registration procedures [RFC8126] described in Table 13.
+
+2638	   Range(Bitmap)          Registration Procedures
+2639	   ===============================================================
+2640	   00000000-01111111      IETF Review
+
+2642	   10000000               Reserved
+
+2644	   Table 13: Registration procedures for the Test Activation PDU
+2645	   Modifier Bitmap registry
+
+2647	   Initially, IANA will assign the bitmap values defined by Table 14 in
+2648	   the "Test Activation PDU Modifier Bitmap" registry.
+
+2650	   Value    Description               Reference
+2651	   ===============================================================
+2652	   0x00     No modifications          <this RFC>
+
+2654	   0x01     Set when srIndexConf is   <this RFC>
+2655	            start rate for search
+
+2657	   0x02     Set for randomized        <this RFC>
+2658	            UDP payload
+
+2660	   Table 14: Initial Test Activation PDU Modifier Bitmap values
+
+2662	11.3.8.  Test Activation PDU Rate Adjustment Algo.  Registry
+
+2664	   The Test Activation PDU layout contains a rateAdjAlgo field.  The
+2665	   table below defines the assigned Capitalized alphabetic UTF-8 values
+2666	   in the registry.
+
+2668	   IANA will create the "Test Activation PDU Rate Adjustment Algo."
+2669	   registry under the "UDP Speed Test Protocol (UDPSTP)" registry group.
+2670	   The Test Activation PDU layout contains a rateAdjAlgo field.  The
+2671	   code points in this registry are allocated according to the
+2672	   registration procedures [RFC8126] described in Table 15.
+
+2674	   Range(Capital alphabet. UTF-8)     Registration Procedures
+2675	   ==========================================================
+2676	   A-Q                                IETF review
+
+2678	   R-V                                Experimental
+
+2680	   W-Y                                Private use
+
+2682	   Z                                  Reserved
+
+2684	   Table 15: Registration procedures for the Test Activation PDU Rate
+2685	   Adjustment Algo. registry
+2686	   Initially, IANA will assign the Capitalized alphabetic UTF-8 values,
+2687	   as well as the corresponding incremental numeric, defined by Table 16
+2688	   in the "Test Activation PDU Rate Adjustment Algo." registry.
+
+2690	   Value(Numeric)   Description             Reference
+2691	   ========================================================
+2692	   A(n/a)           Not used                <this RFC>
+
+2694	   B(0)             Rate algorithm Type B   <this RFC>
+
+2696	   C(1)             Rate algorithm Type C   <this RFC>
+
+2698	   Table 16: Initial Test Activation PDU Rate Adjustment Algo. values
+
+2700	11.3.9.  Test Activation PDU Command Response Field Registry
+
+2702	   IANA will create the "Test Activation PDU Command Response Field"
+2703	   registry under the "UDP Speed Test Protocol (UDPSTP)" registry group.
+2704	   The Test Activation PDU layout (also) contains a cmdResponse field.
+2705	   The code points in this registry are allocated according to the
+2706	   registration procedures [RFC8126] described in Table 17.
+
+2708	   Range(Decimal)         Registration Procedures
+2709	   ===============================================================
+2710	   0-127                  IETF Review
+
+2712	   128-239                First Come, First Served
+
+2714	   240-249                Experimental
+
+2716	   250-254                Private Use
+
+2718	   255                    Reserved
+
+2720	   Table 17: Registration procedures for the Test Activation PDU Command
+2721	   Response Field registry
+
+2723	   Initially, IANA will assign the decimal values defined by Table 18 in
+2724	   the "Test Activation PDU Command Response Field" registry.
+
+2726	   Value   Description                 Reference
+2727	   ===============================================================
+2728	   0       None (used by               <this RFC>
+2729	           client in Request)
+
+2731	   1       Server Acknowledgment       <this RFC>
+
+2733	   2       Server indicates an error   <this RFC>
+2734	   Table 18: Initial Test Activation PDU Command Response Field values
+
+2736	11.4.  Guidelines for the Designated Experts
+
+2738	   It is suggested that multiple designated experts be appointed for
+2739	   registry change requests.
+
+2741	   Criteria that should be applied by the designated experts include
+2742	   determining whether the proposed registration duplicates existing
+2743	   entries and whether the registration description is clear and fits
+2744	   the purpose of this registry.
+
+2746	   Registration requests are evaluated within a two-week review period
+2747	   on the advice of one or more designated experts.  Within the review
+2748	   period, the designated experts will either approve or deny the
+2749	   registration request, communicating this decision to IANA.  Denials
+2750	   should include an explanation and, if applicable, suggestions as to
+2751	   how to make the request successful.
+
+2753	12.  KDF Example (OpenSSL)
+
+2755	   <CODE BEGINS>
+2756	   /*
+2757	    * Output individual authentication and encryption keys, of length
+2758	    * SHA256_KEY_LEN and AES128_KEY_LEN respectively, from derived key
+2759	    * material.
+2760	    * Return Values: 0 = Failure, 1 = Success
+2761	    */
+2762	   int kdf_hmac_sha256(char *Kin, uint32_t authUnixTime,
+2763	     unsigned char *cAuthKey, unsigned char *cEncKey,   /* Client */
+2764	     unsigned char *sAuthKey, unsigned char *sEncKey) { /* Server */
+
+2766	     int var, keylen = (SHA256_KEY_LEN * 2) + (AES128_KEY_LEN * 2);
+2767	     char context[16];
+2768	     unsigned char *keyptr, keybuf[keylen];
+2769	     EVP_KDF *kdf = NULL;
+2770	     EVP_KDF_CTX *kctx = NULL;
+2771	     OSSL_PARAM params[16], *p = params;
+
+2773	     /*
+2774	      * Fetch KDF algorithm and create context
+2775	      */
+2776	     if ((kdf = EVP_KDF_fetch(NULL, "KBKDF", NULL)) == NULL) {
+2777	       return 0;
+2778	     }
+2779	     if ((kctx = EVP_KDF_CTX_new(kdf)) == NULL) {
+2780	       EVP_KDF_free(kdf);
+2781	       return 0;
+
+2783	     }
+
+2785	     /*
+2786	      * Set parameters for KBKDF
+2787	      */
+2788	     *p++ = OSSL_PARAM_construct_utf8_string(OSSL_KDF_PARAM_MODE, "COUNTER", 0);
+2789	     *p++ = OSSL_PARAM_construct_utf8_string(OSSL_KDF_PARAM_MAC, "HMAC", 0);
+2790	     *p++ = OSSL_PARAM_construct_utf8_string(OSSL_KDF_PARAM_DIGEST, "SHA256", 0);
+2791	     *p++ = OSSL_PARAM_construct_octet_string(OSSL_KDF_PARAM_KEY, Kin, strlen(Kin));
+2792	     *p++ = OSSL_PARAM_construct_octet_string(OSSL_KDF_PARAM_SALT, "UDPSTP", 6);
+2793	     var = snprintf(context, sizeof(context), "%u", authUnixTime);
+2794	     *p++ = OSSL_PARAM_construct_octet_string(OSSL_KDF_PARAM_INFO, context, var);
+2795	     /* Confirm the following are enabled */
+2796	     var = 1;
+2797	     *p++ = OSSL_PARAM_construct_int(OSSL_KDF_PARAM_KBKDF_USE_L, &var);
+2798	     *p++ = OSSL_PARAM_construct_int(OSSL_KDF_PARAM_KBKDF_USE_SEPARATOR, &var);
+2799	     /* Set counter length in bits (available as of OpenSSL 3.1) */
+2800	     var = 32; /* 32 is backward compatible with OpenSSL 3.0 */
+2801	     *p++ = OSSL_PARAM_construct_int(OSSL_KDF_PARAM_KBKDF_R, &var);
+2802	     *p++ = OSSL_PARAM_construct_end();
+
+2804	     /*
+2805	      * Derive key material
+2806	      */
+2807	     if (EVP_KDF_derive(kctx, keybuf, keylen, params) < 1) {
+2808	       EVP_KDF_CTX_free(kctx);
+2809	       EVP_KDF_free(kdf);
+2810	       return 0;
+2811	     }
+
+2813	     /*
+2814	      * Output individual keys
+2815	      */
+2816	     keyptr = keybuf;
+2817	     memcpy(cAuthKey, keyptr, SHA256_KEY_LEN);
+2818	     keyptr += SHA256_KEY_LEN;
+2819	     memcpy(sAuthKey, keyptr, SHA256_KEY_LEN);
+2820	     keyptr += SHA256_KEY_LEN;
+2821	     memcpy(cEncKey, keyptr, AES128_KEY_LEN);
+2822	     keyptr += AES128_KEY_LEN;
+2823	     memcpy(sEncKey, keyptr, AES128_KEY_LEN);
+
+2825	     /*
+2826	      * Cleanup
+2827	      */
+2828	     EVP_KDF_CTX_free(kctx);
+2829	     EVP_KDF_free(kdf);
+2830	     return 1;
+
+2832	   }
+2833	   <CODE ENDS>
+
+2835	                    Figure 12: KDF Example Code Snippet
+
+2837	13.  Acknowledgments
+
+2839	   This document was edited by Al Morton, who passed away before being
+2840	   able to finalize this work.  Ruediger Geib only joined later to help
+2841	   finalize this draft.
+
+2843	   Thanks to Lincoln Lavoie, Can Desem, Greg Mirsky, Bjoern Ivar Teigen,
+2844	   Ken Kerpez and Chen Li for reviewing this draft and providing helpful
+2845	   suggestions and areas for further development.  Mohamed Boucadair's
+2846	   AD review improved comprehensability of the document.  David Dong and
+2847	   Amanda Baber provided early reviews of the IANA Considerations
+2848	   section.
+
+2850	   Brian Weis provided an early SEC-DIR review; version 02 captures
+2851	   clarifications and version 03-09 took up on the protocol changes
+2852	   which Brian suggested.  Tommy Pauly sheperded this document.
+
+2854	14.  References
+
+2856	14.1.  Normative References
+
+2858	   [EVP_KDF-KB]
+2859	              "The Key-Based EVP_KDF implementation",
+2860	              <https://docs.openssl.org/master/man7/EVP_KDF-KB/>.
+
+2862	   [FIPS-197] National Institute of Standards and Technology, NIST.,
+2863	              "Federal Information Processing Standards Publication 197
+2864	              (FIPS-197), ADVANCED ENCRYPTION STANDARD (AES)", 26
+2865	              November 2001, <https://nvlpubs.nist.gov/nistpubs/fips/
+2866	              nist.fips.197.pdf>.
+
+2868	   [RFC0768]  Postel, J., "User Datagram Protocol", STD 6, RFC 768,
+2869	              DOI 10.17487/RFC0768, August 1980,
+2870	              <https://www.rfc-editor.org/info/rfc768>.
+
+2872	   [RFC0791]  Postel, J., "Internet Protocol", STD 5, RFC 791,
+2873	              DOI 10.17487/RFC0791, September 1981,
+2874	              <https://www.rfc-editor.org/info/rfc791>.
+
+2876	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+2877	              Requirement Levels", BCP 14, RFC 2119,
+2878	              DOI 10.17487/RFC2119, March 1997,
+2879	              <https://www.rfc-editor.org/info/rfc2119>.
+
+2881	   [RFC3168]  Ramakrishnan, K., Floyd, S., and D. Black, "The Addition
+2882	              of Explicit Congestion Notification (ECN) to IP",
+2883	              RFC 3168, DOI 10.17487/RFC3168, September 2001,
+2884	              <https://www.rfc-editor.org/info/rfc3168>.
+
+2886	   [RFC4086]  Eastlake 3rd, D., Schiller, J., and S. Crocker,
+2887	              "Randomness Requirements for Security", BCP 106, RFC 4086,
+2888	              DOI 10.17487/RFC4086, June 2005,
+2889	              <https://www.rfc-editor.org/info/rfc4086>.
+
+2891	   [RFC5044]  Culley, P., Elzur, U., Recio, R., Bailey, S., and J.
+2892	              Carrier, "Marker PDU Aligned Framing for TCP
+2893	              Specification", RFC 5044, DOI 10.17487/RFC5044, October
+2894	              2007, <https://www.rfc-editor.org/info/rfc5044>.
+
+2896	   [RFC6234]  Eastlake 3rd, D. and T. Hansen, "US Secure Hash Algorithms
+2897	              (SHA and SHA-based HMAC and HKDF)", RFC 6234,
+2898	              DOI 10.17487/RFC6234, May 2011,
+2899	              <https://www.rfc-editor.org/info/rfc6234>.
+
+2901	   [RFC7210]  Housley, R., Polk, T., Hartman, S., and D. Zhang,
+2902	              "Database of Long-Lived Symmetric Cryptographic Keys",
+2903	              RFC 7210, DOI 10.17487/RFC7210, April 2014,
+2904	              <https://www.rfc-editor.org/info/rfc7210>.
+
+2906	   [RFC8085]  Eggert, L., Fairhurst, G., and G. Shepherd, "UDP Usage
+2907	              Guidelines", BCP 145, RFC 8085, DOI 10.17487/RFC8085,
+2908	              March 2017, <https://www.rfc-editor.org/info/rfc8085>.
+
+2910	   [RFC8126]  Cotton, M., Leiba, B., and T. Narten, "Guidelines for
+2911	              Writing an IANA Considerations Section in RFCs", BCP 26,
+2912	              RFC 8126, DOI 10.17487/RFC8126, June 2017,
+2913	              <https://www.rfc-editor.org/info/rfc8126>.
+
+2915	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+2916	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+2917	              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+2919	   [RFC8899]  Fairhurst, G., Jones, T., Tüxen, M., Rüngeler, I., and T.
+2920	              Völker, "Packetization Layer Path MTU Discovery for
+2921	              Datagram Transports", RFC 8899, DOI 10.17487/RFC8899,
+2922	              September 2020, <https://www.rfc-editor.org/info/rfc8899>.
+
+2924	   [RFC9097]  Morton, A., Geib, R., and L. Ciavattone, "Metrics and
+2925	              Methods for One-Way IP Capacity", RFC 9097,
+2926	              DOI 10.17487/RFC9097, November 2021,
+2927	              <https://www.rfc-editor.org/info/rfc9097>.
+
+2929	   [TR-471]   Morton, A,, Editor., "Broadband Forum TR-471: IP Layer
+2930	              Capacity Metrics and Measurement, Issue 4", September
+2931	              2024, <https://www.broadband-forum.org/technical/download/
+2932	              TR-471.pdf>.
+
+2934	   [Y.1540]   ITU-T, "Internet protocol data communication service - IP
+2935	              packet transfer and availability performance parameters",
+2936	              ITU-T Recommendation Y.1540, December 2019,
+2937	              <https://www.itu.int/rec/T-REC-Y.1540-201912-I/en>.
+
+2939	14.2.  Informative References
+
+2941	   [CBC]      Dworkin, M., "NIST Special Publication 800-38A:
+2942	              Recommendation for Block Cipher Modes of Operation:
+2943	              Methods and Techniques, U.S. National Institute of
+2944	              Standards and Technology", December 2001,
+2945	              <https://csrc.nist.gov/pubs/sp/800/38/a/final>.
+
+2947	   [NIST800-108]
+2948	              Chen, LC., "Recommendation for Key Derivation Using
+2949	              Pseudorandom Functions (Revised, Update 1)", August 2022,
+2950	              <https://nvlpubs.nist.gov/nistpubs/SpecialPublications/
+2951	              NIST.SP.800-108r1-upd1.pdf>.
+
+2953	   [RFC3148]  Mathis, M. and M. Allman, "A Framework for Defining
+2954	              Empirical Bulk Transfer Capacity Metrics", RFC 3148,
+2955	              DOI 10.17487/RFC3148, July 2001,
+2956	              <https://www.rfc-editor.org/info/rfc3148>.
+
+2958	   [RFC4656]  Shalunov, S., Teitelbaum, B., Karp, A., Boote, J., and M.
+2959	              Zekauskas, "A One-way Active Measurement Protocol
+2960	              (OWAMP)", RFC 4656, DOI 10.17487/RFC4656, September 2006,
+2961	              <https://www.rfc-editor.org/info/rfc4656>.
+
+2963	   [RFC5136]  Chimento, P. and J. Ishac, "Defining Network Capacity",
+2964	              RFC 5136, DOI 10.17487/RFC5136, February 2008,
+2965	              <https://www.rfc-editor.org/info/rfc5136>.
+
+2967	   [RFC5357]  Hedayat, K., Krzanowski, R., Morton, A., Yum, K., and J.
+2968	              Babiarz, "A Two-Way Active Measurement Protocol (TWAMP)",
+2969	              RFC 5357, DOI 10.17487/RFC5357, October 2008,
+2970	              <https://www.rfc-editor.org/info/rfc5357>.
+
+2972	   [RFC7497]  Morton, A., "Rate Measurement Test Protocol Problem
+2973	              Statement and Requirements", RFC 7497,
+2974	              DOI 10.17487/RFC7497, April 2015,
+2975	              <https://www.rfc-editor.org/info/rfc7497>.
+
+2977	   [RFC7594]  Eardley, P., Morton, A., Bagnulo, M., Burbridge, T.,
+2978	              Aitken, P., and A. Akhter, "A Framework for Large-Scale
+2979	              Measurement of Broadband Performance (LMAP)", RFC 7594,
+2980	              DOI 10.17487/RFC7594, September 2015,
+2981	              <https://www.rfc-editor.org/info/rfc7594>.
+
+2983	   [RFC8337]  Mathis, M. and A. Morton, "Model-Based Metrics for Bulk
+2984	              Transport Capacity", RFC 8337, DOI 10.17487/RFC8337, March
+2985	              2018, <https://www.rfc-editor.org/info/rfc8337>.
+
+2987	   [RFC8762]  Mirsky, G., Jun, G., Nydell, H., and R. Foote, "Simple
+2988	              Two-Way Active Measurement Protocol", RFC 8762,
+2989	              DOI 10.17487/RFC8762, March 2020,
+2990	              <https://www.rfc-editor.org/info/rfc8762>.
+
+2992	   [RFC8799]  Carpenter, B. and B. Liu, "Limited Domains and Internet
+2993	              Protocols", RFC 8799, DOI 10.17487/RFC8799, July 2020,
+2994	              <https://www.rfc-editor.org/info/rfc8799>.
+
+2996	   [RFC9145]  Boucadair, M., Reddy.K, T., and D. Wing, "Integrity
+2997	              Protection for the Network Service Header (NSH) and
+2998	              Encryption of Sensitive Context Headers", RFC 9145,
+2999	              DOI 10.17487/RFC9145, December 2021,
+3000	              <https://www.rfc-editor.org/info/rfc9145>.
+
+3002	Authors' Addresses
+
+3004	   Len Ciavattone
+3005	   AT&T Labs
+3006	   Middletown, NJ
+3007	   United States of America
+3008	   Email: lenciavattone@gmail.com
+
+3010	   Ruediger Geib
+3011	   Deutsche Telekom
+3012	   Deutsche Telekom Allee 9
+3013	   64295 Darmstadt
+3014	   Germany
+3015	   Phone: +49 6151 5812747
+3016	   Email: Ruediger.Geib@telekom.de
+
+
+
+
+
+
+
+
+
