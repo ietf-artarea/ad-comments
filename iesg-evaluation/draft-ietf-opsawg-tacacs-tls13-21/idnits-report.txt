@@ -1,0 +1,836 @@
+idnits 2.17.1 
+
+draft-ietf-opsawg-tacacs-tls13-21.txt:
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+  == There is 1 instance of lines with non-ascii characters in the document.
+
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     Summary: 0 errors (**), 0 flaws (~~), 1 warning (==), 0 comments (--).
+
+--------------------------------------------------------------------------------
+
+
+2	Operations and Management Area Working Group                     T. Dahm
+3	Internet-Draft
+4	Updates: 8907 (if approved)                                   J. Heasley
+5	Intended status: Standards Track                                     NTT
+6	Expires: 12 November 2025                               D.C. Medway Gash
+7	                                                     Cisco Systems, Inc.
+8	                                                                  A. Ota
+9	                                                             Google Inc.
+10	                                                             11 May 2025
+
+12	   Terminal Access Controller Access-Control System Plus over TLS 1.3
+13	                           (TACACS+ over TLS)
+14	                   draft-ietf-opsawg-tacacs-tls13-21
+
+16	Abstract
+
+18	   The Terminal Access Controller Access-Control System Plus (TACACS+)
+19	   protocol provides device administration for routers, network access
+20	   servers, and other networked computing devices via one or more
+21	   centralized TACACS+ servers.  This document adds Transport Layer
+22	   Security (TLS 1.3) support to TACACS+ and obsoletes former inferior
+23	   security mechanisms.
+
+25	   This document updates RFC 8907.
+
+27	Requirements Language
+
+29	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+30	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+31	   "OPTIONAL" in this document are to be interpreted as described in BCP
+32	   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+33	   capitals, as shown here.
+
+35	Status of This Memo
+
+37	   This Internet-Draft is submitted in full conformance with the
+38	   provisions of BCP 78 and BCP 79.
+
+40	   Internet-Drafts are working documents of the Internet Engineering
+41	   Task Force (IETF).  Note that other groups may also distribute
+42	   working documents as Internet-Drafts.  The list of current Internet-
+43	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+45	   Internet-Drafts are draft documents valid for a maximum of six months
+46	   and may be updated, replaced, or obsoleted by other documents at any
+47	   time.  It is inappropriate to use Internet-Drafts as reference
+48	   material or to cite them other than as "work in progress."
+49	   This Internet-Draft will expire on 12 November 2025.
+
+51	Copyright Notice
+
+53	   Copyright (c) 2025 IETF Trust and the persons identified as the
+54	   document authors.  All rights reserved.
+
+56	   This document is subject to BCP 78 and the IETF Trust's Legal
+57	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+58	   license-info) in effect on the date of publication of this document.
+59	   Please review these documents carefully, as they describe your rights
+60	   and restrictions with respect to this document.  Code Components
+61	   extracted from this document must include Revised BSD License text as
+62	   described in Section 4.e of the Trust Legal Provisions and are
+63	   provided without warranty as described in the Revised BSD License.
+
+65	Table of Contents
+
+67	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
+68	   2.  Technical Definitions . . . . . . . . . . . . . . . . . . . .   3
+69	   3.  TACACS+ over TLS  . . . . . . . . . . . . . . . . . . . . . .   4
+70	     3.1.  Separating TLS Connections  . . . . . . . . . . . . . . .   4
+71	     3.2.  TLS Connection  . . . . . . . . . . . . . . . . . . . . .   5
+72	     3.3.  TLS Authentication Options  . . . . . . . . . . . . . . .   6
+73	     3.4.  TLS Certificate-Based Authentication  . . . . . . . . . .   6
+74	       3.4.1.  TLS Certificate Path Verification . . . . . . . . . .   6
+75	       3.4.2.  TLS Certificate Identification  . . . . . . . . . . .   7
+76	       3.4.3.  Cipher Suites Requirements  . . . . . . . . . . . . .   8
+77	     3.5.  TLS PSK Authentication  . . . . . . . . . . . . . . . . .   8
+78	     3.6.  TLS Resumption  . . . . . . . . . . . . . . . . . . . . .   9
+79	   4.  Obsolescence of TACACS+ Obfuscation . . . . . . . . . . . . .   9
+80	   5.  Security Considerations . . . . . . . . . . . . . . . . . . .  10
+81	     5.1.  TLS . . . . . . . . . . . . . . . . . . . . . . . . . . .  10
+82	       5.1.1.  TLS Use . . . . . . . . . . . . . . . . . . . . . . .  11
+83	       5.1.2.  TLS 0-RTT . . . . . . . . . . . . . . . . . . . . . .  11
+84	       5.1.3.  TLS Options . . . . . . . . . . . . . . . . . . . . .  11
+85	       5.1.4.  Unreachable Certification Authority (CA)  . . . . . .  12
+86	       5.1.5.  TLS Server Name Indicator (SNI) . . . . . . . . . . .  12
+87	       5.1.6.  Server Identity Wildcards . . . . . . . . . . . . . .  12
+88	     5.2.  TACACS+ Configuration . . . . . . . . . . . . . . . . . .  12
+89	     5.3.  Well-Known TCP/IP Port Number . . . . . . . . . . . . . .  13
+90	   6.  Operational Considerations  . . . . . . . . . . . . . . . . .  13
+91	     6.1.  Migration . . . . . . . . . . . . . . . . . . . . . . . .  13
+92	     6.2.  Maintaining Non-TLS TACACS+ Clients . . . . . . . . . . .  14
+93	     6.3.  YANG Model for TACACS+ Clients  . . . . . . . . . . . . .  14
+94	   7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  14
+95	   8.  Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .  15
+96	   9.  Normative References  . . . . . . . . . . . . . . . . . . . .  15
+97	   10. Informative References  . . . . . . . . . . . . . . . . . . .  16
+98	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  17
+
+100	1.  Introduction
+
+102	   The Terminal Access Controller Access-Control System Plus (TACACS+)
+103	   Protocol [RFC8907] provides device administration for routers,
+104	   network access servers, and other networked computing devices via one
+105	   or more centralized TACACS+ servers.  The protocol provides
+106	   authentication, authorization and accounting services (AAA) for
+107	   TACACS+ clients within the device administration use case.
+
+109	   While the content of the protocol is highly sensitive, TACACS+ lacks
+110	   effective confidentiality, integrity, and authentication of the
+111	   connection and network traffic between the TACACS+ server and client,
+112	   requiring secure transport to safeguard a deployment.  The security
+113	   mechanisms as described in Section 10 of [RFC8907] are extremely
+114	   weak.
+
+116	   To address these deficiencies, this document updates the TACACS+
+117	   protocol to use TLS 1.3 [RFC8446] authentication and encryption, and
+118	   obsoletes the use of TACACS+ obfuscation mechanisms (Section 10.5 of
+119	   [RFC8907]).
+
+121	2.  Technical Definitions
+
+123	   The terms defined in Section 3 of [RFC8907] are fully applicable here
+124	   and will not be repeated.  The following terms are also used in this
+125	   document.
+
+127	   Obfuscation: TACACS+ was originally intended to incorporate a
+128	   mechanism for securing the body of its packets.  The algorithm is
+129	   categorized as Obfuscation in Section 10.5.2 of [RFC8907].  The term
+130	   is used to ensure that the algorithm is not mistaken for encryption.
+131	   It should not be considered secure.
+
+133	   Non-TLS connection: This term refers to the connection defined in
+134	   [RFC8907].  It is a connection without TLS, using the unsecure
+135	   TACACS+ authentication and obfuscation (or the unobfuscated option
+136	   for test).  The use of well-known TCP/IP host port number 49 is
+137	   specified as the default for Non-TLS connections.
+
+139	   TLS connection: A TLS connection is a TCP/IP connection with TLS
+140	   authentication and encryption used by TACACS+ for transport.  A TLS
+141	   connection for TACACS+ is always between one TACACS+ client and one
+142	   TACACS+ server.
+
+144	   TLS TACACS+ server: This document describes a variant of the TACACS+
+145	   server, introduced in Section 3.2 of [RFC8907], which utilizes TLS
+146	   for transport, and makes some associated protocol optimizations.
+147	   Both server variants respond to TACACS+ traffic, but this document
+148	   specifically defines a TACACS+ server (whether TLS or Non-TLS) as
+149	   being bound to specific port number on a particular IP address or
+150	   hostname.  This definition is important in the context of the
+151	   configuration of TACACS+ clients, to ensure they direct their traffic
+152	   to the correct TACACS+ servers.
+
+154	   Peer: The peer of a TACACS+ client (or server) in the context of a
+155	   TACACS+ connection, is a TACACS+ server (or client).  Together, the
+156	   ends of a TACACS+ connection are referred to as peers.
+
+158	3.  TACACS+ over TLS
+
+160	   TACACS+ over TLS takes the protocol defined in [RFC8907], removes the
+161	   option for MD5 obfuscation, and specifies that TLS 1.3 be used for
+162	   transport (Section 3.1 elaborates TLS version support).  A new well-
+163	   known default host port number is used.  The next sections provide
+164	   further details and guidance.
+
+166	   TLS is introduced into TACACS+ to fulfill the following requirements:
+
+168	   1.  Confidentiality and Integrity: The MD5 algorithm underlying the
+169	       obfuscation mechanism specified in [RFC8907] has been shown to be
+170	       insecure [RFC6151] when used for encryption.  This prevents
+171	       TACACS+ being used in a [FIPS-140-3] - compliant deployment.
+172	       Securing TACACS+ protocol with TLS is intended to provide
+173	       confidentiality and integrity without requiring the provision of
+174	       a secured network.
+
+176	   2.  Peer authentication: The authentication capabilities of TLS
+177	       replace the shared secrets of obfuscation for mutual
+178	       authentication.
+
+180	   This document adheres to the recommendations in [I-D.ietf-uta-
+181	   require-tls13].
+
+183	3.1.  Separating TLS Connections
+
+185	   All data exchanged by TACACS+ peers MUST be encrypted, including the
+186	   mutual authentication of the peers.  Therefore, when a TCP connection
+187	   is established for the service, a TLS handshake begins immediately.
+
+189	   To ensure separation of TACACS+ traffic that uses TLS from that which
+190	   does not (Section 5.3), TLS TACACS+ servers MUST be deployed on a
+191	   separate TCP/IP port number from Non-TLS TACACS+ servers (preferably
+192	   on a separate host, as recommended in Section 5.1.1).  Because of the
+193	   widespread use of default port number settings in numerous existing
+194	   TACACS+ client configurations, a well-known system TCP/IP port number
+195	   is assigned: the designated port number is [TBD] (Section 7) with the
+196	   service name tacacss (Section 7).  This ensures that the client can
+197	   separate TLS and Non-TLS traffic even where default port numbers are
+198	   omitted from its TACACS+ server connection configuration.
+
+200	   Under exceptional circumstances, this document permits any other TCP
+201	   port number to be configured when required by deployment specifics,
+202	   but the implications in Section 5.3 have to be considered by
+203	   operators.
+
+205	3.2.  TLS Connection
+
+207	   A TACACS+ client initiates a TLS connection by making a TCP
+208	   connection to a configured TLS TACACS+ server on the TACACS+ TLS port
+209	   number.  Once the TCP connection is established, the client MUST
+210	   immediately begin the TLS negotiation before sending any TACACS+
+211	   protocol data.
+
+213	   TLS 1.3 [RFC8446] must be used for transport, though it is expected
+214	   that TACACS+ as described in this document will work with future
+215	   versions of TLS.  Earlier versions of TLS MUST NOT be used.
+
+217	   Once the TLS connection is established, the exchange of TACACS+ data
+218	   proceeds as defined in [RFC8907], except that it is transmitted over
+219	   TLS as TLS application data and without TACACS+ obfuscation
+220	   (Section 4).
+
+222	   The connection persists until the TLS TACACS+ peer closes it, either
+223	   due to an error, or at the conclusion of the TACACS+ session, or, if
+224	   Single Connection Mode (Section 4.3 of [RFC8907]) has been
+225	   negotiated, when an inactivity timeout occurs.  Why it closed has no
+226	   bearing on TLS resumption, unless closed by a TLS error, in which
+227	   case the ticket might be invalidated.
+
+229	   TACACS+ connections are not long-lived.  Non 'Single Connection Mode'
+230	   (Section 4.3 of [RFC8907]) connections are closed as soon as the
+231	   TACACS+ session completes.  Single Connection Mode connections are
+232	   longer lived, but even these are timed out and closed after a short
+233	   period of inactivity.  For this reason, keepalives are not required
+234	   to be supported.
+
+236	   TACACS+ clients and servers widely support IPv6 configuration in
+237	   addition to IPv4.  This document makes no changes to recommendations
+238	   in this area.
+
+240	3.3.  TLS Authentication Options
+
+242	   Implementations MUST support certificate-based mutual authentication,
+243	   to provide a core option for interoperability between deployments.
+244	   This authentication option is specified in Section 3.4.
+
+246	   In addition to certificate-based TLS authentication, implementations
+247	   MAY support the following alternative authentication mechanisms:
+
+249	   *  Pre-Shared Keys (PSKs) (Section 3.5), also known as external PSKs
+250	      in TLS 1.3.
+
+252	   *  Raw Public Keys (RPKs).  The details of RPK are considered out-of-
+253	      scope for this document.  Refer to [RFC7250] and Section 4.4.2 of
+254	      [RFC8446] for implementation, deployment, and security
+255	      considerations.
+
+257	3.4.  TLS Certificate-Based Authentication
+
+259	   TLS certificate authentication is the primary authentication option
+260	   for TACACS+ over TLS.  This section covers certificate-based
+261	   authentication only.
+
+263	   Deploying TLS certificate-based uthentication correctly will
+264	   considerably improve the security of TACACS+ deployments.  It is
+265	   essential for implementers and operators to understand the
+266	   implications of a TLS certificate-based authentication solution,
+267	   including the correct handling of certificates, Certificate
+268	   Authorities (CAs), and all elements of TLS configuration.  For
+269	   guidance, start with [BCP195].
+
+271	   Each peer MUST validate the certificate path of its remote peer,
+272	   including revocation checking, as described in Section 3.4.1.
+
+274	   If the verification succeeds, the authentication is successful and
+275	   the connection is permitted.  Policy may impose further constraints
+276	   upon the peer, allowing or denying the connection based on
+277	   certificate fields or any other parameters exposed by the
+278	   implementation.
+
+280	   Unless disabled by configuration, a peer MUST NOT permit connection
+281	   of any peer that presents an invalid TLS certificate.
+
+283	3.4.1.  TLS Certificate Path Verification
+
+285	   The implementation of certificate-based mutual authentication MUST
+286	   support certificate path verification as described in Section 6 of
+287	   [RFC5280].
+
+289	   In some deployments, a peer may be isolated from a remote peer's CA.
+290	   Implementations for these deployments MUST support certificate chains
+291	   (a.k.a. bundles or chains of trust), where the entire chain of the
+292	   remote's certificate is stored on the local peer.
+
+294	   TLS Cached Information Extension [RFC7924] SHOULD be implemented.
+295	   This MAY be augmented with RPKs [RFC7250], though revocation must be
+296	   handled as it is not part of the standard.
+
+298	   Other approaches may be used for loading the intermediate
+299	   certificates onto the client, but MUST include support for revocation
+300	   checking.  For example, [RFC5280] details the Authority Information
+301	   Access (AIA) extension to provide information about the issuer of the
+302	   certificate in which the extension appears.  It can be used to
+303	   provide the address of the Online Certificate Status Protocol (OCSP)
+304	   responder from where revocation status of the certificate (which
+305	   includes the extension) can be checked.
+
+307	3.4.2.  TLS Certificate Identification
+
+309	   For the client-side validation of presented TLS TACACS+ server
+310	   identities, implementations MUST follow [RFC9525] validation
+311	   techniques.  Identifier types DNS-ID, IP-ID, or SRV-ID are applicable
+312	   for use with the TLS TACACS+ protocol, selected by operators
+313	   depending upon the deployment design.  TLS TACACS+ does not use URI-
+314	   IDs for TLS TACACS+ server identity verification.
+
+316	   Wildcards in TLS TACACS+ server identities simplify certificate
+317	   management by allowing a single certificate to secure multiple
+318	   servers in a deployment.  However, this introduces security risks, as
+319	   compromising the private key of a wildcard certificate impacts all
+320	   servers using it.  To address these risks, the guidelines in
+321	   Section 6.3 of [RFC9525] MUST be followed, and the wildcard SHOULD be
+322	   confined to a subdomain dedicated solely to TACACS+ servers.
+
+324	   For the TLS TACACS+ server-side validation of client identities,
+325	   implementations MUST support the ability to configure which fields of
+326	   a certificate are used for client identification, to verify that the
+327	   client is a valid source for the received certificate and that it is
+328	   permitted access to TACACS+. Implementations MUST support either:
+
+330	   Network address based validation methods as described in Section 5.2
+331	   of [RFC5425].
+
+333	   or
+334	   Client Identity validation of a shared identity in the certificate
+335	   subjectAltName.  This is applicable in deployments where the client
+336	   securely supports an identity which is shared with the TLS TACACS+
+337	   server.  Matching of dNSName and iPAddress MUST be supported.  Other
+338	   options defined in Section 4.2.1.6 of [RFC5280] MAY be supported.
+339	   This approach allows a client's network location to be reconfigured
+340	   without issuing a new client certificate.
+
+342	   Implementations MUST support the TLS Server Name Indication extension
+343	   (SNI) (Section 3 of [RFC6066]).  TLS TACACS+ clients MUST support the
+344	   ability to configure the TLS TACACS+ server's domain name, so that it
+345	   may be included in the SNI "server_name" extension of the client
+346	   hello (This is distinct from the IP Address or hostname configuration
+347	   used for the TCP connection).  Refer to Section 5.1.5 for security
+348	   related operator considerations.
+
+350	   Certificate provisioning is out of scope of this document.
+
+352	3.4.3.  Cipher Suites Requirements
+
+354	   Implementations MUST support the TLS 1.3 mandatory cipher suites
+355	   (Section 9.1 of [RFC8446]).  Readers should refer to [BCP195].  The
+356	   cipher suites offered or accepted SHOULD be configurable so that
+357	   operators can adapt.
+
+359	3.5.  TLS PSK Authentication
+
+361	   As an alternative to certificate-based authentication,
+362	   implementations MAY support PSKs, also known as External PSKs in TLS
+363	   1.3 [RFC8446].  These should not be confused with resumption PSKs.
+
+365	   The use of External PSKs is less well established than certificate-
+366	   based authentication.  It is RECOMMENDED that systems follow the
+367	   directions of [RFC9257] and Section 4 of [RFC8446].
+
+369	   Where PSK Authentication is implemented, PSK lengths of at least 16
+370	   octets MUST be supported.
+
+372	   PSK Identity MUST follow recommendations of Section 6.1 of [RFC9257].
+373	   Implementations MUST support PSK identities of at least 16 octets.
+
+375	   Although this document removes the option of MD5 obfuscation
+376	   (Section 4), it is still possible that the TLS and Non-TLS versions
+377	   of TACACS+ may exist in an organization, for example, during
+378	   migration (Section 6.1).  In such cases, the shared secrets
+379	   configured for TACACS+ obfuscation clients MUST NOT be the same as
+380	   the PSKs configured for TLS clients.
+
+382	3.6.  TLS Resumption
+
+384	   The TLS Resumption protocol, detailed in [RFC8446], can minimize the
+385	   number of round trips required during the handshake process.  If a
+386	   TLS client holds a ticket previously extracted from a
+387	   NewSessionTicket message from the TLS TACACS+ server, it can use the
+388	   PSK identity tied to that ticket.  If the TLS TACACS+ server
+389	   consents, the resumed session is acknowledged as authenticated and
+390	   securely linked to the initial session.
+
+392	   The client SHOULD use resumption when it holds a valid unused ticket
+393	   from the TLS TACACS+ server, as each ticket is intended for a single
+394	   use only and will be refreshed during resumption.  The TLS TACACS+
+395	   server can reject a resumption request, but the TLS TACACS+ server
+396	   SHOULD allow resumption if the ticket in question has not expired and
+397	   has not been used before.
+
+399	   When a TLS TACACS+ server is presented with a resumption request from
+400	   the TLS client, it MAY still choose to require a full handshake.  In
+401	   this case, the negotiation proceeds as if the session was a new
+402	   authentication, and the resumption attempt is ignored.  As described
+403	   in Appendix C.4 of [RFC8446], reuse of a ticket allows passive
+404	   observers to correlate different connections.  TLS TACACS+ clients
+405	   and servers SHOULD follow the client tracking preventions in
+406	   Appendix C.4 of [RFC8446].
+
+408	   When processing TLS resumption, certificates must be verified to
+409	   check for revocation during the period since the last
+410	   NewSessionTicket Message.
+
+412	   The resumption ticket_lifetime SHOULD be configurable, including a
+413	   zero seconds lifetime.  Refer to Section 4.6.1 of [RFC8446] for
+414	   guidance on ticket lifetime.
+
+416	4.  Obsolescence of TACACS+ Obfuscation
+
+418	   [RFC8907] describes the obfuscation mechanism, documented in
+419	   Section 5.2 of [RFC5425].  Such a method is weak.
+
+421	   The introduction of TLS PSK, certificate peer authentication, and TLS
+422	   encryption to TACACS+ replaces these former mechanisms and so
+423	   obfuscation is hereby obsoleted.  This section describes how the
+424	   TACACS+ client and servers MUST operate with regards to the
+425	   obfuscation mechanism.
+
+427	   Peers MUST NOT use obfuscation with TLS.
+
+429	   A TACACS+ client initiating a TACACS+ TLS connection MUST set the
+430	   TAC_PLUS_UNENCRYPTED_FLAG bit, thereby asserting that obfuscation is
+431	   not used for the session.  All subsequent packets MUST have the
+432	   TAC_PLUS_UNENCRYPTED_FLAG bit set to 1.
+
+434	   A TLS TACACS+ server that receives a packet with the
+435	   TAC_PLUS_UNENCRYPTED_FLAG bit not set to 1 over a TLS connection,
+436	   MUST return an error of TAC_PLUS_AUTHEN_STATUS_ERROR,
+437	   TAC_PLUS_AUTHOR_STATUS_ERROR, or TAC_PLUS_ACCT_STATUS_ERROR as
+438	   appropriate for the TACACS+ message type, with the
+439	   TAC_PLUS_UNENCRYPTED_FLAG bit set to 1, and terminate the session.
+440	   This behavior corresponds to that defined in Section 4.5 of [RFC8907]
+441	   Data Obfuscation for TAC_PLUS_UNENCRYPTED_FLAG or key mismatches.
+
+443	   A TACACS+ client that receives a packet with the
+444	   TAC_PLUS_UNENCRYPTED_FLAG bit not set to 1 MUST terminate the
+445	   session, and SHOULD log this error.
+
+447	5.  Security Considerations
+
+449	5.1.  TLS
+
+451	   This document improves the confidentiality, integrity, and
+452	   authentication of the connection and network traffic between TACACS+
+453	   peers by adding TLS support.
+
+455	   Simply adding TLS support to the protocol does not guarantee the
+456	   protection of the TLS TACACS+ server and clients.  It is essential
+457	   for the operators and equipment vendors to adhere to the latest best
+458	   practices for ensuring the integrity of network devices and selecting
+459	   secure TLS key and encryption algorithms.
+
+461	   [BCP195] offers substantial guidance for implementing protocols that
+462	   use TLS and their deployment.  Those implementing and deploying
+463	   Secure TACACS+ must adhere to the recommendations relevant to TLS 1.3
+464	   outlined in [BCP195] or its subsequent versions.
+
+466	   This document outlines additional restrictions permissible under
+467	   [BCP195] For example, any recommendations referring to TLS 1.2,
+468	   including the mandatory support, are not relevant for Secure TACACS+
+469	   as TLS 1.3 or above is mandated.
+
+471	   This document concerns the use of TLS as transport for TACACS+, and
+472	   does not make any changes to the core TACACS+ protocol, other than
+473	   the direct implications of deprecating obfuscation.  Operators MUST
+474	   be cognizant of the security implications of the TACACS+ protocol
+475	   itself.  Further documents are planned, for example, to address the
+476	   security implications of password based authentication and enhance
+477	   the protocol to accommodate alternative schemes.
+
+479	5.1.1.  TLS Use
+
+481	   New TACACS+ production deployments SHOULD use TLS authentication and
+482	   encryption.  Also see [RFC3365].
+
+484	   TLS TACACS+ servers (as defined in Section 2) MUST NOT allow Non-TLS
+485	   connections, because of the threat of downgrade attacks or
+486	   misconfiguration described in Section 5.3.  Instead, separate Non-TLS
+487	   TACACS+ servers SHOULD be set up to cater for these clients.
+
+489	   It is NOT RECOMMENDED that TLS TACACS+ servers and Non-TLS TACACS+
+490	   servers be deployed on the same host, for reasons discussed in
+491	   Section 5.3.  Non-TLS connections would be better served by deploying
+492	   the required Non-TLS TACACS+ servers on separate hosts.
+
+494	   TACACS+ Clients MUST NOT fail back to a Non-TLS connection if a TLS
+495	   connection fails.  This prohibition includes during the migration of
+496	   a deployment (Section 6.1).
+
+498	5.1.2.  TLS 0-RTT
+
+500	   TLS 1.3 resumption and PSK techniques make it possible to send Early
+501	   Data, aka. 0-RTT data, data that is sent before the TLS handshake
+502	   completes.  Replay of this data is a risk.  Given the sensitivity of
+503	   TACACS+ data, clients MUST NOT send data until the full TLS handshake
+504	   completes; that is, clients MUST NOT send 0-RTT data and TLS TACACS+
+505	   servers MUST abruptly disconnect clients that do.
+
+507	5.1.3.  TLS Options
+
+509	   Recommendations in [BCP195] MUST be followed to determine which TLS
+510	   versions and algorithms should be supported, deprecated, obsoleted,
+511	   or abandoned.
+
+513	   Also, Section 9 of [RFC8446] prescribes mandatory supported options.
+
+515	5.1.4.  Unreachable Certification Authority (CA)
+
+517	   Operators should be cognizant of the potential of TLS TACACS+ server
+518	   and/or client isolation from their peer's CA by network failures.
+519	   Isolation from a public key certificate's CA will cause the
+520	   verification of the certificate to fail and thus TLS authentication
+521	   of the peer to fail.  The approach mentioned in Section 3.4.1 can
+522	   help address this and should be considered where implemented.
+
+524	5.1.5.  TLS Server Name Indicator (SNI)
+
+526	   Operators should be aware that the TLS SNI extension is part of the
+527	   TLS client hello and is, therefore, subject to eavesdropping.  Also
+528	   see Section 11.1 of [RFC6066].
+
+530	5.1.6.  Server Identity Wildcards
+
+532	   The use of wildcards in TLS server identities creates a single point
+533	   of failure: a compromised private key of a wildcard certificate
+534	   impacts all servers using it.  Their use MUST follow recommendations
+535	   of Section 7.1 of [RFC9525].  Operators MUST ensure that the wildcard
+536	   is limited to a subdomain dedicated solely to TLS TACACS+ servers.
+537	   Further, operators MUST ensure that the TLS TACACS+ servers covered
+538	   by a wildcard certificate MUST be impervious to redirection of
+539	   traffic to a different server (for example, due to MiTM attacks or
+540	   DNS cache poisoning).
+
+542	5.2.  TACACS+ Configuration
+
+544	   Implementors must ensure that the configuration scheme introduced for
+545	   enabling TLS is straightforward and leaves no room for ambiguity
+546	   regarding whether TLS or Non-TLS will be used between the TACACS+
+547	   client and the TACACS+ server.
+
+549	   This document recommends the use of a separate port number that TLS
+550	   TACACS+ servers will listen to.  Where deployments have not
+551	   overridden the defaults explicitly, TACACS+ client implementations
+552	   MUST use the correct values:
+
+554	   *  for Non-TLS connection TACACS+: Port number 49.
+
+556	   *  for TLS connection TACACS+: (TBD).
+
+558	   Implementors may offer a single option for TACACS+ clients and
+559	   servers to disable all Non-TLS TACACS+ operations.  When enabled on a
+560	   TACACS+ server, it will not respond to any requests from Non-TLS
+561	   TACACS+ client connections.  When enabled on a TACACS+ client, it
+562	   will not establish any Non-TLS TACACS+ server connections.
+
+564	5.3.  Well-Known TCP/IP Port Number
+
+566	   A new port number is considered appropriate and superior to a
+567	   "STARTTLS" command or other negotiation method because it allows:
+
+569	   *  ease of blocking the unobfuscated or obfuscated connections by the
+570	      TCP/IP port number,
+
+572	   *  passive Intrusion Detection Systems (IDSs) monitoring the
+573	      unobfuscated to be unaffected by the introduction of TLS,
+
+575	   *  avoidance of Man in the Middle (MitM) attacks that can interfere
+576	      with STARTTLS,
+
+578	   *  prevention of the accidental exposure of sensitive information due
+579	      to misconfiguration.
+
+581	   However, co-existence of inferior authentication and obfuscated,
+582	   whether a Non-TLS connection or deprecated parts that compose TLS,
+583	   also presents opportunity for down-grade attacks.  Causing failure of
+584	   connections to the TLS-enabled service or the negotiation of shared
+585	   algorithm support are two such down-grade attacks.
+
+587	   The simplest mitigation exposure from Non-TLS connection methods is
+588	   to refuse Non-TLS connections at the host entirely, perhaps using
+589	   separate hosts for Non-TLS connections and TLS.
+
+591	   Another approach is mutual configuration that requires TLS.  TACACS+
+592	   clients and servers SHOULD support configuration that requires peers,
+593	   globally and individually, use TLS.  Furthermore, peers SHOULD be
+594	   configurable to limit offered or recognized TLS versions and
+595	   algorithms to those recommended by standards bodies and implementers.
+
+597	6.  Operational Considerations
+
+599	   Operational and deployment considerations are spread throughout the
+600	   document.  While avoiding repetition, it is useful for the impatient
+601	   to direct particular attention to Sections 5.2 and 5.1.5.  However,
+602	   it is important that the entire Section 5 is observed.
+
+604	6.1.  Migration
+
+606	   Section 5.2 mentions that for an optimal deployment of TLS TACACS+,
+607	   TLS should be universally applied throughout the deployment.
+608	   However, during the migration process from a Non-TLS TACACS+
+609	   deployment, operators may need to support both TLS and Non-TLS
+610	   TACACS+ servers.  This migration phase allows operators to gradually
+611	   transition their deployments from an insecure state to a more secure
+612	   one, but it is important to note that it is vulnerable to downgrade
+613	   attacks.  Therefore, the migration phase should be considered
+614	   insecure until it is fully completed.  To mitigate this hazard:
+
+616	   *  The period where any client is configured with both TLS and Non-
+617	      TLS TACACS+ servers should be minimized.
+
+619	   *  The operator must consider the impact of mixed TLS and Non-TLS on
+620	      security, as mentioned above.
+
+622	6.2.  Maintaining Non-TLS TACACS+ Clients
+
+624	   Some TACACS+ client devices in a deployment may not implement TLS.
+625	   These devices will require access to Non-TLS TACACS+ servers.
+626	   Operators must follow the recommendation of Section 5.1.1 and deploy
+627	   separate Non-TLS TACACS+ servers for these Non-TLS clients from those
+628	   used for the TLS clients.
+
+630	6.3.  YANG Model for TACACS+ Clients
+
+632	   [ietf-opsawg-secure-tacacs-yang] specifies a YANG model for managing
+633	   TACACS+ clients, including TLS support.
+
+635	7.  IANA Considerations
+
+637	   IANA (has allocated) is requested to allocate a new well-known system
+638	   TCP/IP port number ([TBD]) for the service name "tacacss", described
+639	   as "TACACS+ over TLS".  The service name "tacacss" follows the common
+640	   practice of appending an "s" to the name given to the Non-TLS well-
+641	   known port name.  This allocation is justified in Section 5.3.
+
+643	   IANA (has added) is requested to add tacacss as a new entry to the
+644	   "Service name and Transport Protocol Port Number Registry" available
+645	   at https://www.iana.org/assignments/service-names-port-numbers/
+
+647	   Service Name: tacacss
+
+649	   Port Number: [TBD]
+
+651	   Transport Protocol: TCP
+
+653	   Description: TLS Secure Login Host Protocol (TACACSS)
+
+655	   Assignee: IESG
+
+657	   Contact: IETF Chair
+
+659	   Reference: [TBD] (This Document)
+660	   RFC EDITOR: this port number should replace "[TBD]" within this
+661	   document.
+
+663	   Considerations about service discovery are out of scope of this
+664	   document.
+
+666	8.  Acknowledgments
+
+668	   The author(s) would like to thank Russ Housley, Steven M.  Bellovin,
+669	   Stephen Farrell, Alan DeKok, Warren Kumari, Tom Petch, Tirumal Reddy,
+670	   Valery Smyslov, and Mohamed Boucadair for their support, insightful
+671	   review, and/or comments.  [RFC5425] was also used as a basis for the
+672	   general approach to TLS.  [RFC9190] was used as a basis for TLS
+673	   Resumption Recommendations.  draft-ietf-radext-tls-psk, although
+674	   still in draft form at the time of writing, was used as a model for
+675	   PSK Recommendations.
+
+677	9.  Normative References
+
+679	   [BCP195]   Best Current Practice 195,
+680	              <https://www.rfc-editor.org/info/bcp195>.
+681	              At the time of writing, this BCP comprises the following:
+
+683	              Sheffer, Y., Saint-Andre, P., and T. Fossati,
+684	              "Recommendations for Secure Use of Transport Layer
+685	              Security (TLS) and Datagram Transport Layer Security
+686	              (DTLS)", BCP 195, RFC 9325, DOI 10.17487/RFC9325, November
+687	              2022, <https://www.rfc-editor.org/info/rfc9325>.
+
+689	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+690	              Requirement Levels", BCP 14, RFC 2119,
+691	              DOI 10.17487/RFC2119, March 1997,
+692	              <https://www.rfc-editor.org/info/rfc2119>.
+
+694	   [RFC5280]  Cooper, D., Santesson, S., Farrell, S., Boeyen, S.,
+695	              Housley, R., and W. Polk, "Internet X.509 Public Key
+696	              Infrastructure Certificate and Certificate Revocation List
+697	              (CRL) Profile", RFC 5280, DOI 10.17487/RFC5280, May 2008,
+698	              <https://www.rfc-editor.org/info/rfc5280>.
+
+700	   [RFC5425]  Miao, F., Ed., Ma, Y., Ed., and J. Salowey, Ed.,
+701	              "Transport Layer Security (TLS) Transport Mapping for
+702	              Syslog", RFC 5425, DOI 10.17487/RFC5425, March 2009,
+703	              <https://www.rfc-editor.org/info/rfc5425>.
+
+705	   [RFC6066]  Eastlake 3rd, D., "Transport Layer Security (TLS)
+706	              Extensions: Extension Definitions", RFC 6066,
+707	              DOI 10.17487/RFC6066, January 2011,
+708	              <https://www.rfc-editor.org/info/rfc6066>.
+
+710	   [RFC7250]  Wouters, P., Ed., Tschofenig, H., Ed., Gilmore, J.,
+711	              Weiler, S., and T. Kivinen, "Using Raw Public Keys in
+712	              Transport Layer Security (TLS) and Datagram Transport
+713	              Layer Security (DTLS)", RFC 7250, DOI 10.17487/RFC7250,
+714	              June 2014, <https://www.rfc-editor.org/info/rfc7250>.
+
+716	   [RFC7924]  Santesson, S. and H. Tschofenig, "Transport Layer Security
+717	              (TLS) Cached Information Extension", RFC 7924,
+718	              DOI 10.17487/RFC7924, July 2016,
+719	              <https://www.rfc-editor.org/info/rfc7924>.
+
+721	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+722	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+723	              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+725	   [RFC8446]  Rescorla, E., "The Transport Layer Security (TLS) Protocol
+726	              Version 1.3", RFC 8446, DOI 10.17487/RFC8446, August 2018,
+727	              <https://www.rfc-editor.org/info/rfc8446>.
+
+729	   [RFC8907]  Dahm, T., Ota, A., Medway Gash, D.C., Carrel, D., and L.
+730	              Grant, "The Terminal Access Controller Access-Control
+731	              System Plus (TACACS+) Protocol", RFC 8907,
+732	              DOI 10.17487/RFC8907, September 2020,
+733	              <https://www.rfc-editor.org/info/rfc8907>.
+
+735	   [RFC9525]  Saint-Andre, P. and R. Salz, "Service Identity in TLS",
+736	              RFC 9525, DOI 10.17487/RFC9525, November 2023,
+737	              <https://www.rfc-editor.org/info/rfc9525>.
+
+739	10.  Informative References
+
+741	   [FIPS-140-3]
+742	              National Institute of Standards and Technology, U.S.
+743	              Department of Commerce, "NIST Federal Information
+744	              Processing Standards (FIPS) Publication 140-3",
+745	              <https://csrc.nist.gov/pubs/fips/140-3/final>.
+
+747	   [ietf-opsawg-secure-tacacs-yang]
+748	              Boucadair, M., Ed., Wu, B., Zheng, G., and M. Wang, "A
+749	              YANG Data Model for Terminal Access Controller Access-
+750	              Control System Plus (TACACS+)",
+751	              <https://datatracker.ietf.org/doc/draft-ietf-opsawg-
+752	              secure-tacacs-yang/>.
+
+754	   [RFC3365]  Schiller, J., "Strong Security Requirements for Internet
+755	              Engineering Task Force Standard Protocols", BCP 61,
+756	              RFC 3365, DOI 10.17487/RFC3365, August 2002,
+757	              <https://www.rfc-editor.org/info/rfc3365>.
+
+759	   [RFC6151]  Turner, S. and L. Chen, "Updated Security Considerations
+760	              for the MD5 Message-Digest and the HMAC-MD5 Algorithms",
+761	              RFC 6151, DOI 10.17487/RFC6151, March 2011,
+762	              <https://www.rfc-editor.org/info/rfc6151>.
+
+764	   [RFC9190]  Preuß Mattsson, J. and M. Sethi, "EAP-TLS 1.3: Using the
+765	              Extensible Authentication Protocol with TLS 1.3",
+766	              RFC 9190, DOI 10.17487/RFC9190, February 2022,
+767	              <https://www.rfc-editor.org/info/rfc9190>.
+
+769	   [RFC9257]  Housley, R., Hoyland, J., Sethi, M., and C. A. Wood,
+770	              "Guidance for External Pre-Shared Key (PSK) Usage in TLS",
+771	              RFC 9257, DOI 10.17487/RFC9257, July 2022,
+772	              <https://www.rfc-editor.org/info/rfc9257>.
+
+774	   [TLSCSREC] IANA, "Transport Layer Security (TLS) Parameters",
+775	              <https://www.iana.org/assignments/tls-parameters/tls-
+776	              parameters.xhtml#tls-parameters-4>.
+
+778	Authors' Addresses
+
+780	   Thorsten Dahm
+781	   Email: thorsten.dahm@gmail.com
+
+783	   John Heasley
+784	   NTT
+785	   Email: heas@shrubbery.net
+
+787	   Douglas C. Medway Gash
+788	   Cisco Systems, Inc.
+789	   170 West Tasman Dr.
+790	   San Jose, CA 95134
+791	   United States of America
+792	   Email: dcmgash@cisco.com
+
+794	   Andrej Ota
+795	   Google Inc.
+796	   1600 Amphitheatre Parkway
+797	   Mountain View, CA 94043
+798	   United States of America
+799	   Email: andrej@ota.si
+
+
+
+
+
+
+
+
+
