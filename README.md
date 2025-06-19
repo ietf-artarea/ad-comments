@@ -12,3 +12,10 @@ All commments must be provided to the datatracker and ietf lists which are the s
 ./scripts/ballot-init.sh or13 draft-ietf-dnsop-rfc8624-bis-09
 ```
 
+
+### AD Evaluation
+
+```bash
+./scripts/ad-evaluation.sh or13 draft-ietf-cellar-tags-18
+```
+
