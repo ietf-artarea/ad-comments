@@ -1,0 +1,2183 @@
+idnits 2.17.1 
+
+draft-ietf-cellar-tags-18.txt:
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     No nits found.
+--------------------------------------------------------------------------------
+
+
+2	cellar                                                         S. Lhomme
+3	Internet-Draft
+4	Intended status: Standards Track                               M. Bunkus
+5	Expires: 1 December 2025
+6	                                                                 D. Rice
+7	                                                             30 May 2025
+
+9	              Matroska Media Container Tag Specifications
+10	                       draft-ietf-cellar-tags-18
+
+12	Abstract
+
+14	   This document defines the Matroska multimedia container tags, namely
+15	   the tag names and their respective semantic meaning.
+
+17	Status of This Memo
+
+19	   This Internet-Draft is submitted in full conformance with the
+20	   provisions of BCP 78 and BCP 79.
+
+22	   Internet-Drafts are working documents of the Internet Engineering
+23	   Task Force (IETF).  Note that other groups may also distribute
+24	   working documents as Internet-Drafts.  The list of current Internet-
+25	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+27	   Internet-Drafts are draft documents valid for a maximum of six months
+28	   and may be updated, replaced, or obsoleted by other documents at any
+29	   time.  It is inappropriate to use Internet-Drafts as reference
+30	   material or to cite them other than as "work in progress."
+
+32	   This Internet-Draft will expire on 1 December 2025.
+
+34	Copyright Notice
+
+36	   Copyright (c) 2025 IETF Trust and the persons identified as the
+37	   document authors.  All rights reserved.
+
+39	   This document is subject to BCP 78 and the IETF Trust's Legal
+40	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+41	   license-info) in effect on the date of publication of this document.
+42	   Please review these documents carefully, as they describe your rights
+43	   and restrictions with respect to this document.  Code Components
+44	   extracted from this document must include Revised BSD License text as
+45	   described in Section 4.e of the Trust Legal Provisions and are
+46	   provided without warranty as described in the Revised BSD License.
+
+48	Table of Contents
+
+50	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+51	   2.  Notation and Conventions  . . . . . . . . . . . . . . . . . .   3
+52	   3.  Tagging . . . . . . . . . . . . . . . . . . . . . . . . . . .   3
+53	     3.1.  Why Official Tags Matter  . . . . . . . . . . . . . . . .   4
+54	     3.2.  Tag Formatting  . . . . . . . . . . . . . . . . . . . . .   5
+55	       3.2.1.  TagName Formatting  . . . . . . . . . . . . . . . . .   5
+56	       3.2.2.  TagString Formatting  . . . . . . . . . . . . . . . .   5
+57	         3.2.2.1.  Date Tags Formatting  . . . . . . . . . . . . . .   6
+58	         3.2.2.2.  Number Tags Formatting  . . . . . . . . . . . . .   6
+59	         3.2.2.3.  Country Code Tags Formatting  . . . . . . . . . .   6
+60	     3.3.  Target Types  . . . . . . . . . . . . . . . . . . . . . .   7
+61	       3.3.1.  Target Types Parts  . . . . . . . . . . . . . . . . .  10
+62	     3.4.  Multiple Targets UID  . . . . . . . . . . . . . . . . . .  14
+63	   4.  Official Tags . . . . . . . . . . . . . . . . . . . . . . . .  18
+64	     4.1.  Nesting Information . . . . . . . . . . . . . . . . . . .  18
+65	     4.2.  Organization Information  . . . . . . . . . . . . . . . .  19
+66	     4.3.  Titles  . . . . . . . . . . . . . . . . . . . . . . . . .  20
+67	     4.4.  Nested Information  . . . . . . . . . . . . . . . . . . .  20
+68	     4.5.  Entities  . . . . . . . . . . . . . . . . . . . . . . . .  22
+69	     4.6.  Search and Classification . . . . . . . . . . . . . . . .  25
+70	     4.7.  Temporal Information  . . . . . . . . . . . . . . . . . .  27
+71	     4.8.  Spatial Information . . . . . . . . . . . . . . . . . . .  28
+72	     4.9.  User Information  . . . . . . . . . . . . . . . . . . . .  29
+73	     4.10. Technical Information . . . . . . . . . . . . . . . . . .  30
+74	     4.11. External Identifiers  . . . . . . . . . . . . . . . . . .  35
+75	     4.12. Commercial  . . . . . . . . . . . . . . . . . . . . . . .  36
+76	     4.13. Legal . . . . . . . . . . . . . . . . . . . . . . . . . .  37
+77	   5.  Security Considerations . . . . . . . . . . . . . . . . . . .  37
+78	   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  38
+79	     6.1.  Matroska Tags Names Registry  . . . . . . . . . . . . . .  38
+80	   7.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  46
+81	     7.1.  Normative References  . . . . . . . . . . . . . . . . . .  46
+82	     7.2.  Informative References  . . . . . . . . . . . . . . . . .  48
+83	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  48
+
+85	1.  Introduction
+
+87	   Matroska is a multimedia container format defined in [RFC9559].  It
+88	   can store timestamped multimedia data but also chapters and tags.
+89	   The Tag elements add important metadata to identify and classify the
+90	   information found in a Matroska Segment.  It can tag a whole Segment,
+91	   separate Tracks elements, individual Chapter elements or Attachments
+92	   elements.
+
+94	   Some details about tagging are already present in Section 24 of
+95	   [RFC9559].  Readers of this document should be familiar with that
+96	   section, the different high level parts of Matroska as defined in in
+97	   Section 4.5 of [RFC9559] and EBML Master Elements as defined in in
+98	   Section 7.7 of [RFC8794].
+
+100	   While the Matroska tagging framework allows anyone to create their
+101	   own custom tags, it is important to have a common set of values for
+102	   interoperability.  This document defines a set of common tag names
+103	   used in Matroska.
+
+105	2.  Notation and Conventions
+
+107	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+108	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+109	   "OPTIONAL" in this document are to be interpreted as described in BCP
+110	   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+111	   capitals, as shown here.
+
+113	3.  Tagging
+
+115	   When a SimpleTag is nested within another SimpleTag, the nested
+116	   SimpleTag becomes an attribute of its parent SimpleTag.  For
+117	   instance, if you wanted to store the dates that a singer started
+118	   being the lead performer, then your SimpleTag tree would look
+119	   something like this:
+
+121	   *  Targets
+
+123	      -  TagTrackUID = {track UID of tagged content}.
+
+125	   *  ARTIST = "Pet Shop Boys"
+
+127	      -  LEAD_PERFORMER = "Neil Tennant"
+
+129	         o  DATE_STARTED = "1981-08"
+
+131	   This corresponds to this layout of EBML elements:
+
+133	   <Tags>
+134	     <Tag>
+135	       <Targets>
+136	         <TagTrackUID>{track UID of tagged content}</TagTrackUID>
+137	       </Targets>
+
+139	       <SimpleTag>
+140	         <TagName>ARTIST</TagName>
+141	         <TagString>Pet Shop Boys</TagString>
+
+143	         <!-- sub tag(s) about the ARTIST -->
+144	         <SimpleTag>
+145	           <TagName>LEAD_PERFORMER</TagName>
+146	           <TagString>Neil Tennant</TagString>
+
+148	           <!-- sub tag(s) about the LEAD_PERFORMER -->
+149	           <SimpleTag>
+150	             <TagName>DATE_STARTED</TagName>
+151	             <TagString>1981-08</TagString>
+152	           </SimpleTag>
+
+154	         </SimpleTag>
+
+156	       </SimpleTag>
+157	     </Tag>
+158	   </Tags>
+
+160	   In this way, it becomes possible to store any SimpleTag as attributes
+161	   of another SimpleTag.
+
+163	3.1.  Why Official Tags Matter
+
+165	   There is a debate between people who think all tags should be free
+166	   and those who think all tags should be strict.  Our recommendations
+167	   are in between.
+
+169	   Advanced-users application might let you put any tag in your file.
+170	   But for the rest of the applications, they usually give you a basic
+171	   list of tags you can use.  Both have their needs, but it's usually a
+172	   bad idea to use custom or exotic tags because you will probably be
+173	   the only person to use this information even though everyone else
+174	   could benefit from it.  So hopefully, when someone wants to put
+175	   information in one's file, they will find an official one that fits
+176	   their need and hopefully use it.  If it's not in the list, this
+177	   person can try to add a new tag in the Matroska Tags Names registry
+178	   (Section 6.1).  This registry is not meant to have every possible
+179	   information in a file.  Matroska files are not meant to become a
+180	   whole database of people who made costumes for a film.  A website
+181	   would be better for that.  It's hard to define what should be in and
+182	   what doesn't make sense in a file; thus, each demand needs to balance
+183	   if it makes sense to be carried over in a file for storage and/or
+184	   sharing or if it doesn't belong there.
+
+186	   We also need an official list simply for developers to be able to
+187	   display relevant information in their own design, if they choose to
+188	   support a list of meta-information they should know which tag has the
+189	   wanted meaning so that other apps could understand the same meaning.
+
+191	3.2.  Tag Formatting
+
+193	3.2.1.  TagName Formatting
+
+195	   Official TagName values MUST consist of UTF-8 capital letters,
+196	   numbers and the underscore character '_'.
+
+198	   Official TagName values MUST NOT contain any space.
+
+200	   Official TagName values MUST NOT start with the underscore character
+201	   '_'; see Section 3.1.
+
+203	   It is RECOMMENDED to start a tag name with the underscore character
+204	   '_' for non official tags than are not meant to make it to the list
+205	   of official tags.
+
+207	3.2.2.  TagString Formatting
+
+209	   Although tags are metadata mostly used for reading, there are cases
+210	   where the string value could be used for sorting, categorization,
+211	   etc.  For this reason, when possible, strict formatting of the value
+212	   should be used so everyone can agree on how to use the value.
+
+214	   Multiple items SHOULD never be stored as a list in a single
+215	   TagString.  If there is more than one tag value with the same name to
+216	   be stored, then more than one SimpleTag SHOULD be used.
+
+218	   Due to preexisting files where these formatting rules were not
+219	   explicit, they are usually presented as rules that SHOULD be applied
+220	   when possible, rather than MUST be applied at all times.  It is
+221	   RECOMMENDED to use strict formatting when writing new tag values.
+
+223	3.2.2.1.  Date Tags Formatting
+
+225	   TagString fields defined in this document with dates MUST have the
+226	   following format: "YYYY-MM-DD hh:mm:ss.mss" or a reduced version.
+227	   The format is similar to the [ISO8601] date and time format defined
+228	   in Appendix A of [RFC3339] without the "T" separator, without the
+229	   time offset and with the addition of the milliseconds "mss".  The
+230	   date and times represented are in Coordinated Universal Time (UTC).
+
+232	   Date and times are usually not precise to a particular millisecond.
+233	   To store less accurate dates, parts of the date string are removed
+234	   starting from the right.  For instance, to store only the year, one
+235	   would use "2004".  To store a specific day such as May 1st, 2003, one
+236	   would use "2003-05-01".
+
+238	3.2.2.2.  Number Tags Formatting
+
+240	   TagString fields that require a floating-point number MUST use the
+241	   "." mark instead of the "," mark.  Only ASCII numbers "0" to "9" and
+242	   the "." character MUST be used.  The "." separator represents the
+243	   boundary between the integer value and the decimal parts.  If the
+244	   string doesn't contain the "." separator, the value is an integer
+245	   value.  Digit grouping delimiters MUST NOT be used.
+
+247	   To display it differently for another locale, applications MUST
+248	   support auto replacement on display.
+
+250	   In legacy media containers, it is possible that the "," character
+251	   might have been used as a separator or that digit grouping delimiters
+252	   might have been used.  A Matroska Reader SHOULD consider the
+253	   following character handling to parse such legacy formats:
+
+255	   *  if multiple instances of the same non-number character are found,
+256	      they are be ignored,
+257	   *  if only one "." character is found and no other non-number
+258	      character is found, the "." is the integer-decimal separator,
+259	   *  if only one "," character is found and no other non-number
+260	      character is found, the "," is a digit grouping delimiter,
+261	   *  any other non-number character is ignored.
+
+263	3.2.2.3.  Country Code Tags Formatting
+
+265	   TagString fields that use a Country Code MUST use the Matroska
+266	   countries form defined in Section 13 of [RFC9559], i.e. [RFC5646]
+267	   two-letter region subtags, without the UK exception.
+
+269	3.3.  Target Types
+
+271	   The TargetTypeValue element allows tagging of different parts that
+272	   are inside or outside a given file.  For example, in an audio file
+273	   with one song you could have information about the album it comes
+274	   from the CD set even if it's not found in the file.
+
+276	   For applications to know the kind of information (e.g., "TITLE")
+277	   relates to a certain level (CD title or track title), we also need a
+278	   set of official TargetTypeValue values and TargetType names.  That
+279	   also means the same tag name can have different meanings depending on
+280	   its TargetTypeValue, otherwise we would end up with 7 "TITLE_" tag
+281	   names.
+
+283	   For human readability a TargetType string can be added next to the
+284	   corresponding TargetTypeValue.  Audio and video have different
+285	   TargetType values.  The following table summarizes the TargetType
+286	   values found in Section 5.1.8.1.1.2 of [RFC9559] for audio and video
+287	   content:
+
+289	   +=================+=================+===============================+
+290	   | TargetTypeValue | Audio           | Comment                       |
+291	   |                 | TargetType      |                               |
+292	   +=================+=================+===============================+
+293	   | 70              | COLLECTION      | the high hierarchy consisting |
+294	   |                 |                 | of many different lower items |
+295	   +-----------------+-----------------+-------------------------------+
+296	   | 60              | EDITION /       | a list of lower levels        |
+297	   |                 | ISSUE /         | grouped together              |
+298	   |                 | VOLUME / OPUS   |                               |
+299	   +-----------------+-----------------+-------------------------------+
+300	   | 50              | ALBUM / OPERA   | the most common grouping      |
+301	   |                 | / CONCERT       | level of music (e.g., an      |
+302	   |                 |                 | album)                        |
+303	   +-----------------+-----------------+-------------------------------+
+304	   | 40              | PART /          | when an album has different   |
+305	   |                 | SESSION         | logical parts                 |
+306	   +-----------------+-----------------+-------------------------------+
+307	   | 30              | TRACK / SONG    | the common parts of an album  |
+308	   +-----------------+-----------------+-------------------------------+
+309	   | 20              | SUBTRACK /      | corresponds to parts of a     |
+310	   |                 | PART /          | track for audio (e.g., a      |
+311	   |                 | MOVEMENT        | movement)                     |
+312	   +-----------------+-----------------+-------------------------------+
+313	   | 10              | -               | the lowest hierarchy found in |
+314	   |                 |                 | music                         |
+315	   +-----------------+-----------------+-------------------------------+
+
+317	         Table 1: TargetTypeValue Values Audio Semantic Description
+
+319	   +=================+=================+===============================+
+320	   | TargetTypeValue | Video           | Comment                       |
+321	   |                 | TargetType      |                               |
+322	   +=================+=================+===============================+
+323	   | 70              | COLLECTION      | the high hierarchy consisting |
+324	   |                 |                 | of many different lower items |
+325	   +-----------------+-----------------+-------------------------------+
+326	   | 60              | SEASON /        | a list of lower levels        |
+327	   |                 | SEQUEL /        | grouped together              |
+328	   |                 | VOLUME          |                               |
+329	   +-----------------+-----------------+-------------------------------+
+330	   | 50              | MOVIE /         | the most common grouping      |
+331	   |                 | EPISODE /       | level of video (e.g., an      |
+332	   |                 | CONCERT         | episode for TV series)        |
+333	   +-----------------+-----------------+-------------------------------+
+334	   | 40              | PART /          | when an episode has different |
+335	   |                 | SESSION         | logical parts                 |
+336	   +-----------------+-----------------+-------------------------------+
+337	   | 30              | CHAPTER         | the common parts of a movie   |
+338	   |                 |                 | or episode                    |
+339	   +-----------------+-----------------+-------------------------------+
+340	   | 20              | SCENE           | a sequence of continuous      |
+341	   |                 |                 | action in a film or video     |
+342	   +-----------------+-----------------+-------------------------------+
+343	   | 10              | SHOT            | the lowest hierarchy found in |
+344	   |                 |                 | movies                        |
+345	   +-----------------+-----------------+-------------------------------+
+
+347	         Table 2: TargetTypeValue Values Video Semantic Description
+
+349	   Tags from a TargetTypeValue apply to the all lower TargetTypeValues.
+350	   This means that if a CD has the same artist for all tracks, you just
+351	   need to set the "ARTIST" tag at TargetTypeValue 50 (ALBUM) and not to
+352	   each TargetTypeValue 30 (TRACK), but you can also repeat the value
+353	   for each track.  If some tracks of that CD have no known "ARTIST",
+354	   the value MUST be set to nothing, a void string "" as detailed in
+355	   Section 24.2 of [RFC9559], so that the album "ARTIST" doesn't apply.
+
+357	   If a tag with a given TagName is found at a TargetTypeValue, only
+358	   values of that TagName are valid at that TargetTypeValue level.  In
+359	   other words, the TagName values from upper TargetTypeValue levels
+360	   don't apply at that level.
+
+362	   Multiple SimpleTag with the same TagName can be used at a given
+363	   TargetTypeValue level when each SimpleTag contain a TagString.  For
+364	   example this can be useful to find a single "ARTIST" even when they
+365	   are found in a collaboration.  The concatenation of each TagString
+366	   represents the value for the TagName at this level.  The
+367	   presentation, for instance with a separator, is up to the
+368	   application.
+
+370	3.3.1.  Target Types Parts
+
+372	   There are three organizational tags defined in Section 4.2:
+
+374	   *  TOTAL_PARTS
+
+376	   *  PART_NUMBER
+
+378	   *  PART_OFFSET
+
+380	   These tags allow specifying the ordering of some tags within another
+381	   group of tags.
+
+383	   For example if you have an album with 10 tracks and you want to tag
+384	   the second track from it.  You set "TOTAL_PARTS" to "10" at
+385	   TargetTypeValue 50 (ALBUM).  It means the "ALBUM" contains 10 lower
+386	   parts.  The lower part in question is the first lower TargetTypeValue
+387	   that is specified in the file.  So, if it's TargetTypeValue = 30
+388	   (TRACK), then that means the album contains 10 tracks.  If
+389	   TargetTypeValue is 20 (MOVEMENT), that means the album contains 10
+390	   movements, etc.  And since it's the second track within the album,
+391	   the "PART_NUMBER" at TargetTypeValue 30 (TRACK) is set to "2".
+
+393	   If the parts are split into multiple logical entities, you can also
+394	   use "PART_OFFSET".  For example you are tagging the third track of
+395	   the second CD of a double CD album with a total of 10 tracks the
+396	   "TOTAL_PARTS" at TargetTypeValue 50 (ALBUM) is "10", the
+397	   "PART_NUMBER" at TargetTypeValue 30 (TRACK) is "3", and the the
+398	   "PART_OFFSET" at TargetTypeValue 30 (TRACK) is "5", which is the
+399	   number of tracks on the first CD.
+
+401	   When a TargetTypeValue level doesn't exist it MUST NOT be specified
+402	   in the files, so that the "TOTAL_PARTS" and "PART_NUMBER" elements
+403	   match the same levels.
+
+405	   Here is an example of an audio record with 2 tracks in a single file,
+406	   corresponding to [DaFunk].  There is one Tag element for the record,
+407	   and one Tag element per track on the record.  Each track is
+408	   identified by a chapter.
+
+410	   The Tag for the record:
+
+412	   *  Targets
+
+414	      -  TargetTypeValue = 50
+
+416	   *  ARTIST = "Daft Punk"
+
+418	   *  TITLE = "Da Funk"
+
+420	   *  TOTAL_PARTS = "2"
+
+422	   The Tag for the first track:
+
+424	   *  Targets
+
+426	      -  TargetTypeValue = 30
+
+428	      -  TagChapterUID = 12345
+
+430	   *  TITLE = "Da Funk"
+
+432	   *  PART_NUMBER = "1"
+
+434	   The Tag for the second track:
+
+436	   *  Targets
+
+438	      -  TargetTypeValue = 30
+
+440	      -  TagChapterUID = 67890
+
+442	   *  TITLE = "Rollin' & Scratchin'"
+
+444	   *  PART_NUMBER = "2"
+
+446	   This corresponds to this layout of EBML elements:
+
+448	   <Tags>
+449	     <!-- description of the whole file/record -->
+450	     <Tag>
+451	       <Targets>
+452	         <TargetTypeValue>50</TargetTypeValue>
+453	       </Targets>
+
+455	       <SimpleTag>
+456	         <TagName>ARTIST</TagName>
+457	         <TagString>Daft Punk</TagString>
+
+459	       </SimpleTag>
+
+461	       <SimpleTag>
+462	         <TagName>TITLE</TagName>
+463	         <TagString>Da Funk</TagString>
+464	       </SimpleTag>
+
+466	       <SimpleTag>
+467	         <TagName>TOTAL_PARTS</TagName>
+468	         <TagString>2</TagString>
+469	       </SimpleTag>
+470	     </Tag>
+
+472	     <!-- description of the first track/chapter -->
+473	     <Tag>
+474	       <Targets>
+475	         <TargetTypeValue>30</TargetTypeValue>
+476	         <TagChapterUID>12345</TagChapterUID>
+477	       </Targets>
+
+479	       <SimpleTag>
+480	         <TagName>TITLE</TagName>
+481	         <TagString>Da Funk</TagString>
+482	       </SimpleTag>
+
+484	       <SimpleTag>
+485	         <TagName>PART_NUMBER</TagName>
+486	         <TagString>1</TagString>
+487	       </SimpleTag>
+488	     </Tag>
+
+490	     <!-- description of the second track/chapter -->
+491	     <Tag>
+492	       <Targets>
+493	         <TargetTypeValue>30</TargetTypeValue>
+494	         <TagChapterUID>67890</TagChapterUID>
+495	       </Targets>
+
+497	       <SimpleTag>
+498	         <TagName>TITLE</TagName>
+499	         <TagString>Rollin' & Scratchin'</TagString>
+500	       </SimpleTag>
+
+502	       <SimpleTag>
+503	         <TagName>PART_NUMBER</TagName>
+504	         <TagString>2</TagString>
+505	       </SimpleTag>
+506	     </Tag>
+
+508	   </Tags>
+
+510	   Here is an example using the "PART_OFFSET" tag.  It corresponds to a
+511	   file that contains the third track on the second CD of the 2-CD album
+512	   "The Orb's Adventures Beyond The Ultraworld" [OrbUltraworld]:
+
+514	   The Tag for the album:
+
+516	   *  Targets
+
+518	      -  TargetTypeValue = 50
+
+520	   *  ARTIST = "Orb"
+
+522	      -  SORT_WITH = "Orb, The"
+
+524	   *  TITLE = "The Orb's Adventures Beyond The Ultraworld"
+
+526	   *  TOTAL_PARTS = "10"
+
+528	   The Tag for the third track of the second CD:
+
+530	   *  Targets
+
+532	      -  TargetTypeValue = 30
+
+534	   *  TITLE = "Outlands"
+
+536	   *  PART_NUMBER = "3"
+
+538	   *  PART_OFFSET = "5"
+
+540	   This corresponds to this layout of EBML elements:
+
+542	   <Tags>
+543	    <!-- description of the whole album -->
+544	    <Tag>
+545	     <Targets>
+546	      <TargetTypeValue>50</TargetTypeValue>
+547	     </Targets>
+
+549	     <SimpleTag>
+550	      <TagName>ARTIST</TagName>
+551	      <TagString>Orb</TagString>
+
+553	      <SimpleTag>
+554	       <TagName>SORT_WITH</TagName>
+555	       <TagString>Orb, The</TagString>
+
+557	      </SimpleTag>
+558	     </SimpleTag>
+
+560	     <SimpleTag>
+561	      <TagName>TITLE</TagName>
+562	      <TagString>The Orb's Adventures Beyond The Ultraworld</TagString>
+563	     </SimpleTag>
+
+565	     <!-- the number of sub elements in this album (10 tracks) -->
+566	     <SimpleTag>
+567	      <TagName>TOTAL_PARTS</TagName>
+568	      <TagString>10</TagString>
+569	     </SimpleTag>
+570	    </Tag>
+
+572	    <!-- description of the third track of the second CD -->
+573	    <Tag>
+574	     <Targets>
+575	      <TargetTypeValue>30</TargetTypeValue>
+576	     </Targets>
+
+578	     <SimpleTag>
+579	      <TagName>TITLE</TagName>
+580	      <TagString>Outlands</TagString>
+581	     </SimpleTag>
+
+583	     <!-- This is the third track of the second CD -->
+584	     <SimpleTag>
+585	      <TagName>PART_NUMBER</TagName>
+586	      <TagString>3</TagString>
+587	     </SimpleTag>
+
+589	     <!-- The first CD contains 5 tracks -->
+590	     <SimpleTag>
+591	      <TagName>PART_OFFSET</TagName>
+592	      <TagString>5</TagString>
+593	     </SimpleTag>
+594	    </Tag>
+595	   </Tags>
+
+597	3.4.  Multiple Targets UID
+
+599	   A Tag element has a single Targets element with a single
+600	   TargetTypeValue element.  But the Targets element can contain various
+601	   TagTrackUID, TagEditionUID, TagChapterUID and TagAttachmentUID
+602	   elements.
+
+604	   When multiple values are found using the same Tag UID element (e.g.,
+605	   TagTrackUID) a logical OR is applied on these elements.  In other
+606	   words the tags apply to each entity defined by a UID.  This is the
+607	   list of UIDs the tags apply to (e.g., list of TagTrackUID).  Such a
+608	   list may contain a single UID element.
+
+610	   When different lists of Tag UID elements are found (e.g., a list of
+611	   TagTrackUID and a list of TagChapterUID) a logical AND is applied
+612	   between those lists.  In other words the tags apply only to the
+613	   entities matching a UID in each list of Tag UID elements.
+
+615	   These operations allow factorizing tags that would otherwise need to
+616	   be repeated multiple times.
+
+618	   Here is an example of a Tag applying to 2 chapters, using the same
+619	   [DaFunk] example as in Section 3.3.1:
+
+621	   *  Targets
+
+623	      -  TargetTypeValue = 30
+
+625	      -  TagChapterUID = 12345
+
+627	      -  TagChapterUID = 67890
+
+629	   *  WRITTEN_BY = "Thomas Bangalter"
+
+631	   *  WRITTEN_BY = "Guy-Manuel de Homem-Christo"
+
+633	   *  PRODUCER = "Thomas Bangalter"
+
+635	   *  PRODUCER = "Guy-Manuel de Homem-Christo"
+
+637	   This corresponds to this layout of EBML elements:
+
+639	   <Tags>
+640	     <Tag>
+641	       <Targets>
+642	         <TargetTypeValue>30</TargetTypeValue>
+
+644	         <!-- chapter with Da Funk -->
+645	         <TagChapterUID>12345</TagChapterUID>
+
+647	         <!-- chapter with Rollin' & Scratchin' -->
+648	         <TagChapterUID>67890</TagChapterUID>
+649	       </Targets>
+
+651	       <!-- first writer of Da Funk and Rollin' & Scratchin' -->
+652	       <SimpleTag>
+653	         <TagName>WRITTEN_BY</TagName>
+654	         <TagString>Thomas Bangalter</TagString>
+655	       </SimpleTag>
+
+657	       <!-- second writer of Da Funk and Rollin' & Scratchin' -->
+658	       <SimpleTag>
+659	         <TagName>WRITTEN_BY</TagName>
+660	         <TagString>Guy-Manuel de Homem-Christo</TagString>
+661	       </SimpleTag>
+
+663	       <!-- first producer of Da Funk and Rollin' & Scratchin' -->
+664	       <SimpleTag>
+665	         <TagName>PRODUCER</TagName>
+666	         <TagString>Thomas Bangalter</TagString>
+667	       </SimpleTag>
+
+669	       <!-- second producer of Da Funk and Rollin' & Scratchin' -->
+670	       <SimpleTag>
+671	         <TagName>PRODUCER</TagName>
+672	         <TagString>Guy-Manuel de Homem-Christo</TagString>
+673	       </SimpleTag>
+674	     </Tag>
+675	   </Tags>
+
+677	   Some combinations of different Tag UID elements are not possible.
+
+679	   A TagChapterUID and TagAttachmentUID can't be mixed because there is
+680	   no overlap with a Chapter and an Attachment that would make sense.
+681	   An attachment applies to the whole segment and can be tied to tracks,
+682	   via \Segment\Tracks\TrackEntry\AttachmentLink as defined in
+683	   Section 5.1.4.1.24 of [RFC9559], but not chapters.
+
+685	   Mixing TagEditionUID and TagChapterUID elements is also not useful
+686	   because each Chapter UID would need to be in one of the Chapter
+687	   Edition UID.  That would be the same as not using the list of
+688	   TagEditionUID at all.
+
+690	   The following table shows the allowed combinations between lists of
+691	   Tag UID elements:
+
+693	   +============+================+=========+=========+================+
+694	   | UID        | Track          | Edition | Chapter | Attachment     |
+695	   | elements   |                |         |         |                |
+696	   +============+================+=========+=========+================+
+697	   | Track      | YES            | YES     | YES     | with matching  |
+698	   |            |                |         |         | AttachmentLink |
+699	   +------------+----------------+---------+---------+----------------+
+700	   | Edition    | YES            | YES     | NO      | YES            |
+701	   +------------+----------------+---------+---------+----------------+
+702	   | Chapter    | YES            | NO      | YES     | NO             |
+703	   +------------+----------------+---------+---------+----------------+
+704	   | Attachment | with matching  | YES     | NO      | YES            |
+705	   |            | AttachmentLink |         |         |                |
+706	   +------------+----------------+---------+---------+----------------+
+
+708	              Table 3: Tag UID elements allowed combinations
+
+710	   Here is an example of a Tag applying to a single track and a single
+711	   chapter.  It represents the composer of the music in a part of a
+712	   movie.  The file may contain a second audio track with audio
+713	   commentary not including that music, so we only tag the track with
+714	   the music.
+
+716	   *  Targets
+
+718	      -  TargetTypeValue = 30
+
+720	      -  TagTrackUID = 123
+
+722	      -  TagChapterUID = 987654321
+
+724	   *  COMPOSER = "Hans Zimmer"
+
+726	   This corresponds to this layout of EBML elements:
+
+728	   <Tags>
+729	     <Tag>
+730	       <Targets>
+731	         <TargetTypeValue>30</TargetTypeValue>
+
+733	         <!-- chapter with the music -->
+734	         <TagTrackUID>123</TagTrackUID>
+
+736	         <!-- track with the music -->
+737	         <TagChapterUID>67890</TagChapterUID>
+738	       </Targets>
+
+740	       <!-- composer of the music in that chapter for that track -->
+741	       <SimpleTag>
+742	         <TagName>COMPOSER</TagName>
+743	         <TagString>Hans Zimmer</TagString>
+744	       </SimpleTag>
+
+746	     </Tag>
+747	   </Tags>
+
+749	4.  Official Tags
+
+751	   The following is a complete list of the supported Matroska Tags.  As
+752	   stated in Section 3.1 it is better to use official tags as much as
+753	   possible, otherwise compatibility will be compromised.  If you find
+754	   that there is a Tag missing that you would like to use, then please
+755	   contact the persons mentioned in the IANA Matroska Tags Registry for
+756	   its inclusion; see Section 6.1.
+
+758	4.1.  Nesting Information
+
+760	   Nesting Information tags are tags that usually contain any other
+761	   tags.
+
+763	      +==========+========+=========================================+
+764	      | Tag Name | Type   | Description                             |
+765	      +==========+========+=========================================+
+766	      | ORIGINAL | nested | A special tag that is meant to have     |
+767	      |          |        | other tags inside (using nested tags)   |
+768	      |          |        | to describe the original work of art    |
+769	      |          |        | that this item is based on.             |
+770	      +----------+--------+-----------------------------------------+
+771	      | SAMPLE   | nested | A tag that contains other tags to       |
+772	      |          |        | describe a sample used in the targeted  |
+773	      |          |        | item originally found in another work   |
+774	      |          |        | of art.                                 |
+775	      +----------+--------+-----------------------------------------+
+776	      | COUNTRY  | UTF-8  | The name of the country that is meant   |
+777	      |          |        | to have other tags inside (using nested |
+778	      |          |        | tags) to country specific information   |
+779	      |          |        | about the item, using the Country Code  |
+780	      |          |        | format defined in Section 3.2.2.3.      |
+781	      +----------+--------+-----------------------------------------+
+
+783	                     Table 4: Nesting Information tags
+
+785	4.2.  Organization Information
+
+787	   All tags in this section express hierarchy defined in Section 3.3.1.
+
+789	   +=============+=======+=============================================+
+790	   | Tag Name    | Type  | Description                                 |
+791	   +=============+=======+=============================================+
+792	   | TOTAL_PARTS | UTF-8 | Total number of parts defined at the first  |
+793	   |             |       | lower level. (e.g., if TargetTypeValue is   |
+794	   |             |       | "50" (TargetType = "ALBUM"), the total      |
+795	   |             |       | number of tracks of an audio CD).           |
+796	   +-------------+-------+---------------------------------------------+
+797	   | PART_NUMBER | UTF-8 | Index of the current part relative to       |
+798	   |             |       | parts of the same level, starting at 1.     |
+799	   |             |       | (e.g., if TargetTypeValue is "30"           |
+800	   |             |       | (TargetType = "TRACK"), the track number    |
+801	   |             |       | of an audio CD).                            |
+802	   +-------------+-------+---------------------------------------------+
+803	   | PART_OFFSET | UTF-8 | A number to add to "PART_NUMBER", when the  |
+804	   |             |       | parts at that level don't start at 1        |
+805	   |             |       | (e.g., if TargetTypeValue is "30"           |
+806	   |             |       | (TargetType = "TRACK"), the track number    |
+807	   |             |       | of the second audio CD).                    |
+808	   +-------------+-------+---------------------------------------------+
+
+810	                   Table 5: Organization Information tags
+
+812	4.3.  Titles
+
+814	       +==========+=======+=======================================+
+815	       | Tag Name | Type  | Description                           |
+816	       +==========+=======+=======================================+
+817	       | TITLE    | UTF-8 | The title of this item.  For example, |
+818	       |          |       | for music you might label this "Canon |
+819	       |          |       | in D", or for video's audio track you |
+820	       |          |       | might use "English 5.1" This is akin  |
+821	       |          |       | to the "TIT2" tag in [ID3v2.3] when   |
+822	       |          |       | the TargetTypeValue is 30 (TRACK).    |
+823	       +----------+-------+---------------------------------------+
+824	       | SUBTITLE | UTF-8 | Sub Title of the entity.  This is     |
+825	       |          |       | akin to the "TIT3" tag in [ID3v2.3]   |
+826	       |          |       | when the TargetTypeValue is 30        |
+827	       |          |       | (TRACK).                              |
+828	       +----------+-------+---------------------------------------+
+
+830	                           Table 6: Titles tags
+
+832	4.4.  Nested Information
+
+834	   Nested Information tags are tags providing information about their
+835	   parent tags.
+
+837	   +=============+=======+============================================+
+838	   | Tag Name    | Type  | Description                                |
+839	   +=============+=======+============================================+
+840	   | URL         | UTF-8 | URL corresponding to the tag it is         |
+841	   |             |       | included in, using the format defined in   |
+842	   |             |       | [RFC3986].                                 |
+843	   +-------------+-------+--------------------------------------------+
+844	   | SORT_WITH   | UTF-8 | A child SimpleTag element to indicate what |
+845	   |             |       | alternative value the parent SimpleTag     |
+846	   |             |       | element can have to be sorted -- for       |
+847	   |             |       | example, "Pet Shop Boys" instead of "The   |
+848	   |             |       | Pet Shop Boys".  Or "Marley Bob" and       |
+849	   |             |       | "Marley Robert Nesta" (no comma needed).   |
+850	   +-------------+-------+--------------------------------------------+
+851	   | INSTRUMENTS | UTF-8 | The instruments that are being used/       |
+852	   |             |       | played, separated by a comma.  It MUST be  |
+853	   |             |       | a child of another tag, including the      |
+854	   |             |       | following: "ARTIST", "LEAD_PERFORMER", or  |
+855	   |             |       | "ACCOMPANIMENT".                           |
+856	   +-------------+-------+--------------------------------------------+
+857	   | EMAIL       | UTF-8 | Email corresponding to the tag it is       |
+858	   |             |       | included in, using the "Addr-Spec" format  |
+859	   |             |       | defined in Section 3.4.1 of [RFC5322].     |
+860	   +-------------+-------+--------------------------------------------+
+861	   | ADDRESS     | UTF-8 | The physical address of the entity.  The   |
+862	   |             |       | address MAY include a country code.  If a  |
+863	   |             |       | country code is included, it is            |
+864	   |             |       | RECOMMENDED to use the Country Code format |
+865	   |             |       | defined in Section 3.2.2.3.  It can be     |
+866	   |             |       | useful for a recording label.              |
+867	   +-------------+-------+--------------------------------------------+
+868	   | FAX         | UTF-8 | The fax number corresponding to the tag it |
+869	   |             |       | is included in.  It can be useful for a    |
+870	   |             |       | recording label.                           |
+871	   +-------------+-------+--------------------------------------------+
+872	   | PHONE       | UTF-8 | The phone number corresponding to the tag  |
+873	   |             |       | it is included in.  It can be useful for a |
+874	   |             |       | recording label.                           |
+875	   +-------------+-------+--------------------------------------------+
+
+877	                     Table 7: Nested Information tags
+
+879	4.5.  Entities
+
+881	    +=========================+=======+===============================+
+882	    | Tag Name                | Type  | Description                   |
+883	    +=========================+=======+===============================+
+884	    | ARTIST                  | UTF-8 | A person or band/collective   |
+885	    |                         |       | generally considered          |
+886	    |                         |       | responsible for the work.     |
+887	    |                         |       | This is akin to the "TPE1"    |
+888	    |                         |       | tag in [ID3v2.3] when the     |
+889	    |                         |       | TargetTypeValue is 30         |
+890	    |                         |       | (TRACK).                      |
+891	    +-------------------------+-------+-------------------------------+
+892	    | LEAD_PERFORMER          | UTF-8 | Lead Performer/Soloist(s).    |
+893	    |                         |       | This can sometimes be the     |
+894	    |                         |       | same as "ARTIST".  This is    |
+895	    |                         |       | akin to the "TPE1" tag in     |
+896	    |                         |       | [ID3v2.3] when the            |
+897	    |                         |       | TargetTypeValue is 30         |
+898	    |                         |       | (TRACK).                      |
+899	    +-------------------------+-------+-------------------------------+
+900	    | ACCOMPANIMENT           | UTF-8 | Band/orchestra/accompaniment/ |
+901	    |                         |       | musician.  This is akin to    |
+902	    |                         |       | the "TPE2" tag in [ID3v2.3]   |
+903	    |                         |       | when the TargetTypeValue is   |
+904	    |                         |       | 30 (TRACK).                   |
+905	    +-------------------------+-------+-------------------------------+
+906	    | COMPOSER                | UTF-8 | The name of one composer of   |
+907	    |                         |       | this item.  This is akin to   |
+908	    |                         |       | the "TCOM" tag in [ID3v2.3]   |
+909	    |                         |       | when the TargetTypeValue is   |
+910	    |                         |       | 30 (TRACK).                   |
+911	    +-------------------------+-------+-------------------------------+
+912	    | ARRANGER                | UTF-8 | The name of a person who      |
+913	    |                         |       | arranged the piece (e.g.,     |
+914	    |                         |       | Ravel).                       |
+915	    +-------------------------+-------+-------------------------------+
+916	    | LYRICS                  | UTF-8 | The lyrics corresponding to a |
+917	    |                         |       | song, in case audio           |
+918	    |                         |       | synchronization is not known  |
+919	    |                         |       | or as a duplicate of a        |
+920	    |                         |       | subtitle track.  Editing this |
+921	    |                         |       | value, when it is a duplicate |
+922	    |                         |       | of a subtitle track, SHOULD   |
+923	    |                         |       | also result in editing the    |
+924	    |                         |       | subtitle track for more       |
+925	    |                         |       | consistency, and vice versa.  |
+926	    +-------------------------+-------+-------------------------------+
+927	    | LYRICIST                | UTF-8 | The name of a person who      |
+928	    |                         |       | wrote the lyrics for a        |
+929	    |                         |       | musical item.  This is akin   |
+930	    |                         |       | to the "TEXT" tag in          |
+931	    |                         |       | [ID3v2.3] when the            |
+932	    |                         |       | TargetTypeValue is 30         |
+933	    |                         |       | (TRACK).                      |
+934	    +-------------------------+-------+-------------------------------+
+935	    | CONDUCTOR               | UTF-8 | Conductor/performer           |
+936	    |                         |       | refinement.  This is akin to  |
+937	    |                         |       | the "TPE3" tag in [ID3v2.3]   |
+938	    |                         |       | when the TargetTypeValue is   |
+939	    |                         |       | 30 (TRACK).                   |
+940	    +-------------------------+-------+-------------------------------+
+941	    | DIRECTOR                | UTF-8 | The name of a director of a   |
+942	    |                         |       | movie.  This is akin to the   |
+943	    |                         |       | "IART" tag [RIFF.tags].       |
+944	    +-------------------------+-------+-------------------------------+
+945	    | ASSISTANT_DIRECTOR      | UTF-8 | The name of the assistant     |
+946	    |                         |       | director.                     |
+947	    +-------------------------+-------+-------------------------------+
+948	    | DIRECTOR_OF_PHOTOGRAPHY | UTF-8 | The name of the director of   |
+949	    |                         |       | photography, also known as    |
+950	    |                         |       | cinematographer.  This is     |
+951	    |                         |       | akin to the "ICNM" tag in     |
+952	    |                         |       | [RIFF.tags].                  |
+953	    +-------------------------+-------+-------------------------------+
+954	    | SOUND_ENGINEER          | UTF-8 | The name of the sound         |
+955	    |                         |       | engineer or sound recordist.  |
+956	    +-------------------------+-------+-------------------------------+
+957	    | ART_DIRECTOR            | UTF-8 | The person who oversees the   |
+958	    |                         |       | artists and craftspeople who  |
+959	    |                         |       | build the sets.               |
+960	    +-------------------------+-------+-------------------------------+
+961	    | PRODUCTION_DESIGNER     | UTF-8 | Artist responsible for        |
+962	    |                         |       | designing the overall visual  |
+963	    |                         |       | appearance of a movie.        |
+964	    +-------------------------+-------+-------------------------------+
+965	    | CHOREGRAPHER            | UTF-8 | The name of the choregrapher  |
+966	    +-------------------------+-------+-------------------------------+
+967	    | COSTUME_DESIGNER        | UTF-8 | The name of the costume       |
+968	    |                         |       | designer                      |
+969	    +-------------------------+-------+-------------------------------+
+970	    | ACTOR                   | UTF-8 | An actor or actress playing a |
+971	    |                         |       | role in this movie.  This is  |
+972	    |                         |       | the person's real name, not   |
+973	    |                         |       | the character's name the      |
+974	    |                         |       | person is playing.            |
+975	    +-------------------------+-------+-------------------------------+
+976	    | CHARACTER               | UTF-8 | The name of the character an  |
+977	    |                         |       | actor or actress plays in     |
+978	    |                         |       | this movie.  This SHOULD be a |
+979	    |                         |       | sub-tag of an ACTOR tag in    |
+980	    |                         |       | order to not cause            |
+981	    |                         |       | ambiguities.                  |
+982	    +-------------------------+-------+-------------------------------+
+983	    | WRITTEN_BY              | UTF-8 | The author of the story or    |
+984	    |                         |       | script (used for movies and   |
+985	    |                         |       | TV shows).                    |
+986	    +-------------------------+-------+-------------------------------+
+987	    | SCREENPLAY_BY           | UTF-8 | The author of the screenplay  |
+988	    |                         |       | or scenario (used for movies  |
+989	    |                         |       | and TV shows).                |
+990	    +-------------------------+-------+-------------------------------+
+991	    | EDITED_BY               | UTF-8 | The name of a film editor for |
+992	    |                         |       | a movie.  This is akin to the |
+993	    |                         |       | "IEDT" tag in [RIFF.tags].    |
+994	    +-------------------------+-------+-------------------------------+
+995	    | PRODUCER                | UTF-8 | The name of a producer for a  |
+996	    |                         |       | song/movie.  This is akin to  |
+997	    |                         |       | the "IPRO" tag in             |
+998	    |                         |       | [RIFF.tags].                  |
+999	    +-------------------------+-------+-------------------------------+
+1000	    | COPRODUCER              | UTF-8 | The name of a co-producer.    |
+1001	    +-------------------------+-------+-------------------------------+
+1002	    | EXECUTIVE_PRODUCER      | UTF-8 | The name of an executive      |
+1003	    |                         |       | producer.                     |
+1004	    +-------------------------+-------+-------------------------------+
+1005	    | DISTRIBUTED_BY          | UTF-8 | The name of a company         |
+1006	    |                         |       | distributing the content.     |
+1007	    |                         |       | This is akin to the "IDST"    |
+1008	    |                         |       | tag in [RIFF.tags].           |
+1009	    +-------------------------+-------+-------------------------------+
+1010	    | MASTERED_BY             | UTF-8 | The engineer who mastered the |
+1011	    |                         |       | content for a physical medium |
+1012	    |                         |       | or for digital distribution.  |
+1013	    +-------------------------+-------+-------------------------------+
+1014	    | ENCODED_BY              | UTF-8 | This is akin to the "TENC"    |
+1015	    |                         |       | tag in [ID3v2.3].             |
+1016	    +-------------------------+-------+-------------------------------+
+1017	    | MIXED_BY                | UTF-8 | DJ mix by the artist          |
+1018	    |                         |       | specified                     |
+1019	    +-------------------------+-------+-------------------------------+
+1020	    | REMIXED_BY              | UTF-8 | Interpreted, remixed, or      |
+1021	    |                         |       | otherwise modified by.  This  |
+1022	    |                         |       | is akin to the "TPE4" tag in  |
+1023	    |                         |       | [ID3v2.3] when the            |
+1024	    |                         |       | TargetTypeValue is 30         |
+1025	    |                         |       | (TRACK).                      |
+1026	    +-------------------------+-------+-------------------------------+
+1027	    | PRODUCTION_STUDIO       | UTF-8 | The name of a physical studio |
+1028	    |                         |       | where the content was         |
+1029	    |                         |       | recorded.  This is akin to    |
+1030	    |                         |       | the "ISTD" tag in             |
+1031	    |                         |       | [RIFF.tags].                  |
+1032	    +-------------------------+-------+-------------------------------+
+1033	    | THANKS_TO               | UTF-8 | A very general tag for        |
+1034	    |                         |       | everyone else that wants to   |
+1035	    |                         |       | be listed.                    |
+1036	    +-------------------------+-------+-------------------------------+
+1037	    | PUBLISHER               | UTF-8 | This is akin to the "TPUB"    |
+1038	    |                         |       | tag in [ID3v2.3] when the     |
+1039	    |                         |       | TargetTypeValue is 30         |
+1040	    |                         |       | (TRACK).                      |
+1041	    +-------------------------+-------+-------------------------------+
+1042	    | LABEL                   | UTF-8 | The record label or imprint   |
+1043	    |                         |       | on the disc.                  |
+1044	    +-------------------------+-------+-------------------------------+
+
+1046	                           Table 8: Entities tags
+
+1048	4.6.  Search and Classification
+
+1050	   +=====================+=======+=====================================+
+1051	   | Tag Name            | Type  | Description                         |
+1052	   +=====================+=======+=====================================+
+1053	   | GENRE               | UTF-8 | The main genre (classical,          |
+1054	   |                     |       | ambient-house, synthpop, sci-       |
+1055	   |                     |       | fi, drama, etc.).  The format       |
+1056	   |                     |       | follows the "TCON" tag in           |
+1057	   |                     |       | [ID3v2.3] when the                  |
+1058	   |                     |       | TargetTypeValue is 30 (TRACK).      |
+1059	   +---------------------+-------+-------------------------------------+
+1060	   | MOOD                | UTF-8 | Intended to reflect the mood of     |
+1061	   |                     |       | the item with a few keywords        |
+1062	   |                     |       | (e.g., "Romantic", "Sad" or         |
+1063	   |                     |       | "Uplifting").  The format           |
+1064	   |                     |       | follows that of the "TMOO" tag      |
+1065	   |                     |       | in [ID3v2.4] when the               |
+1066	   |                     |       | TargetTypeValue is 30 (TRACK).      |
+1067	   +---------------------+-------+-------------------------------------+
+1068	   | ORIGINAL_MEDIA_TYPE | UTF-8 | Describes the original type of      |
+1069	   |                     |       | the media, such as, "DVD",          |
+1070	   |                     |       | "CD", "computer image,"             |
+1071	   |                     |       | "drawing," "lithograph," and so     |
+1072	   |                     |       | forth.  This is akin to the         |
+1073	   |                     |       | "TMED" tag in [ID3v2.4].            |
+1074	   +---------------------+-------+-------------------------------------+
+1075	   | CONTENT_TYPE        | UTF-8 | The type of the item (e.g.,         |
+1076	   |                     |       | Documentary, Feature Film,          |
+1077	   |                     |       | Cartoon, Music Video, Music,        |
+1078	   |                     |       | Sound FX).                          |
+1079	   +---------------------+-------+-------------------------------------+
+1080	   | SUBJECT             | UTF-8 | Describes the topic of the          |
+1081	   |                     |       | file, such as "Aerial view of       |
+1082	   |                     |       | Seattle."                           |
+1083	   +---------------------+-------+-------------------------------------+
+1084	   | DESCRIPTION         | UTF-8 | A short description of the          |
+1085	   |                     |       | content, such as "Two birds         |
+1086	   |                     |       | flying."                            |
+1087	   +---------------------+-------+-------------------------------------+
+1088	   | KEYWORDS            | UTF-8 | Keywords to the item separated      |
+1089	   |                     |       | by a comma, used for searching.     |
+1090	   +---------------------+-------+-------------------------------------+
+1091	   | SUMMARY             | UTF-8 | A plot outline or a summary of      |
+1092	   |                     |       | the story.                          |
+1093	   +---------------------+-------+-------------------------------------+
+1094	   | SYNOPSIS            | UTF-8 | A description of the story line     |
+1095	   |                     |       | of the item.                        |
+1096	   +---------------------+-------+-------------------------------------+
+1097	   | INITIAL_KEY         | UTF-8 | The initial key that a musical      |
+1098	   |                     |       | track starts in.  The format is     |
+1099	   |                     |       | identical to "TKEY" tag in          |
+1100	   |                     |       | [ID3v2.3] when the                  |
+1101	   |                     |       | TargetTypeValue is 30 (TRACK).      |
+1102	   +---------------------+-------+-------------------------------------+
+1103	   | PERIOD              | UTF-8 | Describes the period that the       |
+1104	   |                     |       | piece is from or about.  For        |
+1105	   |                     |       | example, "Renaissance".             |
+1106	   +---------------------+-------+-------------------------------------+
+1107	   | LAW_RATING          | UTF-8 | Depending on the "COUNTRY" it       |
+1108	   |                     |       | is the format of the rating of      |
+1109	   |                     |       | a movie (P, R, X in the USA, an     |
+1110	   |                     |       | age in other countries or a URI     |
+1111	   |                     |       | defining a logo).                   |
+1112	   +---------------------+-------+-------------------------------------+
+
+1114	                  Table 9: Search and Classification tags
+
+1116	4.7.  Temporal Information
+
+1118	   All tags in this section use the Date format defined in
+1119	   Section 3.2.2.1.
+
+1121	    +================+=======+========================================+
+1122	    | Tag Name       | Type  | Description                            |
+1123	    +================+=======+========================================+
+1124	    | DATE_RELEASED  | UTF-8 | The time that the item was originally  |
+1125	    |                |       | released.  This is akin to the "TDRL"  |
+1126	    |                |       | tag in [ID3v2.4] when the              |
+1127	    |                |       | TargetTypeValue is 30 (TRACK).         |
+1128	    +----------------+-------+----------------------------------------+
+1129	    | DATE_RECORDED  | UTF-8 | The time that the recording began.     |
+1130	    |                |       | This is akin to the "TDRC" tag in      |
+1131	    |                |       | [ID3v2.4] when the TargetTypeValue is  |
+1132	    |                |       | 30 (TRACK).                            |
+1133	    +----------------+-------+----------------------------------------+
+1134	    | DATE_ENCODED   | UTF-8 | The time that the encoding of this     |
+1135	    |                |       | item was completed began.  This is     |
+1136	    |                |       | akin to the "TDEN" tag in [ID3v2.4]    |
+1137	    |                |       | when the TargetTypeValue is 30         |
+1138	    |                |       | (TRACK).                               |
+1139	    +----------------+-------+----------------------------------------+
+1140	    | DATE_TAGGED    | UTF-8 | The time that the tags were done for   |
+1141	    |                |       | this item.  This is akin to the "TDTG" |
+1142	    |                |       | tag in [ID3v2.4] when the              |
+1143	    |                |       | TargetTypeValue is 30 (TRACK).         |
+1144	    +----------------+-------+----------------------------------------+
+1145	    | DATE_DIGITIZED | UTF-8 | The time that the item was transferred |
+1146	    |                |       | to a digital medium.  This is akin to  |
+1147	    |                |       | the "IDIT" tag in [RIFF.tags].         |
+1148	    +----------------+-------+----------------------------------------+
+1149	    | DATE_WRITTEN   | UTF-8 | The time that the writing of the       |
+1150	    |                |       | music/script began.                    |
+1151	    +----------------+-------+----------------------------------------+
+1152	    | DATE_PURCHASED | UTF-8 | Information on when the file was       |
+1153	    |                |       | purchased; see also Section 4.12 on    |
+1154	    |                |       | purchase tags.                         |
+1155	    +----------------+-------+----------------------------------------+
+1156	    | DATE_STARTED   | UTF-8 | When the information of the parent     |
+1157	    |                |       | SimpleTag element starts being valid.  |
+1158	    |                |       | The information of the parent          |
+1159	    |                |       | SimpleTag element is only valid        |
+1160	    |                |       | between this date and the "DATE_ENDED" |
+1161	    |                |       | date of the same level.  The           |
+1162	    |                |       | "DATE_ENDED" is OPTIONAL.  If empty or |
+1163	    |                |       | omitted the end date is unknown.       |
+1164	    +----------------+-------+----------------------------------------+
+1165	    | DATE_ENDED     | UTF-8 | When the information is not valid      |
+1166	    |                |       | anymore.  The information of the       |
+1167	    |                |       | parent SimpleTag element is only valid |
+1168	    |                |       | between the "DATE_STARTED" date of the |
+1169	    |                |       | same level and this date.  The         |
+1170	    |                |       | "DATE_STARTED" is OPTIONAL.  If empty  |
+1171	    |                |       | or omitted the start date is unknown.  |
+1172	    +----------------+-------+----------------------------------------+
+
+1174	                    Table 10: Temporal Information tags
+
+1176	4.8.  Spatial Information
+
+1178	   +======================+=======+===================================+
+1179	   | Tag Name             | Type  | Description                       |
+1180	   +======================+=======+===================================+
+1181	   | RECORDING_LOCATION   | UTF-8 | The location where the item was   |
+1182	   |                      |       | recorded, using the Country Code  |
+1183	   |                      |       | format defined in                 |
+1184	   |                      |       | Section 3.2.2.3.  This code is    |
+1185	   |                      |       | followed by a comma, then more    |
+1186	   |                      |       | detailed information such as      |
+1187	   |                      |       | state/province, another comma,    |
+1188	   |                      |       | and then city.  For example, "US, |
+1189	   |                      |       | Texas, Austin".  This will allow  |
+1190	   |                      |       | for easy sorting.  It is okay to  |
+1191	   |                      |       | only store the country, or the    |
+1192	   |                      |       | country and the state/province.   |
+1193	   |                      |       | More detailed information can be  |
+1194	   |                      |       | added after the city through the  |
+1195	   |                      |       | use of additional commas.  In     |
+1196	   |                      |       | cases where the province/state is |
+1197	   |                      |       | unknown, but you want to store    |
+1198	   |                      |       | the city, simply leave a space    |
+1199	   |                      |       | between the two commas.  For      |
+1200	   |                      |       | example, "US, , Austin".          |
+1201	   +----------------------+-------+-----------------------------------+
+1202	   | COMPOSITION_LOCATION | UTF-8 | Location that the item was        |
+1203	   |                      |       | originally designed/written,      |
+1204	   |                      |       | using the Country Code format     |
+1205	   |                      |       | defined in Section 3.2.2.3.  This |
+1206	   |                      |       | code is followed by a comma, then |
+1207	   |                      |       | more detailed information such as |
+1208	   |                      |       | state/province, another comma,    |
+1209	   |                      |       | and then city.  For example, "US, |
+1210	   |                      |       | Texas, Austin".  This will allow  |
+1211	   |                      |       | for easy sorting.  It is okay to  |
+1212	   |                      |       | only store the country, or the    |
+1213	   |                      |       | country and the state/province.   |
+1214	   |                      |       | More detailed information can be  |
+1215	   |                      |       | added after the city through the  |
+1216	   |                      |       | use of additional commas.  In     |
+1217	   |                      |       | cases where the province/state is |
+1218	   |                      |       | unknown, but you want to store    |
+1219	   |                      |       | the city, simply leave a space    |
+1220	   |                      |       | between the two commas.  For      |
+1221	   |                      |       | example, "US, , Austin".          |
+1222	   +----------------------+-------+-----------------------------------+
+1223	   | COMPOSER_NATIONALITY | UTF-8 | Nationality of the main composer  |
+1224	   |                      |       | of the item, mostly for classical |
+1225	   |                      |       | music, using the Country Code     |
+1226	   |                      |       | format defined in                 |
+1227	   |                      |       | Section 3.2.2.3.                  |
+1228	   +----------------------+-------+-----------------------------------+
+
+1230	                    Table 11: Spatial Information tags
+
+1232	4.9.  User Information
+
+1234	   All tags in this section are personal to the user of these files.
+
+1236	     +==============+=======+=======================================+
+1237	     | Tag Name     | Type  | Description                           |
+1238	     +==============+=======+=======================================+
+1239	     | COMMENT      | UTF-8 | Any comment related to the content.   |
+1240	     +--------------+-------+---------------------------------------+
+1241	     | PLAY_COUNTER | UTF-8 | The number of time the item has been  |
+1242	     |              |       | played.                               |
+1243	     +--------------+-------+---------------------------------------+
+1244	     | RATING       | UTF-8 | A numeric value defining how much a   |
+1245	     |              |       | person likes the song/movie.  The     |
+1246	     |              |       | number is between 0 and 5 with stored |
+1247	     |              |       | using the Float number defined in     |
+1248	     |              |       | Section 3.2.2.2 (e.g., 2.7), 5(.0)    |
+1249	     |              |       | being the highest possible rating.    |
+1250	     |              |       | Other rating systems with different   |
+1251	     |              |       | ranges will have to be scaled.        |
+1252	     +--------------+-------+---------------------------------------+
+
+1254	                     Table 12: User Information tags
+
+1256	4.10.  Technical Information
+
+1258	   +=================================+========+========================+
+1259	   | Tag Name                        | Type   | Description            |
+1260	   +=================================+========+========================+
+1261	   | ENCODER                         | UTF-8  | The software or        |
+1262	   |                                 |        | hardware used to       |
+1263	   |                                 |        | encode this item.      |
+1264	   |                                 |        | ("LAME" or "XviD")     |
+1265	   +---------------------------------+--------+------------------------+
+1266	   | ENCODER_SETTINGS                | UTF-8  | A list of the          |
+1267	   |                                 |        | settings used for      |
+1268	   |                                 |        | encoding this item.    |
+1269	   |                                 |        | No specific format.    |
+1270	   +---------------------------------+--------+------------------------+
+1271	   | BPS                             | UTF-8  | The average bits per   |
+1272	   |                                 |        | second of the          |
+1273	   |                                 |        | specified item stored  |
+1274	   |                                 |        | using the Float        |
+1275	   |                                 |        | number defined in      |
+1276	   |                                 |        | Section 3.2.2.2.       |
+1277	   |                                 |        | This is only the data  |
+1278	   |                                 |        | in the Block(s), and   |
+1279	   |                                 |        | excludes headers and   |
+1280	   |                                 |        | any container          |
+1281	   |                                 |        | overhead.              |
+1282	   +---------------------------------+--------+------------------------+
+1283	   | FPS                             | UTF-8  | The average frames     |
+1284	   |                                 |        | per second of the      |
+1285	   |                                 |        | specified item.  This  |
+1286	   |                                 |        | is typically the       |
+1287	   |                                 |        | average number of      |
+1288	   |                                 |        | Blocks per second      |
+1289	   |                                 |        | stored using the       |
+1290	   |                                 |        | Float number defined   |
+1291	   |                                 |        | in Section 3.2.2.2.    |
+1292	   |                                 |        | In the event that      |
+1293	   |                                 |        | lacing is used, each   |
+1294	   |                                 |        | laced chunk is to be   |
+1295	   |                                 |        | counted as a separate  |
+1296	   |                                 |        | frame.                 |
+1297	   +---------------------------------+--------+------------------------+
+1298	   | BPM                             | UTF-8  | Average number of      |
+1299	   |                                 |        | beats per minute in    |
+1300	   |                                 |        | the complete target    |
+1301	   |                                 |        | (e.g., a chapter)      |
+1302	   |                                 |        | stored using the       |
+1303	   |                                 |        | Float number defined   |
+1304	   |                                 |        | in Section 3.2.2.2.    |
+1305	   +---------------------------------+--------+------------------------+
+1306	   | MEASURE                         | UTF-8  | In music, a measure    |
+1307	   |                                 |        | is a unit of time in   |
+1308	   |                                 |        | Western music like     |
+1309	   |                                 |        | "4/4".  It represents  |
+1310	   |                                 |        | a regular grouping of  |
+1311	   |                                 |        | beats, a meter, as     |
+1312	   |                                 |        | indicated in musical   |
+1313	   |                                 |        | notation by the time   |
+1314	   |                                 |        | signature.  The        |
+1315	   |                                 |        | majority of the        |
+1316	   |                                 |        | contemporary rock and  |
+1317	   |                                 |        | pop music you hear on  |
+1318	   |                                 |        | the radio these days   |
+1319	   |                                 |        | is written in the 4/4  |
+1320	   |                                 |        | time signature.        |
+1321	   +---------------------------------+--------+------------------------+
+1322	   | TUNING                          | UTF-8  | It is saved as a       |
+1323	   |                                 |        | frequency in hertz to  |
+1324	   |                                 |        | allow near-perfect     |
+1325	   |                                 |        | tuning of instruments  |
+1326	   |                                 |        | to the same tone as    |
+1327	   |                                 |        | the musical piece      |
+1328	   |                                 |        | (e.g., "441.34" in     |
+1329	   |                                 |        | Hertz).  The values    |
+1330	   |                                 |        | is stored using the    |
+1331	   |                                 |        | Float number defined   |
+1332	   |                                 |        | in Section 3.2.2.2.    |
+1333	   +---------------------------------+--------+------------------------+
+1334	   | REPLAYGAIN_GAIN                 | UTF-8  | The gain to apply to   |
+1335	   |                                 |        | reach 89 dB SPL        |
+1336	   |                                 |        | (Sound Pressure Level  |
+1337	   |                                 |        | in decibels) on        |
+1338	   |                                 |        | playback.  The value   |
+1339	   |                                 |        | is computed according  |
+1340	   |                                 |        | to the [ReplayGain]    |
+1341	   |                                 |        | standard.  The value   |
+1342	   |                                 |        | in decibels (dB) is    |
+1343	   |                                 |        | stored as a string     |
+1344	   |                                 |        | (e.g., "-0.42 dB"),    |
+1345	   |                                 |        | using the Float        |
+1346	   |                                 |        | number defined in      |
+1347	   |                                 |        | Section 3.2.2.2.  The  |
+1348	   |                                 |        | decibel unit is        |
+1349	   |                                 |        | OPTIONAL.  There MAY   |
+1350	   |                                 |        | be a space between     |
+1351	   |                                 |        | the number and the     |
+1352	   |                                 |        | decibel unit.  Note    |
+1353	   |                                 |        | that ReplayGain        |
+1354	   |                                 |        | information can be     |
+1355	   |                                 |        | found at all           |
+1356	   |                                 |        | TargetType levels      |
+1357	   |                                 |        | (track, album, etc).   |
+1358	   +---------------------------------+--------+------------------------+
+1359	   | REPLAYGAIN_PEAK                 | UTF-8  | The maximum absolute   |
+1360	   |                                 |        | peak amplitude of the  |
+1361	   |                                 |        | item.  The value is    |
+1362	   |                                 |        | computed according to  |
+1363	   |                                 |        | the [ReplayGain]       |
+1364	   |                                 |        | standard.  The value   |
+1365	   |                                 |        | is a normalized        |
+1366	   |                                 |        | absolute sample value  |
+1367	   |                                 |        | of the target audio,   |
+1368	   |                                 |        | using the Float        |
+1369	   |                                 |        | number defined in      |
+1370	   |                                 |        | Section 3.2.2.2        |
+1371	   |                                 |        | (e.g., "1.0129").      |
+1372	   |                                 |        | Note that ReplayGain   |
+1373	   |                                 |        | information can be     |
+1374	   |                                 |        | found at all           |
+1375	   |                                 |        | TargetType levels      |
+1376	   |                                 |        | (track, album, etc).   |
+1377	   +---------------------------------+--------+------------------------+
+1378	   | EBU_R128_LOUDNESS               | binary | EBU R 128 Loudness.    |
+1379	   |                                 |        | The value is the       |
+1380	   |                                 |        | Loudness relative to   |
+1381	   |                                 |        | nominal full scale in  |
+1382	   |                                 |        | LUFS (Loudness Units   |
+1383	   |                                 |        | Full Scale)            |
+1384	   |                                 |        | normalized to a        |
+1385	   |                                 |        | Target Level of -23.0  |
+1386	   |                                 |        | LUFS as defined in     |
+1387	   |                                 |        | [EBU-R.128].  This     |
+1388	   |                                 |        | value is stored as a   |
+1389	   |                                 |        | floating-point number  |
+1390	   |                                 |        | in the 32-bit and      |
+1391	   |                                 |        | 64-bit binary          |
+1392	   |                                 |        | interchange format,    |
+1393	   |                                 |        | as defined in          |
+1394	   |                                 |        | [IEEE.754].  It is     |
+1395	   |                                 |        | similar to a EBML      |
+1396	   |                                 |        | floating number value  |
+1397	   |                                 |        | Section 7.3 of         |
+1398	   |                                 |        | [RFC8794].             |
+1399	   +---------------------------------+--------+------------------------+
+1400	   | EBU_R128_MAX_TRUE_PEAK          | binary | EBU R 128 Maximum      |
+1401	   |                                 |        | True Peak Level.       |
+1402	   |                                 |        | This corresponds to    |
+1403	   |                                 |        | the maximum value of   |
+1404	   |                                 |        | the audio signal       |
+1405	   |                                 |        | waveform of a          |
+1406	   |                                 |        | programme in the       |
+1407	   |                                 |        | continuous time        |
+1408	   |                                 |        | domain, measured in    |
+1409	   |                                 |        | dB True Peak (dBTP),   |
+1410	   |                                 |        | as defined in          |
+1411	   |                                 |        | [EBU-R.128].  This     |
+1412	   |                                 |        | value is stored as a   |
+1413	   |                                 |        | floating-point number  |
+1414	   |                                 |        | in the 32-bit and      |
+1415	   |                                 |        | 64-bit binary          |
+1416	   |                                 |        | interchange format,    |
+1417	   |                                 |        | as defined in          |
+1418	   |                                 |        | [IEEE.754].  It is     |
+1419	   |                                 |        | similar to a EBML      |
+1420	   |                                 |        | floating number value  |
+1421	   |                                 |        | Section 7.3 of         |
+1422	   |                                 |        | [RFC8794].             |
+1423	   +---------------------------------+--------+------------------------+
+1424	   | EBU_R128_LOUDNESS_RANGE         | binary | EBU R 128 Loudness     |
+1425	   |                                 |        | Range, measures the    |
+1426	   |                                 |        | variation in a time-   |
+1427	   |                                 |        | varying loudness       |
+1428	   |                                 |        | measurement, in LU     |
+1429	   |                                 |        | (Loudness Units) as    |
+1430	   |                                 |        | defined in             |
+1431	   |                                 |        | [EBU-TECH.3342].       |
+1432	   |                                 |        | This value is stored   |
+1433	   |                                 |        | as a floating-point    |
+1434	   |                                 |        | number in the 32-bit   |
+1435	   |                                 |        | and 64-bit binary      |
+1436	   |                                 |        | interchange format,    |
+1437	   |                                 |        | as defined in          |
+1438	   |                                 |        | [IEEE.754].  It is     |
+1439	   |                                 |        | similar to a EBML      |
+1440	   |                                 |        | floating number value  |
+1441	   |                                 |        | Section 7.3 of         |
+1442	   |                                 |        | [RFC8794].             |
+1443	   +---------------------------------+--------+------------------------+
+1444	   | EBU_R128_MAX_MOMENTARY_LOUDNESS | binary | EBU R 128 Maximum      |
+1445	   |                                 |        | Momentary Loudness,    |
+1446	   |                                 |        | measures the           |
+1447	   |                                 |        | variation of loudness  |
+1448	   |                                 |        | on a 0.4 s sliding     |
+1449	   |                                 |        | rectangular window,    |
+1450	   |                                 |        | in LUFS (Loudness      |
+1451	   |                                 |        | Units Full Scale) as   |
+1452	   |                                 |        | defined in             |
+1453	   |                                 |        | [EBU-TECH.3341].       |
+1454	   |                                 |        | This value is stored   |
+1455	   |                                 |        | as a floating-point    |
+1456	   |                                 |        | number in the 32-bit   |
+1457	   |                                 |        | and 64-bit binary      |
+1458	   |                                 |        | interchange format,    |
+1459	   |                                 |        | as defined in          |
+1460	   |                                 |        | [IEEE.754].  It is     |
+1461	   |                                 |        | similar to a EBML      |
+1462	   |                                 |        | floating number value  |
+1463	   |                                 |        | Section 7.3 of         |
+1464	   |                                 |        | [RFC8794].             |
+1465	   +---------------------------------+--------+------------------------+
+1466	   | EBU_R128_MAX_SHORT_LOUDNESS     | binary | EBU R 128 Maximum      |
+1467	   |                                 |        | Short-Term Loudness,   |
+1468	   |                                 |        | measures the           |
+1469	   |                                 |        | variation of loudness  |
+1470	   |                                 |        | on a 3 s sliding       |
+1471	   |                                 |        | rectangular window,    |
+1472	   |                                 |        | in LUFS (Loudness      |
+1473	   |                                 |        | Units Full Scale) as   |
+1474	   |                                 |        | defined in             |
+1475	   |                                 |        | [EBU-TECH.3341].       |
+1476	   |                                 |        | This value is stored   |
+1477	   |                                 |        | as a floating-point    |
+1478	   |                                 |        | number in the 32-bit   |
+1479	   |                                 |        | and 64-bit binary      |
+1480	   |                                 |        | interchange format,    |
+1481	   |                                 |        | as defined in          |
+1482	   |                                 |        | [IEEE.754].  It is     |
+1483	   |                                 |        | similar to a EBML      |
+1484	   |                                 |        | floating number value  |
+1485	   |                                 |        | Section 7.3 of         |
+1486	   |                                 |        | [RFC8794].             |
+1487	   +---------------------------------+--------+------------------------+
+
+1489	                    Table 13: Technical Information tags
+
+1491	4.11.  External Identifiers
+
+1493	     +================+========+=====================================+
+1494	     | Tag Name       | Type   | Description                         |
+1495	     +================+========+=====================================+
+1496	     | ISRC           | UTF-8  | The International Standard          |
+1497	     |                |        | Recording Code [ISRC], excluding    |
+1498	     |                |        | the "ISRC" prefix and including     |
+1499	     |                |        | hyphens.                            |
+1500	     +----------------+--------+-------------------------------------+
+1501	     | MCDI           | binary | This is a binary dump of the TOC of |
+1502	     |                |        | the CDROM that this item was taken  |
+1503	     |                |        | from.  This holds the same          |
+1504	     |                |        | information as the "MCDI" in        |
+1505	     |                |        | [ID3v2.3] when the TargetTypeValue  |
+1506	     |                |        | is 50 (ALBUM).                      |
+1507	     +----------------+--------+-------------------------------------+
+1508	     | ISBN           | UTF-8  | International Standard Book Number  |
+1509	     |                |        | [ISBN].                             |
+1510	     +----------------+--------+-------------------------------------+
+1511	     | BARCODE        | UTF-8  | European Article Numbering EAN-13   |
+1512	     |                |        | barcode defined in [GS1] General    |
+1513	     |                |        | Specifications.                     |
+1514	     +----------------+--------+-------------------------------------+
+1515	     | CATALOG_NUMBER | UTF-8  | A label-specific string used to     |
+1516	     |                |        | identify the release -- for         |
+1517	     |                |        | example, TIC 01.                    |
+1518	     +----------------+--------+-------------------------------------+
+1519	     | LABEL_CODE     | UTF-8  | A 4-digit or 5-digit number to      |
+1520	     |                |        | identify the record label,          |
+1521	     |                |        | typically printed as (LC) xxxx or   |
+1522	     |                |        | (LC) 0xxxx on CDs medias or covers  |
+1523	     |                |        | (only the number is stored).        |
+1524	     +----------------+--------+-------------------------------------+
+1525	     | LCCN           | UTF-8  | Library of Congress Control Number  |
+1526	     |                |        | [LCCN].                             |
+1527	     +----------------+--------+-------------------------------------+
+1528	     | IMDB           | UTF-8  | Internet Movie Database [IMDb]      |
+1529	     |                |        | title identifier. "tt" followed by  |
+1530	     |                |        | at least 7 digits for Movies, TV    |
+1531	     |                |        | Shows, and Episodes.                |
+1532	     +----------------+--------+-------------------------------------+
+1533	     | TMDB           | UTF-8  | The Movie DB "movie_id" or "tv_id"  |
+1534	     |                |        | identifier for movies/TV shows      |
+1535	     |                |        | [MovieDB].  The variable length     |
+1536	     |                |        | digits string MUST be prefixed with |
+1537	     |                |        | either "movie/" or "tv/".           |
+1538	     +----------------+--------+-------------------------------------+
+1539	     | TVDB           | UTF-8  | The TV Database "Series ID" or      |
+1540	     |                |        | "Episode ID" identifier for TV      |
+1541	     |                |        | shows [TheTVDB].  Variable length   |
+1542	     |                |        | all-digits string identifying a TV  |
+1543	     |                |        | Show to use with the "series/{id}"  |
+1544	     |                |        | API.                                |
+1545	     +----------------+--------+-------------------------------------+
+1546	     | TVDB2          | UTF-8  | The TV Database [TheTVDB] tag which |
+1547	     |                |        | can include movies.  The variable   |
+1548	     |                |        | length digits string representing a |
+1549	     |                |        | "Series ID", "Episode ID" or "Movie |
+1550	     |                |        | ID" identifier MUST be prefixed     |
+1551	     |                |        | with "series/", "episodes/", or     |
+1552	     |                |        | "movies/", respectively.            |
+1553	     +----------------+--------+-------------------------------------+
+
+1555	                    Table 14: External Identifiers tags
+
+1557	4.12.  Commercial
+
+1559	   +===================+=======+=======================================+
+1560	   | Tag Name          | Type  | Description                           |
+1561	   +===================+=======+=======================================+
+1562	   | PURCHASE_ITEM     | UTF-8 | URL to purchase this file using the   |
+1563	   |                   |       | URL format defined in [RFC3986].      |
+1564	   |                   |       | This is akin to the "WPAY" tag in     |
+1565	   |                   |       | [ID3v2.3] when the TargetTypeValue    |
+1566	   |                   |       | is 30 (TRACK).                        |
+1567	   +-------------------+-------+---------------------------------------+
+1568	   | PURCHASE_INFO     | UTF-8 | Information on where to purchase      |
+1569	   |                   |       | this album using the URL format       |
+1570	   |                   |       | defined in [RFC3986].  This is akin   |
+1571	   |                   |       | to the "WCOM" tag in [ID3v2.3] when   |
+1572	   |                   |       | the TargetTypeValue is 30 (TRACK).    |
+1573	   +-------------------+-------+---------------------------------------+
+1574	   | PURCHASE_OWNER    | UTF-8 | Information on the person who         |
+1575	   |                   |       | purchased the file.  This is akin     |
+1576	   |                   |       | to the "TOWN" tag in [ID3v2.3] when   |
+1577	   |                   |       | the TargetTypeValue is 30 (TRACK).    |
+1578	   +-------------------+-------+---------------------------------------+
+1579	   | PURCHASE_PRICE    | UTF-8 | The amount paid for entity, using     |
+1580	   |                   |       | the Float number defined in           |
+1581	   |                   |       | Section 3.2.2.2.  The currency is     |
+1582	   |                   |       | not included.  For instance, you      |
+1583	   |                   |       | would store "15.59" instead of        |
+1584	   |                   |       | "$15.59USD".                          |
+1585	   +-------------------+-------+---------------------------------------+
+1586	   | PURCHASE_CURRENCY | UTF-8 | The currency type used to pay for     |
+1587	   |                   |       | the entity.  Use [ISO4217] for the    |
+1588	   |                   |       | 3 letter alphabetic code.             |
+1589	   +-------------------+-------+---------------------------------------+
+
+1591	                         Table 15: Commercial tags
+
+1593	4.13.  Legal
+
+1595	    +======================+=======+==================================+
+1596	    | Tag Name             | Type  | Description                      |
+1597	    +======================+=======+==================================+
+1598	    | COPYRIGHT            | UTF-8 | The copyright information as per |
+1599	    |                      |       | the copyright holder.  This is   |
+1600	    |                      |       | akin to the "TCOP" tag in        |
+1601	    |                      |       | [ID3v2.3] when the               |
+1602	    |                      |       | TargetTypeValue is 30 (TRACK).   |
+1603	    +----------------------+-------+----------------------------------+
+1604	    | PRODUCTION_COPYRIGHT | UTF-8 | The copyright information as per |
+1605	    |                      |       | the production copyright holder. |
+1606	    |                      |       | This is akin to the "TPRO" tag   |
+1607	    |                      |       | in [ID3v2.4] when the            |
+1608	    |                      |       | TargetTypeValue is 30 (TRACK).   |
+1609	    +----------------------+-------+----------------------------------+
+1610	    | LICENSE              | UTF-8 | The license applied to the       |
+1611	    |                      |       | content (e.g., Creative Commons  |
+1612	    |                      |       | variants).                       |
+1613	    +----------------------+-------+----------------------------------+
+1614	    | TERMS_OF_USE         | UTF-8 | The terms of use for this item.  |
+1615	    |                      |       | This is akin to the "USER" tag   |
+1616	    |                      |       | in [ID3v2.3].                    |
+1617	    +----------------------+-------+----------------------------------+
+
+1619	                            Table 16: Legal tags
+
+1621	5.  Security Considerations
+
+1623	   This document inherits security considerations from the EBML
+1624	   [RFC8794] and Matroska [RFC9559] documents.
+
+1626	   Tag values can be either TagString or TagBinary blobs.  In both cases
+1627	   issues can happen if the parsing of the data fails.
+
+1629	   Most of the time strings are kept as-is and don't pose a security
+1630	   issue, apart from invalid UTF-8 values.
+
+1632	   String tags that are parsed like "REPLAYGAIN_GAIN" or
+1633	   "REPLAYGAIN_PEAK" defined in Section 4.10 or string tags following
+1634	   the rules from Section 3.2.2 or string tags following other strict
+1635	   formats like URLs may cause issues when the string is bogus or in an
+1636	   unexpected format.
+
+1638	   Binary tags that need to be parsed like "MCDI" defined in
+1639	   Section 4.11 may cause issues when the data is bogus or incomplete.
+
+1641	   Due to the nature of nested SimpleTag, it is possible to exhaust the
+1642	   memory of the host app by using very deep nesting.  An host app MAY
+1643	   add some limits to the amount of nesting possible to avoid such
+1644	   issues.
+
+1646	6.  IANA Considerations
+
+1648	6.1.  Matroska Tags Names Registry
+
+1650	   IANA has created a new registry called the "Matroska Tag Names"
+1651	   registry.
+
+1653	   To register a new Tag Name in this registry, one needs a Name, a
+1654	   Type, a Change Controller, and an optional Reference to a document
+1655	   describing the Element ID.
+
+1657	   The Name corresponds to the value stored in the TagName element.  The
+1658	   Name SHOULD always be written in all capital letters and contain no
+1659	   space as defined in Section 3.2,
+
+1661	   The Type corresponds to which element will be stored the tag value.
+1662	   There can be 3 values for the Type:
+
+1664	   *  UTF-8: the value of the Tag is stored in TagString,
+
+1666	   Matroska Tag Names for UTF-8 data are to be allocated according to
+1667	   the "First Come First Served" policy [RFC8126].
+
+1669	   *  binary: the value of the Tag is stored in TagBinary,
+
+1671	   Matroska Tag Names for binary data are to be allocated according to
+1672	   the "Specification Required" policy [RFC8126].
+
+1674	   *  nested: the tag doesn't contain a value, only nested tags inside.
+
+1676	   Matroska Tag Names for nested tags are to be allocated according to
+1677	   the "Specification Required" policy [RFC8126].
+
+1679	   Matroska Tag Names Values found in this document are assigned as
+1680	   initial values as follows:
+
+1682	      +=================================+==========+================+
+1683	      |                        Tag Name | Tag Type | Reference      |
+1684	      +=================================+==========+================+
+1685	      |                        ORIGINAL | nested   | This document, |
+1686	      |                                 |          | Section 4.1    |
+1687	      +---------------------------------+----------+----------------+
+1688	      |                          SAMPLE | nested   | This document, |
+1689	      |                                 |          | Section 4.1    |
+1690	      +---------------------------------+----------+----------------+
+1691	      |                         COUNTRY | UTF-8    | This document, |
+1692	      |                                 |          | Section 4.1    |
+1693	      +---------------------------------+----------+----------------+
+1694	      |                     TOTAL_PARTS | UTF-8    | This document, |
+1695	      |                                 |          | Section 4.2    |
+1696	      +---------------------------------+----------+----------------+
+1697	      |                     PART_NUMBER | UTF-8    | This document, |
+1698	      |                                 |          | Section 4.2    |
+1699	      +---------------------------------+----------+----------------+
+1700	      |                     PART_OFFSET | UTF-8    | This document, |
+1701	      |                                 |          | Section 4.2    |
+1702	      +---------------------------------+----------+----------------+
+1703	      |                           TITLE | UTF-8    | This document, |
+1704	      |                                 |          | Section 4.3    |
+1705	      +---------------------------------+----------+----------------+
+1706	      |                        SUBTITLE | UTF-8    | This document, |
+1707	      |                                 |          | Section 4.3    |
+1708	      +---------------------------------+----------+----------------+
+1709	      |                             URL | UTF-8    | This document, |
+1710	      |                                 |          | Section 4.4    |
+1711	      +---------------------------------+----------+----------------+
+1712	      |                       SORT_WITH | UTF-8    | This document, |
+1713	      |                                 |          | Section 4.4    |
+1714	      +---------------------------------+----------+----------------+
+1715	      |                     INSTRUMENTS | UTF-8    | This document, |
+1716	      |                                 |          | Section 4.4    |
+1717	      +---------------------------------+----------+----------------+
+1718	      |                           EMAIL | UTF-8    | This document, |
+1719	      |                                 |          | Section 4.4    |
+1720	      +---------------------------------+----------+----------------+
+1721	      |                         ADDRESS | UTF-8    | This document, |
+1722	      |                                 |          | Section 4.4    |
+1723	      +---------------------------------+----------+----------------+
+1724	      |                             FAX | UTF-8    | This document, |
+1725	      |                                 |          | Section 4.4    |
+1726	      +---------------------------------+----------+----------------+
+1727	      |                           PHONE | UTF-8    | This document, |
+1728	      |                                 |          | Section 4.4    |
+1729	      +---------------------------------+----------+----------------+
+1730	      |                          ARTIST | UTF-8    | This document, |
+1731	      |                                 |          | Section 4.5    |
+1732	      +---------------------------------+----------+----------------+
+1733	      |                  LEAD_PERFORMER | UTF-8    | This document, |
+1734	      |                                 |          | Section 4.5    |
+1735	      +---------------------------------+----------+----------------+
+1736	      |                   ACCOMPANIMENT | UTF-8    | This document, |
+1737	      |                                 |          | Section 4.5    |
+1738	      +---------------------------------+----------+----------------+
+1739	      |                        COMPOSER | UTF-8    | This document, |
+1740	      |                                 |          | Section 4.5    |
+1741	      +---------------------------------+----------+----------------+
+1742	      |                        ARRANGER | UTF-8    | This document, |
+1743	      |                                 |          | Section 4.5    |
+1744	      +---------------------------------+----------+----------------+
+1745	      |                          LYRICS | UTF-8    | This document, |
+1746	      |                                 |          | Section 4.5    |
+1747	      +---------------------------------+----------+----------------+
+1748	      |                        LYRICIST | UTF-8    | This document, |
+1749	      |                                 |          | Section 4.5    |
+1750	      +---------------------------------+----------+----------------+
+1751	      |                       CONDUCTOR | UTF-8    | This document, |
+1752	      |                                 |          | Section 4.5    |
+1753	      +---------------------------------+----------+----------------+
+1754	      |                        DIRECTOR | UTF-8    | This document, |
+1755	      |                                 |          | Section 4.5    |
+1756	      +---------------------------------+----------+----------------+
+1757	      |              ASSISTANT_DIRECTOR | UTF-8    | This document, |
+1758	      |                                 |          | Section 4.5    |
+1759	      +---------------------------------+----------+----------------+
+1760	      |         DIRECTOR_OF_PHOTOGRAPHY | UTF-8    | This document, |
+1761	      |                                 |          | Section 4.5    |
+1762	      +---------------------------------+----------+----------------+
+1763	      |                  SOUND_ENGINEER | UTF-8    | This document, |
+1764	      |                                 |          | Section 4.5    |
+1765	      +---------------------------------+----------+----------------+
+1766	      |                    ART_DIRECTOR | UTF-8    | This document, |
+1767	      |                                 |          | Section 4.5    |
+1768	      +---------------------------------+----------+----------------+
+1769	      |             PRODUCTION_DESIGNER | UTF-8    | This document, |
+1770	      |                                 |          | Section 4.5    |
+1771	      +---------------------------------+----------+----------------+
+1772	      |                    CHOREGRAPHER | UTF-8    | This document, |
+1773	      |                                 |          | Section 4.5    |
+1774	      +---------------------------------+----------+----------------+
+1775	      |                COSTUME_DESIGNER | UTF-8    | This document, |
+1776	      |                                 |          | Section 4.5    |
+1777	      +---------------------------------+----------+----------------+
+1778	      |                           ACTOR | UTF-8    | This document, |
+1779	      |                                 |          | Section 4.5    |
+1780	      +---------------------------------+----------+----------------+
+1781	      |                       CHARACTER | UTF-8    | This document, |
+1782	      |                                 |          | Section 4.5    |
+1783	      +---------------------------------+----------+----------------+
+1784	      |                      WRITTEN_BY | UTF-8    | This document, |
+1785	      |                                 |          | Section 4.5    |
+1786	      +---------------------------------+----------+----------------+
+1787	      |                   SCREENPLAY_BY | UTF-8    | This document, |
+1788	      |                                 |          | Section 4.5    |
+1789	      +---------------------------------+----------+----------------+
+1790	      |                       EDITED_BY | UTF-8    | This document, |
+1791	      |                                 |          | Section 4.5    |
+1792	      +---------------------------------+----------+----------------+
+1793	      |                        PRODUCER | UTF-8    | This document, |
+1794	      |                                 |          | Section 4.5    |
+1795	      +---------------------------------+----------+----------------+
+1796	      |                      COPRODUCER | UTF-8    | This document, |
+1797	      |                                 |          | Section 4.5    |
+1798	      +---------------------------------+----------+----------------+
+1799	      |              EXECUTIVE_PRODUCER | UTF-8    | This document, |
+1800	      |                                 |          | Section 4.5    |
+1801	      +---------------------------------+----------+----------------+
+1802	      |                  DISTRIBUTED_BY | UTF-8    | This document, |
+1803	      |                                 |          | Section 4.5    |
+1804	      +---------------------------------+----------+----------------+
+1805	      |                     MASTERED_BY | UTF-8    | This document, |
+1806	      |                                 |          | Section 4.5    |
+1807	      +---------------------------------+----------+----------------+
+1808	      |                      ENCODED_BY | UTF-8    | This document, |
+1809	      |                                 |          | Section 4.5    |
+1810	      +---------------------------------+----------+----------------+
+1811	      |                        MIXED_BY | UTF-8    | This document, |
+1812	      |                                 |          | Section 4.5    |
+1813	      +---------------------------------+----------+----------------+
+1814	      |                      REMIXED_BY | UTF-8    | This document, |
+1815	      |                                 |          | Section 4.5    |
+1816	      +---------------------------------+----------+----------------+
+1817	      |               PRODUCTION_STUDIO | UTF-8    | This document, |
+1818	      |                                 |          | Section 4.5    |
+1819	      +---------------------------------+----------+----------------+
+1820	      |                       THANKS_TO | UTF-8    | This document, |
+1821	      |                                 |          | Section 4.5    |
+1822	      +---------------------------------+----------+----------------+
+1823	      |                       PUBLISHER | UTF-8    | This document, |
+1824	      |                                 |          | Section 4.5    |
+1825	      +---------------------------------+----------+----------------+
+1826	      |                           LABEL | UTF-8    | This document, |
+1827	      |                                 |          | Section 4.5    |
+1828	      +---------------------------------+----------+----------------+
+1829	      |                           GENRE | UTF-8    | This document, |
+1830	      |                                 |          | Section 4.6    |
+1831	      +---------------------------------+----------+----------------+
+1832	      |                            MOOD | UTF-8    | This document, |
+1833	      |                                 |          | Section 4.6    |
+1834	      +---------------------------------+----------+----------------+
+1835	      |             ORIGINAL_MEDIA_TYPE | UTF-8    | This document, |
+1836	      |                                 |          | Section 4.6    |
+1837	      +---------------------------------+----------+----------------+
+1838	      |                    CONTENT_TYPE | UTF-8    | This document, |
+1839	      |                                 |          | Section 4.6    |
+1840	      +---------------------------------+----------+----------------+
+1841	      |                         SUBJECT | UTF-8    | This document, |
+1842	      |                                 |          | Section 4.6    |
+1843	      +---------------------------------+----------+----------------+
+1844	      |                     DESCRIPTION | UTF-8    | This document, |
+1845	      |                                 |          | Section 4.6    |
+1846	      +---------------------------------+----------+----------------+
+1847	      |                        KEYWORDS | UTF-8    | This document, |
+1848	      |                                 |          | Section 4.6    |
+1849	      +---------------------------------+----------+----------------+
+1850	      |                         SUMMARY | UTF-8    | This document, |
+1851	      |                                 |          | Section 4.6    |
+1852	      +---------------------------------+----------+----------------+
+1853	      |                        SYNOPSIS | UTF-8    | This document, |
+1854	      |                                 |          | Section 4.6    |
+1855	      +---------------------------------+----------+----------------+
+1856	      |                     INITIAL_KEY | UTF-8    | This document, |
+1857	      |                                 |          | Section 4.6    |
+1858	      +---------------------------------+----------+----------------+
+1859	      |                          PERIOD | UTF-8    | This document, |
+1860	      |                                 |          | Section 4.6    |
+1861	      +---------------------------------+----------+----------------+
+1862	      |                      LAW_RATING | UTF-8    | This document, |
+1863	      |                                 |          | Section 4.6    |
+1864	      +---------------------------------+----------+----------------+
+1865	      |                   DATE_RELEASED | UTF-8    | This document, |
+1866	      |                                 |          | Section 4.7    |
+1867	      +---------------------------------+----------+----------------+
+1868	      |                   DATE_RECORDED | UTF-8    | This document, |
+1869	      |                                 |          | Section 4.7    |
+1870	      +---------------------------------+----------+----------------+
+1871	      |                    DATE_ENCODED | UTF-8    | This document, |
+1872	      |                                 |          | Section 4.7    |
+1873	      +---------------------------------+----------+----------------+
+1874	      |                     DATE_TAGGED | UTF-8    | This document, |
+1875	      |                                 |          | Section 4.7    |
+1876	      +---------------------------------+----------+----------------+
+1877	      |                  DATE_DIGITIZED | UTF-8    | This document, |
+1878	      |                                 |          | Section 4.7    |
+1879	      +---------------------------------+----------+----------------+
+1880	      |                    DATE_WRITTEN | UTF-8    | This document, |
+1881	      |                                 |          | Section 4.7    |
+1882	      +---------------------------------+----------+----------------+
+1883	      |                  DATE_PURCHASED | UTF-8    | This document, |
+1884	      |                                 |          | Section 4.7    |
+1885	      +---------------------------------+----------+----------------+
+1886	      |                    DATE_STARTED | UTF-8    | This document, |
+1887	      |                                 |          | Section 4.7    |
+1888	      +---------------------------------+----------+----------------+
+1889	      |                      DATE_ENDED | UTF-8    | This document, |
+1890	      |                                 |          | Section 4.7    |
+1891	      +---------------------------------+----------+----------------+
+1892	      |              RECORDING_LOCATION | UTF-8    | This document, |
+1893	      |                                 |          | Section 4.8    |
+1894	      +---------------------------------+----------+----------------+
+1895	      |            COMPOSITION_LOCATION | UTF-8    | This document, |
+1896	      |                                 |          | Section 4.8    |
+1897	      +---------------------------------+----------+----------------+
+1898	      |            COMPOSER_NATIONALITY | UTF-8    | This document, |
+1899	      |                                 |          | Section 4.8    |
+1900	      +---------------------------------+----------+----------------+
+1901	      |                         COMMENT | UTF-8    | This document, |
+1902	      |                                 |          | Section 4.9    |
+1903	      +---------------------------------+----------+----------------+
+1904	      |                    PLAY_COUNTER | UTF-8    | This document, |
+1905	      |                                 |          | Section 4.9    |
+1906	      +---------------------------------+----------+----------------+
+1907	      |                          RATING | UTF-8    | This document, |
+1908	      |                                 |          | Section 4.9    |
+1909	      +---------------------------------+----------+----------------+
+1910	      |                         ENCODER | UTF-8    | This document, |
+1911	      |                                 |          | Section 4.10   |
+1912	      +---------------------------------+----------+----------------+
+1913	      |                ENCODER_SETTINGS | UTF-8    | This document, |
+1914	      |                                 |          | Section 4.10   |
+1915	      +---------------------------------+----------+----------------+
+1916	      |                             BPS | UTF-8    | This document, |
+1917	      |                                 |          | Section 4.10   |
+1918	      +---------------------------------+----------+----------------+
+1919	      |                             FPS | UTF-8    | This document, |
+1920	      |                                 |          | Section 4.10   |
+1921	      +---------------------------------+----------+----------------+
+1922	      |                             BPM | UTF-8    | This document, |
+1923	      |                                 |          | Section 4.10   |
+1924	      +---------------------------------+----------+----------------+
+1925	      |                         MEASURE | UTF-8    | This document, |
+1926	      |                                 |          | Section 4.10   |
+1927	      +---------------------------------+----------+----------------+
+1928	      |                          TUNING | UTF-8    | This document, |
+1929	      |                                 |          | Section 4.10   |
+1930	      +---------------------------------+----------+----------------+
+1931	      |                 REPLAYGAIN_GAIN | UTF-8    | This document, |
+1932	      |                                 |          | Section 4.10   |
+1933	      +---------------------------------+----------+----------------+
+1934	      |                 REPLAYGAIN_PEAK | UTF-8    | This document, |
+1935	      |                                 |          | Section 4.10   |
+1936	      +---------------------------------+----------+----------------+
+1937	      |               EBU_R128_LOUDNESS | binary   | This document, |
+1938	      |                                 |          | Section 4.10   |
+1939	      +---------------------------------+----------+----------------+
+1940	      |          EBU_R128_MAX_TRUE_PEAK | binary   | This document, |
+1941	      |                                 |          | Section 4.10   |
+1942	      +---------------------------------+----------+----------------+
+1943	      |         EBU_R128_LOUDNESS_RANGE | binary   | This document, |
+1944	      |                                 |          | Section 4.10   |
+1945	      +---------------------------------+----------+----------------+
+1946	      | EBU_R128_MAX_MOMENTARY_LOUDNESS | binary   | This document, |
+1947	      |                                 |          | Section 4.10   |
+1948	      +---------------------------------+----------+----------------+
+1949	      |     EBU_R128_MAX_SHORT_LOUDNESS | binary   | This document, |
+1950	      |                                 |          | Section 4.10   |
+1951	      +---------------------------------+----------+----------------+
+1952	      |                            ISRC | UTF-8    | This document, |
+1953	      |                                 |          | Section 4.11   |
+1954	      +---------------------------------+----------+----------------+
+1955	      |                            MCDI | binary   | This document, |
+1956	      |                                 |          | Section 4.11   |
+1957	      +---------------------------------+----------+----------------+
+1958	      |                            ISBN | UTF-8    | This document, |
+1959	      |                                 |          | Section 4.11   |
+1960	      +---------------------------------+----------+----------------+
+1961	      |                         BARCODE | UTF-8    | This document, |
+1962	      |                                 |          | Section 4.11   |
+1963	      +---------------------------------+----------+----------------+
+1964	      |                  CATALOG_NUMBER | UTF-8    | This document, |
+1965	      |                                 |          | Section 4.11   |
+1966	      +---------------------------------+----------+----------------+
+1967	      |                      LABEL_CODE | UTF-8    | This document, |
+1968	      |                                 |          | Section 4.11   |
+1969	      +---------------------------------+----------+----------------+
+1970	      |                            LCCN | UTF-8    | This document, |
+1971	      |                                 |          | Section 4.11   |
+1972	      +---------------------------------+----------+----------------+
+1973	      |                            IMDB | UTF-8    | This document, |
+1974	      |                                 |          | Section 4.11   |
+1975	      +---------------------------------+----------+----------------+
+1976	      |                            TMDB | UTF-8    | This document, |
+1977	      |                                 |          | Section 4.11   |
+1978	      +---------------------------------+----------+----------------+
+1979	      |                            TVDB | UTF-8    | This document, |
+1980	      |                                 |          | Section 4.11   |
+1981	      +---------------------------------+----------+----------------+
+1982	      |                           TVDB2 | UTF-8    | This document, |
+1983	      |                                 |          | Section 4.11   |
+1984	      +---------------------------------+----------+----------------+
+1985	      |                   PURCHASE_ITEM | UTF-8    | This document, |
+1986	      |                                 |          | Section 4.12   |
+1987	      +---------------------------------+----------+----------------+
+1988	      |                   PURCHASE_INFO | UTF-8    | This document, |
+1989	      |                                 |          | Section 4.12   |
+1990	      +---------------------------------+----------+----------------+
+1991	      |                  PURCHASE_OWNER | UTF-8    | This document, |
+1992	      |                                 |          | Section 4.12   |
+1993	      +---------------------------------+----------+----------------+
+1994	      |                  PURCHASE_PRICE | UTF-8    | This document, |
+1995	      |                                 |          | Section 4.12   |
+1996	      +---------------------------------+----------+----------------+
+1997	      |               PURCHASE_CURRENCY | UTF-8    | This document, |
+1998	      |                                 |          | Section 4.12   |
+1999	      +---------------------------------+----------+----------------+
+2000	      |                       COPYRIGHT | UTF-8    | This document, |
+2001	      |                                 |          | Section 4.13   |
+2002	      +---------------------------------+----------+----------------+
+2003	      |            PRODUCTION_COPYRIGHT | UTF-8    | This document, |
+2004	      |                                 |          | Section 4.13   |
+2005	      +---------------------------------+----------+----------------+
+2006	      |                         LICENSE | UTF-8    | This document, |
+2007	      |                                 |          | Section 4.13   |
+2008	      +---------------------------------+----------+----------------+
+2009	      |                    TERMS_OF_USE | UTF-8    | This document, |
+2010	      |                                 |          | Section 4.13   |
+2011	      +---------------------------------+----------+----------------+
+
+2013	        Table 17: Initial Contents of "Matroska Tag Names" Registry
+
+2015	7.  References
+
+2017	7.1.  Normative References
+
+2019	   [EBU-R.128]
+2020	              "LOUDNESS NORMALISATION AND PERMITTED MAXIMUM LEVEL OF
+2021	              AUDIO SIGNALS", November 2023,
+2022	              <https://tech.ebu.ch/publications/r128/>.
+
+2024	   [EBU-TECH.3341]
+2025	              "LOUDNESS METERING: 'EBU MODE' METERING TO SUPPLEMENT EBU
+2026	              R 128 LOUDNESS NORMALIZATION", November 2023,
+2027	              <https://tech.ebu.ch/publications/tech3341>.
+
+2029	   [EBU-TECH.3342]
+2030	              "LOUDNESS RANGE: A MEASURE TO SUPPLEMENT EBU R 128
+2031	              LOUDNESS NORMALIZATION", November 2023,
+2032	              <https://tech.ebu.ch/publications/tech3342>.
+
+2034	   [GS1]      "GS1 General Specifications", GS1 20.0, January 2020,
+2035	              <https://www.gs1.org/standards/barcodes-epcrfid-id-keys/
+2036	              gs1-general-specifications>.
+
+2038	   [ID3v2.3]  Nilsson, M., Mahoney, D., Ed., and J. Sundstrom, Ed., "ID3
+2039	              tag version 2.3.0", 3 February 1999,
+2040	              <https://id3.org/id3v2.3.0>.
+
+2042	   [ID3v2.4]  Nilsson, M., "ID3 tag version 2.4.0 - Native Frames", 1
+2043	              November 2000, <https://id3.org/id3v2.4.0-frames>.
+
+2045	   [IEEE.754] IEEE, "IEEE Standard for Binary Floating-Point
+2046	              Arithmetic", 13 June 2019,
+2047	              <https://standards.ieee.org/standard/754-2019.html>.
+
+2049	   [IMDb]     Internet Movie Database, "IMDb data key concepts",
+2050	              <https://developer.imdb.com/documentation/key-concepts/>.
+
+2052	   [ISBN]     International ISBN Agency, "ISBN Users' Manual", December
+2053	              2017, <https://www.isbn-international.org/content/isbn-
+2054	              users-manual/29>.
+
+2056	   [ISO4217]  International Organization for Standardization, "ISO 4217
+2057	              Currency codes", ISO 4217:2015, August 2015,
+2058	              <https://www.iso.org/iso-4217-currency-codes.html>.
+
+2060	   [ISRC]     International ISRC Registration Authority, "International
+2061	              Standard Recording Code (ISRC) Handbook", IFPI 4th
+2062	              Edition, 2021, <https://www.ifpi.org/isrc_handbook/>.
+
+2064	   [LCCN]     United States Library Of Congress, "Library Of Congress
+2065	              Control Number", October 1999,
+2066	              <https://www.loc.gov/marc/lccn.html>.
+
+2068	   [MovieDB]  The Movie Database, "The Movie Database API",
+2069	              <https://developers.themoviedb.org/3/movies/get-movie-
+2070	              details>.
+
+2072	   [ReplayGain]
+2073	              Robinson, D., "ReplayGain 1.0 specification", 10 July
+2074	              2001, <http://wiki.hydrogenaud.io/
+2075	              index.php?title=Replay_Gain_specification>.
+
+2077	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+2078	              Requirement Levels", BCP 14, RFC 2119,
+2079	              DOI 10.17487/RFC2119, March 1997,
+2080	              <https://www.rfc-editor.org/info/rfc2119>.
+
+2082	   [RFC3986]  Berners-Lee, T., Fielding, R., and L. Masinter, "Uniform
+2083	              Resource Identifier (URI): Generic Syntax", STD 66,
+2084	              RFC 3986, DOI 10.17487/RFC3986, January 2005,
+2085	              <https://www.rfc-editor.org/info/rfc3986>.
+
+2087	   [RFC5322]  Resnick, P., Ed., "Internet Message Format", RFC 5322,
+2088	              DOI 10.17487/RFC5322, October 2008,
+2089	              <https://www.rfc-editor.org/info/rfc5322>.
+
+2091	   [RFC5646]  Phillips, A., Ed. and M. Davis, Ed., "Tags for Identifying
+2092	              Languages", BCP 47, RFC 5646, DOI 10.17487/RFC5646,
+2093	              September 2009, <https://www.rfc-editor.org/info/rfc5646>.
+
+2095	   [RFC8126]  Cotton, M., Leiba, B., and T. Narten, "Guidelines for
+2096	              Writing an IANA Considerations Section in RFCs", BCP 26,
+2097	              RFC 8126, DOI 10.17487/RFC8126, June 2017,
+2098	              <https://www.rfc-editor.org/info/rfc8126>.
+
+2100	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+2101	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+2102	              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+2104	   [RFC8794]  Lhomme, S., Rice, D., and M. Bunkus, "Extensible Binary
+2105	              Meta Language", RFC 8794, DOI 10.17487/RFC8794, July 2020,
+2106	              <https://www.rfc-editor.org/info/rfc8794>.
+
+2108	   [RFC9559]  Lhomme, S., Bunkus, M., and D. Rice, "Matroska Media
+2109	              Container Format Specification", RFC 9559,
+2110	              DOI 10.17487/RFC9559, October 2024,
+2111	              <https://www.rfc-editor.org/info/rfc9559>.
+
+2113	   [TheTVDB]  The TVDB, "TVDB API V4",
+2114	              <https://thetvdb.github.io/v4-api/>.
+
+2116	7.2.  Informative References
+
+2118	   [DaFunk]   Discogs, "Daft Punk - Da Funk",
+2119	              <https://www.discogs.com/release/7983-Daft-Punk-Da-Funk>.
+
+2121	   [ISO8601]  International Organization for Standardization, "Date and
+2122	              time - Representations for information interchange - Part
+2123	              1: Basic rules", ISO 8601-1:2019, February 2019,
+2124	              <https://www.iso.org/standard/70907.html>.
+
+2126	   [OrbUltraworld]
+2127	              Discogs, "Orb - The Orb's Adventures Beyond The
+2128	              Ultraworld", <https://www.discogs.com/release/13265-Orb-
+2129	              The-Orbs-Adventures-Beyond-The-Ultraworld>.
+
+2131	   [RFC3339]  Klyne, G. and C. Newman, "Date and Time on the Internet:
+2132	              Timestamps", RFC 3339, DOI 10.17487/RFC3339, July 2002,
+2133	              <https://www.rfc-editor.org/info/rfc3339>.
+
+2135	   [RIFF.tags]
+2136	              Exiftool, "RIFF Tags",
+2137	              <https://exiftool.org/TagNames/RIFF.html>.
+
+2139	Authors' Addresses
+
+2141	   Steve Lhomme
+2142	   Email: slhomme@matroska.org
+
+2144	   Moritz Bunkus
+2145	   Email: moritz@bunkus.org
+
+2147	   Dave Rice
+2148	   Email: dave@dericed.com
+
+
+
+
+
+
+
+
+
