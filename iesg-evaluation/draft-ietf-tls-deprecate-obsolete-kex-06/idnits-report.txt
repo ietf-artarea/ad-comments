@@ -1,0 +1,1066 @@
+idnits 2.17.1 
+
+draft-ietf-tls-deprecate-obsolete-kex-06.txt:
+-(438): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+  == There are 6 instances of lines with non-ascii characters in the document.
+
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     Summary: 0 errors (**), 0 flaws (~~), 1 warning (==), 0 comments (--).
+
+--------------------------------------------------------------------------------
+
+
+2	TLS Working Group                                              N. Aviram
+3	Internet-Draft                                              22 June 2025
+4	Updates: 9325, 4346, 5246, 4162, 6347, 5932,
+5	         5288, 6209, 6367, 8422, 5289, 5469,
+6	         4785, 4279, 5487, 6655, 7905 (if
+7	         approved)
+8	Intended status: Standards Track
+9	Expires: 24 December 2025
+
+11	        Deprecating Obsolete Key Exchange Methods in (D)TLS 1.2
+12	                draft-ietf-tls-deprecate-obsolete-kex-06
+
+14	Abstract
+
+16	   For (D)TLS 1.2, this document deprecates the use of two key
+17	   exchanges, namely Diffie-Hellman over a finite field and RSA, and it
+18	   discourages the use of static elliptic curve Diffie-Hellman cipher
+19	   suites.
+
+21	   These prescriptions apply only to (D)TLS 1.2 since (D)TLS 1.0 and TLS
+22	   1.1 are deprecated by RFC 8996 and (D)TLS 1.3 either does not use the
+23	   affected algorithm or does not share the relevant configuration
+24	   options.  (There is no DTLS version 1.1.)
+
+26	   This document updates RFCs 9325, 4346, 5246, 4162, 6347, 5932, 5288,
+27	   6209, 6367, 8422, 5289, 5469, 4785, 4279, 5487, 6655, and 7905.
+
+29	Status of This Memo
+
+31	   This Internet-Draft is submitted in full conformance with the
+32	   provisions of BCP 78 and BCP 79.
+
+34	   Internet-Drafts are working documents of the Internet Engineering
+35	   Task Force (IETF).  Note that other groups may also distribute
+36	   working documents as Internet-Drafts.  The list of current Internet-
+37	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+39	   Internet-Drafts are draft documents valid for a maximum of six months
+40	   and may be updated, replaced, or obsoleted by other documents at any
+41	   time.  It is inappropriate to use Internet-Drafts as reference
+42	   material or to cite them other than as "work in progress."
+
+44	   This Internet-Draft will expire on 24 December 2025.
+
+46	Copyright Notice
+
+48	   Copyright (c) 2025 IETF Trust and the persons identified as the
+49	   document authors.  All rights reserved.
+
+51	   This document is subject to BCP 78 and the IETF Trust's Legal
+52	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+53	   license-info) in effect on the date of publication of this document.
+54	   Please review these documents carefully, as they describe your rights
+55	   and restrictions with respect to this document.  Code Components
+56	   extracted from this document must include Revised BSD License text as
+57	   described in Section 4.e of the Trust Legal Provisions and are
+58	   provided without warranty as described in the Revised BSD License.
+
+60	Table of Contents
+
+62	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+63	     1.1.  Requirements  . . . . . . . . . . . . . . . . . . . . . .   4
+64	   2.  Non-Ephemeral Diffie-Hellman  . . . . . . . . . . . . . . . .   5
+65	   3.  Ephemeral Finite Field Diffie-Hellman . . . . . . . . . . . .   5
+66	   4.  RSA . . . . . . . . . . . . . . . . . . . . . . . . . . . . .   5
+67	   5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   6
+68	   6.  Security Considerations . . . . . . . . . . . . . . . . . . .   6
+69	   7.  Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .   7
+70	   8.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   7
+71	     8.1.  Normative References  . . . . . . . . . . . . . . . . . .   7
+72	     8.2.  Informative References  . . . . . . . . . . . . . . . . .  10
+73	   Appendix A.  DH Cipher Suites Deprecated by This Document . . . .  12
+74	   Appendix B.  ECDH Cipher Suites Whose Use Is Discouraged by This
+75	           Document  . . . . . . . . . . . . . . . . . . . . . . . .  15
+76	   Appendix C.  DHE Cipher Suites deprecated by This Document  . . .  16
+77	   Appendix D.  RSA Cipher Suites Deprecated by This Document  . . .  20
+78	   Appendix E.  TLS ClientCertificateType Identifiers Deprecated by
+79	           This Document . . . . . . . . . . . . . . . . . . . . . .  22
+80	   Appendix F.  Updating RFC 9325  . . . . . . . . . . . . . . . . .  22
+81	   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  23
+
+83	1.  Introduction
+
+85	   (D)TLS 1.2 supports a variety of key exchange algorithms, including
+86	   RSA, Diffie-Hellman over a finite field, and elliptic curve Diffie-
+87	   Hellman (ECDH).
+
+89	   Diffie-Hellman key exchange, over any group, comes in ephemeral and
+90	   non-ephemeral varieties.  Non-ephemeral DH algorithms use static DH
+91	   public keys included in the authenticating peer's certificate; see
+92	   [RFC4492] for discussion.  In contrast, ephemeral DH algorithms use
+93	   ephemeral DH public keys sent in the handshake and authenticated by
+94	   the peer's certificate.  Ephemeral and non-ephemeral finite field DH
+95	   algorithms are called DHE and DH (or FFDHE and FFDH), respectively,
+96	   and ephemeral and non-ephemeral elliptic curve DH algorithms are
+97	   called ECDHE and ECDH, respectively [RFC4492].
+
+99	   In general, non-ephemeral cipher suites are not recommended due to
+100	   their lack of forward secrecy.  Moreover, as demonstrated by the
+101	   [Raccoon] attack on finite-field DH, public key reuse, either via
+102	   non-ephemeral cipher suites or reused keys with ephemeral cipher
+103	   suites, can lead to timing side channels that may leak connection
+104	   secrets.  For elliptic curve DH, invalid curve attacks similarly
+105	   exploit secret reuse in order to break security [ICA], further
+106	   demonstrating the risk of reusing public keys.  While both side
+107	   channels can be avoided in implementations, experience shows that in
+108	   practice, implementations may fail to thwart such attacks due to the
+109	   complexity and number of the required mitigations.
+
+111	   Additionally, RSA key exchange suffers from security problems that
+112	   are independent of implementation choices as well as problems that
+113	   stem purely from the difficulty of implementing security
+114	   countermeasures correctly.
+
+116	   At a rough glance, the problems affecting FFDHE in (D)TLS 1.2 are as
+117	   follows:
+
+119	   1.  FFDHE suffers from interoperability problems because there is no
+120	       mechanism for negotiating the group, and some implementations
+121	       only support small group sizes (see [RFC7919], Section 1).
+
+123	   2.  FFDHE groups may have small subgroups, which enables several
+124	       attacks [subgroups].  When presented with a custom, non-
+125	       standardized FFDHE group, a handshaking client cannot practically
+126	       verify that the group chosen by the server does not suffer from
+127	       this problem.  There is also no mechanism for such handshakes to
+128	       fall back to other key exchange parameters that are acceptable to
+129	       the client.  Custom FFDHE groups are widespread (as a result of
+130	       advice based on [weak-dh]).  Therefore, clients cannot simply
+131	       reject handshakes that present custom, and thus potentially
+132	       dangerous, groups.
+
+134	   3.  In practice, some operators use 1024-bit FFDHE groups since this
+135	       is the maximum size that ensures wide support (see [RFC7919],
+136	       Section 1).  This size leaves only a small security margin vs.
+137	       the current discrete log record, which stands at 795 bits
+138	       [DLOG795].
+
+140	   4.  Expanding on the previous point, just a handful of very large
+141	       computations allow an attacker to cheaply decrypt a relatively
+142	       large fraction of FFDHE traffic (namely, traffic encrypted using
+143	       particular standardized groups) [weak-dh].
+
+145	   5.  When secrets are not fully ephemeral, FFDHE suffers from the
+146	       [Raccoon] side channel attack.  (Note that FFDH is inherently
+147	       vulnerable to the Raccoon attack unless constant-time mitigations
+148	       are employed.)
+
+150	   The problems affecting RSA key exchange in (D)TLS 1.2 are as follows:
+
+152	   1.  RSA key exchange offers no forward secrecy, by construction.
+
+154	   2.  RSA key exchange may be vulnerable to Bleichenbacher's attack
+155	       [BLEI].  Experience shows that variants of this attack arise
+156	       every few years because implementing the relevant countermeasure
+157	       correctly is difficult (see [ROBOT], [NEW-BLEI], [DROWN]).
+
+159	   3.  In addition to the above point, there is no convenient mechanism
+160	       in (D)TLS 1.2 for the domain separation of keys.  Therefore, a
+161	       single endpoint that is vulnerable to Bleichenbacher's attack
+162	       would affect all endpoints sharing the same RSA key (see [XPROT],
+163	       [DROWN]).
+
+165	   This document updates [RFC9325], [RFC4346], [RFC5246], [RFC4162],
+166	   [RFC6347], [RFC5932], [RFC5288], [RFC6209], [RFC6367], [RFC8422],
+167	   [RFC5289], [RFC4785], [RFC4279], [RFC5487], [RFC6655], [RFC7905] and
+168	   [RFC5469] to remediate the above problems.
+
+170	   [RFC9325] contains the latest IETF recommendations for users of the
+171	   (D)TLS protocol (and specifically, (D)TLS 1.2) and this document
+172	   supersedes it in several points.  Appendix F details the exact
+173	   differences.  All other recommendations of the BCP document remain
+174	   valid.
+
+176	1.1.  Requirements
+
+178	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+179	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+180	   "OPTIONAL" in this document are to be interpreted as described in
+181	   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+182	   capitals, as shown here.
+
+184	2.  Non-Ephemeral Diffie-Hellman
+
+186	   Clients MUST NOT offer and servers MUST NOT select non-ephemeral FFDH
+187	   cipher suites in (D)TLS 1.2 connections.  (Note that (D)TLS 1.0 and
+188	   TLS 1.1 are deprecated by [RFC8996] and (D)TLS 1.3 does not support
+189	   FFDH [I-D.ietf-tls-rfc8446bis][RFC9147].)  This includes all cipher
+190	   suites listed in the table in Appendix A.
+
+192	   Clients SHOULD NOT offer and servers SHOULD NOT select non-ephemeral
+193	   ECDH cipher suites in (D)TLS 1.2 connections.  (This requirement is
+194	   already present in [RFC9325].  Note that (D)TLS 1.0 and TLS 1.1 are
+195	   deprecated by [RFC8996] and (D)TLS 1.3 does not support ECDH
+196	   [I-D.ietf-tls-rfc8446bis][RFC9147].)  This includes all cipher suites
+197	   listed in the table in Appendix B.
+
+199	   In addition, to avoid the use of non-ephemeral Diffie-Hellman,
+200	   clients SHOULD NOT use and servers SHOULD NOT accept certificates
+201	   with fixed DH parameters.  These certificate types are rsa_fixed_dh,
+202	   dss_fixed_dh, rsa_fixed_ecdh and ecdsa_fixed_ecdh as listed in
+203	   Appendix E.  These values only apply to (D)TLS versions of 1.2 and
+204	   below.
+
+206	3.  Ephemeral Finite Field Diffie-Hellman
+
+208	   Clients MUST NOT offer and servers MUST NOT select FFDHE cipher
+209	   suites in (D)TLS 1.2 connections.  This includes all cipher suites
+210	   listed in the table in Appendix C.  (Note that (D)TLS 1.0 and TLS 1.1
+211	   are deprecated by [RFC8996].)  FFDHE cipher suites in (D)TLS 1.3 do
+212	   not suffer from the problems presented in Section 1; see
+213	   [I-D.ietf-tls-rfc8446bis] and [RFC9147].  Therefore, clients and
+214	   servers MAY offer FFDHE cipher suites in (D)TLS 1.3 connections.
+
+216	4.  RSA
+
+218	   Clients MUST NOT offer and servers MUST NOT select RSA cipher suites
+219	   in (D)TLS 1.2 connections.  (Note that (D)TLS 1.0 and TLS 1.1 are
+220	   deprecated by [RFC8996], and (D)TLS 1.3 does not support static RSA
+221	   [I-D.ietf-tls-rfc8446bis][RFC9147].)  This includes all cipher suites
+222	   listed in the table in Appendix D.  Note that these cipher suites are
+223	   already marked as not recommended in the "TLS Cipher Suites"
+224	   registry.
+
+226	5.  IANA Considerations
+
+228	   This document requests IANA to mark the cipher suites from the "TLS
+229	   Cipher Suites" registry listed in Appendix A, Appendix B, Appendix C,
+230	   Appendix D, and the certificate types from the "TLS
+231	   ClientCertificateType Identifiers" registry listed in Appendix E as
+232	   "D" in the "Recommended" column, see [I-D.ietf-tls-rfc8447bis].
+
+234	   For each regsitry entry in Appendix A, Appendix B, Appendix C,
+235	   Appendix D, and Appendix E, IANA is also requested to update the
+236	   registry entry's Reference column to refer to the this document.
+
+238	6.  Security Considerations
+
+240	   Non-ephemeral finite field DH cipher suites (TLS_DH_*), as well as
+241	   ephemeral key reuse for finite field DH cipher suites, are prohibited
+242	   due to the [Raccoon] attack.  Both are already considered bad
+243	   practice since they do not provide forward secrecy.  However, Raccoon
+244	   revealed that timing side channels in processing TLS premaster
+245	   secrets may be exploited to reveal the encrypted premaster secret.
+
+247	   As for non-ephemeral elliptic curve DH cipher suites (TLS_ECDH_*),
+248	   forgoing forward secrecy not only allows retroactive decryption in
+249	   the event of key compromise but may also enable a broad category of
+250	   attacks where the attacker exploits key reuse to repeatedly query a
+251	   cryptographic secret.
+
+253	   This category includes, but is not necessarily limited to, the
+254	   following examples:
+
+256	   1.  Invalid curve attacks, where the attacker exploits key reuse to
+257	       repeatedly query and eventually learn the key itself.  These
+258	       attacks have been shown to be practical against real-world TLS
+259	       implementations [ICA].
+
+261	   2.  Side channel attacks, where the attacker exploits key reuse and
+262	       an additional side channel to learn a cryptographic secret.  As
+263	       one example of such attacks, refer to [MAY4].
+
+265	   3.  Fault attacks, where the attacker exploits key reuse and
+266	       incorrect calculations to learn a cryptographic secret.  As one
+267	       example of such attacks, see [PARIS256].
+
+269	   Such attacks are often implementation-dependent, including the above
+270	   examples.  However, these examples demonstrate that building a system
+271	   that reuses keys and avoids this category of attacks is difficult in
+272	   practice.  In contrast, avoiding key reuse not only prevents
+273	   decryption in the event of key compromise, but also precludes this
+274	   category of attacks altogether.  Therefore, this document discourages
+275	   the reuse of elliptic curve DH public keys.
+
+277	   As for ephemeral finite field Diffie-Hellman in (D)TLS 1.2 (TLS_DHE_*
+278	   and TLS_PSK_DHE_*), as explained above, clients have no practical way
+279	   to support these cipher suites while ensuring they only negotiate
+280	   security parameters that are acceptable to them.  In (D)TLS 1.2, the
+281	   server chooses the Diffie-Hellman group, and custom groups are
+282	   prevalent.  Therefore, once the client includes these cipher suites
+283	   in its handshake and the server presents a custom group, the client
+284	   cannot complete the handshake while ensuring security.  Verifying the
+285	   group structure is prohibitively expensive for the client.  Using a
+286	   safelist of known-good groups is also impractical, since server
+287	   operators were encouraged to generate their own custom group.
+288	   Further, there is no mechanism for the handshake to fall back to
+289	   other parameters, that are acceptable to both the client and server.
+
+291	7.  Acknowledgments
+
+293	   This document includes many important contributions from Carrie
+294	   Bartle, who wrote much of the prose, and presented it several times
+295	   at the IETF TLS WG.
+
+297	   The document was inspired by discussions on the TLS WG mailing list
+298	   and a suggestion by Filippo Valsorda following the release of the
+299	   [Raccoon] attack.  Thanks to Christopher A.  Wood for writing up the
+300	   initial draft of this document.  Thanks also to Thomas Fossati, Sean
+301	   Turner, Joe Salowey, Yaron Sheffer, Christian Buchgraber, John Preuß
+302	   Mattsson and Manuel Pégourié-Gonnard for comments and suggestions.
+
+304	8.  References
+
+306	8.1.  Normative References
+
+308	   [I-D.ietf-tls-rfc8446bis]
+309	              Rescorla, E., "The Transport Layer Security (TLS) Protocol
+310	              Version 1.3", Work in Progress, Internet-Draft, draft-
+311	              ietf-tls-rfc8446bis-12, 17 February 2025,
+312	              <https://datatracker.ietf.org/doc/html/draft-ietf-tls-
+313	              rfc8446bis-12>.
+
+315	   [I-D.ietf-tls-rfc8447bis]
+316	              Salowey, J. A. and S. Turner, "IANA Registry Updates for
+317	              TLS and DTLS", Work in Progress, Internet-Draft, draft-
+318	              ietf-tls-rfc8447bis-14, 16 June 2025,
+319	              <https://datatracker.ietf.org/doc/html/draft-ietf-tls-
+320	              rfc8447bis-14>.
+
+322	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+323	              Requirement Levels", BCP 14, RFC 2119,
+324	              DOI 10.17487/RFC2119, March 1997,
+325	              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+327	   [RFC4162]  Lee, H.J., Yoon, J.H., and J.I. Lee, "Addition of SEED
+328	              Cipher Suites to Transport Layer Security (TLS)",
+329	              RFC 4162, DOI 10.17487/RFC4162, August 2005,
+330	              <https://www.rfc-editor.org/rfc/rfc4162>.
+
+332	   [RFC4279]  Eronen, P., Ed. and H. Tschofenig, Ed., "Pre-Shared Key
+333	              Ciphersuites for Transport Layer Security (TLS)",
+334	              RFC 4279, DOI 10.17487/RFC4279, December 2005,
+335	              <https://www.rfc-editor.org/rfc/rfc4279>.
+
+337	   [RFC4346]  Dierks, T. and E. Rescorla, "The Transport Layer Security
+338	              (TLS) Protocol Version 1.1", RFC 4346,
+339	              DOI 10.17487/RFC4346, April 2006,
+340	              <https://www.rfc-editor.org/rfc/rfc4346>.
+
+342	   [RFC4785]  Blumenthal, U. and P. Goel, "Pre-Shared Key (PSK)
+343	              Ciphersuites with NULL Encryption for Transport Layer
+344	              Security (TLS)", RFC 4785, DOI 10.17487/RFC4785, January
+345	              2007, <https://www.rfc-editor.org/rfc/rfc4785>.
+
+347	   [RFC5246]  Dierks, T. and E. Rescorla, "The Transport Layer Security
+348	              (TLS) Protocol Version 1.2", RFC 5246,
+349	              DOI 10.17487/RFC5246, August 2008,
+350	              <https://www.rfc-editor.org/rfc/rfc5246>.
+
+352	   [RFC5288]  Salowey, J., Choudhury, A., and D. McGrew, "AES Galois
+353	              Counter Mode (GCM) Cipher Suites for TLS", RFC 5288,
+354	              DOI 10.17487/RFC5288, August 2008,
+355	              <https://www.rfc-editor.org/rfc/rfc5288>.
+
+357	   [RFC5289]  Rescorla, E., "TLS Elliptic Curve Cipher Suites with SHA-
+358	              256/384 and AES Galois Counter Mode (GCM)", RFC 5289,
+359	              DOI 10.17487/RFC5289, August 2008,
+360	              <https://www.rfc-editor.org/rfc/rfc5289>.
+
+362	   [RFC5469]  Eronen, P., Ed., "DES and IDEA Cipher Suites for Transport
+363	              Layer Security (TLS)", RFC 5469, DOI 10.17487/RFC5469,
+364	              February 2009, <https://www.rfc-editor.org/rfc/rfc5469>.
+
+366	   [RFC5487]  Badra, M., "Pre-Shared Key Cipher Suites for TLS with SHA-
+367	              256/384 and AES Galois Counter Mode", RFC 5487,
+368	              DOI 10.17487/RFC5487, March 2009,
+369	              <https://www.rfc-editor.org/rfc/rfc5487>.
+
+371	   [RFC5932]  Kato, A., Kanda, M., and S. Kanno, "Camellia Cipher Suites
+372	              for TLS", RFC 5932, DOI 10.17487/RFC5932, June 2010,
+373	              <https://www.rfc-editor.org/rfc/rfc5932>.
+
+375	   [RFC6209]  Kim, W., Lee, J., Park, J., and D. Kwon, "Addition of the
+376	              ARIA Cipher Suites to Transport Layer Security (TLS)",
+377	              RFC 6209, DOI 10.17487/RFC6209, April 2011,
+378	              <https://www.rfc-editor.org/rfc/rfc6209>.
+
+380	   [RFC6347]  Rescorla, E. and N. Modadugu, "Datagram Transport Layer
+381	              Security Version 1.2", RFC 6347, DOI 10.17487/RFC6347,
+382	              January 2012, <https://www.rfc-editor.org/rfc/rfc6347>.
+
+384	   [RFC6367]  Kanno, S. and M. Kanda, "Addition of the Camellia Cipher
+385	              Suites to Transport Layer Security (TLS)", RFC 6367,
+386	              DOI 10.17487/RFC6367, September 2011,
+387	              <https://www.rfc-editor.org/rfc/rfc6367>.
+
+389	   [RFC6655]  McGrew, D. and D. Bailey, "AES-CCM Cipher Suites for
+390	              Transport Layer Security (TLS)", RFC 6655,
+391	              DOI 10.17487/RFC6655, July 2012,
+392	              <https://www.rfc-editor.org/rfc/rfc6655>.
+
+394	   [RFC7905]  Langley, A., Chang, W., Mavrogiannopoulos, N.,
+395	              Strombergson, J., and S. Josefsson, "ChaCha20-Poly1305
+396	              Cipher Suites for Transport Layer Security (TLS)",
+397	              RFC 7905, DOI 10.17487/RFC7905, June 2016,
+398	              <https://www.rfc-editor.org/rfc/rfc7905>.
+
+400	   [RFC7919]  Gillmor, D., "Negotiated Finite Field Diffie-Hellman
+401	              Ephemeral Parameters for Transport Layer Security (TLS)",
+402	              RFC 7919, DOI 10.17487/RFC7919, August 2016,
+403	              <https://www.rfc-editor.org/rfc/rfc7919>.
+
+405	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+406	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+407	              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+409	   [RFC8422]  Nir, Y., Josefsson, S., and M. Pegourie-Gonnard, "Elliptic
+410	              Curve Cryptography (ECC) Cipher Suites for Transport Layer
+411	              Security (TLS) Versions 1.2 and Earlier", RFC 8422,
+412	              DOI 10.17487/RFC8422, August 2018,
+413	              <https://www.rfc-editor.org/rfc/rfc8422>.
+
+415	   [RFC8996]  Moriarty, K. and S. Farrell, "Deprecating TLS 1.0 and TLS
+416	              1.1", BCP 195, RFC 8996, DOI 10.17487/RFC8996, March 2021,
+417	              <https://www.rfc-editor.org/rfc/rfc8996>.
+
+419	   [RFC9147]  Rescorla, E., Tschofenig, H., and N. Modadugu, "The
+420	              Datagram Transport Layer Security (DTLS) Protocol Version
+421	              1.3", RFC 9147, DOI 10.17487/RFC9147, April 2022,
+422	              <https://www.rfc-editor.org/rfc/rfc9147>.
+
+424	   [RFC9325]  Sheffer, Y., Saint-Andre, P., and T. Fossati,
+425	              "Recommendations for Secure Use of Transport Layer
+426	              Security (TLS) and Datagram Transport Layer Security
+427	              (DTLS)", BCP 195, RFC 9325, DOI 10.17487/RFC9325, November
+428	              2022, <https://www.rfc-editor.org/rfc/rfc9325>.
+
+430	8.2.  Informative References
+
+432	   [BLEI]     Bleichenbacher, D., "Chosen Ciphertext Attacks against
+433	              Protocols Based on RSA Encryption Standard PKCS #1",
+434	              Advances in Cryptology -- CRYPTO'98, LNCS vol. 1462,
+435	              pages: 1-12 , 1998.
+
+437	   [DLOG795]  Boudot, F., Gaudry, P., Guillevic, A., Heninger, N.,
+438	              Thomé, E., and P. Zimmermann, "Comparing the difficulty of
+439	              factorization and discrete logarithm: a 240-digit
+440	              experiment", 17 August 2020,
+441	              <https://eprint.iacr.org/2020/697>.
+
+443	   [DROWN]    Aviram, N., Schinzel, S., Somorovsky, J., Heninger, N.,
+444	              Dankel, M., Steube, J., Valenta, L., Adrian, D.,
+445	              Halderman, J. A., Dukhovni, V., Käsper, E., Cohney, S.,
+446	              Engels, S., Paar, C., and Y. Shavitt, "DROWN: Breaking TLS
+447	              using SSLv2", August 2016,
+448	              <https://drownattack.com/drown-attack-paper.pdf>.
+
+450	   [ICA]      Jager, T., Schwenk, J., and J. Somorovsky, "Practical
+451	              invalid curve attacks on TLS-ECDH", 21 September 2015,
+452	              <https://citeseerx.ist.psu.edu/viewdoc/
+453	              download?doi=10.1.1.704.7932&rep=rep1&type=pdf>.
+
+455	   [MAY4]     Genkin, D., Valenta, L., and Y. Yarom, "May the fourth be
+456	              with you: A microarchitectural side channel attack on
+457	              several real-world applications of curve25519", n.d.,
+458	              <https://dl.acm.org/doi/pdf/10.1145/3133956.3134029>.
+
+460	   [NEW-BLEI] Meyer, C., Somorovsky, J., Weiss, E., Schwenk, J.,
+461	              Schinzel, S., and E. Tews, "Revisiting SSL/TLS
+462	              Implementations: New Bleichenbacher Side Channels and
+463	              Attacks", August 2014,
+464	              <https://www.usenix.org/system/files/conference/
+465	              usenixsecurity14/sec14-paper-meyer.pdf>.
+
+467	   [PARIS256] Devlin, S. and F. Valsorda, "The PARIS256 Attack", n.d.,
+468	              <https://i.blackhat.com/us-18/Wed-August-8/us-18-Valsorda-
+469	              Squeezing-A-Key-Through-A-Carry-Bit-wp.pdf>.
+
+471	   [Raccoon]  Merget, R., Brinkmann, M., Aviram, N., Somorovsky, J.,
+472	              Mittmann, J., and J. Schwenk, "Raccoon Attack: Finding and
+473	              Exploiting Most-Significant-Bit-Oracles in TLS-DH(E)", 9
+474	              September 2020,
+475	              <https://raccoon-attack.com/RacoonAttack.pdf>.
+
+477	   [RFC4492]  Blake-Wilson, S., Bolyard, N., Gupta, V., Hawk, C., and B.
+478	              Moeller, "Elliptic Curve Cryptography (ECC) Cipher Suites
+479	              for Transport Layer Security (TLS)", RFC 4492,
+480	              DOI 10.17487/RFC4492, May 2006,
+481	              <https://www.rfc-editor.org/rfc/rfc4492>.
+
+483	   [ROBOT]    Boeck, H., Somorovsky, J., and C. Young, "Return Of
+484	              Bleichenbacher's Oracle Threat (ROBOT)", 27th USENIX
+485	              Security Symposium , 2018.
+
+487	   [subgroups]
+488	              Valenta, L., Adrian, D., Sanso, A., Cohney, S., Fried, J.,
+489	              Hastings, M., Halderman, J. A., and N. Heninger,
+490	              "Measuring small subgroup attacks against Diffie-Hellman",
+491	              15 October 2016,
+492	              <https://eprint.iacr.org/2016/995/20161017:193515>.
+
+494	   [weak-dh]  Adrian, D., Bhargavan, K., Durumeric, Z., Gaudry, P.,
+495	              Green, M., Halderman, J. A., Heninger, N., Springall, D.,
+496	              Thomé, E., Valenta, L., VanderSloot, B., Wustrow, E.,
+497	              Zanella-Béguelin, S., and P. Zimmermann, "Weak Diffie-
+498	              Hellman and the Logjam Attack", October 2015,
+499	              <https://weakdh.org/>.
+
+501	   [XPROT]    Jager, T., Schwenk, J., and J. Somorovsky, "On the
+502	              Security of TLS 1.3 and QUIC Against Weaknesses in PKCS#1
+503	              v1.5 Encryption", Proceedings of the 22nd ACM SIGSAC
+504	              Conference on Computer and Communications Security , 2015.
+
+506	Appendix A.  DH Cipher Suites Deprecated by This Document
+
+508	     +==========================================+====================+
+509	     | Ciphersuite                              | Reference          |
+510	     +==========================================+====================+
+511	     | TLS_DH_DSS_EXPORT_WITH_DES40_CBC_SHA     | [RFC4346]          |
+512	     +------------------------------------------+--------------------+
+513	     | TLS_DH_DSS_WITH_DES_CBC_SHA              | [RFC5469]          |
+514	     +------------------------------------------+--------------------+
+515	     | TLS_DH_DSS_WITH_3DES_EDE_CBC_SHA         | [RFC5246]          |
+516	     +------------------------------------------+--------------------+
+517	     | TLS_DH_RSA_EXPORT_WITH_DES40_CBC_SHA     | [RFC4346]          |
+518	     +------------------------------------------+--------------------+
+519	     | TLS_DH_RSA_WITH_DES_CBC_SHA              | [RFC5469]          |
+520	     +------------------------------------------+--------------------+
+521	     | TLS_DH_RSA_WITH_3DES_EDE_CBC_SHA         | [RFC5246]          |
+522	     +------------------------------------------+--------------------+
+523	     | TLS_DH_anon_EXPORT_WITH_RC4_40_MD5       | [RFC4346][RFC6347] |
+524	     +------------------------------------------+--------------------+
+525	     | TLS_DH_anon_WITH_RC4_128_MD5             | [RFC5246][RFC6347] |
+526	     +------------------------------------------+--------------------+
+527	     | TLS_DH_anon_EXPORT_WITH_DES40_CBC_SHA    | [RFC4346]          |
+528	     +------------------------------------------+--------------------+
+529	     | TLS_DH_anon_WITH_DES_CBC_SHA             | [RFC5469]          |
+530	     +------------------------------------------+--------------------+
+531	     | TLS_DH_anon_WITH_3DES_EDE_CBC_SHA        | [RFC5246]          |
+532	     +------------------------------------------+--------------------+
+533	     | TLS_DH_DSS_WITH_AES_128_CBC_SHA          | [RFC5246]          |
+534	     +------------------------------------------+--------------------+
+535	     | TLS_DH_RSA_WITH_AES_128_CBC_SHA          | [RFC5246]          |
+536	     +------------------------------------------+--------------------+
+537	     | TLS_DH_anon_WITH_AES_128_CBC_SHA         | [RFC5246]          |
+538	     +------------------------------------------+--------------------+
+539	     | TLS_DH_DSS_WITH_AES_256_CBC_SHA          | [RFC5246]          |
+540	     +------------------------------------------+--------------------+
+541	     | TLS_DH_RSA_WITH_AES_256_CBC_SHA          | [RFC5246]          |
+542	     +------------------------------------------+--------------------+
+543	     | TLS_DH_anon_WITH_AES_256_CBC_SHA         | [RFC5246]          |
+544	     +------------------------------------------+--------------------+
+545	     | TLS_DH_DSS_WITH_AES_128_CBC_SHA256       | [RFC5246]          |
+546	     +------------------------------------------+--------------------+
+547	     | TLS_DH_RSA_WITH_AES_128_CBC_SHA256       | [RFC5246]          |
+548	     +------------------------------------------+--------------------+
+549	     | TLS_DH_DSS_WITH_CAMELLIA_128_CBC_SHA     | [RFC5932]          |
+550	     +------------------------------------------+--------------------+
+551	     | TLS_DH_RSA_WITH_CAMELLIA_128_CBC_SHA     | [RFC5932]          |
+552	     +------------------------------------------+--------------------+
+553	     | TLS_DH_anon_WITH_CAMELLIA_128_CBC_SHA    | [RFC5932]          |
+554	     +------------------------------------------+--------------------+
+555	     | TLS_DH_DSS_WITH_AES_256_CBC_SHA256       | [RFC5246]          |
+556	     +------------------------------------------+--------------------+
+557	     | TLS_DH_RSA_WITH_AES_256_CBC_SHA256       | [RFC5246]          |
+558	     +------------------------------------------+--------------------+
+559	     | TLS_DH_anon_WITH_AES_128_CBC_SHA256      | [RFC5246]          |
+560	     +------------------------------------------+--------------------+
+561	     | TLS_DH_anon_WITH_AES_256_CBC_SHA256      | [RFC5246]          |
+562	     +------------------------------------------+--------------------+
+563	     | TLS_DH_DSS_WITH_CAMELLIA_256_CBC_SHA     | [RFC5932]          |
+564	     +------------------------------------------+--------------------+
+565	     | TLS_DH_RSA_WITH_CAMELLIA_256_CBC_SHA     | [RFC5932]          |
+566	     +------------------------------------------+--------------------+
+567	     | TLS_DH_anon_WITH_CAMELLIA_256_CBC_SHA    | [RFC5932]          |
+568	     +------------------------------------------+--------------------+
+569	     | TLS_DH_DSS_WITH_SEED_CBC_SHA             | [RFC4162]          |
+570	     +------------------------------------------+--------------------+
+571	     | TLS_DH_RSA_WITH_SEED_CBC_SHA             | [RFC4162]          |
+572	     +------------------------------------------+--------------------+
+573	     | TLS_DH_anon_WITH_SEED_CBC_SHA            | [RFC4162]          |
+574	     +------------------------------------------+--------------------+
+575	     | TLS_DH_RSA_WITH_AES_128_GCM_SHA256       | [RFC5288]          |
+576	     +------------------------------------------+--------------------+
+577	     | TLS_DH_RSA_WITH_AES_256_GCM_SHA384       | [RFC5288]          |
+578	     +------------------------------------------+--------------------+
+579	     | TLS_DH_DSS_WITH_AES_128_GCM_SHA256       | [RFC5288]          |
+580	     +------------------------------------------+--------------------+
+581	     | TLS_DH_DSS_WITH_AES_256_GCM_SHA384       | [RFC5288]          |
+582	     +------------------------------------------+--------------------+
+583	     | TLS_DH_anon_WITH_AES_128_GCM_SHA256      | [RFC5288]          |
+584	     +------------------------------------------+--------------------+
+585	     | TLS_DH_anon_WITH_AES_256_GCM_SHA384      | [RFC5288]          |
+586	     +------------------------------------------+--------------------+
+587	     | TLS_DH_DSS_WITH_CAMELLIA_128_CBC_SHA256  | [RFC5932]          |
+588	     +------------------------------------------+--------------------+
+589	     | TLS_DH_RSA_WITH_CAMELLIA_128_CBC_SHA256  | [RFC5932]          |
+590	     +------------------------------------------+--------------------+
+591	     | TLS_DH_anon_WITH_CAMELLIA_128_CBC_SHA256 | [RFC5932]          |
+592	     +------------------------------------------+--------------------+
+593	     | TLS_DH_DSS_WITH_CAMELLIA_256_CBC_SHA256  | [RFC5932]          |
+594	     +------------------------------------------+--------------------+
+595	     | TLS_DH_RSA_WITH_CAMELLIA_256_CBC_SHA256  | [RFC5932]          |
+596	     +------------------------------------------+--------------------+
+597	     | TLS_DH_anon_WITH_CAMELLIA_256_CBC_SHA256 | [RFC5932]          |
+598	     +------------------------------------------+--------------------+
+599	     | TLS_DH_DSS_WITH_ARIA_128_CBC_SHA256      | [RFC6209]          |
+600	     +------------------------------------------+--------------------+
+601	     | TLS_DH_DSS_WITH_ARIA_256_CBC_SHA384      | [RFC6209]          |
+602	     +------------------------------------------+--------------------+
+603	     | TLS_DH_RSA_WITH_ARIA_128_CBC_SHA256      | [RFC6209]          |
+604	     +------------------------------------------+--------------------+
+605	     | TLS_DH_RSA_WITH_ARIA_256_CBC_SHA384      | [RFC6209]          |
+606	     +------------------------------------------+--------------------+
+607	     | TLS_DH_anon_WITH_ARIA_128_CBC_SHA256     | [RFC6209]          |
+608	     +------------------------------------------+--------------------+
+609	     | TLS_DH_anon_WITH_ARIA_256_CBC_SHA384     | [RFC6209]          |
+610	     +------------------------------------------+--------------------+
+611	     | TLS_DH_RSA_WITH_ARIA_128_GCM_SHA256      | [RFC6209]          |
+612	     +------------------------------------------+--------------------+
+613	     | TLS_DH_RSA_WITH_ARIA_256_GCM_SHA384      | [RFC6209]          |
+614	     +------------------------------------------+--------------------+
+615	     | TLS_DH_DSS_WITH_ARIA_128_GCM_SHA256      | [RFC6209]          |
+616	     +------------------------------------------+--------------------+
+617	     | TLS_DH_DSS_WITH_ARIA_256_GCM_SHA384      | [RFC6209]          |
+618	     +------------------------------------------+--------------------+
+619	     | TLS_DH_anon_WITH_ARIA_128_GCM_SHA256     | [RFC6209]          |
+620	     +------------------------------------------+--------------------+
+621	     | TLS_DH_anon_WITH_ARIA_256_GCM_SHA384     | [RFC6209]          |
+622	     +------------------------------------------+--------------------+
+623	     | TLS_DH_RSA_WITH_CAMELLIA_128_GCM_SHA256  | [RFC6367]          |
+624	     +------------------------------------------+--------------------+
+625	     | TLS_DH_RSA_WITH_CAMELLIA_256_GCM_SHA384  | [RFC6367]          |
+626	     +------------------------------------------+--------------------+
+627	     | TLS_DH_DSS_WITH_CAMELLIA_128_GCM_SHA256  | [RFC6367]          |
+628	     +------------------------------------------+--------------------+
+629	     | TLS_DH_DSS_WITH_CAMELLIA_256_GCM_SHA384  | [RFC6367]          |
+630	     +------------------------------------------+--------------------+
+631	     | TLS_DH_anon_WITH_CAMELLIA_128_GCM_SHA256 | [RFC6367]          |
+632	     +------------------------------------------+--------------------+
+633	     | TLS_DH_anon_WITH_CAMELLIA_256_GCM_SHA384 | [RFC6367]          |
+634	     +------------------------------------------+--------------------+
+
+636	                                  Table 1
+
+638	Appendix B.  ECDH Cipher Suites Whose Use Is Discouraged by This
+639	             Document
+
+641	   +=============================================+====================+
+642	   | Ciphersuite                                 | Reference          |
+643	   +=============================================+====================+
+644	   | TLS_ECDH_ECDSA_WITH_NULL_SHA                | [RFC8422]          |
+645	   +---------------------------------------------+--------------------+
+646	   | TLS_ECDH_ECDSA_WITH_RC4_128_SHA             | [RFC8422][RFC6347] |
+647	   +---------------------------------------------+--------------------+
+648	   | TLS_ECDH_ECDSA_WITH_3DES_EDE_CBC_SHA        | [RFC8422]          |
+649	   +---------------------------------------------+--------------------+
+650	   | TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA         | [RFC8422]          |
+651	   +---------------------------------------------+--------------------+
+652	   | TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA         | [RFC8422]          |
+653	   +---------------------------------------------+--------------------+
+654	   | TLS_ECDH_RSA_WITH_NULL_SHA                  | [RFC8422]          |
+655	   +---------------------------------------------+--------------------+
+656	   | TLS_ECDH_RSA_WITH_RC4_128_SHA               | [RFC8422][RFC6347] |
+657	   +---------------------------------------------+--------------------+
+658	   | TLS_ECDH_RSA_WITH_3DES_EDE_CBC_SHA          | [RFC8422]          |
+659	   +---------------------------------------------+--------------------+
+660	   | TLS_ECDH_RSA_WITH_AES_128_CBC_SHA           | [RFC8422]          |
+661	   +---------------------------------------------+--------------------+
+662	   | TLS_ECDH_RSA_WITH_AES_256_CBC_SHA           | [RFC8422]          |
+663	   +---------------------------------------------+--------------------+
+664	   | TLS_ECDH_anon_WITH_NULL_SHA                 | [RFC8422]          |
+665	   +---------------------------------------------+--------------------+
+666	   | TLS_ECDH_anon_WITH_RC4_128_SHA              | [RFC8422][RFC6347] |
+667	   +---------------------------------------------+--------------------+
+668	   | TLS_ECDH_anon_WITH_3DES_EDE_CBC_SHA         | [RFC8422]          |
+669	   +---------------------------------------------+--------------------+
+670	   | TLS_ECDH_anon_WITH_AES_128_CBC_SHA          | [RFC8422]          |
+671	   +---------------------------------------------+--------------------+
+672	   | TLS_ECDH_anon_WITH_AES_256_CBC_SHA          | [RFC8422]          |
+673	   +---------------------------------------------+--------------------+
+674	   | TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA256      | [RFC5289]          |
+675	   +---------------------------------------------+--------------------+
+676	   | TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA384      | [RFC5289]          |
+677	   +---------------------------------------------+--------------------+
+678	   | TLS_ECDH_RSA_WITH_AES_128_CBC_SHA256        | [RFC5289]          |
+679	   +---------------------------------------------+--------------------+
+680	   | TLS_ECDH_RSA_WITH_AES_256_CBC_SHA384        | [RFC5289]          |
+681	   +---------------------------------------------+--------------------+
+682	   | TLS_ECDH_ECDSA_WITH_AES_128_GCM_SHA256      | [RFC5289]          |
+683	   +---------------------------------------------+--------------------+
+684	   | TLS_ECDH_ECDSA_WITH_AES_256_GCM_SHA384      | [RFC5289]          |
+685	   +---------------------------------------------+--------------------+
+686	   | TLS_ECDH_RSA_WITH_AES_128_GCM_SHA256        | [RFC5289]          |
+687	   +---------------------------------------------+--------------------+
+688	   | TLS_ECDH_RSA_WITH_AES_256_GCM_SHA384        | [RFC5289]          |
+689	   +---------------------------------------------+--------------------+
+690	   | TLS_ECDH_ECDSA_WITH_ARIA_128_CBC_SHA256     | [RFC6209]          |
+691	   +---------------------------------------------+--------------------+
+692	   | TLS_ECDH_ECDSA_WITH_ARIA_256_CBC_SHA384     | [RFC6209]          |
+693	   +---------------------------------------------+--------------------+
+694	   | TLS_ECDH_RSA_WITH_ARIA_128_CBC_SHA256       | [RFC6209]          |
+695	   +---------------------------------------------+--------------------+
+696	   | TLS_ECDH_RSA_WITH_ARIA_256_CBC_SHA384       | [RFC6209]          |
+697	   +---------------------------------------------+--------------------+
+698	   | TLS_ECDH_ECDSA_WITH_ARIA_128_GCM_SHA256     | [RFC6209]          |
+699	   +---------------------------------------------+--------------------+
+700	   | TLS_ECDH_ECDSA_WITH_ARIA_256_GCM_SHA384     | [RFC6209]          |
+701	   +---------------------------------------------+--------------------+
+702	   | TLS_ECDH_RSA_WITH_ARIA_128_GCM_SHA256       | [RFC6209]          |
+703	   +---------------------------------------------+--------------------+
+704	   | TLS_ECDH_RSA_WITH_ARIA_256_GCM_SHA384       | [RFC6209]          |
+705	   +---------------------------------------------+--------------------+
+706	   | TLS_ECDH_ECDSA_WITH_CAMELLIA_128_CBC_SHA256 | [RFC6367]          |
+707	   +---------------------------------------------+--------------------+
+708	   | TLS_ECDH_ECDSA_WITH_CAMELLIA_256_CBC_SHA384 | [RFC6367]          |
+709	   +---------------------------------------------+--------------------+
+710	   | TLS_ECDH_RSA_WITH_CAMELLIA_128_CBC_SHA256   | [RFC6367]          |
+711	   +---------------------------------------------+--------------------+
+712	   | TLS_ECDH_RSA_WITH_CAMELLIA_256_CBC_SHA384   | [RFC6367]          |
+713	   +---------------------------------------------+--------------------+
+714	   | TLS_ECDH_ECDSA_WITH_CAMELLIA_128_GCM_SHA256 | [RFC6367]          |
+715	   +---------------------------------------------+--------------------+
+716	   | TLS_ECDH_ECDSA_WITH_CAMELLIA_256_GCM_SHA384 | [RFC6367]          |
+717	   +---------------------------------------------+--------------------+
+718	   | TLS_ECDH_RSA_WITH_CAMELLIA_128_GCM_SHA256   | [RFC6367]          |
+719	   +---------------------------------------------+--------------------+
+720	   | TLS_ECDH_RSA_WITH_CAMELLIA_256_GCM_SHA384   | [RFC6367]          |
+721	   +---------------------------------------------+--------------------+
+
+723	                                 Table 2
+
+725	Appendix C.  DHE Cipher Suites deprecated by This Document
+
+727	    +===========================================+=====================+
+728	    | Ciphersuite                               | Reference           |
+729	    +===========================================+=====================+
+730	    | TLS_DHE_DSS_EXPORT_WITH_DES40_CBC_SHA     | [RFC4346]           |
+731	    +-------------------------------------------+---------------------+
+732	    | TLS_DHE_DSS_WITH_DES_CBC_SHA              | [RFC5469] [RFC8996] |
+733	    +-------------------------------------------+---------------------+
+734	    | TLS_DHE_DSS_WITH_3DES_EDE_CBC_SHA         | [RFC5246]           |
+735	    +-------------------------------------------+---------------------+
+736	    | TLS_DHE_RSA_EXPORT_WITH_DES40_CBC_SHA     | [RFC4346]           |
+737	    +-------------------------------------------+---------------------+
+738	    | TLS_DHE_RSA_WITH_DES_CBC_SHA              | [RFC5469] [RFC8996] |
+739	    +-------------------------------------------+---------------------+
+740	    | TLS_DHE_RSA_WITH_3DES_EDE_CBC_SHA         | [RFC5246]           |
+741	    +-------------------------------------------+---------------------+
+742	    | TLS_DHE_PSK_WITH_NULL_SHA                 | [RFC4785]           |
+743	    +-------------------------------------------+---------------------+
+744	    | TLS_DHE_DSS_WITH_AES_128_CBC_SHA          | [RFC5246]           |
+745	    +-------------------------------------------+---------------------+
+746	    | TLS_DHE_RSA_WITH_AES_128_CBC_SHA          | [RFC5246]           |
+747	    +-------------------------------------------+---------------------+
+748	    | TLS_DHE_DSS_WITH_AES_256_CBC_SHA          | [RFC5246]           |
+749	    +-------------------------------------------+---------------------+
+750	    | TLS_DHE_RSA_WITH_AES_256_CBC_SHA          | [RFC5246]           |
+751	    +-------------------------------------------+---------------------+
+752	    | TLS_DHE_DSS_WITH_AES_128_CBC_SHA256       | [RFC5246]           |
+753	    +-------------------------------------------+---------------------+
+754	    | TLS_DHE_DSS_WITH_CAMELLIA_128_CBC_SHA     | [RFC5932]           |
+755	    +-------------------------------------------+---------------------+
+756	    | TLS_DHE_RSA_WITH_CAMELLIA_128_CBC_SHA     | [RFC5932]           |
+757	    +-------------------------------------------+---------------------+
+758	    | TLS_DHE_RSA_WITH_AES_128_CBC_SHA256       | [RFC5246]           |
+759	    +-------------------------------------------+---------------------+
+760	    | TLS_DHE_DSS_WITH_AES_256_CBC_SHA256       | [RFC5246]           |
+761	    +-------------------------------------------+---------------------+
+762	    | TLS_DHE_RSA_WITH_AES_256_CBC_SHA256       | [RFC5246]           |
+763	    +-------------------------------------------+---------------------+
+764	    | TLS_DHE_DSS_WITH_CAMELLIA_256_CBC_SHA     | [RFC5932]           |
+765	    +-------------------------------------------+---------------------+
+766	    | TLS_DHE_RSA_WITH_CAMELLIA_256_CBC_SHA     | [RFC5932]           |
+767	    +-------------------------------------------+---------------------+
+768	    | TLS_DHE_PSK_WITH_RC4_128_SHA              | [RFC4279][RFC6347]  |
+769	    +-------------------------------------------+---------------------+
+770	    | TLS_DHE_PSK_WITH_3DES_EDE_CBC_SHA         | [RFC4279]           |
+771	    +-------------------------------------------+---------------------+
+772	    | TLS_DHE_PSK_WITH_AES_128_CBC_SHA          | [RFC4279]           |
+773	    +-------------------------------------------+---------------------+
+774	    | TLS_DHE_PSK_WITH_AES_256_CBC_SHA          | [RFC4279]           |
+775	    +-------------------------------------------+---------------------+
+776	    | TLS_DHE_DSS_WITH_SEED_CBC_SHA             | [RFC4162]           |
+777	    +-------------------------------------------+---------------------+
+778	    | TLS_DHE_RSA_WITH_SEED_CBC_SHA             | [RFC4162]           |
+779	    +-------------------------------------------+---------------------+
+780	    | TLS_DHE_RSA_WITH_AES_128_GCM_SHA256       | [RFC5288]           |
+781	    +-------------------------------------------+---------------------+
+782	    | TLS_DHE_RSA_WITH_AES_256_GCM_SHA384       | [RFC5288]           |
+783	    +-------------------------------------------+---------------------+
+784	    | TLS_DHE_DSS_WITH_AES_128_GCM_SHA256       | [RFC5288]           |
+785	    +-------------------------------------------+---------------------+
+786	    | TLS_DHE_DSS_WITH_AES_256_GCM_SHA384       | [RFC5288]           |
+787	    +-------------------------------------------+---------------------+
+788	    | TLS_DHE_PSK_WITH_AES_128_GCM_SHA256       | [RFC5487]           |
+789	    +-------------------------------------------+---------------------+
+790	    | TLS_DHE_PSK_WITH_AES_256_GCM_SHA384       | [RFC5487]           |
+791	    +-------------------------------------------+---------------------+
+792	    | TLS_DHE_PSK_WITH_AES_128_CBC_SHA256       | [RFC5487]           |
+793	    +-------------------------------------------+---------------------+
+794	    | TLS_DHE_PSK_WITH_AES_256_CBC_SHA384       | [RFC5487]           |
+795	    +-------------------------------------------+---------------------+
+796	    | TLS_DHE_PSK_WITH_NULL_SHA256              | [RFC5487]           |
+797	    +-------------------------------------------+---------------------+
+798	    | TLS_DHE_PSK_WITH_NULL_SHA384              | [RFC5487]           |
+799	    +-------------------------------------------+---------------------+
+800	    | TLS_DHE_DSS_WITH_CAMELLIA_128_CBC_SHA256  | [RFC5932]           |
+801	    +-------------------------------------------+---------------------+
+802	    | TLS_DHE_RSA_WITH_CAMELLIA_128_CBC_SHA256  | [RFC5932]           |
+803	    +-------------------------------------------+---------------------+
+804	    | TLS_DHE_DSS_WITH_CAMELLIA_256_CBC_SHA256  | [RFC5932]           |
+805	    +-------------------------------------------+---------------------+
+806	    | TLS_DHE_RSA_WITH_CAMELLIA_256_CBC_SHA256  | [RFC5932]           |
+807	    +-------------------------------------------+---------------------+
+808	    | TLS_DHE_DSS_WITH_ARIA_128_CBC_SHA256      | [RFC6209]           |
+809	    +-------------------------------------------+---------------------+
+810	    | TLS_DHE_DSS_WITH_ARIA_256_CBC_SHA384      | [RFC6209]           |
+811	    +-------------------------------------------+---------------------+
+812	    | TLS_DHE_RSA_WITH_ARIA_128_CBC_SHA256      | [RFC6209]           |
+813	    +-------------------------------------------+---------------------+
+814	    | TLS_DHE_RSA_WITH_ARIA_256_CBC_SHA384      | [RFC6209]           |
+815	    +-------------------------------------------+---------------------+
+816	    | TLS_DHE_RSA_WITH_ARIA_128_GCM_SHA256      | [RFC6209]           |
+817	    +-------------------------------------------+---------------------+
+818	    | TLS_DHE_RSA_WITH_ARIA_256_GCM_SHA384      | [RFC6209]           |
+819	    +-------------------------------------------+---------------------+
+820	    | TLS_DHE_DSS_WITH_ARIA_128_GCM_SHA256      | [RFC6209]           |
+821	    +-------------------------------------------+---------------------+
+822	    | TLS_DHE_DSS_WITH_ARIA_256_GCM_SHA384      | [RFC6209]           |
+823	    +-------------------------------------------+---------------------+
+824	    | TLS_DHE_PSK_WITH_ARIA_128_CBC_SHA256      | [RFC6209]           |
+825	    +-------------------------------------------+---------------------+
+826	    | TLS_DHE_PSK_WITH_ARIA_256_CBC_SHA384      | [RFC6209]           |
+827	    +-------------------------------------------+---------------------+
+828	    | TLS_DHE_PSK_WITH_ARIA_128_GCM_SHA256      | [RFC6209]           |
+829	    +-------------------------------------------+---------------------+
+830	    | TLS_DHE_PSK_WITH_ARIA_256_GCM_SHA384      | [RFC6209]           |
+831	    +-------------------------------------------+---------------------+
+832	    | TLS_DHE_RSA_WITH_CAMELLIA_128_GCM_SHA256  | [RFC6367]           |
+833	    +-------------------------------------------+---------------------+
+834	    | TLS_DHE_RSA_WITH_CAMELLIA_256_GCM_SHA384  | [RFC6367]           |
+835	    +-------------------------------------------+---------------------+
+836	    | TLS_DHE_DSS_WITH_CAMELLIA_128_GCM_SHA256  | [RFC6367]           |
+837	    +-------------------------------------------+---------------------+
+838	    | TLS_DHE_DSS_WITH_CAMELLIA_256_GCM_SHA384  | [RFC6367]           |
+839	    +-------------------------------------------+---------------------+
+840	    | TLS_DHE_PSK_WITH_CAMELLIA_128_GCM_SHA256  | [RFC6367]           |
+841	    +-------------------------------------------+---------------------+
+842	    | TLS_DHE_PSK_WITH_CAMELLIA_256_GCM_SHA384  | [RFC6367]           |
+843	    +-------------------------------------------+---------------------+
+844	    | TLS_DHE_PSK_WITH_CAMELLIA_128_CBC_SHA256  | [RFC6367]           |
+845	    +-------------------------------------------+---------------------+
+846	    | TLS_DHE_PSK_WITH_CAMELLIA_256_CBC_SHA384  | [RFC6367]           |
+847	    +-------------------------------------------+---------------------+
+848	    | TLS_DHE_RSA_WITH_AES_128_CCM              | [RFC6655]           |
+849	    +-------------------------------------------+---------------------+
+850	    | TLS_DHE_RSA_WITH_AES_256_CCM              | [RFC6655]           |
+851	    +-------------------------------------------+---------------------+
+852	    | TLS_DHE_RSA_WITH_AES_128_CCM_8            | [RFC6655]           |
+853	    +-------------------------------------------+---------------------+
+854	    | TLS_DHE_RSA_WITH_AES_256_CCM_8            | [RFC6655]           |
+855	    +-------------------------------------------+---------------------+
+856	    | TLS_DHE_PSK_WITH_AES_128_CCM              | [RFC6655]           |
+857	    +-------------------------------------------+---------------------+
+858	    | TLS_DHE_PSK_WITH_AES_256_CCM              | [RFC6655]           |
+859	    +-------------------------------------------+---------------------+
+860	    | TLS_DHE_RSA_WITH_CHACHA20_POLY1305_SHA256 | [RFC7905]           |
+861	    +-------------------------------------------+---------------------+
+862	    | TLS_DHE_PSK_WITH_CHACHA20_POLY1305_SHA256 | [RFC7905]           |
+863	    +-------------------------------------------+---------------------+
+864	    | TLS_PSK_DHE_WITH_AES_128_CCM_8            | [RFC6655]           |
+865	    +-------------------------------------------+---------------------+
+866	    | TLS_PSK_DHE_WITH_AES_256_CCM_8            | [RFC6655]           |
+867	    +-------------------------------------------+---------------------+
+
+869	                                  Table 3
+
+871	Appendix D.  RSA Cipher Suites Deprecated by This Document
+
+873	    +===========================================+=====================+
+874	    | Ciphersuite                               | Reference           |
+875	    +===========================================+=====================+
+876	    | TLS_RSA_WITH_NULL_MD5                     | [RFC5246]           |
+877	    +-------------------------------------------+---------------------+
+878	    | TLS_RSA_WITH_NULL_SHA                     | [RFC5246]           |
+879	    +-------------------------------------------+---------------------+
+880	    | TLS_RSA_EXPORT_WITH_RC4_40_MD5            | [RFC4346][RFC6347]  |
+881	    +-------------------------------------------+---------------------+
+882	    | TLS_RSA_WITH_RC4_128_MD5                  | [RFC5246][RFC6347]  |
+883	    +-------------------------------------------+---------------------+
+884	    | TLS_RSA_WITH_RC4_128_SHA                  | [RFC5246][RFC6347]  |
+885	    +-------------------------------------------+---------------------+
+886	    | TLS_RSA_EXPORT_WITH_RC2_CBC_40_MD5        | [RFC4346]           |
+887	    +-------------------------------------------+---------------------+
+888	    | TLS_RSA_WITH_IDEA_CBC_SHA                 | [RFC5469] [RFC8996] |
+889	    +-------------------------------------------+---------------------+
+890	    | TLS_RSA_EXPORT_WITH_DES40_CBC_SHA         | [RFC4346]           |
+891	    +-------------------------------------------+---------------------+
+892	    | TLS_RSA_WITH_DES_CBC_SHA                  | [RFC5469] [RFC8996] |
+893	    +-------------------------------------------+---------------------+
+894	    | TLS_RSA_WITH_3DES_EDE_CBC_SHA             | [RFC5246]           |
+895	    +-------------------------------------------+---------------------+
+896	    | TLS_RSA_PSK_WITH_NULL_SHA                 | [RFC4785]           |
+897	    +-------------------------------------------+---------------------+
+898	    | TLS_RSA_WITH_AES_128_CBC_SHA              | [RFC5246]           |
+899	    +-------------------------------------------+---------------------+
+900	    | TLS_RSA_WITH_AES_256_CBC_SHA              | [RFC5246]           |
+901	    +-------------------------------------------+---------------------+
+902	    | TLS_RSA_WITH_NULL_SHA256                  | [RFC5246]           |
+903	    +-------------------------------------------+---------------------+
+904	    | TLS_RSA_WITH_AES_128_CBC_SHA256           | [RFC5246]           |
+905	    +-------------------------------------------+---------------------+
+906	    | TLS_RSA_WITH_AES_256_CBC_SHA256           | [RFC5246]           |
+907	    +-------------------------------------------+---------------------+
+908	    | TLS_RSA_WITH_CAMELLIA_128_CBC_SHA         | [RFC5932]           |
+909	    +-------------------------------------------+---------------------+
+910	    | TLS_RSA_WITH_CAMELLIA_256_CBC_SHA         | [RFC5932]           |
+911	    +-------------------------------------------+---------------------+
+912	    | TLS_RSA_PSK_WITH_RC4_128_SHA              | [RFC4279][RFC6347]  |
+913	    +-------------------------------------------+---------------------+
+914	    | TLS_RSA_PSK_WITH_3DES_EDE_CBC_SHA         | [RFC4279]           |
+915	    +-------------------------------------------+---------------------+
+916	    | TLS_RSA_PSK_WITH_AES_128_CBC_SHA          | [RFC4279]           |
+917	    +-------------------------------------------+---------------------+
+918	    | TLS_RSA_PSK_WITH_AES_256_CBC_SHA          | [RFC4279]           |
+919	    +-------------------------------------------+---------------------+
+920	    | TLS_RSA_WITH_SEED_CBC_SHA                 | [RFC4162]           |
+921	    +-------------------------------------------+---------------------+
+922	    | TLS_RSA_WITH_AES_128_GCM_SHA256           | [RFC5288]           |
+923	    +-------------------------------------------+---------------------+
+924	    | TLS_RSA_WITH_AES_256_GCM_SHA384           | [RFC5288]           |
+925	    +-------------------------------------------+---------------------+
+926	    | TLS_RSA_PSK_WITH_AES_128_GCM_SHA256       | [RFC5487]           |
+927	    +-------------------------------------------+---------------------+
+928	    | TLS_RSA_PSK_WITH_AES_256_GCM_SHA384       | [RFC5487]           |
+929	    +-------------------------------------------+---------------------+
+930	    | TLS_RSA_PSK_WITH_AES_128_CBC_SHA256       | [RFC5487]           |
+931	    +-------------------------------------------+---------------------+
+932	    | TLS_RSA_PSK_WITH_AES_256_CBC_SHA384       | [RFC5487]           |
+933	    +-------------------------------------------+---------------------+
+934	    | TLS_RSA_PSK_WITH_NULL_SHA256              | [RFC5487]           |
+935	    +-------------------------------------------+---------------------+
+936	    | TLS_RSA_PSK_WITH_NULL_SHA384              | [RFC5487]           |
+937	    +-------------------------------------------+---------------------+
+938	    | TLS_RSA_WITH_CAMELLIA_128_CBC_SHA256      | [RFC5932]           |
+939	    +-------------------------------------------+---------------------+
+940	    | TLS_RSA_WITH_CAMELLIA_256_CBC_SHA256      | [RFC5932]           |
+941	    +-------------------------------------------+---------------------+
+942	    | TLS_RSA_WITH_ARIA_128_CBC_SHA256          | [RFC6209]           |
+943	    +-------------------------------------------+---------------------+
+944	    | TLS_RSA_WITH_ARIA_256_CBC_SHA384          | [RFC6209]           |
+945	    +-------------------------------------------+---------------------+
+946	    | TLS_RSA_WITH_ARIA_128_GCM_SHA256          | [RFC6209]           |
+947	    +-------------------------------------------+---------------------+
+948	    | TLS_RSA_WITH_ARIA_256_GCM_SHA384          | [RFC6209]           |
+949	    +-------------------------------------------+---------------------+
+950	    | TLS_RSA_PSK_WITH_ARIA_128_CBC_SHA256      | [RFC6209]           |
+951	    +-------------------------------------------+---------------------+
+952	    | TLS_RSA_PSK_WITH_ARIA_256_CBC_SHA384      | [RFC6209]           |
+953	    +-------------------------------------------+---------------------+
+954	    | TLS_RSA_PSK_WITH_ARIA_128_GCM_SHA256      | [RFC6209]           |
+955	    +-------------------------------------------+---------------------+
+956	    | TLS_RSA_PSK_WITH_ARIA_256_GCM_SHA384      | [RFC6209]           |
+957	    +-------------------------------------------+---------------------+
+958	    | TLS_RSA_WITH_CAMELLIA_128_GCM_SHA256      | [RFC6367]           |
+959	    +-------------------------------------------+---------------------+
+960	    | TLS_RSA_WITH_CAMELLIA_256_GCM_SHA384      | [RFC6367]           |
+961	    +-------------------------------------------+---------------------+
+962	    | TLS_RSA_PSK_WITH_CAMELLIA_128_GCM_SHA256  | [RFC6367]           |
+963	    +-------------------------------------------+---------------------+
+964	    | TLS_RSA_PSK_WITH_CAMELLIA_256_GCM_SHA384  | [RFC6367]           |
+965	    +-------------------------------------------+---------------------+
+966	    | TLS_RSA_PSK_WITH_CAMELLIA_128_CBC_SHA256  | [RFC6367]           |
+967	    +-------------------------------------------+---------------------+
+968	    | TLS_RSA_PSK_WITH_CAMELLIA_256_CBC_SHA384  | [RFC6367]           |
+969	    +-------------------------------------------+---------------------+
+970	    | TLS_RSA_WITH_AES_128_CCM                  | [RFC6655]           |
+971	    +-------------------------------------------+---------------------+
+972	    | TLS_RSA_WITH_AES_256_CCM                  | [RFC6655]           |
+973	    +-------------------------------------------+---------------------+
+974	    | TLS_RSA_WITH_AES_128_CCM_8                | [RFC6655]           |
+975	    +-------------------------------------------+---------------------+
+976	    | TLS_RSA_WITH_AES_256_CCM_8                | [RFC6655]           |
+977	    +-------------------------------------------+---------------------+
+978	    | TLS_RSA_PSK_WITH_CHACHA20_POLY1305_SHA256 | [RFC7905]           |
+979	    +-------------------------------------------+---------------------+
+
+981	                                  Table 4
+
+983	Appendix E.  TLS ClientCertificateType Identifiers Deprecated by This
+984	             Document
+
+986	                   +=======================+===========+
+987	                   | Certificate Type      | Reference |
+988	                   +=======================+===========+
+989	                   | rsa_fixed_dh (3)      | [RFC5246] |
+990	                   +-----------------------+-----------+
+991	                   | dss_fixed_dh (4)      | [RFC5246] |
+992	                   +-----------------------+-----------+
+993	                   | rsa_fixed_ecdh (65)   | [RFC8422] |
+994	                   +-----------------------+-----------+
+995	                   | ecdsa_fixed_ecdh (66) | [RFC8422] |
+996	                   +-----------------------+-----------+
+
+998	                                  Table 5
+
+1000	Appendix F.  Updating RFC 9325
+
+1002	   This document updates [RFC9325] with respect to the use of (D)TLS
+1003	   1.2, and the table below lists the exact changes.  For RFC 9325, Sec.
+1004	   4.1 is the source of all details listed.
+
+1006	   // Note to RFC Editor: please replace XXX below by the current RFC
+1007	   // number.
+
+1009	         +============================+=============+============+
+1010	         |                            | RFC 9325    |    RFC XXX |
+1011	         +============================+=============+============+
+1012	         | Non-ephemeral FFDH         | SHOULD NOT  |   MUST NOT |
+1013	         +----------------------------+-------------+------------+
+1014	         | Non-ephemeral ECDH         | SHOULD NOT  |  No change |
+1015	         +----------------------------+-------------+------------+
+1016	         | Fixed DH certificate types | Unspecified | SHOULD NOT |
+1017	         +----------------------------+-------------+------------+
+1018	         | Ephemeral FFDH             | SHOULD NOT  |   MUST NOT |
+1019	         +----------------------------+-------------+------------+
+1020	         | Static RSA                 | SHOULD NOT  |   MUST NOT |
+1021	         +----------------------------+-------------+------------+
+
+1023	                                  Table 6
+
+1025	Author's Address
+
+1027	   Nimrod Aviram
+1028	   Email: nimrod.aviram@gmail.com
+
+
+
+
+
+
+
+
+
