@@ -1,0 +1,905 @@
+idnits 2.17.1 
+
+draft-ietf-suit-mti-22.txt:
+-(4): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(851): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+  == There are 4 instances of lines with non-ascii characters in the document.
+
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     Summary: 0 errors (**), 0 flaws (~~), 1 warning (==), 0 comments (--).
+
+--------------------------------------------------------------------------------
+
+
+2	SUIT                                                            B. Moran
+3	Internet-Draft                                               Arm Limited
+4	Intended status: Standards Track                          Ø. Rønningstad
+5	Expires: 8 January 2026                             Nordic Semiconductor
+6	                                                            A. Tsukamoto
+7	                                  Openchip & Software Technologies, S.L.
+8	                                                             7 July 2025
+
+10	     Cryptographic Algorithms for Internet of Things (IoT) Devices
+11	                         draft-ietf-suit-mti-22
+
+13	Abstract
+
+15	   This document defines cryptographic algorithm profiles for use with
+16	   the Software Updates for Internet of Things (SUIT) manifest.  These
+17	   profiles specify sets of algorithms to promote interoperability
+18	   across implementations.
+
+20	   The SUIT manifest, as defined in "A Manifest Information Model for
+21	   Firmware Updates in Internet of Things (IoT) Devices" (RFC 9124),
+22	   provides a flexible and extensible format for describing how firmware
+23	   and software updates are to be fetched, verified, decrypted, and
+24	   installed on resource-constrained devices.  To ensure the security of
+25	   these update processes, the manifest relies on cryptographic
+26	   algorithms for functions such as digital signature verification,
+27	   integrity checking, and confidentiality.
+
+29	   Given the diversity of IoT deployments and the evolving cryptographic
+30	   landscape, algorithm agility is essential.  This document groups
+31	   algorithms into named profiles to accommodate varying levels of
+32	   device capabilities and security requirements.  These profiles
+33	   support the use cases laid out in the SUIT architecture, published in
+34	   "A Firmware Update Architecture for Internet of Things" (RFC 9019).
+
+36	Status of This Memo
+
+38	   This Internet-Draft is submitted in full conformance with the
+39	   provisions of BCP 78 and BCP 79.
+
+41	   Internet-Drafts are working documents of the Internet Engineering
+42	   Task Force (IETF).  Note that other groups may also distribute
+43	   working documents as Internet-Drafts.  The list of current Internet-
+44	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+46	   Internet-Drafts are draft documents valid for a maximum of six months
+47	   and may be updated, replaced, or obsoleted by other documents at any
+48	   time.  It is inappropriate to use Internet-Drafts as reference
+49	   material or to cite them other than as "work in progress."
+
+51	   This Internet-Draft will expire on 8 January 2026.
+
+53	Copyright Notice
+
+55	   Copyright (c) 2025 IETF Trust and the persons identified as the
+56	   document authors.  All rights reserved.
+
+58	   This document is subject to BCP 78 and the IETF Trust's Legal
+59	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+60	   license-info) in effect on the date of publication of this document.
+61	   Please review these documents carefully, as they describe your rights
+62	   and restrictions with respect to this document.  Code Components
+63	   extracted from this document must include Revised BSD License text as
+64	   described in Section 4.e of the Trust Legal Provisions and are
+65	   provided without warranty as described in the Revised BSD License.
+
+67	Table of Contents
+
+69	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
+70	   2.  Conventions and Definitions . . . . . . . . . . . . . . . . .   4
+71	   3.  Profiles  . . . . . . . . . . . . . . . . . . . . . . . . . .   4
+72	     3.1.  Profile suit-sha256-hmac-a128kw-a128ctr . . . . . . . . .   5
+73	     3.2.  Profile suit-sha256-esp256-ecdh-a128ctr . . . . . . . . .   5
+74	     3.3.  Profile suit-sha256-ed25519-ecdh-a128ctr  . . . . . . . .   6
+75	     3.4.  Profile suit-sha256-esp256-ecdh-a128gcm . . . . . . . . .   6
+76	     3.5.  Profile suit-sha256-ed25519-ecdh-chacha-poly  . . . . . .   7
+77	     3.6.  Profile suit-sha256-hsslms-a256kw-a256ctr . . . . . . . .   7
+78	   4.  Security Considerations . . . . . . . . . . . . . . . . . . .   8
+79	     4.1.  Payload Encryption as Part of a Defense-in-Depth
+80	           Strategy  . . . . . . . . . . . . . . . . . . . . . . . .   8
+81	     4.2.  Use of AES-CTR in Payload Encryption  . . . . . . . . . .   9
+82	   5.  Operational Considerations  . . . . . . . . . . . . . . . . .   9
+83	     5.1.  Profile Support Discovery . . . . . . . . . . . . . . . .   9
+84	     5.2.  Profile Selection and Control . . . . . . . . . . . . . .  10
+85	     5.3.  Profile Provisioning and Constraints  . . . . . . . . . .  10
+86	     5.4.  Logging and Reporting . . . . . . . . . . . . . . . . . .  11
+87	   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  11
+88	     6.1.  Profile: suit-sha256-hmac-a128kw-a128ctr  . . . . . . . .  12
+89	     6.2.  Profile: suit-sha256-esp256-ecdh-a128ctr  . . . . . . . .  12
+90	     6.3.  Profile: suit-sha256-ed25519-ecdh-a128ctr . . . . . . . .  12
+91	     6.4.  Profile: suit-sha256-esp256-ecdh-a128gcm  . . . . . . . .  13
+92	     6.5.  Profile: suit-sha256-ed25519-ecdh-chacha-poly . . . . . .  13
+93	     6.6.  Profile: suit-sha256-hsslms-a256kw-a256ctr  . . . . . . .  13
+
+95	   7.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  14
+96	     7.1.  Normative References  . . . . . . . . . . . . . . . . . .  14
+97	     7.2.  Informative References  . . . . . . . . . . . . . . . . .  15
+98	   Appendix A.  Full CDDL  . . . . . . . . . . . . . . . . . . . . .  16
+99	   Appendix B.  Acknowledgments  . . . . . . . . . . . . . . . . . .  19
+100	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  19
+
+102	1.  Introduction
+
+104	   This document defines algorithm profiles intended for authors of
+105	   Software Updates of Internet of Things (SUIT) manifests and their
+106	   recipients, with the goal of promoting interoperability in software
+107	   update scenarios for constrained nodes.  These profiles specify sets
+108	   of algorithms that are tailored to the evolving security landscape,
+109	   recognizing that cryptographic requirements may change over time.
+
+111	   The following profiles are defined:
+
+113	   *  One profile designed for constrained devices that support only
+114	      symmetric key cryptography
+
+116	   *  Two profiles for constrained devices capable of using asymmetric
+117	      key cryptography
+
+119	   *  Two profiles that employ Authenticated Encryption with Associated
+120	      Data (AEAD) ciphers
+
+122	   *  One constrained asymmetric profile that uses a hash-based
+123	      signature scheme
+
+125	   Due to the asymmetric nature of SUIT deployments - where manifest
+126	   authors typically operate in resource-rich environments while
+127	   recipients are resource-constrained - the cryptographic requirements
+128	   differ between these two roles.
+
+130	   This specification uses AES-CTR in combination with a digest
+131	   algorithm, as defined in [RFC9459], to support use cases that require
+132	   out-of-order block reception and decryption-capabilities not offered
+133	   by AEAD algorithms.  For further discussion of these constrained use
+134	   cases, refer to Section 4.2.  Other SUIT use cases (see
+135	   [I-D.ietf-suit-manifest]) may define different profiles.
+
+137	2.  Conventions and Definitions
+
+139	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+140	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+141	   "OPTIONAL" in this document are to be interpreted as described in
+142	   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+143	   capitals, as shown here.
+
+145	   This specification uses the following abbreviations:
+
+147	   *  Advanced Encryption Standard (AES)
+
+149	   *  AES Counter (AES-CTR) Mode
+
+151	   *  AES Key Wrap (AES-KW)
+
+153	   *  Authenticated Encryption with Associated Data (AEAD)
+
+155	   *  Concise Binary Object Representation (CBOR)
+
+157	   *  CBOR Object Signing and Encryption (COSE)
+
+159	   *  Concise Data Definition Language (CDDL)
+
+161	   *  Elliptic Curve Diffie-Hellman Ephemeral-Static (ECDH-ES)
+
+163	   *  Hash-based Message Authentication Code (HMAC)
+
+165	   *  Hierarchical Signature System / Leighton-Micali Signature (HSS/
+166	      LMS)
+
+168	   *  Software Updates for Internet of Things (SUIT)
+
+170	   SUIT specifically addresses the requirements of constrained devices
+171	   and networks, as described in [RFC9019].
+
+173	   The terms "Author", "Recipient", and "Manifest" are defined in
+174	   [I-D.ietf-suit-manifest].
+
+176	3.  Profiles
+
+178	   Each profile consists of algorithms from the following categories:
+
+180	   *  Digest Algorithms
+
+182	   *  Authentication Algorithms
+
+184	   *  Key Exchange Algorithms (optional)
+185	   *  Encryption Algorithms (optional)
+
+187	   Each profile references specific algorithm identifiers, as defined in
+188	   [IANA-COSE].  Since these algorithm identifiers are used in the
+189	   context of the IETF SUIT manifest [I-D.ietf-suit-manifest], they are
+190	   represented using CBOR Object Signing and Encryption (COSE)
+191	   structures as defined in [RFC9052] and [RFC9053].
+
+193	   The use of the profiles by authors and recipients is based on the
+194	   following assumptions:
+
+196	   *  Recipients MAY choose which profile they wish to implement.  It is
+197	      RECOMMENDED that they implement the suit-sha256-hsslms-a256kw-
+198	      a256ctr profile (Section 3.6).  Recipients MAY implement any
+199	      number of other profiles not defined in this document.  Recipients
+200	      MAY choose not to implement encryption and the corresponding key
+201	      exchange algorithms if they do not intend to support encrypted
+202	      payloads.
+
+204	   *  Authors MUST implement all profiles with a status set to
+205	      'MANDATORY' in Section 6.  Authors MAY implement any number of
+206	      additional profiles.
+
+208	3.1.  Profile suit-sha256-hmac-a128kw-a128ctr
+
+210	   This profile only offers support for symmetric cryptographic
+211	   algorithms.
+
+213	              +================+=================+==========+
+214	              | Algorithm Type | Algorithm       | COSE Key |
+215	              +================+=================+==========+
+216	              | Digest         | SHA-256         | -16      |
+217	              +----------------+-----------------+----------+
+218	              | Authentication | HMAC-256        | 5        |
+219	              +----------------+-----------------+----------+
+220	              | Key Exchange   | A128KW Key Wrap | -3       |
+221	              +----------------+-----------------+----------+
+222	              | Encryption     | A128CTR         | -65534   |
+223	              +----------------+-----------------+----------+
+
+225	                                  Table 1
+
+227	3.2.  Profile suit-sha256-esp256-ecdh-a128ctr
+
+229	   This profile supports asymmetric algorithms for use with constrained
+230	   devices.
+
+232	             +================+==================+==========+
+233	             | Algorithm Type | Algorithm        | COSE Key |
+234	             +================+==================+==========+
+235	             | Digest         | SHA-256          | -16      |
+236	             +----------------+------------------+----------+
+237	             | Authentication | ESP256           | -9       |
+238	             +----------------+------------------+----------+
+239	             | Key Exchange   | ECDH-ES + A128KW | -29      |
+240	             +----------------+------------------+----------+
+241	             | Encryption     | A128CTR          | -65534   |
+242	             +----------------+------------------+----------+
+
+244	                                 Table 2
+
+246	3.3.  Profile suit-sha256-ed25519-ecdh-a128ctr
+
+248	   This profile supports an alternative choice of asymmetric algorithms
+249	   for use with constrained devices.
+
+251	             +================+==================+==========+
+252	             | Algorithm Type | Algorithm        | COSE Key |
+253	             +================+==================+==========+
+254	             | Digest         | SHA-256          | -16      |
+255	             +----------------+------------------+----------+
+256	             | Authentication | Ed25519          | -19      |
+257	             +----------------+------------------+----------+
+258	             | Key Exchange   | ECDH-ES + A128KW | -29      |
+259	             +----------------+------------------+----------+
+260	             | Encryption     | A128CTR          | -65534   |
+261	             +----------------+------------------+----------+
+
+263	                                 Table 3
+
+265	3.4.  Profile suit-sha256-esp256-ecdh-a128gcm
+
+267	   This profile supports asymmetric algorithms in combination with AEAD
+268	   algorithms.
+
+270	             +================+==================+==========+
+271	             | Algorithm Type | Algorithm        | COSE Key |
+272	             +================+==================+==========+
+273	             | Digest         | SHA-256          | -16      |
+274	             +----------------+------------------+----------+
+275	             | Authentication | ESP256           | -9       |
+276	             +----------------+------------------+----------+
+277	             | Key Exchange   | ECDH-ES + A128KW | -29      |
+278	             +----------------+------------------+----------+
+279	             | Encryption     | A128GCM          | 1        |
+280	             +----------------+------------------+----------+
+
+282	                                 Table 4
+
+284	3.5.  Profile suit-sha256-ed25519-ecdh-chacha-poly
+
+286	   This profile also supports asymmetric algorithms with AEAD algorithms
+287	   but offers an alternative to suit-sha256-esp256-ecdh-a128gcm.
+
+289	             +================+===================+==========+
+290	             | Algorithm Type | Algorithm         | COSE Key |
+291	             +================+===================+==========+
+292	             | Digest         | SHA-256           | -16      |
+293	             +----------------+-------------------+----------+
+294	             | Authentication | Ed25519           | -19      |
+295	             +----------------+-------------------+----------+
+296	             | Key Exchange   | ECDH-ES + A128KW  | -29      |
+297	             +----------------+-------------------+----------+
+298	             | Encryption     | ChaCha20/Poly1305 | 24       |
+299	             +----------------+-------------------+----------+
+
+301	                                  Table 5
+
+303	3.6.  Profile suit-sha256-hsslms-a256kw-a256ctr
+
+305	   This profile utilizes a stateful hash-based signature algorithm,
+306	   namely the Hierarchical Signature System / Leighton-Micali Signature
+307	   (HSS/LMS), as a unique alternative to the profiles listed above.
+
+309	   A note regarding the use of the HSS/LMS: The decision as to how deep
+310	   the tree is, is a decision that affects authoring tools only (see
+311	   [RFC8778]).  Verification is not affected by the choice of the "W"
+312	   parameter, but the size of the signature is affected.  To support the
+313	   long lifetimes required by IoT devices, it is RECOMMENDED to use
+314	   trees with greater height (see Section 2.2 of [RFC8778]).
+
+316	                 +================+===========+==========+
+317	                 | Algorithm Type | Algorithm | COSE Key |
+318	                 +================+===========+==========+
+319	                 | Digest         | SHA-256   | -16      |
+320	                 +----------------+-----------+----------+
+321	                 | Authentication | HSS/LMS   | -46      |
+322	                 +----------------+-----------+----------+
+323	                 | Key Exchange   | A256KW    | -5       |
+324	                 +----------------+-----------+----------+
+325	                 | Encryption     | A256CTR   | -65532   |
+326	                 +----------------+-----------+----------+
+
+328	                                  Table 6
+
+330	4.  Security Considerations
+
+332	   Payload encryption is used to protect sensitive content such as
+333	   machine learning models, proprietary algorithms, and personal data
+334	   [RFC6973].  In the context of SUIT, the primary purpose of payload
+335	   encryption is to defend against unauthorized observation during
+336	   distribution.  By encrypting the payload, confidential information
+337	   can be safeguarded from eavesdropping.
+
+339	   However, encrypting firmware or software update payloads on commodity
+340	   devices do not constitute an effective cybersecurity defense against
+341	   targeted attacks.  Once an attacker gains access to a device, they
+342	   may still be able to extract the plaintext payload.
+
+344	4.1.  Payload Encryption as Part of a Defense-in-Depth Strategy
+
+346	   To define the purpose of payload encryption as a defensive
+347	   cybersecurity tool, it is important to define the capabilities of
+348	   modern threat actors.  A variety of capabilities are possible:
+
+350	   *  find bugs by binary code inspection
+
+352	   *  send unexpected data to communication interfaces, looking for
+353	      unexpected behavior
+
+355	   *  use fault injection to bypass or manipulate code
+
+357	   *  use communication attacks or fault injection along with gadgets
+358	      found in the code
+
+360	   Given this range of capabilities, it is important to understand which
+361	   capabilities are impacted by firmware encryption.  Threat actors who
+362	   find bugs by manual inspection or use gadgets found in the code will
+363	   need to first extract the code from the target.  In the IoT context,
+364	   it is expected that most threat actors will start with sample devices
+365	   and physical access to test attacks.
+
+367	   Due to these factors, payload encryption serves to limit the pool of
+368	   attackers to those who have the technical capability to extract code
+369	   from physical devices and those who perform code-free attacks.
+
+371	4.2.  Use of AES-CTR in Payload Encryption
+
+373	   AES-CTR mode with a digest is specified, see [RFC9459].  All of the
+374	   AES-CTR security considerations in [RFC9459] apply.  See
+375	   [I-D.ietf-suit-firmware-encryption] for additional background
+376	   information.
+
+378	5.  Operational Considerations
+
+380	   While this document focuses on the cryptographic aspects of manifest
+381	   processing, several operational and manageability considerations are
+382	   relevant when deploying these profiles in practice.
+
+384	5.1.  Profile Support Discovery
+
+386	   To enable interoperability of the described profiles, it is important
+387	   for a manifest author to determine which profiles are supported by a
+388	   device.  Furthermore, it is also important for the author and the
+389	   distribution system (see Section 3 of
+390	   [I-D.ietf-suit-firmware-encryption]) to know whether firmware for a
+391	   particular device or family of devices needs to be encrypted, and
+392	   which key distribution mechanism shall be used.  This information can
+393	   be obtained through:
+
+395	   *  Manual configuration.
+
+397	   *  Device management systems, as described in [RFC9019], which
+398	      typically maintain metadata about device capabilities and their
+399	      lifecycle status.  These systems may use proprietary or
+400	      standardized management protocols to expose supported features.
+401	      LwM2M [LwM2M] is one such standardized protocol.  The Trusted
+402	      Execution Environment Provisioning (TEEP) protocol
+403	      [I-D.ietf-teep-protocol] is another option.
+
+405	   *  Capability reporting mechanisms, such as those described in
+406	      [I-D.ietf-suit-report], which define structures that allow a
+407	      device to communicate supported SUIT features and cryptographic
+408	      capabilities to a management or attestation entity.
+
+410	5.2.  Profile Selection and Control
+
+412	   When a device supports multiple algorithm profiles, it is expected
+413	   that the SUIT manifest author indicates the appropriate profile based
+414	   on the intended recipient(s) and other policies.  The manifest itself
+415	   indicates which algorithms are used; devices are expected to validate
+416	   manifests using supported algorithms.
+
+418	   Devices do not autonomously choose which profile to apply; rather,
+419	   they either accept or reject a manifest based on the algorithm
+420	   profile it uses.  There is no protocol-level negotiation of profiles
+421	   at SUIT manifest processing time.  Any dynamic profile selection or
+422	   configuration is expected to occur as part of other protocols, for
+423	   example, through device management.
+
+425	5.3.  Profile Provisioning and Constraints
+
+427	   Provisioning for a given profile may include:
+
+429	   *  Installation of trust anchors for acceptable signers.
+
+431	   *  Distribution of keys used by the content key distribution
+432	      mechanism (see Section 4 of [I-D.ietf-suit-firmware-encryption]).
+
+434	   *  Availability of specific cryptographic libraries or hardware
+435	      support (e.g., for post-quantum algorithms or AEAD ciphers).
+
+437	   *  Evaluation of the required storage and processing resources for
+438	      the selected profile.
+
+440	   *  Support for manifest processing capabilities.
+
+442	   There may be conditions under which switching to a different
+443	   algorithm profile is not feasible, such as:
+
+445	   *  Lack of hardware support (e.g., no crypto acceleration).
+
+447	   *  Resource limitations on memory-constrained devices (e.g.,
+448	      insufficient flash or RAM).
+
+450	   *  Deployment policy constraints or regulatory compliance
+451	      requirements.
+
+453	   In such cases, a device management or update orchestration system
+454	   should take these constraints into account when constructing and
+455	   distributing manifests.
+
+457	5.4.  Logging and Reporting
+
+459	   Implementations MAY log failures to process a manifest due to
+460	   unsupported algorithm profiles or unavailable cryptographic
+461	   functionality.  When supported, such events SHOULD be reported using
+462	   secure mechanisms, such as those described in [I-D.ietf-suit-report],
+463	   to assist operators in diagnosing update failures or
+464	   misconfigurations.
+
+466	6.  IANA Considerations
+
+468	   IANA is requested to create a page for "COSE SUIT Algorithm Profiles"
+469	   within the "Software Update for the Internet of Things (SUIT)"
+470	   registry group.  IANA is also requested to create a registry for
+471	   "COSE SUIT Algorithm Profiles" within that registry group.
+
+473	   While most profile attributes are self-explanatory, the status field
+474	   warrants a brief explanation.  This field can take one of three
+475	   values: MANDATORY, NOT RECOMMENDED, or OPTIONAL.
+
+477	   *  MANDATORY indicates that the profile is mandatory to implement for
+478	      manifest authors.
+
+480	   *  NOT RECOMMENDED means that the profile should generally be avoided
+481	      in new implementations.
+
+483	   *  OPTIONAL suggests that support for the profile is permitted but
+484	      not required.
+
+486	   IANA is requested to add a note that mirrors these status values to
+487	   the registry.
+
+489	   Adding new profiles or updating the status of existing profiles
+490	   requires Standards Action (Section 4.9 of [RFC8126]).
+
+492	   As time progresses, algorithm profiles may loose their MANDATORY
+493	   status.  Then, their status will become either OPTIONAL or NOT
+494	   RECOMMENDED for new implementations.  Likewise, a profile may be
+495	   transitioned from OPTIONAL to NOT RECOMMENDED.  Since it may be
+496	   impossible to update certain parts of the IoT device firmware in the
+497	   field, such as first stage bootloaders, support for all relevant
+498	   algorithms will almost always be required by authoring tools.
+
+500	   The initial content of the "COSE SUIT Algorithm Profiles" registry
+501	   is:
+
+503	6.1.  Profile: suit-sha256-hmac-a128kw-a128ctr
+
+505	   *  Profile: suit-sha256-hmac-a128kw-a128ctr
+
+507	   *  Status: MANDATORY
+
+509	   *  Digest: -16
+
+511	   *  Auth: 5
+
+513	   *  Key Exchange: -3
+
+515	   *  Encryption: -65534
+
+517	   *  Descriptor Array: [-16, 5, -3, -65534]
+
+519	   *  Reference: Section 3.1 of THIS_DOCUMENT
+
+521	6.2.  Profile: suit-sha256-esp256-ecdh-a128ctr
+
+523	   *  Profile: suit-sha256-esp256-ecdh-a128ctr
+
+525	   *  Status: MANDATORY
+
+527	   *  Digest: -16
+
+529	   *  Auth: -9
+
+531	   *  Key Exchange: -29
+
+533	   *  Encryption: -65534
+
+535	   *  Descriptor Array: [-16, -9, -29, -65534]
+
+537	   *  Reference: Section 3.2 of THIS_DOCUMENT
+
+539	6.3.  Profile: suit-sha256-ed25519-ecdh-a128ctr
+
+541	   *  Profile: suit-sha256-ed25519-ecdh-a128ctr
+
+543	   *  Status: MANDATORY
+
+545	   *  Digest: -16
+
+547	   *  Auth: -19
+548	   *  Key Exchange: -29
+
+550	   *  Encryption: -65534
+
+552	   *  Descriptor Array: [-16, -19, -29, -65534]
+
+554	   *  Reference: Section 3.3 of THIS_DOCUMENT
+
+556	6.4.  Profile: suit-sha256-esp256-ecdh-a128gcm
+
+558	   *  Profile: suit-sha256-esp256-ecdh-a128gcm
+
+560	   *  Status: MANDATORY
+
+562	   *  Digest: -16
+
+564	   *  Auth: -9
+
+566	   *  Key Exchange: -29
+
+568	   *  Encryption: 1
+
+570	   *  Descriptor Array: [-16, -9, -29, 1]
+
+572	   *  Reference: Section 3.4 of THIS_DOCUMENT
+
+574	6.5.  Profile: suit-sha256-ed25519-ecdh-chacha-poly
+
+576	   *  Profile: suit-sha256-ed25519-ecdh-chacha-poly
+
+578	   *  Status: MANDATORY
+
+580	   *  Digest: -16
+
+582	   *  Auth: -19
+
+584	   *  Key Exchange: -29
+
+586	   *  Encryption: 24
+
+588	   *  Descriptor Array: [-16, -19, -29, 24]
+
+590	   *  Reference: Section 3.5 of THIS_DOCUMENT
+
+592	6.6.  Profile: suit-sha256-hsslms-a256kw-a256ctr
+
+594	   *  Profile: suit-sha256-hsslms-a256kw-a256ctr
+595	   *  Status: MANDATORY
+
+597	   *  Digest: -16
+
+599	   *  Auth: -46
+
+601	   *  Key Exchange: -5
+
+603	   *  Encryption: -65532
+
+605	   *  Descriptor Array: [-16, -46, -5, -65532]
+
+607	   *  Reference: Section 3.6 of THIS_DOCUMENT
+
+609	7.  References
+
+611	7.1.  Normative References
+
+613	   [I-D.ietf-suit-manifest]
+614	              Moran, B., Tschofenig, H., Birkholz, H., Zandberg, K., and
+615	              O. Rønningstad, "A Concise Binary Object Representation
+616	              (CBOR)-based Serialization Format for the Software Updates
+617	              for Internet of Things (SUIT) Manifest", Work in Progress,
+618	              Internet-Draft, draft-ietf-suit-manifest-34, 28 May 2025,
+619	              <https://datatracker.ietf.org/doc/html/draft-ietf-suit-
+620	              manifest-34>.
+
+622	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+623	              Requirement Levels", BCP 14, RFC 2119,
+624	              DOI 10.17487/RFC2119, March 1997,
+625	              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+627	   [RFC8126]  Cotton, M., Leiba, B., and T. Narten, "Guidelines for
+628	              Writing an IANA Considerations Section in RFCs", BCP 26,
+629	              RFC 8126, DOI 10.17487/RFC8126, June 2017,
+630	              <https://www.rfc-editor.org/rfc/rfc8126>.
+
+632	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+633	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+634	              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+636	   [RFC8610]  Birkholz, H., Vigano, C., and C. Bormann, "Concise Data
+637	              Definition Language (CDDL): A Notational Convention to
+638	              Express Concise Binary Object Representation (CBOR) and
+639	              JSON Data Structures", RFC 8610, DOI 10.17487/RFC8610,
+640	              June 2019, <https://www.rfc-editor.org/rfc/rfc8610>.
+
+642	   [RFC8778]  Housley, R., "Use of the HSS/LMS Hash-Based Signature
+643	              Algorithm with CBOR Object Signing and Encryption (COSE)",
+644	              RFC 8778, DOI 10.17487/RFC8778, April 2020,
+645	              <https://www.rfc-editor.org/rfc/rfc8778>.
+
+647	   [RFC9052]  Schaad, J., "CBOR Object Signing and Encryption (COSE):
+648	              Structures and Process", STD 96, RFC 9052,
+649	              DOI 10.17487/RFC9052, August 2022,
+650	              <https://www.rfc-editor.org/rfc/rfc9052>.
+
+652	   [RFC9459]  Housley, R. and H. Tschofenig, "CBOR Object Signing and
+653	              Encryption (COSE): AES-CTR and AES-CBC", RFC 9459,
+654	              DOI 10.17487/RFC9459, September 2023,
+655	              <https://www.rfc-editor.org/rfc/rfc9459>.
+
+657	7.2.  Informative References
+
+659	   [I-D.ietf-suit-firmware-encryption]
+660	              Tschofenig, H., Housley, R., Moran, B., Brown, D., and K.
+661	              Takayama, "Encrypted Payloads in SUIT Manifests", Work in
+662	              Progress, Internet-Draft, draft-ietf-suit-firmware-
+663	              encryption-25, 7 July 2025,
+664	              <https://datatracker.ietf.org/doc/html/draft-ietf-suit-
+665	              firmware-encryption-25>.
+
+667	   [I-D.ietf-suit-report]
+668	              Moran, B. and H. Birkholz, "Secure Reporting of Update
+669	              Status", Work in Progress, Internet-Draft, draft-ietf-
+670	              suit-report-13, 7 July 2025,
+671	              <https://datatracker.ietf.org/doc/html/draft-ietf-suit-
+672	              report-13>.
+
+674	   [I-D.ietf-teep-protocol]
+675	              Tschofenig, H., Pei, M., Wheeler, D. M., Thaler, D., and
+676	              A. Tsukamoto, "Trusted Execution Environment Provisioning
+677	              (TEEP) Protocol", Work in Progress, Internet-Draft, draft-
+678	              ietf-teep-protocol-21, 3 March 2025,
+679	              <https://datatracker.ietf.org/doc/html/draft-ietf-teep-
+680	              protocol-21>.
+
+682	   [IANA-COSE]
+683	              "CBOR Object Signing and Encryption (COSE)", 2022,
+684	              <https://www.iana.org/assignments/cose/cose.xhtml>.
+
+686	   [LwM2M]    Open Mobile Alliance, "OMA Lightweight M2M", 20 April
+687	              2025,
+688	              <https://www.openmobilealliance.org/specifications/lwm2m>.
+
+690	   [RFC6973]  Cooper, A., Tschofenig, H., Aboba, B., Peterson, J.,
+691	              Morris, J., Hansen, M., and R. Smith, "Privacy
+692	              Considerations for Internet Protocols", RFC 6973,
+693	              DOI 10.17487/RFC6973, July 2013,
+694	              <https://www.rfc-editor.org/rfc/rfc6973>.
+
+696	   [RFC9019]  Moran, B., Tschofenig, H., Brown, D., and M. Meriac, "A
+697	              Firmware Update Architecture for Internet of Things",
+698	              RFC 9019, DOI 10.17487/RFC9019, April 2021,
+699	              <https://www.rfc-editor.org/rfc/rfc9019>.
+
+701	   [RFC9053]  Schaad, J., "CBOR Object Signing and Encryption (COSE):
+702	              Initial Algorithms", RFC 9053, DOI 10.17487/RFC9053,
+703	              August 2022, <https://www.rfc-editor.org/rfc/rfc9053>.
+
+705	Appendix A.  Full CDDL
+
+707	   The following CDDL snippet [RFC8610] creates a subset of COSE for use
+708	   with SUIT.  Both tagged and untagged messages are defined.  SUIT only
+709	   uses tagged COSE messages, but untagged messages are also defined for
+710	   use in protocols that share a ciphersuite with SUIT.
+
+712	   To be valid, the following CDDL MUST have the COSE CDDL appended to
+713	   it.  The COSE CDDL can be obtained by following the directions in
+714	   [RFC9052], Section 1.4.
+
+716	   =============== NOTE: '\' line wrapping per RFC 8792 ================
+
+718	   SUIT_COSE_tool_tweak /= suit-sha256-hmac-a128kw-a128ctr
+719	   SUIT_COSE_tool_tweak /= suit-sha256-esp256-ecdh-a128ctr
+720	   SUIT_COSE_tool_tweak /= suit-sha256-ed25519-ecdh-a128ctr
+721	   SUIT_COSE_tool_tweak /= suit-sha256-esp256-ecdh-a128gcm
+722	   SUIT_COSE_tool_tweak /= suit-sha256-ed25519-ecdh-chacha-poly
+723	   SUIT_COSE_tool_tweak /= suit-sha256-hsslms-a256kw-a256ctr
+724	   SUIT_COSE_tool_tweak /= SUIT_COSE_Profiles
+
+726	   SUIT_COSE_Profiles /= SUIT_COSE_Profile_HMAC_A128KW_A128CTR
+727	   SUIT_COSE_Profiles /= SUIT_COSE_Profile_ESP256_ECDH_A128CTR
+728	   SUIT_COSE_Profiles /= SUIT_COSE_Profile_ED25519_ECDH_A128CTR
+729	   SUIT_COSE_Profiles /= SUIT_COSE_Profile_ESP256_ECDH_A128GCM
+730	   SUIT_COSE_Profiles /= \
+731	                        SUIT_COSE_Profile_ED25519_ECDH_CHACHA20_POLY1304
+732	   SUIT_COSE_Profiles /= SUIT_COSE_Profile_HSSLMS_A256KW_A256CTR
+
+734	   suit-sha256-hmac-a128kw-a128ctr    = [-16, 5, -3, -65534]
+735	   suit-sha256-esp256-ecdh-a128ctr     = [-16, -9, -29, -65534]
+736	   suit-sha256-ed25519-ecdh-a128ctr     = [-16, -19, -29, -65534]
+737	   suit-sha256-esp256-ecdh-a128gcm     = [-16, -9, -29, 1]
+738	   suit-sha256-ed25519-ecdh-chacha-poly = [-16, -19, -29, 24]
+739	   suit-sha256-hsslms-a256kw-a256ctr  = [-16, -46, -5, -65532]
+
+741	   SUIT_COSE_Profile_HMAC_A128KW_A128CTR =
+742	       SUIT_COSE_Profile<5,-65534> .and COSE_Messages
+743	   SUIT_COSE_Profile_ESP256_ECDH_A128CTR =
+744	       SUIT_COSE_Profile<-9,-65534> .and COSE_Messages
+745	   SUIT_COSE_Profile_ED25519_ECDH_A128CTR =
+746	       SUIT_COSE_Profile<-19,-65534> .and COSE_Messages
+747	   SUIT_COSE_Profile_ESP256_ECDH_A128GCM =
+748	       SUIT_COSE_Profile<-9,1> .and COSE_Messages
+749	   SUIT_COSE_Profile_ED25519_ECDH_CHACHA20_POLY1304 =
+750	       SUIT_COSE_Profile<-19,24> .and COSE_Messages
+751	   SUIT_COSE_Profile_HSSLMS_A256KW_A256CTR =
+752	       SUIT_COSE_Profile<-46,-65532> .and COSE_Messages
+
+754	   SUIT_COSE_Profile<authid, encid> = SUIT_COSE_Messages<authid,encid>
+
+756	   SUIT_COSE_Messages<authid, encid> =
+757	       SUIT_COSE_Untagged_Message<authid, encid> /
+758	       SUIT_COSE_Tagged_Message<authid, encid>
+
+760	   SUIT_COSE_Untagged_Message<authid, encid> = SUIT_COSE_Sign<authid> /
+761	       SUIT_COSE_Sign1<authid> / SUIT_COSE_Encrypt<encid> /
+762	       SUIT_COSE_Encrypt0<encid> / SUIT_COSE_Mac<authid> /
+763	       SUIT_COSE_Mac0<authid>
+
+765	   SUIT_COSE_Tagged_Message<authid, encid> =
+766	       SUIT_COSE_Sign_Tagged<authid> / SUIT_COSE_Sign1_Tagged<authid> /
+767	       SUIT_COSE_Encrypt_Tagged<encid> / SUIT_COSE_Encrypt0_Tagged<\
+768	                                                                encid> /
+769	       SUIT_COSE_Mac_Tagged<authid> / SUIT_COSE_Mac0_Tagged<authid>
+
+771	   ; Note: This is not the same definition as is used in COSE.
+772	   ; It restricts a COSE header definition further without
+773	   ; repeating the COSE definition. It should be merged
+774	   ; with COSE by using the CDDL .and operator.
+775	   SUIT_COSE_Profile_Headers<algid> = (
+776	       protected : bstr .cbor SUIT_COSE_alg_map<algid>,
+777	       unprotected : SUIT_COSE_header_map
+778	   )
+779	   SUIT_COSE_alg_map<algid> = {
+780	       1 => algid,
+781	       * int => any
+782	   }
+
+784	   SUIT_COSE_header_map = {
+785	       * int => any
+
+787	   }
+
+789	   SUIT_COSE_Sign_Tagged<authid> = #6.98(SUIT_COSE_Sign<authid>)
+
+791	   SUIT_COSE_Sign<authid> = [
+792	       SUIT_COSE_Profile_Headers<authid>,
+793	       payload : bstr / nil,
+794	       signatures : [+ SUIT_COSE_Signature<authid>]
+795	   ]
+
+797	   SUIT_COSE_Signature<authid> =  [
+798	       SUIT_COSE_Profile_Headers<authid>,
+799	       signature : bstr
+800	   ]
+
+802	   SUIT_COSE_Sign1_Tagged<authid> = #6.18(SUIT_COSE_Sign1<authid>)
+
+804	   SUIT_COSE_Sign1<authid> = [
+805	       SUIT_COSE_Profile_Headers<authid>,
+806	       payload : bstr / nil,
+807	       signature : bstr
+808	   ]
+
+810	   SUIT_COSE_Encrypt_Tagged<encid> = #6.96(SUIT_COSE_Encrypt<encid>)
+
+812	   SUIT_COSE_Encrypt<encid> = [
+813	       SUIT_COSE_Profile_Headers<encid>,
+814	       ciphertext : bstr / nil,
+815	       recipients : [+SUIT_COSE_recipient<encid>]
+816	   ]
+
+818	   SUIT_COSE_recipient<encid> = [
+819	       SUIT_COSE_Profile_Headers<encid>,
+820	       ciphertext : bstr / nil,
+821	       ? recipients : [+SUIT_COSE_recipient<encid>]
+822	   ]
+
+824	   SUIT_COSE_Encrypt0_Tagged<encid> = #6.16(SUIT_COSE_Encrypt0<encid>)
+825	   SUIT_COSE_Encrypt0<encid> = [
+826	       SUIT_COSE_Profile_Headers<encid>,
+827	       ciphertext : bstr / nil,
+828	   ]
+
+830	   SUIT_COSE_Mac_Tagged<authid> = #6.97(SUIT_COSE_Mac<authid>)
+
+832	   SUIT_COSE_Mac<authid> = [
+833	      SUIT_COSE_Profile_Headers<authid>,
+834	      payload : bstr / nil,
+835	      tag : bstr,
+836	      recipients :[+SUIT_COSE_recipient<authid>]
+837	   ]
+
+839	   SUIT_COSE_Mac0_Tagged<authid> = #6.17(SUIT_COSE_Mac0<authid>)
+
+841	   SUIT_COSE_Mac0<authid> = [
+842	      SUIT_COSE_Profile_Headers<authid>,
+843	      payload : bstr / nil,
+844	      tag : bstr,
+845	   ]
+
+847	Appendix B.  Acknowledgments
+
+849	   We would like to specifically thank Henk Birkholz, Mohamed Boucadair,
+850	   Deb Cooley, Lorenzo Corneo, Linda Dunbar, Russ Housley, Michael B.
+851	   Jones, Jouni Korhonen, Magnus Nyström, Michael Richardson, and Hannes
+852	   Tschofenig for their review comments.
+
+854	Authors' Addresses
+
+856	   Brendan Moran
+857	   Arm Limited
+858	   Email: brendan.moran.ietf@gmail.com
+
+860	   Øyvind Rønningstad
+861	   Nordic Semiconductor
+862	   Email: oyvind.ronningstad@gmail.com
+
+864	   Akira Tsukamoto
+865	   Openchip & Software Technologies, S.L.
+866	   Email: akira.tsukamoto@gmail.com
+
+
+
+
+
+
+
+
+
