@@ -1,0 +1,1847 @@
+idnits 2.17.1 
+
+draft-ietf-tsvwg-nqb-30.txt:
+-(584): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+  == There are 5 instances of lines with non-ascii characters in the document.
+
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     Summary: 0 errors (**), 0 flaws (~~), 1 warning (==), 0 comments (--).
+
+--------------------------------------------------------------------------------
+
+
+2	Transport Area Working Group                                    G. White
+3	Internet-Draft                                                 CableLabs
+4	Updates: 8325 (if approved)                                   T. Fossati
+5	Intended status: Standards Track                                  Linaro
+6	Expires: 1 January 2026                                          R. Geib
+7	                                                        Deutsche Telekom
+8	                                                            30 June 2025
+
+10	   A Non-Queue-Building Per-Hop Behavior (NQB PHB) for Differentiated
+11	                                Services
+12	                        draft-ietf-tsvwg-nqb-30
+
+14	Abstract
+
+16	   This document specifies characteristics of a Non-Queue-Building Per-
+17	   Hop Behavior (NQB PHB).  The NQB PHB provides a shallow-buffered,
+18	   best-effort service as a complement to a Default deep-buffered best-
+19	   effort service for Internet services.  The purpose of this NQB PHB is
+20	   to provide a separate queue that enables smooth (i.e. non-bursty),
+21	   low-data-rate, application-limited traffic microflows, which would
+22	   ordinarily share a queue with bursty and capacity-seeking traffic, to
+23	   avoid the latency, latency variation and loss caused by such traffic.
+24	   This PHB is implemented without prioritization and can be implemented
+25	   without rate policing, making it suitable for environments where the
+26	   use of these features is restricted.  The NQB PHB has been developed
+27	   primarily for use by access network segments, where queuing delays
+28	   and queuing loss caused by Queue-Building protocols are manifested,
+29	   but its use is not limited to such segments.  In particular, the
+30	   application of NQ PHB to cable broadband links, Wi-Fi links, and
+31	   mobile network radio and core segments are discussed.  This document
+32	   recommends a specific Differentiated Services Code Point (DSCP) to
+33	   identify Non-Queue-Building microflows, and updates the RFC8325
+34	   guidance on mapping Diffserv to IEEE 802.11 for this codepoint.
+
+36	   [NOTE (to be removed by RFC-Editor): This document references an ISE
+37	   submission draft (I-D.briscoe-docsis-q-protection) that is approved
+38	   for publication as an RFC.  This draft should be held for publication
+39	   until the queue protection RFC can be referenced.]
+
+41	Status of This Memo
+
+43	   This Internet-Draft is submitted in full conformance with the
+44	   provisions of BCP 78 and BCP 79.
+
+46	   Internet-Drafts are working documents of the Internet Engineering
+47	   Task Force (IETF).  Note that other groups may also distribute
+48	   working documents as Internet-Drafts.  The list of current Internet-
+49	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+51	   Internet-Drafts are draft documents valid for a maximum of six months
+52	   and may be updated, replaced, or obsoleted by other documents at any
+53	   time.  It is inappropriate to use Internet-Drafts as reference
+54	   material or to cite them other than as "work in progress."
+
+56	   This Internet-Draft will expire on 1 January 2026.
+
+58	Copyright Notice
+
+60	   Copyright (c) 2025 IETF Trust and the persons identified as the
+61	   document authors.  All rights reserved.
+
+63	   This document is subject to BCP 78 and the IETF Trust's Legal
+64	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+65	   license-info) in effect on the date of publication of this document.
+66	   Please review these documents carefully, as they describe your rights
+67	   and restrictions with respect to this document.  Code Components
+68	   extracted from this document must include Revised BSD License text as
+69	   described in Section 4.e of the Trust Legal Provisions and are
+70	   provided without warranty as described in the Revised BSD License.
+
+72	Table of Contents
+
+74	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
+75	   2.  Requirements Language . . . . . . . . . . . . . . . . . . . .   5
+76	   3.  Context . . . . . . . . . . . . . . . . . . . . . . . . . . .   5
+77	     3.1.  Non-Queue-Building Behavior . . . . . . . . . . . . . . .   5
+78	     3.2.  Relationship to the Diffserv Architecture . . . . . . . .   6
+79	     3.3.  Relationship to L4S . . . . . . . . . . . . . . . . . . .   8
+80	     3.4.  Applicability . . . . . . . . . . . . . . . . . . . . . .   8
+81	   4.  Non-Queue-Building Sender Requirements  . . . . . . . . . . .   9
+82	   5.  Non-Queue-Building PHB Requirements . . . . . . . . . . . . .  10
+83	     5.1.  Primary Requirements  . . . . . . . . . . . . . . . . . .  11
+84	     5.2.  Traffic Protection  . . . . . . . . . . . . . . . . . . .  13
+85	     5.3.  Limiting Packet Bursts from Links . . . . . . . . . . . .  16
+86	   6.  Operational Considerations  . . . . . . . . . . . . . . . . .  17
+87	     6.1.  NQB Traffic Identification  . . . . . . . . . . . . . . .  17
+88	     6.2.  Aggregation of the NQB DSCP into another Diffserv PHB . .  17
+89	     6.3.  Aggregation of other DSCPs into the NQB PHB . . . . . . .  18
+90	     6.4.  Cross-domain usage and DSCP Re-marking  . . . . . . . . .  19
+91	       6.4.1.  Interoperability with Non-DS-Capable Domains  . . . .  19
+92	     6.5.  The NQB DSCP and Tunnels  . . . . . . . . . . . . . . . .  21
+93	     6.6.  Guidance for Lower-Rate Links . . . . . . . . . . . . . .  22
+
+95	   7.  Mapping NQB to standards of other SDOs  . . . . . . . . . . .  22
+96	     7.1.  DOCSIS Access Networks  . . . . . . . . . . . . . . . . .  23
+97	     7.2.  Mobile Networks . . . . . . . . . . . . . . . . . . . . .  23
+98	     7.3.  Wi-Fi Networks  . . . . . . . . . . . . . . . . . . . . .  24
+99	       7.3.1.  Interoperability with Existing Wi-Fi Networks . . . .  24
+100	       7.3.2.  The Updates to RFC 8325 . . . . . . . . . . . . . . .  27
+101	   8.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  28
+102	   9.  Implementation Status . . . . . . . . . . . . . . . . . . . .  29
+103	   10. Security Considerations . . . . . . . . . . . . . . . . . . .  29
+104	   11. References  . . . . . . . . . . . . . . . . . . . . . . . . .  31
+105	     11.1.  Normative References . . . . . . . . . . . . . . . . . .  31
+106	     11.2.  Informative References . . . . . . . . . . . . . . . . .  31
+107	   Appendix A.  DSCP Re-marking Policies . . . . . . . . . . . . . .  35
+108	   Appendix B.  Comparison with Expedited Forwarding . . . . . . . .  37
+109	   Appendix C.  Impact on Higher Layer Protocols . . . . . . . . . .  38
+110	   Appendix D.  Alternative Diffserv Code Points . . . . . . . . . .  39
+111	   Acknowledgements  . . . . . . . . . . . . . . . . . . . . . . . .  39
+112	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  39
+
+114	1.  Introduction
+
+116	   This document defines a Differentiated Services per-hop behavior
+117	   (PHB) called the "Non-Queue-Building Per-Hop Behavior" (NQB PHB),
+118	   which isolates traffic microflows (application-to-application flows,
+119	   see [RFC2475]) that are relatively low data rate and that do not
+120	   themselves materially contribute to queuing delay and loss, allowing
+121	   them to avoid the queuing delays and losses caused by other traffic.
+122	   Such Non-Queue-Building microflows (for example: interactive voice,
+123	   game sync packets, certain machine-to-machine applications, DNS
+124	   lookups, and some real-time IoT analytics data) are low-data-rate
+125	   application-limited microflows that are distinguished from bursty
+126	   traffic microflows and high-data-rate traffic microflows managed by a
+127	   classic congestion control algorithm, both of which cause queuing
+128	   delay and loss.  The term "classic congestion control" is defined in
+129	   [RFC9330] to mean one that coexists with standard Reno congestion
+130	   control [RFC5681].  In this document we will use the term Queue-
+131	   Building (QB) to refer to microflows that cause queuing delay and
+132	   loss.
+
+134	   In accordance with IETF guidance in [RFC2914] and [RFC8085], most
+135	   packets carried by access networks are managed by an end-to-end
+136	   congestion control algorithm.  Many of the commonly-deployed
+137	   congestion control algorithms, such as Reno [RFC5681], Cubic
+138	   [RFC9438] or BBR [I-D.ietf-ccwg-bbr], are designed to seek the
+139	   available capacity of the path from sender to receiver (which can
+140	   frequently be the access network link capacity), and in doing so
+141	   generally overshoot the available capacity, causing a queue to build
+142	   up at the bottleneck link.  This queue build-up results in delay
+143	   (variable latency) and packet loss that can affect all the
+144	   applications that are sharing the bottleneck link.  Moreover, many
+145	   bottleneck links implement a relatively deep buffer (100 ms or more)
+146	   [Gettys2012][Cardwell2017][WikipediaBufferbloat][I-D.ietf-ccwg-bbr]
+147	   in order to enable these congestion control algorithms to use the
+148	   link efficiently, which exacerbates the latency and latency variation
+149	   experienced.
+
+151	   In contrast to applications that frequently cause queuing delay,
+152	   there are a variety of relatively low data rate applications that do
+153	   not materially contribute to queuing delay and loss but are
+154	   nonetheless subjected to it by sharing the same bottleneck link in
+155	   the access network.  Many of these applications can be sensitive to
+156	   latency or latency variation, as well as packet loss, and thus
+157	   produce a poor quality of experience in such conditions.
+
+159	   Active Queue Management (AQM) mechanisms intended for single queues
+160	   (such as PIE [RFC8033], DOCSIS-PIE [RFC8034], PI2 [RFC9332], or CoDel
+161	   [RFC8289]) can improve the quality of experience for latency
+162	   sensitive applications, but there are practical limits to the amount
+163	   of improvement that can be achieved without impacting the throughput
+164	   of capacity-seeking applications.  For example, AQMs generally allow
+165	   a significant amount of queue depth variation to accommodate the
+166	   behaviors of congestion control algorithms such as Reno and Cubic.
+167	   If the AQM attempted to control the queue depth much more tightly,
+168	   applications using those algorithms would not fully utilize the link.
+169	   Alternatively, flow queuing systems, such as fq_codel [RFC8290] can
+170	   be employed to isolate microflows from one another, but they are not
+171	   appropriate for all bottleneck links due to reasons that include
+172	   complexity.
+
+174	   The NQB PHB supports differentiating between these two classes of
+175	   traffic in bottleneck links and queuing them separately so that both
+176	   classes can deliver satisfactory quality of experience for their
+177	   applications.  In particular, the NQB PHB provides a shallow-
+178	   buffered, best-effort service as a complement to a Default (see
+179	   [RFC2474]) deep-buffered best-effort service.  This PHB is designed
+180	   for broadband access network links, where there is minimal
+181	   aggregation of traffic, and especially when buffers are deep.  The
+182	   applicability of this PHB to lower-speed links is discussed in
+183	   Section 5.
+
+185	   To be clear, a network implementing the NQB PHB solely provides
+186	   isolation for traffic classified as behaving in conformance with the
+187	   NQB DSCP.  A node supporting the NQB PHB makes no guarantees on
+188	   latency or data rate for NQB-marked microflows (beyond the latency
+189	   bound provided by the shallow buffer), it is the NQB senders'
+190	   behavior itself which results in low latency and low loss.
+
+192	   Section 6 and Section 7 of this document provide guidance for network
+193	   operators that might forward traffic marked with the NQB DSCP.
+194	   Networks that do not currently implement support for the NQB PHB are
+195	   described in Section 6 regarding treatment of the recommended DSCP
+196	   for NQB traffic, and in particular Section 6.2, which provides
+197	   specific recommendations for this case.  In addition, Section 6.4
+198	   provides recommendations around interconnection with networks that do
+199	   support the NQB PHB.
+
+201	2.  Requirements Language
+
+203	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+204	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+205	   "OPTIONAL" in this document are to be interpreted as described in BCP
+206	   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+207	   capitals, as shown here.
+
+209	3.  Context
+
+211	3.1.  Non-Queue-Building Behavior
+
+213	   There are applications that send traffic at relatively low data rates
+214	   and/or in a fairly smooth and consistent manner such that they are
+215	   unlikely to exceed the available capacity of the network path between
+216	   sender and receiver even at an inter-packet timescale.  Some of these
+217	   applications are transactional in nature, and might only send one
+218	   packet (or a few packets) per RTT.  These applications might
+219	   themselves only cause very small, transient queues to form in network
+220	   buffers, but nonetheless they can be subjected to packet delay and
+221	   delay variation as a result of sharing a network buffer with
+222	   applications that tend to cause large and/or standing queues to form.
+223	   These applications typically implement a response to network
+224	   congestion that consists of discontinuing (or significantly reducing)
+225	   transmissions.  These applications can be negatively affected by
+226	   excessive packet delay and delay variation.  Such applications are
+227	   ideal candidates to be queued separately from the applications that
+228	   are the cause of queue build-up, latency and loss.
+
+230	   In contrast, Queue-Building (QB) microflows include those that probe
+231	   for the link capacity and induce latency and loss as a result, for
+232	   example microflows that use Cubic, Reno or other TCP/QUIC congestion
+233	   control algorithms in a capacity-seeking manner.  Other types of QB
+234	   microflows include those that send at a high burst rate even if the
+235	   long-term average data rate is much lower.
+
+237	3.2.  Relationship to the Diffserv Architecture
+
+239	   The IETF has defined the Differentiated Services architecture
+240	   [RFC2475] with the intention that it allows traffic to be marked in a
+241	   manner that conveys the performance requirements of that traffic
+242	   either qualitatively or in a relative sense (e.g. priority).  The
+243	   architecture defines the use of the Diffserv field [RFC2474] for this
+244	   purpose, and numerous RFCs have been written that describe
+245	   recommended interpretations of the values (Diffserv Code Points
+246	   [RFC2474]) of the field, and standardized treatments (traffic
+247	   conditioning and per-hop-behaviors [RFC2475]) that can be implemented
+248	   to satisfy the performance requirements of traffic so marked.
+
+250	   While this architecture is powerful and flexible enough to be
+251	   configured to meet the performance requirements of a variety of
+252	   applications and traffic categories, or to achieve differentiated
+253	   service offerings, meeting the performance requirements of an
+254	   application across the entire sender-to-receiver path involves all
+255	   the networks in the path agreeing on what those requirements are and
+256	   sharing an interest in meeting them.  In many cases this is made more
+257	   difficult since the performance "requirements" are not strict ones
+258	   (e.g., applications will degrade in some manner as loss/latency/
+259	   jitter increase), so the importance of meeting them for any
+260	   particular application in some cases involves a judgment as to the
+261	   value of avoiding some amount of degradation in quality for that
+262	   application in exchange for an increase in the degradation of another
+263	   application.
+
+265	   Further, in many cases the implementation of Diffserv PHBs has
+266	   historically involved prioritization of service classes with respect
+267	   to one another, which sets up the zero-sum game alluded to in the
+268	   previous paragraph, and results in the need to limit access to higher
+269	   priority classes via mechanisms such as access control, admission
+270	   control, traffic conditioning and rate policing, and/or to meter and
+271	   bill for carriage of such traffic.  These mechanisms can be difficult
+272	   or impossible to implement in the Internet.
+
+274	   Finally, some jurisdictions impose regulations that limit the ability
+275	   of networks to provide differentiation of services, in large part
+276	   this seems to be based on the belief that doing so necessarily
+277	   involves prioritization or privileged access to network capacity, and
+278	   thus a benefit to one class of traffic always comes at the expense of
+279	   another.
+
+281	   In contrast, the NQB PHB has been designed with the goal that it
+282	   avoids many of these issues, and thus could conceivably be deployed
+283	   across the Internet.  The intent of the NQB DSCP is that it signals
+284	   verifiable behavior that permits the sender to request differentiated
+285	   treatment.  Also, the NQB traffic is to be given a separate queue
+286	   with forwarding preference equal to Default traffic and given no
+287	   reserved capacity other than any minimum capacity that it shares with
+288	   Default traffic.  As a result, the NQB PHB does not aim to meet
+289	   specific application performance requirements.  Instead, the sole
+290	   goal of the NQB PHB is to isolate NQB traffic from other traffic that
+291	   degrades loss, latency, and jitter performance, given that the NQB
+292	   traffic is itself only an insignificant contributor to those
+293	   degradations.  The PHB is also designed to reduce the incentives for
+294	   a sender to mismark its traffic, since neither higher capacity nor
+295	   reserved capacity are being offered.  These attributes eliminate many
+296	   of the trade-offs that underlie the handling of differentiated
+297	   service classes in the Diffserv architecture as it has traditionally
+298	   been defined.  These attributes also significantly simplify access
+299	   control and admission control functions, reducing them to simple
+300	   verification of behavior.  This aspect is discussed further in
+301	   Section 4 and Section 5.2.
+
+303	   The NQB PHB is therefore intended for the situation where the
+304	   performance requirements of applications cannot be assured across the
+305	   whole sender-to-receiver path, and as a result, applications cannot
+306	   feasibly place requirements on the network.  Instead, many
+307	   applications have evolved to make the best out of the network
+308	   environment that they find themselves in.  In this context, the NQB
+309	   PHB provides a better network environment for applications that send
+310	   data at relatively low and non-bursty data rates.
+
+312	   In regards to comparison between the NQB PHB and other standardized
+313	   PHBs in the Diffserv series, the closest similarity is to the
+314	   Expedited Forwarding (EF) PHB [RFC3246], which also intends to enable
+315	   low loss, low delay, and low jitter services.  Unlike EF, NQB has no
+316	   requirement for a guaranteed minimum rate, nor to police incoming
+317	   traffic to such a rate, and NQB is expected to be given the same
+318	   forwarding preference as Default traffic.  See Appendix B for a more
+319	   detailed comparison of the NQB and EF PHBs.
+
+321	   In nodes that support multiple DiffServ Service Classes, NQB traffic
+322	   is intended to be treated as a part of the Default treatment.
+323	   Traffic assigned to this class does not receive better forwarding
+324	   treatment (e.g., prioritization) with respect to other classes, AFxx,
+325	   EF, etc.  Of course, traffic marked as NQB could (like other Default
+326	   traffic) could receive better forwarding treatment with respect to
+327	   Lower-Effort (LE) [RFC8622] (e.g. the NQB queue could be emptied in a
+328	   priority sequence before the LE queue).
+
+330	3.3.  Relationship to L4S
+
+332	   The NQB DSCP and PHB described in this document have been defined to
+333	   operate independently of the L4S Architecture [RFC9330].
+334	   Nonetheless, traffic marked with the NQB DSCP is intended to be
+335	   compatible with L4S [RFC9330], with the result being that NQB traffic
+336	   and L4S traffic can share the low-latency queue in an L4S DualQ node
+337	   [RFC9332].  Compliance, by a network node, with the DualQ Coupled AQM
+338	   requirements (Section 2.5 of [RFC9332]) is considered sufficient to
+339	   support the NQB PHB requirement of fair allocation of capacity
+340	   between the QB and NQB queues (Section 5).  Note that these
+341	   requirements in turn require compliance with all the requirements in
+342	   Section 5 of [RFC9331].
+
+344	   Applications that comply with both the NQB sender requirements in
+345	   Section 4 and the L4S "Prague" requirements in Section 4 of [RFC9331]
+346	   could mark their packets both with the NQB DSCP and with the ECT(1)
+347	   value.
+
+349	   NQB network functions MUST treat packets marked with the NQB DSCP
+350	   uniformly, regardless of the value of the ECN field.  Here, NQB
+351	   network functions refers to the traffic protection function (defined
+352	   in Section 5.2) and any re-marking/traffic policing function designed
+353	   to protect unmanaged networks (as described in Section 6.4.1).
+
+355	   In nodes that support both the NQB PHB and L4S, the L4S network
+356	   functions SHOULD treat packets marked with the NQB DSCP and ECT(1) or
+357	   CE the same as packets marked with the Default DSCP and the same ECN
+358	   value.  Here, L4S network functions refers to the L4S Network Node
+359	   functions (Section 5 of [RFC9331]), and any mechanisms designed to
+360	   protect the L4S queue (such as those discussed in Section 8.2 of
+361	   [RFC9330]).  The processing by an L4S node of an ECT(0) packet that
+362	   is classified to the L queue (e.g. as a result of being marked with a
+363	   NQB DSCP) is specified in Section 5.4.1.1 of [RFC9331] and
+364	   Section 2.5.1.1 of [RFC9332].
+
+366	3.4.  Applicability
+
+368	   This PHB is primarily applicable for high-speed broadband access
+369	   network links, where there is minimal aggregation of traffic, and
+370	   deep buffers are common.
+
+372	   In many other links, forwarding NQB-marked packets using the Default
+373	   treatment might be sufficient to preserve loss/latency/jitter
+374	   performance for NQB traffic.  This is generally true in links that do
+375	   not typically experience congestion (for example, many backbone and
+376	   core network links), and in highly aggregated links (links designed
+377	   to carry a large number of simultaneous microflows) where individual
+378	   microflow burstiness is averaged out and thus is unlikely to cause
+379	   much actual delay.
+
+381	4.  Non-Queue-Building Sender Requirements
+
+383	   Microflows that are eligible to be marked with the NQB DSCP are ones
+384	   that send non-bursty traffic at a low data rate relative to typical
+385	   network path capacities.  Here the data rate is limited by the
+386	   application itself rather than by network capacity - these microflows
+387	   send at a data rate of no more than about 1 percent of the "typical"
+388	   network path capacity.  In addition, these microflows are required to
+389	   be sent in a smooth (i.e. paced) manner, where the number of IP bytes
+390	   sent in any time interval "T" is less than or equal to R * T + 1 MTU,
+391	   where "R" is the maximum rate described in the preceding sentence.
+392	   For example, in today's Internet, where access network data rates are
+393	   typically on the order of 50 Mbps or more (and see Section 6.6 for a
+394	   discussion of cases where this isn't true), this implies 500 kbps as
+395	   an upper limit.
+
+397	   Microflows marked with the NQB DSCP are expected to comply with
+398	   existing guidance for safe deployment on the Internet, including the
+399	   guidance around response to network congestion, for example the
+400	   requirements in [RFC8085] and Section 2 of [RFC3551] (also see the
+401	   circuit breaker limits in Section 4.3 of [RFC8083] and the
+402	   description of inelastic pseudowires in Section 4 of [RFC7893]).  The
+403	   fact that a microflow's data rate is low relative to typical network
+404	   capacities is no guarantee that sufficient capacity exists in any
+405	   particular network, and it is the responsibility of the application
+406	   to detect and react appropriately if the network capacity is
+407	   insufficient.  To be clear, the description of NQB-marked microflows
+408	   in this document is not to be interpreted as suggesting that
+409	   applications generating such microflows are in any way exempt from
+410	   this responsibility.  One way that an application marking its traffic
+411	   as NQB can handle this is to implement a low latency congestion
+412	   control mechanism as described in [RFC9331].
+
+414	   The Diffserv field specification requires the definition of a
+415	   recommended DSCP to be associated with each standardized PHB (see
+416	   Section 5 of [RFC2474]).  In accordance with this, applications are
+417	   RECOMMENDED to use the Diffserv Code Point (DSCP) 45 (decimal) to
+418	   mark microflows as NQB.  The choice of the DSCP value 45 (decimal) is
+419	   motivated in part by the desire to achieve separate queuing in
+420	   existing Wi-Fi networks (see Section 7.3) and by the desire to make
+421	   implementation of the PHB simpler in network gear that has the
+422	   ability to classify traffic based on ranges of DSCP values (see
+423	   Section 6.3 for further discussion).
+
+425	   The two primary considerations for whether an application chooses to
+426	   mark its traffic as NQB involve the risks of being subjected to a
+427	   traffic protection algorithm (see Section 5.2) and/or to the
+428	   consequences of overrunning the NQB shallow buffer if (in either
+429	   case) the traffic contributes to the formation of a queue in a node
+430	   that supports the PHB.  In both cases, the result could be that
+431	   excess traffic is discarded or queued separately as Default traffic
+432	   (and thus potentially delivered out of order).  To avoid these risks,
+433	   if a microflow's traffic exceeds the rate equation provided in the
+434	   first paragraph of this section, the application MUST NOT mark this
+435	   traffic with the NQB DSCP.  In such a case, the application could
+436	   instead consider using a low latency congestion control mechanism as
+437	   described in [RFC9331].
+
+439	   The sender requirements outlined in this section are all related to
+440	   observable attributes of the packet stream, which makes it possible
+441	   for network elements (including nodes implementing the PHB) to
+442	   monitor for inappropriate usage of the DSCP, and take action (such as
+443	   discarding or re-marking) on traffic that does not comply.  This
+444	   functionality, when implemented as part of the PHB is described in
+445	   Section 5.2.
+
+447	5.  Non-Queue-Building PHB Requirements
+
+449	   For the NQB PHB to become widely deployed, it is important that
+450	   incentives are aligned correctly, i.e., that there is a benefit to
+451	   the application in marking its packets correctly, and a disadvantage
+452	   (or at least no benefit) to an application in intentionally
+453	   mismarking its traffic.  Thus, a useful property of nodes (i.e.
+454	   network switches and routers) that support separate queues for NQB
+455	   and QB microflows is that for microflows consistent with the NQB
+456	   sender requirements in Section 4, the NQB queue would likely be a
+457	   better choice than the QB queue; and for microflows inconsistent with
+458	   those requirements, the QB queue would likely be a better choice than
+459	   the NQB queue.  By adhering to these principles, there is little
+460	   incentive for senders to mismark their traffic as NQB.
+
+462	   This principle of incentive alignment ensures a system is robust to
+463	   the behavior of the large majority of individuals and organizations
+464	   who can be expected to act in their own interests (including
+465	   application developers and service providers who act in the interests
+466	   of their users).  Malicious behavior is not necessarily based on
+467	   rational self-interest, so incentive alignment is not a sufficient
+468	   defense, but the large majority of users do not act out of malice.
+469	   Protection against malicious attacks (and accidents) is addressed in
+470	   Section 5.2 and summarized in Section 10.  As mentioned previously,
+471	   the NQB designation and marking is intended to convey verifiable
+472	   traffic behavior, as opposed to simply a desire for differentiated
+473	   treatment.  As a result, any mismarking can be identified by the
+474	   network.
+
+476	5.1.  Primary Requirements
+
+478	   A node supporting the NQB PHB MUST provide a queue for Non-Queue-
+479	   Building traffic separate from the queue used for Default traffic.
+
+481	   A node supporting the NQB PHB SHOULD NOT rate limit or rate police
+482	   the aggregate of NQB traffic separately from Default traffic.  An
+483	   exception to this recommendation for traffic sent towards a non-DS-
+484	   capable domain is discussed in Section 6.4.1.  Note also that
+485	   Section 5.2 discusses potential uses of per-microflow (rather than
+486	   aggregate) rate policing.
+
+488	   The NQB queue SHOULD be given equivalent forwarding preference
+489	   compared to Default.  The node SHOULD provide a scheduler that allows
+490	   NQB and Default traffic to share the link in a manner that treats the
+491	   two classes equally, e.g., a deficit round-robin (DRR) scheduler with
+492	   equal weights, or two Wireless Multimedia Access Categories with the
+493	   same channel access (EDCA) parameters.  The use of equal weights for
+494	   DRR is given as a reasonable example, and is not intended to preclude
+495	   other scheduling weights (see below for details).  A node that
+496	   provides rate limits or rate guarantees for Default traffic SHOULD
+497	   ensure that such limits and/or guarantees are shared with NQB traffic
+498	   in a manner that treats the two classes equally.  This could be
+499	   supported using a hierarchical scheduler where the rate limits and
+500	   guarantees are configured on a parent class, and the two queues
+501	   (Default and NQB) are arranged as the children of the parent class
+502	   and given equal access to the capacity configured for the parent
+503	   class (e.g. with equal DRR scheduling).  Compliance with these
+504	   recommendations reduces the incentives for QB traffic to be mismarked
+505	   as NQB, and is most important in nodes that are likely bottlenecks,
+506	   where deviation from them could result in a discernible benefit for
+507	   mismarked traffic (to the detriment of other traffic).  In network
+508	   nodes that are rarely bottlenecks, these recommendations are less
+509	   critical.
+
+511	   In the DRR example above, equal scheduling weights was only an
+512	   example.  Ideally the DRR weight would be chosen to match the highest
+513	   fraction of capacity that NQB compliant flows are likely to use on a
+514	   particular network segment.  Given that NQB compliant flows are not
+515	   capacity-seeking (in contrast to QB flows, which can be), and since
+516	   DRR allows unused capacity in one class to be used by traffic in the
+517	   other, providing a higher-than-necessary NQB scheduler weight could
+518	   be considered less problematic than the reverse.  That said,
+519	   providing a higher-than-needed NQB scheduler weight does increase the
+520	   likelihood that a non-compliant microflow mismarked as NQB is able to
+521	   use more than its fair share of network capacity.  NQB microflows are
+522	   expected to each consume no more than 1% of the link capacity, and in
+523	   low stat-mux environments (such as at the edge of the network) would
+524	   be unlikely in aggregate to consume 50% of the link capacity.  Thus,
+525	   50% seems a reasonable upper bound on the weight for the NQB PHB in
+526	   these environments.
+
+528	   A node supporting the NQB PHB SHOULD by default classify packets
+529	   marked with the NQB DSCP 45 (decimal) into the queue for Non-Queue-
+530	   Building traffic.  In accordance with the requirement in Section 3 of
+531	   [RFC2474], a node supporting the NQB PHB MUST support the ability to
+532	   configure the DSCP that is used to classify packets into the queue
+533	   for Non-Queue-Building traffic.  A node supporting the NQB PHB MAY
+534	   support the ability to configure multiple DSCPs that are used to
+535	   classify packets into the queue for Non-Queue-Building traffic.
+
+537	   Support for the NQB PHB is advantageous at bottleneck nodes.  Many
+538	   bottleneck nodes have a relatively deep buffer for Default traffic
+539	   (e.g., roughly equal to the base RTT of the expected connections,
+540	   which could be tens or hundreds of ms).  Providing a similarly deep
+541	   buffer for the NQB queue would be at cross purposes to providing very
+542	   low queueing delay and would erode the incentives for QB traffic to
+543	   be marked correctly at such a bottleneck node.  The NQB queue MUST
+544	   have a buffer size that is significantly smaller than the buffer
+545	   provided for Default traffic.  It is RECOMMENDED to configure an NQB
+546	   buffer size less than or equal to 10 ms at the shared NQB/Default
+547	   egress rate.
+
+549	   In order to enable network operators to monitor the usage of the NQB
+550	   PHB, and in particular to monitor for potential mis-marking of QB
+551	   traffic, a node supporting the NQB PHB MUST provide statistics that
+552	   can be used by the network operator to detect whether abuse is
+553	   occurring (e.g. packet and drop counters).  Support for such counters
+554	   ensures that operators who configure the NQB PHB have the ability to
+555	   track the amount of packet drop that is occurring due to traffic
+556	   overrunning the shallow buffer, and then take action if they believe
+557	   the PHB is causing more issues than it is solving in their
+558	   environment.  Those actions could include disabling the PHB,
+559	   identifying and dealing with the sources of malicious traffic
+560	   directly, enabling traffic protection (Section 5.2) if it is
+561	   available, or pursuing a feature request with the equipment
+562	   manufacturer to add a traffic protection function if it isn't
+563	   currently available.
+
+565	   To prevent propagation of degradation of service for NQB traffic
+566	   caused by potential mis-marking of QB traffic, network equipment that
+567	   supports this PHB and handles traffic for multiple users (e.g.,
+568	   subscribers) SHOULD support provisioning of capacity and related
+569	   forwarding resources on a per-user (e.g., subscriber) basis and
+570	   SHOULD support enforcement of the resulting per-user limits on the
+571	   aggregate of NQB and QB traffic for each user.  This functionality is
+572	   commonly available in the class of network equipment for which this
+573	   PHB is primarily applicable (see Section 3.4).  Provisioning
+574	   methodology as well as decisions on whether and how to enforce the
+575	   resulting limits may vary by network operator.
+
+577	   While not fully described in this document, it may be possible for
+578	   network equipment to implement a separate QB/NQB pair of queues for
+579	   additional service classes beyond the Default PHB / NQB PHB pair.
+
+581	   In some cases, existing network gear has been deployed that cannot
+582	   readily be upgraded or configured to support the PHB requirements.
+583	   This equipment might however be capable of loosely supporting an NQB
+584	   service – see Section 7.3.1 for details and an example where this is
+585	   particularly important.  A similar approach might prove to be useful
+586	   in other network environments.
+
+588	5.2.  Traffic Protection
+
+590	   It is possible that, due to an implementation error or
+591	   misconfiguration, a QB microflow could end up being mismarked as NQB,
+592	   or vice versa.  It is also possible that a malicious actor could
+593	   introduce a QB microflow marked as NQB with the intention of causing
+594	   disruptions.  In the case of a low data rate microflow that isn't
+595	   marked as NQB and therefore ends up in the QB queue, it would only
+596	   impact its own quality of service, and so it seems to be of lesser
+597	   concern.  However, a QB microflow that is mismarked as NQB is able to
+598	   contribute to NQB queue formation at a network node which would cause
+599	   queuing delays and/or loss for all the other microflows that are
+600	   sharing the NQB queue.
+
+602	   To prevent this situation from harming the performance of the
+603	   microflows that comply with the requirements in Section 4, network
+604	   elements that support the NQB PHB SHOULD support a "traffic
+605	   protection" function that can identify microflows or packets that are
+606	   inconsistent with the sender requirements in Section 4, and either
+607	   reclassify those microflows/packets to the QB queue or discard the
+608	   offending traffic.  In the case of a traffic protection algorithm
+609	   that reclassifies offending traffic, the implementation MAY
+610	   additionally re-mark such traffic to Default (or possibly to another
+611	   local use code point) so that the result of the traffic protection
+612	   decision can be used by further hops.  This sort of re-marking could
+613	   provide a limited layer of protection in situations where downstream
+614	   network nodes support separate queuing for NQB marked packets but
+615	   lack support for traffic protection.
+
+617	   If traffic protection is not supported or is not effective in
+618	   preventing queue formation and growth in the NQB queue, then QB
+619	   traffic that is mismarked as NQB is able to form a queue that
+620	   overflows the shallow buffer provided for NQB traffic, which is
+621	   expected to result in redirecting the excess packets to the QB queue
+622	   or discarding them.  Both actions degrade service for not only the
+623	   mismarked QB traffic, but also for any correctly marked NQB traffic,
+624	   likely causing a significant degradation of service for NQB traffic.
+625	   Even if mismarked QB traffic does not cause buffer overflow, the
+626	   queue that forms results in QB traffic obtaining the reduced loss and
+627	   delay benefits of the NQB service while causing queuing delays for
+628	   all the other microflows that are sharing the queue.  These increased
+629	   abilities of QB traffic to damage the NQB service in the absence of a
+630	   traffic protection function needs to be considered.  This is the
+631	   motivation for the "SHOULD" requirement to support traffic protection
+632	   (in the previous paragraph).  An NQB PHB implementation that does not
+633	   support traffic protection risks being limited to deployment
+634	   situations where traffic protection is potentially not necessary.
+635	   One example of such a situation could be a controlled environment
+636	   (e.g., enterprise LAN) where a network administrator is expected to
+637	   manage the usage of DSCPs.
+
+639	   Traffic protection as it is defined here differs from Traffic
+640	   Conditioning implemented in other Diffserv contexts.  Traffic
+641	   Conditioning is commonly performed at the edge of a Diffserv domain
+642	   (either ingress or egress, depending on Traffic Conditioning
+643	   Agreements in place).  In contrast, traffic protection is intended to
+644	   be implemented in the nodes that implement the PHB.  By placing the
+645	   traffic protection at the PHB node, an implementation can monitor the
+646	   actual NQB queue and take action only if a queue begins to form.
+647	   Implementation of traffic protection at PHB nodes that are most
+648	   likely to be a bottleneck is particularly important because these are
+649	   the nodes that would be expected to show the most queue build-up in
+650	   the presence of QB traffic mismarked as NQB.
+
+652	   This specification does not mandate a particular algorithm for
+653	   traffic protection.  This is intentional, since this will probably be
+654	   an area where implementers innovate, and the specifics of traffic
+655	   protection could need to be different in different network equipment
+656	   and in different network contexts.  Instead this specification
+657	   provides guidelines and some examples of traffic protection
+658	   algorithms which could be employed.
+
+660	   The traffic protection function SHOULD NOT base its decisions upon
+661	   application-layer constructs (such as the port number used by the
+662	   application or the source/destination IP address).  Instead, it ought
+663	   to base its decisions on the actual behavior of each microflow (i.e.
+664	   the pattern of packet arrivals).
+
+666	   A conventional implementation of such a traffic protection algorithm
+667	   is a per-microflow rate policer, designed to identify microflows that
+668	   exceed the bound provided in Section 4, where the value R is set to 1
+669	   percent of the egress link capacity available for NQB traffic.  An
+670	   alternative is to use a traffic protection algorithm that bases its
+671	   decisions on the detection of actual queuing (i.e. by monitoring the
+672	   queuing delay experienced by packets in the NQB queue) in correlation
+673	   with the arrival of packets for each microflow.  While a per-
+674	   microflow rate policer is conceptually simpler (and is based directly
+675	   on the NQB sender requirements), it could often end up being more
+676	   strict than is necessary (for example by policing a flow that exceeds
+677	   the rate equation even when the link is underutilized).  One example
+678	   traffic protection algorithm based on the detection of actual queuing
+679	   can be found in [I-D.briscoe-docsis-q-protection].  This algorithm
+680	   maintains per-microflow state for a certain number of simultaneous
+681	   "queue-building" microflows (e.g. 32), and shared state for any
+682	   additional microflows above that number.
+
+684	   In the case of a traffic protection algorithm that reclassifies
+685	   offending traffic, different levels of hysteresis could be
+686	   considered.  For example, the reclassify decision could be made on a
+687	   packet-by-packet basis, which could result in significant out-of-
+688	   order delivery for offending microflows as some portion of the
+689	   microflow's packets remain in the NQB queue and some are reclassified
+690	   to the Default queue.  Alternatively, a traffic protection function
+691	   could employ a certain level of hysteresis to prevent borderline
+692	   microflows from being reclassified capriciously, thus causing less
+693	   potential for out-of-order delivery.  As a third option, the decision
+694	   could be made to take action on all the future packets of the
+695	   microflow, though sufficient logic would be needed to ensure that a
+696	   future microflow (e.g. with the same 5-tuple) isn't misidentified as
+697	   the current offending microflow.
+
+699	   In the case of a traffic protection algorithm that discards offending
+700	   traffic, similar levels of hysteresis could be considered.  In this
+701	   case, it is RECOMMENDED that the decision thresholds be set higher
+702	   than in the case of designs that reclassify, since the degradation of
+703	   communications caused by packet discard are likely to be greater than
+704	   the degradation caused by out-of-order delivery.
+
+706	   The traffic protection function described here might require that the
+707	   network element maintain microflow state.  The traffic protection
+708	   function MUST be designed such that the node implementing the NQB PHB
+709	   does not fail (e.g. crash) in the case that the microflow state is
+710	   exhausted.
+
+712	   Some networks might prefer to implement a more traditional Traffic
+713	   Conditioning approach, and police the application of the NQB DSCP at
+714	   the ingress edge so that per-hop traffic protection is not needed.
+715	   This could be accomplished via the use of a per-microflow rate
+716	   policer that polices microflows at 1 percent of the minimum link
+717	   capacity of the network.  This approach would generally be expected
+718	   to be inferior to per-hop traffic protection, because on one hand it
+719	   would be difficult for edge nodes to guarantee that there would never
+720	   be more than 100 NQB flows that would share a single internal
+721	   bottleneck, and on the other hand there could be internal links that
+722	   have much greater capacity than the minimum.  So, Traffic
+723	   Conditioning at the edge could simultaneously be too lenient and too
+724	   strict.
+
+726	5.3.  Limiting Packet Bursts from Links
+
+728	   Some link technologies introduce burstiness by briefly storing
+729	   packets prior to forwarding them.  A common cause of this burstiness
+730	   is link discontinuity (i.e. where the link is not continuously
+731	   available for transmission by the device), for example time-division-
+732	   duplex links or time-division-multiple-access (TDMA) links.  Some
+733	   link technologies that fall into this category are passive optical
+734	   networks (PON), Wi-Fi, LTE/5G and DOCSIS.
+
+736	   As well as NQB senders needing to limit packet bursts (see
+737	   Section 4), traffic designated for the NQB PHB would benefit from
+738	   configuring these link technologies to limit the burstiness
+739	   introduced.  This is for three reasons.  The first reason is that
+740	   burstiness, whether caused by the sender or by a link on the path,
+741	   could cause queuing delays at downstream bottlenecks and thus degrade
+742	   Quality of Experience.  The second reason is that burstiness in links
+743	   typically means that packets have been delayed by a variable amount,
+744	   i.e. for packets that are being aggregated awaiting a transmission
+745	   opportunity, some packets would generally have arrived just after the
+746	   last transmission opportunity, and thus have to wait the longest,
+747	   while others would generally arrive just in time for the next
+748	   transmission opportunity, and thus would wait the least.  This
+749	   manifests as latency variation (jitter) which can also degrade
+750	   Quality of Experience for applications that desire NQB treatment.
+751	   The third reason is that a downstream bottleneck that implements the
+752	   NQB PHB could have implemented a traffic protection mechanism
+753	   (Section 5.2) that responds to queuing delays by re-
+754	   marking/reclassifying/dropping packets, and bursty arrivals caused by
+755	   an upstream link could introduce queuing delays in the NQB queue and
+756	   thus be more likely to be subjected to traffic protection effects.
+
+758	   This document does not set any quantified requirements for links to
+759	   limit burst delay, primarily because link technologies are outside
+760	   the remit of Diffserv specifications.  However, it would not seem
+761	   necessary to limit bursts lower than roughly 10% of the minimum base
+762	   RTT expected in the typical deployment scenario (e.g., 250 us burst
+763	   duration for links within the public Internet).  This observation
+764	   aligns with a similar one in Section 5.5 of [RFC9331].
+
+766	6.  Operational Considerations
+
+768	   This section describes considerations for network operators regarding
+769	   the identification, marking, and handling of NQB traffic.  It
+770	   outlines aggregation behaviors and special considerations in
+771	   unmanaged and inter-network scenarios.  Additionally, Section 6.2
+772	   contains configuration recommendations for nodes that do not support
+773	   the NQB PHB, and Section 6.4.1 contains configuration recommentations
+774	   for networks that interconnect with non-DS-capable domains.
+
+776	6.1.  NQB Traffic Identification
+
+778	   As required in Section 5, nodes supporting the NQB PHB provide for
+779	   the configuration of classifiers that can be used to differentiate
+780	   between QB and NQB traffic of equivalent importance.  The default
+781	   classifier to distinguish NQB traffic from traffic classified as
+782	   Default (DSCP 0) is recommended to be the assigned NQB DSCP (45
+783	   decimal) (see Section 4 and Section 5.1).
+
+785	6.2.  Aggregation of the NQB DSCP into another Diffserv PHB
+
+787	   It is RECOMMENDED that networks and nodes that do not support the NQB
+788	   PHB be configured to treat traffic marked with the NQB DSCP the same
+789	   as traffic with the Default DSCP.  This includes networks and nodes
+790	   that aggregate service classes as discussed in [RFC5127] and
+791	   [RFC8100], in which case this recommendation would result in traffic
+792	   marked with the NQB DSCP being aggregated into the Elastic Treatment
+793	   Aggregate (for [RFC5127] networks) or the Default / Elastic Treatment
+794	   Aggregate (for [RFC8100] networks).
+
+796	   Networks and nodes that do not support the NQB PHB ought to only
+797	   classify packets with the NQB DSCP value into the appropriate
+798	   treatment aggregate, or encapsulate such packets for purposes of
+799	   aggregation, and SHOULD NOT re-mark them with a different DSCP.  This
+800	   preservation of the NQB DSCP value enables hops further along the
+801	   path to provide the NQB PHB successfully.  This aligns with
+802	   recommendations in [RFC5127].
+
+804	   In nodes that do not typically experience congestion (for example,
+805	   many backbone and core network switches), forwarding packets with the
+806	   NQB DSCP using the Default treatment might be sufficient to preserve
+807	   loss/latency/jitter performance for NQB traffic.
+
+809	   In nodes that do experience congestion, forwarding packets with the
+810	   NQB DSCP using the Default treatment could result in degradation of
+811	   loss/latency/jitter performance but nonetheless preserves the
+812	   incentives described in Section 5.
+
+814	   Aggregating traffic marked with the NQB DSCP into a PHB designed for
+815	   real-time, latency sensitive traffic (e.g. the Real-Time Treatment
+816	   Aggregate [RFC5127] or the Bulk Real-Time Treatment Aggregate
+817	   [RFC8100]), might better preserve loss/latency/jitter performance in
+818	   the presence of congestion, but would need to be done with
+819	   consideration of the risk of creating an incentive for non-compliant
+820	   traffic to be mis-marked as NQB.
+
+822	6.3.  Aggregation of other DSCPs into the NQB PHB
+
+824	   The Differentiated Services model provides flexibility for operators
+825	   to control the way they choose to aggregate traffic marked with a
+826	   specific DSCP.  Operators of nodes that support the NQB PHB could
+827	   choose to aggregate other service classes into the NQB queue.  This
+828	   is particularly useful in cases where specialized PHBs for these
+829	   other service classes had not been provided at a potential
+830	   bottleneck, perhaps because it was too complex to manage traffic
+831	   contracts and conditioning.  Candidate service classes for this
+832	   aggregation would include those that carry low-data-rate inelastic
+833	   traffic that has low to very-low tolerance for loss, latency and/or
+834	   jitter.  Operators would need to use their own judgment based on the
+835	   actual traffic characteristics in their networks in deciding whether
+836	   or not to aggregate other service classes / DSCPs with NQB.  For
+837	   networks that use the [RFC4594] service class definitions, this could
+838	   include Telephony (EF/VA), Signaling (CS5), and possibly Real-Time
+839	   Interactive (CS4) (depending on data rate).  In some networks,
+840	   equipment limitations may necessitate aggregating a range of DSCPs
+841	   (e.g. traffic marked with DSCPs 40-47 (decimal), i.e., those whose
+842	   three MSBs are 0b101).  As noted in Section 4, the choice of the DSCP
+843	   value 45 (decimal) is motivated in part by the desire to make this
+844	   aggregation simpler in network equipment that can classify packets
+845	   via comparing the DSCP value to a range of configured values.
+
+847	   A node providing only a NQB queue and a Default queue may obtain an
+848	   NQB performance similar to that of EF, for example as described by
+849	   Appendix A.3.1 of [RFC2598].  Some caveats and differences are
+850	   discussed in Appendix B.
+
+852	   [NOTE: this section references the obsoleted RFC2598 instead of its
+853	   replacement RFC3246, because the former contains the description of
+854	   EF performance.]
+
+856	6.4.  Cross-domain usage and DSCP Re-marking
+
+858	   In contrast to some existing standard PHBs, which are typically only
+859	   used within a Diffserv Domain (e.g., an AS or an enterprise network),
+860	   this PHB is expected to be used across the Internet, wherever
+861	   suitable operator agreements apply.  Under the [RFC2474] model, this
+862	   requires that the corresponding DSCP is recognized and mapped across
+863	   network boundaries accordingly.
+
+865	   If NQB support is extended across a DiffServ domain boundary, the
+866	   interconnected networks agreeing to support NQB SHOULD use the DSCP
+867	   value 45 (decimal) for NQB at network interconnection, unless a
+868	   different DSCP is explicitly documented in the TCA (Traffic
+869	   Conditioning Agreement, see [RFC2475]) for that interconnection.  If
+870	   [RFC8100] is operational between interconnected domains, the
+871	   receiving domain may prefer a different DSCP for NQB traffic that
+872	   allows for a DSCP range-based classification for the Default /
+873	   Elastic Treatment Aggregate.  Similar to the handling of DSCPs for
+874	   other PHBs (and as discussed in [RFC2475]), networks can re-mark NQB
+875	   traffic to a DSCP other than 45 (decimal) for internal usage.  To
+876	   ensure reliable NQB PHB treatment on the entire path, the appropriate
+877	   NQB DSCP would need to be restored when forwarding to another
+878	   network.
+
+880	6.4.1.  Interoperability with Non-DS-Capable Domains
+
+882	   As discussed in Section 4 of [RFC2475], there may be cases where a
+883	   network operator that supports Diffserv is delivering traffic to
+884	   another network domain (e.g. a network outside of their
+885	   administrative control), where there is an understanding that the
+886	   downstream domain does not support Diffserv or there is no knowledge
+887	   of the traffic management capabilities of the downstream domain, and
+888	   no agreement in place.  In such cases, Section 4 of [RFC2475]
+889	   suggests that the upstream domain opportunistically re-mark traffic
+890	   with a Class Selector codepoint or DSCP 0 (Default) under the
+891	   assumption that traffic so marked would be handled in a predictable
+892	   way by the downstream domain.
+
+894	   In the case of a network that supports the NQB PHB (and carries
+895	   traffic marked with the recommended NQB DSCP value) the same concerns
+896	   apply.  In particular, since the recommended NQB DSCP value could be
+897	   given high priority in some non-DS-compliant network gear (e.g.,
+898	   legacy Wi-Fi APs as described in Section 7.3.1), it is RECOMMENDED
+899	   that the operator of the upstream domain implement one of the
+900	   following safeguards before delivering traffic into a non-DS-capable
+901	   domain.
+
+903	   1.  One option for such a safeguard is to re-mark NQB traffic to DSCP
+904	       0 (Default) (or another Class Selector DSCP) before delivering
+905	       traffic into a non-DS-capable domain, in accordance with the
+906	       suggestion in Section 4 of [RFC2475].  Network equipment designed
+907	       for such environments, SHOULD by default re-mark NQB traffic to
+908	       DSCP 0 (Default), and SHOULD support the ability to change and
+909	       disable this re-marking.  Re-marking NQB traffic to DSCP 0
+910	       (Default) could be considered the "safest" approach since the
+911	       upstream domain can thereby ensure that NQB traffic is not given
+912	       inappropriate treatment in the non-DS-capable domain.  That said,
+913	       it comes with the downside that the re-marking ruins any
+914	       possibility of NQB isolation in any further downstream domain
+915	       (not just the immediate neighbor).
+
+917	   2.  As an alternative to re-marking all NQB traffic, such an operator
+918	       could deploy a traffic protection (see Section 5.2) or a shaping/
+919	       policing function on traffic marked with the NQB DSCP that
+920	       minimizes the potential for negative impacts on Default traffic,
+921	       should the downstream domain treat traffic with the NQB DSCP as
+922	       high priority.
+
+924	       In the case that a traffic protection function is used, it MUST
+925	       either re-mark offending traffic to DSCP 0 (or another Class
+926	       Selector DSCP) or discard it.  Note that a traffic protection
+927	       function as defined in this document might only provide
+928	       protection from issues occurring in subsequent network hops if
+929	       the device implementing the traffic protection function is the
+930	       bottleneck link on the path, so it might not be a solution for
+931	       all situations.
+
+933	       In the case that a traffic policing function or a rate shaping
+934	       function is applied to the aggregate of NQB traffic destined to
+935	       such a downstream domain, the policer/shaper rate SHOULD be set
+936	       to either 5% of the interconnection data rate, or 5% of the
+937	       typical rate for such interconnections, whichever is greater,
+938	       with excess traffic being re-marked and classified for Default
+939	       forwarding (or dropped, as a last resort).  A traffic policing
+940	       function SHOULD allow approximately 100 ms of burst tolerance
+941	       (e.g. a token bucket depth equal to 100 ms multiplied by the
+942	       policer rate).  A traffic shaping function SHOULD allow
+943	       approximately 10 ms of burst tolerance, and no more than 50 ms of
+944	       buffering.  The burst tolerance values recommended here are
+945	       intended to reduce the degradation that could be introduced to
+946	       latency and loss sensitive traffic marked NQB without
+947	       significantly degrading Default traffic, and could be adjusted
+948	       based on local network policy.  Increasing the burst tolerance
+949	       would further reduce the potential for degradation (increased
+950	       loss or increased delay) of traffic marked NQB, but would come at
+951	       the cost of an increased risk of degradation (increased loss or
+952	       increased delay) of Default traffic.
+
+954	       The recommendation to limit NQB traffic to 5% is based on an
+955	       assumption that internal links in the downstream domain could
+956	       have data rates as low as one tenth of the interconnect rate, in
+957	       which case if the entire aggregate of NQB traffic traversed a
+958	       single instance of such a link, the aggregate would consume no
+959	       more than 50% of that link's capacity.  The limit for NQB traffic
+960	       SHOULD be adjusted based on any knowledge of the local network
+961	       environment that is available.
+
+963	6.5.  The NQB DSCP and Tunnels
+
+965	   [RFC2983] discusses tunnel models that support Diffserv.  It
+966	   describes a "uniform model" in which the inner DSCP is copied to the
+967	   outer header at encapsulation, and the outer DSCP is copied to the
+968	   inner header at decapsulation.  It also describes a "pipe model" in
+969	   which the outer DSCP is not copied to the inner header at
+970	   decapsulation.  Both models can be used in conjunction with the NQB
+971	   PHB.  In the case of the pipe model, any DSCP manipulation (re-
+972	   marking) of the outer header by intermediate nodes would be discarded
+973	   at tunnel egress.  In some cases, this could improve the possibility
+974	   of achieving NQB treatment in subsequent nodes, but in other cases it
+975	   could degrade that possibility (e.g. if the re-marking was designed
+976	   specifically to preserve NQB treatment in downstream domains).
+
+978	   As is discussed in [RFC2983], tunnel protocols that are sensitive to
+979	   reordering (such as IPSec [RFC4301] or L2TP [RFC2661]) can result in
+980	   undesirable interactions if multiple DSCP PHBs are signaled for
+981	   traffic within a tunnel instance.  This is true for tunnels
+982	   containing a mix of QB and NQB traffic as well.  Additionally, since
+983	   networks supporting the NQB PHB could implement a traffic protection
+984	   mechanism (see Section 5.2) and/or responses to NQB buffer overrun
+985	   that result in out-of-order delivery for traffic marked with the NQB
+986	   DSCP, even tunnels solely containing NQB traffic could have issues if
+987	   they are sensitive to reordering and the outer header retains the NQB
+988	   DSCP.  As a result, the use of a reordering-sensitive tunnel protocol
+989	   to carry NQB traffic, or a mix of QB and NQB traffic, necessitates
+990	   that the outer tunnel header be re-marked with a non-NQB DSCP (e.g.
+991	   Default), in which case the “pipe” model is preferable because it
+992	   preserves the marking differentiation at tunnel decapsulation.
+
+994	6.6.  Guidance for Lower-Rate Links
+
+996	   The NQB sender requirements in Section 4 place responsibility in the
+997	   hands of the application developer to determine the likelihood that
+998	   the application's sending behavior could result in a queue forming
+999	   along the path.  These requirements rely on application developers
+1000	   having a reasonable sense for the network context in which their
+1001	   application is to be deployed.  Even so, there will undoubtedly be
+1002	   networks that contain links having a data rate that is below the
+1003	   lower end of what is considered "typical", and some of these links
+1004	   could even be below the instantaneous sending rate of some NQB-marked
+1005	   applications.
+
+1007	   To limit the consequences of this scenario, operators of networks
+1008	   with lower rate links SHOULD consider utilizing a traffic protection
+1009	   function on those links that is more tolerant of burstiness (i.e., a
+1010	   temporary queue).  This will have the effect of allowing a larger set
+1011	   of NQB-marked microflows to remain in the NQB queue, but will come at
+1012	   the expense of a greater potential for latency variation.  In
+1013	   implementations that support [I-D.briscoe-docsis-q-protection], the
+1014	   burst tolerance can be configured via the CRITICALqLSCORE_us input
+1015	   parameter.
+
+1017	   Alternatively, operators of networks with lower rate links MAY choose
+1018	   to disable NQB support (and thus aggregate traffic marked with the
+1019	   NQB DSCP with Default traffic) on these lower rate links.  For links
+1020	   that have a data rate that is less than ten percent of "typical" path
+1021	   rates, it is RECOMMENDED that the NQB PHB be disabled and that
+1022	   traffic marked with the NQB DSCP is therefore carried using the
+1023	   Default PHB (without being re-marked to the Default DSCP (0)).
+
+1025	7.  Mapping NQB to standards of other SDOs
+
+1027	   This section provide recommendations for the support of the NQB PHB
+1028	   in certain use cases.  This section is not exhaustive.
+
+1030	7.1.  DOCSIS Access Networks
+
+1032	   Residential cable broadband Internet services are commonly configured
+1033	   with a single bottleneck link (the access network link) upon which
+1034	   the service definition is applied.  The service definition, typically
+1035	   an upstream/downstream data rate tuple, is implemented as a
+1036	   configured pair of rate shapers that are applied to the user's
+1037	   traffic.  In such networks, the quality of service that each
+1038	   application receives, and as a result, the quality of experience that
+1039	   it generates for the user is influenced by the characteristics of the
+1040	   access network link.
+
+1042	   To support the NQB PHB, cable broadband services would need to be
+1043	   configured to provide a separate queue for traffic marked with the
+1044	   NQB DSCP.  The NQB queue would need to be configured to share the
+1045	   service's rate shaped capacity with the queue for QB traffic.
+1046	   Further discussion about support of the NQB PHB in DOCSIS networks
+1047	   can be found in [LOW_LATENCY_DOCSIS].
+
+1049	7.2.  Mobile Networks
+
+1051	   Historically, 3GPP mobile networks have utilized "bearers" to
+1052	   encapsulate each user's user plane traffic through the radio and core
+1053	   networks.  A "dedicated bearer" can be allocated a Quality of Service
+1054	   (QoS) to apply any prioritisation to its microflows at queues and
+1055	   radio schedulers.  Typically, an LTE operator provides a dedicated
+1056	   bearer for IMS VoLTE (Voice over LTE) traffic, which is prioritized
+1057	   in order to meet regulatory obligations for call completion rates;
+1058	   and a "best effort" default bearer, for Internet traffic.  The "best
+1059	   effort" bearer provides no guarantees, and hence its buffering
+1060	   characteristics are not compatible with low-latency traffic.  The 5G
+1061	   radio and core systems offer more flexibility over bearer allocation,
+1062	   meaning bearers can be allocated per traffic type (e.g., loss-
+1063	   tolerant, low-latency etc.) and hence support more suitable treatment
+1064	   of Internet real-time microflows.
+
+1066	   To support the NQB PHB, the mobile network could be configured to
+1067	   give User Equipment (UE, the mobile device used by the subscriber) a
+1068	   dedicated, low-latency, non-GBR (non-Guaranteed Bit Rate), EPS
+1069	   (Evolved Packet System, the core and access network architecture used
+1070	   in LTE) bearer, e.g., one with QCI 7 (QoS Class Identifier 7, which
+1071	   is typically used for low-latency, non-GBR services), in addition to
+1072	   the default EPS bearer.  Alternatively, in a 5G system, a Data Radio
+1073	   Bearer with 5QI 7 (5G QoS Identifier 7, similarly used for low-
+1074	   latency traffic) could be provisioned (see Table 5.7.4-1:
+1075	   Standardized 5QI to QoS characteristics mapping in [SA-5G]).
+
+1077	   A packet carrying the NQB DSCP could then be routed through this
+1078	   dedicated low-latency EPS bearer, while a packet that has no
+1079	   associated NQB marking would be routed through the default EPS
+1080	   bearer.
+
+1082	7.3.  Wi-Fi Networks
+
+1084	   Wi-Fi networking equipment compliant with 802.11e/n/ac/ax
+1085	   [IEEE802-11] generally supports either four or eight transmit queues
+1086	   and four sets of associated Enhanced Multimedia Distributed Control
+1087	   Access (EDCA) parameters (corresponding to the four Wi-Fi Multimedia
+1088	   (WMM) Access Categories) that are used to enable differentiated media
+1089	   access characteristics.  As discussed in [RFC8325], it has been a
+1090	   common practice for Wi-Fi implementations to use a default DSCP to
+1091	   User Priority (UP) mapping that utilizes the most significant three
+1092	   bits of the Diffserv Field to select "User Priority" which is then
+1093	   mapped to the four WMM Access Categories.  [RFC8325] also provides an
+1094	   alternative mapping that more closely aligns with the DSCP
+1095	   recommendations provided by the IETF.  In the case of some managed
+1096	   Wi-Fi gear, this mapping can be controlled by the network operator,
+1097	   e.g., via TR-369 [TR-369].
+
+1099	   In addition to the requirements provided in other sections of this
+1100	   document, to support the NQB PHB, Wi-Fi equipment (including
+1101	   equipment compliant with [RFC8325]) SHOULD map the NQB DSCP 45
+1102	   (decimal) into a separate queue in the same Access Category as the
+1103	   queue that carries Default traffic (i.e. the Best Effort Access
+1104	   Category).  It is RECOMMENDED that Wi-Fi equipment provide a separate
+1105	   queue in UP 0, and map the NQB DSCP 45 (decimal) to that queue.  If a
+1106	   separate queue in UP 0 cannot be provided (due to hardware
+1107	   limitations, etc.) a Wi-Fi device MAY map the NQB DSCP 45 (decimal)
+1108	   to UP 3.
+
+1110	7.3.1.  Interoperability with Existing Wi-Fi Networks
+
+1112	   While some existing Wi-Fi equipment might be capable (in some cases
+1113	   via firmware update) of supporting the NQB PHB requirements, many
+1114	   currently deployed devices cannot be configured in this way.  As a
+1115	   result, the remainder of this section discusses interoperability with
+1116	   these existing Wi-Fi networks, as opposed to PHB compliance.
+
+1118	   Since this equipment is widely deployed, and the Wi-Fi link can
+1119	   become a bottleneck link, the performance of traffic marked with the
+1120	   NQB DSCP across such links could have a significant impact on the
+1121	   viability and adoption of the NQB DSCP and PHB.  Depending on the
+1122	   DSCP used to mark NQB traffic, existing Wi-Fi equipment that uses the
+1123	   default mapping of DSCPs to Access Categories (Section 2.3 of
+1124	   [RFC8325]) and the default EDCA parameters will support either (but
+1125	   not both) of the following characteristics:
+
+1127	   *  the NQB PHB requirement for separate queuing of NQB traffic from
+1128	      Default traffic (Section 5.1)
+
+1130	   *  the recommendation to treat NQB traffic with forwarding preference
+1131	      equal to that used for Default traffic (Section 5.1)
+
+1133	   The DSCP value 45 (decimal) is recommended for NQB (see Section 4).
+1134	   This maps NQB to UP 5 using the default mapping, which is in the
+1135	   "Video" Access Category.  While this choice of DSCP enables these Wi-
+1136	   Fi systems to support the NQB PHB requirement for separate queuing,
+1137	   existing Wi-Fi devices generally utilize EDCA parameters that result
+1138	   in statistical prioritization of the "Video" Access Category above
+1139	   the "Best Effort" Access Category.  In addition this equipment does
+1140	   not support the remaining NQB PHB recommendations in Section 5.  The
+1141	   rationale for the choice of DSCP 45 (decimal) as well as its
+1142	   ramifications, and remedies for its limitations are discussed further
+1143	   below.
+
+1145	   The choice of separated queuing rather than equal forwarding
+1146	   preference in existing Wi-Fi networks was motivated by the following:
+
+1148	   *  Separate queuing is necessary in order to provide a benefit for
+1149	      traffic marked with the NQB DSCP.
+
+1151	   *  The arrangement of queues in Wi-Fi gear is typically fixed,
+1152	      whereas the relative priority of the Access Category queues is
+1153	      configurable.  Most Wi-Fi gear has hardware support (albeit
+1154	      generally not exposed for user control) which could be used to
+1155	      adjust the EDCA parameters in order to meet the equal forwarding
+1156	      preference recommendation.  This is discussed further below.
+
+1158	   *  Traffic that is compliant with the NQB sender requirements
+1159	      Section 4 is expected to cause minimal degradation to traffic in
+1160	      lower priority Access Categories, and in any case would be
+1161	      unlikely to cause more degradation to lower priority Access
+1162	      Categories than the existing recommended Video Access Category
+1163	      traffic types: Broadcast Video, Multimedia Streaming, Multimedia
+1164	      Conferencing from [RFC8325], and AudioVideo, ExcellentEffort from
+1165	      [QOS_TRAFFIC_TYPE].
+
+1167	   *  Several existing client applications that are compatible with the
+1168	      NQB sender requirements already select the Video Access Category,
+1169	      and thus would not see a degradation in performance by
+1170	      transitioning to the NQB DSCP, regardless of whether the network
+1171	      supported the PHB.
+
+1173	   *  Application instances on Wi-Fi client devices are already free to
+1174	      choose any Access Category that they wish, regardless of their
+1175	      sending behavior, without any policing of usage.  So, the choice
+1176	      of using DSCP 45 (decimal) for NQB creates no new avenues for non-
+1177	      NQB-compliant client applications to exploit the prioritization
+1178	      function in Wi-Fi.
+
+1180	   *  For application traffic that originates outside of the Wi-Fi
+1181	      network, and thus is transmitted by the Access Point, the choice
+1182	      of DSCP 45 does create a potential for abuse by non-compliant
+1183	      applications.  But, opportunities exist in the network components
+1184	      upstream of the Wi-Fi Access Point to police the usage of the NQB
+1185	      DSCP and potentially re-mark traffic that is considered non-
+1186	      compliant, as is recommended in Section 6.4.1.  Furthermore, it is
+1187	      reasonable to expect that ISPs currently manage the DSCPs on
+1188	      traffic destined to their customers' networks, and will continue
+1189	      to do so whether they support NQB or not.  This includes the
+1190	      practice in residential broadband networks of re-marking the
+1191	      Diffserv field to zero on all traffic.  Any change to these
+1192	      practices done to enable the NQB DSCP to pass through could be
+1193	      done alongside the implementation of the recommendations in
+1194	      Section 6.4.1.
+
+1196	   The choice of Video Access Category rather than the Voice Access
+1197	   Category was motivated by the desire to minimize the potential for
+1198	   degradation of Best Effort Access Category traffic.  The choice of
+1199	   Video Access Category rather than the Background Access Category was
+1200	   motivated by the much greater potential of degradation to NQB traffic
+1201	   that would be caused by the vast majority of traffic in most Wi-Fi
+1202	   networks, which utilizes the Best Effort Access Category.
+
+1204	   As stated above, the use of DSCP 45 (decimal) for NQB is not expected
+1205	   to create incentives for abuse by non-compliant applications in the
+1206	   Wi-Fi uplink direction.  The fact that the NQB DSCP brings with it
+1207	   the potential for degradation of non-compliant applications (traffic
+1208	   protection and/or a shallow queue resulting in reordering and/or
+1209	   packet loss at some hop along the path) plus the existence of
+1210	   multiple other DSCP values that don't carry the risk of degradation,
+1211	   and which could be readily used to obtain prioritization (AC_VI or
+1212	   even AC_VO), leads to the conclusion that NQB non-compliant
+1213	   applications that are seeking prioritization in the Wi-Fi uplink
+1214	   would be better off selecting one of those other DSCPs.  This
+1215	   conclusion is not expected to be disturbed by network support for NQB
+1216	   increasing the likelihood of DSCP 45 traffic traversing network
+1217	   boundaries without change to the DSCP, as that likelihood of
+1218	   increased network boundary traversal is balanced by a likelihood of
+1219	   NQB traffic encountering the traffic-limiting aspects of NQB support,
+1220	   traffic protection and shallow buffers, which limit the potential for
+1221	   abuse.
+
+1223	   In the case of traffic originating outside of the Wi-Fi network, the
+1224	   prioritization of traffic marked with the NQB DSCP via the Video
+1225	   Access Category (if left unchanged) could potentially erode the
+1226	   principle of alignment of incentives discussed in Section 5.  In
+1227	   order to preserve the incentives principle for NQB, Wi-Fi systems MAY
+1228	   be configured such that the EDCA parameters for the Video Access
+1229	   Category match those of the Best Effort Access Category, which will
+1230	   mean AC_VI is at the same priority level as AC_BE.  These changes
+1231	   might not be possible on all Access Points, and in any case the
+1232	   requirements and recommendations in Section 6.4.1 would apply in this
+1233	   situation.
+
+1235	   Systems that utilize [RFC8325] but cannot provide a separate AC_BE
+1236	   queue for NQB traffic, SHOULD map the NQB DSCP 45 (decimal) (or the
+1237	   locally determined alternative) to UP 5 in the "Video" Access
+1238	   Category as well (see Section 7.3.2).
+
+1240	7.3.2.  The Updates to RFC 8325
+
+1242	   [XXX RFC Editor please replace RFCXXXX with this RFC number when
+1243	   published XXX]
+
+1245	   Section 4.2.9 of [RFC8325] describes the recommendation for the
+1246	   handling of Standard service class traffic that carries the Default
+1247	   DSCP.  This update to [RFC8325] changes the title of Section 4.2.9 of
+1248	   [RFC8325] from "Standard" to "Standard and Non-Queue-Building".  This
+1249	   update additionally adds a paragraph at the end of Section 4.2.9 of
+1250	   [RFC8325] as follows:
+
+1252	       RFCXXXX defines a shallow-buffered best-effort service for
+1253	       traffic marked with the NQB DSCP (45 decimal) and recommends the
+1254	       following treatment in Wi-Fi equipment.  It is RECOMMENDED that
+1255	       Wi-Fi equipment map the NQB DSCP 45 (decimal) into a separate
+1256	       queue in the same Access Category as the queue that carries
+1257	       Default traffic (i.e. the Best Effort Access Category).  It is
+1258	       RECOMMENDED that Wi-Fi equipment provide a separate queue in UP
+1259	       0, and map the NQB DSCP 45 (decimal) to that queue.  If a
+1260	       separate queue in UP 0 cannot be provided (due to hardware
+1261	       limitations, etc.) a Wi-Fi device MAY map the NQB DSCP 45
+1262	       (decimal) to UP 3.  If neither of these options provides a
+1263	       separate queue from Default traffic, it is RECOMMENDED that Wi-Fi
+1264	       equipment map the NQB DSCP 45 (decimal) to UP 5 (which
+1265	       corresponds to the default mapping described in Section 2.3).
+1266	       RFCXXXX provides additional recommendations and requirements for
+1267	       support of the NQB PHB that aren't available in the QoS model
+1268	       described in Section 6, but nonetheless could be supported in
+1269	       implementations.
+
+1271	   This update to [RFC8325] inserts a new row for "Non-Queue-Building"
+1272	   traffic between the existing "Low-Latency Data" and "OAM" rows in its
+1273	   Figure 1 as follows:
+
+1275	  +---------------+------+----------+-------------+--------------------+
+1276	  |    Low-       | AF21 |          |             |                    |
+1277	  |    Latency    | AF22 | RFC 2597 |     3       | AC_BE (Best Effort)|
+1278	  |    Data       | AF23 |          |             |                    |
+1279	  +---------------+------+----------+-------------+--------------------+
+1280	  |     Non-      |      |          |    0, 3     | AC_BE (Best Effort)|
+1281	  |    Queue-     | NQB  | RFC XXXX |            OR                    |
+1282	  |   Building    |      |          |     5       |    AC_VI (Video)   |
+1283	  |               |      |          |      See Section 4.2.9           |
+1284	  +---------------+------+----------+-------------+--------------------+
+1285	  |     OAM       | CS2  | RFC 2474 |     0       | AC_BE (Best Effort)|
+1286	  +---------------+------+----------+-------------+--------------------+
+
+1288	   This update adds the following sentence to the end of the first
+1289	   paragraph in Section 5.3 of [RFC8325]: "An exception to this is the
+1290	   NQB DSCP 45 (decimal) which encodes for best-effort service."
+
+1292	8.  IANA Considerations
+
+1294	   This document requests that IANA assign the Differentiated Services
+1295	   Field Codepoint (DSCP) 45 ('0b101101', 0x2D) from the "Differentiated
+1296	   Services Field Codepoints (DSCP)" registry
+1297	   (https://www.iana.org/assignments/dscp-registry/) ("DSCP Pool 3
+1298	   Codepoints", Codepoint Space xxxx01, Standards Action) as the
+1299	   RECOMMENDED codepoint for Non-Queue-Building behavior.
+
+1301	   IANA should update this registry as follows:
+
+1303	   *  Name: NQB
+
+1305	   *  Value (Binary): 101101
+
+1307	   *  Value (Decimal): 45
+
+1309	   *  Reference: this document
+
+1311	9.  Implementation Status
+
+1313	   Note to RFC Editor: This section should be removed prior to
+1314	   publication
+
+1316	   The NQB PHB is implemented in equipment compliant with the current
+1317	   DOCSIS 3.1 specification, published by CableLabs at: CableLabs
+1318	   Specifications Search (https://www.cablelabs.com/specifications/searc
+1319	   h?query=&category=DOCSIS&subcat=DOCSIS%203.1&doctype=Specifications&c
+1320	   ontent=false&archives=false&currentPage=1).
+
+1322	   CableLabs maintains a list of production cable modem devices that are
+1323	   Certified as being compliant to the DOCSIS Specifications, this list
+1324	   is available at https://www.cablelabs.com/wp-content/uploads/2013/10/
+1325	   cert_qual.xlsx.  DOCSIS 3.1 modems certified in CW 134 or greater
+1326	   implement the NQB PHB.  This includes products from Arcadyan
+1327	   Technology Corporation, Arris, AVM, Castlenet, Commscope, Hitron,
+1328	   Motorola, Netgear, Sagemcom and Vantiva.  There are additional
+1329	   production implementations that have not been Certified as compliant
+1330	   to the specification, but which have been tested in non-public
+1331	   Interoperability Events.  These implementations are all proprietary,
+1332	   not available as open source.
+
+1334	10.  Security Considerations
+
+1336	   The security considerations for the NQB PHB relate to the potential
+1337	   to impact the capacity available or latency experienced by other
+1338	   flows that share a bottleneck on the path with traffic that is marked
+1339	   with the recommended NQB DSCP.
+
+1341	   Full support for the NQB PHB in bottleneck links limits the
+1342	   incentives for a Queue-Building application to mismark its packets as
+1343	   NQB, particularly for implementations that support traffic
+1344	   protection.  If a Queue-Building microflow were to mismark its
+1345	   packets as NQB, it would be unlikely to receive a benefit by doing
+1346	   so, and it would usually experience a degradation, in contrast to
+1347	   mismarking its packets for a higher-priority PHB, e.g., the EF PHB
+1348	   [RFC3246].  The nature of the degradation would depend on the
+1349	   specifics of the PHB implementation, including response to NQB buffer
+1350	   overflow (and on the presence or absence of a traffic protection
+1351	   function), but could include excessive packet loss, excessive latency
+1352	   variation and/or excessive out-of-order delivery.  If a Non-Queue-
+1353	   Building microflow was to fail to mark its packets as NQB, it could
+1354	   suffer the latency and loss typical of sharing a queue with capacity
+1355	   seeking traffic.
+
+1357	   To preserve low latency performance for NQB traffic, networks that
+1358	   support the NQB PHB will need to ensure that mechanisms are in place
+1359	   to prevent malicious traffic marked with the NQB DSCP from causing
+1360	   excessive queue delays.  Section 5.2 recommends the implementation of
+1361	   a traffic protection mechanism to achieve this goal.  The
+1362	   recommendations on traffic protection mechanisms in this document
+1363	   presume that some type of "flow" state be maintained in order to
+1364	   differentiate between microflows that are causing queuing delay and
+1365	   those that aren't.  Since this flow state is likely finite, this
+1366	   opens up the possibility of flow-state exhaustion attacks.  While
+1367	   this document requires that traffic protection mechanisms be designed
+1368	   with this possibility in mind, the outcomes of flow-state exhaustion
+1369	   would depend on the implementation.
+
+1371	   If traffic protection is not implemented or is not able to prevent
+1372	   queue formation in the NQB shallow buffer, the limited size of that
+1373	   buffer will cause a growing queue to overrun that buffer, resulting
+1374	   in negative effects (e.g., reforwarding as Default, discarding) that
+1375	   potentially impact multiple NQB-marked microflows, independent of
+1376	   whether each affected microflow contributed to queue formation.  As
+1377	   discussed elsewhere in this draft, those negative effects serve to
+1378	   discourage misuse and abuse of NQB by QB traffic, but the negative
+1379	   side effects on NQB traffic that is using NQB (and the associated
+1380	   shallow buffer) as intended motivates limiting the effects of shallow
+1381	   buffer overrun via per-user provisioning limits that prevent queue
+1382	   overrun effects from affecting other users (see Section 5.1).
+
+1384	   Notwithstanding the above, the choice of DSCP for NQB does allow
+1385	   existing Wi-Fi networks to readily (and by default) support some of
+1386	   the PHB requirements, but without a traffic protection function, and
+1387	   (when left in the default state) by giving NQB traffic higher
+1388	   priority than QB traffic.  This is not considered to be a compliant
+1389	   implementation of the PHB.  These existing Wi-Fi networks currently
+1390	   provide priority to half of the DSCP space, whether or not 45 is
+1391	   assigned to the NQB DSCP.  While the NQB DSCP value could also be
+1392	   abused to gain priority on such links, the potential presence of
+1393	   traffic protection functions in other hops along the path (which
+1394	   likely act on the NQB DSCP value alone) would make it less attractive
+1395	   for such abuse than any of the other 31 DSCP values that are given
+1396	   priority.
+
+1398	   This document discusses the potential use of the NQB DSCP and NQB PHB
+1399	   in network technologies that are standardized in other SDOs.  Any
+1400	   security considerations that relate to deployment and operation of
+1401	   NQB solely in specific network technologies are not discussed here.
+
+1403	   NQB uses the Diffserv field.  The design of Diffserv does not include
+1404	   integrity protection for the DSCP, and thus it is possible for the
+1405	   DSCP to be changed by an on-path attacker.  The NQB PHB and
+1406	   associated DSCP don't change this.  While re-marking DSCPs is
+1407	   permitted for various reasons (some are discussed in this document,
+1408	   others can be found in [RFC2474] and [RFC2475]), if done maliciously,
+1409	   this might negatively affect the QoS of the tampered microflow.
+1410	   Nonetheless, an on-path attacker can also alter other mutable fields
+1411	   in the IP header (e.g. the TTL), which can wreak much more havoc than
+1412	   just altering QoS treatment.
+
+1414	11.  References
+
+1416	11.1.  Normative References
+
+1418	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+1419	              Requirement Levels", BCP 14, RFC 2119,
+1420	              DOI 10.17487/RFC2119, March 1997,
+1421	              <https://www.rfc-editor.org/info/rfc2119>.
+
+1423	   [RFC2474]  Nichols, K., Blake, S., Baker, F., and D. Black,
+1424	              "Definition of the Differentiated Services Field (DS
+1425	              Field) in the IPv4 and IPv6 Headers", RFC 2474,
+1426	              DOI 10.17487/RFC2474, December 1998,
+1427	              <https://www.rfc-editor.org/info/rfc2474>.
+
+1429	   [RFC8085]  Eggert, L., Fairhurst, G., and G. Shepherd, "UDP Usage
+1430	              Guidelines", BCP 145, RFC 8085, DOI 10.17487/RFC8085,
+1431	              March 2017, <https://www.rfc-editor.org/info/rfc8085>.
+
+1433	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+1434	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+1435	              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+1437	   [RFC8325]  Szigeti, T., Henry, J., and F. Baker, "Mapping Diffserv to
+1438	              IEEE 802.11", RFC 8325, DOI 10.17487/RFC8325, February
+1439	              2018, <https://www.rfc-editor.org/info/rfc8325>.
+
+1441	11.2.  Informative References
+
+1443	   [Barik]    Barik, R., Welzl, M., Elmokashfi, A., Dreibholz, T., and
+1444	              S. Gjessing, "Can WebRTC QoS Work? A DSCP Measurement
+1445	              Study", ITC 30, September 2018.
+
+1447	   [Cardwell2017]
+1448	              Cardwell, N., Cheng, Y., Jacobson, V., Iyengar, J., Swett,
+1449	              I., and B. Yan, "BBR: Congestion-Based Congestion
+1450	              Control", Communications of the ACM Vol. 60, No. 2, pp.
+1451	              58–66, DOI 10.1145/3009824, February 2017,
+1452	              <https://doi.org/10.1145/3009824>.
+
+1454	   [Custura]  Custura, A., Venne, A., and G. Fairhurst, "Exploring DSCP
+1455	              modification pathologies in mobile edge networks", TMA ,
+1456	              2017.
+
+1458	   [Gettys2012]
+1459	              Gettys, J. and K. Nichols, "Bufferbloat: Dark Buffers in
+1460	              the Internet", Communications of the ACM Vol. 55, No. 1,
+1461	              pp. 57–65, DOI 10.1145/2063166.2071893, January 2012,
+1462	              <https://doi.org/10.1145/2063166.2071893>.
+
+1464	   [I-D.briscoe-docsis-q-protection]
+1465	              Briscoe, B. and G. White, "The DOCSIS(r) Queue Protection
+1466	              Algorithm to Preserve Low Latency", Work in Progress,
+1467	              Internet-Draft, draft-briscoe-docsis-q-protection-07, 23
+1468	              November 2023, <https://datatracker.ietf.org/doc/html/
+1469	              draft-briscoe-docsis-q-protection-07>.
+
+1471	   [I-D.ietf-ccwg-bbr]
+1472	              Cardwell, N., Swett, I., and J. Beshay, "BBR Congestion
+1473	              Control", Work in Progress, Internet-Draft, draft-ietf-
+1474	              ccwg-bbr-02, 28 February 2025,
+1475	              <https://datatracker.ietf.org/doc/html/draft-ietf-ccwg-
+1476	              bbr-02>.
+
+1478	   [IEEE802-11]
+1479	              IEEE-SA, "IEEE 802.11-2020", IEEE 802, December 2020,
+1480	              <https://standards.ieee.org/standard/802_11-2020.html>.
+
+1482	   [LOW_LATENCY_DOCSIS]
+1483	              CableLabs, "Low Latency DOCSIS: Technology Overview",
+1484	              February 2019, <https://cablela.bs/low-latency-docsis-
+1485	              technology-overview-february-2019>.
+
+1487	   [QOS_TRAFFIC_TYPE]
+1488	              Microsoft, Corporation, "QOS_TRAFFIC_TYPE enumeration",
+1489	              2022, <https://learn.microsoft.com/en-
+1490	              us/windows/win32/api/qos2/ne-qos2-qos_traffic_type>.
+
+1492	   [RFC2475]  Blake, S., Black, D., Carlson, M., Davies, E., Wang, Z.,
+1493	              and W. Weiss, "An Architecture for Differentiated
+1494	              Services", RFC 2475, DOI 10.17487/RFC2475, December 1998,
+1495	              <https://www.rfc-editor.org/info/rfc2475>.
+
+1497	   [RFC2598]  Jacobson, V., Nichols, K., and K. Poduri, "An Expedited
+1498	              Forwarding PHB", RFC 2598, DOI 10.17487/RFC2598, June
+1499	              1999, <https://www.rfc-editor.org/info/rfc2598>.
+
+1501	   [RFC2661]  Townsley, W., Valencia, A., Rubens, A., Pall, G., Zorn,
+1502	              G., and B. Palter, "Layer Two Tunneling Protocol "L2TP"",
+1503	              RFC 2661, DOI 10.17487/RFC2661, August 1999,
+1504	              <https://www.rfc-editor.org/info/rfc2661>.
+
+1506	   [RFC2914]  Floyd, S., "Congestion Control Principles", BCP 41,
+1507	              RFC 2914, DOI 10.17487/RFC2914, September 2000,
+1508	              <https://www.rfc-editor.org/info/rfc2914>.
+
+1510	   [RFC2983]  Black, D., "Differentiated Services and Tunnels",
+1511	              RFC 2983, DOI 10.17487/RFC2983, October 2000,
+1512	              <https://www.rfc-editor.org/info/rfc2983>.
+
+1514	   [RFC3246]  Davie, B., Charny, A., Bennet, J.C.R., Benson, K., Le
+1515	              Boudec, J.Y., Courtney, W., Davari, S., Firoiu, V., and D.
+1516	              Stiliadis, "An Expedited Forwarding PHB (Per-Hop
+1517	              Behavior)", RFC 3246, DOI 10.17487/RFC3246, March 2002,
+1518	              <https://www.rfc-editor.org/info/rfc3246>.
+
+1520	   [RFC3551]  Schulzrinne, H. and S. Casner, "RTP Profile for Audio and
+1521	              Video Conferences with Minimal Control", STD 65, RFC 3551,
+1522	              DOI 10.17487/RFC3551, July 2003,
+1523	              <https://www.rfc-editor.org/info/rfc3551>.
+
+1525	   [RFC4301]  Kent, S. and K. Seo, "Security Architecture for the
+1526	              Internet Protocol", RFC 4301, DOI 10.17487/RFC4301,
+1527	              December 2005, <https://www.rfc-editor.org/info/rfc4301>.
+
+1529	   [RFC4594]  Babiarz, J., Chan, K., and F. Baker, "Configuration
+1530	              Guidelines for DiffServ Service Classes", RFC 4594,
+1531	              DOI 10.17487/RFC4594, August 2006,
+1532	              <https://www.rfc-editor.org/info/rfc4594>.
+
+1534	   [RFC5127]  Chan, K., Babiarz, J., and F. Baker, "Aggregation of
+1535	              Diffserv Service Classes", RFC 5127, DOI 10.17487/RFC5127,
+1536	              February 2008, <https://www.rfc-editor.org/info/rfc5127>.
+
+1538	   [RFC5681]  Allman, M., Paxson, V., and E. Blanton, "TCP Congestion
+1539	              Control", RFC 5681, DOI 10.17487/RFC5681, September 2009,
+1540	              <https://www.rfc-editor.org/info/rfc5681>.
+
+1542	   [RFC7893]  Stein, Y., Black, D., and B. Briscoe, "Pseudowire
+1543	              Congestion Considerations", RFC 7893,
+1544	              DOI 10.17487/RFC7893, June 2016,
+1545	              <https://www.rfc-editor.org/info/rfc7893>.
+
+1547	   [RFC8033]  Pan, R., Natarajan, P., Baker, F., and G. White,
+1548	              "Proportional Integral Controller Enhanced (PIE): A
+1549	              Lightweight Control Scheme to Address the Bufferbloat
+1550	              Problem", RFC 8033, DOI 10.17487/RFC8033, February 2017,
+1551	              <https://www.rfc-editor.org/info/rfc8033>.
+
+1553	   [RFC8034]  White, G. and R. Pan, "Active Queue Management (AQM) Based
+1554	              on Proportional Integral Controller Enhanced (PIE) for
+1555	              Data-Over-Cable Service Interface Specifications (DOCSIS)
+1556	              Cable Modems", RFC 8034, DOI 10.17487/RFC8034, February
+1557	              2017, <https://www.rfc-editor.org/info/rfc8034>.
+
+1559	   [RFC8083]  Perkins, C. and V. Singh, "Multimedia Congestion Control:
+1560	              Circuit Breakers for Unicast RTP Sessions", RFC 8083,
+1561	              DOI 10.17487/RFC8083, March 2017,
+1562	              <https://www.rfc-editor.org/info/rfc8083>.
+
+1564	   [RFC8100]  Geib, R., Ed. and D. Black, "Diffserv-Interconnection
+1565	              Classes and Practice", RFC 8100, DOI 10.17487/RFC8100,
+1566	              March 2017, <https://www.rfc-editor.org/info/rfc8100>.
+
+1568	   [RFC8289]  Nichols, K., Jacobson, V., McGregor, A., Ed., and J.
+1569	              Iyengar, Ed., "Controlled Delay Active Queue Management",
+1570	              RFC 8289, DOI 10.17487/RFC8289, January 2018,
+1571	              <https://www.rfc-editor.org/info/rfc8289>.
+
+1573	   [RFC8290]  Hoeiland-Joergensen, T., McKenney, P., Taht, D., Gettys,
+1574	              J., and E. Dumazet, "The Flow Queue CoDel Packet Scheduler
+1575	              and Active Queue Management Algorithm", RFC 8290,
+1576	              DOI 10.17487/RFC8290, January 2018,
+1577	              <https://www.rfc-editor.org/info/rfc8290>.
+
+1579	   [RFC8622]  Bless, R., "A Lower-Effort Per-Hop Behavior (LE PHB) for
+1580	              Differentiated Services", RFC 8622, DOI 10.17487/RFC8622,
+1581	              June 2019, <https://www.rfc-editor.org/info/rfc8622>.
+
+1583	   [RFC9330]  Briscoe, B., Ed., De Schepper, K., Bagnulo, M., and G.
+1584	              White, "Low Latency, Low Loss, and Scalable Throughput
+1585	              (L4S) Internet Service: Architecture", RFC 9330,
+1586	              DOI 10.17487/RFC9330, January 2023,
+1587	              <https://www.rfc-editor.org/info/rfc9330>.
+
+1589	   [RFC9331]  De Schepper, K. and B. Briscoe, Ed., "The Explicit
+1590	              Congestion Notification (ECN) Protocol for Low Latency,
+1591	              Low Loss, and Scalable Throughput (L4S)", RFC 9331,
+1592	              DOI 10.17487/RFC9331, January 2023,
+1593	              <https://www.rfc-editor.org/info/rfc9331>.
+
+1595	   [RFC9332]  De Schepper, K., Briscoe, B., Ed., and G. White, "Dual-
+1596	              Queue Coupled Active Queue Management (AQM) for Low
+1597	              Latency, Low Loss, and Scalable Throughput (L4S)",
+1598	              RFC 9332, DOI 10.17487/RFC9332, January 2023,
+1599	              <https://www.rfc-editor.org/info/rfc9332>.
+
+1601	   [RFC9435]  Custura, A., Fairhurst, G., and R. Secchi, "Considerations
+1602	              for Assigning a New Recommended Differentiated Services
+1603	              Code Point (DSCP)", RFC 9435, DOI 10.17487/RFC9435, July
+1604	              2023, <https://www.rfc-editor.org/info/rfc9435>.
+
+1606	   [RFC9438]  Xu, L., Ha, S., Rhee, I., Goel, V., and L. Eggert, Ed.,
+1607	              "CUBIC for Fast and Long-Distance Networks", RFC 9438,
+1608	              DOI 10.17487/RFC9438, August 2023,
+1609	              <https://www.rfc-editor.org/info/rfc9438>.
+
+1611	   [SA-5G]    3GPP, "System Architecture for 5G", TS 23.501 V18.6.0,
+1612	              June 2024.
+
+1614	   [TR-369]   Broadband Forum, "The User Services Platform", January
+1615	              2022, <https://usp.technology/specification/index.html>.
+
+1617	   [WikipediaBufferbloat]
+1618	              Wikipedia Contributors, "Bufferbloat", 23 May 2025,
+1619	              <https://en.wikipedia.org/wiki/Bufferbloat>.
+
+1621	Appendix A.  DSCP Re-marking Policies
+
+1623	   Some network operators typically bleach (zero out) the Diffserv field
+1624	   on ingress into their network [RFC9435][Custura][Barik], and in some
+1625	   cases apply their own DSCP for internal usage.  Bleaching the NQB
+1626	   DSCP is not expected to cause harm to Default traffic, but it will
+1627	   severely limit the ability to provide NQB treatment.  Reports on
+1628	   existing deployments of DSCP manipulation [Custura][Barik] categorize
+1629	   the re-marking behaviors into the following six policies: bleach all
+1630	   traffic (set DSCP to zero), set the top three bits (the former
+1631	   Precedence bits) on all traffic to 0b000, 0b001, or 0b010, set the
+1632	   low three bits on all traffic to 0b000, or re-mark all traffic to a
+1633	   particular (non-zero) DSCP value.
+
+1635	   Regarding the DSCP value 45 (decimal), there were no observations of
+1636	   DSCP manipulation reported in which traffic was marked 45 (decimal)
+1637	   by any of these policies.  Thus it appears that these re-marking
+1638	   policies would be unlikely to result in QB traffic being marked as
+1639	   NQB (45).  In terms of the fate of traffic marked with the NQB DSCP
+1640	   that is subjected to one of these policies, it would be
+1641	   indistinguishable from some subset (possibly all) of other traffic.
+1642	   In the policies where all traffic is re-marked using the same (zero
+1643	   or non-zero) DSCP, the ability for a subsequent network hop to
+1644	   differentiate NQB traffic via DSCP would clearly be lost entirely.
+
+1646	   In the policies where the top three bits are overwritten (see
+1647	   Section 4.2 of [RFC9435]), the NQB DSCP (45) would receive the same
+1648	   marking as would the currently unassigned Pool 3 DSCPs
+1649	   5,13,21,29,37,53,61, with all of these DSCPs getting re-marked to
+1650	   DSCP = 5, 13 or 21 (depending on the overwrite value used).  Since
+1651	   none of the DSCPs in the preceding lists are currently assigned by
+1652	   IANA, and they all are reserved for Standards Action, it is believed
+1653	   that they are not widely used currently, but this could vary based on
+1654	   local-usage, and could change in the future.  If networks in which
+1655	   this sort of re-marking occurs (or networks downstream) classify the
+1656	   resulting DSCP (i.e. 5, 13, or 21) to the NQB PHB, or re-mark such
+1657	   traffic as 45 (decimal), they risk treating as NQB other traffic,
+1658	   which was not originally marked as NQB.  In addition, as described in
+1659	   Section 6 of [RFC9435] future assignments of these 0bxxx101 DSCPs
+1660	   would need to be made with consideration of the potential that they
+1661	   all are treated as NQB in some networks.
+
+1663	   For the policy in which the low three bits are set to 0b000, the NQB
+1664	   (45) value would be re-marked to CS5 and would be indistinguishable
+1665	   from CS5, VA, EF (and the unassigned DSCPs 41, 42, 43).  Traffic
+1666	   marked using the existing standardized DSCPs in this list are likely
+1667	   to share the same general properties as NQB traffic (non-capacity-
+1668	   seeking, very low data rate or relatively low and consistent data
+1669	   rate).  Similarly, any future recommended usage for DSCPs 41, 42, 43
+1670	   would likely be somewhat compatible with NQB treatment, assuming that
+1671	   IP Precedence compatibility (see Section 1.5.4 of [RFC4594]) is
+1672	   maintained in the future.  Here there might be an opportunity for a
+1673	   node to provide the NQB PHB or the CS5 PHB to CS5-marked traffic and
+1674	   retain some of the benefits of NQB marking.  This could be another
+1675	   motivation to classify CS5-marked traffic into the NQB queue (as
+1676	   discussed in Section 6.3).
+
+1678	Appendix B.  Comparison with Expedited Forwarding
+
+1680	   The Expedited Forwarding definition [RFC3246] provides the following
+1681	   text to describe the EF PHB forwarding behavior: "This specification
+1682	   defines a PHB in which EF packets are guaranteed to receive service
+1683	   at or above a configured rate" and "the rate at which EF traffic is
+1684	   served at a given output interface should be at least the configured
+1685	   rate R, over a suitably defined interval, independent of the offered
+1686	   load of non-EF traffic to that interface."  Notably, this description
+1687	   is true of any class of traffic that is configured with a guaranteed
+1688	   minimum rate, including the Default PHB if configured per the
+1689	   guidelines in Section 1.5.1 of [RFC4594].  [RFC3246] goes on to
+1690	   formalize the definition of EF by requiring that an EF node be
+1691	   characterizable in terms of the fidelity with which it is able to
+1692	   provide a guaranteed rate.
+
+1694	   While the NQB PHB is not required to be configured with a guaranteed
+1695	   minimum rate, [RFC2474] and [RFC4594] recommend assigning some
+1696	   minimum resources for the Default PHB, in particular some dedicated
+1697	   capacity.  If such a guaranteed minimum rate is configured for the
+1698	   Default PHB, it is recommended (Section 5) that NQB traffic share and
+1699	   be given equal access to that rate.  In such cases, the NQB PHB could
+1700	   effectively receive a rate guarantee of (e.g.) 50% of the rate
+1701	   guaranteed to the combined NQB/Default PHBs, and so technically
+1702	   complies with the PHB forwarding behavior defined for EF.
+
+1704	   However, EF is intended to be a managed service, and requires that
+1705	   traffic be policed such that the arriving rate of traffic into the EF
+1706	   PHB doesn't exceed the guaranteed forwarding rate configured for the
+1707	   PHB, thereby ensuring that low latency and low latency variation are
+1708	   provided.  NQB is intended as a best effort service, and hence the
+1709	   aggregate of traffic arriving to the NQB PHB queue could exceed the
+1710	   forwarding rate available to the PHB.  Section 5.2 discusses the
+1711	   recommended mechanism for handling excess traffic in NQB.  While EF
+1712	   relies on rate policing and dropping of excess traffic at the domain
+1713	   border, this is only one option for NQB.  NQB primarily recommends
+1714	   traffic protection located at each potential bottleneck, where actual
+1715	   queuing can be detected and where excess traffic can be reclassified
+1716	   into the Default PHB rather than dropping it.  Local traffic
+1717	   protection is more feasible for NQB, given the focus is on access
+1718	   networks, where one node is typically designed to be the known
+1719	   bottleneck where traffic control functions all reside.  In contrast,
+1720	   EF is presumed to follow the Diffserv architecture [RFC2475] for core
+1721	   networks, where traffic conditioning is delegated to border nodes, in
+1722	   order to simplify high capacity interior nodes.  Further, NQB
+1723	   recommends a microflow-based mechanism to limit the performance
+1724	   impact of excess traffic to those microflows causing potential
+1725	   congestion of the NQB queue, whereas EF ignores microflow properties.
+
+1727	   Note that under congestion, low loss for NQB conformant flows is only
+1728	   ensured if such a mechanism is operational.  Note also that this
+1729	   mechanism for NQB operates at the available forwarding rate for the
+1730	   PHB (which could vary based on other traffic load) as opposed to a
+1731	   configured guaranteed rate, as in EF.
+
+1733	   The lack of a requirement of a guaranteed minimum rate, and the lack
+1734	   of a requirement to police incoming traffic to such a rate, makes the
+1735	   NQB PHB suitable for implementation in networks where link capacity
+1736	   is not or cannot be guaranteed.
+
+1738	   There are additional distinctions between EF and NQB arising from the
+1739	   intended usage as described in [RFC4594] and the actual usage in
+1740	   practice in the Internet.  In Section 1.5.3 of [RFC4594], EF is
+1741	   described as generally being used to carry voice or data that
+1742	   requires "wire like" behavior through the network.  The NQB PHB
+1743	   similarly is useful to carry application traffic requiring wire like
+1744	   performance, characterized by low packet delay and delay variation,
+1745	   but places a pre-condition that each microflow be relatively low data
+1746	   rate and sent in a smooth (non-bursty) manner.  In actual practice,
+1747	   EF traffic is oftentimes prioritized over Default traffic.  This
+1748	   contrasts with NQB traffic which is to be treated with the same
+1749	   forwarding precedence as Default (and sometimes aggregated with
+1750	   Default).
+
+1752	Appendix C.  Impact on Higher Layer Protocols
+
+1754	   The NQB PHB itself has no impact on higher layer protocols, because
+1755	   it only isolates NQB traffic from non-NQB.  However, traffic
+1756	   protection of the PHB can have unintended side-effects on higher
+1757	   layer protocols.  Traffic protection introduces the possibility that
+1758	   microflows classified into the NQB queue could experience out-of-
+1759	   order delivery or packet loss if their behavior is not consistent
+1760	   with the NQB sender requirements.  Out-of-order delivery could be
+1761	   particularly likely if the traffic protection algorithm makes
+1762	   decisions on a packet-by-packet basis.  In this scenario, a microflow
+1763	   that is (mis)marked as NQB and that causes a queue to form in this
+1764	   bottleneck link could see some of its packets forwarded by the NQB
+1765	   queue, and some of them either discarded or redirected to the QB
+1766	   queue.  In the case of redirection, depending on the queuing latency
+1767	   and scheduling within the network element, this could result in
+1768	   packets being delivered out of order.  As a result, the use of the
+1769	   NQB DSCP by a higher layer protocol carries some risk that an
+1770	   increased amount of out-of-order delivery or packet loss will be
+1771	   experienced.  This characteristic provides one disincentive for
+1772	   incorrectly setting the NQB DSCP on traffic that doesn't comply with
+1773	   the NQB sender requirements.
+
+1775	Appendix D.  Alternative Diffserv Code Points
+
+1777	   In networks where the DSCP 45 (decimal) is already in use for another
+1778	   (e.g., a local-use) purpose, or where specialized PHBs are available
+1779	   that can meet specific application requirements (e.g., a guaranteed-
+1780	   latency path for voice traffic), it could be preferred to use another
+1781	   DSCP.
+
+1783	   In end systems where the choice of using DSCP 45 (decimal) is not
+1784	   available to the application, the CS5 DSCP (40 decimal) could be used
+1785	   as a fallback.  See Section 6.3 for rationale as to why this choice
+1786	   could be fruitful.
+
+1788	Acknowledgements
+
+1790	   Thanks to Gorry Fairhurst, Diego Lopez, Stuart Cheshire, Brian
+1791	   Carpenter, Bob Briscoe, Greg Skinner, Toke Hoeiland-Joergensen, Luca
+1792	   Muscariello, David Black, Jerome Henry, Steven Blake, Jonathan
+1793	   Morton, Roland Bless, Kevin Smith, Martin Dolly and Kyle Rose for
+1794	   their review comments.  Thanks also to Gorry Fairhurst and Ana
+1795	   Custura for their input on selection of appropriate DSCPs.
+
+1797	Authors' Addresses
+
+1799	   Greg White
+1800	   CableLabs
+1801	   Email: g.white@cablelabs.com
+
+1803	   Thomas Fossati
+1804	   Linaro
+1805	   Email: thomas.fossati@linaro.org
+
+1807	   Rüdiger Geib
+1808	   Deutsche Telekom
+1809	   Email: Ruediger.Geib@telekom.de
+
+
+
+
+
+
+
+
+
