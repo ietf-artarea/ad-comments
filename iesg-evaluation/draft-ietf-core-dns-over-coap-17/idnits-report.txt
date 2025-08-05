@@ -1,0 +1,1458 @@
+idnits 2.17.1 
+
+draft-ietf-core-dns-over-coap-17.txt:
+-(4): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(6): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(10): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(453): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(617): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(883): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(981): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(1009): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(1378): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+  == There are 24 instances of lines with non-ascii characters in the
+     document.
+
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     Summary: 0 errors (**), 0 flaws (~~), 1 warning (==), 0 comments (--).
+
+--------------------------------------------------------------------------------
+
+
+2	CoRE                                                       M. S. Lenders
+3	Internet-Draft                                                TU Dresden
+4	Intended status: Standards Track                               C. Amsüss
+5	Expires: 25 January 2026
+6	                                                             C. Gündoğan
+7	                                                        NeuralAgent GmbH
+8	                                                           T. C. Schmidt
+9	                                                             HAW Hamburg
+10	                                                             M. Wählisch
+11	                                        TU Dresden & Barkhausen Institut
+12	                                                            24 July 2025
+
+14	                          DNS over CoAP (DoC)
+15	                    draft-ietf-core-dns-over-coap-17
+
+17	Abstract
+
+19	   This document defines a protocol for exchanging DNS messages over the
+20	   Constrained Application Protocol (CoAP).  These CoAP messages can be
+21	   protected by (D)TLS-Secured CoAP (CoAPS) or Object Security for
+22	   Constrained RESTful Environments (OSCORE) to provide encrypted DNS
+23	   message exchange for constrained devices in the Internet of Things
+24	   (IoT).
+
+26	About This Document
+
+28	   This note is to be removed before publishing as an RFC.
+
+30	   The latest revision of this draft can be found at https://core-
+31	   wg.github.io/draft-dns-over-coap/draft-ietf-core-dns-over-coap.html.
+32	   Status information for this document may be found at
+33	   https://datatracker.ietf.org/doc/draft-ietf-core-dns-over-coap/.
+
+35	   Discussion of this document takes place on the CoRE Working Group
+36	   mailing list (mailto:core@ietf.org), which is archived at
+37	   https://mailarchive.ietf.org/arch/browse/core/.  Subscribe at
+38	   https://www.ietf.org/mailman/listinfo/core/.
+
+40	   Source for this draft and an issue tracker can be found at
+41	   https://github.com/core-wg/draft-dns-over-coap.
+
+43	Status of This Memo
+
+45	   This Internet-Draft is submitted in full conformance with the
+46	   provisions of BCP 78 and BCP 79.
+
+48	   Internet-Drafts are working documents of the Internet Engineering
+49	   Task Force (IETF).  Note that other groups may also distribute
+50	   working documents as Internet-Drafts.  The list of current Internet-
+51	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+53	   Internet-Drafts are draft documents valid for a maximum of six months
+54	   and may be updated, replaced, or obsoleted by other documents at any
+55	   time.  It is inappropriate to use Internet-Drafts as reference
+56	   material or to cite them other than as "work in progress."
+
+58	   This Internet-Draft will expire on 25 January 2026.
+
+60	Copyright Notice
+
+62	   Copyright (c) 2025 IETF Trust and the persons identified as the
+63	   document authors.  All rights reserved.
+
+65	   This document is subject to BCP 78 and the IETF Trust's Legal
+66	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+67	   license-info) in effect on the date of publication of this document.
+68	   Please review these documents carefully, as they describe your rights
+69	   and restrictions with respect to this document.  Code Components
+70	   extracted from this document must include Revised BSD License text as
+71	   described in Section 4.e of the Trust Legal Provisions and are
+72	   provided without warranty as described in the Revised BSD License.
+
+74	Table of Contents
+
+76	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
+77	   2.  Terminology and Conventions . . . . . . . . . . . . . . . . .   5
+78	   3.  Selection of a DoC Server . . . . . . . . . . . . . . . . . .   6
+79	     3.1.  Discovery by Resource Type  . . . . . . . . . . . . . . .   6
+80	     3.2.  Discovery using SVCB Resource Records or DNR  . . . . . .   6
+81	       3.2.1.  Examples  . . . . . . . . . . . . . . . . . . . . . .   9
+82	   4.  Basic Message Exchange  . . . . . . . . . . . . . . . . . . .  10
+83	     4.1.  The "application/dns-message" Content-Format  . . . . . .  10
+84	     4.2.  DNS Queries in CoAP Requests  . . . . . . . . . . . . . .  10
+85	       4.2.1.  Request Format  . . . . . . . . . . . . . . . . . . .  11
+86	       4.2.2.  Support of CoAP Caching . . . . . . . . . . . . . . .  11
+87	       4.2.3.  Examples  . . . . . . . . . . . . . . . . . . . . . .  11
+88	     4.3.  DNS Responses in CoAP Responses . . . . . . . . . . . . .  12
+89	       4.3.1.  Response Codes and Handling DNS and CoAP errors . . .  12
+90	       4.3.2.  Support of CoAP Caching . . . . . . . . . . . . . . .  12
+91	       4.3.3.  Examples  . . . . . . . . . . . . . . . . . . . . . .  13
+92	   5.  Interaction with other CoAP and CoRE Features . . . . . . . .  15
+93	     5.1.  DNS Push Notifications and CoAP Observe . . . . . . . . .  15
+94	     5.2.  OSCORE  . . . . . . . . . . . . . . . . . . . . . . . . .  15
+95	     5.3.  Mapping DoC to DoH  . . . . . . . . . . . . . . . . . . .  16
+
+97	   6.  Considerations for Unprotected Use  . . . . . . . . . . . . .  16
+98	   7.  Implementation Status . . . . . . . . . . . . . . . . . . . .  16
+99	     7.1.  DoC Client  . . . . . . . . . . . . . . . . . . . . . . .  17
+100	     7.2.  DoC Server  . . . . . . . . . . . . . . . . . . . . . . .  17
+101	   8.  Security Considerations . . . . . . . . . . . . . . . . . . .  17
+102	   9.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  18
+103	     9.1.  CoAP Content-Formats Registry . . . . . . . . . . . . . .  19
+104	     9.2.  DNS Service Bindings (SVCB) Registry  . . . . . . . . . .  19
+105	     9.3.  Resource Type (rt=) Link Target Attribute Values
+106	           Registry  . . . . . . . . . . . . . . . . . . . . . . . .  19
+107	   10. References  . . . . . . . . . . . . . . . . . . . . . . . . .  19
+108	     10.1.  Normative References . . . . . . . . . . . . . . . . . .  20
+109	     10.2.  Informative References . . . . . . . . . . . . . . . . .  21
+110	   Appendix A.  Evaluation . . . . . . . . . . . . . . . . . . . . .  24
+111	   Appendix B.  Change Log . . . . . . . . . . . . . . . . . . . . .  25
+112	     B.1.  Since draft-ietf-core-dns-over-coap-16  . . . . . . . . .  25
+113	     B.2.  Since draft-ietf-core-dns-over-coap-15  . . . . . . . . .  25
+114	     B.3.  Since draft-ietf-core-dns-over-coap-14  . . . . . . . . .  26
+115	     B.4.  Since draft-ietf-core-dns-over-coap-13  . . . . . . . . .  26
+116	     B.5.  Since draft-ietf-core-dns-over-coap-12  . . . . . . . . .  26
+117	     B.6.  Since draft-ietf-core-dns-over-coap-10  . . . . . . . . .  27
+118	     B.7.  Since draft-ietf-core-dns-over-coap-09  . . . . . . . . .  27
+119	     B.8.  Since draft-ietf-core-dns-over-coap-08  . . . . . . . . .  28
+120	     B.9.  Since draft-ietf-core-dns-over-coap-07  . . . . . . . . .  28
+121	     B.10. Since draft-ietf-core-dns-over-coap-06  . . . . . . . . .  28
+122	     B.11. Since draft-ietf-core-dns-over-coap-05  . . . . . . . . .  28
+123	     B.12. Since draft-ietf-core-dns-over-coap-04  . . . . . . . . .  29
+124	     B.13. Since draft-ietf-core-dns-over-coap-03  . . . . . . . . .  29
+125	     B.14. Since draft-ietf-core-dns-over-coap-02  . . . . . . . . .  29
+126	     B.15. Since draft-ietf-core-dns-over-coap-01  . . . . . . . . .  29
+127	     B.16. Since draft-ietf-core-dns-over-coap-00  . . . . . . . . .  30
+128	     B.17. Since draft-lenders-dns-over-coap-04  . . . . . . . . . .  30
+129	   Acknowledgments . . . . . . . . . . . . . . . . . . . . . . . . .  30
+130	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  30
+
+132	1.  Introduction
+
+134	   This document defines DNS over CoAP (DoC), a protocol to send DNS
+135	   [RFC1035] queries and get DNS responses over the Constrained
+136	   Application Protocol (CoAP) [RFC7252].  Each DNS query-response pair
+137	   is mapped into a CoAP message exchange.  Each CoAP message can be
+138	   secured by DTLS [RFC6347] [RFC9147] or Object Security for
+139	   Constrained RESTful Environments (OSCORE) [RFC8613] but also TLS
+140	   [RFC8323] [RFC8446] to ensure message integrity and confidentiality.
+
+142	   The application use case of DoC is inspired by DNS over HTTPS
+143	   [RFC8484] (DoH).  DoC, however, aims for deployment in the
+144	   constrained Internet of Things (IoT), which usually conflicts with
+145	   the requirements introduced by HTTPS.  Constrained IoT devices may be
+146	   restricted in memory, power consumption, link layer frame sizes,
+147	   throughput, and latency.  They may only have a handful kilobytes of
+148	   both RAM and ROM.  They may sleep for long durations of time, after
+149	   which they need to refresh the named resources they know about.  Name
+150	   resolution in such scenarios must take into account link layer frame
+151	   sizes of only a few hundred bytes, bit rates in the magnitude of
+152	   kilobits per second, and latencies of several seconds [RFC7228]
+153	   [I-D.ietf-iotops-7228bis]
+154	   // RFC Ed.: Please remove the [RFC7228] reference and replace it with
+155	   // [I-D.ietf-iotops-7228bis] throughout the document in case
+156	   // [I-D.ietf-iotops-7228bis] becomes an RFC before publication..
+
+158	   In order not to be burdened by the resource requirements of TCP and
+159	   HTTPS, constrained IoT devices could use DNS over DTLS [RFC8094].  In
+160	   contrast to DNS over DTLS, DoC can take advantage of CoAP features to
+161	   mitigate drawbacks of datagram-based communication.  These features
+162	   include: block-wise transfer [RFC7959], which solves the Path MTU
+163	   problem of DNS over DTLS (see [RFC8094], Section 5); CoAP proxies,
+164	   which provide an additional level of caching; re-use of data
+165	   structures for application traffic and DNS information, which saves
+166	   memory on constrained devices.
+
+168	   To avoid the resource requirements of DTLS or TLS on top of UDP
+169	   (e.g., introduced by DNS over DTLS [RFC8094] or DNS over QUIC
+170	   [RFC9250]), DoC allows for lightweight message protection based on
+171	   OSCORE.
+
+173	                 . FETCH coaps://[2001:db8::1]/
+174	                /
+175	               /
+176	              CoAP request
+177	   +------+   [DNS query]   +------+   DNS query     .---------------.
+178	   | DoC  |---------------->| DoC  |--- --- --- --->|      DNS        |
+179	   |Client|<----------------|Server|<--- --- --- ---| Infrastructure  |
+180	   +------+  CoAP response  +------+  DNS response   '---------------'
+181	             [DNS response]
+182	      \                        /\                                 /
+183	       '-----DNS over CoAP----'  '--DNS over UDP/HTTPS/QUIC/...--'
+
+185	                      Figure 1: Basic DoC architecture
+
+187	   The most important components of DoC can be seen in Figure 1: a DoC
+188	   client tries to resolve DNS information by sending DNS queries
+189	   carried within CoAP requests to a DoC server.  That DoC server is a
+190	   DNS client (i.e., a stub or recursive resolver) that resolves DNS
+191	   information by using other DNS transports such as DNS over UDP
+192	   [RFC1035], DNS over HTTPS [RFC8484], or DNS over QUIC [RFC9250] when
+193	   communicating with the upstream DNS infrastructure.  Using that
+194	   information, the DoC server then replies to the queries of the DoC
+195	   client with DNS responses carried within CoAP responses.
+
+197	   Note that this specification is distinct from DoH, since the CoAP-
+198	   specific FETCH method [RFC8132] is used.  This has the benefit of
+199	   having the DNS query in the body as when using the POST method, but
+200	   still with the same caching advantages of responses to requests that
+201	   use the GET method.  Having the DNS query in the body means that we
+202	   do not need extra base64 encoding, which would increase code
+203	   complexity and message sizes.  Also, this allows for the block-wise
+204	   transfer of queries [RFC7959].
+
+206	2.  Terminology and Conventions
+
+208	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+209	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+210	   "OPTIONAL" in this document are to be interpreted as described in
+211	   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+212	   capitals, as shown here.
+
+214	   A server that provides the service specified in this document is
+215	   called a "DoC server" to differentiate it from a classic "DNS
+216	   server".  A DoC server acts either as a DNS stub resolver or a DNS
+217	   recursive resolver [BCP219].  As such, the DoC server communicates
+218	   with an "upstream DNS infrastructure" or a single "upstream DNS
+219	   server".  A "DoC resource" is a CoAP resource [RFC7252] at the DoC
+220	   server that DoC clients can target to send a DNS query in a CoAP
+221	   request.
+
+223	   A client using the service specified in this document to retrieve the
+224	   DNS information is called a "DoC client".
+
+226	   The term "constrained nodes" is used as defined in [RFC7228].
+227	   [RFC6690] describes that "Constrained RESTful Environments (CoRE)"
+228	   realize the Representational State Transfer (REST) architecture
+229	   [REST] in a suitable form for such constrained nodes.
+
+231	   The terms "payload" and "body" are used as defined in [RFC7959],
+232	   Section 2.  Note that, when block-wise transfer is not used, the
+233	   terms "payload" and "body" are to be understood as equal.
+
+235	   For better readability, in the examples in this document the binary
+236	   payload and resource records are shown in a hexadecimal
+237	   representation as well as a human-readable format.  In the actual
+238	   message sent and received, however, they are encoded in the binary
+239	   message format defined in [RFC1035].
+
+241	3.  Selection of a DoC Server
+
+243	   While there is no path specified for the DoC resource, it is
+244	   RECOMMENDED to use the root path "/" to keep the CoAP requests small.
+
+246	   The DoC client needs to know the DoC server and the DoC resource at
+247	   the DoC server.  Possible options to assure this could be manual
+248	   configuration of a Uniform Resource Identifier (URI) [RFC3986] or
+249	   Constrained Resource Identifier (CRI) [I-D.ietf-core-href], or
+250	   automatic configuration, e.g., using a CoRE resource directory
+251	   [RFC9176], DHCP or Router Advertisement options [RFC9463], or
+252	   discovery of designated resolvers [RFC9462].  Automatic configuration
+253	   SHOULD only be done from a trusted source.
+
+255	3.1.  Discovery by Resource Type
+
+257	   For discovery of the DoC resource through a link mechanism that
+258	   allows describing a resource type (e.g., the Resource Type attribute
+259	   in [RFC6690]), this document introduces the resource type "core.dns".
+260	   It can be used to identify a generic DNS resolver that is available
+261	   to the client.
+
+263	3.2.  Discovery using SVCB Resource Records or DNR
+
+265	   A DoC server can also be discovered using Service Binding (SVCB)
+266	   Resource Records (RR) [RFC9460] [RFC9461] or Discovery of Network-
+267	   designated Resolvers (DNR) Service Parameters [RFC9463].  [RFC8323]
+268	   defines the Application-Layer Protocol Negotiation (ALPN) ID for CoAP
+269	   over TLS servers and [I-D.ietf-core-coap-dtls-alpn] defines the ALPN
+270	   ID for CoAP over DTLS servers.  Because the ALPN extension is only
+271	   defined for (D)TLS, these mechanisms cannot be used for DoC servers
+272	   which use only OSCORE [RFC8613] and Ephemeral Diffie-Hellman Over
+273	   COSE (EDHOC) [RFC9528] (with COSE abbreviating "Concise Binary Object
+274	   Notation (CBOR) Object Signing and Encryption" [RFC9052]) for
+275	   security.  Specifying an alternate discovery mechanism is out of
+276	   scope of this specification.  [I-D.lenders-core-dnr] provides further
+277	   exploration of the challenges here.
+
+279	   This document is not an SVCB mapping document for the CoAP schemes as
+280	   defined in Section 2.4.3 of [RFC9460].  A full SVCB mapping is being
+281	   prepared in [I-D.ietf-core-transport-indication], generalizing
+282	   mechanisms that are introduced in this document for discovery of DoC.
+
+284	   This document specifies "docpath" as a single-valued SvcParamKey that
+285	   is mandatory for DoC SVCB records.  If the "docpath" SvcParamKey is
+286	   absent, the service should not be considered a valid DoC service.
+
+288	   The docpath is devided up into segments of the absolute path to the
+289	   DoC resource (docpath-segment), each a sequence of 1-255 octets.  In
+290	   ABNF [RFC5234]:
+
+292	   docpath-segment = 1*255OCTET
+
+294	   Note that this restricts the length of each docpath-segment to at
+295	   most 255 octets.  Paths with longer segments cannot be advertised
+296	   with the "docpath" SvcParam and are thus NOT RECOMMENDED for the path
+297	   to the DoC resource.
+
+299	   The presentation format value of "docpath" SHALL be a comma-separated
+300	   list (Appendix A.1 of [RFC9460]) of 0 or more docpath-segments.  The
+301	   root path "/" is represented by 0 docpath-segments, i.e., an empty
+302	   list.  The same considerations for the "," and "" characters in
+303	   docpath-segments for zone-file implementations as for the alpn-ids in
+304	   an "alpn" SvcParam MAY apply (Section 7.1.1 of [RFC9460]).
+
+306	   The wire-format value for "docpath" consists of 0 or more sequences
+307	   of octets prefixed by their respective length as a single octet.  We
+308	   call this single octets the length octet.  The length octet and the
+309	   corresponding sequence form a length-value pair.  These length-value
+310	   pairs are concatenated to form the SvcParamValue.  These pairs MUST
+311	   exactly fill the SvcParamValue; otherwise, the SvcParamValue is
+312	   malformed.  Each such length-value pair represents one segment of the
+313	   absolute path to the DoC resource.  The root path "/" is represented
+314	   by 0 length-value pairs, i.e., SvcParamValue length 0.
+
+316	   Note that this format uses the same encoding as the "alpn" SvcParam
+317	   and can reuse the decoders and encoders for that SvcParam with the
+318	   adaption that a length of zero is allowed.  As long as each docpath-
+319	   segment is of length 0 and 24 octets, it is easily transferred into
+320	   the path representation in CRIs [I-D.ietf-core-href] by masking each
+321	   length octet with the CBOR text string major type 3 (0x60 as an
+322	   octet, see [RFC8949]).  Furthermore, it is easily transferable into a
+323	   sequence of CoAP Uri-Path options by mapping each length octet into
+324	   the Option Delta and Option Length of the corresponding CoAP Uri-Path
+325	   option, provided the docpath-segments are all of a length between 0
+326	   and 12 octets (see [RFC7252], Section 3.1).  Likewise, it can be
+327	   transferred into a URI path-abempty form by replacing each length
+328	   octet with the "/" character None of the abovementioned prevent
+329	   longer docpath-segments than the considered, they just make the
+330	   translation harder, as they require to make space for the longer
+331	   delimiters, in turn requiring to move octets.
+
+333	   To use the service binding from an SVCB RR, the DoC client MUST send
+334	   a DoC request constructed from the SvcParams including "docpath".
+335	   The construction algorithm for DoC requests is as follows, going
+336	   through the provided records in order of their priority.
+
+338	   *  If the "alpn" SvcParam value for the service is "coap", a CoAP
+339	      request for CoAP over TLS MUST be constructed.  If it is "co", a
+340	      CoAP request for CoAP over DTLS MUST be constructed.  Any other
+341	      SvcParamKeys specifying a transport are out of the scope of this
+342	      document.
+
+344	   *  The destination address for the request SHOULD be taken from
+345	      additional information about the target, e.g., from an AAAA record
+346	      associated with the target name or from an "ipv6hint" SvcParam
+347	      value.  As a fallback, an address MAY be queried for the target
+348	      name of the SVCB record.
+
+350	   *  The destination port for the request MUST be taken from the "port"
+351	      SvcParam value, if present.  Otherwise, take the default port of
+352	      the CoAP transport, e.g., with regards to this specification TCP
+353	      port 5684 for "coap" or UDP port 5684 for "co".  This document
+354	      introduces no limitations on the ports that can be used.  If a
+355	      malicious SVCB record allows its originator to influence message
+356	      payloads, Section 12 of [RFC9460] recommends placing such
+357	      restrictions in the SVCB mapping document.  The records used in
+358	      this document only infuence the Uri-Path option.  That option is
+359	      only sent in the plaintext of an encrytped (D)TLS channel, and
+360	      thus does not warrant any limitations.
+
+362	   *  The request URI's hostname component MUST be the Authentication
+363	      Domain Name (ADN) when obtained through DNR and MUST be the target
+364	      name of the SVCB record when obtained through a _dns query (if
+365	      AliasMode is used, to the target name of the AliasMode record).
+366	      This can be achieved efficiently by setting that name in TLS
+367	      Server Name Indication (SNI) [RFC8446], or by setting the Uri-Host
+368	      option on each request.
+
+370	   *  For each element in the CBOR sequence of the "docpath" SvcParam
+371	      value, a Uri-Path option MUST be added to the request.
+
+373	   *  If the request constructed this way receives a response, the same
+374	      SVCB record MUST be used for construction of future DoC queries.
+375	      If not, or if the endpoint becomes unreachable, the algorithm
+376	      SHOULD be repeated with the SVCB record with the next highest
+377	      priority.
+
+379	   A more generalized construction algorithm for any CoAP request can be
+380	   found in [I-D.ietf-core-transport-indication].
+
+382	3.2.1.  Examples
+
+384	   // RFC Ed.: Since the number for "docpath" was not assigned at the
+385	   // time of writing, we used the hex ff 0a (in decimal 65290; from the
+386	   // private use range of SvcParamKeys) throughout this section.
+387	   // Before publication, please replace ff 0a with the hexadecimal
+388	   // representation of the final value assigned by IANA in this
+389	   // section.
+
+391	   A typical SVCB resource record response for a DoC server at the root
+392	   path "/" of the server looks like the following (the "docpath"
+393	   SvcParam is the last 4 bytes ff 0a 00 00 in the binary):
+
+395	   Resource record (binary):
+396	     04 5f 64 6e 73 07 65 78 61 6d 70 6c 65 03 6f 72
+397	     67 00 00 40 00 01 00 00 06 28 00 1e 00 01 03 64
+398	     6e 73 07 65 78 61 6d 70 6c 65 03 6f 72 67 00 00
+399	     01 00 03 02 63 6f ff 0a 00 00
+
+401	   Resource record (human-readable):
+402	     _dns.example.org.  1576  IN SVCB 1 dns.example.org (
+403	         alpn=co docpath )
+
+405	   The root path is RECOMMENDED but not required.  Here are two examples
+406	   where the "docpath" represents paths of varying depth.  First, "/dns"
+407	   is provided in the following example (the last 8 bytes ff 0a 00 04 03
+408	   64 6e 73):
+
+410	   Resource record (binary):
+411	     04 5f 64 6e 73 07 65 78 61 6d 70 6c 65 03 6f 72
+412	     67 00 00 40 00 01 00 00 00 55 00 22 00 01 03 64
+413	     6e 73 07 65 78 61 6d 70 6c 65 03 6f 72 67 00 00
+414	     01 00 03 02 63 6f ff 0a 00 04 03 64 6e 73
+
+416	   Resource record (human-readable):
+417	     _dns.example.org.    85  IN SVCB 1 dns.example.org (
+418	         alpn=co docpath=dns )
+
+420	   Second, an examples for the path "/n/s" (the last 8 bytes ff 0a 00 04
+421	   01 6e 01 73):
+
+423	   Resource record (binary):
+424	     04 5f 64 6e 73 07 65 78 61 6d 70 6c 65 03 6f 72
+425	     67 00 00 40 00 01 00 00 06 6b 00 22 00 01 03 64
+426	     6e 73 07 65 78 61 6d 70 6c 65 03 6f 72 67 00 00
+427	     01 00 03 02 63 6f ff 0a 00 04 01 6e 01 73
+
+429	   Resource record (human-readable):
+430	     _dns.example.org.   643  IN SVCB 1 dns.example.org (
+431	         alpn=co docpath=n,s )
+
+433	   If the server also provides DNS over HTTPS, "dohpath" and "docpath"
+434	   MAY co-exist:
+
+436	   Resource record (binary):
+437	     04 5f 64 6e 73 07 65 78 61 6d 70 6c 65 03 6f 72
+438	     67 00 00 40 00 01 00 00 01 ad 00 2b 00 01 03 64
+439	     6e 73 07 65 78 61 6d 70 6c 65 03 6f 72 67 00 00
+440	     01 00 06 02 68 33 02 63 6f 00 07 00 07 2f 7b 3f
+441	     64 6e 73 7d ff 0a 00 00
+
+443	   Resource record (human-readable):
+444	     _dns.example.org.   429  IN SVCB 1 dns.example.org (
+445	         alpn=h3,co dohpath=/{?dns} docpath )
+
+447	4.  Basic Message Exchange
+
+449	4.1.  The "application/dns-message" Content-Format
+
+451	   This document defines a CoAP Content-Format identifier for the
+452	   Internet media type "application/dns-message" to be the mnemonic 553
+453	   — based on the port assignment of DNS.  This media type is defined as
+454	   in Section 6 of [RFC8484], i.e., a single DNS message encoded in the
+455	   DNS on-the-wire format [RFC1035].  Both DoC client and DoC server
+456	   MUST be able to parse contents in the "application/dns-message"
+457	   Content-Format.  For the purposes of this document, only OPCODE 0
+458	   (Query) is supported for DNS messages.  Future work might provide
+459	   specifications and considerations for other values of OPCODE.  Unless
+460	   another error takes precedence, a DoC server uses RCODE = 4, NotImp
+461	   [RFC1035], in its response to a query with an OPCODE that it does not
+462	   implement (see also Section 4.3.3).
+
+464	4.2.  DNS Queries in CoAP Requests
+
+466	   A DoC client encodes a single DNS query in one or more CoAP request
+467	   messages that use the CoAP FETCH [RFC8132] request method.  Requests
+468	   SHOULD include an Accept option to indicate the type of content that
+469	   can be parsed in the response.
+
+471	   Since CoAP provides reliability at the message layer (e.g., through
+472	   Confirmable messages) the retransmission mechanism of the DNS
+473	   protocol as defined in [RFC1035] is not needed.
+
+475	4.2.1.  Request Format
+
+477	   When sending a CoAP request, a DoC client MUST include the DNS query
+478	   in the body of the CoAP request.  As specified in Section 2.3.1 of
+479	   [RFC8132], the type of content of the body MUST be indicated using
+480	   the Content-Format option.  This document specifies the usage of
+481	   Content-Format "application/dns-message" (for details, see
+482	   Section 4.1).  A DoC server MUST be able to parse requests of
+483	   Content-Format "application/dns-message".
+
+485	4.2.2.  Support of CoAP Caching
+
+487	   The DoC client SHOULD set the ID field of the DNS header to 0 to
+488	   enable a CoAP cache (e.g., a CoAP proxy en-route) to respond to the
+489	   same DNS queries with a cache entry.  This ensures that the CoAP
+490	   Cache-Key (see [RFC8132], Section 2) does not change when multiple
+491	   DNS queries for the same DNS data, carried in CoAP requests, are
+492	   issued.  Apart from losing these caching benefits, there is no harm
+493	   it not setting it to 0, e.g., when the query was received from
+494	   somewhere else.  In any instance, a DoC server MUST copy the ID from
+495	   the query in its response to that query.
+
+497	4.2.3.  Examples
+
+499	   The following example illustrates the usage of a CoAP message to
+500	   resolve "example.org.  IN AAAA" based on the URI
+501	   "coaps://[2001:db8::1]/".  The CoAP body is encoded in the
+502	   "application/dns-message" Content-Format.
+
+504	   FETCH coaps://[2001:db8::1]/
+505	   Content-Format: 553 (application/dns-message)
+506	   Accept: 553 (application/dns-message)
+507	   Payload (binary):
+508	     00 00 01 20 00 01 00 00 00 00 00 00 07 65 78 61
+509	     6d 70 6c 65 03 6f 72 67 00 00 1c 00 01
+
+511	   Payload (human-readable):
+512	     ;; ->>Header<<- opcode: QUERY, status: NOERROR, id: 0
+513	     ;; flags: rd ad; QUERY: 1, ANSWER: 0, AUTHORITY: 0, ARCOUNT: 0
+
+515	     ;; QUESTION SECTION:
+516	     ;example.org.             IN      AAAA
+
+518	4.3.  DNS Responses in CoAP Responses
+
+520	   Each DNS query-response pair is mapped to a CoAP request-response
+521	   operation.  DNS responses are provided in the body of the CoAP
+522	   response, i.e., it is also possible to transfer them using block-wise
+523	   transfer [RFC7959].  A DoC server MUST be able to produce responses
+524	   in the "application/dns-message" Content-Format (for details, see
+525	   Section 4.1) when requested.  A DoC client MUST be able to understand
+526	   responses in the "application/dns-message" Content-Format when it
+527	   does not send an Accept option.  Any response Content-Format other
+528	   than "application/dns-message" MUST be indicated with the Content-
+529	   Format option by the DoC server.
+
+531	4.3.1.  Response Codes and Handling DNS and CoAP errors
+
+533	   A DNS response indicates either success or failure in the RCODE of
+534	   the DNS header (see Section 4.1.1 of [RFC1035]).  It is RECOMMENDED
+535	   that CoAP responses that carry a parseable DNS response use a 2.05
+536	   (Content) response code.
+
+538	   CoAP responses using non-successful response codes MUST NOT contain a
+539	   DNS response and MUST only be used for errors in the CoAP layer or
+540	   when a request does not fulfill the requirements of the DoC protocol.
+
+542	   Communication errors with an upstream DNS server (e.g., timeouts)
+543	   MUST be indicated by including a DNS response with the appropriate
+544	   RCODE in a successful CoAP response, i.e., using a 2.xx response
+545	   code.  When an error occurs at the CoAP layer, e.g., if an unexpected
+546	   request method or an unsupported Content-Format in the request are
+547	   used, the DoC server SHOULD respond with an appropriate CoAP error.
+
+549	   A DoC client might try to repeat a non-successful exchange unless
+550	   otherwise prohibited.  The DoC client might also decide to repeat a
+551	   non-successful exchange with a different URI, for instance, when the
+552	   response indicates an unsupported Content-Format.
+
+554	4.3.2.  Support of CoAP Caching
+
+556	   For reliability and energy saving measures, content decoupling (such
+557	   as en-route caching on proxies) takes a far greater role than it does
+558	   in HTTP.  Likewise, CoAP makes it possible to use cache validation to
+559	   refresh stale cache entries to reduce the number of large response
+560	   messages.  For cache validation, CoAP implementations regularly use
+561	   hashing over the message content for ETag generation (see [RFC7252],
+562	   Section 5.10.6).  As such, the approach to guarantee the same cache
+563	   key for DNS responses as proposed in DoH ([RFC8484], Section 5.1) is
+564	   not sufficient and needs to be updated so that the TTLs in the
+565	   response are more often the same regardless of query time.
+
+567	   The DoC server MUST ensure that the sum of the Max-Age value of a
+568	   CoAP response and any TTL in the DNS response is less than or equal
+569	   to the corresponding TTL received from an upstream DNS server.  This
+570	   also includes the default Max-Age value of 60 seconds (see
+571	   Section 5.10.5 of [RFC7252]) when no Max-Age option is provided.  The
+572	   DoC client MUST then add the Max-Age value of the carrying CoAP
+573	   response to all TTLs in a DNS response on reception and use these
+574	   calculated TTLs for the associated records.
+
+576	   The RECOMMENDED algorithm for a DoC server to meet the requirement
+577	   for DoC is as follows: Set the Max-Age option of a response to the
+578	   minimum TTL of a DNS response and subtract this value from all TTLs
+579	   of that DNS response.  This prevents expired records unintentionally
+580	   being served from an intermediate CoAP cache.  Additionally, if the
+581	   ETag for cache validation is based on the content of the response, it
+582	   allows that ETag not to change.  This then remains the case even if
+583	   the TTL values are updated by an upstream DNS cache.  If only one
+584	   record set per DNS response is assumed, a simplification of this
+585	   algorithm is to just set all TTLs in the response to 0 and set the
+586	   TTLs at the DoC client to the value of the Max-Age option.
+
+588	   If shorter caching periods are plausible, e.g., if the RCODE of the
+589	   message indicates an error that should only be cached for a minimal
+590	   duration, the value for the Max-Age option SHOULD be set accordingly.
+591	   This value might be 0, but if the DoC server knows that the error
+592	   will persist, greater values are also conceivable, depending on the
+593	   projected duration of the error.  The same applies for DNS responses
+594	   that for any reason do not carry any records with a TTL.
+
+596	4.3.3.  Examples
+
+598	   The following example illustrates the response to the query
+599	   "example.org.  IN AAAA record", with recursion turned on.  Successful
+600	   responses carry one answer record including address
+601	   2001:db8:1:0:1:2:3:4 and TTL 79689.
+
+603	   A successful response:
+
+605	   2.05 Content
+606	   Content-Format: 553 (application/dns-message)
+607	   Max-Age: 58719
+608	   Payload (human-readable):
+609	     ;; ->>Header<<- opcode: QUERY, status: NOERROR, id: 0
+610	     ;; flags: qr rd ad; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ARCOUNT: 0
+
+612	     ;; QUESTION SECTION:
+613	     ;example.org.                 IN      AAAA
+614	     ;; ANSWER SECTION:
+615	     ;example.org.         79689   IN      AAAA    2001:db8:1:0:1:2:3:4
+
+617	   When a DNS error – NxDomain (RCODE = 3) for "does.not.exist" in this
+618	   case – is noted in the DNS response, the CoAP response still
+619	   indicates success.
+
+621	  2.05 Content
+622	  Content-Format: 553 (application/dns-message)
+623	  Payload (human-readable):
+624	    ;; ->>HEADER<<- opcode: QUERY, status: NXDOMAIN, id: 0
+625	    ;; flags: qr rd ra; QUERY: 1, ANSWER: 0, AUTHORITY: 0, ADDITIONAL: 0
+
+627	    ;; QUESTION SECTION:
+628	    ;does.not.exist.              IN      AAAA
+
+630	   As described in Section 4.1, a DoC server uses NotImp (RCODE = 4) if
+631	   it does not support an OPCODE—a DNS Update (OPCODE = 5) for
+632	   "example.org" in this case.
+
+634	   2.05 Content
+635	   Content-Format: 553 (application/dns-message)
+636	   Payload (human-readable):
+637	     ;; ->>Header<<- opcode: UPDATE, status: NOTIMP, id: 0
+638	     ;; flags: qr ra; QUERY: 1, ANSWER: 0, AUTHORITY: 0, ARCOUNT: 0
+
+640	     ;; QUERY SECTION:
+641	     ;example.org.                 IN      AAAA
+
+643	   When an error occurs at the CoAP layer, the DoC server responds with
+644	   an appropriate CoAP error, for instance 4.15 (Unsupported Content-
+645	   Format) if the Content-Format option in the request was not set to
+646	   "application/dns-message" and the Content-Format is not otherwise
+647	   supported by the server.
+
+649	   4.15 Unsupported Content-Format
+650	   [no payload]
+
+652	5.  Interaction with other CoAP and CoRE Features
+
+654	5.1.  DNS Push Notifications and CoAP Observe
+
+656	   DNS Push Notifications [RFC8765] provides the capability to
+657	   asynchronously notify clients about resource record changes.
+658	   However, it results in additional overhead, which conflicts with
+659	   constrained resources.  This is the reason why it is RECOMMENDED to
+660	   use CoAP Observe [RFC7641] instead of DNS Push in the DoC domain.
+661	   The DoC server SHOULD provide Observe capabilities on its DoC
+662	   resource and do as follows.
+
+664	   If the CoAP request indicates that the DoC client wants to observe a
+665	   resource record, a DoC server MAY use a DNS Subscribe message instead
+666	   of a classic DNS query to fetch the information on behalf of a DoC
+667	   client.  If this is not supported by the DoC server, it MUST act as
+668	   if the DoC resource were not observable.
+
+670	   Whenever the DoC server receives a DNS Push message from the DNS
+671	   infrastructure for an observed resource record, the DoC server sends
+672	   an appropriate Observe notification response to the DoC client.
+
+674	   If no more DoC clients observe a resource record for which the DoC
+675	   server has an open subscription, the DoC server MUST use a DNS
+676	   Unsubscribe message to close its subscription to the resource record
+677	   as well.
+
+679	   A DoC server can still provide Observe capabilities to its DoC
+680	   resource without providing this proxying to DNS Push, e.g., if it
+681	   receives new information on a record through other means.
+
+683	5.2.  OSCORE
+
+685	   It is RECOMMENDED to carry DNS messages protected using OSCORE
+686	   [RFC8613] between the DoC client and the DoC server.  The
+687	   establishment and maintenance of the OSCORE Security Context is out
+688	   of the scope of this document.
+
+690	   [I-D.amsuess-core-cachable-oscore] describes a method to allow cache
+691	   retrieval of OSCORE responses and discusses the corresponding
+692	   implications on message sizes and security properties.
+
+694	5.3.  Mapping DoC to DoH
+
+696	   This document provides no specification on how to map between DoC and
+697	   DoH, e.g., at a CoAP-to-HTTP-proxy.  In fact, such a direct mapping
+698	   is NOT RECOMMENDED: rewriting the FETCH method (Section 4.2) and the
+699	   TTL rewriting (Section 4.3.2) as specified in this draft would be
+700	   non-trivial.  It is RECOMMENDED to use a DNS forwarder to map between
+701	   DoC and DoH, as would be the case for mapping between any other pair
+702	   of DNS transports.
+
+704	6.  Considerations for Unprotected Use
+
+706	   The use of DoC without confidentiality and integrity protection is
+707	   NOT RECOMMENDED.  Without secure communication, many possible attacks
+708	   need to be evaluated in the context of the application's threat
+709	   model.  This includes known threats for unprotected DNS [RFC3833]
+710	   [RFC9076] and CoAP Section 11 of [RFC7252].  While DoC does not use
+711	   the random ID of the DNS header (see Section 4.2.2), equivalent
+712	   protection against off-path poisoning attacks is achieved by using
+713	   random large token values for unprotected CoAP requests.  If a DoC
+714	   message is unprotected it MUST use a random token of at least 2 bytes
+715	   length to mitigate this kind of poisoning attacks.
+
+717	7.  Implementation Status
+
+719	   This section records the status of known implementations of the
+720	   protocol defined by this specification at the time of posting of this
+721	   Internet-Draft, and is based on a proposal described in [RFC7942].
+722	   The description of implementations in this section is intended to
+723	   assist the IETF in its decision processes in progressing drafts to
+724	   RFCs.  Please note that the listing of any individual implementation
+725	   here does not imply endorsement by the IETF.  Furthermore, no effort
+726	   has been spent to verify the information presented here that was
+727	   supplied by IETF contributors.  This is not intended as, and must not
+728	   be construed to be, a catalog of available implementations or their
+729	   features.  Readers are advised to note that other implementations may
+730	   exist.
+
+732	   According to [RFC7942], "this will allow reviewers and working groups
+733	   to assign due consideration to documents that have the benefit of
+734	   running code, which may serve as evidence of valuable experimentation
+735	   and feedback that have made the implemented protocols more mature.
+736	   It is up to the individual working groups to use this information as
+737	   they see fit".
+
+739	   // RFC Ed.: Please remove this section before publication.  When
+740	   // deleting this section, please also remove RFC7942 from the
+741	   // references of this document.
+
+743	7.1.  DoC Client
+
+745	   The authors of this document provide a DoC client implementation
+746	   available in the IoT operating system RIOT (https://doc.riot-os.org/
+747	   group__net__gcoap__dns.html).
+
+749	   Level of maturity:  production
+
+751	   Version compatibility:  draft-ietf-core-dns-over-coap-13
+
+753	   License:  LGPL-2.1
+
+755	   Contact information:  Martine S.  Lenders <martine.lenders@tu-
+756	      dresden.de>
+
+758	   Last update of this information:  September 2024
+
+760	7.2.  DoC Server
+
+762	   The authors of this document provide a DoC server implementation in
+763	   Python (https://github.com/anr-bmbf-pivot/aiodnsprox).
+
+765	   Level of maturity:  production
+
+767	   Version compatibility:  draft-ietf-core-dns-over-coap-13
+
+769	   License:  MIT
+
+771	   Contact information:  Martine S.  Lenders <martine.lenders@tu-
+772	      dresden.de>
+
+774	   Last update of this information:  September 2024
+
+776	8.  Security Considerations
+
+778	   General CoAP security considerations ([RFC7252], Section 11) apply to
+779	   DoC.  DoC also inherits the security considerations of the protocols
+780	   used for secure communication, e.g., OSCORE ([RFC8613], Section 12)
+781	   or DTLS ([RFC6347], Section 5 and [RFC9147], Section 11).
+782	   Additionally, DoC uses request patterns that require the maintenance
+783	   of long-lived security contexts.  Section 2.6 of
+784	   [I-D.ietf-core-corr-clar] provides insights on what can be done when
+785	   those are resumed from a new endpoint.
+
+787	   Though DTLS v1.2 [RFC6347] was obsoleteted by DTLS v1.3 [RFC9147]
+788	   there are still many CoAP implementations that still use v1.2 at the
+789	   time of writing.  As such, this document also accounts for the usage
+790	   of DTLS v1.2 even though newer versions are RECOMMENDED when using
+791	   DTLS to secure CoAP.
+
+793	   When using unprotected CoAP (see Section 6), setting the ID of a DNS
+794	   message to 0 as specified in Section 4.2.2 opens the DNS cache of a
+795	   DoC client to cache poisoning attacks via response spoofing.  This
+796	   document requires an unpredictable CoAP token in each DoC query from
+797	   the client when CoAP is not secured to mitigate such an attack over
+798	   DoC (see Section 6).
+
+800	   For secure communication via DTLS or OSCORE, the impact of a fixed ID
+801	   on security is limited, as both harden against injecting spoofed
+802	   responses.  Consequently, the ID of the DNS message can be set to 0
+803	   without any concern in order to leverage the advantages of CoAP
+804	   caching.
+
+806	   A DoC client must be aware that the DoC server may communicate
+807	   unprotected with the upstream DNS infrastructure, e.g., using DNS
+808	   over UDP.  DoC can only guarantee confidentiality and integrity of
+809	   communication between parties for which the security context is
+810	   exchanged.  The DoC server may use another security context to
+811	   communicate upstream with both confidentiality and integrity (e.g.,
+812	   DNS over QUIC [RFC9250]), but, while recommended, this is opaque to
+813	   the DoC client on the protocol level.  Record integrity can also be
+814	   ensured upstream using, e.g., DNSSEC [RFC9364].
+
+816	   A DoC client may not be able to perform DNSSEC validation, e.g., due
+817	   to code size constraints, or due to the size of the responses.  It
+818	   may trust its DoC server to perform DNSSEC validation; how that trust
+819	   is expressed is out of the scope of this document.  For instance, a
+820	   DoC client may be, configured to use a particular credential by which
+821	   it recognizes an eligible DoC server.  That information can also
+822	   imply trust in the DNSSEC validation by that server.
+
+824	9.  IANA Considerations
+
+826	   // RFC Ed.: throughout this section, please replace RFC-XXXX with the
+827	   // RFC number of this specification and remove this note.
+
+829	   This document has the following actions for IANA.
+
+831	9.1.  CoAP Content-Formats Registry
+
+833	   IANA is requested to assign a CoAP Content-Format ID for the
+834	   "application/dns-message" media type in the "CoAP Content-Formats"
+835	   registry, within the "Constrained RESTful Environments (CoRE)
+836	   Parameters" registry group [RFC7252], corresponding to the
+837	   "application/dns-message" media type from the "Media Types" registry
+838	   (see [RFC8484]).
+
+840	   Content Type: application/dns-message
+
+842	   Content Coding: -
+
+844	   ID: 553 (suggested)
+
+846	   Reference: [RFC8484] and [RFC-XXXX], Section 4.1
+
+848	9.2.  DNS Service Bindings (SVCB) Registry
+
+850	   IANA is requested to add the following entry to the "Service
+851	   Parameter Keys (SvcParamKeys)" registry within the "DNS Service
+852	   Bindings (SVCB)" registry group.  The definition of this parameter
+853	   can be found in Section 3.
+
+855	   +=============+=========+===============+============+=============+
+856	   | Number      | Name    | Meaning       | Change     | Reference   |
+857	   |             |         |               | Controller |             |
+858	   +=============+=========+===============+============+=============+
+859	   | 10          | docpath | DNS over CoAP | IETF       | [RFC-XXXX], |
+860	   | (suggested) |         | resource path |            | Section 3   |
+861	   +-------------+---------+---------------+------------+-------------+
+
+863	                     Table 1: Values for SvcParamKeys
+
+865	9.3.  Resource Type (rt=) Link Target Attribute Values Registry
+
+867	   IANA is requested to add a new Resource Type (rt=) Link Target
+868	   Attribute "core.dns" to the "Resource Type (rt=) Link Target
+869	   Attribute Values" registry within the "Constrained RESTful
+870	   Environments (CoRE) Parameters" registry group.
+
+872	   Value: core.dns
+
+874	   Description: DNS over CoAP resource.
+
+876	   Reference: [RFC-XXXX], Section 3
+
+878	10.  References
+879	10.1.  Normative References
+
+881	   [I-D.ietf-core-coap-dtls-alpn]
+882	              Lenders, M. S., Amsüss, C., Schmidt, T. C., and M.
+883	              Wählisch, "ALPN ID Specification for CoAP over DTLS", Work
+884	              in Progress, Internet-Draft, draft-ietf-core-coap-dtls-
+885	              alpn-04, 1 April 2025,
+886	              <https://datatracker.ietf.org/doc/html/draft-ietf-core-
+887	              coap-dtls-alpn-04>.
+
+889	   [RFC1035]  Mockapetris, P., "Domain names - implementation and
+890	              specification", STD 13, RFC 1035, DOI 10.17487/RFC1035,
+891	              November 1987, <https://www.rfc-editor.org/rfc/rfc1035>.
+
+893	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+894	              Requirement Levels", BCP 14, RFC 2119,
+895	              DOI 10.17487/RFC2119, March 1997,
+896	              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+898	   [RFC3986]  Berners-Lee, T., Fielding, R., and L. Masinter, "Uniform
+899	              Resource Identifier (URI): Generic Syntax", STD 66,
+900	              RFC 3986, DOI 10.17487/RFC3986, January 2005,
+901	              <https://www.rfc-editor.org/rfc/rfc3986>.
+
+903	   [RFC5234]  Crocker, D., Ed. and P. Overell, "Augmented BNF for Syntax
+904	              Specifications: ABNF", STD 68, RFC 5234,
+905	              DOI 10.17487/RFC5234, January 2008,
+906	              <https://www.rfc-editor.org/rfc/rfc5234>.
+
+908	   [RFC6347]  Rescorla, E. and N. Modadugu, "Datagram Transport Layer
+909	              Security Version 1.2", RFC 6347, DOI 10.17487/RFC6347,
+910	              January 2012, <https://www.rfc-editor.org/rfc/rfc6347>.
+
+912	   [RFC7252]  Shelby, Z., Hartke, K., and C. Bormann, "The Constrained
+913	              Application Protocol (CoAP)", RFC 7252,
+914	              DOI 10.17487/RFC7252, June 2014,
+915	              <https://www.rfc-editor.org/rfc/rfc7252>.
+
+917	   [RFC7641]  Hartke, K., "Observing Resources in the Constrained
+918	              Application Protocol (CoAP)", RFC 7641,
+919	              DOI 10.17487/RFC7641, September 2015,
+920	              <https://www.rfc-editor.org/rfc/rfc7641>.
+
+922	   [RFC7959]  Bormann, C. and Z. Shelby, Ed., "Block-Wise Transfers in
+923	              the Constrained Application Protocol (CoAP)", RFC 7959,
+924	              DOI 10.17487/RFC7959, August 2016,
+925	              <https://www.rfc-editor.org/rfc/rfc7959>.
+
+927	   [RFC8132]  van der Stok, P., Bormann, C., and A. Sehgal, "PATCH and
+928	              FETCH Methods for the Constrained Application Protocol
+929	              (CoAP)", RFC 8132, DOI 10.17487/RFC8132, April 2017,
+930	              <https://www.rfc-editor.org/rfc/rfc8132>.
+
+932	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+933	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+934	              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+936	   [RFC8323]  Bormann, C., Lemay, S., Tschofenig, H., Hartke, K.,
+937	              Silverajan, B., and B. Raymor, Ed., "CoAP (Constrained
+938	              Application Protocol) over TCP, TLS, and WebSockets",
+939	              RFC 8323, DOI 10.17487/RFC8323, February 2018,
+940	              <https://www.rfc-editor.org/rfc/rfc8323>.
+
+942	   [RFC8484]  Hoffman, P. and P. McManus, "DNS Queries over HTTPS
+943	              (DoH)", RFC 8484, DOI 10.17487/RFC8484, October 2018,
+944	              <https://www.rfc-editor.org/rfc/rfc8484>.
+
+946	   [RFC8613]  Selander, G., Mattsson, J., Palombini, F., and L. Seitz,
+947	              "Object Security for Constrained RESTful Environments
+948	              (OSCORE)", RFC 8613, DOI 10.17487/RFC8613, July 2019,
+949	              <https://www.rfc-editor.org/rfc/rfc8613>.
+
+951	   [RFC8742]  Bormann, C., "Concise Binary Object Representation (CBOR)
+952	              Sequences", RFC 8742, DOI 10.17487/RFC8742, February 2020,
+953	              <https://www.rfc-editor.org/rfc/rfc8742>.
+
+955	   [RFC8765]  Pusateri, T. and S. Cheshire, "DNS Push Notifications",
+956	              RFC 8765, DOI 10.17487/RFC8765, June 2020,
+957	              <https://www.rfc-editor.org/rfc/rfc8765>.
+
+959	   [RFC8949]  Bormann, C. and P. Hoffman, "Concise Binary Object
+960	              Representation (CBOR)", STD 94, RFC 8949,
+961	              DOI 10.17487/RFC8949, December 2020,
+962	              <https://www.rfc-editor.org/rfc/rfc8949>.
+
+964	   [RFC9147]  Rescorla, E., Tschofenig, H., and N. Modadugu, "The
+965	              Datagram Transport Layer Security (DTLS) Protocol Version
+966	              1.3", RFC 9147, DOI 10.17487/RFC9147, April 2022,
+967	              <https://www.rfc-editor.org/rfc/rfc9147>.
+
+969	10.2.  Informative References
+
+971	   [BCP219]   Best Current Practice 219,
+972	              <https://www.rfc-editor.org/info/bcp219>.
+973	              At the time of writing, this BCP comprises the following:
+
+975	              Hoffman, P. and K. Fujiwara, "DNS Terminology", BCP 219,
+976	              RFC 9499, DOI 10.17487/RFC9499, March 2024,
+977	              <https://www.rfc-editor.org/info/rfc9499>.
+
+979	   [DoC-paper]
+980	              Lenders, M., Amsüss, C., Gündogan, C., Nawrocki, M.,
+981	              Schmidt, T., and M. Wählisch, "Securing Name Resolution in
+982	              the IoT: DNS over CoAP", Association for Computing
+983	              Machinery (ACM), Proceedings of the ACM on Networking vol.
+984	              1, no. CoNEXT2, pp. 1-25, DOI 10.1145/3609423, September
+985	              2023, <https://doi.org/10.1145/3609423>.
+
+987	   [I-D.amsuess-core-cachable-oscore]
+988	              Amsüss, C. and M. Tiloca, "Cacheable OSCORE", Work in
+989	              Progress, Internet-Draft, draft-amsuess-core-cachable-
+990	              oscore-11, 6 July 2025,
+991	              <https://datatracker.ietf.org/doc/html/draft-amsuess-core-
+992	              cachable-oscore-11>.
+
+994	   [I-D.ietf-core-corr-clar]
+995	              Bormann, C., "Constrained Application Protocol (CoAP):
+996	              Corrections and Clarifications", Work in Progress,
+997	              Internet-Draft, draft-ietf-core-corr-clar-02, 20 June
+998	              2025, <https://datatracker.ietf.org/doc/html/draft-ietf-
+999	              core-corr-clar-02>.
+
+1001	   [I-D.ietf-core-href]
+1002	              Bormann, C. and H. Birkholz, "Constrained Resource
+1003	              Identifiers", Work in Progress, Internet-Draft, draft-
+1004	              ietf-core-href-23, 7 July 2025,
+1005	              <https://datatracker.ietf.org/doc/html/draft-ietf-core-
+1006	              href-23>.
+
+1008	   [I-D.ietf-core-transport-indication]
+1009	              Amsüss, C. and M. S. Lenders, "CoAP Transport Indication",
+1010	              Work in Progress, Internet-Draft, draft-ietf-core-
+1011	              transport-indication-09, 7 July 2025,
+1012	              <https://datatracker.ietf.org/doc/html/draft-ietf-core-
+1013	              transport-indication-09>.
+
+1015	   [I-D.ietf-iotops-7228bis]
+1016	              Bormann, C., Ersue, M., Keränen, A., and C. Gomez,
+1017	              "Terminology for Constrained-Node Networks", Work in
+1018	              Progress, Internet-Draft, draft-ietf-iotops-7228bis-02, 7
+1019	              July 2025, <https://datatracker.ietf.org/doc/html/draft-
+1020	              ietf-iotops-7228bis-02>.
+
+1022	   [I-D.lenders-core-dnr]
+1023	              Lenders, M. S., Amsüss, C., Schmidt, T. C., and M.
+1024	              Wählisch, "Discovery of Network-designated OSCORE-based
+1025	              Resolvers: Problem Statement", Work in Progress, Internet-
+1026	              Draft, draft-lenders-core-dnr-06, 7 July 2025,
+1027	              <https://datatracker.ietf.org/doc/html/draft-lenders-core-
+1028	              dnr-06>.
+
+1030	   [REST]     Fielding, R., "Architectural Styles and the Design of
+1031	              Network-based Software Architectures", Ph.D. Dissertation,
+1032	              University of California, Irvine, 2000,
+1033	              <https://www.ics.uci.edu/~fielding/pubs/dissertation/
+1034	              fielding_dissertation.pdf>.
+
+1036	   [RFC3833]  Atkins, D. and R. Austein, "Threat Analysis of the Domain
+1037	              Name System (DNS)", RFC 3833, DOI 10.17487/RFC3833, August
+1038	              2004, <https://www.rfc-editor.org/rfc/rfc3833>.
+
+1040	   [RFC6690]  Shelby, Z., "Constrained RESTful Environments (CoRE) Link
+1041	              Format", RFC 6690, DOI 10.17487/RFC6690, August 2012,
+1042	              <https://www.rfc-editor.org/rfc/rfc6690>.
+
+1044	   [RFC7228]  Bormann, C., Ersue, M., and A. Keranen, "Terminology for
+1045	              Constrained-Node Networks", RFC 7228,
+1046	              DOI 10.17487/RFC7228, May 2014,
+1047	              <https://www.rfc-editor.org/rfc/rfc7228>.
+
+1049	   [RFC7942]  Sheffer, Y. and A. Farrel, "Improving Awareness of Running
+1050	              Code: The Implementation Status Section", BCP 205,
+1051	              RFC 7942, DOI 10.17487/RFC7942, July 2016,
+1052	              <https://www.rfc-editor.org/rfc/rfc7942>.
+
+1054	   [RFC8094]  Reddy, T., Wing, D., and P. Patil, "DNS over Datagram
+1055	              Transport Layer Security (DTLS)", RFC 8094,
+1056	              DOI 10.17487/RFC8094, February 2017,
+1057	              <https://www.rfc-editor.org/rfc/rfc8094>.
+
+1059	   [RFC8446]  Rescorla, E., "The Transport Layer Security (TLS) Protocol
+1060	              Version 1.3", RFC 8446, DOI 10.17487/RFC8446, August 2018,
+1061	              <https://www.rfc-editor.org/rfc/rfc8446>.
+
+1063	   [RFC9052]  Schaad, J., "CBOR Object Signing and Encryption (COSE):
+1064	              Structures and Process", STD 96, RFC 9052,
+1065	              DOI 10.17487/RFC9052, August 2022,
+1066	              <https://www.rfc-editor.org/rfc/rfc9052>.
+
+1068	   [RFC9076]  Wicinski, T., Ed., "DNS Privacy Considerations", RFC 9076,
+1069	              DOI 10.17487/RFC9076, July 2021,
+1070	              <https://www.rfc-editor.org/rfc/rfc9076>.
+
+1072	   [RFC9176]  Amsüss, C., Ed., Shelby, Z., Koster, M., Bormann, C., and
+1073	              P. van der Stok, "Constrained RESTful Environments (CoRE)
+1074	              Resource Directory", RFC 9176, DOI 10.17487/RFC9176, April
+1075	              2022, <https://www.rfc-editor.org/rfc/rfc9176>.
+
+1077	   [RFC9250]  Huitema, C., Dickinson, S., and A. Mankin, "DNS over
+1078	              Dedicated QUIC Connections", RFC 9250,
+1079	              DOI 10.17487/RFC9250, May 2022,
+1080	              <https://www.rfc-editor.org/rfc/rfc9250>.
+
+1082	   [RFC9364]  Hoffman, P., "DNS Security Extensions (DNSSEC)", BCP 237,
+1083	              RFC 9364, DOI 10.17487/RFC9364, February 2023,
+1084	              <https://www.rfc-editor.org/rfc/rfc9364>.
+
+1086	   [RFC9460]  Schwartz, B., Bishop, M., and E. Nygren, "Service Binding
+1087	              and Parameter Specification via the DNS (SVCB and HTTPS
+1088	              Resource Records)", RFC 9460, DOI 10.17487/RFC9460,
+1089	              November 2023, <https://www.rfc-editor.org/rfc/rfc9460>.
+
+1091	   [RFC9461]  Schwartz, B., "Service Binding Mapping for DNS Servers",
+1092	              RFC 9461, DOI 10.17487/RFC9461, November 2023,
+1093	              <https://www.rfc-editor.org/rfc/rfc9461>.
+
+1095	   [RFC9462]  Pauly, T., Kinnear, E., Wood, C. A., McManus, P., and T.
+1096	              Jensen, "Discovery of Designated Resolvers", RFC 9462,
+1097	              DOI 10.17487/RFC9462, November 2023,
+1098	              <https://www.rfc-editor.org/rfc/rfc9462>.
+
+1100	   [RFC9463]  Boucadair, M., Ed., Reddy.K, T., Ed., Wing, D., Cook, N.,
+1101	              and T. Jensen, "DHCP and Router Advertisement Options for
+1102	              the Discovery of Network-designated Resolvers (DNR)",
+1103	              RFC 9463, DOI 10.17487/RFC9463, November 2023,
+1104	              <https://www.rfc-editor.org/rfc/rfc9463>.
+
+1106	   [RFC9528]  Selander, G., Preuß Mattsson, J., and F. Palombini,
+1107	              "Ephemeral Diffie-Hellman Over COSE (EDHOC)", RFC 9528,
+1108	              DOI 10.17487/RFC9528, March 2024,
+1109	              <https://www.rfc-editor.org/rfc/rfc9528>.
+
+1111	Appendix A.  Evaluation
+
+1113	   The authors of this document presented the design, implementation,
+1114	   and analysis of DoC in their paper "Securing Name Resolution in the
+1115	   IoT: DNS over CoAP" [DoC-paper].
+
+1117	Appendix B.  Change Log
+
+1119	   // RFC Ed.: Please remove this section before publication.
+
+1121	B.1.  Since draft-ietf-core-dns-over-coap-16
+1122	      (https://datatracker.ietf.org/doc/html/draft-ietf-core-dns-over-
+1123	      coap-16)
+
+1125	   *  Mention TLS as possible protection mechanism in abstract and intro
+
+1127	   *  Fix representation format in the docpath examples
+
+1129	   *  Make docpath wire-format paragraph easier to parse
+
+1131	B.2.  Since draft-ietf-core-dns-over-coap-15
+1132	      (https://datatracker.ietf.org/doc/html/draft-ietf-core-dns-over-
+1133	      coap-15)
+
+1135	   *  Address Genart and Artart review:
+
+1137	      -  Add editor's note about removing RFC7228 reference in case
+1138	         rfc7228bis comes out before publication
+
+1140	      -  Address minor nits
+
+1142	      -  Resolve less well-known abbreviations
+
+1144	      -  Name default ports for "coap" and "co"
+
+1146	      -  Add reasoning why we also consider DTLS v1.2 (RFC 6347)
+
+1148	      -  Add illustrative reference for ETag generation
+
+1150	   *  Address DNS SVCB SvcParamKeys IANA expert review:
+
+1152	      -  docpath: clarifications and examples
+
+1154	      -  Rework representation format and wire-format of "docpath"
+
+1156	      -  State that we don't do the full SVCB mapping
+
+1158	      -  Explicitly do not limit what port= can do.
+
+1160	      -  port limitations: We're not the SVCB mapping document
+
+1162	   *  Address Tsvart Review
+1163	      -  Prefer ADN for Uri-Host; don't prescribe _how_ it is set
+
+1165	B.3.  Since draft-ietf-core-dns-over-coap-14
+1166	      (https://datatracker.ietf.org/doc/html/draft-ietf-core-dns-over-
+1167	      coap-14)
+
+1169	   *  Remove superfluous and confusing step in SVCB to request algorithm
+
+1171	   *  Address AD review:
+
+1173	      -  Remove RFC8949 as CBOR diagnostic notation reference
+
+1175	      -  CoRE-specific FETCH method -> CoAP-specific FETCH method
+
+1177	      -  Remove double reference to BCP 219
+
+1179	      -  Fix wording and references around SVCB records and ALPN
+
+1181	      -  Move format description for examples to Terminology section
+
+1183	      -  Retitle section 5 to "Interaction with other CoAP and CoRE
+1184	         Features"
+
+1186	      -  Make prevention of poisoning attacks normative for unprotected
+1187	         CoAP
+
+1189	      -  Provide specs on if the SHOULD on ID=0 does not apply
+
+1191	      -  Make construction algorithm normative
+
+1193	      -  Add definition for CoRE
+
+1195	      -  General grammar, wording, and spelling cleanups
+
+1197	B.4.  Since draft-ietf-core-dns-over-coap-13
+1198	      (https://datatracker.ietf.org/doc/html/draft-ietf-core-dns-over-
+1199	      coap-13)
+
+1201	   *  Address shepherd review
+
+1203	B.5.  Since draft-ietf-core-dns-over-coap-12
+1204	      (https://datatracker.ietf.org/doc/html/draft-ietf-core-dns-over-
+1205	      coap-12)
+
+1207	   *  Address Esko's review
+
+1209	   *  Address Marcos's review
+1210	   *  Address Mikolai's review
+
+1212	B.6.  Since draft-ietf-core-dns-over-coap-10
+1213	      (https://datatracker.ietf.org/doc/html/draft-ietf-core-dns-over-
+1214	      coap-10)
+
+1216	   *  Replace imprecise or wrong terms:
+
+1218	      -  disjunct => distinct
+
+1220	      -  unencrypted CoAP => unprotected CoAP
+
+1222	      -  security mode => confidential communication
+
+1224	   *  Pull in definition of CBOR sequences and their EDN
+
+1226	   *  Fix broken external section references
+
+1228	   *  Define terminology for "upstream DNS infrastructure" and "upstream
+1229	      DNS server"
+
+1231	   *  Fix wording on DNS error handling
+
+1233	   *  Clarify that any OpCode beyond 0 is not supported for now and
+1234	      remove now redundant DNS Upgrade section as a consequence
+
+1236	   *  Clarify that the DoC/DoH mapping is what is NOT RECOMMENDED
+
+1238	   *  Avoid use of undefined term “CoAP resource identifier”
+
+1240	   *  Discuss Max-Age option value in an error case
+
+1242	   *  Add human-readable format to examples
+
+1244	   *  General language check pass
+
+1246	B.7.  Since draft-ietf-core-dns-over-coap-09
+1247	      (https://datatracker.ietf.org/doc/html/draft-ietf-core-dns-over-
+1248	      coap-09)
+
+1250	   *  Update SVCB SvcParamKey
+
+1252	   *  Update corr-clar reference
+
+1254	   *  Add reference to DNS Update [RFC2136]
+1255	      (https://datatracker.ietf.org/doc/html/rfc2136), clarify that it
+1256	      is currently not considered
+
+1258	   *  Add to security considerations: unprotected upstream DNS and
+1259	      DNSSEC
+
+1261	B.8.  Since draft-ietf-core-dns-over-coap-08
+1262	      (https://datatracker.ietf.org/doc/html/draft-ietf-core-dns-over-
+1263	      coap-08)
+
+1265	   *  Update Cenk's Affiliation
+
+1267	B.9.  Since draft-ietf-core-dns-over-coap-07
+1268	      (https://datatracker.ietf.org/doc/html/draft-ietf-core-dns-over-
+1269	      coap-07)
+
+1271	   *  Address IANA early review #1368678
+
+1273	   *  Update normative reference to CoAP over DTLS alpn SvcParam
+
+1275	   *  Add missing DTLSv1.2 reference
+
+1277	   *  Security considerations: Point into corr-clar-future
+
+1279	   *  Implementation Status: Update to current version
+
+1281	B.10.  Since draft-ietf-core-dns-over-coap-06
+1282	       (https://datatracker.ietf.org/doc/html/draft-ietf-core-dns-over-
+1283	       coap-06)
+
+1285	   *  Add "docpath" SVCB ParamKey definition
+
+1287	   *  IANA fixes
+
+1289	      -  Use new column names (see Errata 4954)
+
+1291	      -  Add reference to RFC 8484 for application/dns-message Media
+1292	         Type
+
+1294	      -  IANA: unify self references
+
+1296	B.11.  Since draft-ietf-core-dns-over-coap-05
+1297	       (https://datatracker.ietf.org/doc/html/draft-ietf-core-dns-over-
+1298	       coap-05)
+
+1300	   *  Add references to relevant SVCB/DNR RFCs and drafts
+
+1302	B.12.  Since draft-ietf-core-dns-over-coap-04
+1303	       (https://datatracker.ietf.org/doc/html/draft-ietf-core-dns-over-
+1304	       coap-04)
+
+1306	   *  Add note on cacheable OSCORE
+
+1308	   *  Address early IANA review
+
+1310	B.13.  Since draft-ietf-core-dns-over-coap-03
+1311	       (https://datatracker.ietf.org/doc/html/draft-ietf-core-dns-over-
+1312	       coap-03)
+
+1314	   *  Amended Introduction with short contextualization of constrained
+1315	      environments
+
+1317	   *  Add Appendix A on evaluation
+
+1319	B.14.  Since draft-ietf-core-dns-over-coap-02
+1320	       (https://datatracker.ietf.org/doc/html/draft-ietf-core-dns-over-
+1321	       coap-02)
+
+1323	   *  Move implementation details to Implementation Status (in
+1324	      accordance with [RFC7942])
+
+1326	   *  Recommend root path to keep the CoAP options small
+
+1328	   *  Set Content-Format for application/dns-message to 553
+
+1330	   *  SVCB/DNR: Move to Server Selection Section but leave TBD based on
+1331	      DNSOP discussion for now
+
+1333	   *  Clarify that DoC and DoH are distinct
+
+1335	   *  Clarify mapping between DoC and DoH
+
+1337	   *  Update considerations on unprotected use
+
+1339	   *  Don't call OSCORE end-to-end encrypted
+
+1341	B.15.  Since draft-ietf-core-dns-over-coap-01
+1342	       (https://datatracker.ietf.org/doc/html/draft-ietf-core-dns-over-
+1343	       coap-01)
+
+1345	   *  Specify DoC server role in terms of DNS terminology
+
+1347	   *  Clarify communication of DoC to DNS infrastructure is agnostic of
+1348	      the transport
+
+1350	   *  Add subsection on how to implement DNS Push in DoC
+
+1352	   *  Add appendix on reference implementation
+
+1354	B.16.  Since draft-ietf-core-dns-over-coap-00
+1355	       (https://datatracker.ietf.org/doc/html/draft-ietf-core-dns-over-
+1356	       coap-00)
+
+1358	   *  SVGify ASCII art
+
+1360	   *  Move section on "DoC Server Considerations" (was Section 5.1) to
+1361	      its own draft (draft-lenders-dns-cns
+1362	      (https://datatracker.ietf.org/doc/draft-lenders-dns-cns/))
+
+1364	   *  Replace layer violating statement for CON with statement of fact
+
+1366	   *  Add security considerations on ID=0
+
+1368	B.17.  Since draft-lenders-dns-over-coap-04
+1369	       (https://datatracker.ietf.org/doc/html/draft-lenders-dns-over-
+1370	       coap-04)
+
+1372	   *  Removed change log of draft-lenders-dns-over-coap
+
+1374	Acknowledgments
+
+1376	   The authors of this document want to thank Mike Bishop, Carsten
+1377	   Bormann, Elwyn B.  Davies, Esko Dijk, Thomas Fossati, Mikolai
+1378	   Gütschow, Todd Herr, Tommy Pauly, Ben Schwartz, Marco Tiloca, and Tim
+1379	   Wicinski for their feedback and comments.
+
+1381	Authors' Addresses
+
+1383	   Martine Sophie Lenders
+1384	   TUD Dresden University of Technology
+1385	   Helmholtzstr. 10
+1386	   D-01069 Dresden
+1387	   Germany
+1388	   Email: martine.lenders@tu-dresden.de
+
+1390	   Christian Amsüss
+1391	   Email: christian@amsuess.com
+1392	   Cenk Gündoğan
+1393	   NeuralAgent GmbH
+1394	   Mies-van-der-Rohe-Straße 6
+1395	   D-80807 Munich
+1396	   Germany
+1397	   Email: cenk.gundogan@neuralagent.ai
+
+1399	   Thomas C. Schmidt
+1400	   HAW Hamburg
+1401	   Berliner Tor 7
+1402	   D-20099 Hamburg
+1403	   Germany
+1404	   Email: t.schmidt@haw-hamburg.de
+
+1406	   Matthias Wählisch
+1407	   TUD Dresden University of Technology & Barkhausen Institut
+1408	   Helmholtzstr. 10
+1409	   D-01069 Dresden
+1410	   Germany
+1411	   Email: m.waehlisch@tu-dresden.de
+
+
+
+
+
+
+
+
+
