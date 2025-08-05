@@ -1,0 +1,305 @@
+idnits 2.17.1 
+
+draft-ietf-core-coap-dtls-alpn-04.txt:
+-(4): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(8): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(182): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+  == There are 6 instances of lines with non-ascii characters in the document.
+
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     Summary: 0 errors (**), 0 flaws (~~), 1 warning (==), 0 comments (--).
+
+--------------------------------------------------------------------------------
+
+
+2	Constrained RESTful Environments                           M. S. Lenders
+3	Internet-Draft                                                TU Dresden
+4	Intended status: Informational                                 C. Amsüss
+5	Expires: 3 October 2025
+6	                                                           T. C. Schmidt
+7	                                                             HAW Hamburg
+8	                                                             M. Wählisch
+9	                                        TU Dresden & Barkhausen Institut
+10	                                                            1 April 2025
+
+12	                ALPN ID Specification for CoAP over DTLS
+13	                   draft-ietf-core-coap-dtls-alpn-04
+
+15	Abstract
+
+17	   This document specifies an Application-Layer Protocol Negotiation
+18	   (ALPN) ID for transport-layer-secured Constrained Application
+19	   Protocol (CoAP) services.
+
+21	About This Document
+
+23	   This note is to be removed before publishing as an RFC.
+
+25	   The latest revision of this draft can be found at https://core-
+26	   wg.github.io/coap-dtls-alpn/draft-ietf-core-coap-dtls-alpn.html.
+27	   Status information for this document may be found at
+28	   https://datatracker.ietf.org/doc/draft-ietf-core-coap-dtls-alpn/.
+
+30	   Discussion of this document takes place on the Constrained RESTful
+31	   Environments Working Group mailing list (mailto:core@ietf.org), which
+32	   is archived at https://mailarchive.ietf.org/arch/browse/core/.
+33	   Subscribe at https://www.ietf.org/mailman/listinfo/core/.
+
+35	   Source for this draft and an issue tracker can be found at
+36	   https://github.com/core-wg/coap-dtls-alpn.
+
+38	Status of This Memo
+
+40	   This Internet-Draft is submitted in full conformance with the
+41	   provisions of BCP 78 and BCP 79.
+
+43	   Internet-Drafts are working documents of the Internet Engineering
+44	   Task Force (IETF).  Note that other groups may also distribute
+45	   working documents as Internet-Drafts.  The list of current Internet-
+46	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+48	   Internet-Drafts are draft documents valid for a maximum of six months
+49	   and may be updated, replaced, or obsoleted by other documents at any
+50	   time.  It is inappropriate to use Internet-Drafts as reference
+51	   material or to cite them other than as "work in progress."
+
+53	   This Internet-Draft will expire on 3 October 2025.
+
+55	Copyright Notice
+
+57	   Copyright (c) 2025 IETF Trust and the persons identified as the
+58	   document authors.  All rights reserved.
+
+60	   This document is subject to BCP 78 and the IETF Trust's Legal
+61	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+62	   license-info) in effect on the date of publication of this document.
+63	   Please review these documents carefully, as they describe your rights
+64	   and restrictions with respect to this document.  Code Components
+65	   extracted from this document must include Revised BSD License text as
+66	   described in Section 4.e of the Trust Legal Provisions and are
+67	   provided without warranty as described in the Revised BSD License.
+
+69	Table of Contents
+
+71	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+72	   2.  Application-Layer Protocol Negotiation (ALPN) IDs . . . . . .   3
+73	   3.  Security Considerations . . . . . . . . . . . . . . . . . . .   3
+74	   4.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   3
+75	     4.1.  TLS ALPN for CoAP . . . . . . . . . . . . . . . . . . . .   3
+76	   5.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   4
+77	     5.1.  Normative References  . . . . . . . . . . . . . . . . . .   4
+78	     5.2.  Informative References  . . . . . . . . . . . . . . . . .   4
+79	   Appendix A.  Change Log . . . . . . . . . . . . . . . . . . . . .   5
+80	     A.1.  Since draft-ietf-core-coap-dtls-alpn-03 . . . . . . . . .   5
+81	     A.2.  Since draft-ietf-core-coap-dtls-alpn-02 . . . . . . . . .   5
+82	     A.3.  Since draft-ietf-core-coap-dtls-alpn-01 . . . . . . . . .   5
+83	     A.4.  Since draft-ietf-core-coap-dtls-alpn-00 . . . . . . . . .   5
+84	   Acknowledgments . . . . . . . . . . . . . . . . . . . . . . . . .   6
+85	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .   6
+
+87	1.  Introduction
+
+89	   Application-Layer Protocol Negotiation (ALPN) enables communicating
+90	   parties to agree on an application-layer protocol during a Transport
+91	   Layer Security (TLS) handshake using an ALPN ID [RFC7301].  This ALPN
+92	   ID can be discovered for services as part of Service Bindings (SVCB)
+93	   via the DNS, using SVCB resource records with the "alpn" Service
+94	   Parameter Keys [RFC9460].  As an example, applications that use the
+95	   Constrained Application Protocol (CoAP) [RFC7252] can obtain this
+96	   information as part of the discovery of DNS over CoAP (DoC) servers
+97	   (see Section 3.2 of [I-D.ietf-core-dns-over-coap]) that deploy TLS
+98	   [RFC8446] or Datagram Transport Layer Security (DTLS) [RFC6347]
+99	   [RFC9147] to secure their messages.  This document specifies an ALPN
+100	   ID for CoAP services that are secured by transport layer security
+101	   using DTLS.  An ALPN ID for CoAP services secured by TLS has already
+102	   been specified in [RFC8323].
+
+104	2.  Application-Layer Protocol Negotiation (ALPN) IDs
+
+106	   For CoAP over TLS, an ALPN ID was defined as "coap" in [RFC8323].  As
+107	   it is not advisable to re-use the same ALPN ID for a different
+108	   transport layer, an ALPN for CoAP over DTLS is registered in
+109	   Section 4.1.
+
+111	   ALPN ID values have variable length.  For CoAP over DTLS, a short
+112	   value ("co") is allocated, as this can avoid fragmentation of Client
+113	   Hello and Server Hello messages in constrained networks with link-
+114	   layer fragmentation, such as 6LoWPAN [RFC4944].
+
+116	   To discover CoAP services that secure their messages with TLS or
+117	   DTLS, the ALPN IDs "coap" and "co" can be used, respectively, in the
+118	   same manner as for any other service secured with transport layer
+119	   security, as described in [RFC9460].  The discovery of CoAP services
+120	   that rely on other security mechanisms is out of the scope of this
+121	   document.
+
+123	3.  Security Considerations
+
+125	   Any security considerations on ALPN (see [RFC7301]) and SVCB resource
+126	   records (see [RFC9460]) also apply to this document.
+
+128	4.  IANA Considerations
+
+130	   // RFC Ed.: throughout this section, please replace RFC-XXXX with the
+131	   // RFC number of this specification and remove this note.
+
+133	   This document has the following actions for IANA.
+
+135	4.1.  TLS ALPN for CoAP
+
+137	   The following entry has been added to the "TLS Application-Layer
+138	   Protocol Negotiation (ALPN) Protocol IDs" registry, which is part of
+139	   the "Transport Layer Security (TLS) Extensions" registry group.
+
+141	   *  Protocol: CoAP (over DTLS)
+142	   *  Identification sequence: 0x63 0x6f ("co")
+
+144	   *  Reference: [RFC7252] and [RFC-XXXX]
+
+146	   Note that [RFC7252] does not define the use of the ALPN TLS extension
+147	   during the DTLS connection handshake.  This document does not change
+148	   this behavior, and thus does not establish any rules like those in
+149	   Section 8.2 of [RFC8323].
+
+151	5.  References
+
+153	5.1.  Normative References
+
+155	   [RFC6347]  Rescorla, E. and N. Modadugu, "Datagram Transport Layer
+156	              Security Version 1.2", RFC 6347, DOI 10.17487/RFC6347,
+157	              January 2012, <https://www.rfc-editor.org/rfc/rfc6347>.
+
+159	   [RFC7252]  Shelby, Z., Hartke, K., and C. Bormann, "The Constrained
+160	              Application Protocol (CoAP)", RFC 7252,
+161	              DOI 10.17487/RFC7252, June 2014,
+162	              <https://www.rfc-editor.org/rfc/rfc7252>.
+
+164	   [RFC7301]  Friedl, S., Popov, A., Langley, A., and E. Stephan,
+165	              "Transport Layer Security (TLS) Application-Layer Protocol
+166	              Negotiation Extension", RFC 7301, DOI 10.17487/RFC7301,
+167	              July 2014, <https://www.rfc-editor.org/rfc/rfc7301>.
+
+169	   [RFC9147]  Rescorla, E., Tschofenig, H., and N. Modadugu, "The
+170	              Datagram Transport Layer Security (DTLS) Protocol Version
+171	              1.3", RFC 9147, DOI 10.17487/RFC9147, April 2022,
+172	              <https://www.rfc-editor.org/rfc/rfc9147>.
+
+174	   [RFC9460]  Schwartz, B., Bishop, M., and E. Nygren, "Service Binding
+175	              and Parameter Specification via the DNS (SVCB and HTTPS
+176	              Resource Records)", RFC 9460, DOI 10.17487/RFC9460,
+177	              November 2023, <https://www.rfc-editor.org/rfc/rfc9460>.
+
+179	5.2.  Informative References
+
+181	   [I-D.ietf-core-dns-over-coap]
+182	              Lenders, M. S., Amsüss, C., Gündoğan, C., Schmidt, T. C.,
+183	              and M. Wählisch, "DNS over CoAP (DoC)", Work in Progress,
+184	              Internet-Draft, draft-ietf-core-dns-over-coap-13, 3 March
+185	              2025, <https://datatracker.ietf.org/doc/html/draft-ietf-
+186	              core-dns-over-coap-13>.
+
+188	   [RFC4944]  Montenegro, G., Kushalnagar, N., Hui, J., and D. Culler,
+189	              "Transmission of IPv6 Packets over IEEE 802.15.4
+190	              Networks", RFC 4944, DOI 10.17487/RFC4944, September 2007,
+191	              <https://www.rfc-editor.org/rfc/rfc4944>.
+
+193	   [RFC8323]  Bormann, C., Lemay, S., Tschofenig, H., Hartke, K.,
+194	              Silverajan, B., and B. Raymor, Ed., "CoAP (Constrained
+195	              Application Protocol) over TCP, TLS, and WebSockets",
+196	              RFC 8323, DOI 10.17487/RFC8323, February 2018,
+197	              <https://www.rfc-editor.org/rfc/rfc8323>.
+
+199	   [RFC8446]  Rescorla, E., "The Transport Layer Security (TLS) Protocol
+200	              Version 1.3", RFC 8446, DOI 10.17487/RFC8446, August 2018,
+201	              <https://www.rfc-editor.org/rfc/rfc8446>.
+
+203	Appendix A.  Change Log
+
+205	A.1.  Since draft-ietf-core-coap-dtls-alpn-03
+206	      (https://datatracker.ietf.org/doc/draft-ietf-core-coap-dtls-
+207	      alpn/03/)
+
+209	   *  Make DTLS references normative
+
+211	A.2.  Since draft-ietf-core-coap-dtls-alpn-02
+212	      (https://datatracker.ietf.org/doc/draft-ietf-core-coap-dtls-
+213	      alpn/02/)
+
+215	   *  Address shepherd review
+
+217	A.3.  Since draft-ietf-core-coap-dtls-alpn-01
+218	      (https://datatracker.ietf.org/doc/draft-ietf-core-coap-dtls-
+219	      alpn/01/)
+
+221	   *  Address review by Esko Dijk
+
+223	   *  Address review by Marco Tiloca
+
+225	A.4.  Since draft-ietf-core-coap-dtls-alpn-00
+226	      (https://datatracker.ietf.org/doc/draft-ietf-core-coap-dtls-
+227	      alpn/00/)
+
+229	   *  Fix ALPN ID for CoAP over TLS
+
+231	   *  Change intended status to Informational
+
+233	Acknowledgments
+
+235	   We like to thank Rich Salz for the expert review on the "co" ALPN ID
+236	   allocation.  We also like to thank Mohamed Boucadair and Ben Schwartz
+237	   for their early review before WG adoption of this draft and Esko
+238	   Dijk, Thomas Fossati, and Marco Tiloca for their feedback and
+239	   comments.
+
+241	Authors' Addresses
+
+243	   Martine Sophie Lenders
+244	   TUD Dresden University of Technology
+245	   Helmholtzstr. 10
+246	   D-01069 Dresden
+247	   Germany
+248	   Email: martine.lenders@tu-dresden.de
+
+250	   Christian Amsüss
+251	   Email: christian@amsuess.com
+
+253	   Thomas C. Schmidt
+254	   HAW Hamburg
+255	   Berliner Tor 7
+256	   D-20099 Hamburg
+257	   Germany
+258	   Email: t.schmidt@haw-hamburg.de
+
+260	   Matthias Wählisch
+261	   TUD Dresden University of Technology & Barkhausen Institut
+262	   Helmholtzstr. 10
+263	   D-01069 Dresden
+264	   Germany
+265	   Email: m.waehlisch@tu-dresden.de
+
+
+
+
+
+
+
+
+
