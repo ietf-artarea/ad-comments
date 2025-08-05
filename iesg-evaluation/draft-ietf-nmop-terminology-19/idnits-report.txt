@@ -1,0 +1,762 @@
+idnits 2.17.1 
+
+draft-ietf-nmop-terminology-19.txt:
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     No nits found.
+--------------------------------------------------------------------------------
+
+
+2	Network Working Group                                      N. Davis, Ed.
+3	Internet-Draft                                                     Ciena
+4	Intended status: Informational                            A. Farrel, Ed.
+5	Expires: 20 December 2025                             Old Dog Consulting
+6	                                                                 T. Graf
+7	                                                                Swisscom
+8	                                                                   Q. Wu
+9	                                                                  Huawei
+10	                                                                   C. Yu
+11	                                                     Huawei Technologies
+12	                                                            18 June 2025
+
+14	        Some Key Terms for Network Fault and Problem Management
+15	                     draft-ietf-nmop-terminology-19
+
+17	Abstract
+
+19	   This document sets out some terms that are fundamental to a common
+20	   understanding of network fault and problem management within the
+21	   IETF.
+
+23	   The purpose of this document is to bring clarity to discussions and
+24	   other work related to network fault and problem management, in
+25	   particular to YANG models and management protocols that report, make
+26	   visible, or manage network faults and problems.
+
+28	Status of This Memo
+
+30	   This Internet-Draft is submitted in full conformance with the
+31	   provisions of BCP 78 and BCP 79.
+
+33	   Internet-Drafts are working documents of the Internet Engineering
+34	   Task Force (IETF).  Note that other groups may also distribute
+35	   working documents as Internet-Drafts.  The list of current Internet-
+36	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+38	   Internet-Drafts are draft documents valid for a maximum of six months
+39	   and may be updated, replaced, or obsoleted by other documents at any
+40	   time.  It is inappropriate to use Internet-Drafts as reference
+41	   material or to cite them other than as "work in progress."
+
+43	   This Internet-Draft will expire on 20 December 2025.
+
+45	Copyright Notice
+
+47	   Copyright (c) 2025 IETF Trust and the persons identified as the
+48	   document authors.  All rights reserved.
+
+50	   This document is subject to BCP 78 and the IETF Trust's Legal
+51	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+52	   license-info) in effect on the date of publication of this document.
+53	   Please review these documents carefully, as they describe your rights
+54	   and restrictions with respect to this document.  Code Components
+55	   extracted from this document must include Revised BSD License text as
+56	   described in Section 4.e of the Trust Legal Provisions and are
+57	   provided without warranty as described in the Revised BSD License.
+
+59	Table of Contents
+
+61	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+62	   2.  Usage of Terms  . . . . . . . . . . . . . . . . . . . . . . .   3
+63	   3.  Terminology . . . . . . . . . . . . . . . . . . . . . . . . .   3
+64	     3.1.  Context Terminology . . . . . . . . . . . . . . . . . . .   4
+65	     3.2.  Core Terms  . . . . . . . . . . . . . . . . . . . . . . .   5
+66	     3.3.  Other Terms . . . . . . . . . . . . . . . . . . . . . . .   9
+67	   4.  Workflow Explanations . . . . . . . . . . . . . . . . . . . .   9
+68	   5.  Security Considerations . . . . . . . . . . . . . . . . . . .  14
+69	   6.  Privacy Considerations  . . . . . . . . . . . . . . . . . . .  14
+70	   7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  14
+71	   Acknowledgments . . . . . . . . . . . . . . . . . . . . . . . . .  14
+72	   Informative References  . . . . . . . . . . . . . . . . . . . . .  15
+73	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  16
+
+75	1.  Introduction
+
+77	   Successful operation of large or busy networks depends on effective
+78	   network management.  This requires a virtuous circle of network
+79	   control, network observability, network analytics, network assurance,
+80	   and back to network control.  Network fault and problem management
+81	   [RFC6632] is an important aspect of network management and control
+82	   solutions.  It deals with the detection, reporting, inspection,
+83	   isolation, correlation, and management of events within the network.
+84	   The intention of this document is to focus on those events that have
+85	   a negative effect on the network's ability to forward traffic
+86	   according to expected behavior and so deliver services.  Fault and
+87	   problem management extends to include actions taken to determine the
+88	   causes of problems and to work toward recovery of expected network
+89	   behavior.
+
+91	   A number of work efforts within the IETF seek to provide components
+92	   of a fault management system, such as YANG models or management
+93	   protocols.  It is important that a common terminology is used so that
+94	   there is a clear understanding of how the elements of the management
+95	   and control solutions fit together, and how faults and problems will
+96	   be handled.
+
+98	   This document sets out some terms that are fundamental to a common
+99	   understanding of network fault and problem management.  While
+100	   "faults" and "problems" are concepts that apply at all levels of
+101	   technology in the Internet, the scope of this document is restricted
+102	   to the network layer and below, hence this document is specifically
+103	   about "network fault and problem management."  The concept of
+104	   "incidents" is also touched on in this document, where an incident
+105	   results from one or more problems and is the disruption of a network
+106	   service.
+
+108	   Note that some useful terms are defined in [RFC3877] and [RFC8632].
+109	   The definitions in this document are informed by those documents, but
+110	   they are not dependent on that prior work.
+
+112	2.  Usage of Terms
+
+114	   The terms defined in this document are principally intended for
+115	   consistent use within the IETF.  Where similar concepts are described
+116	   in other bodies, an attempt has been made to harmonize with those
+117	   other descriptions, but there is care needed where terms are not used
+118	   consistently between bodies or where terms are applied outside the
+119	   network layer.  If other bodies find the terminology defined in this
+120	   document useful, they are free to use it.
+
+122	   The purpose of this document is to define the following terms for use
+123	   in other documents.  Other terms are defined to enable those
+124	   definitions and may also be used by other documents, although that is
+125	   not the principal purpose of their definitions here.
+
+127	   *  Event
+128	   *  State
+129	   *  Fault
+130	   *  Problem
+131	   *  Symptom
+132	   *  Cause
+133	   *  Alert
+134	   *  Alarm
+
+136	   When other documents make use of the terms as defined in this
+137	   document, it is suggested here that such uses should use
+138	   capitalization of the terms as in this document to help distinguish
+139	   them from colloquial uses, and should include an early section
+140	   listing the terms inherited from this document with a citation.
+
+142	3.  Terminology
+
+144	   This section contains key terms.  It is split into three subsections.
+
+146	   *  Section 3.1 contains terms that help to set the context for
+147	      network fault and problem management systems.
+
+149	   *  Section 3.2 includes specific and detailed core terms that will be
+150	      used in other documents that describe elements of the network
+151	      fault and problem management systems.
+
+153	   *  Section 3.3 provides three further terms that may be helpful.
+
+155	3.1.  Context Terminology
+
+157	   This section includes some terminology that helps describe the
+158	   context for the rest of this work.  The terms may be viewed as a
+159	   cascaded sequence of processes, starting with Network Telemetry and
+160	   building to Network Observability.  The definitions are deliberately
+161	   kept relatively terse.  Further documents may expand on these terms
+162	   without loss of specificity.  Such contextualization (if any) should
+163	   be highlighted clearly in those documents.
+
+165	   Network Telemetry:  This is defined in [RFC9232] and describes the
+166	      process of collecting operational network data categorized
+167	      according to the network plane (e.g., layer 3, layer 2, layer 1)
+168	      from which it was derived.  Data collected through the Network
+169	      Telemetry process does not contain any data related to service
+170	      definitions (i.e., "intent" per Section 3.1 of [RFC9315]).
+
+172	   Network Monitoring:  This is the process of keeping a continuous
+173	      record of functions related to a network topology.  It involves
+174	      tracking various aspects such as traffic patterns, device health,
+175	      performance metrics, and overall network behaviour.  This approach
+176	      differentiates network monitoring from resource or device
+177	      monitoring, which focuses on individual components or resources
+178	      (Section 3.2).
+
+180	   Network Analytics:  Network Analytics is the process of deriving
+181	      analytical insights from operational network data.  A process
+182	      could be a piece of software, a system, or a human that analyzes
+183	      operational data and outputs new analytical data related to the
+184	      operational data, for example, a symptom.
+
+186	   Network Observability:  The Network Observability process is the
+187	      enablement of network behavioral assessment through analysis of
+188	      observed operational network data (logs, alarms, traces, etc.)
+189	      with the aim of detecting symptoms of network behavior, and to
+190	      identify anomalies and their causes.  Network Observability begins
+191	      with information gathered using Network Monitoring tools and that
+192	      may be further enriched with other operational data.  The expected
+193	      outcome of the observability processes is identification and
+194	      analysis of deviations in observed state versus the expected state
+195	      of a network.
+
+197	   Thus, there is a cascaded sequence where the following relationships
+198	   apply.
+
+200	   *  Network Telemetry is the process of collecting operational data
+201	      from a network.
+
+203	   *  Network Monitoring is the process of creating/keeping a record of
+204	      data gathered in Network Telemetry.
+
+206	   *  Network Analytics is the process of deriving insight through the
+207	      data recorded in Network Monitoring.
+
+209	   *  Network Observability is the process of enabling behavioral
+210	      assessment of a network through Network Analytics.
+
+212	3.2.  Core Terms
+
+214	   The terms are presented below in an order that is intended to flow
+215	   such that it is possible to gain understanding reading top to bottom.
+216	   The figures and explanations in Section 4 may aid understanding the
+217	   terms set out here.
+
+219	   Resource:  An element of a network system.
+
+221	      Resource is a recursive concept so that a Resource may be a
+222	      collection of other Resources (for example, a network node
+223	      comprises a collection of network interfaces).
+
+225	   Characteristic:  Observable or measurable aspect or behavior
+226	      associated with a Resource.
+
+228	      *  A Characteristic may be considered to be built on facts (see
+229	         'Value', below) and the contexts and descriptors that identify
+230	         and give meaning to the facts.
+
+232	      *  The term "Metric" [RFC9417] is another word for a measurable
+233	         Characteristic which may also be thought of as analogous to a
+234	         'variable'.
+
+236	   Value:  A Value is a measure of a Characteristic associated with a
+237	      Resource.  It may be in the form of a categorization (e.g., high
+238	      or low), an integer (e.g., a count or gauge), or a reading of a
+239	      continuous variable (e.g., an analog measurement), etc.
+
+241	   Change:  In the context of Network Monitoring, a Change is the
+242	      variation in the Value of a Characteristic associated with a
+243	      Resource and may arise over a period of time.
+
+245	      *  Not all Changes are noteworthy (i.e., they do not have
+246	         Relevance).
+
+248	      *  Perception of Change depends upon Detection, the sampling
+249	         rate/accuracy/detail, and perspective.
+
+251	      *  It may be helpful to qualify this as "Value Change" because the
+252	         English word "change" is often heavily used.
+
+254	   Event:  The variation in Value of a Characteristic of a Resource at a
+255	      distinct moment in time (i.e., the period is negligible).
+
+257	      *  Compared with a Change, which may be over a period of time, an
+258	         Event happens at a distinct moment in time.  Thus, an Event may
+259	         be the observation of a Change.
+
+261	   Condition:  A Condition is an interpretation of the Values of a set
+262	      of one or more Characteristics of a Resource (with respect to
+263	      working order or some other aspect relevant to the Resource
+264	      purpose/application), for example "low available memory".  Thus,
+265	      it is the output of a function applied to a set of one or more
+266	      variables.
+
+268	   State:  A particular Condition that a Resource has (i.e., it is in a
+269	      State) at a specific time.  For example, a router may report the
+270	      total amount of memory it has, and how much is free.  These are
+271	      the Values of two Characteristics of a Resource.  These Values can
+272	      be interpreted to determine the Condition of the Resource, and
+273	      that may determine the State of the router, such as shortage of
+274	      memory.
+
+276	      *  While a State may be observed at a specific moment in time, it
+277	         is actually determined by summarizing measurement over time in
+278	         a process sometimes called State compression.
+
+280	      *  It may be helpful to qualify this as "Resource State" to make
+281	         clear the distinction between this and other uses of "state"
+282	         such as "protocol state".
+
+284	      *  This term may be contrasted with "Operational State" as used in
+285	         [RFC8342].  For example, the state of a link might be up/down/
+286	         degraded, but the operational state of link would include a
+287	         collection of Values of Characteristics of the link.
+
+289	   Detect (hence Detected, Detection):  To notice the presence of
+290	      something (State, Change, Event, activity, etc.).
+
+292	      *  Hence also to notice a Change (from the perspective of an
+293	         observer such as a monitoring system).
+
+295	   Relevance:  Consideration of an Event, State, or Value (through the
+296	      application of policy, relative to a specific perspective, intent,
+297	      and in relation to other Events, States, and Values) to determine
+298	      whether it is of note to the system that controls or manages the
+299	      network.  Note, for example, that not all Changes are Relevant.
+
+301	      *  This term may also be used as "Relevant Event", "Relevant
+302	         State", or "Relevant Value".
+
+304	   Occurrence:  A Relevant Event or a particular Relevant Change.
+
+306	      *  An Occurrence may be an aggregation or abstraction of multiple
+307	         fine-grain Events or Changes.
+
+309	      *  An Occurrence may occur at any macro or micro scale because
+310	         Resources are a recursive concept, and may be perceived
+311	         depending on the scope of observation (i.e., according to the
+312	         level of Resource recursion that is examined).  That is,
+313	         Occurrences, themselves a recursive concept.
+
+315	   Fault:  An Occurrence (i.e., an Event or a Change) that is not
+316	      desired/required (as it may be indicative of a current or future
+317	      undesired State).  Thus, a Fault happens at a moment in time.  A
+318	      Fault can potentially be associated with a Cause.  See [RFC8632]
+319	      for a more detailed discussion of network faults.
+
+321	      *  Note that there is a distinction between a Fault and a Problem
+322	         that depends on context.  For example, in a connectivity
+323	         service where redundancy is present, a link down is a Problem,
+324	         but from the perspective of managing the network resources, a
+325	         link down is a Fault.  Likewise, for example, in a router with
+326	         two power supplies, if the backup power supply fails, this is a
+327	         Problem.
+
+329	   Problem:  A State that is undesirable and that may require remedial
+330	      action.  A Problem cannot necessarily be associated with a Cause.
+331	      The resolution of a Problem does not necessarily act on the thing
+332	      that has the Problem.
+
+334	      *  Note that there is a historic aspect to the concept of a
+335	         Problem.  The current State may be operational, but there could
+336	         have been a Fault that is unexplained, and the fact of that
+337	         unexplained recent Fault is a Problem.
+
+339	      *  Note that while a Problem is unresolved it may continue to
+340	         require attention.  A record of resolved Problems may be
+341	         maintained in a log.
+
+343	      *  Note that there may be a State which is considered to be a
+344	         Problem from several perspectives.  For example, consider a
+345	         "loss of light" State that may cause multiple services to fail.
+346	         In this example, a new State (the light recovers) may cause the
+347	         Problem to be resolved from one perspective (the services are
+348	         operational once more), but may leave the Problem as unresolved
+349	         (because the loss of light has not been explained).  Further,
+350	         in this example, there could be another development (the reason
+351	         for the temporary loss of light is traced to a microbend in the
+352	         fiber that is repaired) resulting in that unresolved Problem
+353	         now being resolved.  But, in this example, this still leaves a
+354	         further Problem unresolved (a microbend occurred, and that
+355	         Problem is not resolved until it is understood how it occurred
+356	         and a remedy is put in place to prevent recurrence).
+
+358	   Cause:  The Events (Detected or otherwise) that gave rise to a Fault/
+359	      Problem.
+
+361	   Incident:  A (Network) Incident is an undesired Occurrence such as an
+362	      unexpected interruption of a network service, degradation of the
+363	      quality of a network service, or the below-target performance of a
+364	      network service.  An Incident results from one or more Problems,
+365	      and a Problem may give rise to or contribute to one or more
+366	      Incidents.  Greater discussion of Network Incident relationships,
+367	      including Customer Incidents and Incident management, can be found
+368	      in [I-D.ietf-nmop-network-incident-yang].
+
+370	   Symptom:  An observable Value, Change, State, Event, or Condition
+371	      considered as an indication of a Problem or potential Problem.
+
+373	   Anomaly:  A (Network) Anomaly is an unusual or unexpected Event or
+374	      pattern in network data in the forwarding plane, control plane, or
+375	      management plane that deviates from the normal, expected behavior.
+376	      See [I-D.ietf-nmop-network-anomaly-architecture] for more details.
+
+378	   Alert:  An indication of a Fault.
+
+380	   Alarm:  As specified in [RFC8632], an Alarm signifies an undesirable
+381	      State in a Resource that requires corrective action.  From a
+382	      management point of view, an Alarm can be seen as a State in its
+383	      own right and the transition to this State may result in an Alert
+384	      being issued.  The receipt of this Alert may give rise to a
+385	      continuous indication (to a human operator) highlighting the
+386	      potential or actual presence of a Problem.
+
+388	3.3.  Other Terms
+
+390	   Three other terms may be helpful:
+
+392	   Intermittent:  A State that is not continuous, but keeps occurring in
+393	      some time frame.
+
+395	   Transient:  A State that is not continuous, and occurs once in some
+396	      time frame.
+
+398	   Recurrent:  A Problem that is actively resolved, but reoccurs.
+
+400	4.  Workflow Explanations
+
+402	   This section aims to add information about the relationship between
+403	   the terms defined in Section 3.2.  The text and figures here are for
+404	   explanation and are not normative for the definition of terms.
+
+406	   The relationship between Resources and Characteristics is shown in
+407	   Figure 1.  Note that there is a 1:n relationship between Network
+408	   system and Resources, and between Resources and Characteristics: this
+409	   is not shown on the figure for clarity.
+
+411	                                  Characteristics
+412	                                         ^
+413	                                         |
+414	                                      Resources
+415	                                         ^
+416	                                         |
+417	                                  Network system
+
+419	                  Figure 1: Resources and Characteristics
+
+421	   The Value of a Characteristic of a Resource may change over time.
+422	   Specific Changes in Value may be noticed at a specific time (as
+423	   digital Changes), Detected, and treated as Events.  This is shown on
+424	   the left of Figure 2.
+
+426	   The center of Figure 2 shows how the Value of a Characteristic may
+427	   change over time.  The Value may be Detected at specific times or
+428	   periodically and give rise to States (and consequently State
+429	   Changes).
+
+431	   In practice, the Characteristic may vary in an analog manner over
+432	   time as shown on the right-hand side of Figure 2.  The Value can be
+433	   read or reported (i.e., Detected) periodically leading to analog
+434	   Values that may be deemed Relevant Values, or may be evaluated over
+435	   time as shown in Figure 6.
+
+437	              Event                State                  Value
+
+439	                ^                    ^                      ^
+440	         Detect :             Detect :               Detect :
+441	                :                    :                      :
+
+443	           ^        ^          ^     ^     ^                   /\
+444	           :        :          :     :     :                  /  \
+445	           :        :          :     :     :             /\  /    \
+446	            __    __               _____                /  \/
+447	           |        |             |     |            /\/
+448	         __|        |__       ____|     |____       /
+
+450	        Change at a time     Change over time      Change over time
+
+452	                   Figure 2: Characteristics and Changes
+
+454	   Figure 3 shows the workflow progress for Events.  As noted above, an
+455	   Event is a Change in the Value of a Characteristic at a time.  The
+456	   Event may be evaluated (considering policy, relative to a specific
+457	   perspective, with a view to intent, and in relation to other Events,
+458	   States, and Values) to determine if it is an Occurrence and possibly
+459	   to indicate a Change of State.  An Occurrence may be undesirable (a
+460	   Fault) and that can cause an Alert to be generated, may be evidence
+461	   of a Problem and could directly indicate a Cause.  In some cases, an
+462	   Alert may give rise to an Alarm highlighting the potential or actual
+463	   presence of a Problem.
+
+465	                              Alert - - - > Alarm
+466	                                ^
+467	                                |
+468	                                |     -----> Cause
+469	                                |    |
+470	                                |----------> Problem
+471	                                |
+472	                                |
+473	                              Fault
+474	                                ^
+475	                                |
+476	                                |
+477	                                |
+478	                            Occurrence
+479	                                ^
+480	                                |
+481	                                |----------> State
+482	                                |
+483	                                |
+484	                              Event
+
+486	                    Figure 3: Event and Dependent Terms
+
+488	   Parallel to the workflow for Events, Figure 4 shows the workflow
+489	   progress for States.  As shown in Figure 2, Change noted at a
+490	   particular time gives rise to State.  The State may be deemed to have
+491	   Relevance considering policy, relative to a specific perspective,
+492	   with a view to intent, and in relation to other Events, States, and
+493	   Values.  A Relevant State may be deemed a Problem, or may indicate a
+494	   Problem or potential Problem.
+
+496	   Problems may be considered based on Symptoms and may map directly or
+497	   indirectly to Causes.  An Incident results from one or more Problems.
+498	   An Alarm may be raised as the result of a Problem, and the transition
+499	   to an Alarmed state may give rise to an Alert.
+
+501	                             Alarm - - -> Alert
+502	                               ^
+503	                               |     ------> Incident
+504	                               |    |
+505	                               |    |   ---> Cause
+506	                               |    |  |
+507	                           Problem---------> Symptom
+508	                               ^
+509	                               |
+510	                               | Relevance
+511	                               |
+512	                               |
+513	                             State
+
+515	                    Figure 4: State and Dependent Terms
+
+517	   Figure 5 shows how Faults and Problems may be consolidated to
+518	   determine the Causes.  The arrows show how one item may give rise to
+519	   another.
+
+521	   A Cause can be indicated by or determined from Faults, Problems, and
+522	   Symptoms.  It may be that one Cause points to another, and can also
+523	   be considered as a Symptom.  The determination of Causes can consider
+524	   multiple inputs.  An Incident results from one or more Problems.
+
+526	                                          ---------
+527	                           ------------- |         |
+528	                          |  ----------> | Symptom |
+529	                          | |            |         |
+530	                          | |             ---------
+531	                          v |                 ^
+532	                       ---------              |
+533	              ------->|  Cause  |<---------   |
+534	             |         ---------           |  |
+535	             |           ^   |             |  |
+536	             |           |   |             |  |
+537	             |            ---              |  |
+538	             |                             |  |
+539	         ---------                      ---------          ----------
+540	        |  Fault  |------------------->| Problem |------->| Incident |
+541	         ---------                      ---------          ----------
+
+543	               Figure 5: Consolidation of Symptoms and Causes
+
+545	   Figure 6 shows how thresholds are important in the consideration of
+546	   analog Values and Events.  The arrows in the figure show how one item
+547	   may give rise to or utilize another.  The use of threshold-driven
+548	   Events and States (and the Alerts that they might give rise to) must
+549	   be treated with caution to dampen any "flapping" (so that consistent
+550	   States may be observed) and to avoid overwhelming management
+551	   processes or systems.  Analog Values may be read or notified from the
+552	   Resource and could transition a threshold, be deemed Relevant Values,
+553	   or evaluated over time.  Events may be counted, and the Count may
+554	   cross a threshold or reach a Relevant Value.
+
+556	   The Threshold Process may be implementation-specific and subject to
+557	   policies.  When a threshold is crossed and any other conditions are
+558	   matched, an Event may be determined, and treated like any other
+559	   Event.
+
+561	    Occurrence
+562	         ^
+563	         |
+564	         |---------------------> State
+565	         |
+566	         |        -------                  Relevance
+567	         |------>| Count |-----------------------------> Value
+568	         |        -------          |                       ^
+569	         |           |             |                       |
+570	         |           |             |                       | Relevance
+571	         |           |             v                       |
+572	         |           |        -----------           ----------------
+573	       Event         |       | Evaluated |         |                |
+574	         ^           |       | over time |<--------|  Analog Value  |
+575	         |           v        -----------          |                |
+576	         |      -----------        |               |                |
+577	         |     | Threshold |       |               |                |
+578	         |<----|  Process  |<------                |                |
+579	         |     |           |<----------------------|                |
+580	         |      -----------                         ----------------
+581	         |                                                 ^
+582	         |                                                 |
+583	         | Detect                                   Detect |
+584	         |                                                 |
+585	    Change at a Time                                Change over Time
+
+587	                  Figure 6: Counts, Thresholds, and Values
+
+589	5.  Security Considerations
+
+591	   This document specifies terminology and has no direct effect on the
+592	   security of implementations or deployments.  However, protocol
+593	   solutions and management models need to be aware of several aspects:
+
+595	   *  The exposure of information pertaining to Faults and Problems may
+596	      make available knowledge of the internal workings of a network (in
+597	      particular its vulnerabilities) that may be of use to an attacker.
+
+599	   *  Systems that generate management information (messages,
+600	      notifications, etc.) when Faults occur, may be attacked by causing
+601	      them to generate so much information that the system that manages
+602	      the network is swamped and unable to properly manage the network.
+
+604	   *  Reporting false information about Faults (or masking reports of
+605	      Faults) may cause the system that manages the network to function
+606	      incorrectly.
+
+608	6.  Privacy Considerations
+
+610	   In general, network fault and problem management should not expose
+611	   information about end-user activities or user data.  The main privacy
+612	   concern is for a network operator to keep control of all information
+613	   about Faults to protect their privacy and the details of how the
+614	   network operators operate their network.
+
+616	7.  IANA Considerations
+
+618	   This document makes no requests for IANA action.
+
+620	Acknowledgments
+
+622	   The authors would like to thank Med Boucadair, Wanting Du, Joe
+623	   Clarke, Javier Antich, Benoit Claise, Christopher Janz, Sherif
+624	   Mostafa, Kristian Larsson, Dirk Hugo, Carsten Bormann, Hilarie Orman,
+625	   Stewart Bryant, Bo Wu, Paul Kyzivat, Jouni Korhonen, Reshad Rahman,
+626	   Rob Wilton, Mahesh Jethanandani, and Tim Bray for their helpful
+627	   comments.
+
+629	   Special thanks to the team that met at a side meeting at IETF-120 to
+630	   discuss some of the thorny issues:
+
+632	   *  Benoit Claise
+633	   *  Watson Ladd
+634	   *  Brad Peters
+635	   *  Bo Wu
+636	   *  Georgios Karagiannis
+637	   *  Olga Havel
+638	   *  Vincenzo Riccobene
+639	   *  Yi Lin
+640	   *  Jie Dong
+641	   *  Aihua Guo
+642	   *  Thomas Graf
+643	   *  Qin Wu
+644	   *  Chaode Yu
+645	   *  Adrian Farrel
+
+647	Informative References
+
+649	   [I-D.ietf-nmop-network-anomaly-architecture]
+650	              Graf, T., Du, W., Francois, P., and A. H. Feng, "A
+651	              Framework for a Network Anomaly Detection Architecture",
+652	              Work in Progress, Internet-Draft, draft-ietf-nmop-network-
+653	              anomaly-architecture-03, 8 May 2025,
+654	              <https://datatracker.ietf.org/doc/html/draft-ietf-nmop-
+655	              network-anomaly-architecture-03>.
+
+657	   [I-D.ietf-nmop-network-incident-yang]
+658	              Hu, T., Contreras, L. M., Wu, Q., Davis, N., and C. Feng,
+659	              "A YANG Data Model for Network Incident Management", Work
+660	              in Progress, Internet-Draft, draft-ietf-nmop-network-
+661	              incident-yang-04, 14 June 2025,
+662	              <https://datatracker.ietf.org/doc/html/draft-ietf-nmop-
+663	              network-incident-yang-04>.
+
+665	   [RFC3877]  Chisholm, S. and D. Romascanu, "Alarm Management
+666	              Information Base (MIB)", RFC 3877, DOI 10.17487/RFC3877,
+667	              September 2004, <https://www.rfc-editor.org/info/rfc3877>.
+
+669	   [RFC6632]  Ersue, M., Ed. and B. Claise, "An Overview of the IETF
+670	              Network Management Standards", RFC 6632,
+671	              DOI 10.17487/RFC6632, June 2012,
+672	              <https://www.rfc-editor.org/info/rfc6632>.
+
+674	   [RFC8342]  Bjorklund, M., Schoenwaelder, J., Shafer, P., Watsen, K.,
+675	              and R. Wilton, "Network Management Datastore Architecture
+676	              (NMDA)", RFC 8342, DOI 10.17487/RFC8342, March 2018,
+677	              <https://www.rfc-editor.org/info/rfc8342>.
+
+679	   [RFC8632]  Vallin, S. and M. Bjorklund, "A YANG Data Model for Alarm
+680	              Management", RFC 8632, DOI 10.17487/RFC8632, September
+681	              2019, <https://www.rfc-editor.org/info/rfc8632>.
+
+683	   [RFC9232]  Song, H., Qin, F., Martinez-Julia, P., Ciavaglia, L., and
+684	              A. Wang, "Network Telemetry Framework", RFC 9232,
+685	              DOI 10.17487/RFC9232, May 2022,
+686	              <https://www.rfc-editor.org/info/rfc9232>.
+
+688	   [RFC9315]  Clemm, A., Ciavaglia, L., Granville, L. Z., and J.
+689	              Tantsura, "Intent-Based Networking - Concepts and
+690	              Definitions", RFC 9315, DOI 10.17487/RFC9315, October
+691	              2022, <https://www.rfc-editor.org/info/rfc9315>.
+
+693	   [RFC9417]  Claise, B., Quilbeuf, J., Lopez, D., Voyer, D., and T.
+694	              Arumugam, "Service Assurance for Intent-Based Networking
+695	              Architecture", RFC 9417, DOI 10.17487/RFC9417, July 2023,
+696	              <https://www.rfc-editor.org/info/rfc9417>.
+
+698	Authors' Addresses
+
+700	   Nigel Davis (editor)
+701	   Ciena
+702	   United Kingdom
+703	   Email: ndavis@ciena.com
+
+705	   Adrian Farrel (editor)
+706	   Old Dog Consulting
+707	   United Kingdom
+708	   Email: adrian@olddog.co.uk
+
+710	   Thomas Graf
+711	   Swisscom
+712	   Binzring 17
+713	   CH-8045 Zurich
+714	   Switzerland
+715	   Email: thomas.graf@swisscom.com
+
+717	   Qin Wu
+718	   Huawei
+719	   101 Software Avenue, Yuhua District
+720	   Nanjing
+721	   Jiangsu, 210012
+722	   China
+723	   Email: bill.wu@huawei.com
+
+725	   Chaode Yu
+726	   Huawei Technologies
+727	   Email: yuchaode@huawei.com
+
+
+
+
+
+
+
+
+
