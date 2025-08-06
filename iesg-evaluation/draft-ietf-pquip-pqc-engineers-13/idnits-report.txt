@@ -1,0 +1,2208 @@
+idnits 2.17.1 
+
+draft-ietf-pquip-pqc-engineers-13.txt:
+-(317): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(331): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(362): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+  == There are 19 instances of lines with non-ascii characters in the
+     document.
+
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     Summary: 0 errors (**), 0 flaws (~~), 1 warning (==), 0 comments (--).
+
+--------------------------------------------------------------------------------
+
+
+2	PQUIP                                                        A. Banerjee
+3	Internet-Draft                                                  T. Reddy
+4	Intended status: Informational                          D. Schoinianakis
+5	Expires: 2 January 2026                                            Nokia
+6	                                                            T. Hollebeek
+7	                                                                DigiCert
+8	                                                            M. Ounsworth
+9	                                                                 Entrust
+10	                                                             1 July 2025
+
+12	                Post-Quantum Cryptography for Engineers
+13	                   draft-ietf-pquip-pqc-engineers-13
+
+15	Abstract
+
+17	   The advent of a cryptographically relevant quantum computer (CRQC)
+18	   would render state-of-the-art, traditional public-key algorithms
+19	   deployed today obsolete, as the mathematical assumptions underpinning
+20	   their security would no longer hold.  To address this, protocols and
+21	   infrastructure must transition to post-quantum algorithms, which are
+22	   designed to resist both traditional and quantum attacks.  This
+23	   document explains why engineers need to be aware of and understand
+24	   post-quantum cryptography (PQC), detailing the impact of CRQCs on
+25	   existing systems and the challenges involved in transitioning to
+26	   post-quantum algorithms.  Unlike previous cryptographic updates, this
+27	   shift may require significant protocol redesign due to the unique
+28	   properties of post-quantum algorithms.
+
+30	About This Document
+
+32	   This note is to be removed before publishing as an RFC.
+
+34	   Status information for this document may be found at
+35	   https://datatracker.ietf.org/doc/draft-ietf-pquip-pqc-engineers/.
+
+37	   Discussion of this document takes place on the pquip Working Group
+38	   mailing list (mailto:pqc@ietf.org), which is archived at
+39	   https://mailarchive.ietf.org/arch/browse/pqc/.  Subscribe at
+40	   https://www.ietf.org/mailman/listinfo/pqc/.
+
+42	Status of This Memo
+
+44	   This Internet-Draft is submitted in full conformance with the
+45	   provisions of BCP 78 and BCP 79.
+
+47	   Internet-Drafts are working documents of the Internet Engineering
+48	   Task Force (IETF).  Note that other groups may also distribute
+49	   working documents as Internet-Drafts.  The list of current Internet-
+50	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+52	   Internet-Drafts are draft documents valid for a maximum of six months
+53	   and may be updated, replaced, or obsoleted by other documents at any
+54	   time.  It is inappropriate to use Internet-Drafts as reference
+55	   material or to cite them other than as "work in progress."
+
+57	   This Internet-Draft will expire on 2 January 2026.
+
+59	Copyright Notice
+
+61	   Copyright (c) 2025 IETF Trust and the persons identified as the
+62	   document authors.  All rights reserved.
+
+64	   This document is subject to BCP 78 and the IETF Trust's Legal
+65	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+66	   license-info) in effect on the date of publication of this document.
+67	   Please review these documents carefully, as they describe your rights
+68	   and restrictions with respect to this document.  Code Components
+69	   extracted from this document must include Revised BSD License text as
+70	   described in Section 4.e of the Trust Legal Provisions and are
+71	   provided without warranty as described in the Revised BSD License.
+
+73	Table of Contents
+
+75	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
+76	   2.  Terminology . . . . . . . . . . . . . . . . . . . . . . . . .   6
+77	   3.  Threat of CRQCs on Cryptography . . . . . . . . . . . . . . .   7
+78	     3.1.  Symmetric Cryptography  . . . . . . . . . . . . . . . . .   7
+79	     3.2.  Asymmetric Cryptography . . . . . . . . . . . . . . . . .   8
+80	     3.3.  Quantum Side-channel Attacks  . . . . . . . . . . . . . .   9
+81	   4.  Traditional Cryptographic Primitives that Could Be Replaced by
+82	           PQC . . . . . . . . . . . . . . . . . . . . . . . . . . .   9
+83	   5.  Invariants of PQC: Necessitating Compliance Adjustments . . .  10
+84	   6.  NIST PQC Algorithms . . . . . . . . . . . . . . . . . . . . .  11
+85	     6.1.  NIST Candidates Selected for Standardization  . . . . . .  11
+86	       6.1.1.  PQC Key Encapsulation Mechanisms (KEMs) . . . . . . .  11
+87	       6.1.2.  PQC Signatures  . . . . . . . . . . . . . . . . . . .  11
+88	   7.  ISO Candidates Selected for Standardization . . . . . . . . .  12
+89	     7.1.  PQC Key Encapsulation Mechanisms (KEMs) . . . . . . . . .  12
+90	   8.  Timeline for Transition . . . . . . . . . . . . . . . . . . .  12
+91	   9.  PQC Categories  . . . . . . . . . . . . . . . . . . . . . . .  14
+92	     9.1.  Lattice-Based Public-Key Cryptography . . . . . . . . . .  15
+93	     9.2.  Hash-Based Public-Key Cryptography  . . . . . . . . . . .  15
+94	     9.3.  Code-Based Public-Key Cryptography  . . . . . . . . . . .  16
+
+96	   10. KEMs  . . . . . . . . . . . . . . . . . . . . . . . . . . . .  16
+97	     10.1.  Authenticated Key Exchange . . . . . . . . . . . . . . .  18
+98	     10.2.  Security Properties of KEMs  . . . . . . . . . . . . . .  22
+99	       10.2.1.  IND-CCA2 . . . . . . . . . . . . . . . . . . . . . .  22
+100	       10.2.2.  Binding  . . . . . . . . . . . . . . . . . . . . . .  22
+101	     10.3.  HPKE . . . . . . . . . . . . . . . . . . . . . . . . . .  23
+102	   11. PQC Signatures  . . . . . . . . . . . . . . . . . . . . . . .  23
+103	     11.1.  Security Properties of PQC Signatures  . . . . . . . . .  23
+104	     11.2.  EUF-CMA and SUF-CMA  . . . . . . . . . . . . . . . . . .  23
+105	     11.3.  Details of FN-DSA, ML-DSA, and SLH-DSA . . . . . . . . .  24
+106	     11.4.  Details of XMSS and LMS  . . . . . . . . . . . . . . . .  26
+107	       11.4.1.  LMS Key and Signature Sizes  . . . . . . . . . . . .  26
+108	     11.5.  Hash-then-Sign . . . . . . . . . . . . . . . . . . . . .  27
+109	   12. Recommendations for Security / Performance Tradeoffs  . . . .  28
+110	   13. Comparing PQC KEMs/Signatures vs Traditional KEMs
+111	           (KEXs)/Signatures . . . . . . . . . . . . . . . . . . . .  31
+112	   14. Post-Quantum and Traditional Hybrid Schemes . . . . . . . . .  33
+113	     14.1.  PQ/T Hybrid Confidentiality  . . . . . . . . . . . . . .  33
+114	     14.2.  PQ/T Hybrid Authentication . . . . . . . . . . . . . . .  34
+115	     14.3.  Hybrid Cryptographic Algorithm Combinations:
+116	            Considerations and Approaches  . . . . . . . . . . . . .  35
+117	       14.3.1.  Hybrid Cryptographic Combinations  . . . . . . . . .  35
+118	       14.3.2.  Composite Keys in Hybrid Schemes . . . . . . . . . .  35
+119	       14.3.3.  Key Reuse in Hybrid Schemes  . . . . . . . . . . . .  36
+120	       14.3.4.  Jurisdictional Fragmentation . . . . . . . . . . . .  37
+121	       14.3.5.  Future Directions and Ongoing Research . . . . . . .  37
+122	   15. Security Considerations . . . . . . . . . . . . . . . . . . .  37
+123	     15.1.  Cryptanalysis  . . . . . . . . . . . . . . . . . . . . .  37
+124	     15.2.  Cryptographic Agility  . . . . . . . . . . . . . . . . .  38
+125	     15.3.  Hybrid Key Exchange and Signatures: Bridging the Gap
+126	            Between Post-Quantum and Traditional Cryptography  . . .  39
+127	     15.4.  Caution: Ciphertext commitment in KEM vs DH  . . . . . .  40
+128	   16. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  40
+129	   17. Further Reading & Resources . . . . . . . . . . . . . . . . .  40
+130	   18. Informative References  . . . . . . . . . . . . . . . . . . .  40
+131	   Acknowledgements  . . . . . . . . . . . . . . . . . . . . . . . .  48
+132	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  48
+
+134	1.  Introduction
+
+136	   Quantum computing is no longer just a theoretical concept in
+137	   computational science and physics; it is now an active area of
+138	   research with practical implications.  Considerable research efforts
+139	   and enormous corporate and government funding for the development of
+140	   practical quantum computing systems are currently being invested.  At
+141	   the time this document is published, cryptographically relevant
+142	   quantum computers (CRQCs) that can break widely used public-key
+143	   cryptographic algorithms are not yet available.  However, there is
+144	   ongoing research and development in the field of quantum computing,
+145	   with the goal of building more powerful and scalable quantum
+146	   computers.
+
+148	   One common myth is that quantum computers are faster than
+149	   conventional CPUs and GPUs in all areas.  This is not the case; much
+150	   as GPUs outperform general-purpose CPUs only on specific types of
+151	   problems, so too will quantum computers have a niche set of problems
+152	   on which they excel.  Unfortunately for cryptographers, integer
+153	   factorization and discrete logarithms, the mathematical problems
+154	   underpinning much of classical public key cryptography, happen to
+155	   fall within the niche that quantum computers are expected to excel
+156	   at.  As quantum technology advances, there is the potential for
+157	   future quantum computers to have a significant impact on current
+158	   cryptographic systems.  Predicting the date of emergence of a CRQC is
+159	   a challenging task, and there is ongoing uncertainty regarding when
+160	   they will become practically feasible [CRQCThreat].
+
+162	   Extensive research has produced several post-quantum cryptographic
+163	   algorithms that offer the potential to ensure cryptography's survival
+164	   in the quantum computing era.  However, transitioning to a post-
+165	   quantum infrastructure is not a straightforward task, and there are
+166	   numerous challenges to overcome.  It requires a combination of
+167	   engineering efforts, proactive assessment and evaluation of available
+168	   technologies, and a careful approach to product development.
+
+170	   PQC is sometimes referred to as "quantum-proof", "quantum-safe", or
+171	   "quantum-resistant".  It is the development of cryptographic
+172	   algorithms designed to secure communication and data in a world where
+173	   quantum computers are powerful enough to break traditional
+174	   cryptographic systems, such as RSA and ECC.  PQC algorithms are
+175	   intended to be resistant to attacks by quantum computers, which use
+176	   quantum-mechanical phenomena to solve mathematical problems that are
+177	   infeasible for classical computers.
+
+179	   As the threat of CRQCs draws nearer, engineers responsible for
+180	   designing, maintaining, and securing cryptographic systems must
+181	   prepare for the significant changes that the existence of CRQCs will
+182	   bring.  Engineers need to understand how to implement post-quantum
+183	   algorithms in applications, how to evaluate the trade-offs between
+184	   security and performance, and how to ensure backward compatibility
+185	   with current systems where needed.  This is not merely a one-for-one
+186	   replacement of algorithms; in many cases, the shift to PQC will
+187	   involve redesigning protocols and infrastructure to accommodate the
+188	   significant differences in resource utilization and key sizes between
+189	   traditional and PQC algorithms.
+
+191	   This document aims to provide general guidance to engineers working
+192	   on cryptographic libraries, network security, and infrastructure
+193	   development, where long-term security planning is crucial.  The
+194	   document covers topics such as selecting appropriate PQC algorithms,
+195	   understanding the differences between PQC key encapsulation
+196	   mechanisms (KEMs) and traditional Diffie-Hellman and RSA style key
+197	   exchanges, and provides insights into expected key, ciphertext and
+198	   signature sizes and processing time differences between PQC and
+199	   traditional algorithms.  Additionally, it discusses the potential
+200	   threat to symmetric cryptography and hash functions from CRQCs.
+
+202	   It is important to remember that asymmetric algorithms (also known as
+203	   public key algorithms) are largely used for secure communications
+204	   between organizations or endpoints that may not have previously
+205	   interacted, so a significant amount of coordination between
+206	   organizations, and within and between ecosystems needs to be taken
+207	   into account.  Such transitions are some of the most complicated in
+208	   the tech industry and will require staged migrations in which
+209	   upgraded agents need to co-exist and communicate with non-upgraded
+210	   agents at a scale never before undertaken.
+
+212	   The National Security Agency (NSA) of the United States released an
+213	   article on future PQC algorithm requirements for US national security
+214	   systems [CNSA2-0] based on the need to protect against deployments of
+215	   CRQCs in the future.  The German Federal Office for Information
+216	   Security (BSI) has also released a PQC migration and recommendations
+217	   document [BSI-PQC] which largely aligns with United States National
+218	   Institute of Standards and Technology (NIST) and NSA guidance, but
+219	   differs on some of the guidance.
+
+221	   CRQCs pose a threat to both symmetric and asymmetric cryptographic
+222	   schemes.  However, the threat to asymmetric cryptography is
+223	   significantly greater due to Shor's algorithm, which can break
+224	   widely-used public key schemes like RSA and ECC.  Symmetric
+225	   cryptography and hash functions face a lower risk from Grover's
+226	   algorithm, although the impact is less severe and can typically be
+227	   mitigated by doubling key and digest lengths where the risk applies.
+228	   It is crucial for the reader to understand that when the word "PQC"
+229	   is mentioned in the document, it means asymmetric cryptography (or
+230	   public key cryptography), and not any symmetric algorithms based on
+231	   stream ciphers, block ciphers, hash functions, MACs, etc., which are
+232	   less vulnerable to quantum computers.  This document does not cover
+233	   such topics as when traditional algorithms might become vulnerable
+234	   (for that, see documents such as [QC-DNS] and others).  It also does
+235	   not cover unrelated technologies like quantum key distribution (QKD)
+236	   or quantum key generation, which use quantum hardware to exploit
+237	   quantum effects to protect communications and generate keys,
+238	   respectively.  PQC is based on conventional math (not on quantum
+239	   mechanics) and software and can be run on any general purpose
+240	   computer.
+
+242	   This document does not go into the deep mathematics or technical
+243	   specification of the PQC algorithms, but rather provides an overview
+244	   to engineers on the current threat landscape and the relevant
+245	   algorithms designed to help prevent those threats.  Also, the
+246	   cryptographic and algorithmic guidance given in this document should
+247	   be taken as non-authoritative if it conflicts with emerging and
+248	   evolving guidance from the IRTF's Crypto Forum Research Group (CFRG).
+
+250	   There is ongoing discussion about whether to use the term "post-
+251	   quantum", "quantum ready", or "quantum resistant", to describe
+252	   algorithms that resist CRQCs, and a consensus has not yet been
+253	   reached.  It is important to clarify that "post-quantum" refers to
+254	   algorithms designed to withstand attacks by CRQCs and classical
+255	   computers alike.  These algorithms are based on mathematically hard
+256	   cryptographic problems that neither CRQCs nor classical computers are
+257	   expected to break.  This document uses any of these terms
+258	   interchangeably to refer to such algorithms.
+
+260	2.  Terminology
+
+262	   Quantum computer: A computer that performs computations using
+263	   quantum-mechanical phenomena such as superposition and entanglement.
+
+265	   Physical qubit: The basic physical unit in a quantum computer, which
+266	   is prone to noise and errors.
+
+268	   Logical qubit: A fault-tolerant qubit constructed from multiple
+269	   physical qubits using quantum error correction; it is the effective
+270	   unit for reliable quantum computation.
+
+272	   Post-Quantum Cryptography (PQC): Cryptographic algorithms designed to
+273	   be secure against quantum and classical attacks.
+
+275	   Cryptographically Relevant Quantum Computer (CRQC): A quantum
+276	   computer with sufficient "logical qubits" to perform cryptographic
+277	   attacks (e.g., break RSA/ECC).
+
+279	3.  Threat of CRQCs on Cryptography
+
+281	   When considering the security risks associated with the ability of a
+282	   quantum computer to attack traditional cryptography, it is important
+283	   to distinguish between the impact on symmetric algorithms and public-
+284	   key ones.  Dr. Peter Shor and Dr. Lov Grover developed two algorithms
+285	   that changed the way the world thinks of security under the presence
+286	   of a CRQC.
+
+288	   Quantum computers are, by their nature, hybrids of classical and
+289	   quantum computational units.  For example, Shor's algorithm consists
+290	   of a combination of quantum and classical computational steps.  Thus,
+291	   the term "quantum adversary" should be thought of as "quantum-
+292	   enhanced adversary", meaning they have access to both classical and
+293	   quantum computational techniques.
+
+295	   Despite the fact that large-scale quantum computers do not yet exist
+296	   to experiment on, the theoretical properties of quantum computation
+297	   are very well understood.  This allows us to reason today about the
+298	   upper limits of quantum-enhanced computation, and indeed to design
+299	   cryptographic algorithms that are resistant to any conceivable form
+300	   of quantum cryptanalysis.
+
+302	3.1.  Symmetric Cryptography
+
+304	   For unstructured data such as symmetric encrypted data or
+305	   cryptographic hashes, although CRQCs can search for specific
+306	   solutions across all possible input combinations (e.g., Grover's
+307	   algorithm), no quantum algorithm is known to break the underlying
+308	   security properties of these classes of algorithms.
+
+310	   Grover's algorithm is a quantum search algorithm that provides a
+311	   theoretical quadratic speedup for searching an unstructured database,
+312	   compared to traditional search algorithms.  This has led to the
+313	   common misconception that symmetric key lengths need to be doubled
+314	   for quantum security.  When you consider the mapping of hash values
+315	   to their corresponding hash inputs (also known as pre-image), or of
+316	   ciphertext blocks to the corresponding plaintext blocks, as an
+317	   unstructured database, then Grover’s algorithm theoretically requires
+318	   doubling the key sizes of the symmetric algorithms that are currently
+319	   deployed today to counter the quadratic speedup and maintain current
+320	   security level.  This is because Grover’s algorithm reduces the
+321	   amount of operations to break 128-bit symmetric cryptography to
+322	   2^{64} quantum operations, which might sound computationally
+323	   feasible.  However, quantum operations are fundamentally different
+324	   from classical ones as 2^{64} classical operations can be efficiently
+325	   parallelized, 2^{64} quantum operations must be performed serially,
+326	   making them infeasible on practical quantum computers.
+
+328	   Grover's algorithm is highly non-parallelizable and even if one
+329	   deploys 2^c computational units in parallel to brute-force a key
+330	   using Grover's algorithm, it will complete in time proportional to
+331	   2^{(128−c)/2}, or, put simply, using 256 quantum computers will only
+332	   reduce runtime by a factor of 16, 1024 quantum computers will only
+333	   reduce runtime by a factor of 32 and so forth (see [NIST] and
+334	   [Cloudflare]).  Due to this inherent limitation, the general expert
+335	   consensus is that AES-128 remains secure in practice, and key sizes
+336	   do not necessarily need to be doubled.
+
+338	   It would be natural to ask whether future research will develop a
+339	   superior algorithm that could outperform Grover's algorithm in the
+340	   general case.  However, Christof Zalka has shown that Grover's
+341	   algorithm achieves the best possible complexity for this type of
+342	   search, meaning no significantly faster quantum approach is expected
+343	   [Grover-search]
+
+345	   Finally, in their evaluation criteria for PQC, NIST is assessing the
+346	   security levels of proposed post-quantum algorithms by comparing them
+347	   against the equivalent traditional and quantum security of AES-128,
+348	   192, and 256.  This indicates that NIST is confident in the stable
+349	   security properties of AES, even in the presence of both traditional
+350	   and quantum attacks.  As a result, 128-bit algorithms can be
+351	   considered quantum-safe for the foreseeable future.  However, for
+352	   compliance purposes, some organizations, such as the National Agency
+353	   for the Security of Information Systems (ANSSI), recommend the use of
+354	   AES-256 [ANSSI].
+
+356	3.2.  Asymmetric Cryptography
+
+358	   “Shor’s algorithm” efficiently solves the integer factorization
+359	   problem (and the related discrete logarithm problem), which underpin
+360	   the foundations of the vast majority of public-key cryptography that
+361	   the world uses today.  This implies that, if a CRQC is developed,
+362	   today’s public-key cryptography algorithms (e.g., RSA, Diffie-Hellman
+363	   and elliptic curve cryptography, as well as less commonly-used
+364	   variants such as ElGamal and Schnorr signatures) and protocols would
+365	   need to be replaced by algorithms and protocols that can offer
+366	   cryptanalytic resistance against CRQCs.  Note that Shor’s algorithm
+367	   cannot run solely on a classical computer, it requires a CRQC.
+
+369	   For example, to provide some context, one would need around 20
+370	   million noisy qubits to break RSA-2048 in 8 hours [RSAShor] and
+371	   [RSA8HRS] or 4099 stable (or logical) qubits to break it in 10
+372	   seconds [RSA10SC].
+
+374	   For structured data such as public keys and signatures, CRQCs can
+375	   fully solve the underlying hard problems used in traditional
+376	   cryptography (see Shor's algorithm).  Because an increase in the size
+377	   of the key-pair would not provide a secure solution (short of RSA
+378	   keys that are many gigabytes in size [PQRSA]), a complete replacement
+379	   of the algorithm is needed.  Therefore, post-quantum public-key
+380	   cryptography must rely on problems that are different from the ones
+381	   used in traditional public-key cryptography (i.e., the integer
+382	   factorization problem, the finite-field discrete logarithm problem,
+383	   and the elliptic-curve discrete logarithm problem).
+
+385	3.3.  Quantum Side-channel Attacks
+
+387	   The field of cryptographic side-channel attacks potentially stands to
+388	   gain a boost in attacker power once cryptanalytic techniques can be
+389	   enhanced with quantum computation techniques [QuantSide].  While a
+390	   full discussion of quantum side-channel techniques is beyond the
+391	   scope of this document, implementers of cryptographic hardware should
+392	   be aware that current best-practices for side-channel resistance may
+393	   not be sufficient against quantum adversaries.
+
+395	4.  Traditional Cryptographic Primitives that Could Be Replaced by PQC
+
+397	   Any asymmetric cryptographic algorithm based on integer
+398	   factorization, finite field discrete logarithms or elliptic curve
+399	   discrete logarithms will be vulnerable to attacks using Shor's
+400	   algorithm on a CRQC.  This document focuses on the principal
+401	   functions of asymmetric cryptography:
+
+403	   *  Key agreement and key transport: Key agreement schemes, typically
+404	      referred to as Diffie-Hellman (DH) or Elliptic Curve Diffie-
+405	      Hellman (ECDH), as well as key transport, typically using RSA
+406	      encryption, are used to establish a shared cryptographic key for
+407	      secure communication.  They are one of the mechanisms that can be
+408	      replaced by PQC, as they are based on existing public key
+409	      cryptography and is therefore vulnerable to Shor's algorithm.  A
+410	      CRQC can employ Shor's algorithm to efficiently find the prime
+411	      factors of a large public key (in the case of RSA), which in turn
+412	      can be exploited to derive the private key.  In the case of
+413	      Diffie-Hellman, a CRQC has the potential to calculate the discrete
+414	      logarithm of the (short or long-term) Diffie-Hellman public key.
+415	      This, in turn, would reveal the secret required to derive the
+416	      symmetric encryption key.
+
+418	   *  Digital signatures: Digital signature schemes are used to
+419	      authenticate the identity of a sender, detect unauthorized
+420	      modifications to data, and underpin trust in a system.  Similar to
+421	      key agreement, signatures also depend on a public-private key pair
+422	      based on the same mathematics as for key agreement and key
+423	      transport, and hence a break in existing public key cryptography
+424	      will also affect traditional digital signatures, hence the
+425	      importance of developing post-quantum digital signatures.
+
+427	   *  BBS signatures: BBS (Boneh-Boyen-Shacham) signatures are a
+428	      privacy-preserving signature scheme that offers zero-knowledge
+429	      proof-like properties by allowing selective disclosure of specific
+430	      signed attributes without revealing the entire set of signed data.
+431	      The security of BBS signatures relies on the hardness of the
+432	      discrete logarithm problem, making them vulnerable to Shor's
+433	      algorithm.  A CRQC can break the data authenticity security
+434	      property of BBS but not the data confidentiality (Section 6.9 of
+435	      [I-D.irtf-cfrg-bbs-signatures]).
+
+437	   *  Content encryption: Content encryption typically refers to the
+438	      encryption of the data using symmetric key algorithms, such as
+439	      AES, to ensure confidentiality.  The threat to symmetric
+440	      cryptography is discussed in Section 3.1.
+
+442	5.  Invariants of PQC: Necessitating Compliance Adjustments
+
+444	   In the context of PQC, symmetric-key cryptographic algorithms are
+445	   generally not directly impacted by quantum computing advancements.
+446	   Symmetric-key cryptography, which includes keyed primitives such as
+447	   block ciphers (e.g., AES) and message authentication mechanisms
+448	   (e.g., HMAC-SHA256), relies on secret keys shared between the sender
+449	   and receiver and remains secure even in a post-quantum world.
+450	   Symmetric cryptography also includes hash functions (e.g., SHA-256)
+451	   that are used for secure message digesting without any shared key
+452	   material.  HMAC is a specific construction that utilizes a
+453	   cryptographic hash function and a secret key shared between the
+454	   sender and receiver to produce a message authentication code.
+
+456	   Grover's algorithm does not pose a practical threat to symmetric
+457	   cryptography (see Section 3.1 for more details).  As a result, CRQCs
+458	   offer no substantial advantages in breaking symmetric-key algorithms
+459	   compared to classical computers.  However, for compliance purposes,
+460	   such as meeting the standards of CNSA 2.0 (Commercial National
+461	   Security Algorithm Suite 2.0) [CNSA2-0], AES-256 must be used to
+462	   ensure the highest level of security against both traditional and
+463	   quantum threats.
+
+465	6.  NIST PQC Algorithms
+
+467	   At time of writing, NIST have standardized three PQC algorithms, with
+468	   more expected to be standardised in the future ([NISTFINAL]).  These
+469	   algorithms are not necessarily drop-in replacements for traditional
+470	   asymmetric cryptographic algorithms.  For instance, RSA [RSA] and ECC
+471	   [RFC6090] can be used as both a key encapsulation method (KEM) and as
+472	   a signature scheme, whereas there is currently no post-quantum
+473	   algorithm that can perform both functions.  When upgrading protocols,
+474	   it is important to replace the existing use of traditional algorithms
+475	   with either a PQC KEM or a PQC signature method, depending on how the
+476	   traditional algorithm was previously being used.  Additionally, KEMs,
+477	   as described in Section 10, present a different API than either key
+478	   agreement or key transport primitives.  As a result, they may require
+479	   protocol-level or application-level changes in order to be
+480	   incorporated.
+
+482	6.1.  NIST Candidates Selected for Standardization
+
+484	6.1.1.  PQC Key Encapsulation Mechanisms (KEMs)
+
+486	   *  [ML-KEM]: Module-Lattice-based Key-Encapsulation Mechanism
+487	      Standard (FIPS-203).
+
+489	   *  [HQC]: This algorithm is based on the hardness of the syndrome
+490	      decoding problem for quasi-cyclic concatenated Reed-Muller and
+491	      Reed-Solomon (RMRS) codes in the Hamming metric.  Reed-Muller (RM)
+492	      codes are a class of block error-correcting codes commonly used in
+493	      wireless and deep-space communications, while Reed-Solomon (RS)
+494	      codes are widely used to detect and correct multiple-bit errors.
+495	      HQC has been selected as part of the NIST post-quantum
+496	      cryptography project but has not yet been standardized.
+
+498	6.1.2.  PQC Signatures
+
+500	   *  [ML-DSA]: Module-Lattice-Based Digital Signature Standard (FIPS-
+501	      204).
+
+503	   *  [SLH-DSA]: Stateless Hash-Based Digital Signature (FIPS-205).
+
+505	   *  [FN-DSA]: FN-DSA is a lattice signature scheme (FIPS-206)
+506	      (Section 9.1 and Section 11.3).
+
+508	7.  ISO Candidates Selected for Standardization
+
+510	   At the time of writing, ISO has standardized three PQC KEM
+511	   algorithms, which are mentioned in the following subsection.
+
+513	7.1.  PQC Key Encapsulation Mechanisms (KEMs)
+
+515	   *  [FrodoKEM]: Key Encapsulation mechanism based on the hardness of
+516	      learning with errors in algebraically unstructured lattices.
+
+518	   *  [ClassicMcEliece]: Based on the hardness of syndrome decoding of
+519	      Goppa codes.  Goppa codes are a class of error-correcting codes
+520	      that can correct a certain number of errors in a transmitted
+521	      message.  The decoding problem involves recovering the original
+522	      message from the received noisy codeword.
+
+524	   *  [NTRU]: Key encapsulation mechanism based on the "N-th degree
+525	      Truncated polynomial Ring Units" (NTRU) lattices.
+
+527	8.  Timeline for Transition
+
+529	   The timeline, and driving motivation for transition differs slightly
+530	   between data confidentiality (e.g., encryption) and data
+531	   authentication (e.g., signature) use-cases.
+
+533	   For data confidentiality, one is concerned with the so-called
+534	   "harvest now, decrypt later" attack where a malicious actor with
+535	   adequate resources can launch an attack to store sensitive encrypted
+536	   data today that they hope to decrypt once a CRQC is available.  This
+537	   implies that, every day, sensitive encrypted data is susceptible to
+538	   the attack by not implementing quantum-safe strategies, as it
+539	   corresponds to data possibly being deciphered in the future.
+
+541	   For authentication, it is often the case that signatures have a very
+542	   short lifetime between signing and verifying (such as during a TLS
+543	   handshake) but some authentication use-cases do require long
+544	   lifetimes, such as signing firmware or software that will be active
+545	   for decades, signing legal documents, or signing certificates that
+546	   will be embedded into hardware devices such as smartcards.  Even for
+547	   short-lived signatures use cases, the infrastructure often relies on
+548	   long-lived root keys which can be difficult to update or replace on
+549	   in-field devices.
+
+551	   +------------------------+----------------------------+
+552	   |                        |                            |
+553	   |           y            |             x              |
+554	   +------------------------+----------+-----------------+
+555	   |                                   | <--------------->
+556	   |               z                   |   Security gap
+557	   +-----------------------------------+
+
+559	                           Figure 1: Mosca model
+
+561	   These challenges are illustrated nicely by the so-called Mosca model
+562	   discussed in [Threat-Report].  In Figure 1, "x" denotes the time that
+563	   systems and data need to remain secure, "y" the number of years to
+564	   fully migrate to a PQC infrastructure, and "z" the time until a CRQC
+565	   that can break current cryptography is available.  The model assumes
+566	   either that encrypted data can be intercepted and stored before the
+567	   migration is completed in "y" years, or that signatures will still be
+568	   relied upon for "x" years after their creation.  This data remains
+569	   vulnerable for the complete "x" years of their lifetime, thus the sum
+570	   "x+y" gives us an estimate of the full timeframe that data remain
+571	   insecure.  The model essentially asks how one is preparing IT systems
+572	   during those "y" years (in other words, how one can minimize those
+573	   "y" years) to minimize the transition phase to a PQC infrastructure
+574	   and hence minimize the risks of data being exposed in the future.
+
+576	   Finally, other factors that could accelerate the introduction of a
+577	   CRQC should not be under-estimated, like for example faster-than-
+578	   expected advances in quantum computing and more efficient versions of
+579	   Shor’s algorithm requiring fewer qubits.  Innovation often comes in
+580	   waves, so it is to the industry’s benefit to remain vigilant and
+581	   prepare as early as possible.  Bear in mind also that while the
+582	   industry tracks advances from public research institutions such as
+583	   universities and companies that publish their results, there is also
+584	   a great deal of large-budget quantum research being conducted
+585	   privately by various national interests.  Therefore, the true state
+586	   of quantum computer advancement is likely several years ahead of the
+587	   publicly available research.
+
+589	   Organizations should also consider carefully and honestly what their
+590	   migration timeline "y" actually is.  If you think only of the time
+591	   between receiving a patch from your technology vendor, and rolling
+592	   that patch out, then "y" might seem as short as a few weeks.
+593	   However, this represents the minority of migration cases; more often,
+594	   a PQC migration will involve at least some amount of hardware
+595	   replacement.  For example, performance-sensitive applications will
+596	   need CPUs with PQC hardware acceleration.  Security-sensitive
+597	   applications will need PQC TPMs, TEEs, Secure Enclaves, and other
+598	   cryptographic co-processors.  Smartcard applications will require
+599	   replacement of the cards as well as of the readers which can come in
+600	   many form-factors: tap-for-entry door and turnstile readers, PIN pad
+601	   machines, laptops with built-in smartcard readers, and many others.
+
+603	   Included in "y" is not only the deployment time, but also preparation
+604	   time: integration, testing, auditing, and re-certification of
+605	   cryptographic environments.  Consider also upstream effects that
+606	   contribute to "y", including lead-times for your vendors to produce
+607	   PQC-ready products, which may itself include auditing and
+608	   certification delays, time for regulating bodies to adopt PQC
+609	   policies, time for auditors to become familiar with the new
+610	   requirements, etc.  If you measure the full migration time "y" from
+611	   when your vendors begin implementing PQC functionality, to when you
+612	   switch off your last non-PQC-capable device, then "y" can be quite
+613	   long; likely measured in years for even most moderately-sized
+614	   organizations, this long tail should not discourage early action.
+
+616	   Organizations responsible for protecting long-lived sensitive data or
+617	   operating critical infrastructure will need to begin transitioning
+618	   immediately, particularly in scenarios where data is vulnerable to
+619	   HDNL attacks.  PQ/T or PQ key exchange is relatively self-contained,
+620	   typically requiring changes only to the cryptographic library (e.g.,
+621	   OpenSSL).  In contrast, migrating to post-quantum or PQ/T digital
+622	   signatures involves broader ecosystem changes, including updates to
+623	   certificates, CAs, Certificate Management Protocols, HSMs, and trust
+624	   anchors.  Starting early with hybrid key exchange deployments allows
+625	   organizations to gain operational experience, while prototyping and
+626	   planning for PQ/T or PQ digital signature integration helps identify
+627	   ecosystem-wide impacts early.  This phased approach reduces long-term
+628	   migration risks and ensures readiness for more complex updates.
+
+630	9.  PQC Categories
+
+632	   The post-quantum cryptographic schemes standardized by NIST, along
+633	   with the ongoing Round 4 candidates, can be categorized into three
+634	   main groups: lattice-based, hash-based, and code-based.  Other
+635	   approaches, such as isogeny-based, multivariate-based, and MPC-in-
+636	   the-Head-based cryptography, are also being explored in research and
+637	   standardization efforts.  NIST has been calling for additional
+638	   digital signature proposals to be considered in the PQC
+639	   standardization process which has completed two rounds in October,
+640	   2024 [AddSig].
+
+642	9.1.  Lattice-Based Public-Key Cryptography
+
+644	   Lattice-based public-key cryptography leverages the simple
+645	   construction of lattices (i.e., a regular collection of points in a
+646	   Euclidean space that are evenly spaced) to create "trapdoor"
+647	   problems.  These problems are efficient to compute if you possess the
+648	   secret information but challenging to compute otherwise.  Examples of
+649	   such problems include the shortest vector, closest vector, short
+650	   integer solution, learning with errors, module learning with errors,
+651	   and learning with rounding problems.  All of these problems feature
+652	   strong proofs for worst-to-average case reduction, effectively
+653	   relating the hardness of the average case to the worst case.
+
+655	   Lattice-based schemes usually have good performances and average size
+656	   public keys and signatures (average within the PQC primitives at
+657	   least; they are still several orders of magnitude larger than e.g.,
+658	   RSA or ECC signatures), making them the best available candidates for
+659	   general-purpose use such as replacing the use of RSA in PKIX
+660	   certificates.
+
+662	   Examples of this class of algorithms include ML-KEM, FN-DSA, ML-DSA
+663	   and FrodoKEM.
+
+665	   It is noteworthy that lattice-based encryption schemes require a
+666	   rounding step during decryption which has a non-zero probability of
+667	   "rounding the wrong way" and leading to a decryption failure, meaning
+668	   that valid encryptions are decrypted incorrectly; as such, an
+669	   attacker could significantly reduce the security of lattice-based
+670	   schemes that have a relatively high failure rate.  However, for most
+671	   of the NIST PQC proposals, the number of required oracle queries to
+672	   force a decryption failure is above practical limits, as has been
+673	   shown in [LattFail1].  More recent works have improved upon the
+674	   results in [LattFail1], showing that the cost of searching for
+675	   additional failing ciphertexts after one or more have already been
+676	   found, can be sped up dramatically [LattFail2].  Nevertheless, at the
+677	   time this document is published, the PQC candidates by NIST are
+678	   considered secure under these attacks and constant monitoring as
+679	   cryptanalysis research is ongoing.
+
+681	9.2.  Hash-Based Public-Key Cryptography
+
+683	   Hash based PKC has been around since the 1970s, when it was developed
+684	   by Lamport and Merkle.  It is used to create digital signature
+685	   algorithms and its security is based on the security of the
+686	   underlying cryptographic hash function.  Many variants of hash-based
+687	   signatures (HBS) have been developed since the 70s including the
+688	   recent XMSS [RFC8391], HSS/LMS [RFC8554] or BPQS [BPQS] schemes.
+689	   Unlike many other digital signature techniques, most hash-based
+690	   signature schemes are stateful, which means that signing necessitates
+691	   the update and careful tracking of the state of the secret key.
+692	   Producing multiple signatures using the same secret key state results
+693	   in loss of security and may ultimately enable signature forgery
+694	   attacks against that key.
+
+696	   Stateful hash-based signatures with long service lifetimes require
+697	   additional operational complexity compared with other signature
+698	   types.  For example, consider a 20-year root key; there is an
+699	   expectation that 20 years is longer than the expected lifetime of the
+700	   hardware that key is stored on, and therefore the key will need to be
+701	   migrated to new hardware at some point.  Disaster-recovery scenarios
+702	   where the primary node fails without warning can be similarly tricky.
+703	   This requires careful operational and compliance consideration to
+704	   ensure that no private key state can be reused across the migration
+705	   or disaster recovery event.  One approach for avoiding these issues
+706	   is to only use stateful HBS for short-term use cases that do not
+707	   require horizontal scaling, for example signing a batch of firmware
+708	   images and then retiring the signing key.
+
+710	   The SLH-DSA algorithm, which was standardized by NIST, leverages the
+711	   HORST (hash to obtain random subset with trees) technique and remains
+712	   the only standardized hash based signature scheme that is stateless,
+713	   thus avoiding the complexities associated with state management.
+714	   SLH-DSA is an advancement on SPHINCS which reduces the signature
+715	   sizes in SPHINCS and makes it more compact.
+
+717	9.3.  Code-Based Public-Key Cryptography
+
+719	   This area of cryptography started in the 1970s and 80s based on the
+720	   seminal work of McEliece and Niederreiter which focuses on the study
+721	   of cryptosystems based on error-correcting codes.  Some popular error
+722	   correcting codes include Goppa codes (used in McEliece
+723	   cryptosystems), encoding and decoding syndrome codes used in Hamming
+724	   quasi-cyclic (HQC), or quasi-cyclic moderate density parity check
+725	   (QC-MDPC) codes.
+
+727	   Examples include all the unbroken NIST Round 4 finalists: Classic
+728	   McEliece, HQC (selected by NIST for standardization), and BIKE.
+
+730	10.  KEMs
+
+732	   A Key Encapsulation Mechanism (KEM) is a cryptographic technique used
+733	   for securely exchanging symmetric key material between two parties
+734	   over an insecure channel.  It is commonly used in hybrid encryption
+735	   schemes, where a combination of asymmetric (public key) and symmetric
+736	   encryption is employed.  The KEM encapsulation results in a fixed-
+737	   length symmetric key that can be used with a symmetric algorithm,
+738	   typically a block cipher, in one of two different ways:
+
+740	   *  Derive a data encryption key (DEK) to encrypt the data
+
+742	   *  Derive a key encryption key (KEK) used to wrap a DEK
+
+744	   These techniques are often referred to as "hybrid public key
+745	   encryption (HPKE)" [RFC9180] mechanism.
+
+747	   The term "encapsulation" is chosen intentionally to indicate that KEM
+748	   algorithms behave differently at the API level from the key agreement
+749	   or key encipherment / key transport mechanisms that are in use today.
+750	   Key agreement schemes imply that both parties contribute a public /
+751	   private key pair to the exchange, while key encipherment / key
+752	   transport schemes imply that the symmetric key material is chosen by
+753	   one party and "encrypted" or "wrapped" for the other party.  KEMs, on
+754	   the other hand, behave according to the following API primitives
+755	   [PQCAPI]:
+
+757	   *  def kemKeyGen() -> (pk, sk)
+
+759	   *  def kemEncaps(pk) -> (ss, ct)
+
+761	   *  def kemDecaps(ct, sk) -> ss
+
+763	   where pk is the public key, sk is the secret key, ct is the
+764	   ciphertext representing an encapsulated key, and ss is the shared
+765	   secret.  The following figure illustrates a sample flow of a KEM-
+766	   based key exchange:
+
+768	                         +---------+ +---------+
+769	                         | Client  | | Server  |
+770	                         +---------+ +---------+
+771	     +----------------------+ |           |
+772	     | pk, sk = kemKeyGen() |-|           |
+773	     +----------------------+ |           |
+774	                              |           |
+775	                              | pk        |
+776	                              |---------->|
+777	                              |           | +-----------------------+
+778	                              |           |-| ss, ct = kemEncaps(pk)|
+779	                              |           | +-----------------------+
+780	                              |           |
+781	                              |       ct  |
+782	                              |<----------|
+783	   +------------------------+ |           |
+784	   | ss = kemDecaps(ct, sk) |-|           |
+785	   +------------------------+ |           |
+786	                              |           |
+
+788	                      Figure 2: KEM based key exchange
+
+790	10.1.  Authenticated Key Exchange
+
+792	   Authenticated Key Exchange (AKE) with KEMs where both parties
+793	   contribute a KEM public key to the overall session key is interactive
+794	   as described in [I-D.draft-ietf-lake-edhoc].  However, single-sided
+795	   KEM, such as when one peer has a KEM key in a certificate and the
+796	   other peer wants to encrypt for it (as in S/MIME or OpenPGP email),
+797	   can be achieved using non-interactive HPKE [RFC9180].  The following
+798	   figure illustrates the Diffie-Hellman (DH) Key exchange:
+
+800	                         +---------+ +---------+
+801	                         | Client  | | Server  |
+802	                         +---------+ +---------+
+803	     +-----------------------+ |           |
+804	     | Long-term client key: | |           |
+805	     |         sk1, pk1      |-|           |
+806	     +-----------------------+ |           |
+807	                               |           |
+808	                               | pk1       |
+809	                               |---------->|
+810	                               |           | +------------------------+
+811	                               |           |-| Long-term server key:  |
+812	                               |           | |         sk2, pk2       |
+813	                               |           | | ss = KeyEx(pk1, sk2)   |
+814	                               |           | +------------------------+
+815	                               |           |
+816	                               |        pk2|
+817	                               |<----------|
+818	   +-------------------------+ |           |
+819	   | ss = KeyEx(pk2, sk1)    | |           |
+820	   | encryptContent(ss)      |-|           |
+821	   +-------------------------+ |           |
+822	                               | encrypted |
+823	                               |   content |
+824	                               |---------->|
+825	                               |           | +------------------------+
+826	                               |           | | decryptContent(ss)     |
+827	                               |           | +------------------------+
+
+829	                     Figure 3: Diffie-Hellman based AKE
+
+831	   What's important to note about the sample flow above is that the
+832	   shared secret ss is derived using key material from both the Client
+833	   and the Server, which classifies it as an AKE.  There is another
+834	   property of a key exchange, called Non-Interactive Key Exchange
+835	   (NIKE) which refers to whether the sender can compute the shared
+836	   secret ss and encrypt content without requiring active interaction
+837	   (an exchange of network messages) with the recipient.  Figure 3 shows
+838	   a Diffie-Hellman key exchange which is an AKE, since both parties are
+839	   using long-term keys which can have established trust (for example,
+840	   via certificates), but it is not a NIKE, since the client needs to
+841	   wait for the network interaction to receive the receiver's public key
+842	   pk2 before it can compute the shared secret ss and begin content
+843	   encryption.  However, a DH key exchange can be an AKE and a NIKE at
+844	   the same time if the receiver's public key is known to the sender in
+845	   advance, and many Internet protocols rely on this property of DH-
+846	   based key exchanges.
+
+848	                         +---------+ +---------+
+849	                         | Client  | | Server  |
+850	                         +---------+ +---------+
+851	     +-----------------------+ |           |
+852	     | Long-term client key: | |           |
+853	     |         sk1, pk1      |-|           |
+854	     | Long-term server key: | |           |
+855	     |         pk2           | |           |
+856	     | ss = KeyEx(pk2, sk1)  | |           |
+857	     | encryptContent(ss)    |-|           |
+858	     +-----------------------+ |           |
+859	                               |           |
+860	                               | pk1,      |
+861	                               | encrypted |
+862	                               |   content |
+863	                               |---------->|
+864	                               |           | +------------------------+
+865	                               |           |-| Long-term server key:  |
+866	                               |           | |         sk2, pk2       |
+867	                               |           | | ss = KeyEx(pk1, sk2)   |
+868	                               |           | | decryptContent(ss)     |
+869	                               |           | +------------------------+
+
+871	         Figure 4: Diffie-Hellman based AKE and NIKE simultaneously
+
+873	   The complication with KEMs is that a KEM Encaps() is non-
+874	   deterministic; it involves randomness chosen by the sender of that
+875	   message.  Therefore, in order to perform an AKE, the client must wait
+876	   for the server to generate the needed randomness and perform Encaps()
+877	   against the client key, which necessarily requires a network round-
+878	   trip.  Therefore, a KEM-based protocol can either be an AKE or a
+879	   NIKE, but cannot be both at the same time.  Consequently, certain
+880	   Internet protocols will necessitate a redesign to accommodate this
+881	   distinction, either by introducing extra network round-trips or by
+882	   making trade-offs in security properties.
+
+884	                         +---------+ +---------+
+885	                         | Client  | | Server  |
+886	                         +---------+ +---------+
+887	   +------------------------+ |           |
+888	   | pk1, sk1 = kemKeyGen() |-|           |
+889	   +------------------------+ |           |
+890	                              |           |
+891	                              |pk1        |
+892	                              |---------->|
+893	                              |           | +--------------------------+
+894	                              |           |-| ss1, ct1 = kemEncaps(pk1)|
+895	                              |           | | pk2, sk2 = kemKeyGen()   |
+896	                              |           | +--------------------------+
+897	                              |           |
+898	                              |    ct1,pk2|
+899	                              |<----------|
+900	   +------------------------+ |           |
+901	   | ss1 = kemDecaps(ct1, sk1)|-|         |
+902	   | ss2, ct2 = kemEncaps(pk2)|           |
+903	   | ss = Combiner(ss1, ss2)| |           |
+904	   +------------------------+ |           |
+905	                              |           |
+906	                              |ct2        |
+907	                              |---------->|
+908	                              |           | +--------------------------+
+909	                              |           |-| ss2 = kemDecaps(ct2, sk2)|
+910	                              |           | | ss = Combiner(ss1, ss2)  |
+911	                              |           | +--------------------------+
+
+913	                          Figure 5: KEM based AKE
+
+915	   Here, Combiner(ss1, ss2), often referred to as a KEM Combiner, is a
+916	   cryptographic construction that takes in two shared secrets and
+917	   returns a single combined shared secret.  The simplest combiner is
+918	   concatenation ss1 || ss2, but combiners can vary in complexity
+919	   depending on the cryptographic properties required.  For example, if
+920	   the combination should preserve IND-CCA2 of either input even if the
+921	   other is chosen maliciously, then a more complex construct is
+922	   required.  Another consideration for combiner design is so-called
+923	   "binding properties" introduced in [KEEPINGUP], which may require the
+924	   ciphertexts and recipient public keys to be included in the combiner.
+925	   KEM combiner security analysis becomes more complicated in hybrid
+926	   settings where the two KEMs represent different algorithms, for
+927	   example, where one is ML-KEM and the other is ECDH.  For a more
+928	   thorough discussion of KEM combiners, see [KEEPINGUP],
+929	   [I-D.draft-ounsworth-cfrg-kem-combiners], and
+930	   [I-D.draft-connolly-cfrg-xwing-kem].
+
+932	10.2.  Security Properties of KEMs
+
+934	10.2.1.  IND-CCA2
+
+936	   IND-CCA2 (INDistinguishability under adaptive Chosen-Ciphertext
+937	   Attack) is an advanced security notion for encryption schemes.  It
+938	   ensures the confidentiality of the plaintext and resistance against
+939	   chosen-ciphertext attacks.  An appropriate definition of IND-CCA2
+940	   security for KEMs can be found in [CS01] and [BHK09].  ML-KEM
+941	   [ML-KEM] and Classic McEliece provide IND-CCA2 security.
+
+943	   Understanding IND-CCA2 security is essential for individuals involved
+944	   in designing or implementing cryptographic systems and protocols in
+945	   order to evaluate the strength of the algorithm, assess its
+946	   suitability for specific use cases, and ensure that data
+947	   confidentiality and security requirements are met.  Understanding
+948	   IND-CCA2 security is generally not necessary for developers migrating
+949	   to using an IETF-vetted key establishment method (KEM) within a given
+950	   protocol or flow.  IND-CCA2 is a widely accepted security notion for
+951	   public key encryption mechanisms, making it suitable for a broad
+952	   range of applications.  IETF specification authors should include all
+953	   security concerns in the "Security Considerations" section of the
+954	   relevant RFC and not rely on implementers being experts in
+955	   cryptographic theory.
+
+957	10.2.2.  Binding
+
+959	   KEMs also have an orthogonal set of properties to consider when
+960	   designing protocols around them: binding [KEEPINGUP].  This can be
+961	   "ciphertext binding", "public key binding", "context binding", or any
+962	   other property that is important to not be substituted between KEM
+963	   invocations.  In general, a KEM is considered to bind a certain value
+964	   if substitution of that value by an attacker will necessarily result
+965	   in a different shared secret being derived.  As an example, if an
+966	   attacker can construct two different ciphertexts which will
+967	   decapsulate to the same shared secret; or can construct a ciphertext
+968	   which will decapsulate to the same shared secret under two different
+969	   public keys, or can substitute whole KEM exchanges from one session
+970	   into another, then the construction is not ciphertext binding, public
+971	   key binding, or context binding respectively.  Similarly, protocol
+972	   designers may wish to bind protocol state information such as a
+973	   transaction ID or nonce so that attempts to replay ciphertexts from
+974	   one session inside a different session will be blocked at the
+975	   cryptographic level because the server derives a different shared
+976	   secret and is thus is unable to decrypt the content.
+
+978	   The solution to binding is generally achieved at the protocol design
+979	   level: It is recommended to avoid using the KEM output shared secret
+980	   directly without integrating it into an appropriate protocol.  While
+981	   KEM algorithms provide key secrecy, they do not inherently ensure
+982	   source authenticity, protect against replay attacks, or guarantee
+983	   freshness.  These security properties should be addressed by
+984	   incorporating the KEM into a protocol that has been analyzed for such
+985	   protections.  Even though modern KEMs such as ML-KEM produce full-
+986	   entropy shared secrets, it is still advisable for binding reasons to
+987	   pass it through a key derivation function (KDF) and also include all
+988	   values that you wish to bind; then finally you will have a shared
+989	   secret that is safe to use at the protocol level.
+
+991	10.3.  HPKE
+
+993	   Modern cryptography has long used the notion of "hybrid encryption"
+994	   where an asymmetric algorithm is used to establish a key, and then a
+995	   symmetric algorithm is used for bulk content encryption.
+
+997	   HPKE (hybrid public key encryption) [RFC9180] is a specific
+998	   instantiation of this which works with a combination of KEMs, KDFs
+999	   and AEAD (authenticated encryption with additional data) schemes.
+1000	   HPKE includes three authenticated variants, including one that
+1001	   authenticates possession of a pre-shared key and two optional ones
+1002	   that authenticate possession of a key encapsulation mechanism (KEM)
+1003	   private key.  HPKE can be extended to support hybrid post-quantum KEM
+1004	   [I-D.draft-connolly-cfrg-xwing-kem].  ML-KEM does not support the
+1005	   static-ephemeral key exchange that allows HPKE based on DH based KEMs
+1006	   and its optional authenticated modes as discussed in section 1.5 of
+1007	   [I-D.draft-connolly-cfrg-xwing-kem].
+
+1009	11.  PQC Signatures
+
+1011	   Any digital signature scheme that provides a construction defining
+1012	   security under a post-quantum setting falls under this category of
+1013	   PQC signatures.
+
+1015	11.1.  Security Properties of PQC Signatures
+
+1017	11.2.  EUF-CMA and SUF-CMA
+
+1019	   EUF-CMA (existential unforgeability under chosen message attack)
+1020	   [GMR88] is a security notion for digital signature schemes.  It
+1021	   guarantees that an adversary, even with access to a signing oracle,
+1022	   cannot forge a valid signature for an arbitrary message.  EUF-CMA
+1023	   provides strong protection against forgery attacks, ensuring the
+1024	   integrity and authenticity of digital signatures by preventing
+1025	   unauthorized modifications or fraudulent signatures.  ML-DSA, FN-DSA,
+1026	   and SLH-DSA provide EUF-CMA security.
+
+1028	   SUF-CMA (strong unforgeability under chosen message attack) builds
+1029	   upon EUF-CMA by requiring that an adversary cannot produce a
+1030	   different valid signature for a message that has already been signed
+1031	   by the signing oracle.  Like EUF-CMA, SUF-CMA provides robust
+1032	   assurances for digital signature schemes, further enhancing their
+1033	   security posture.  ML-DSA, FN-DSA, and SLH-DSA also achieve SUF-CMA
+1034	   security.
+
+1036	   Understanding EUF-CMA and SUF-CMA security is essential for designing
+1037	   or implementing cryptographic systems in order to ensure the
+1038	   security, reliability, and robustness of digital signature schemes.
+1039	   These notions allow for informed decision-making, vulnerability
+1040	   analysis, compliance with standards, and designing systems that
+1041	   provide strong protection against forgery attacks.  For developers
+1042	   migrating to using an IETF-vetted PQC signature scheme within a given
+1043	   protocol or flow, a deep understanding of EUF-CMA and SUF-CMA
+1044	   security may not be necessary, as the schemes vetted by IETF adhere
+1045	   to these stringent security standards.
+
+1047	   EUF-CMA and SUF-CMA are considered strong security benchmarks for
+1048	   public key signature algorithms, making them suitable for most
+1049	   applications.  IETF specification authors should include all security
+1050	   concerns in the "Security Considerations" section of the relevant RFC
+1051	   and should not assume that implementers are experts in cryptographic
+1052	   theory.
+
+1054	11.3.  Details of FN-DSA, ML-DSA, and SLH-DSA
+
+1056	   ML-DSA [ML-DSA] is a digital signature algorithm based on the
+1057	   hardness of lattice problems over module lattices (i.e., the Module
+1058	   Learning with Errors problem (MLWE)).  The design of the algorithm is
+1059	   based on the "Fiat-Shamir with Aborts" [Lyu09] framework introduced
+1060	   by Lyubashevsky, that leverages rejection sampling to render lattice-
+1061	   based Fiat-Shamir (FS) schemes compact and secure.  ML-DSA uses
+1062	   uniformly-distributed random number sampling over small integers to
+1063	   compute coefficients in error vectors, which makes the scheme easier
+1064	   to implement compared with FN-DSA [FN-DSA] which uses Gaussian-
+1065	   distributed numbers, necessitating the need to use floating point
+1066	   arithmetic during signature generation.
+
+1068	   ML-DSA offers both deterministic and randomized signing and is
+1069	   instantiated with 3 parameter sets providing different security
+1070	   levels.  Security properties of ML-DSA are discussed in Section 9 of
+1071	   [I-D.ietf-lamps-dilithium-certificates].
+
+1073	   FN-DSA [FN-DSA] is based on the GPV hash-and-sign lattice-based
+1074	   signature framework introduced by Gentry, Peikert, and
+1075	   Vaikuntanathan, which is a framework that requires a certain class of
+1076	   lattices and a trapdoor sampler technique.
+
+1078	   The main design principle of FN-DSA is compactness, i.e., it was
+1079	   designed in a way that achieves minimal total memory bandwidth
+1080	   requirement (the sum of the signature size plus the public key size).
+1081	   This is possible due to the compactness of NTRU lattices.  FN-DSA
+1082	   also offers very efficient signing and verification procedures.  The
+1083	   main potential downsides of FN-DSA refer to the non-triviality of its
+1084	   algorithms and the need for floating point arithmetic support in
+1085	   order to support Gaussian-distributed random number sampling where
+1086	   the other lattice schemes use the less efficient but easier to
+1087	   support uniformly-distributed random number sampling.
+
+1089	   Implementers of FN-DSA need to be aware that FN-DSA signing is highly
+1090	   susceptible to side-channel attacks, unless constant-time 64-bit
+1091	   floating-point operations are used.  This requirement is extremely
+1092	   platform-dependent, as noted in NIST's report.
+
+1094	   The performance characteristics of ML-DSA and FN-DSA may differ based
+1095	   on the specific implementation and hardware platform.  Generally, ML-
+1096	   DSA is known for its relatively fast signature generation, while FN-
+1097	   DSA can provide more efficient signature verification.  The choice
+1098	   may depend on whether the application requires more frequent
+1099	   signature generation or signature verification (See [LIBOQS]).  For
+1100	   further clarity on the sizes and security levels, please refer to the
+1101	   tables in sections Section 12 and Section 13.
+
+1103	   SLH-DSA [SLH-DSA] utilizes the concept of stateless hash-based
+1104	   signatures, where each signature is unique and unrelated to any
+1105	   previous signature (as discussed in Section 9.2).  This property
+1106	   eliminates the need for maintaining state information during the
+1107	   signing process.  SLH-DSA was designed to sign up to 2^64 messages
+1108	   under a given key pair, and it offers three security levels.  The
+1109	   parameters for each of the security levels were chosen to provide 128
+1110	   bits of security, 192 bits of security, and 256 bits of security.
+1111	   SLH-DSA offers smaller public key sizes, larger signature sizes,
+1112	   slower signature generation, and slower verification when compared to
+1113	   ML-DSA and FN-DSA.  SLH-DSA does not introduce a new hardness
+1114	   assumption beyond those inherent to the underlying hash functions.
+1115	   It builds upon established foundations in cryptography, making it a
+1116	   reliable and robust digital signature scheme for a post-quantum
+1117	   world.
+
+1119	   All of these algorithms, ML-DSA, FN-DSA, and SLH-DSA include two
+1120	   signature modes: pure mode, where the entire content is signed
+1121	   directly, and pre-hash mode, where a digest of the content is signed.
+
+1123	11.4.  Details of XMSS and LMS
+
+1125	   The eXtended Merkle Signature Scheme (XMSS) [RFC8391] and
+1126	   Hierarchical Signature Scheme (HSS) / Leighton-Micali Signature (LMS)
+1127	   [RFC8554] are stateful hash-based signature schemes, where the secret
+1128	   key state changes over time.  In both schemes, reusing a secret key
+1129	   state compromises cryptographic security guarantees.
+
+1131	   XMSS and LMS can be used for signing a potentially large but fixed
+1132	   number of messages and the number of signing operations depends upon
+1133	   the size of the tree.  XMSS and LMS provide cryptographic digital
+1134	   signatures without relying on the conjectured hardness of
+1135	   mathematical problems, instead leveraging the properties of
+1136	   cryptographic hash functions.  Multi-tree XMSS and LMS (i.e., XMSS-MT
+1137	   and HSS respectively) use a hyper-tree based hierarchical approach
+1138	   with a Merkle tree at each level of the hierarchy.  [RFC8391]
+1139	   describes both single-tree and multi-tree variants of XMSS, while
+1140	   [RFC8554] describes the Leighton-Micali One-Time Signature (LM-OTS)
+1141	   system as well as the LMS and HSS N-time signature systems.
+1142	   Comparison of XMSS and LMS is discussed in Section 10 of [RFC8554].
+
+1144	   The number of tree layers in multi-tree XMSS and HSS provides a
+1145	   trade-off between signature size on the one side and key generation
+1146	   and signing speed on the other side.  Increasing the number of layers
+1147	   reduces key generation time exponentially and signing time linearly
+1148	   at the cost of increasing the signature size linearly.  HSS allows
+1149	   for customization of each subtree whereas XMSS-MT does not, electing
+1150	   instead to use the same structure for each subtree.
+
+1152	   Due to the complexities described above, the XMSS and LMS are not a
+1153	   suitable replacement for traditional signature schemes like RSA or
+1154	   ECDSA.  Applications that expect a long lifetime of a signature, like
+1155	   firmware update or secure boot, are typical use cases where those
+1156	   schemes can be successfully applied.
+
+1158	11.4.1.  LMS Key and Signature Sizes
+
+1160	   The LMS scheme is characterized by four distinct parameter sets: the
+1161	   underlying hash function (SHA2-256 or SHAKE-256), the length of the
+1162	   digest (24 or 32 bytes), the LMS tree height parameter that controls
+1163	   a maximal number of signatures that the private key can produce, and
+1164	   the width of the Winternitz coefficients (see [RFC8554], section 4.1)
+1165	   that can be used to trade-off signing time for signature size.
+1166	   Parameters can be mixed, providing 80 possible parameterizations of
+1167	   the scheme.
+
+1169	   The public (PK) and private (SK) key size depends on the length of
+1170	   the digest (M).  The signature size depends on the digest, the
+1171	   Winternitz parameter (W), the LMS tree height (H), and the length of
+1172	   the digest.  The table below provides key and signature sizes for
+1173	   parameterization with the digest size M=32 of the scheme.
+
+1175	            +====+====+===+======+======+======+======+======+
+1176	            | PK | SK | W | H=5  | H=10 | H=15 | H=20 | H=25 |
+1177	            +====+====+===+======+======+======+======+======+
+1178	            | 56 | 52 | 1 | 8684 | 8844 | 9004 | 9164 | 9324 |
+1179	            +----+----+---+------+------+------+------+------+
+1180	            | 56 | 52 | 2 | 4460 | 4620 | 4780 | 4940 | 5100 |
+1181	            +----+----+---+------+------+------+------+------+
+1182	            | 56 | 52 | 4 | 2348 | 2508 | 2668 | 2828 | 2988 |
+1183	            +----+----+---+------+------+------+------+------+
+1184	            | 56 | 52 | 8 | 1292 | 1452 | 1612 | 1772 | 1932 |
+1185	            +----+----+---+------+------+------+------+------+
+
+1187	                                 Table 1
+
+1189	11.5.  Hash-then-Sign
+
+1191	   Within the hash-then-sign paradigm, the message is hashed before
+1192	   signing it.  By pre-hashing, the onus of resistance to existential
+1193	   forgeries becomes heavily reliant on the collision-resistance of the
+1194	   hash function in use.  The hash-then-sign paradigm has the ability to
+1195	   improve application performance by reducing the size of signed
+1196	   messages that need to be transmitted between application and
+1197	   cryptographic module, and making the signature size predictable and
+1198	   manageable.  As a corollary, hashing remains mandatory even for short
+1199	   messages and assigns a further computational requirement onto the
+1200	   verifier.  This makes the performance of hash-then-sign schemes more
+1201	   consistent, but not necessarily more efficient.
+
+1203	   Using a hash function to produce a fixed-size digest of a message
+1204	   ensures that the signature is compatible with a wide range of systems
+1205	   and protocols, regardless of the specific message size or format.
+1206	   Crucially for hardware security modules, Hash-then-Sign also
+1207	   significantly reduces the amount of data that needs to be transmitted
+1208	   and processed by a Hardware Security Module (HSM).  Consider
+1209	   scenarios such as a networked HSM located in a different data center
+1210	   from the calling application or a smart card connected over a USB
+1211	   interface.  In these cases, streaming a message that is megabytes or
+1212	   gigabytes long can result in notable network latency, on-device
+1213	   signing delays, or even depletion of available on-device memory.
+
+1215	   Note that the vast majority of Internet protocols that sign large
+1216	   messages already perform some form of content hashing at the protocol
+1217	   level, so this tends to be more of a concern with proprietary
+1218	   cryptographic protocols, and protocols from non-IETF standards
+1219	   bodies.  Protocols like TLS 1.3 and DNSSEC use the Hash-then-Sign
+1220	   paradigm.  In TLS 1.3 [RFC8446] CertificateVerify messages, the
+1221	   content that is covered under the signature includes the transcript
+1222	   hash output (Section 4.4.1 of [RFC8446]), while DNSSEC [RFC4034] uses
+1223	   it to provide origin authentication and integrity assurance services
+1224	   for DNS data.  Similarly, the Cryptographic Message Syntax (CMS)
+1225	   [RFC5652] includes a mandatory message digest step before invoking
+1226	   the signature algorithm.
+
+1228	   In the case of ML-DSA, it internally incorporates the necessary hash
+1229	   operations as part of its signing algorithm.  ML-DSA directly takes
+1230	   the original message, applies a hash function internally, and then
+1231	   uses the resulting hash value for the signature generation process.
+1232	   In the case of SLH-DSA, it internally performs randomized message
+1233	   compression using a keyed hash function that can process arbitrary
+1234	   length messages.  In the case of FN-DSA, the SHAKE-256 hash function
+1235	   is used as part of the signature process to derive a digest of the
+1236	   message being signed.
+
+1238	   Therefore, ML-DSA, FN-DSA, and SLH-DSA offer enhanced security over
+1239	   the traditional Hash-then-Sign paradigm because by incorporating
+1240	   dynamic key material into the message digest, a pre-computed hash
+1241	   collision on the message to be signed no longer yields a signature
+1242	   forgery.  Applications requiring the performance and bandwidth
+1243	   benefits of Hash-then-Sign may still pre-hash at the protocol level
+1244	   prior to invoking ML-DSA, FN-DSA, or SLH-DSA, but protocol designers
+1245	   should be aware that doing so re-introduces the weakness that hash
+1246	   collisions directly yield signature forgeries.  Signing the full un-
+1247	   digested message is recommended where applications can tolerate it.
+
+1249	12.  Recommendations for Security / Performance Tradeoffs
+
+1251	   The table below denotes the five security levels provided by NIST for
+1252	   PQC algorithms.  Neither NIST nor the IETF make any specific
+1253	   recommendations about which security level to use.  In general,
+1254	   protocols will include algorithm choices at multiple levels so that
+1255	   users can choose the level appropriate to their policies and data
+1256	   classification, similar to how organizations today choose which size
+1257	   of RSA key to use.  The security levels are defined as requiring
+1258	   computational resources comparable to or greater than an attack on
+1259	   AES (128, 192 and 256) and SHA2/SHA3 algorithms, i.e., exhaustive key
+1260	   recovery for AES and optimal collision search for SHA2/SHA3.  This
+1261	   information is a re-print of information provided in the NIST PQC
+1262	   project [NIST] as of time this document is published.
+
+1264	     +=============+=====================+===========================+
+1265	     | PQ Security | AES/SHA(2/3)        | PQC Algorithm             |
+1266	     | Level       | hardness            |                           |
+1267	     +=============+=====================+===========================+
+1268	     | 1           | AES-128 (exhaustive | ML-KEM-512, FN-DSA-512,   |
+1269	     |             | key recovery)       | SLH-DSA-SHA2/SHAKE-128f/s |
+1270	     +-------------+---------------------+---------------------------+
+1271	     | 2           | SHA-256/SHA3-256    | ML-DSA-44                 |
+1272	     |             | (collision search)  |                           |
+1273	     +-------------+---------------------+---------------------------+
+1274	     | 3           | AES-192 (exhaustive | ML-KEM-768, ML-DSA-65,    |
+1275	     |             | key recovery)       | SLH-DSA-SHA2/SHAKE-192f/s |
+1276	     +-------------+---------------------+---------------------------+
+1277	     | 4           | SHA-384/SHA3-384    | No algorithm tested at    |
+1278	     |             | (collision search)  | this level                |
+1279	     +-------------+---------------------+---------------------------+
+1280	     | 5           | AES-256 (exhaustive | ML-KEM-1024, FN-DSA-1024, |
+1281	     |             | key recovery)       | ML-DSA-87, SLH-DSA-SHA2/  |
+1282	     |             |                     | SHAKE-256f/s              |
+1283	     +-------------+---------------------+---------------------------+
+
+1285	                                  Table 2
+
+1287	   The SLH-DSA-x-yf/s "f/s" in the above table denotes whether SLH-DSA
+1288	   is using SHAKE or SHA-2 as an underlying hash function "x" and
+1289	   whether it is the fast (f) or small (s) version for "y" bit AES
+1290	   security level.  Refer to [I-D.ietf-lamps-cms-sphincs-plus] for
+1291	   further details on SLH-DSA algorithms.
+
+1293	   The following table compares the signature sizes for different SLH-
+1294	   DSA algorithm categories at equivalent security levels, using the
+1295	   "simple" version.  The categories include "(f)" for fast signature
+1296	   generation, and "(s)" for smaller signature size and faster
+1297	   verification, although with slower signature generation.  Both
+1298	   SHA-256 and SHAKE-256 parameterizations produce the same signature
+1299	   sizes and are therefore included together in the table.
+
+1301	   +==========+===========================+========+=======+===========+
+1302	   | PQ       | Algorithm                 | Public |Private| Signature |
+1303	   | Security |                           | key    |key    | size (in  |
+1304	   | Level    |                           | size   |size   | bytes)    |
+1305	   |          |                           | (in    |(in    |           |
+1306	   |          |                           | bytes) |bytes) |           |
+1307	   +==========+===========================+========+=======+===========+
+1308	   | 1        | SLH-DSA-{SHA2,SHAKE}-128f | 32     |64     | 17088     |
+1309	   +----------+---------------------------+--------+-------+-----------+
+1310	   | 1        | SLH-DSA-{SHA2,SHAKE}-128s | 32     |64     | 7856      |
+1311	   +----------+---------------------------+--------+-------+-----------+
+1312	   | 3        | SLH-DSA-{SHA2,SHAKE}-192f | 48     |96     | 35664     |
+1313	   +----------+---------------------------+--------+-------+-----------+
+1314	   | 3        | SLH-DSA-{SHA2,SHAKE}-192s | 48     |96     | 16224     |
+1315	   +----------+---------------------------+--------+-------+-----------+
+1316	   | 5        | SLH-DSA-{SHA2,SHAKE}-256f | 64     |128    | 49856     |
+1317	   +----------+---------------------------+--------+-------+-----------+
+1318	   | 5        | SLH-DSA-{SHA2,SHAKE}-256s | 64     |128    | 29792     |
+1319	   +----------+---------------------------+--------+-------+-----------+
+
+1321	                                  Table 3
+
+1323	   The following table illustrates the impact of performance on
+1324	   different security levels in terms of private key sizes, public key
+1325	   sizes, and ciphertext/signature sizes.
+
+1327	   +==========+=============+============+============+================+
+1328	   | PQ       | Algorithm   | Public key | Private    | Ciphertext/    |
+1329	   | Security |             | size (in   | key size   | signature      |
+1330	   | Level    |             | bytes)     | (in bytes) | size (in       |
+1331	   |          |             |            |            | bytes)         |
+1332	   +==========+=============+============+============+================+
+1333	   | 1        | ML-KEM-512  | 800        | 1632       | 768            |
+1334	   +----------+-------------+------------+------------+----------------+
+1335	   | 1        | FN-DSA-512  | 897        | 1281       | 666            |
+1336	   +----------+-------------+------------+------------+----------------+
+1337	   | 2        | ML-DSA-44   | 1312       | 2560       | 2420           |
+1338	   +----------+-------------+------------+------------+----------------+
+1339	   | 3        | ML-KEM-768  | 1184       | 2400       | 1088           |
+1340	   +----------+-------------+------------+------------+----------------+
+1341	   | 3        | ML-DSA-65   | 1952       | 4032       | 3309           |
+1342	   +----------+-------------+------------+------------+----------------+
+1343	   | 5        | FN-DSA-1024 | 1793       | 2305       | 1280           |
+1344	   +----------+-------------+------------+------------+----------------+
+1345	   | 5        | ML-KEM-1024 | 1568       | 3168       | 1588           |
+1346	   +----------+-------------+------------+------------+----------------+
+1347	   | 5        | ML-DSA-87   | 2592       | 4896       | 4627           |
+1348	   +----------+-------------+------------+------------+----------------+
+
+1350	                                  Table 4
+
+1352	13.  Comparing PQC KEMs/Signatures vs Traditional KEMs (KEXs)/Signatures
+
+1354	   This section provides two tables for comparison of different KEMs and
+1355	   signatures respectively, in the traditional and post-quantum
+1356	   scenarios.  These tables focus on the secret key sizes, public key
+1357	   sizes, and ciphertext/signature sizes for the PQC algorithms and
+1358	   their traditional counterparts of similar security levels.
+
+1360	   The first table compares traditional vs. PQC KEMs in terms of
+1361	   security, public and private key sizes, and ciphertext sizes.
+
+1363	   +=============+=====================+========+=========+============+
+1364	   | PQ Security | Algorithm           | Public | Private | Ciphertext |
+1365	   | Level       |                     | key    | key     | size (in   |
+1366	   |             |                     | size   | size    | bytes)     |
+1367	   |             |                     | (in    | (in     |            |
+1368	   |             |                     | bytes) | bytes)  |            |
+1369	   +=============+=====================+========+=========+============+
+1370	   | Traditional | P256_HKDF_SHA-256   | 65     | 32      | 65         |
+1371	   +-------------+---------------------+--------+---------+------------+
+1372	   | Traditional | P521_HKDF_SHA-512   | 133    | 66      | 133        |
+1373	   +-------------+---------------------+--------+---------+------------+
+1374	   | Traditional | X25519_HKDF_SHA-256 | 32     | 32      | 32         |
+1375	   +-------------+---------------------+--------+---------+------------+
+1376	   | 1           | ML-KEM-512          | 800    | 1632    | 768        |
+1377	   +-------------+---------------------+--------+---------+------------+
+1378	   | 3           | ML-KEM-768          | 1184   | 2400    | 1088       |
+1379	   +-------------+---------------------+--------+---------+------------+
+1380	   | 5           | ML-KEM-1024         | 1568   | 3168    | 1568       |
+1381	   +-------------+---------------------+--------+---------+------------+
+
+1383	                                  Table 5
+
+1385	   The next table compares traditional vs. PQC signature schemes in
+1386	   terms of security, public, private key sizes, and signature sizes.
+
+1388	    +=============+=============+============+============+===========+
+1389	    | PQ Security | Algorithm   | Public key | Private    | Signature |
+1390	    | Level       |             | size (in   | key size   | size (in  |
+1391	    |             |             | bytes)     | (in bytes) | bytes)    |
+1392	    +=============+=============+============+============+===========+
+1393	    | Traditional | RSA2048     | 256        | 256        | 256       |
+1394	    +-------------+-------------+------------+------------+-----------+
+1395	    | Traditional | ECDSA-P256  | 64         | 32         | 64        |
+1396	    +-------------+-------------+------------+------------+-----------+
+1397	    | 1           | FN-DSA-512  | 897        | 1281       | 666       |
+1398	    +-------------+-------------+------------+------------+-----------+
+1399	    | 2           | ML-DSA-44   | 1312       | 2560       | 2420      |
+1400	    +-------------+-------------+------------+------------+-----------+
+1401	    | 3           | ML-DSA-65   | 1952       | 4032       | 3309      |
+1402	    +-------------+-------------+------------+------------+-----------+
+1403	    | 5           | FN-DSA-1024 | 1793       | 2305       | 1280      |
+1404	    +-------------+-------------+------------+------------+-----------+
+1405	    | 5           | ML-DSA-87   | 2592       | 4896       | 4627      |
+1406	    +-------------+-------------+------------+------------+-----------+
+
+1408	                                  Table 6
+
+1410	   As is clear from the above table, PQC KEMs and signature schemes
+1411	   typically have significantly larger keys and ciphertexts/signatures
+1412	   than their traditional counterparts.  These increased key and
+1413	   signatures sizes could introduce problems in protocols.  As an
+1414	   example, IKEv2 uses UDP as the transport for its messages.  One
+1415	   challenge with integrating a PQC KEM into IKEv2 is that IKE
+1416	   fragmentation cannot be utilized in the initial IKE_SA_INIT exchange.
+1417	   To address this issue, [RFC9242] introduces a solution by defining a
+1418	   new exchange called the "Intermediate Exchange" which can be
+1419	   fragmented using the IKE fragmentation mechanism.  [RFC9370] then
+1420	   uses this Intermediate Exchange to carry out the PQC key exchange
+1421	   after the initial IKEv2 exchange and before the IKE_AUTH exchange.
+1422	   Another example from [SP-1800-38C] section 6.3.3 shows that increased
+1423	   key and signature sizes cause protocol key exchange messages to span
+1424	   more network packets, therefore it results in a higher total loss
+1425	   probability per packet.  In lossy network conditions, this may
+1426	   increase the latency of the key exchange.
+
+1428	14.  Post-Quantum and Traditional Hybrid Schemes
+
+1430	   The migration to PQC is unique in the history of modern digital
+1431	   cryptography in that neither the traditional algorithms nor the post-
+1432	   quantum algorithms are fully trusted to protect data for the required
+1433	   lifetimes.  The traditional algorithms, such as RSA and ECDH, will
+1434	   fall to quantum cryptanalysis, while the post-quantum algorithms face
+1435	   uncertainty about the underlying mathematics, compliance issues,
+1436	   unknown vulnerabilities, and hardware and software implementations
+1437	   that have not had sufficient maturing time to rule out traditional
+1438	   cryptanalytic attacks and implementation bugs.
+
+1440	   During the transition from traditional to post-quantum algorithms,
+1441	   there may be a desire or a requirement for protocols that use both
+1442	   algorithm types.  [I-D.ietf-pquip-pqt-hybrid-terminology] defines the
+1443	   terminology for the post-quantum and traditional (PQ/T) hybrid
+1444	   schemes.
+
+1446	14.1.  PQ/T Hybrid Confidentiality
+
+1448	   The PQ/T Hybrid Confidentiality property can be used to protect from
+1449	   a "harvest now, decrypt later" attack described in Section 8, which
+1450	   refers to an attacker collecting encrypted data now and waiting for
+1451	   quantum computers to become powerful enough to break the encryption
+1452	   later.  Two types of hybrid key agreement schemes are discussed
+1453	   below.
+
+1455	   *  Concatenated hybrid key agreement scheme: The final shared secret
+1456	      that will be used as an input of the key derivation function is
+1457	      the result of the concatenation of the secrets established with
+1458	      each key agreement scheme.  For example, in
+1459	      [I-D.ietf-tls-hybrid-design], the client uses the TLS supported
+1460	      groups extension to advertise support for a PQ/T hybrid scheme,
+1461	      and the server can select this group if it supports the scheme.
+1462	      The hybrid-aware client and server establish a hybrid secret by
+1463	      concatenating the two shared secrets, which is used as the shared
+1464	      secret in the existing TLS 1.3 key schedule.
+
+1466	   *  Cascaded hybrid key agreement scheme: The final shared secret is
+1467	      computed by applying as many iterations of the key derivation
+1468	      function as the number of key agreement schemes composing the
+1469	      hybrid key agreement scheme.  For example, [RFC9370] extends the
+1470	      Internet Key Exchange Protocol Version 2 (IKEv2) to allow one or
+1471	      more PQC algorithms in addition to the traditional algorithm to
+1472	      derive the final IKE SA keys using the cascade method as explained
+1473	      in Section 2.2.2 of [RFC9370].
+
+1475	   Various instantiations of these two types of hybrid key agreement
+1476	   schemes have been explored.  One must be careful when selecting which
+1477	   hybrid scheme to use.  The chosen scheme for protocols like TLS 1.3
+1478	   [I-D.ietf-tls-hybrid-design] has IND-CCA2 robustness, that is IND-
+1479	   CCA2 security is guaranteed for the scheme as long as at least one of
+1480	   the component algorithms is IND-CCA2 secure.
+
+1482	14.2.  PQ/T Hybrid Authentication
+
+1484	   The PQ/T hybrid authentication property can be utilized in scenarios
+1485	   where an on-path attacker possesses network devices equipped with
+1486	   CRQCs, capable of breaking traditional authentication protocols, or
+1487	   where an attacker can attack long-lived authenticated data such as CA
+1488	   certificates or signed software images.  This property ensures
+1489	   authentication through a PQ/T hybrid scheme or a PQ/T hybrid
+1490	   protocol, as long as at least one component algorithm remains secure
+1491	   to provide the intended security level.  For example, a PQ/T hybrid
+1492	   certificate [I-D.ietf-lamps-pq-composite-sigs]can be employed to
+1493	   facilitate a PQ/T hybrid authentication protocol.  However, a PQ/T
+1494	   hybrid authentication protocol does not need to use a PQ/T hybrid
+1495	   certificate; separate certificates could be used for individual
+1496	   component algorithms [I-D.ietf-lamps-cert-binding-for-multi-auth].
+1497	   When separate certificates are used, it may be possible for attackers
+1498	   to take them apart or put them together in unexpected ways, including
+1499	   enabling cross-protocol attacks.  The exact risks this presents are
+1500	   highly dependent on the protocol and use case, so a full security
+1501	   analysis is needed.  Best practices for ensuring that pairs of
+1502	   certificates are only used as intended are discussed in more detail
+1503	   in Sections 12.3.2 and 12.3.3 of this document.
+
+1505	   The frequency and duration of system upgrades and the time when CRQCs
+1506	   will become widely available need to be weighed to determine whether
+1507	   and when to support the PQ/T Hybrid Authentication property.
+
+1509	14.3.  Hybrid Cryptographic Algorithm Combinations: Considerations and
+1510	       Approaches
+
+1512	14.3.1.  Hybrid Cryptographic Combinations
+
+1514	   It is also possible to use more than two algorithms together in a
+1515	   hybrid scheme, with various methods for combining them.  For post-
+1516	   quantum transition purposes, the combination of a post-quantum
+1517	   algorithm with a traditional algorithm is the most straightforward
+1518	   and recommended.  The use of multiple post-quantum algorithms with
+1519	   different mathematical bases has also been considered.  Combining
+1520	   algorithms in a way that requires both to be used together ensures
+1521	   stronger security, while combinations that do not require both will
+1522	   sacrifice security but offer other benefits like backwards
+1523	   compatibility and crypto agility.  Including a traditional key
+1524	   alongside a post-quantum key often has minimal bandwidth impact.
+
+1526	14.3.2.  Composite Keys in Hybrid Schemes
+
+1528	   When combining keys in an "and" mode, it may make more sense to
+1529	   consider them to be a single composite key, instead of two keys.
+1530	   This generally requires fewer changes to various components of PKI
+1531	   ecosystems, many of which are not prepared to deal with two keys or
+1532	   dual signatures.  To those protocol- or application-layer parsers, a
+1533	   "composite" algorithm composed of two "component" algorithms is
+1534	   simply a new algorithm, and support for adding new algorithms
+1535	   generally already exists.  Treating multiple "component" keys as a
+1536	   single "composite" key also has security advantages such as
+1537	   preventing cross-protocol reuse of the individual component keys and
+1538	   guarantees about revoking or retiring all component keys together at
+1539	   the same time, especially if the composite is treated as a single
+1540	   object all the way down into the cryptographic module.
+
+1542	   All that needs to be done is to standardize the formats of how the
+1543	   two keys from the two algorithms are combined into a single data
+1544	   structure, and how the two resulting signatures or KEMs are combined
+1545	   into a single signature or KEM.  The answer can be as simple as
+1546	   concatenation, if the lengths are fixed or easily determined.  At the
+1547	   time this document is published, security research is ongoing as to
+1548	   the security properties of concatenation-based composite signatures
+1549	   and KEMs vs more sophisticated signature and KEM combiners, and in
+1550	   which protocol contexts those simpler combiners are sufficient.
+
+1552	   One last consideration is the specific pairs of algorithms that can
+1553	   be combined.  A recent trend in protocols is to only allow a small
+1554	   number of "known good" configurations that make sense, often referred
+1555	   to in cryptography as a "ciphersuite", instead of allowing arbitrary
+1556	   combinations of individual configuration choices that may interact in
+1557	   dangerous ways.  The current consensus is that the same approach
+1558	   should be followed for combining cryptographic algorithms, and that
+1559	   "known good" pairs should be explicitly listed ("explicit
+1560	   composite"), instead of just allowing arbitrary combinations of any
+1561	   two cryptographic algorithms ("generic composite").
+
+1563	   The same considerations apply when using multiple certificates to
+1564	   transport a pair of related keys for the same subject.  Exactly how
+1565	   two certificates should be managed in order to avoid some of the
+1566	   pitfalls mentioned above is still an active area of investigation.
+1567	   Using two certificates keeps the certificate tooling simple and
+1568	   straightforward, but in the end simply moves the problems with
+1569	   requiring that both certs are intended to be used as a pair, must
+1570	   produce two signatures which must be carried separately, and both
+1571	   must validate, to the certificate management layer, where addressing
+1572	   these concerns in a robust way can be difficult.
+
+1574	   At least one scheme has been proposed that allows the pair of
+1575	   certificates to exist as a single certificate when being issued and
+1576	   managed, but dynamically split into individual certificates when
+1577	   needed ([I-D.draft-bonnell-lamps-chameleon-certs].
+
+1579	14.3.3.  Key Reuse in Hybrid Schemes
+
+1581	   An important security note, particularly when using hybrid signature
+1582	   keys, but also to a lesser extent hybrid KEM keys, is key reuse.  In
+1583	   traditional cryptography, problems can occur with so-called "cross-
+1584	   protocol attacks" when the same key can be used for multiple
+1585	   protocols; for example signing TLS handshakes and signing S/MIME
+1586	   emails.  While it is not best-practice to reuse keys within the same
+1587	   protocol, for example using the same key for multiple S/MIME
+1588	   certificates for the same user, it is not generally catastrophic for
+1589	   security.  However, key reuse becomes a large security problem within
+1590	   hybrids.
+
+1592	   Consider an {RSA, ML-DSA} hybrid key where the RSA key also appears
+1593	   within a single-algorithm certificate.  In this case, an attacker
+1594	   could perform a "stripping attack" where they take some piece of data
+1595	   signed with the {RSA, ML-DSA} key, remove the ML-DSA signature and
+1596	   present the data as if it was intended for the RSA only certificate.
+1597	   This leads to a set of security definitions called "non-separability
+1598	   properties", which refers to how well the signature scheme resists
+1599	   various complexities of downgrade / stripping attacks
+
+1601	   [I-D.draft-ietf-pquip-hybrid-signature-spectrums].  Therefore, it is
+1602	   recommended that implementers either reuse the entire hybrid key as a
+1603	   whole, or perform fresh key generation of all component keys per
+1604	   usage, and must not take an existing key and reuse it as a component
+1605	   of a hybrid.
+
+1607	14.3.4.  Jurisdictional Fragmentation
+
+1609	   Another potential application of hybrids bears mentioning, even
+1610	   though it is not directly PQC-related.  That is using hybrids to
+1611	   navigate inter-jurisdictional cryptographic connections.  Traditional
+1612	   cryptography is already fragmented by jurisdiction: consider that
+1613	   while most jurisdictions support Elliptic Curve Diffie-Hellman, those
+1614	   in the United States will prefer the NIST curves while those in
+1615	   Germany will prefer the Brainpool curves.  China, Russia, and other
+1616	   jurisdictions have their own national cryptography standards.  This
+1617	   situation of fragmented global cryptography standards is unlikely to
+1618	   improve with PQC.  If "and" mode hybrids become standardized for the
+1619	   reasons mentioned above, then one could imagine leveraging them to
+1620	   create "ciphersuites" in which a single cryptographic operation
+1621	   simultaneously satisfies the cryptographic requirements of both
+1622	   endpoints.
+
+1624	14.3.5.  Future Directions and Ongoing Research
+
+1626	   Many aspects of hybrid cryptography are still under investigation.
+1627	   LAMPS WG at IETF is actively exploring the security properties of
+1628	   these combinations, and future standards will reflect the evolving
+1629	   consensus on these issues.
+
+1631	15.  Security Considerations
+
+1633	15.1.  Cryptanalysis
+
+1635	   Traditional cryptanalysis exploits weaknesses in algorithm design,
+1636	   mathematical vulnerabilities, or implementation flaws, that are
+1637	   exploitable with classical (i.e. non-quantum) hardware, whereas
+1638	   quantum cryptanalysis harnesses the power of CRQCs to solve specific
+1639	   mathematical problems more efficiently.  Another form of quantum
+1640	   cryptanalysis is "quantum side-channel" attacks.  In such attacks, a
+1641	   device under threat is directly connected to a quantum computer,
+1642	   which then injects entangled or superimposed data streams to exploit
+1643	   hardware that lacks protection against quantum side-channels.  Both
+1644	   pose threats to the security of cryptographic algorithms, including
+1645	   those used in PQC.  Developing and adopting new cryptographic
+1646	   algorithms resilient against these threats is crucial for ensuring
+1647	   long-term security in the face of advancing cryptanalysis techniques.
+
+1649	   Recent attacks on the side-channel implementations using deep
+1650	   learning based power analysis have also shown that one needs to be
+1651	   cautious while implementing the required PQC algorithms in hardware.
+1652	   Two of the most recent works include one attack on ML-KEM [KyberSide]
+1653	   and one attack on Saber [SaberSide].  An evolving threat landscape
+1654	   points to the fact that lattice based cryptography is indeed more
+1655	   vulnerable to side-channel attacks as in [SideCh], [LatticeSide].
+1656	   Consequently, there were some mitigation techniques for side channel
+1657	   attacks that have been proposed as in [Mitigate1], [Mitigate2], and
+1658	   [Mitigate3].
+
+1660	15.2.  Cryptographic Agility
+
+1662	   Cryptographic agility is recommended for both traditional and quantum
+1663	   cryptanalysis as it enables organizations to adapt to emerging
+1664	   threats, adopt stronger algorithms, comply with standards, and plan
+1665	   for long-term security in the face of evolving cryptanalytic
+1666	   techniques and the advent of CRQCs.
+
+1668	   Several PQC schemes are available that need to be tested;
+1669	   cryptography experts around the world are pushing for the best
+1670	   possible solutions, and the first standards that will ease the
+1671	   introduction of PQC are being prepared.  It is of paramount
+1672	   importance and a call for imminent action for organizations, bodies,
+1673	   and enterprises to start evaluating their cryptographic agility,
+1674	   assess the complexity of implementing PQC into their products,
+1675	   processes, and systems, and develop a migration plan that achieves
+1676	   their security goals to the best possible extent.
+
+1678	   An important and often overlooked step in achieving cryptographic
+1679	   agility is maintaining a cryptographic inventory.  Modern software
+1680	   stacks incorporate cryptography in numerous places, making it
+1681	   challenging to identify all instances.  Therefore, cryptographic
+1682	   agility and inventory management take two major forms: First,
+1683	   application developers responsible for software maintenance should
+1684	   actively search for instances of hard-coded cryptographic algorithms
+1685	   within applications.  When possible, they should design the choice of
+1686	   algorithm to be dynamic, based on application configuration.  Second,
+1687	   administrators, policy officers, and compliance teams should take
+1688	   note of any instances where an application exposes cryptographic
+1689	   configurations.  These instances should be managed either through
+1690	   organization-wide written cryptographic policies or automated
+1691	   cryptographic policy systems.
+
+1693	   Numerous commercial solutions are available for both detecting hard-
+1694	   coded cryptographic algorithms in source code and compiled binaries,
+1695	   as well as providing cryptographic policy management control planes
+1696	   for enterprise and production environments.
+
+1698	15.3.  Hybrid Key Exchange and Signatures: Bridging the Gap Between
+1699	       Post-Quantum and Traditional Cryptography
+
+1701	   Post-quantum algorithms selected for standardization are relatively
+1702	   new and they have not been subject to the same depth of study as
+1703	   traditional algorithms.  PQC implementations will also be new and
+1704	   therefore more likely to contain implementation bugs than the battle-
+1705	   tested crypto implementations that are relied on today.  In addition,
+1706	   certain deployments may need to retain traditional algorithms due to
+1707	   regulatory constraints, for example FIPS [SP-800-56C] or PCI
+1708	   compliance [PCI].  Hybrid key exchange is recommended to enhance
+1709	   security against the "harvest now, decrypt later" attack.
+1710	   Additionally, hybrid signatures provide for time to react in the case
+1711	   of the announcement of a devastating attack against any one
+1712	   algorithm, while not fully abandoning traditional cryptosystems.
+
+1714	   Hybrid key exchange performs both a classical and a post-quantum key
+1715	   exchange in parallel.  It provides security redundancy against
+1716	   potential weaknesses in PQ algorithms, allows for a gradual
+1717	   transition of trust in PQC algorithms, and, in backward-compatible
+1718	   designs, enables gradual adoption without breaking compatibility with
+1719	   existing systems.  For instance, in TLS 1.3, a hybrid key exchange
+1720	   can combine a widely supported classical algorithm, such as X25519,
+1721	   with a post-quantum algorithm like ML-KEM.  This allows legacy
+1722	   clients to continue using the classical algorithm while enabling
+1723	   upgraded clients to proceed with hybrid key exchange.  In contrast,
+1724	   overhead-spreading hybrid designs focus on reducing the PQ overhead.
+1725	   For example, approaches like those described in
+1726	   [I-D.hale-mls-combiner] amortize PQ costs by selectively applying PQ
+1727	   updates in key exchange processes, allowing systems to balance
+1728	   security and efficiency.  This strategy ensures a post-quantum secure
+1729	   channel while keeping the overhead manageable, making it particularly
+1730	   suitable for constrained environments.
+
+1732	   While some hybrid key exchange options introduce additional
+1733	   computational and bandwidth overhead, the impact of traditional key
+1734	   exchange algorithms (e.g., key size) is typically small, helping to
+1735	   keep the overall increase in resource usage manageable for most
+1736	   systems.  In highly constrained environments, however, those hybrid
+1737	   key exchange protocols may be impractical due to their higher
+1738	   resource requirements compared to pure post-quantum or traditional
+1739	   key exchange approaches.  However, some hybrid key exchange designs
+1740	   distribute the PQC overhead, making them more suitable for
+1741	   constrained environments.  The choice of hybrid key exchange design
+1742	   depends on the specific system requirements and use case, so the
+1743	   appropriate approach may vary.
+
+1745	15.4.  Caution: Ciphertext commitment in KEM vs DH
+
+1747	   The ciphertext generated by a KEM is not necessarily directly linked
+1748	   to the shared secret it produces.  KEMs allow for multiple
+1749	   ciphertexts to encapsulate the same shared secret, which enables
+1750	   flexibility in key management without enforcing a strict one-to-one
+1751	   correspondence between ciphertexts and shared secrets.  This allows
+1752	   for secret reuse across different recipients, sessions, or
+1753	   operational contexts without the need for new secrets for each use,
+1754	   simplifying key distribution and reducing computational overhead.  In
+1755	   contrast, cryptographic schemes like Diffie-Hellman inherently link
+1756	   the public key to the derived shared secret, meaning any change in
+1757	   the public key results in a different shared secret.
+
+1759	16.  IANA Considerations
+
+1761	   This document has no IANA considerations.
+
+1763	17.  Further Reading & Resources
+
+1765	   A good book on modern cryptography is Serious Cryptography, 2nd
+1766	   Edition, by Jean-Philippe Aumasson, ISBN 9781718503847.
+
+1768	   The Open Quantum Safe (OQS) Project [OQS] is an open-source project
+1769	   that aims to support the transition to quantum-resistant
+1770	   cryptography.
+
+1772	   The IETF's PQUIP Working Group [PQUIP-WG] maintains a list of PQC-
+1773	   related protocol work within the IETF.
+
+1775	18.  Informative References
+
+1777	   [AddSig]   "AddSig", n.d., <https://csrc.nist.gov/Projects/pqc-dig-
+1778	              sig/standardization>.
+
+1780	   [ANSSI]    "ANSSI views on the Post-Quantum Cryptography transition",
+1781	              n.d., <https://cyber.gouv.fr/sites/default/files/document/
+1782	              follow_up_position_paper_on_post_quantum_cryptography.pdf>
+1783	              .
+
+1785	   [BHK09]    "Subtleties in the Definition of IND-CCA: When and How
+1786	              Should Challenge-Decryption be Disallowed?",
+1787	              <https://eprint.iacr.org/2009/418>.
+
+1789	   [BIKE]     "BIKE", n.d., <http://pqc-hqc.org/>.
+
+1791	   [BPQS]     "BPQS", n.d., <https://eprint.iacr.org/2018/658.pdf>.
+
+1793	   [BSI-PQC]  "Quantum-safe cryptography – fundamentals, current
+1794	              developments and recommendations", May 2022,
+1795	              <https://www.bsi.bund.de/SharedDocs/Downloads/EN/BSI/
+1796	              Publications/Brochure/quantum-safe-
+1797	              cryptography.html?nn=916626>.
+
+1799	   [ClassicMcEliece]
+1800	              "Classic McEliece", n.d., <https://classic.mceliece.org/>.
+
+1802	   [Cloudflare]
+1803	              "NIST’s pleasant post-quantum surprise",
+1804	              <https://blog.cloudflare.com/nist-post-quantum-surprise/>.
+
+1806	   [CNSA2-0]  "Announcing the Commercial National Security Algorithm
+1807	              Suite 2.0", <https://media.defense.gov/2022/
+1808	              Sep/07/2003071834/-1/-1/0/CSA_CNSA_2.0_ALGORITHMS_.PDF>.
+
+1810	   [CRQCThreat]
+1811	              "CRQCThreat", n.d.,
+1812	              <https://sam-jaques.appspot.com/quantum_landscape_2024>.
+
+1814	   [CS01]     "Design and Analysis of Practical Public-Key Encryption
+1815	              Schemes Secure against Adaptive Chosen Ciphertext Attack",
+1816	              <https://eprint.iacr.org/2001/108>.
+
+1818	   [FN-DSA]   "Fast Fourier lattice-based compact signatures over NTRU",
+1819	              <https://falcon-sign.info/>.
+
+1821	   [FrodoKEM] "FrodoKEM", n.d., <https://frodokem.org/>.
+
+1823	   [GMR88]    "A digital signature scheme secure against adaptive
+1824	              chosen-message attacks.",
+1825	              <https://people.csail.mit.edu/silvio/
+1826	              Selected%20Scientific%20Papers/Digital%20Signatures/
+1827	              A_Digital_Signature_Scheme_Secure_Against_Adaptive_Chosen-
+1828	              Message_Attack.pdf>.
+
+1830	   [Grover-search]
+1831	              "C. Zalka, “Grover’s quantum searching algorithm is
+1832	              optimal,” Physical Review A, vol. 60, pp. 2746-2751,
+1833	              1999.".
+
+1835	   [HQC]      "HQC", n.d., <http://pqc-hqc.org/>.
+
+1837	   [I-D.draft-bonnell-lamps-chameleon-certs]
+1838	              Bonnell, C., Gray, J., Hook, D., Okubo, T., and M.
+1839	              Ounsworth, "A Mechanism for Encoding Differences in Paired
+1840	              Certificates", Work in Progress, Internet-Draft, draft-
+1841	              bonnell-lamps-chameleon-certs-06, 16 April 2025,
+1842	              <https://datatracker.ietf.org/doc/html/draft-bonnell-
+1843	              lamps-chameleon-certs-06>.
+
+1845	   [I-D.draft-connolly-cfrg-xwing-kem]
+1846	              Connolly, D., Schwabe, P., and B. Westerbaan, "X-Wing:
+1847	              general-purpose hybrid post-quantum KEM", Work in
+1848	              Progress, Internet-Draft, draft-connolly-cfrg-xwing-kem-
+1849	              07, 3 May 2025, <https://datatracker.ietf.org/doc/html/
+1850	              draft-connolly-cfrg-xwing-kem-07>.
+
+1852	   [I-D.draft-ietf-lake-edhoc]
+1853	              Selander, G., Mattsson, J. P., and F. Palombini,
+1854	              "Ephemeral Diffie-Hellman Over COSE (EDHOC)", Work in
+1855	              Progress, Internet-Draft, draft-ietf-lake-edhoc-23, 22
+1856	              January 2024, <https://datatracker.ietf.org/doc/html/
+1857	              draft-ietf-lake-edhoc-23>.
+
+1859	   [I-D.draft-ietf-pquip-hybrid-signature-spectrums]
+1860	              Bindel, N., Hale, B., Connolly, D., and F. D, "Hybrid
+1861	              signature spectrums", Work in Progress, Internet-Draft,
+1862	              draft-ietf-pquip-hybrid-signature-spectrums-07, 20 June
+1863	              2025, <https://datatracker.ietf.org/doc/html/draft-ietf-
+1864	              pquip-hybrid-signature-spectrums-07>.
+
+1866	   [I-D.draft-ounsworth-cfrg-kem-combiners]
+1867	              Ounsworth, M., Wussler, A., and S. Kousidis, "Combiner
+1868	              function for hybrid key encapsulation mechanisms (Hybrid
+1869	              KEMs)", Work in Progress, Internet-Draft, draft-ounsworth-
+1870	              cfrg-kem-combiners-05, 31 January 2024,
+1871	              <https://datatracker.ietf.org/doc/html/draft-ounsworth-
+1872	              cfrg-kem-combiners-05>.
+
+1874	   [I-D.hale-mls-combiner]
+1875	              Joël, Hale, B., Mularczyk, M., and X. Tian, "Flexible
+1876	              Hybrid PQ MLS Combiner", Work in Progress, Internet-Draft,
+1877	              draft-hale-mls-combiner-01, 26 September 2024,
+1878	              <https://datatracker.ietf.org/doc/html/draft-hale-mls-
+1879	              combiner-01>.
+
+1881	   [I-D.ietf-lamps-cert-binding-for-multi-auth]
+1882	              Becker, A., Guthrie, R., and M. J. Jenkins, "Related
+1883	              Certificates for Use in Multiple Authentications within a
+1884	              Protocol", Work in Progress, Internet-Draft, draft-ietf-
+1885	              lamps-cert-binding-for-multi-auth-06, 10 December 2024,
+1886	              <https://datatracker.ietf.org/doc/html/draft-ietf-lamps-
+1887	              cert-binding-for-multi-auth-06>.
+
+1889	   [I-D.ietf-lamps-cms-sphincs-plus]
+1890	              Housley, R., Fluhrer, S., Kampanakis, P., and B.
+1891	              Westerbaan, "Use of the SLH-DSA Signature Algorithm in the
+1892	              Cryptographic Message Syntax (CMS)", Work in Progress,
+1893	              Internet-Draft, draft-ietf-lamps-cms-sphincs-plus-19, 13
+1894	              January 2025, <https://datatracker.ietf.org/doc/html/
+1895	              draft-ietf-lamps-cms-sphincs-plus-19>.
+
+1897	   [I-D.ietf-lamps-dilithium-certificates]
+1898	              Massimo, J., Kampanakis, P., Turner, S., and B.
+1899	              Westerbaan, "Internet X.509 Public Key Infrastructure -
+1900	              Algorithm Identifiers for the Module-Lattice-Based Digital
+1901	              Signature Algorithm (ML-DSA)", Work in Progress, Internet-
+1902	              Draft, draft-ietf-lamps-dilithium-certificates-12, 26 June
+1903	              2025, <https://datatracker.ietf.org/doc/html/draft-ietf-
+1904	              lamps-dilithium-certificates-12>.
+
+1906	   [I-D.ietf-lamps-pq-composite-sigs]
+1907	              Ounsworth, M., Gray, J., Pala, M., Klaußner, J., and S.
+1908	              Fluhrer, "Composite ML-DSA for use in X.509 Public Key
+1909	              Infrastructure", Work in Progress, Internet-Draft, draft-
+1910	              ietf-lamps-pq-composite-sigs-06, 18 June 2025,
+1911	              <https://datatracker.ietf.org/doc/html/draft-ietf-lamps-
+1912	              pq-composite-sigs-06>.
+
+1914	   [I-D.ietf-pquip-pqt-hybrid-terminology]
+1915	              D, F., P, M., and B. Hale, "Terminology for Post-Quantum
+1916	              Traditional Hybrid Schemes", Work in Progress, Internet-
+1917	              Draft, draft-ietf-pquip-pqt-hybrid-terminology-06, 10
+1918	              January 2025, <https://datatracker.ietf.org/doc/html/
+1919	              draft-ietf-pquip-pqt-hybrid-terminology-06>.
+
+1921	   [I-D.ietf-tls-hybrid-design]
+1922	              Stebila, D., Fluhrer, S., and S. Gueron, "Hybrid key
+1923	              exchange in TLS 1.3", Work in Progress, Internet-Draft,
+1924	              draft-ietf-tls-hybrid-design-13, 17 June 2025,
+1925	              <https://datatracker.ietf.org/doc/html/draft-ietf-tls-
+1926	              hybrid-design-13>.
+
+1928	   [I-D.irtf-cfrg-bbs-signatures]
+1929	              Looker, T., Kalos, V., Whitehead, A., and M. Lodder, "The
+1930	              BBS Signature Scheme", Work in Progress, Internet-Draft,
+1931	              draft-irtf-cfrg-bbs-signatures-08, 3 March 2025,
+1932	              <https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-
+1933	              bbs-signatures-08>.
+
+1935	   [KEEPINGUP]
+1936	              "Keeping Up with the KEMs: Stronger Security Notions for
+1937	              KEMs and automated analysis of KEM-based protocols", n.d.,
+1938	              <https://eprint.iacr.org/2023/1933>.
+
+1940	   [KyberSide]
+1941	              "A Side-Channel Attack on a Hardware Implementation of
+1942	              CRYSTALS-Kyber", <https://eprint.iacr.org/2022/1452>.
+
+1944	   [LattFail1]
+1945	              "Decryption Failure Attacks on IND-CCA Secure Lattice-
+1946	              Based Schemes", <https://link.springer.com/
+1947	              chapter/10.1007/978-3-030-17259-6_19#chapter-info>.
+
+1949	   [LattFail2]
+1950	              "(One) Failure Is Not an Option: Bootstrapping the Search
+1951	              for Failures in Lattice-Based Encryption Schemes.",
+1952	              <https://link.springer.com/
+1953	              chapter/10.1007/978-3-030-45727-3_1>.
+
+1955	   [LatticeSide]
+1956	              "Generic Side-channel attacks on CCA-secure lattice-based
+1957	              PKE and KEM schemes", <https://eprint.iacr.org/2019/948>.
+
+1959	   [LIBOQS]   "LibOQS - Open Quantum Safe",
+1960	              <https://github.com/open-quantum-safe/liboqs>.
+
+1962	   [Lyu09]    "V. Lyubashevsky, “Fiat-Shamir With Aborts: Applications
+1963	              to Lattice and Factoring-Based Signatures“, ASIACRYPT
+1964	              2009", <https://www.iacr.org/archive/
+1965	              asiacrypt2009/59120596/59120596.pdf>.
+
+1967	   [Mitigate1]
+1968	              "POLKA: Towards Leakage-Resistant Post-Quantum CCA-Secure
+1969	              Public Key Encryption",
+1970	              <https://eprint.iacr.org/2022/873>.
+
+1972	   [Mitigate2]
+1973	              "Leakage-Resilient Certificate-Based Authenticated Key
+1974	              Exchange Protocol",
+1975	              <https://ieeexplore.ieee.org/document/9855226>.
+
+1977	   [Mitigate3]
+1978	              "Post-Quantum Authenticated Encryption against Chosen-
+1979	              Ciphertext Side-Channel Attacks",
+1980	              <https://eprint.iacr.org/2022/916>.
+
+1982	   [ML-DSA]   "FIPS-204: Module-Lattice-Based Digital Signature
+1983	              Standard", <https://nvlpubs.nist.gov/nistpubs/FIPS/
+1984	              NIST.FIPS.204.pdf>.
+
+1986	   [ML-KEM]   "FIPS-203: Module-Lattice-based Key-Encapsulation
+1987	              Mechanism Standard",
+1988	              <https://nvlpubs.nist.gov/nistpubs/FIPS/
+1989	              NIST.FIPS.203.pdf>.
+
+1991	   [NIST]     "Post-Quantum Cryptography Standardization",
+1992	              <https://csrc.nist.gov/projects/post-quantum-cryptography/
+1993	              post-quantum-cryptography-standardization>.
+
+1995	   [NISTFINAL]
+1996	              "NIST Releases First 3 Finalized Post-Quantum Encryption
+1997	              Standards", n.d., <https://www.nist.gov/news-
+1998	              events/news/2024/08/nist-releases-first-3-finalized-post-
+1999	              quantum-encryption-standards>.
+
+2001	   [NTRU]     "NTRU", n.d., <https://ntru.org/index.shtml>.
+
+2003	   [OQS]      "Open Quantum Safe Project", n.d.,
+2004	              <https://openquantumsafe.org/>.
+
+2006	   [PCI]      "Payment Card Industry Data Security Standard", n.d.,
+2007	              <https://docs-
+2008	              prv.pcisecuritystandards.org/PCI%20DSS/Standard/PCI-DSS-
+2009	              v4_0_1.pdf>.
+
+2011	   [PQCAPI]   "PQC - API notes",
+2012	              <https://csrc.nist.gov/CSRC/media/Projects/Post-Quantum-
+2013	              Cryptography/documents/example-files/api-notes.pdf>.
+
+2015	   [PQRSA]    "Post-quantum RSA", April 2017,
+2016	              <https://cr.yp.to/papers/pqrsa-20170419.pdf>.
+
+2018	   [PQUIP-WG] "Post-Quantum Use In Protocols (pquip) Working Group",
+2019	              n.d.,
+2020	              <https://datatracker.ietf.org/group/pquip/documents/>.
+
+2022	   [QC-DNS]   "Quantum Computing and the DNS",
+2023	              <https://www.icann.org/octo-031-en.pdf>.
+
+2025	   [QuantSide]
+2026	              "QuantSide", n.d., <https://arxiv.org/pdf/2304.03315>.
+
+2028	   [RFC4034]  Arends, R., Austein, R., Larson, M., Massey, D., and S.
+2029	              Rose, "Resource Records for the DNS Security Extensions",
+2030	              RFC 4034, DOI 10.17487/RFC4034, March 2005,
+2031	              <https://www.rfc-editor.org/rfc/rfc4034>.
+
+2033	   [RFC5652]  Housley, R., "Cryptographic Message Syntax (CMS)", STD 70,
+2034	              RFC 5652, DOI 10.17487/RFC5652, September 2009,
+2035	              <https://www.rfc-editor.org/rfc/rfc5652>.
+
+2037	   [RFC6090]  McGrew, D., Igoe, K., and M. Salter, "Fundamental Elliptic
+2038	              Curve Cryptography Algorithms", RFC 6090,
+2039	              DOI 10.17487/RFC6090, February 2011,
+2040	              <https://www.rfc-editor.org/rfc/rfc6090>.
+
+2042	   [RFC8391]  Huelsing, A., Butin, D., Gazdag, S., Rijneveld, J., and A.
+2043	              Mohaisen, "XMSS: eXtended Merkle Signature Scheme",
+2044	              RFC 8391, DOI 10.17487/RFC8391, May 2018,
+2045	              <https://www.rfc-editor.org/rfc/rfc8391>.
+
+2047	   [RFC8446]  Rescorla, E., "The Transport Layer Security (TLS) Protocol
+2048	              Version 1.3", RFC 8446, DOI 10.17487/RFC8446, August 2018,
+2049	              <https://www.rfc-editor.org/rfc/rfc8446>.
+
+2051	   [RFC8554]  McGrew, D., Curcio, M., and S. Fluhrer, "Leighton-Micali
+2052	              Hash-Based Signatures", RFC 8554, DOI 10.17487/RFC8554,
+2053	              April 2019, <https://www.rfc-editor.org/rfc/rfc8554>.
+
+2055	   [RFC9180]  Barnes, R., Bhargavan, K., Lipp, B., and C. Wood, "Hybrid
+2056	              Public Key Encryption", RFC 9180, DOI 10.17487/RFC9180,
+2057	              February 2022, <https://www.rfc-editor.org/rfc/rfc9180>.
+
+2059	   [RFC9242]  Smyslov, V., "Intermediate Exchange in the Internet Key
+2060	              Exchange Protocol Version 2 (IKEv2)", RFC 9242,
+2061	              DOI 10.17487/RFC9242, May 2022,
+2062	              <https://www.rfc-editor.org/rfc/rfc9242>.
+
+2064	   [RFC9370]  Tjhai, CJ., Tomlinson, M., Bartlett, G., Fluhrer, S., Van
+2065	              Geest, D., Garcia-Morchon, O., and V. Smyslov, "Multiple
+2066	              Key Exchanges in the Internet Key Exchange Protocol
+2067	              Version 2 (IKEv2)", RFC 9370, DOI 10.17487/RFC9370, May
+2068	              2023, <https://www.rfc-editor.org/rfc/rfc9370>.
+
+2070	   [RSA]      "A Method for Obtaining Digital Signatures and Public-Key
+2071	              Cryptosystems+",
+2072	              <https://dl.acm.org/doi/pdf/10.1145/359340.359342>.
+
+2074	   [RSA10SC]  "Breaking RSA Encryption - an Update on the State-of-the-
+2075	              Art", <https://www.quintessencelabs.com/blog/breaking-rsa-
+2076	              encryption-update-state-art>.
+
+2078	   [RSA8HRS]  "How to factor 2048 bit RSA integers in 8 hours using 20
+2079	              million noisy qubits", <https://arxiv.org/abs/1905.09749>.
+
+2081	   [RSAShor]  "Circuit for Shor’s algorithm using 2n+3 qubits",
+2082	              <https://arxiv.org/pdf/quant-ph/0205095.pdf>.
+
+2084	   [SaberSide]
+2085	              "A side-channel attack on a masked and shuffled software
+2086	              implementation of Saber",
+2087	              <https://link.springer.com/article/10.1007/
+2088	              s13389-023-00315-3>.
+
+2090	   [SideCh]   "Side-Channel Attacks on Lattice-Based KEMs Are Not
+2091	              Prevented by Higher-Order Masking",
+2092	              <https://eprint.iacr.org/2022/919>.
+
+2094	   [SIDH-Attack]
+2095	              "An efficient key recovery attack on SIDH", n.d.,
+2096	              <https://eprint.iacr.org/2022/975.pdf>.
+
+2098	   [SIKE]     "SIKE – Supersingular Isogeny Key Encapsulation", n.d.,
+2099	              <https://sike.org/>.
+
+2101	   [SLH-DSA]  "FIPS-205: Stateless Hash-Based Digital Signature
+2102	              Standard", <https://nvlpubs.nist.gov/nistpubs/FIPS/
+2103	              NIST.FIPS.205.pdf>.
+
+2105	   [SP-1800-38C]
+2106	              "Migration to Post-Quantum Cryptography Quantum Readiness:
+2107	              Quantum-Resistant Cryptography Technology Interoperability
+2108	              and Performance Report",
+2109	              <https://www.nccoe.nist.gov/sites/default/files/2023-12/
+2110	              pqc-migration-nist-sp-1800-38c-preliminary-draft.pdf>.
+
+2112	   [SP-800-56C]
+2113	              "Recommendation for Key-Derivation Methods in Key-
+2114	              Establishment Schemes",
+2115	              <https://nvlpubs.nist.gov/nistpubs/SpecialPublications/
+2116	              NIST.SP.800-56Cr2.pdf>.
+
+2118	   [Threat-Report]
+2119	              "Quantum Threat Timeline Report 2020",
+2120	              <https://globalriskinstitute.org/publications/quantum-
+2121	              threat-timeline-report-2020/>.
+
+2123	Acknowledgements
+
+2125	   This document leverages text from an earlier draft by Paul Hoffman.
+2126	   Thanks to Dan Wing, Florence D, Thom Wiggers, Sophia Grundner-
+2127	   Culemann, Panos Kampanakis, Ben S, Sofia Celi, Melchior Aelmans,
+2128	   Falko Strenzke, Deirdre Connolly, Hani Ezzadeen, Britta Hale, Scott
+2129	   Rose, Hilarie Orman, Thomas Fossati, and Daniel Van Geest for the
+2130	   discussion, review and comments.
+
+2132	   In particular, the authors would like to acknowledge the
+2133	   contributions to this document by Kris Kwiatkowski.
+
+2135	Authors' Addresses
+
+2137	   Aritra Banerjee
+2138	   Nokia
+2139	   London
+2140	   United Kingdom
+2141	   Email: aritra.banerjee@nokia.com
+
+2143	   Tirumaleswar Reddy
+2144	   Nokia
+2145	   Bangalore
+2146	   Karnataka
+2147	   India
+2148	   Email: k.tirumaleswar_reddy@nokia.com
+
+2150	   Dimitrios Schoinianakis
+2151	   Nokia
+2152	   Athens
+2153	   Greece
+2154	   Email: dimitrios.schoinianakis@nokia-bell-labs.com
+
+2156	   Timothy Hollebeek
+2157	   DigiCert
+2158	   Pittsburgh,
+2159	   United States of America
+2160	   Email: tim.hollebeek@digicert.com
+
+2162	   Mike Ounsworth
+2163	   Entrust Limited
+2164	   2500 Solandt Road – Suite 100
+2165	   Ottawa, Ontario  K2K 3G5
+2166	   Canada
+2167	   Email: mike.ounsworth@entrust.com
+
+
+
+
+
+
+
+
+
