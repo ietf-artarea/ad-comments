@@ -1,0 +1,407 @@
+idnits 2.17.1 
+
+draft-ietf-sidrops-manifest-numbers-07.txt:
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     No nits found.
+--------------------------------------------------------------------------------
+
+
+2	Internet Engineering Task Force                              T. Harrison
+3	Internet-Draft                                             G. Michaelson
+4	Updates: 9286 (if approved)                                        APNIC
+5	Intended status: Standards Track                             J. Snijders
+6	Expires: 22 January 2026                                    21 July 2025
+
+8	   Resource Public Key Infrastructure (RPKI) Manifest Number Handling
+9	                 draft-ietf-sidrops-manifest-numbers-07
+
+11	Abstract
+
+13	   The Resource Public Key Infrastructure (RPKI) makes use of signed
+14	   objects called manifests.  A manifest lists each file that an issuer
+15	   intends to include within an RPKI repository, and can be used to
+16	   detect certain forms of attack against a repository.  Manifests
+17	   include a "manifest number" (manifestNumber), which an issuer must
+18	   increment whenever it issues a new manifest, and Relying Parties
+19	   (RPs) are required to verify that a newly-retrieved manifest for a
+20	   given Certification Authority (CA) has a higher manifestNumber than
+21	   the previously-validated manifest.  However, the manifestNumber field
+22	   is 20 octets in length (i.e.  bounded), and no behaviour is specified
+23	   for when a manifestNumber reaches the largest possible value.  This
+24	   document updates RFC9286 by specifying issuer and RP behaviour for
+25	   this scenario.
+
+27	Status of This Memo
+
+29	   This Internet-Draft is submitted in full conformance with the
+30	   provisions of BCP 78 and BCP 79.
+
+32	   Internet-Drafts are working documents of the Internet Engineering
+33	   Task Force (IETF).  Note that other groups may also distribute
+34	   working documents as Internet-Drafts.  The list of current Internet-
+35	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+37	   Internet-Drafts are draft documents valid for a maximum of six months
+38	   and may be updated, replaced, or obsoleted by other documents at any
+39	   time.  It is inappropriate to use Internet-Drafts as reference
+40	   material or to cite them other than as "work in progress."
+
+42	   This Internet-Draft will expire on 22 January 2026.
+
+44	Copyright Notice
+
+46	   Copyright (c) 2025 IETF Trust and the persons identified as the
+47	   document authors.  All rights reserved.
+
+49	   This document is subject to BCP 78 and the IETF Trust's Legal
+50	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+51	   license-info) in effect on the date of publication of this document.
+52	   Please review these documents carefully, as they describe your rights
+53	   and restrictions with respect to this document.  Code Components
+54	   extracted from this document must include Revised BSD License text as
+55	   described in Section 4.e of the Trust Legal Provisions and are
+56	   provided without warranty as described in the Revised BSD License.
+
+58	Table of Contents
+
+60	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+61	     1.1.  Requirements Language . . . . . . . . . . . . . . . . . .   4
+62	   2.  Manifest Number Handling  . . . . . . . . . . . . . . . . . .   4
+63	   3.  General Repository Handling . . . . . . . . . . . . . . . . .   5
+64	   4.  Operational Considerations  . . . . . . . . . . . . . . . . .   5
+65	   5.  Security Considerations . . . . . . . . . . . . . . . . . . .   5
+66	   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   6
+67	   7.  Implementation status . . . . . . . . . . . . . . . . . . . .   6
+68	   8.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .   6
+69	   9.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   6
+70	     9.1.  Normative References  . . . . . . . . . . . . . . . . . .   6
+71	     9.2.  Informative References  . . . . . . . . . . . . . . . . .   7
+72	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .   8
+
+74	1.  Introduction
+
+76	   The Resource Public Key Infrastructure (RPKI) [RFC6480] makes use of
+77	   signed objects [RFC6488] called manifests [RFC9286].  A manifest
+78	   lists each file that an issuer intends to include within an RPKI
+79	   repository [RFC6481], and can be used to detect certain forms of
+80	   attack against a repository.  Manifests include a "manifest number"
+81	   (manifestNumber), which an issuer must increment by one whenever it
+82	   issues a new manifest, and Relying Parties (RPs) are required to
+83	   verify that a newly-retrieved manifest for a given Certification
+84	   Authority (CA) has a higher manifestNumber than the previously-
+85	   validated manifest (Section 4.2.1 of [RFC9286]).
+
+87	   However, the manifestNumber field is 20 octets in length (i.e.,
+88	   bounded), and no behaviour is specified for when a manifestNumber
+89	   reaches the largest possible value (2^159-1).  When that value is
+90	   reached, some RP implementations will accept a new manifest for the
+91	   CA only once the current manifest has expired, while others will not
+92	   accept a new manifest at all.
+
+94	   While it is practically impossible for an issuer to reach the largest
+95	   possible value under normal operating conditions (it would require
+96	   that the issuer issue one manifest per second for
+97	   23,171,956,451,847,141,650,870 quintillion years), there is still a
+98	   chance that it could be reached due to bugs in the issuance or
+99	   publication systems or incorrect/inadvertent use of those systems.
+100	   For example:
+
+102	   *  Incrementing by large values when issuing manifests, such that the
+103	      time to reach that largest value is reduced.
+
+105	   *  Reissuing new manifests in an infinite delay-free loop, such that
+106	      the manifestNumber increases by a large value in a comparatively
+107	      short period of time.
+
+109	   *  Inadvertently setting the manifestNumber to the largest possible
+110	      value, such that the issuer will no longer be able to publish
+111	      usable manifests for that repository.
+
+113	   These scenarios might also arise in combination and be more severe as
+114	   a result.  For example, a CA might increase the manifestNumber by a
+115	   large value on reissuance, and also reissue the manifest more
+116	   frequently than is necessary.
+
+118	   For a subordinate CA, the risk of repository invalidation due to such
+119	   a problem can be addressed by the issuer using the key rollover
+120	   process [RFC6489] to get a new CA certificate.  RPs will treat this
+121	   new certificate as though it represents a distinct CA, and the
+122	   manifestNumber can be reset at that point.
+
+124	   However, this option is not available for RPKI Trust Anchors (TAs).
+125	   If a TA publishes a manifest with the largest-possible manifestNumber
+126	   value, then it is difficult to rely on the TA after that point, since
+127	   (as described previously) some RPs will not accept a new manifest
+128	   until the current one has expired, while others will reject all new
+129	   manifests indefinitely.  Particularly in the case of TAs, the
+130	   manifest validity period may be quite long, too.  Issuing a new TA
+131	   and distributing the associated Trust Anchor Locator (TAL) [RFC8630]
+132	   to clients would involve a large amount of work for TA operators and
+133	   RPs.  Additionally, depending on the RP implementation being used,
+134	   there would be a limited degree of RPKI protection by way of that TA
+135	   for the time between the issuance of the problematic manifest and the
+136	   installation of the new TAL.
+
+138	   In order to avoid these problems, this document updates [RFC9286] by
+139	   defining how issuers and RPs can handle this scenario in order to
+140	   facilitate ongoing use of an affected repository.
+
+142	1.1.  Requirements Language
+
+144	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+145	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+146	   "OPTIONAL" in this document are to be interpreted as described in BCP
+147	   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+148	   capitals, as shown here.
+
+150	2.  Manifest Number Handling
+
+152	   For a given CA, an RP MUST NOT reject a new manifest issued by that
+153	   CA on the basis of it not having a higher manifestNumber than a
+154	   previously-validated manifest if the new manifest has a different
+155	   filename from that of the previously-validated manifest.  In other
+156	   words, an RP has to reset its stored manifestNumber for a given CA if
+157	   the CA changes the filename of its manifest.
+
+159	   With this behaviour, it is possible for a CA to be configured such
+160	   that any time it issues a new manifest, it uses a new filename for
+161	   that manifest.  If a CA were configured in this way, the
+162	   manifestNumber validation set out in Section 4.2.1 of [RFC9286] would
+163	   have no purpose.  To avoid this outcome, CAs SHOULD NOT use new
+164	   filenames for manifests except in situations where such a change is
+165	   necessary to address the invalidity problem described in this
+166	   document.  Similarly, an RP SHOULD alert its operators when a
+167	   manifest filename changes for a given CA.
+
+169	   To avoid certain forms of replay attack, RPs MUST verify that the URI
+170	   in the accessLocation in one of the id-ad-signedObject accessMethod
+171	   instances in the manifest's Subject Information Access (SIA)
+172	   extension exactly matches the URI presented in the RPKI Repository
+173	   Delta Protocol (RRDP) [RFC8182] "publish" element or the path
+174	   presented by remote rsync servers.
+
+176	   A CA specifies its manifest URI by way of an SIA entry with an
+177	   accessMethod of id-ad-rpkiManifest (Section 4.8.8.1 of [RFC6487]).
+178	   For the purposes of this document, the manifest filename is the final
+179	   segment of the path of the accessLocation URI from that SIA entry.
+
+181	   Section 4.8.8.1 of [RFC6487] states that a CA may include in its
+182	   certificate multiple id-ad-rpkiManifest SIA entries.  For
+183	   comparisons, an RP may use the filename from any one of the id-ad-
+184	   rpkiManifest SIA entries in the previously-validated CA certificate.
+185	   If that filename does not appear in any of the id-ad-rpkiManifest SIA
+186	   entries in the CA certificate that is currently being validated, then
+187	   the manifest filename has changed for the purposes of this document.
+188	   The corollary of this behaviour is that a CA that includes multiple
+189	   id-ad-rpkiManifest SIA entries in its certificate and wants to rely
+190	   on the behaviour defined in this document MUST ensure that none of
+191	   the manifest filenames in the previous CA certificate appear in the
+192	   newly-issued CA certificate.
+
+194	   Section 3.2.1 of [RFC8488] describes a manifest selection approach
+195	   for RPs that involves collecting all unexpired, valid manifests for a
+196	   CA, and then selecting from that collection the manifest that has the
+197	   highest manifestNumber.  The approach set out in the current document
+198	   is different from that approach.
+
+200	3.  General Repository Handling
+
+202	   Section 2 contains a specific update to [RFC9286] for the handling of
+203	   manifest numbers, in order to address one potential permanent
+204	   invalidity scenario.  RPs that encounter other permanent invalidity
+205	   scenarios SHOULD also consider how those can be addressed such that
+206	   the scenario does not require the relevant CA or TA to perform a key
+207	   rollover operation.  For example, in the event that an RP recognises
+208	   that a permanent invalidity scenario has occurred, the RP could alert
+209	   the operator and provide an option to the operator to stop relying on
+210	   cached data for the affected repository, so that the CA can rectify
+211	   the problem.
+
+213	4.  Operational Considerations
+
+215	   CA software may opt to support the manifest number reset
+216	   functionality in various ways.  For example, it could change the
+217	   manifest filename when the manifestNumber reaches a certain
+218	   threshold, or it could alert the operator in this scenario and
+219	   request confirmation that the filename should be changed.
+
+221	5.  Security Considerations
+
+223	   The RPKI primarily exists to support and improve security of the
+224	   global Internet routing system.
+
+226	   Reliability improvements to the RPKI itself, such as outlined in this
+227	   document, strengthen its dependability (see Section 8 of [RFC6480]).
+
+229	   [RFC9286] requires that RPs perform two replay-related checks on
+230	   newly-retrieved manifests: firstly, that the purported new manifest
+231	   has a greater manifestNumber than the cached manifest, and secondly,
+232	   that the purported new manifest has a more recent thisUpdate than the
+233	   cached manifest.  An RP that implements the behaviour in Section 2
+234	   will momentarily omit the manifestNumber check following a manifest
+235	   filename change.  So long as the RP still performs the second check
+236	   described above, it will be protected against replay attacks.
+
+238	   Although this document updates [RFC9286], the security considerations
+239	   from [RFC9286] remain relevant.
+
+241	6.  IANA Considerations
+
+243	   This document has no actions for IANA.
+
+245	7.  Implementation status
+
+247	   This section is to be removed before publishing as an RFC.
+
+249	   This section records the status of known implementations of the
+250	   protocol defined by this specification at the time of posting of this
+251	   Internet-Draft, and is based on a proposal described in [RFC7942].
+252	   The description of implementations in this section is intended to
+253	   assist the IETF in its decision processes in progressing drafts to
+254	   RFCs.  Please note that the listing of any individual implementation
+255	   here does not imply endorsement by the IETF.  Furthermore, no effort
+256	   has been spent to verify the information presented here that was
+257	   supplied by IETF contributors.  This is not intended as, and must not
+258	   be construed to be, a catalog of available implementations or their
+259	   features.  Readers are advised to note that other implementations may
+260	   exist.
+
+262	   According to [RFC7942], "this will allow reviewers and working groups
+263	   to assign due consideration to documents that have the benefit of
+264	   running code, which may serve as evidence of valuable experimentation
+265	   and feedback that have made the implemented protocols more mature.
+266	   It is up to the individual working groups to use this information as
+267	   they see fit".
+
+269	   *  OpenBSD [rpki-client]
+
+271	   *  Routinator [routinator]
+
+273	8.  Acknowledgements
+
+275	   The authors would like to thank Theo Buehler, Ben Maddison, Rob
+276	   Austein, Tim Bruijnzeels, Russ Housley, Mohamed Boucadair, and Luigi
+277	   Iannone for their review and feedback on this document.
+
+279	9.  References
+
+281	9.1.  Normative References
+
+283	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+284	              Requirement Levels", BCP 14, RFC 2119,
+285	              DOI 10.17487/RFC2119, March 1997,
+286	              <https://www.rfc-editor.org/info/rfc2119>.
+
+288	   [RFC6487]  Huston, G., Michaelson, G., and R. Loomans, "A Profile for
+289	              X.509 PKIX Resource Certificates", RFC 6487,
+290	              DOI 10.17487/RFC6487, February 2012,
+291	              <https://www.rfc-editor.org/info/rfc6487>.
+
+293	   [RFC6488]  Lepinski, M., Chi, A., and S. Kent, "Signed Object
+294	              Template for the Resource Public Key Infrastructure
+295	              (RPKI)", RFC 6488, DOI 10.17487/RFC6488, February 2012,
+296	              <https://www.rfc-editor.org/info/rfc6488>.
+
+298	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+299	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+300	              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+302	   [RFC8182]  Bruijnzeels, T., Muravskiy, O., Weber, B., and R. Austein,
+303	              "The RPKI Repository Delta Protocol (RRDP)", RFC 8182,
+304	              DOI 10.17487/RFC8182, July 2017,
+305	              <https://www.rfc-editor.org/info/rfc8182>.
+
+307	   [RFC9286]  Austein, R., Huston, G., Kent, S., and M. Lepinski,
+308	              "Manifests for the Resource Public Key Infrastructure
+309	              (RPKI)", RFC 9286, DOI 10.17487/RFC9286, June 2022,
+310	              <https://www.rfc-editor.org/info/rfc9286>.
+
+312	9.2.  Informative References
+
+314	   [RFC6480]  Lepinski, M. and S. Kent, "An Infrastructure to Support
+315	              Secure Internet Routing", RFC 6480, DOI 10.17487/RFC6480,
+316	              February 2012, <https://www.rfc-editor.org/info/rfc6480>.
+
+318	   [RFC6481]  Huston, G., Loomans, R., and G. Michaelson, "A Profile for
+319	              Resource Certificate Repository Structure", RFC 6481,
+320	              DOI 10.17487/RFC6481, February 2012,
+321	              <https://www.rfc-editor.org/info/rfc6481>.
+
+323	   [RFC6489]  Huston, G., Michaelson, G., and S. Kent, "Certification
+324	              Authority (CA) Key Rollover in the Resource Public Key
+325	              Infrastructure (RPKI)", BCP 174, RFC 6489,
+326	              DOI 10.17487/RFC6489, February 2012,
+327	              <https://www.rfc-editor.org/info/rfc6489>.
+
+329	   [RFC7942]  Sheffer, Y. and A. Farrel, "Improving Awareness of Running
+330	              Code: The Implementation Status Section", BCP 205,
+331	              RFC 7942, DOI 10.17487/RFC7942, July 2016,
+332	              <https://www.rfc-editor.org/info/rfc7942>.
+
+334	   [RFC8488]  Muravskiy, O. and T. Bruijnzeels, "RIPE NCC's
+335	              Implementation of Resource Public Key Infrastructure
+336	              (RPKI) Certificate Tree Validation", RFC 8488,
+337	              DOI 10.17487/RFC8488, December 2018,
+338	              <https://www.rfc-editor.org/info/rfc8488>.
+
+340	   [RFC8630]  Huston, G., Weiler, S., Michaelson, G., Kent, S., and T.
+341	              Bruijnzeels, "Resource Public Key Infrastructure (RPKI)
+342	              Trust Anchor Locator", RFC 8630, DOI 10.17487/RFC8630,
+343	              August 2019, <https://www.rfc-editor.org/info/rfc8630>.
+
+345	   [routinator]
+346	              NLnet Labs, "Routinator", June 2024,
+347	              <https://www.nlnetlabs.nl/projects/routing/routinator/>.
+
+349	   [rpki-client]
+350	              OpenBSD Project, "rpki-client", January 2024,
+351	              <https://www.rpki-client.org/>.
+
+353	Authors' Addresses
+
+355	   Tom Harrison
+356	   Asia Pacific Network Information Centre
+357	   6 Cordelia St
+358	   South Brisbane QLD 4101
+359	   Australia
+360	   Email: tomh@apnic.net
+
+362	   George G. Michaelson
+363	   Asia-Pacific Network Information Centre
+364	   6 Cordelia St
+365	   South Brisbane QLD 4101
+366	   Australia
+367	   Email: ggm@apnic.net
+
+369	   Job Snijders
+370	   Amsterdam
+371	   Netherlands
+372	   Email: job@sobornost.net
+
+
+
+
+
+
+
+
+
