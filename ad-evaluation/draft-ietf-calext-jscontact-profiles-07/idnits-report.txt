@@ -1,0 +1,535 @@
+idnits 2.17.1 
+
+draft-ietf-calext-jscontact-profiles-07.txt:
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+  == There are 2 instances of lines with non-ascii characters in the document.
+
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     Summary: 0 errors (**), 0 flaws (~~), 1 warning (==), 0 comments (--).
+
+--------------------------------------------------------------------------------
+
+
+2	calext                                                       R. Stepanek
+3	Internet-Draft                                                  Fastmail
+4	Intended status: Standards Track                             M. Loffredo
+5	Expires: 1 February 2026                                         IIT-CNR
+6	                                                            31 July 2025
+
+8	                Protocol-Specific Profiles for JSContact
+9	                draft-ietf-calext-jscontact-profiles-07
+
+11	Abstract
+
+13	   This document defines JSContact profiles, an IANA registry for named
+14	   subsets of JSContact elements.  It aims to facilitate using JSContact
+15	   in context of contact data exchange protocols or other use cases, in
+16	   which supporting all of JSContact semantics might be inappropriate.
+
+18	Status of This Memo
+
+20	   This Internet-Draft is submitted in full conformance with the
+21	   provisions of BCP 78 and BCP 79.
+
+23	   Internet-Drafts are working documents of the Internet Engineering
+24	   Task Force (IETF).  Note that other groups may also distribute
+25	   working documents as Internet-Drafts.  The list of current Internet-
+26	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+28	   Internet-Drafts are draft documents valid for a maximum of six months
+29	   and may be updated, replaced, or obsoleted by other documents at any
+30	   time.  It is inappropriate to use Internet-Drafts as reference
+31	   material or to cite them other than as "work in progress."
+
+33	   This Internet-Draft will expire on 1 February 2026.
+
+35	Copyright Notice
+
+37	   Copyright (c) 2025 IETF Trust and the persons identified as the
+38	   document authors.  All rights reserved.
+
+40	   This document is subject to BCP 78 and the IETF Trust's Legal
+41	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+42	   license-info) in effect on the date of publication of this document.
+43	   Please review these documents carefully, as they describe your rights
+44	   and restrictions with respect to this document.  Code Components
+45	   extracted from this document must include Revised BSD License text as
+46	   described in Section 4.e of the Trust Legal Provisions and are
+47	   provided without warranty as described in the Revised BSD License.
+
+49	Table of Contents
+
+51	   1.  Notational Conventions  . . . . . . . . . . . . . . . . . . .   2
+52	   2.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+53	   3.  JSContact Profiles  . . . . . . . . . . . . . . . . . . . . .   3
+54	     3.1.  Profile Name  . . . . . . . . . . . . . . . . . . . . . .   4
+55	     3.2.  Profile Version . . . . . . . . . . . . . . . . . . . . .   4
+56	     3.3.  Supported Properties  . . . . . . . . . . . . . . . . . .   4
+57	   4.  Example Profile . . . . . . . . . . . . . . . . . . . . . . .   6
+58	   5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   9
+59	     5.1.  Creation of the JSContact Profile Registry  . . . . . . .   9
+60	       5.1.1.  JSContact Profile Registry Template . . . . . . . . .   9
+61	       5.1.2.  JSContact Profile Property Template . . . . . . . . .   9
+62	       5.1.3.  Initial Contents of the JSContact Profile Registry  .  10
+63	   6.  Security Considerations . . . . . . . . . . . . . . . . . . .  10
+64	   7.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  10
+65	     7.1.  Normative References  . . . . . . . . . . . . . . . . . .  10
+66	     7.2.  Informative References  . . . . . . . . . . . . . . . . .  11
+67	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  11
+
+69	1.  Notational Conventions
+
+71	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+72	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+73	   "OPTIONAL" in this document are to be interpreted as described in BCP
+74	   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+75	   capitals, as shown here.
+
+77	   The ABNF definitions in this document use the notations of [RFC5234].
+78	   ABNF rules not defined in this document are defined in [RFC5234]
+79	   (such as the ABNF for DIGIT).
+
+81	2.  Introduction
+
+83	   The JSContact [RFC9553] contact card data model and format is
+84	   designed for use in address book applications and directory services.
+85	   Intended as an alternative to the prevalent vCard [RFC6350] data
+86	   format, it covers vCard core semantics and extensions, and provides a
+87	   rich model for personal names, postal addresses and localization.
+88	   All JSContact elements are relevant for some contact card use case
+89	   and, similar to vCard, implementations are expected to support these
+90	   elements when exchanging contact card information using protocols
+91	   such as CardDAV [RFC6352] and JMAP for Contacts [RFC9610].
+
+93	   In contrast, other protocols and internet standards might require
+94	   exchanging _some_ contact card information, but not all of what
+95	   JSContact provides.  Section 1.7.4 of [RFC9553] outlines how
+96	   JSContact implementations may ignore unknown JSContact elements, but
+97	   this only applies to future extensions of [RFC9553]; they are still
+98	   expected to implement all elements of the core specification.  Also,
+99	   the extensibility of JSContact and the requirement to preserve
+100	   arbitrary contact elements might not be adequate for some protocols.
+
+102	   To make use of JSContact under these circumstances, this document
+103	   defines a new IANA registry for JSContact that allows for registering
+104	   named subsets of JSContact elements.  These subsets are referred to
+105	   as "JSContact profiles" and are meant to bring the following
+106	   benefits:
+
+108	   *  Protocol designers might be encouraged to use JSContact, rather
+109	      than coming up with their own contacts format.  This facilitates
+110	      cross-protocol data exchange and migration.
+
+112	   *  Different protocols use the same IANA registry to express which
+113	      JSContact elements they support.  This facilitates understanding
+114	      their commonalities and reusing existing profiles.
+
+116	   *  A central registry provides implementors of JSContact libraries
+117	      with a consistent format documenting which profile supports what
+118	      elements, rather than having to look up that information from
+119	      possibly distinctly organized internet drafts.
+
+121	   This document is organized as follows: Section 3 defines JSContact
+122	   profiles, Section 4 illustrates JSContact profiles by example,
+123	   Section 5 summarizes the relevant information for IANA to establish
+124	   the JSContact Profiles registry.
+
+126	3.  JSContact Profiles
+
+128	   A JSContact profile is a named, versioned subset of JSContact
+129	   properties, value types and values.  These JSContact elements MAY be
+130	   further restricted by the profile, but a profile can not loosen
+131	   restrictions.  For example, a profile can define an originally
+132	   optional property to become mandatory, but it can not make a
+133	   mandatory property become optional.
+
+135	   The JSContact elements MUST be registered in the IANA JSContact
+136	   registry.  A JSContact extension MAY define both a new profile and
+137	   new properties or other elements, as long as they are registered at
+138	   the same time.  A JSContact profile MUST be registered at IANA (see
+139	   Section 5).  Section 3.1 and Section 3.2 define how to name and
+140	   version a JSContact profile, Section 3.3 defines how to define the
+141	   properties supported by that profile.
+
+143	   A JSContact object conforms to a profile if all its properties are in
+144	   the subset of properties defined by that profile and the property
+145	   values comply with the profile restrictions for that property.
+
+147	3.1.  Profile Name
+
+149	   This names the profile.  A JSContact profile MUST have a unique name.
+150	   The name MUST only contain ASCII lowercase alphabetic and numeric
+151	   characters, optionally separated by hyphens.  It MUST start with an
+152	   alphabetic character and it MUST be of at least 1 character and at
+153	   most 255 characters in size.  Formally, it MUST be a valid "profile-
+154	   name" defined in Figure 1.
+
+156	   profile-name = LALPHA *( ["-"] LALPHA / DIGIT ) ; at most 255 octets in size
+
+158	   LALPHA       = %x61-7A ; a-z
+
+160	               Figure 1: ABNF Rule for JSContact Profile Name
+
+162	3.2.  Profile Version
+
+164	   This defines the current version of the profile.  Each profile is
+165	   versioned independently and version numbers are not related to values
+166	   in the IANA JSContact Versions registry.  The version identifier MUST
+167	   be a valid "jsversion" value as defined in Section 1.9.1 of
+168	   [RFC9553].  Any addition to the list of JSContact properties
+169	   supported by that profile (Section 3.3) MUST update the current
+170	   version.
+
+172	   As a note, if a semantic versioning scheme is not adequate for
+173	   protocol designers making use of JSContact profiles, then an
+174	   alternative approach is to register a new JSContact profile for each
+175	   new version.
+
+177	3.3.  Supported Properties
+
+179	   A profile defines a list of property entries that together determine
+180	   the set of properties supported by that profile.  Each entry consists
+181	   of the following elements:
+
+183	   Property Name:  This is the name of the JSContact property that this
+184	      entry refers to.  This MUST be the property name registered in the
+185	      "JSContact Properties" registry.
+
+187	   Property Context:  This is a comma-separated list of JSContact object
+188	      types that support this property in this profile.  Each of these
+189	      types MUST also be listed in the property contexts for this
+190	      property in the "JSContact Properties" registry, but a profile MAY
+191	      only support the property in a subset of these contexts.
+
+193	   Restricted to be Mandatory:  This restricts the property to be
+194	      mandatory in the listed property contexts, despite the property
+195	      originally being defined to be optional in the same contexts.  The
+196	      verbatim value "mandatory" indicates that it is mandatory in this
+197	      profile, the absence of any value indicates that the property is
+198	      mandatory or optional according to its original definition.  This
+199	      means that a profile can make an optional property become
+200	      mandatory, but it can not make a mandatory property become
+201	      optional.
+
+203	   Restricted Property Type:  This restricts the property value type in
+204	      the listed property contexts, despite the property originally
+205	      being defined to have a less restrictive type definition.  If set,
+206	      the value MUST be a type signature as defined in Section 1.3.2 of
+207	      [RFC9553] and it MUST be a subtype of the original type signature
+208	      for these property contexts.  The absence of any value indicates
+209	      that the original type signature applies.  This means that a
+210	      profile can restrict the value types of a property, but it can not
+211	      add value types for that property.
+
+213	   Restricted Enum Values:  This restricts the enumerated values defined
+214	      for this property to a subset of those values.  The values MUST be
+215	      listed in the "JSContact Enum Values" registry for this property
+216	      and context.  The allowed values are separated by comma, the
+217	      absence of any value indicates that all enumerated values are
+218	      allowed.  A profile MAY exclude the default enumerated value of a
+219	      property, in which case all object instances MUST have this
+220	      property set to one of the allowed values.
+
+222	   Restricted PatchObject Keys:  This restricts the PatchObject value of
+223	      this property such that each JSON Pointer key in the PatchObject
+224	      MUST consist of exactly one JSON Pointer reference token [RFC6901]
+225	      (Section 3).  Doing so restricts a PatchObject to only patch
+226	      properties that are set in the same object and only replace their
+227	      values entirely.  The verbatim value "Yes" indicates that this
+228	      profile does restrict PatchObject keys, the absence of any value
+229	      indicates that it does not restrict them.  This MUST NOT be set to
+230	      "Yes", if the property value type is not a PatchObject.
+
+232	   Since Profile Version:  This indicates the highest profile version in
+233	      which this property definition was added or updated.
+
+235	   There MUST NOT be an entry for the "@type" property, it is always
+236	   supported for any JSContact object in any profile.  Similarly, there
+237	   MUST NOT be an entry for the "version" property of the Card object,
+238	   it also is supported by any profile.
+
+240	   The set of supported JSContact properties is then determined by the
+241	   property entries as follows:
+
+243	   1.  Initialize the set with all properties of the Card object for
+244	       which a property entry names this property and contains "Card" in
+245	       the Property Context.  If no property entry contains "Card" in
+246	       the Property Context, initialize the set with all IANA-registered
+247	       Card object properties.
+
+249	   2.  For every property in the set having an object type as value
+250	       type, add all properties for which a property entry names that
+251	       property and contains the object type in the Property Context.
+252	       If no property entry contains the object type in the Property
+253	       Context, add all IANA-registered properties for that object type
+254	       to the set.
+
+256	   3.  Repeat the previous step until no further additions are possible.
+
+258	   A Card object is supported by the profile, if all its properties are
+259	   part of the set of supported properties and all property values are
+260	   valid according to the restrictions defined in the applicable
+261	   property entries.
+
+263	4.  Example Profile
+
+265	   This section provides an example for a JSContact profile, as it would
+266	   be registered in the IANA JSContact Profiles registry.  See
+267	   Section 5.1.1 and Section 5.1.2 for the exact meaning of each
+268	   registry item.  This profile is just for illustration, it is not
+269	   registered at IANA.
+
+271	   Name:
+272	      jscontact-simple
+
+274	   Profile Version:
+275	      1.0
+
+277	   Properties:
+
+279	      +=============+=============+==========+==========+==============+===========+=======+
+280	      |Property Name|Property     |Restricted|Restricted|Restricted    |Restricted |Since  |
+281	      |             |Context      |to be     |Property  |Enum Values   |PatchObject|Profile|
+282	      |             |             |Mandatory |Type      |              |Keys       |Version|
+283	      +=============+=============+==========+==========+==============+===========+=======+
+284	      |addresses    |Card         |          |          |              |           |1.0    |
+285	      +-------------+-------------+----------+----------+--------------+-----------+-------+
+286	      |emails       |Card         |          |          |              |           |1.0    |
+287	      +-------------+-------------+----------+----------+--------------+-----------+-------+
+288	      |kind         |Card         |          |          |individual,org|           |1.0    |
+289	      +-------------+-------------+----------+----------+--------------+-----------+-------+
+290	      |localizations|Card         |          |          |              |Yes        |1.0    |
+291	      +-------------+-------------+----------+----------+--------------+-----------+-------+
+292	      |name         |Card         |          |          |              |           |1.0    |
+293	      +-------------+-------------+----------+----------+--------------+-----------+-------+
+294	      |full         |Address      |mandatory |          |              |           |1.0    |
+295	      +-------------+-------------+----------+----------+--------------+-----------+-------+
+296	      |components   |Name         |          |          |              |           |1.0    |
+297	      +-------------+-------------+----------+----------+--------------+-----------+-------+
+298	      |full         |Name         |          |          |              |           |1.0    |
+299	      +-------------+-------------+----------+----------+--------------+-----------+-------+
+300	      |kind         |NameComponent|          |          |              |           |1.0    |
+301	      +-------------+-------------+----------+----------+--------------+-----------+-------+
+302	      |value        |NameComponent|          |          |              |           |1.0    |
+303	      +-------------+-------------+----------+----------+--------------+-----------+-------+
+
+305	            Table 1: Properties of the "jscontact-simple" profile
+
+307	   This profile describes contact cards that can only contain:
+
+309	   *  Contact cards for individuals and organizations, but no other
+310	      kinds such as groups or devices.
+
+312	   *  Full postal address lines, but no address components or any other
+313	      property of the Address object type.
+
+315	   *  Full names and name components, but no other properties of the
+316	      Name object type.
+
+318	   *  Email addresses, where all properties of the EmailAddress object
+319	      are supported.
+
+321	   *  Localizations, with the restriction that the PatchObject must only
+322	      patch properties of the Card object.
+
+324	   The following Card object conforms to that profile:
+
+326	   {
+327	     "@type": "Card",
+328	     "version": "1.0",
+329	     "name": {
+330	        "components": [
+331	         { "kind": "given", "value": "Hayao" },
+332	         { "kind": "surname", "value": "Miyazaki" }
+333	       ]
+334	     },
+335	     "addresses": {
+336	       "a1": {
+337	         "full": "71 Cherry Court, Somewhere, 123SO, UK"
+338	       }
+339	     },
+340	     "emails": {
+341	       "e1": {
+342	         "address": "hayao@example.com"
+343	       }
+344	     },
+345	     "localizations": {
+346	       "jp": {
+347	         "name": {
+348	           "components": [
+349	            { "kind": "surname", "value": "宮崎" },
+350	            { "kind": "given", "value": "駿" }
+351	           ]
+352	         }
+353	       }
+354	     }
+355	   }
+
+357	   Note that:
+
+359	   *  The Address, Card, Name, and NameComponent object values only
+360	      contain properties for which a property entry exists in the
+361	      profile.
+
+363	   *  The EmailAddress object contains the "address" property.  This is
+364	      allowed because the profile contains a property entry for the
+365	      "emails" property of the Card object, but it does not define a
+366	      property entry for the EmailAddress object type.  Consequently,
+367	      all properties of the EmailAddress object can be set.
+
+369	   *  The "full" property of the Address object is set.  It is the only
+370	      property allowed to be set in that profile for Address, and the
+371	      "full" property is mandatory for this profile.
+
+373	   *  The "kind" property of the the NameComponent objects is set to
+374	      "surname" and "given", respectively.  Since the profile does not
+375	      restrict the enumerated values of this property, all valid
+376	      NameComponent "kind" property values are supported.
+
+378	   *  The "kind" property of the Card object is not set.  The profile
+379	      restricts the enumerated values of this property to "individual"
+380	      and "org".  Since "individual" is the default value for this
+381	      property, there is no need to set it.
+
+383	5.  IANA Considerations
+
+385	5.1.  Creation of the JSContact Profile Registry
+
+387	   IANA will add the "JSContact Profile" registry to the "JSContact"
+388	   registry group originally created in Section 3.2 of [RFC9553].  The
+389	   purpose of this new registry is to describe protocol-specific
+390	   profiles for JSContact data.  The registry policy and change
+391	   procedure of the "JSContact" registry group apply.
+
+393	5.1.1.  JSContact Profile Registry Template
+
+395	   This template defines how to register a new JSContact profile.  It
+396	   consists of the following items:
+
+398	   *  Profile Name
+
+400	   *  Profile Version
+
+402	   *  Properties
+
+404	   Section 3.1 and Section 3.2 define the Profile Name and Profile
+405	   Version item, respectively.  For the Properties item, IANA will
+406	   create a subregistry for each profile name (e.g. "Properties for
+407	   xyz"), listing the properties supported by that profile.  Each entry
+408	   in that list is registered using the template defined in
+409	   Section 5.1.2.
+
+411	5.1.2.  JSContact Profile Property Template
+
+413	   This template consists of the following items:
+
+415	   *  Property Name
+
+417	   *  Property Context
+
+419	   *  Restricted to be Mandatory
+420	   *  Restricted Property Type
+
+422	   *  Restricted Enum Values
+
+424	   *  Restricted PatchObject Keys
+
+426	   *  Since Profile Version
+
+428	   See Section 3.3 for the definitions of these items.
+
+430	5.1.3.  Initial Contents of the JSContact Profile Registry
+
+432	   This document does not define any initial contents for the newly
+433	   created registries.
+
+435	6.  Security Considerations
+
+437	   This document does not provide new security considerations.  The
+438	   security considerations of Section 4 of [RFC9553] apply.
+
+440	7.  References
+
+442	7.1.  Normative References
+
+444	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+445	              Requirement Levels", BCP 14, RFC 2119,
+446	              DOI 10.17487/RFC2119, March 1997,
+447	              <https://www.rfc-editor.org/info/rfc2119>.
+
+449	   [RFC5234]  Crocker, D., Ed. and P. Overell, "Augmented BNF for Syntax
+450	              Specifications: ABNF", STD 68, RFC 5234,
+451	              DOI 10.17487/RFC5234, January 2008,
+452	              <https://www.rfc-editor.org/info/rfc5234>.
+
+454	   [RFC6901]  Bryan, P., Ed., Zyp, K., and M. Nottingham, Ed.,
+455	              "JavaScript Object Notation (JSON) Pointer", RFC 6901,
+456	              DOI 10.17487/RFC6901, April 2013,
+457	              <https://www.rfc-editor.org/info/rfc6901>.
+
+459	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+460	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+461	              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+463	   [RFC9553]  Stepanek, R. and M. Loffredo, "JSContact: A JSON
+464	              Representation of Contact Data", RFC 9553,
+465	              DOI 10.17487/RFC9553, May 2024,
+466	              <https://www.rfc-editor.org/info/rfc9553>.
+
+468	7.2.  Informative References
+
+470	   [RFC6350]  Perreault, S., "vCard Format Specification", RFC 6350,
+471	              DOI 10.17487/RFC6350, August 2011,
+472	              <https://www.rfc-editor.org/info/rfc6350>.
+
+474	   [RFC6352]  Daboo, C., "CardDAV: vCard Extensions to Web Distributed
+475	              Authoring and Versioning (WebDAV)", RFC 6352,
+476	              DOI 10.17487/RFC6352, August 2011,
+477	              <https://www.rfc-editor.org/info/rfc6352>.
+
+479	   [RFC9610]  Jenkins, N., Ed., "JSON Meta Application Protocol (JMAP)
+480	              for Contacts", RFC 9610, DOI 10.17487/RFC9610, December
+481	              2024, <https://www.rfc-editor.org/info/rfc9610>.
+
+483	Authors' Addresses
+
+485	   Robert Stepanek
+486	   Fastmail
+487	   PO Box 234
+488	   Collins St. West
+489	   Melbourne VIC 8007
+490	   Australia
+491	   Email: rsto@fastmailteam.com
+
+493	   Mario Loffredo
+494	   IIT-CNR
+495	   Via Moruzzi, 1
+496	   56124 Pisa
+497	   Italy
+498	   Email: mario.loffredo@iit.cnr.it
+
+
+
+
+
+
+
+
+
