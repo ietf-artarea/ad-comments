@@ -1,0 +1,710 @@
+idnits 2.17.1 
+
+draft-ietf-mailmaint-imap-uidbatches-17.txt:
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     No nits found.
+--------------------------------------------------------------------------------
+
+
+2	MailMaint                                                 D. Eggert, Ed.
+3	Internet-Draft                                                 Apple Inc
+4	Intended status: Standards Track                           9 August 2025
+5	Expires: 10 February 2026
+
+7	                       IMAP UIDBATCHES Extension
+8	                draft-ietf-mailmaint-imap-uidbatches-17
+
+10	Abstract
+
+12	   The UIDBATCHES extension of the Internet Message Access Protocol
+13	   (IMAP) allows clients to retrieve UID ranges that partition a
+14	   mailbox's messages into equally sized batches.  This enables clients
+15	   to perform operations such as FETCH, SEARCH, and STORE on specific
+16	   message batches, providing better control over resource usage and
+17	   response sizes.  The extension is particularly useful with the
+18	   UIDONLY mode where sequence numbers are unavailable.
+
+20	Status of This Memo
+
+22	   This Internet-Draft is submitted in full conformance with the
+23	   provisions of BCP 78 and BCP 79.
+
+25	   Internet-Drafts are working documents of the Internet Engineering
+26	   Task Force (IETF).  Note that other groups may also distribute
+27	   working documents as Internet-Drafts.  The list of current Internet-
+28	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+30	   Internet-Drafts are draft documents valid for a maximum of six months
+31	   and may be updated, replaced, or obsoleted by other documents at any
+32	   time.  It is inappropriate to use Internet-Drafts as reference
+33	   material or to cite them other than as "work in progress."
+
+35	   This Internet-Draft will expire on 10 February 2026.
+
+37	Copyright Notice
+
+39	   Copyright (c) 2025 IETF Trust and the persons identified as the
+40	   document authors.  All rights reserved.
+
+42	   This document is subject to BCP 78 and the IETF Trust's Legal
+43	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+44	   license-info) in effect on the date of publication of this document.
+45	   Please review these documents carefully, as they describe your rights
+46	   and restrictions with respect to this document.  Code Components
+47	   extracted from this document must include Revised BSD License text as
+48	   described in Section 4.e of the Trust Legal Provisions and are
+49	   provided without warranty as described in the Revised BSD License.
+
+51	Table of Contents
+
+53	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+54	   2.  Document Conventions  . . . . . . . . . . . . . . . . . . . .   3
+55	   3.  The UIDBATCHES extension  . . . . . . . . . . . . . . . . . .   3
+56	     3.1.  UIDBATCHES Command  . . . . . . . . . . . . . . . . . . .   3
+57	       3.1.1.  Example Usage . . . . . . . . . . . . . . . . . . . .   4
+58	       3.1.2.  Response Format . . . . . . . . . . . . . . . . . . .   5
+59	       3.1.3.  Batch Sizes . . . . . . . . . . . . . . . . . . . . .   5
+60	       3.1.4.  UIDs  . . . . . . . . . . . . . . . . . . . . . . . .   8
+61	       3.1.5.  Batch Ranges  . . . . . . . . . . . . . . . . . . . .   9
+62	       3.1.6.  Empty Responses . . . . . . . . . . . . . . . . . . .  10
+63	       3.1.7.  Large Mailboxes . . . . . . . . . . . . . . . . . . .  10
+64	     3.2.  Similarity to UID SEARCH Command  . . . . . . . . . . . .  11
+65	     3.3.  Similarity to PARTIAL Extension . . . . . . . . . . . . .  11
+66	     3.4.  Interaction with MESSAGELIMIT Extension . . . . . . . . .  12
+67	     3.5.  Interaction with UIDONLY Extension  . . . . . . . . . . .  12
+68	     3.6.  Interaction with SEARCHRES Extension  . . . . . . . . . .  12
+69	   4.  Formal syntax . . . . . . . . . . . . . . . . . . . . . . . .  12
+70	   5.  Security Considerations . . . . . . . . . . . . . . . . . . .  13
+71	   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  13
+72	     6.1.  Changes/additions to the IMAP4 capabilities registry  . .  13
+73	     6.2.  Changes/additions to the IMAP response codes registry . .  13
+74	   7.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  14
+75	     7.1.  Normative References  . . . . . . . . . . . . . . . . . .  14
+76	     7.2.  Informative References  . . . . . . . . . . . . . . . . .  14
+77	   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  15
+
+79	1.  Introduction
+
+81	   This document defines an extension to the Internet Message Access
+82	   Protocol [RFC9051] that enables clients to retrieve UID ranges which
+83	   partition a mailbox's messages into evenly sized batches.  This
+84	   extension is compatible with both IMAP4rev1 [RFC3501] and IMAP4rev2
+85	   [RFC9051].
+
+87	   The primary purpose of this extension is to allow clients to
+88	   predetermine UID ranges that limit the number of messages each
+89	   command operates on.  This capability is especially beneficial when
+90	   used with the [RFC9586] UIDONLY mode, where sequence numbers are
+91	   unavailable to the client, making it difficult to create message
+92	   batches using traditional methods.
+
+94	2.  Document Conventions
+
+96	   In protocol examples , "C:" indicates lines sent by a client that is
+97	   connected to a server.  "S:" indicates lines sent by the server to
+98	   the client.  These prefixes are not part of the protocol.  Long lines
+99	   in examples are wrapped using "The Single Backslash Strategy"
+100	   described in [RFC8792].
+
+102	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+103	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+104	   "OPTIONAL" in this document are to be interpreted as described in BCP
+105	   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+106	   capitals, as shown here.
+
+108	   Other capitalised words are IMAP keywords [RFC9051] or keywords from
+109	   this document.
+
+111	3.  The UIDBATCHES extension
+
+113	   An IMAP server advertises support for the UIDBATCHES extension by
+114	   including the UIDBATCHES capability in the CAPABILITY response /
+115	   response code.
+
+117	3.1.  UIDBATCHES Command
+
+119	   Arguments:
+120	      Message count per batch.
+121	      OPTIONAL batch range.
+
+123	   Responses:
+124	      REQUIRED untagged response: UIDBATCHES
+
+126	   Result:
+127	      OK uidbatches completed
+128	      NO command exceeds limits
+129	      BAD command unknown or arguments invalid
+
+131	   The UIDBATCHES command requests UID ranges that partition the
+132	   messages in the currently selected mailbox into equally sized
+133	   batches.  The server returns these ranges in descending UID order,
+134	   with batch 1 containing the highest UIDs (most recent messages),
+135	   batch 2 containing the next highest set of UIDs, and so on.
+
+137	   For a mailbox with M messages, requesting batches of size N returns
+138	   UID ranges corresponding to the following sequence number ranges
+139	   (where sequence numbers are ordered from 1 to M, with M being the
+140	   most recent message):
+
+142	   Batch 1: M:(M-N+1)     // Most recent N messages
+143	   Batch 2: (M-N):(M-2*N+1)  // Next N messages
+144	   Batch 3: (M-2*N):(M-3*N+1) // Next N messages
+145	   ...and so on
+
+147	3.1.1.  Example Usage
+
+149	   The following example demonstrates how a client uses UIDBATCHES to
+150	   partition a mailbox into manageable batches:
+
+152	   ========== NOTE: '\' line wrapping per RFC 8792 ===========
+
+154	   C: A142 SELECT INBOX
+155	   S: * 6823 EXISTS
+156	   S: * 1 RECENT
+157	   S: * OK [UNSEEN 12] Message 12 is first unseen
+158	   S: * OK [UIDVALIDITY 3857529045] UIDs valid
+159	   S: * OK [UIDNEXT 215296] Predicted next UID
+160	   S: * FLAGS (\Answered \Flagged \Deleted \Seen \Draft)
+161	   S: * OK [PERMANENTFLAGS (\Deleted \Seen \*)] Limited
+162	   S: A142 OK [READ-WRITE] SELECT completed
+163	   C: A143 UIDBATCHES 2000
+164	   S: * UIDBATCHES (TAG "A143") \
+165	          215295:99696,99695:20351,20350:7830,7829:1
+166	   S: A143 OK UIDBATCHES Completed
+
+168	   The server's response provides four UID ranges:
+
+170	   1.  215295:99696
+
+172	   2.  99695:20351
+
+174	   3.  20350:7830
+
+176	   4.  7829:1
+
+178	   Each range contains up to 2,000 messages, except the last range,
+179	   which contains the remaining 823 messages.
+
+181	   As new messages cannot appear within these UID ranges, the number of
+182	   messages in each range will not increase.  It may decrease, though,
+183	   as messages are deleted.
+
+185	   To prevent server overload, the client MUST NOT re-run UIDBATCHES
+186	   unless at least one of the following conditions is met:
+
+188	   1.  A different mailbox has been selected
+
+190	   2.  More than N/2 messages have been expunged from the mailbox (where
+191	       N is the batch size)
+
+193	   3.  More than N/2 new messages have been received into the mailbox
+
+195	   These restrictions protect servers from expensive operations, as
+196	   computing message batches may be resource-intensive.  The client MUST
+197	   NOT excessively re-run UIDBATCHES while the same mailbox remains
+198	   selected.
+
+200	   The client can keep track of the number of EXPUNGE or VANISHED
+201	   messages and re-run UIDBATCHES if many messages are deleted.
+
+203	   As new messages arrive into the mailbox, the client should add these
+204	   to a new message batch (starting at UID 215296 in the above example).
+205	   Once N/2 or more new messages have been added to the mailbox, the
+206	   client can ask for updated batches by re-running the UIDBATCHES
+207	   command.
+
+209	   The server MAY reject UIDBATCHES commands with a NO response with the
+210	   LIMIT response code if the client exceeds this limit.
+
+212	3.1.2.  Response Format
+
+214	   The server MUST reply with a UIDBATCHES response, even if no ranges
+215	   are returned (see Section 3.1.6).  The UIDBATCHES response MUST
+216	   include the tag of the command it relates to (similar to an ESEARCH
+217	   response defined in [RFC4731]).
+
+219	   The UID ranges in the response MUST be ordered in descending
+220	   sequence, from the highest to the lowest UIDs.
+
+222	3.1.3.  Batch Sizes
+
+224	   To ensure efficient server operation and prevent abuse, this
+225	   extension enforces constraints on batch sizes.  The design balances
+226	   server efficiency requirements with the primary use case of working
+227	   effectively with the [RFC9586] UIDONLY mode, without creating a
+228	   mechanism that circumvents the sequence number restrictions of that
+229	   mode.
+
+231	3.1.3.1.  Batch Size Summary
+
+233	   The following tables provide a quick reference for batch size
+234	   constraints:
+
+236	    +============+================+==================================+
+237	    | Constraint | Client Request | Server Response                  |
+238	    +============+================+==================================+
+239	    | Minimum    | 500 messages   | Aim for >= 90% of requested size |
+240	    +------------+----------------+----------------------------------+
+241	    | Maximum    | No limit       | Never exceed requested size      |
+242	    +------------+----------------+----------------------------------+
+243	    | Exception  | -              | May be smaller during mailbox    |
+244	    |            |                | changes                          |
+245	    +------------+----------------+----------------------------------+
+
+247	                     Table 1: Batch Size Constraints
+
+249	   Key principles:
+
+251	   *  Clients MUST request at least 500 messages per batch
+
+253	   *  Servers MUST NOT return more messages than requested
+
+255	   *  Servers SHOULD return batches close to the requested size (>= 90%
+256	      when possible)
+
+258	   *  Exact batch sizes may vary due to implementation efficiency or
+259	      mailbox changes
+
+261	3.1.3.2.  Client Requirements
+
+263	   The server MUST support batch sizes of 500 messages or larger.  This
+264	   minimum size prevents clients from misusing the extension to
+265	   effectively reconstruct sequence numbers while still allowing
+266	   reasonable batch operations.
+
+268	   The server MUST respond with NO and a response code TOOFEW if the
+269	   client uses a batch size smaller than the minimum allowed by the
+270	   server:
+
+272	   S: A302 NO [TOOFEW] Minimum batch size is 500
+
+274	3.1.3.3.  Server Response Flexibility
+
+276	   While servers SHOULD ideally return batches that correspond exactly
+277	   to the requested size, they have flexibility in specific
+278	   circumstances to enable efficient implementations.
+
+280	3.1.3.3.1.  Hard Constraints
+
+282	   The server MUST NOT return ranges that contain more than the number
+283	   of messages per batch requested by the client.  This is a strict
+284	   upper bound that cannot be exceeded.
+
+286	   If the requested batch size equals or exceeds the total number of
+287	   messages in the mailbox, the server MUST return a single UID range
+288	   spanning all messages.
+
+290	3.1.3.3.2.  Permitted Variations
+
+292	   Servers MAY return fewer messages per range in two specific
+293	   circumstances:
+
+295	   1.  When doing so makes the implementation substantially simpler and/
+296	       or more efficient
+
+298	   2.  When there are changes in mailbox state during the execution of
+299	       the UIDBATCHES command, particularly when messages are expunged
+
+301	   However, servers SHOULD NOT return batches that are substantially
+302	   smaller than requested and SHOULD aim to stay within 90% of the
+303	   requested size.  This guideline reflects the fact that clients
+304	   typically choose batch sizes based on their intended use, such as
+305	   displaying a specific number of messages to users.
+
+307	3.1.3.3.3.  Dynamic Changes
+
+309	   When mailbox state changes during UIDBATCHES execution, servers MAY
+310	   end up returning substantially fewer messages in each batch due to
+311	   message expungement that reduces the overall mailbox size.  Clients
+312	   can detect these situations through the EXPUNGE, VANISHED, or EXISTS
+313	   responses they receive.
+
+315	3.1.3.3.4.  Practical Implications
+
+317	   Due to these flexibility provisions, servers may return batches of
+318	   varying sizes.  For instance, when returning 3 batches of a requested
+319	   size of 1,000, one might contain 990 messages, another 977, and the
+320	   third 1,000 messages.  Clients MUST be prepared to handle such
+321	   variations.
+
+323	   When the total number of messages is not evenly divisible by the
+324	   requested batch size, the final batch will contain the remainder.
+325	   Therefore, the last batch in the mailbox (containing the lowest UIDs)
+326	   will typically have fewer messages than requested.
+
+328	3.1.3.4.  Design Rationale
+
+330	   These restrictions provide servers with implementation flexibility
+331	   while preventing clients from misusing the extension to effectively
+332	   reconstruct sequence numbers.  Section 3.2 also outlines some
+333	   reasoning for these limitations.
+
+335	   The flexibility regarding batch sizes is designed to enable efficient
+336	   server implementations while maintaining predictable behavior for
+337	   clients.  This leeway is not intended as a general permission to
+338	   return arbitrarily sized batches, but rather to accommodate
+339	   implementation constraints and dynamic mailbox changes.
+
+341	3.1.4.  UIDs
+
+343	   The server MAY return UID ranges with UIDs that do not exist on the
+344	   server.  The client as a result MUST NOT make assumptions about the
+345	   existence of messages.  If the server returns the response
+
+347	   ========== NOTE: '\' line wrapping per RFC 8792 ===========
+
+349	   S: * UIDBATCHES (TAG "A302") \
+350	          163886:99703,99696:20358,20351:7841,7830:1
+351	   S: A302 OK UIDBATCHES Completed
+
+353	   there may not be any messages on the server with the UIDs such as
+354	   163886, 99703, 99696, etc.
+
+356	   The range 163886:99703 will span approximately the requested number
+357	   of messages (may be less, see Section 3.1.3), but its start and end
+358	   UIDs may not correspond to messages on the server.
+
+360	   This gives the server implementation some flexibility as to which UID
+361	   ranges to return.  They might, e.g., return 163886:99697 and
+362	   99696:20358 instead of 163886:99703 and 99696:20358 -- assuming that
+363	   there are no messages in the range 99704:99697.
+
+365	   If there are fewer messages in the mailbox than the requested batch
+366	   size, the server would return a single batch that contains all
+367	   messages in the mailbox.
+
+369	   Servers SHOULD end the last UID batch in the mailbox with UID 1 even
+370	   if this UID does not exist on the server.  This makes it unambiguous
+371	   to the client that this range is in fact the last range.
+
+373	3.1.5.  Batch Ranges
+
+375	   A client can optionally provide a batch range.  The server limits its
+376	   response to UID ranges corresponding to the specified batch indices.
+377	   For example, if the client sends
+
+379	   C: A302 UIDBATCHES 2000 10:20
+
+381	   for a mailbox with 100,000 messages, the server would return the 10th
+382	   to 20th batches.  The 10th batch would correspond to message sequence
+383	   numbers `82000:80001` and the 20th batch would correspond to message
+384	   sequence numbers `62000:60001`.
+
+386	   Note that batches start at the highest UIDs: batch 1 is the batch
+387	   with the highest UIDs.
+
+389	   The UID ranges that the server returns would still split the
+390	   mailbox's messages into batches of the requested size (2,000 in the
+391	   example).
+
+393	   If the client requests more batches than exist on the server, the
+394	   server would return those that do exist.  For example if the client
+395	   sends
+
+397	   C: A302 UIDBATCHES 2000 1:5
+
+399	   and the selected mailbox has 7,000 messages, the server would then
+400	   return a UIDBATCHES response with only 4 UID ranges.
+
+402	   Batch ranges such as 1:4 in the above example MUST be ordered lowest
+403	   to highest, i.e. be sent as 1:4 and not as 4:1.  Servers MUST reject
+404	   batch ranges that are in the wrong order with BAD and a response code
+405	   CLIENTBUG:
+
+407	   C: A302 UIDBATCHES 2000 4:1
+408	   S: A302 BAD [CLIENTBUG] Invalid batch range
+
+410	   If the client requests a range of batches that do not exist on the
+411	   server, the server MUST still return an empty response.  See section
+412	   Section 3.1.6.
+
+414	   Note that the number of messages per batch returned by the server may
+415	   be approximate as detailed in Section 3.1.3.  As a result, if the
+416	   client needs to request consecutive batch ranges such as 1:100,
+417	   101:200, 201:300, and so on, the client may want to make these batch
+418	   ranges overlap by e.g. requesting 1:100, 100:200, and 200:300.  The
+419	   client would then be able to check if the resulting UIDs do in fact
+420	   overlap.
+
+422	   Clients MUST NOT request batch ranges that span more than 100,000
+423	   messages, i.e. the number of batches multiplied by the batch size
+424	   MUST NOT be larger than 100,000.  The server MAY reject UIDBATCHES
+425	   commands with a NO response with the TOOMANY response code if the
+426	   client exceeds this limit.
+
+428	   C: A302 UIDBATCHES 2000 1:100
+429	   S: A302 NO [TOOMANY] Too many messages
+
+431	3.1.6.  Empty Responses
+
+433	   When the client issues any valid UIDBATCHES command and the mailbox
+434	   is empty, the server MUST reply with a UIDBATCHES response, e.g.
+
+436	   S: * UIDBATCHES (TAG "A302")
+437	   S: A302 OK UIDBATCHES Completed
+
+439	   If the client requests a range of batches that do not exist, the
+440	   server MUST reply with an empty UIDBATCHES response.  If the mailbox
+441	   has 7,000 messages, and the client sends
+
+443	   C: A302 UIDBATCHES 2000 6:8
+
+445	   the server would respond with
+
+447	   S: * UIDBATCHES (TAG "A302")
+448	   S: A302 OK UIDBATCHES Completed
+
+450	3.1.7.  Large Mailboxes
+
+452	   The server may not be able to return all UID ranges if the mailbox
+453	   contains an extremely large number of messages.
+
+455	   The server MUST at least support returning UID ranges spanning
+456	   100,000 messages.  See Section 3.1.5 for details on this limit.
+
+458	   If the server can not return all of the requested UID ranges, it MUST
+459	   respond with a NO response with the TOOMANY response code.  Notably,
+460	   when the client requests all UID ranges and the mailbox has more than
+461	   100,000 messages, the server MAY reply with a NO response.  For
+462	   example:
+
+464	   C: A302 UIDBATCHES 2000
+465	   S: A302 NO [TOOMANY] Too many messages in mailbox
+466	   The client should know what the message count in the mailbox is, and
+467	   if the message count exceeds 100,000 it may choose to always request
+468	   batch ranges as discussed in Section 3.1.5 instead of requesting all
+469	   batches.
+
+471	3.2.  Similarity to UID SEARCH Command
+
+473	   The UIDBATCHES is in effect nothing more than shorthand for a UID
+474	   SEARCH command of the form
+
+476	   C: A145 UID SEARCH RETURN () <M>,<M-N>,<M-2*N>,<M-3*N>,...
+
+478	   where M is the number of messages in the mailbox and N is the
+479	   requested batch count.
+
+481	   The special purpose UIDBATCHES command, though, tries to address two
+482	   problems:
+
+484	   (a)  for many servers, UID SEARCH commands specifying sequence
+485	        numbers are costly, especially for mailboxes with many messages.
+
+487	   (b)  the UIDONLY extension disallows the use of sequence numbers and
+488	        thus makes it difficult for the client to split its commands
+489	        into batches of a size that works well for the client and
+490	        server.
+
+492	   By providing a special purpose command, servers can implement a
+493	   different, optimized code path for determining message batches.  And
+494	   servers using the UIDONLY extension can provide a facility to let the
+495	   client determine message batches without using sequence numbers in a
+496	   UID SEARCH command.
+
+498	   Section 3.1.3 describes some implementation restrictions to ensure
+499	   this.
+
+501	3.3.  Similarity to PARTIAL Extension
+
+503	   The PARTIAL extension in [RFC9394] provides a different way for the
+504	   client to split its commands into batches by using paged SEARCH and
+505	   FETCH.
+
+507	   The intention of the UIDBATCHES command is to let the client pre-
+508	   determine message batches of a desired size.
+
+510	   This makes it easier for the client to share implementation between
+511	   servers regardless of their support of PARTIAL.  And additionally,
+512	   because the client can issue a corresponding UID SEARCH command to
+513	   servers that do not implement UIDBATCHES, the client can use similar
+514	   batching implementations for servers that support UIDBATCHES and
+515	   those that do not.
+
+517	3.4.  Interaction with MESSAGELIMIT Extension
+
+519	   When the server supports both the [RFC9738] MESSAGELIMIT and
+520	   UIDBATCHES extension, the client SHOULD request batches no larger
+521	   than the specified maximum number of messages that can be processed
+522	   in a single command.  The client MAY choose to use a smaller batch
+523	   size.
+
+525	   Additionally, since servers MAY limit the number of UIDs returned in
+526	   response to UIDBATCHES, it is reasonable to assume that they would at
+527	   most return N UIDs where N is the limit the server announced as its
+528	   MESSAGELIMIT.
+
+530	3.5.  Interaction with UIDONLY Extension
+
+532	   As noted above, the UIDBATCHES extension allows for clients to create
+533	   UID ranges for message batches even when the connection operates in
+534	   UIDONLY mode which otherwise doesn't allow for using message sequence
+535	   numbers.
+
+537	3.6.  Interaction with SEARCHRES Extension
+
+539	   UIDBATCHES is not a SEARCH nor UID SEARCH command.  Servers that
+540	   support SEARCHRES [RFC5182] MUST NOT store the result of UIDBATCHES
+541	   in the $ variable.
+
+543	4.  Formal syntax
+
+545	   The following syntax specification uses the Augmented Backus-Naur
+546	   Form (ABNF) notation as specified in [RFC5234].
+
+548	   Non-terminals referenced but not defined below are as defined by
+549	   IMAP4 [RFC9051].
+
+551	   Except as noted otherwise, all alphabetic characters are case-
+552	   insensitive.  The use of upper or lower case characters to define
+553	   token strings is for editorial clarity only.  Implementations MUST
+554	   accept these strings in a case-insensitive fashion.
+
+556	   capability          =/ "UIDBATCHES"
+557	                          ;; <capability> from [RFC9051]
+
+559	   command-select      =/ message-batches
+
+561	   message-batches     = "UIDBATCHES" SP nz-number
+562	                         [SP nz-number ":" nz-number]
+
+564	   uidbatches-response = "UIDBATCHES" search-correlator
+565	                         [SP uid-range *("," uid-range) ]
+
+567	   mailbox-data        =/ uidbatches-response
+
+569	   resp-text-code      =/ "TOOFEW" / "TOOMANY"
+
+571	5.  Security Considerations
+
+573	   This document defines an additional IMAP4 capability.  As such, it
+574	   does not change the underlying security considerations of [RFC3501]
+575	   and IMAP4rev2 [RFC9051].
+
+577	   This document defines an optimization that can both reduce the amount
+578	   of work performed by the server, as well as the amount of data
+579	   returned to the client.  Use of this extension is likely to cause the
+580	   server and the client to use less memory than when the extension is
+581	   not used.  However, as this is going to be new code in both the
+582	   client and the server, rigorous testing of such code is required in
+583	   order to avoid the introduction of new implementation bugs.
+
+585	6.  IANA Considerations
+
+587	6.1.  Changes/additions to the IMAP4 capabilities registry
+
+589	   IMAP4 capabilities are registered by publishing a standards track or
+590	   IESG approved Informational or Experimental RFC.  The registry is
+591	   currently located at:
+
+593	   https://www.iana.org/assignments/imap4-capabilities
+
+595	   IANA is requested to add registrations of the "UIDBATCHES" capability
+596	   to this registry, pointing to this document.
+
+598	6.2.  Changes/additions to the IMAP response codes registry
+
+600	   IMAP4 response codes are registered by publishing a standards track
+601	   or IESG approved Informational or Experimental RFC.  The registry is
+602	   currently located at:
+
+604	   https://www.iana.org/assignments/imap-response-codes
+
+606	   IANA is requested to add registrations of TOOMANY and TOOFEW to this
+607	   registry, pointing to this document.
+
+609	7.  References
+
+611	7.1.  Normative References
+
+613	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+614	              Requirement Levels", BCP 14, RFC 2119,
+615	              DOI 10.17487/RFC2119, March 1997,
+616	              <https://www.rfc-editor.org/info/rfc2119>.
+
+618	   [RFC3501]  Crispin, M., "INTERNET MESSAGE ACCESS PROTOCOL - VERSION
+619	              4rev1", RFC 3501, DOI 10.17487/RFC3501, March 2003,
+620	              <https://www.rfc-editor.org/info/rfc3501>.
+
+622	   [RFC5234]  Crocker, D., Ed. and P. Overell, "Augmented BNF for Syntax
+623	              Specifications: ABNF", STD 68, RFC 5234,
+624	              DOI 10.17487/RFC5234, January 2008,
+625	              <https://www.rfc-editor.org/info/rfc5234>.
+
+627	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+628	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+629	              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+631	   [RFC9051]  Melnikov, A., Ed. and B. Leiba, Ed., "Internet Message
+632	              Access Protocol (IMAP) - Version 4rev2", RFC 9051,
+633	              DOI 10.17487/RFC9051, August 2021,
+634	              <https://www.rfc-editor.org/info/rfc9051>.
+
+636	   [RFC9738]  Melnikov, A., Achuthan, A. P., Nagulakonda, V., and L.
+637	              Alves, "IMAP MESSAGELIMIT Extension", RFC 9738,
+638	              DOI 10.17487/RFC9738, March 2025,
+639	              <https://www.rfc-editor.org/info/rfc9738>.
+
+641	7.2.  Informative References
+
+643	   [RFC4731]  Melnikov, A. and D. Cridland, "IMAP4 Extension to SEARCH
+644	              Command for Controlling What Kind of Information Is
+645	              Returned", RFC 4731, DOI 10.17487/RFC4731, November 2006,
+646	              <https://www.rfc-editor.org/info/rfc4731>.
+
+648	   [RFC5182]  Melnikov, A., "IMAP Extension for Referencing the Last
+649	              SEARCH Result", RFC 5182, DOI 10.17487/RFC5182, March
+650	              2008, <https://www.rfc-editor.org/info/rfc5182>.
+
+652	   [RFC8792]  Watsen, K., Auerswald, E., Farrel, A., and Q. Wu,
+653	              "Handling Long Lines in Content of Internet-Drafts and
+654	              RFCs", RFC 8792, DOI 10.17487/RFC8792, June 2020,
+655	              <https://www.rfc-editor.org/info/rfc8792>.
+
+657	   [RFC9394]  Melnikov, A., Achuthan, A. P., Nagulakonda, V., and L.
+658	              Alves, "IMAP PARTIAL Extension for Paged SEARCH and
+659	              FETCH", RFC 9394, DOI 10.17487/RFC9394, June 2023,
+660	              <https://www.rfc-editor.org/info/rfc9394>.
+
+662	   [RFC9586]  Melnikov, A., Achuthan, A. P., Nagulakonda, V., Singh, A.,
+663	              and L. Alves, "IMAP Extension for Using and Returning
+664	              Unique Identifiers (UIDs) Only", RFC 9586,
+665	              DOI 10.17487/RFC9586, May 2024,
+666	              <https://www.rfc-editor.org/info/rfc9586>.
+
+668	Author's Address
+
+670	   Daniel Eggert (editor)
+671	   Apple Inc
+672	   One Apple Park Way
+673	   Cupertino, CA 95014
+674	   United States of America
+675	   Email: deggert@apple.com
+
+
+
+
+
+
+
+
+
