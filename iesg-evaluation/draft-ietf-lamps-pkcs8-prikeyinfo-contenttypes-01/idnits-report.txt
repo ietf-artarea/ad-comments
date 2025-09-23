@@ -1,0 +1,262 @@
+idnits 2.17.1 
+
+draft-ietf-lamps-pkcs8-prikeyinfo-contenttypes-01.txt:
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     No nits found.
+--------------------------------------------------------------------------------
+
+
+2	Limited Additional Mechanisms for PKIX and SMIME               J. Mandel
+3	Internet-Draft                                                    AKAYLA
+4	Intended status: Standards Track                              R. Housley
+5	Expires: 5 March 2026                                     Vigil Security
+6	                                                               S. Turner
+7	                                                                   sn3rd
+8	                                                        1 September 2025
+
+10	             PKCS #8 Private-Key Information Content Types
+11	           draft-ietf-lamps-pkcs8-prikeyinfo-contenttypes-01
+
+13	Abstract
+
+15	   This document defines PKCS #8 content types for use with
+16	   PrivateKeyInfo and EncryptedPrivateKeyInfo as specified in RFC 5958.
+
+18	About This Document
+
+20	   This note is to be removed before publishing as an RFC.
+
+22	   The latest revision of this draft can be found at https://github.com/
+23	   lamps-wg/pkcs8-PriKeyInfoCt.  Status information for this document
+24	   may be found at https://datatracker.ietf.org/doc/draft-ietf-lamps-
+25	   pkcs8-prikeyinfo-contenttypes/.
+
+27	   Discussion of this document takes place on the Limited Additional
+28	   Mechanisms for PKIX and SMIME mailing list (mailto:spasm@ietf.org),
+29	   which is archived at https://mailarchive.ietf.org/arch/browse/spasm/.
+30	   Subscribe at https://www.ietf.org/mailman/listinfo/spasm/.
+
+32	   Source for this draft and an issue tracker can be found at
+33	   https://github.com/lamps-wg/pkcs8-PriKeyInfoCt.
+
+35	Status of This Memo
+
+37	   This Internet-Draft is submitted in full conformance with the
+38	   provisions of BCP 78 and BCP 79.
+
+40	   Internet-Drafts are working documents of the Internet Engineering
+41	   Task Force (IETF).  Note that other groups may also distribute
+42	   working documents as Internet-Drafts.  The list of current Internet-
+43	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+45	   Internet-Drafts are draft documents valid for a maximum of six months
+46	   and may be updated, replaced, or obsoleted by other documents at any
+47	   time.  It is inappropriate to use Internet-Drafts as reference
+48	   material or to cite them other than as "work in progress."
+49	   This Internet-Draft will expire on 5 March 2026.
+
+51	Copyright Notice
+
+53	   Copyright (c) 2025 IETF Trust and the persons identified as the
+54	   document authors.  All rights reserved.
+
+56	   This document is subject to BCP 78 and the IETF Trust's Legal
+57	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+58	   license-info) in effect on the date of publication of this document.
+59	   Please review these documents carefully, as they describe your rights
+60	   and restrictions with respect to this document.  Code Components
+61	   extracted from this document must include Revised BSD License text as
+62	   described in Section 4.e of the Trust Legal Provisions and are
+63	   provided without warranty as described in the Revised BSD License.
+
+65	Table of Contents
+
+67	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+68	   2.  Conventions and Definitions . . . . . . . . . . . . . . . . .   2
+69	   3.  Private-Key Information Content Types . . . . . . . . . . . .   3
+70	   4.  Security Considerations . . . . . . . . . . . . . . . . . . .   3
+71	   5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   3
+72	   6.  ASN.1 Module  . . . . . . . . . . . . . . . . . . . . . . . .   3
+73	   7.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   4
+74	     7.1.  Normative References  . . . . . . . . . . . . . . . . . .   4
+75	     7.2.  Informative References  . . . . . . . . . . . . . . . . .   5
+76	   Acknowledgments . . . . . . . . . . . . . . . . . . . . . . . . .   5
+77	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .   5
+
+79	1.  Introduction
+
+81	   The syntax for private-key information was originally described in
+82	   [RFC5208] and later obsoleted by [RFC5958].  This document defines
+83	   PKCS #8 content types for use with PrivateKeyInfo and
+84	   EncryptedPrivateKeyInfo.
+
+86	2.  Conventions and Definitions
+
+88	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+89	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+90	   "OPTIONAL" in this document are to be interpreted as described in
+91	   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+92	   capitals, as shown here.
+
+94	3.  Private-Key Information Content Types
+
+96	   This section defines a content type for private-key information and
+97	   encrypted private-key information.
+
+99	   The PrivateKeyInfo content type is identified by the following object
+100	   identifier:
+
+102	   id-ct-privateKeyInfo OBJECT IDENTIFIER ::= { iso(1)
+103	    member-body(2) us(840) rsadsi(113549) pkcs(1) pkcs-9(9)
+104	    smime(16) ct(1) TBD1 }
+
+106	   The EncryptedPrivateKeyInfo content type is identified by the
+107	   following object identifier:
+
+109	   id-ct-encrPrivateKeyInfo OBJECT IDENTIFIER ::= { iso(1)
+110	    member-body(2) us(840) rsadsi(113549) pkcs(1) pkcs-9(9)
+111	    smime(16) ct(1) TBD2 }
+
+113	4.  Security Considerations
+
+115	   The security considerations in [RFC5958] apply here.
+
+117	5.  IANA Considerations
+
+119	   For the private key info content types defined in section Section 3,
+120	   IANA is requested to assign an object identifier (OID) for each of
+121	   the content types.  The OIDs for the content types should be
+122	   alloacted in the "SMI Security for S/MIME CMS Content Type" registry
+123	   (1.2.840.113549.1.9.16.1), and the description should be set to id-
+124	   ct-privateKeyInfo (TDB1) and id-ct-encrPrivateKeyInfo (TBD2).
+
+126	   For the ASN.1 Module in Section 6, IANA is requested to assign an
+127	   object identifier (OID) for the module identifier.  The OID for the
+128	   module should be allocated in the "SMI Security for S/MIME Module
+129	   Identifier" registry (1.2.840.113549.1.9.16.0), and the Description
+130	   for the new OID should be set to "id-mod-pkcs8ContentType".
+
+132	6.  ASN.1 Module
+
+134	   The ASN.1 module in this section builds upon the modules in
+135	   [RFC5911].
+
+137	   <CODE BEGINS>
+138	   PrivateKeyInfoContentTypes
+139	    { iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1)
+140	      pkcs-9(9) smime(16) modules(0) id-mod-pkcs8ContentType(TBD0) }
+
+142	   DEFINITIONS IMPLICIT TAGS ::=
+143	   BEGIN
+
+145	   -- EXPORTS ALL
+
+147	   IMPORTS
+
+149	   CONTENT-TYPE
+150	    FROM CryptographicMessageSyntax-2009 -- in [RFC5911]
+151	      { iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1)
+152	        pkcs-9(9) smime(16) modules(0) id-mod-cms-2004-02(41) }
+
+154	   PrivateKeyInfo, EncryptedPrivateKeyInfo
+155	    FROM AsymmetricKeyPackageModuleV1 -- in [RFC5958]
+156	       { iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1)
+157	         pkcs-9(9) smime(16) modules(0)
+158	         id-mod-asymmetricKeyPkgV1(50) }  ;
+
+160	   PrivateKeyInfoContentTypes CONTENT-TYPE ::= {
+161	    ct-privateKeyInfo | ct-encrPrivateKeyInfo,
+162	    ... -- Expect additional content types --  }
+
+164	   ct-privateKeyInfo CONTENT-TYPE ::= { PrivateKeyInfo
+165	    IDENTIFIED BY id-ct-privateKeyInfo }
+
+167	   id-ct-privateKeyInfo OBJECT IDENTIFIER ::= { iso(1)
+168	    member-body(2) us(840) rsadsi(113549) pkcs(1) pkcs-9(9)
+169	    smime(16) ct(1) TBD1 }
+
+171	   ct-encrPrivateKeyInfo CONTENT-TYPE ::= { EncryptedPrivateKeyInfo
+172	    IDENTIFIED BY id-ct-encrPrivateKeyInfo }
+
+174	   id-ct-encrPrivateKeyInfo OBJECT IDENTIFIER ::= { iso(1)
+175	    member-body(2) us(840) rsadsi(113549) pkcs(1) pkcs-9(9)
+176	    smime(16) ct(1) TBD2 }
+
+178	   END
+179	   <CODE ENDS>
+
+181	7.  References
+
+183	7.1.  Normative References
+
+185	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+186	              Requirement Levels", BCP 14, RFC 2119,
+187	              DOI 10.17487/RFC2119, March 1997,
+188	              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+190	   [RFC5911]  Hoffman, P. and J. Schaad, "New ASN.1 Modules for
+191	              Cryptographic Message Syntax (CMS) and S/MIME", RFC 5911,
+192	              DOI 10.17487/RFC5911, June 2010,
+193	              <https://www.rfc-editor.org/rfc/rfc5911>.
+
+195	   [RFC5958]  Turner, S., "Asymmetric Key Packages", RFC 5958,
+196	              DOI 10.17487/RFC5958, August 2010,
+197	              <https://www.rfc-editor.org/rfc/rfc5958>.
+
+199	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+200	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+201	              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+203	7.2.  Informative References
+
+205	   [RFC5208]  Kaliski, B., "Public-Key Cryptography Standards (PKCS) #8:
+206	              Private-Key Information Syntax Specification Version 1.2",
+207	              RFC 5208, DOI 10.17487/RFC5208, May 2008,
+208	              <https://www.rfc-editor.org/rfc/rfc5208>.
+
+210	Acknowledgments
+
+212	   Thanks to John Gray and Deb Cooley for reviewing the document and
+213	   providing comments.
+
+215	Authors' Addresses
+
+217	   Joe Mandel
+218	   AKAYLA, Inc.
+219	   Email: joe@akayla.com
+
+221	   Russ Housley
+222	   Vigil Security, LLC
+223	   Email: housley@vigilsec.com
+
+225	   Sean Turner
+226	   sn3rd
+227	   Email: sean@sn3rd.com
+
+
+
+
+
+
+
+
+

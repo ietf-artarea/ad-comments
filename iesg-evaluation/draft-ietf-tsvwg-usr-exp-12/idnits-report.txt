@@ -1,0 +1,578 @@
+idnits 2.17.1 
+
+draft-ietf-tsvwg-usr-exp-12.txt:
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     No nits found.
+--------------------------------------------------------------------------------
+
+1	TSVWG                                                           J. Touch
+2	Internet Draft                                    Independent Consultant
+3	Updates: 4727
+4	Intended status: Standards Track                       September 1, 2025
+5	Expires: March 2026
+
+7	                        User Ports for Experiments
+8	                       draft-ietf-tsvwg-usr-exp-12.txt
+
+10	Abstract
+
+12	   This document defines user ports for experiments using transport
+13	   protocols. It describes the use of experiment identifiers to enable
+14	   shared use of these user ports. It also updates RFC 4727 to
+15	   recommend the use of these experimental identifiers for the system
+16	   ports for experiments in the same manner.
+
+18	Status of this Memo
+
+20	   This Internet-Draft is submitted in full conformance with the
+21	   provisions of BCP 78 and BCP 79.
+
+23	   Internet-Drafts are working documents of the Internet Engineering
+24	   Task Force (IETF), its areas, and its working groups.  Note that
+25	   other groups may also distribute working documents as Internet-
+26	   Drafts.
+
+28	   The list of current Internet-Drafts can be accessed at
+29	   https://www.ietf.org/ietf/1id-abstracts.txt
+
+31	   The list of Internet-Draft Shadow Directories can be accessed at
+32	   https://www.ietf.org/shadow.html
+
+34	   Internet-Drafts are draft documents valid for a maximum of six
+35	   months and may be updated, replaced, or obsoleted by other documents
+36	   at any time.  It is inappropriate to use Internet-Drafts as
+37	   reference material or to cite them other than as "work in progress."
+
+39	   This Internet-Draft will expire on February 1, 2026.
+
+41	Copyright Notice
+
+43	   Copyright (c) 2025 IETF Trust and the persons identified as the
+44	   document authors. All rights reserved.
+
+46	   This document is subject to BCP 78 and the IETF Trust's Legal
+47	   Provisions Relating to IETF Documents
+48	   (http://trustee.ietf.org/license-info) in effect on the date of
+49	   publication of this document. Please review these documents
+50	   carefully, as they describe your rights and restrictions with
+51	   respect to this document. Code Components extracted from this
+52	   document must include Revised BSD License text as described in
+53	   Section 4.e of the Trust Legal Provisions and are provided without
+54	   warranty as described in the Revised BSD License.
+
+56	Table of Contents
+
+58	   1. Introduction ..................................................2
+59	   2. Conventions used in this document .............................3
+60	   3. User Ports for Experiments ....................................3
+61	   4. Protocol Experiment Identifiers (PExIDs) ......................4
+62	   5. Using PExIDs in Transport Protocols ...........................5
+63	      5.1. SCTP and DCCP PExID Use ..................................6
+64	      5.2. PExID Coordination During State Negotiation ..............6
+65	   6. PExID Interactions with Other Protocols and Mechanisms ........7
+66	   7. Security Considerations .......................................8
+67	   8. IANA Considerations ...........................................8
+68	   9. References ...................................................10
+69	      9.1. Normative References ....................................10
+70	      9.2. Informative References ..................................10
+71	   10. Acknowledgments .............................................12
+
+73	1. Introduction
+
+75	   Various network codepoints have been allocated for experimental use,
+76	   including those for IPv4 [RFC791], IPv6 [RFC8200], ICMPv4 [RFC792],
+77	   ICMPv6 [RFC4443], UDP [RFC768], and TCP [RFC9293]. These include
+78	   transport protocol port numbers 1021 and 1022, using the service
+79	   names "EXP1" and "EXP2, respectively [RFC4727]. Note that service
+80	   names are case-insensitive, but are shown in upper-case throughout
+81	   this document to improve their visibility.
+
+83	   There has always been an expectation that experiments needing
+84	   privileged (system) ports use these assignments and unprivileged
+85	   ports use those from the dynamic range [RFC6335][RFC7605]. However,
+86	   dynamic ports can be difficult to reserve in some systems or blocked
+87	   from traversing some firewalls. As a consequence, there is a need
+88	   for non-privileged, non-dynamic ports - i.e., user ports - for
+89	   experiments.
+
+91	   This document reserves user ports for experimentation and describes
+92	   the use of 32-bit unsigned protocol experiment identifiers (PExIDs)
+93	   to differentiate shared use of these ports for concurrent
+94	   experiments, by prepending these PExIDs to the experimental
+95	   protocol's transport data, in front of each separate message or byte
+96	   stream.
+
+98	   This document also creates a PExID registry, in addition to the IANA
+99	   service names and ports registry [SP-reg], to reduce the potential
+100	   that experimental uses of PExIDs interfere with each other if they
+101	   are tested in the same environment or in the public Internet.
+
+103	   This document updates RFC 4727 by adding the following text to
+104	   section 1:
+
+106	      "[IANA-THIS-RFC] defines PExIDs that are that are recommended for
+107	     services that might not qualify for a port assignment per current
+108	     requirements in [RFC6335] and [RFC7605] because they are either
+109	     short-term or need more than one port number during development
+110	     (see Sec. 7.1 of [RFC7605])."
+
+112	2. Conventions used in this document
+
+114	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+115	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+116	   "OPTIONAL" in this document are to be interpreted as described in
+117	   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+118	   capitals, as shown here.
+
+120	3. User Ports for Experiments
+
+122	   The system, user, and dynamic port ranges vary in their properties
+123	   [RFC7605]. System ports often include privileged access, sometimes
+124	   known as 'root'. Dynamic ports are used as client ports when
+125	   establishing associations with services on registered ports. User
+126	   ports have neither privilege nor the risk of use by other
+127	   connections. User ports are also more likely be allowed in firewall
+128	   configurations, where system and dynamic ports can be difficult to
+129	   'un-block'.
+
+131	   This document registers USR-EXP1 and USR-EXP2 for user port
+132	   experiments, using port numbers #UPORT1 and #UPORT2, with the
+133	   details provided in Section 8. These ports are assigned from the
+134	   user range, allowing non-privileged experiments without the need to
+135	   use ports from the dynamic range. They are intended to complement
+136	   the system ports already assigned for experimental use [RFC4727].
+
+138	4. Protocol Experiment Identifiers (PExIDs)
+
+140	   This document also creates a registry for port experiment
+141	   identifiers (PExIDs), in the same manner as the registry created for
+142	   shared TCP option experiments [RFC6994][TCP-reg]. These PExIDs are
+143	   intended for services that typically do not qualify for a port
+144	   assignment per current requirements in [RFC6335] and [RFC7605]
+145	   because they are either short-term or need more than one port number
+146	   during development (see Sec. 7.1 of [RFC7605]). Such is the case for
+147	   student projects that operate over the public Internet and/or across
+148	   firewalls. Additionally, although protocol designers could select an
+149	   arbitrary PExID and hope no other concurrent experiment uses it too,
+150	   PExIDs are obtained as first-come, first-served with no additional
+151	   requirements, so registration is both easy and encouraged.
+
+153	   The PExID approach is inspired by the ExID method for sharing
+154	   experimental option codepoints, originally developed for TCP
+155	   [RFC6994] and later applied to UDP [TH25]. Unlike ExIDs, PExIDs are
+156	   used in the data path and require no OS modification.
+
+158	   Experimenters SHOULD register PExIDs with IANA and include them at
+159	   the beginning of their transport data, i.e., at the front of each
+160	   separate message or byte stream, as a 32-bit unsigned integer in
+161	   network standard byte order. The use of PExIDs helps differentiate
+162	   experiments without the immediate need for additional port
+163	   assignments.
+
+165	   This document also encourages the use of these PExIDs for
+166	   experiments using existing experiment ports, i.e., system ports EXP1
+167	   (#1021) and EXP2 (#1022).
+
+169	   PExIDs differentiate experiments but are not intended to be specific
+170	   to a given experiment port, whether system or user, so a single
+171	   registration is used for all experiment ports. It is the
+172	   responsibility of the experimenter to determine which port(s) each
+173	   experiment uses.
+
+175	   If an experiment using PExIDs is intended to be more widely
+176	   deployed, its designers SHOULD apply for an assigned port, notably
+177	   before distribution as a product for public use. The expectations
+178	   for such services are described in Section 7 of [RFC7605]. If an
+179	   assigned port is granted to a formerly experimental service with a
+180	   registered PExID, that service MUST NOT continue to use the
+181	   experiment ports (even using that PExID) in a deployed system
+182	   available to the public (i.e., a 'shipped product'), per Section 1.1
+183	   of [RFC3692].
+
+185	   The remainder of this document focuses on the issues associated with
+186	   using PExIDs.
+
+188	5. Using PExIDs in Transport Protocols
+
+190	   PExIDs differentiate use of the experiment transport ports, both for
+191	   TCP as previously assigned [RFC4727] and for other transports as
+192	   defined in this document.
+
+194	   The remainder of this section describes PExID use in transport
+195	   protocols in general, the detailed issues associated with SCTP and
+196	   DCCP use, and PExID coordination during state negotiation.
+
+198	5.1. PExID Use in General
+
+200	   PExIDs are intended to be placed in network-standard byte order at
+201	   the beginning of each independent transport data payload.
+
+203	   For connection-oriented transport protocols, such as TCP [RFC9293],
+204	   SCTP [RFC9260], and DCCP [RFC4340], the PExID is typically sent once
+205	   for each connection at the beginning of the user transfer and echoed
+206	   upon receipt, enabling both ends to confirm the experiment for the
+207	   connection's socket pair. That socket pair is then associated with
+208	   the experiment identified by that PExID for the duration of the
+209	   connection.
+
+211	   For connectionless transport protocols, such as UDP [RFC768], the
+212	   PExID is typically included at the beginning of every message in
+213	   both directions.
+
+215	   In most cases, the PExID is sent as user data. SCTP is one
+216	   exception, because of its Payload Protocol Identifier (PPID), as
+217	   discussed further in Section 5.2. Alternately, PExID can be
+218	   confirmed during the connection or security handshake or other
+219	   transport header, as discussed in Section 5.3. In other cases, the
+220	   PExID can be transferred elsewhere in the data stream, as specified
+221	   by the user application.
+
+223	   Two endpoints can engage in multiple experiments using the same
+224	   experimental port number and transport protocol. In such cases,
+225	   users are expected to support demultiplexing of those different
+226	   experiments using the PExID. However, PExIDs SHOULD NOT be used to
+227	   differentiate versions of a protocol or service, because such a
+228	   service would be more difficult to transition to use of an assigned
+229	   port for all future versions, as indicated by Section 7.5 of
+230	   [RFC7605].
+
+232	5.2. SCTP and DCCP PExID Use
+
+234	   SCTP and DCCP connections can use self-assigned Private service
+235	   codes, which provide experimental-use identification
+236	   [RFC4340][RFC5595]. There is thus no need to use PExIDs to
+237	   differentiate experiments on the same port number. PExIDs can be
+238	   used in addition to those codes if desired, notably in developing a
+239	   single application-layer solution for multiple transport protocols.
+
+241	   SCTP also includes a Payload Protocol Identifier (PPID), which
+242	   identifies the information within each user message. PPIDs are
+243	   assigned on a first-come, first-served (FCFS) basis and are abundant
+244	   (2^32 codepoints), so there is no need for a separate experimental-
+245	   use PPID. The PExID differentiate shared use of the user
+246	   experimental port number and thus serves a different purpose than
+247	   the PPID; both can be used together or separately for SCTP.
+
+249	   Because SCTP supports multiple concurrent streams, it is useful for
+250	   experiments using PExIDs to be identified in a particular stream
+251	   before proceeding with other streams, to avoid excessive buffering.
+252	   For SCTP using only PExIDs for that purpose, users SHOULD send the
+253	   PExID ordered and reliably as the first user message using PPID of
+254	   #PPID1 in stream 0 (the default stream). Until the PExID user
+255	   message is echoed back on stream 0, user messages on stream 0 SHOULD
+256	   be sent ordered and the user SHOULD avoid transmitting user messages
+257	   on other streams. The echoed user message SHOULD use the PPID of
+258	   #PPID1 assigned for this purpose. That PExID user message MUST
+259	   contain only the PExID as a 32-bit unsigned integer in network
+260	   standard byte order.
+
+262	5.3. PExID Coordination During State Negotiation
+
+264	   For stateful (connection-oriented) associations, the PExID SHOULD be
+265	   indicated during the initial state negotiation of the transport or
+266	   security protocol. For TCP, SCTP, DCCP, QUIC [RFC9000], the PExID
+267	   can be included in the parameters of the initial connection
+268	   handshake, e.g., as transport options. For UDP, a similar mechanism
+269	   SHOULD be included with each packet if UDP options are supported
+270	   [TH25]. This document does not define a single approach to
+271	   indicating PExIDs for either stateful or connectionless
+272	   associations.
+
+274	   Current transport protocols, including TCP, SCTP, DCCP, QUIC, and
+275	   UDP, do not currently define an option type for indicating PExIDs.
+276	   This document does not define such an option type, because it would
+277	   be available only after having been assigned and widely deployed,
+278	   whereas the mechanism defined in this document is intended to be
+279	   available now, without requiring widescale OS modification.
+
+281	   Both TLS and DTLS provide extensions to negotiate additional
+282	   security association parameters  [RFC8446][RFC9147]. In both
+283	   protocols, the PExID could be sent in ClientHello requests and
+284	   echoed in ServerHello responses, although for these protocols the
+285	   extension requires two fields (because such fields carry only 16
+286	   bits of content and two are needed for the 32-bit PExID).
+
+288	   In all the above cases, the details of such a mechanism are outside
+289	   the scope of this document and will require additional IANA
+290	   codepoint assignments. They are not generally anticipated because
+291	   such mechanisms are more difficult to deploy, hampering the very
+292	   experimentation this mechanism is intended to foster.
+
+294	6. PExID Interactions with Other Protocols and Mechanisms
+
+296	   PExIDs help differentiate different uses of the same experimental
+297	   transport port number using data outside the transport header, and
+298	   thus are not be supported by existing NATs, firewalls, deep-packet
+299	   inspectors (DPIs), or service function chaining [RFC7665]. These
+300	   devices need to be modified to detect the PExID, either at the
+301	   beginning of the connection (for connection-oriented uses) or within
+302	   each data payload (for connectionless uses).
+
+304	   Some methods to traverse tunnels are also affected by the use of
+305	   PExIDs. STUN uses a method similar to PExIDs in its in-band message
+306	   identifier [RFC8489]. These identifiers begin with a 32-bit field
+307	   first two bits are "00", followed by a type and length, followed by
+308	   a 32-bit 'magic number' of 0x2112A442, followed by a 96-bit
+309	   transaction identifier. PExIDs are similar to the transaction
+310	   identifier, but they occur earlier in the data stream. The STUN
+311	   mechanism can be used concurrent with PExIDs if the PExIDs are
+312	   selected where the two highest bits are something other than "00"
+313	   (as required in STUN messages). Because not all service or protocols
+314	   are intended to be used concurrent with STUN, this restricting
+315	   should not be a concern.
+
+317	   The TURN mechanism for NAT traversal does not interact with use of
+318	   PExIDs [RFC8656].
+
+320	   Some protocols use "magic bytes" to identify streams and/or
+321	   messages. PExIDs are a specific interpretation of the first four
+322	   magic bytes of each stream or message to demultiplex shared use of
+323	   the experimental transport ports, thus they are typically not
+324	   compatible with other concurrent use of magic bytes.
+
+326	7. Security Considerations
+
+328	   The creation of new ports for experiment purposes does not create
+329	   any new security considerations. At best, it potentially reduces the
+330	   use of privileged system ports for such experiments, which avoids
+331	   the associated risk of unnecessary privileged access.
+
+333	   Like conventional transport protocol port numbers, PExIDs can be
+334	   used by deep-packet inspection (DPI) to identify services and
+335	   protocols (see Sec. 5.2.1 of [RFC6973]). When such information is
+336	   intended to be protected or private, it can be sent as user data
+337	   inside an encrypted stream or message, e.g., as user data in TCP/TLS
+338	   or UDP/DTLS.
+
+340	   PExIDs are not supported by existing firewalls, DPI devices, IPsec
+341	   traffic selectors or other systems that demultiplex or identify
+342	   traffic using transport port numbers. Different services using the
+343	   same port number cannot currently rely on PExIDs for selective
+344	   filtering.
+
+346	   Experimenters are expected to support security capabilities in any
+347	   new experiment, regardless of whether an experimental or assigned
+348	   port is being used (per Section 7.4 of [RFC7605]).
+
+350	8. IANA Considerations
+
+352	   This document hereby requests the assignment of two user ports for
+353	   experimental purposes below. IANA is asked to replace instances of
+354	   #UPORT1 and #UPORT2 throughout this document based on the actual
+355	   allocation. This paragraph is intended to be removed prior to final
+356	   publication.
+
+358	   This document also hereby requests the assignment of the SCTP PPID
+359	   "PEXID" for use in association with these port numbers. IANA is
+360	   asked to replace instances of #PPID1 throughout this document based
+361	   on the actual allocation. This paragraph is intended to be removed
+362	   prior to final publication.
+
+364	   IANA has assigned the following user ports for experiments:
+
+366	         Service Name            USR-EXP1
+
+368	         Transport Protocol(s)   TCP, UDP, DCCP, and SCTP
+
+370	         Assignee                IESG
+
+372	         Contact                 IETF Chair
+373	         Description             RFC[TBD-rfc]-style Experiment
+
+375	         Reference               RFC [TBD-rfc]
+
+377	         Port Number             #UPORT1 (requesting 1031)
+
+379	         Service Code            none - use private use service codes
+
+381	         Known Unauthorized Uses none
+
+383	         Assignment Notes        Intended for use with PExIDs only
+
+385	   And:
+
+387	         Service Name            USR-EXP2
+
+389	         Transport Protocol(s)   TCP, UDP, DCCP, and SCTP
+
+391	         Assignee                IESG
+
+393	         Contact                 IETF Chair
+
+395	         Description             RFC[TBD-rfc]-style Experiment
+
+397	         Reference               RFC [TBD-rfc]
+
+399	         Port Number             #UPORT2 (requesting 1032)
+
+401	         Service Code            none - use private use service codes
+
+403	         Known Unauthorized Uses none
+
+405	         Assignment Notes        Intended for use with PExIDs only
+
+407	   IANA has assigned the following SCTP Payload Protocol Identifier
+408	   (PPID) for experiments associated with these port numbers:
+
+410	      SCTP PPID #PPID1
+
+412	   This document directs IANA to create a "Port Experimental Option
+413	   Experiment Identifiers (PExIDs)" registry linked under the IANA
+414	   ports registry [SP-reg], using the same format and structure as the
+415	   TCP option ID registry [TCP-reg].  The registry records PExIDs as
+416	   32-bit unsigned integers, including a brief description, document
+417	   pointer (if available), assignee name, and e-mail contact for each
+418	   entry. Once registered, PExIDs can be used with either the system
+419	   (EXP1 #1021, EXP2 #1022) or user (USR-EXP1 #UPORT1, USR-EXP2
+420	   #UPORT2) ports and with any transport protocol. This registry has no
+421	   initial entries.
+
+423	   Entries are assigned on a First Come, First Served (FCFS) basis
+424	   [RFC8126]. IANA will also record known duplicate uses to assist the
+425	   community in both debugging assigned uses as well as correcting
+426	   unauthorized duplicate uses.
+
+428	   IANA should impose no requirements on making a registration request
+429	   other than indicating the desired codepoint and providing a point of
+430	   contact. A short description or acronym for the use is desired but
+431	   not required.
+
+433	9. References
+
+435	9.1. Normative References
+
+437	   [RFC2119] Bradner, S., "Key words for use in RFCs to Indicate
+438	             Requirement Levels", BCP 14, RFC 2119, March 1997.
+
+440	   [RFC3692] Narten, T., "Assigning Experimental and Testing Numbers
+441	             Considered Useful," RFC 3692, BCP 82, Jan. 2004.
+
+443	   [RFC4727] Fenner, B., "Experimental Values in IPv4, IPv6, ICMPv4,
+444	             ICMPv6, UDP, and TCP Headers," RFC 4727, Nov. 2026.
+
+446	   [RFC6335] Cotton, M., Eggert, L., Touch, J., Westerlund, M., and S.
+447	             Cheshire, "Internet Assigned Numbers Authority (IANA)
+448	             Procedures for the Management of the Service Name and
+449	             Transport Protocol Port Number Registry," BCP 165, RFC
+450	             6335, Aug. 2011.
+
+452	   [RFC6994] Touch, J., "Shared Use of Experimental TCP Options," RFC
+453	             6994, Aug. 2013.
+
+455	   [RFC8126] Cotton, M., Leiba, B., and T. Narten, "Guidelines for
+456	             Writing an IANA Considerations Section in RFCs", BCP 26,
+457	             RFC 8126, June 2017.
+
+459	   [RFC8174] Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+460	             2119 Key Words", BCP 14, RFC 8174, May 2017.
+
+462	9.2. Informative References
+
+464	   [RFC768]  Postel, J., "User Datagram Protocol," STD 6, RFC 768, Aug.
+465	             1980.
+
+467	   [RFC791]  Postel, J., "Internet Protocol," STD 5, RFC 791, Sep.
+468	             1981.
+
+470	   [RFC792]  Postel, J., "Internet Control Message Protocol," STD 5,
+471	             RFC 792, Sep. 1981.
+
+473	   [RFC4340] Kohler, E., Handley, M., and S. Floyd, "Datagram
+474	             Congestion Control Protocol (DCCP)," RFC 4340, March 2006.
+
+476	   [RFC4443] Conta, A., Deering, S., and M. Gupta, (Ed.), "Internet
+477	             Control Message Protocol (ICMPv6) for the Internet
+478	             Protocol Version 6 (IPv6) Specification," STD 89, RFC
+479	             4443, Mar. 2006.
+
+481	   [RFC5595] Fairhurst, G., "The Datagram Congestion Control Protocol
+482	             (DCCP) Service Codes", RFC 5595, September 2009.
+
+484	   [RFC6973] Cooper, A., Tschofenig, H., Aboba, B., Peterson, J.,
+485	             Morris, J., Hansen, M., and R. Smith, "Privacy
+486	             Considerations for Internet Protocols", RFC 6973, July
+487	             2013.
+
+489	   [RFC7605] Touch, J., "Recommendations on Using Assigned Transport
+490	             Port Numbers," BCP 165, RFC 7605, Aug. 2015.
+
+492	   [RFC7665] Halpern, J., Ed., and C. Pignataro, Ed., "Service Function
+493	             Chaining (SFC) Architecture", RFC 7665, October 2015.
+
+495	   [RFC8200] Deering, S. and R. Hinden, "Internet Protocol, Version 6
+496	             (IPv6) Specification," STD 86, RFC 8200, Jul. 2017.
+
+498	   [RFC8446] Rescorla, E., "The Transport Layer Security (TLS) Protocol
+499	             VerREsion 1.3", RFC 8446, Aug. 2018.
+
+501	   [RFC8489] Petit-Huguenin, M., Salgueiro, G., Rosenberg, J., Wing,
+502	             D., Mahy, R., and P. Matthews, "Session Traversal
+503	             Utilities for NAT (STUN)", RFC 8489, February 2020.
+
+505	   [RFC8656] Reddy, T., Ed., Johnston, A., Ed., Matthews, P., and J.
+506	             Rosenberg, "Traversal Using Relays around NAT (TURN):
+507	             Relay Extensions to Session Traversal Utilities for NAT
+508	             (STUN)", RFC 8656, February 2020,
+
+510	   [RFC9000] Iyengar, J., Ed., and M. Thomson, Ed., "QUIC: A UDP-Based
+511	             Multiplexed and Secure Transport", RFC 9000, May 2021.
+
+513	   [RFC9147] Rescorla, E., Tschofenig, H., and N. Modadugu, "The
+514	             Datagram Transport Layer Security (DTLS) Protocol Version
+515	             1.3", RFC 9147, April 2022.
+
+517	   [RFC9260] Stewart, R. (Ed.), "Stream Control Transmission Protocol,"
+518	             RFC 9260, Sep. 2007.
+
+520	   [RFC9293] Eddy, W. (Ed.), "Transmission Control Protocol (TCP), Aug.
+521	             STD 7, RFC 9293, 2022.
+
+523	   [SP-reg]  Service Name and Transport Protocol Port Number Registry,
+524	             https://www.iana.org/assignments/service-names-port-
+525	             numbers/service-names-port-numbers.xhtml
+
+527	   [TCP-reg] TCP Option ID registry,
+528	             https://www.iana.org/assignments/tcp-parameters/tcp-
+529	             parameters.xhtml#tcp-exids
+
+531	   [TH25]    Touch, J, C. Heard (Ed.), "Transport Options for UDP",
+532	             draft-ietf-tsvwg-udp-options, Mar. 2025.
+
+534	10. Acknowledgments
+
+536	   This document was prepared using 2-Word-v2.0.template.dot.
+
+538	Authors' Addresses
+
+540	   Joe Touch
+541	   Manhattan Beach, CA 90266 USA
+542	   Phone: +1 (310) 560-0334
+543	   Email: touch@strayalpha.com
+
+
+
+
+
+
+
+
+
