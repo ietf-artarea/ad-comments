@@ -1,0 +1,1075 @@
+idnits 2.17.1 
+
+draft-ietf-mailmaint-messageflag-mailboxattribute-08.txt:
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+  == There are 2 instances of lines with non-ascii characters in the document.
+
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     Summary: 0 errors (**), 0 flaws (~~), 1 warning (==), 0 comments (--).
+
+--------------------------------------------------------------------------------
+
+
+2	MailMaint                                              N.M. Jenkins, Ed.
+3	Internet-Draft                                                  Fastmail
+4	Intended status: Informational                            D. Eggert, Ed.
+5	Expires: 17 March 2026                                         Apple Inc
+6	                                                       13 September 2025
+
+8	 Registration of further IMAP/JMAP keywords and mailbox name attributes
+9	          draft-ietf-mailmaint-messageflag-mailboxattribute-08
+
+11	Abstract
+
+13	   This document defines a number of keywords and mailbox name
+14	   attributes that have been in use across different server and client
+15	   implementations.  It defines the intended use of these keywords and
+16	   mailbox name attributes.  This document registers all of these with
+17	   IANA to avoid name collisions.
+
+19	Status of This Memo
+
+21	   This Internet-Draft is submitted in full conformance with the
+22	   provisions of BCP 78 and BCP 79.
+
+24	   Internet-Drafts are working documents of the Internet Engineering
+25	   Task Force (IETF).  Note that other groups may also distribute
+26	   working documents as Internet-Drafts.  The list of current Internet-
+27	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+29	   Internet-Drafts are draft documents valid for a maximum of six months
+30	   and may be updated, replaced, or obsoleted by other documents at any
+31	   time.  It is inappropriate to use Internet-Drafts as reference
+32	   material or to cite them other than as "work in progress."
+
+34	   This Internet-Draft will expire on 17 March 2026.
+
+36	Copyright Notice
+
+38	   Copyright (c) 2025 IETF Trust and the persons identified as the
+39	   document authors.  All rights reserved.
+
+41	   This document is subject to BCP 78 and the IETF Trust's Legal
+42	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+43	   license-info) in effect on the date of publication of this document.
+44	   Please review these documents carefully, as they describe your rights
+45	   and restrictions with respect to this document.  Code Components
+46	   extracted from this document must include Revised BSD License text as
+47	   described in Section 4.e of the Trust Legal Provisions and are
+48	   provided without warranty as described in the Revised BSD License.
+
+50	Table of Contents
+
+52	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
+53	   2.  Requirements Language . . . . . . . . . . . . . . . . . . . .   4
+54	   3.  Flag Color Keyword  . . . . . . . . . . . . . . . . . . . . .   4
+55	     3.1.  Definition of the $MailFlagBit_ Message Keywords  . . . .   4
+56	     3.2.  Implementation Notes  . . . . . . . . . . . . . . . . . .   5
+57	   4.  Other Message Keywords  . . . . . . . . . . . . . . . . . . .   5
+58	     4.1.  $notify . . . . . . . . . . . . . . . . . . . . . . . . .   5
+59	     4.2.  $muted  . . . . . . . . . . . . . . . . . . . . . . . . .   6
+60	     4.3.  $followed . . . . . . . . . . . . . . . . . . . . . . . .   6
+61	     4.4.  Memos . . . . . . . . . . . . . . . . . . . . . . . . . .   7
+62	       4.4.1.  $memo . . . . . . . . . . . . . . . . . . . . . . . .   7
+63	       4.4.2.  $hasmemo  . . . . . . . . . . . . . . . . . . . . . .   8
+64	     4.5.  Attachment Detection  . . . . . . . . . . . . . . . . . .   8
+65	       4.5.1.  $hasattachment  . . . . . . . . . . . . . . . . . . .   8
+66	       4.5.2.  $hasnoattachment  . . . . . . . . . . . . . . . . . .   9
+67	     4.6.  $autosent . . . . . . . . . . . . . . . . . . . . . . . .   9
+68	     4.7.  Subscription Management . . . . . . . . . . . . . . . . .   9
+69	       4.7.1.  $unsubscribed . . . . . . . . . . . . . . . . . . . .   9
+70	       4.7.2.  $canunsubscribe . . . . . . . . . . . . . . . . . . .  10
+71	     4.8.  $imported . . . . . . . . . . . . . . . . . . . . . . . .  10
+72	     4.9.  $istrusted  . . . . . . . . . . . . . . . . . . . . . . .  11
+73	     4.10. $maskedemail  . . . . . . . . . . . . . . . . . . . . . .  11
+74	     4.11. $new  . . . . . . . . . . . . . . . . . . . . . . . . . .  12
+75	   5.  Mailbox Name Attributes . . . . . . . . . . . . . . . . . . .  12
+76	     5.1.  Snoozed . . . . . . . . . . . . . . . . . . . . . . . . .  12
+77	     5.2.  Scheduled . . . . . . . . . . . . . . . . . . . . . . . .  13
+78	     5.3.  Memos . . . . . . . . . . . . . . . . . . . . . . . . . .  13
+79	   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  14
+80	     6.1.  IMAP/JMAP Keyword Registrations . . . . . . . . . . . . .  14
+81	       6.1.1.  $notify keyword registration  . . . . . . . . . . . .  14
+82	       6.1.2.  $muted keyword registration . . . . . . . . . . . . .  14
+83	       6.1.3.  $followed keyword registration  . . . . . . . . . . .  15
+84	       6.1.4.  $memo keyword registration  . . . . . . . . . . . . .  15
+85	       6.1.5.  $hasmemo keyword registration . . . . . . . . . . . .  15
+86	       6.1.6.  $hasattachment keyword registration . . . . . . . . .  16
+87	       6.1.7.  $hasnoattachment keyword registration . . . . . . . .  16
+88	       6.1.8.  $autosent keyword registration  . . . . . . . . . . .  17
+89	       6.1.9.  $unsubscribed keyword registration  . . . . . . . . .  17
+90	       6.1.10. $canunsubscribe keyword registration  . . . . . . . .  17
+91	       6.1.11. $imported keyword registration  . . . . . . . . . . .  18
+92	       6.1.12. $istrusted keyword registration . . . . . . . . . . .  18
+93	       6.1.13. $maskedemail keyword registration . . . . . . . . . .  18
+94	       6.1.14. $new keyword registration . . . . . . . . . . . . . .  19
+95	       6.1.15. $MailFlagBit0 keyword registration  . . . . . . . . .  19
+96	       6.1.16. $MailFlagBit1 keyword registration  . . . . . . . . .  20
+97	       6.1.17. $MailFlagBit2 keyword registration  . . . . . . . . .  20
+
+99	     6.2.  IMAP Mailbox Name Attributes Registrations  . . . . . . .  20
+100	       6.2.1.  Snoozed mailbox name attribute registration . . . . .  21
+101	       6.2.2.  Scheduled mailbox name attribute registration . . . .  21
+102	       6.2.3.  Memos mailbox name attribute registration . . . . . .  21
+103	   7.  Security Considerations . . . . . . . . . . . . . . . . . . .  21
+104	   8.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  21
+105	     8.1.  Normative References  . . . . . . . . . . . . . . . . . .  21
+106	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  22
+
+108	1.  Introduction
+
+110	   The Internet Message Access Protocol (IMAP) specification [RFC9051]
+111	   defines the use of message keywords, and an "IMAP Keywords" registry
+112	   is created in [RFC5788].  Similarly [RFC8457] creates an "IMAP
+113	   Mailbox Name Attributes Registry".
+
+115	   This document defines 16 message keywords:
+
+117	      $notify
+118	      $muted
+119	      $followed
+120	      $memo
+121	      $hasmemo
+122	      $hasattachment
+123	      $hasnoattachment
+124	      $autosent
+125	      $unsubscribed
+126	      $canunsubscribe
+127	      $imported
+128	      $istrusted
+129	      $maskedemail
+130	      $new
+131	      $MailFlagBit0
+132	      $MailFlagBit1
+133	      $MailFlagBit2
+
+135	   And defines 3 mailbox name attributes:
+
+137	      Snoozed
+138	      Scheduled
+139	      Memos
+
+141	   This document also registers these in the "IMAP Keywords" registry
+142	   and "IMAP Mailbox Name Attributes" registry.
+
+144	2.  Requirements Language
+
+146	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+147	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+148	   "OPTIONAL" in this document are to be interpreted as described in BCP
+149	   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+150	   capitals, as shown here.
+
+152	3.  Flag Color Keyword
+
+154	   The Internet Message Access Protocol (IMAP) specification [RFC9051]
+155	   defines a \Flagged system flag to mark a message for urgent/special
+156	   attention.  The new keywords defined in Sections 6.1.15, 6.1.16, and
+157	   6.1.17 allow such a flagged message to have that flag be of one of 7
+158	   colors.
+
+160	3.1.  Definition of the $MailFlagBit_ Message Keywords
+
+162	   The 3 flag color keywords
+
+164	      $MailFlagBit0
+165	      $MailFlagBit1
+166	      $MailFlagBit2
+
+168	   make up a bit pattern that define the color of the flag as such:
+
+170	                    +=======+=======+=======+========+
+171	                    | Bit 0 | Bit 1 | Bit 2 | Color  |
+172	                    +=======+=======+=======+========+
+173	                    | 0     | 0     | 0     | red    |
+174	                    +-------+-------+-------+--------+
+175	                    | 1     | 0     | 0     | orange |
+176	                    +-------+-------+-------+--------+
+177	                    | 0     | 1     | 0     | yellow |
+178	                    +-------+-------+-------+--------+
+179	                    | 1     | 1     | 0     | green  |
+180	                    +-------+-------+-------+--------+
+181	                    | 0     | 0     | 1     | blue   |
+182	                    +-------+-------+-------+--------+
+183	                    | 1     | 0     | 1     | purple |
+184	                    +-------+-------+-------+--------+
+185	                    | 0     | 1     | 1     | gray   |
+186	                    +-------+-------+-------+--------+
+
+188	                           Table 1: Flag Colors
+
+190	   These flags SHOULD be ignored if the \Flagged system flag is not set.
+191	   If the \Flagged system flag is set, the flagged status MAY be
+192	   displayed to the user in the color corresponding to the combination
+193	   of the 3 flag color keywords.
+
+195	3.2.  Implementation Notes
+
+197	   A mail client that is aware of these flag color keywords SHOULD clear
+198	   all 3 flag color keywords when the user unflags the message, i.e.
+199	   when clearing the \Flagged system flag, all 3 flag color keywords
+200	   SHOULD also be cleared.
+
+202	   A mail client SHOULD NOT set any of these flags unless the \Flagged
+203	   system flag is already set or is being set.
+
+205	   Servers MAY clear these flag color keywords when a client clears the
+206	   \Flagged system flag.
+
+208	4.  Other Message Keywords
+
+210	4.1.  $notify
+
+212	   The $notify keyword indicates that a client should show a
+213	   notification for a message.  This provides a mechanism for more
+214	   selective notifications than the common approach of notifying for
+215	   every message arriving in the inbox.
+
+217	   When a message with this keyword is delivered to a mailstore,
+218	   supporting clients SHOULD display a notification to the user.  This
+219	   notification may appear alongside other message notifications
+220	   according to user preferences.
+
+222	   This keyword enables both users (through filtering rules) and servers
+223	   (through automated processing) to identify specific messages that
+224	   warrant user attention, even if they might otherwise be filtered or
+225	   sorted in a way that wouldn't normally trigger a notification.
+
+227	   Servers typically set this keyword during message delivery when a
+228	   message meets certain criteria indicating importance to the user.
+229	   Clients may clear the keyword when the user interacts with the
+230	   message by opening it, archiving it, or performing other actions.
+231	   When one client clears this keyword, other clients connected to the
+232	   same account may choose to automatically dismiss their corresponding
+233	   notification.
+
+235	4.2.  $muted
+
+237	   The $muted keyword provides a way for users to indicate they are not
+238	   interested in future messages in a particular conversation thread.
+239	   This enables automated processing of subsequent messages in that
+240	   thread to reduce their visibility.
+
+242	   When a new message arrives that belongs to the same thread as one
+243	   marked with this keyword, supporting servers MAY automatically
+244	   deprioritize the message.  This could include moving it to an archive
+245	   or trash folder, marking it as read, or applying other handling that
+246	   reduces its prominence.  The specific actions taken and whether they
+247	   can be configured by the user depends on the implementation.
+
+249	   For thread identification purposes, messages are considered part of
+250	   the same thread when they share the same thread identifier as defined
+251	   in [RFC8474] Section 5.2 for IMAP or [RFC8621], Section 3 for JMAP.
+
+253	   This keyword is set or cleared by clients based on user actions to
+254	   mute or unmute a thread.  When unmuting a thread, clients MUST remove
+255	   this keyword from all messages in the thread that have it.  The
+256	   $muted keyword is mutually exclusive with the $followed keyword.  If
+257	   both are present on messages in the same thread, both servers and
+258	   clients MUST treat the thread as followed rather than muted.
+
+260	   Implementers should note the security considerations in the IANA
+261	   registration: if an attacker gains access to a user's account, they
+262	   could mute threads to hide important communications.  However, this
+263	   represents only a small increase in risk since compromised accounts
+264	   allow many other similar actions.
+
+266	4.3.  $followed
+
+268	   The $followed keyword indicates that a user is particularly
+269	   interested in future messages in a specific thread.  This enables
+270	   special handling to ensure these messages receive appropriate
+271	   attention.
+
+273	   When a new message arrives in a thread where this keyword is present,
+274	   supporting servers MAY take actions to prioritize the message.  This
+275	   could include ensuring it appears in the inbox regardless of
+276	   filtering rules that might otherwise affect it, automatically adding
+277	   the $notify keyword to ensure notifications, or applying other
+278	   handling that increases its visibility.  The specific actions taken
+279	   and whether they can be configured by the user depends on the
+280	   implementation.
+
+282	   For thread identification purposes, messages are considered part of
+283	   the same thread when they share the same thread identifier as defined
+284	   in [RFC8474] Section 5.2 for IMAP or [RFC8621], Section 3 for JMAP.
+
+286	   This keyword is set or cleared by clients based on user actions to
+287	   follow or unfollow a thread.  When unfollowing a thread, clients MUST
+288	   remove this keyword from all messages in the thread that have it.
+289	   The $followed keyword is mutually exclusive with the $muted keyword.
+290	   If both are present on messages in the same thread, servers MUST
+291	   treat the thread as followed rather than muted.
+
+293	4.4.  Memos
+
+295	   The following keywords are used to support user-created annotations
+296	   or memos attached to messages.  They allow for contextual notes to be
+297	   added to conversations while maintaining proper cross-referencing
+298	   between messages and their annotations.
+
+300	   The $memo and $hasmemo keywords are mutually exclusive.  A message
+301	   SHOULD NOT have both keywords set simultaneously.
+
+303	4.4.1.  $memo
+
+305	   The $memo keyword identifies a message as a note-to-self created by
+306	   the user regarding another message in the same thread.  It allows for
+307	   contextual annotations to be added to conversations.
+
+309	   Messages with this keyword should be constructed similar to a reply
+310	   to the message being annotated, with appropriate Subject and Reply-To
+311	   headers set to maintain context and threading.  Servers SHOULD store
+312	   messages with this keyword in a mailbox with the "Memos" mailbox name
+313	   attribute (see Section 6.2.3), if available.
+
+315	   Supporting clients SHOULD present these messages differently from
+316	   regular emails.  Rather than showing them as standalone messages,
+317	   they SHOULD be displayed as annotations attached to the message
+318	   they're commenting on.  Clients MAY provide special UI affordances
+319	   for editing or deleting these memos, which typically requires
+320	   replacing the message since email messages are immutable.
+
+322	   When a client creates or removes a memo, it SHOULD also set or clear
+323	   the related $hasmemo keyword on the message being annotated to
+324	   maintain proper cross-referencing.
+
+326	4.4.2.  $hasmemo
+
+328	   The $hasmemo keyword indicates that a message has an associated memo
+329	   (identified by the $memo keyword) in the same thread.  This allows
+330	   clients to efficiently identify messages with annotations without
+331	   having to examine all messages in a thread.
+
+333	   When a client creates a memo for a message, it SHOULD add this
+334	   keyword to the message being annotated while adding the $memo keyword
+335	   to the memo message itself.  Conversely, when a memo is deleted, the
+336	   client SHOULD remove this keyword from the annotated message.
+
+338	   This keyword enables several optimizations for clients.  It allows
+339	   for efficient searching for messages with annotations, enables visual
+340	   indicators in message lists to show which messages have memos, and
+341	   helps clients decide whether to fetch entire conversation threads
+342	   when loading a mailbox to ensure memos are properly displayed.
+
+344	4.5.  Attachment Detection
+
+346	   The following keywords help clients determine whether a message
+347	   contains attachments without having to fetch and parse the entire
+348	   message structure.  This is particularly useful for displaying
+349	   attachment indicators in message lists or implementing attachment-
+350	   based filtering.
+
+352	   The $hasattachment and $hasnoattachment keywords are mutually
+353	   exclusive.  A message SHOULD NOT have both keywords set
+354	   simultaneously.
+
+356	4.5.1.  $hasattachment
+
+358	   The $hasattachment keyword indicates that a message has one or more
+359	   attachments.  It is set by the server during message delivery or
+360	   processing after analyzing the message structure.
+
+362	   This keyword enables clients to display attachment indicators (such
+363	   as paperclip icons) in message lists without having to fetch the full
+364	   MIME structure for each message.  It also facilitates attachment-
+365	   based filtering and search operations.
+
+367	   When using JMAP, the "hasAttachment" Email property SHOULD reflect
+368	   the same information as this keyword for consistency across
+369	   protocols.
+
+371	4.5.2.  $hasnoattachment
+
+373	   The $hasnoattachment keyword explicitly indicates that a message does
+374	   not have any attachments.  It is set by the server during message
+375	   delivery or processing after analyzing the message structure.
+
+377	   This keyword complements $hasattachment by providing definitive
+378	   information about messages that have been analyzed but found to
+379	   contain no attachments.  The absence of $hasattachment alone is
+380	   inconclusive, as it might simply mean the message hasn't been
+381	   processed for attachment detection.
+
+383	   This explicit distinction is important for clients that need to know
+384	   whether attachment detection has been performed on a message.  When
+385	   using JMAP, the "hasNoAttachment" Email property SHOULD reflect the
+386	   same information as this keyword.
+
+388	4.6.  $autosent
+
+390	   The $autosent keyword identifies messages that were automatically
+391	   generated and sent by the system on behalf of the user, typically in
+392	   response to user-defined filtering rules or settings.
+
+394	   This keyword is set by the server on the user's copy of vacation
+395	   auto-replies, automated responses, or other system-generated messages
+396	   sent on behalf of the user.  It allows clients to visually
+397	   distinguish these messages from those directly composed and sent by
+398	   the user.
+
+400	   Supporting clients MAY display these messages differently in the sent
+401	   items folder, such as with a distinct icon or label indicating their
+402	   automated nature.  This helps prevent user confusion when they
+403	   encounter messages they don't remember writing, particularly in the
+404	   case of vacation responses or other automated replies that may have
+405	   been configured and then forgotten.
+
+407	4.7.  Subscription Management
+
+409	   The following keywords help clients manage mailing list
+410	   subscriptions.  They provide mechanisms for tracking unsubscribe
+411	   attempts and identifying messages with valid unsubscribe options.
+
+413	4.7.1.  $unsubscribed
+
+415	   The $unsubscribed keyword indicates that the user has attempted to
+416	   unsubscribe from the mailing list associated with a message.  It
+417	   provides a persistent record of unsubscription attempts across
+418	   multiple clients.
+
+420	   This keyword is set by a client after a user attempts to unsubscribe
+421	   from a mailing list, typically via a one-click List-Unsubscribe
+422	   action as defined in [RFC8058].  It serves as a record that an
+423	   unsubscription attempt has been made, even if confirmation of
+424	   successful unsubscription hasn't been received.
+
+426	   Supporting clients SHOULD display an indicator on messages with this
+427	   keyword to remind the user they have previously attempted to
+428	   unsubscribe from this sender or mailing list.  This can be helpful
+429	   when users revisit old messages and might otherwise attempt to
+430	   unsubscribe again, or when they receive additional messages despite
+431	   unsubscribing and need to take further action.
+
+433	4.7.2.  $canunsubscribe
+
+435	   The $canunsubscribe keyword indicates that a message contains a
+436	   valid, [RFC8058]-compliant List-Unsubscribe header that clients can
+437	   use to provide one-click unsubscription functionality.
+
+439	   This keyword is set by servers during message delivery when they
+440	   detect a valid List-Unsubscribe header and the message passes
+441	   implementation specific reputation checks.  This pre-verification is
+442	   important, as not all List-Unsubscribe headers are trustworthy, and
+443	   some might lead to phishing sites or generate additional spam.
+
+445	   The primary benefit of this keyword is efficiency—clients can offer
+446	   unsubscribe functionality in their user interface without having to
+447	   fetch and validate the List-Unsubscribe header for every message.  It
+448	   also provides an extra layer of safety since the server has already
+449	   performed reputation checks on the unsubscribe mechanism.
+
+451	   Supporting clients SHOULD display an unsubscribe option for messages
+452	   with this keyword, typically through a button or menu item in the
+453	   message view.
+
+455	4.8.  $imported
+
+457	   The $imported keyword identifies messages that were imported into the
+458	   mailbox from another system rather than received through normal mail
+459	   delivery channels.
+
+461	   This keyword is set by servers during import operations from other
+462	   mail systems, data migrations, or manual imports from local files.
+463	   It helps distinguish messages that didn't arrive through normal mail
+464	   delivery and may have different characteristics or behaviors.
+
+466	   Supporting clients MAY display an indicator for imported messages,
+467	   especially if they have unusual properties such as unexpectedly old
+468	   dates, unusual header structures, or other anomalies that might
+469	   otherwise confuse users.  Some clients might also offer filtering or
+470	   search capabilities specifically for imported messages.
+
+472	4.9.  $istrusted
+
+474	   The $istrusted keyword indicates that a message's sender identity has
+475	   been verified with complete confidence by the server.  It provides a
+476	   strong signal that the message is authentic and can be trusted.
+
+478	   This advisory keyword is set by the server during message delivery
+479	   only when the authenticity of both the sender's name and email
+480	   address can be verified with absolute certainty.  This level of
+481	   verification typically applies only to messages sent by the mailbox
+482	   provider itself to its customers, where the provider can definitively
+483	   confirm the message's origin.
+
+485	   Supporting clients SHOULD display a verification mark (often a
+486	   checkmark icon) or other visual indicator for messages with this
+487	   keyword, helping users identify legitimate communications from their
+488	   service provider.  This is particularly important for distinguishing
+489	   authentic provider messages from phishing attempts that impersonate
+490	   the provider.
+
+492	   Servers MUST exercise extreme caution when applying this keyword, as
+493	   it conveys a high level of trust.  If misapplied, it could lead users
+494	   to trust fraudulent messages.  It SHOULD NOT be used for messages
+495	   that have only passed standard authentication mechanisms like SPF,
+496	   DKIM, or DMARC, which provide good but not absolute verification.
+
+498	4.10.  $maskedemail
+
+500	   The $maskedemail keyword indicates that a message was received
+501	   through a masked email address—an alias created specifically for
+502	   communications with a particular sender to protect the user's primary
+503	   email address.
+
+505	   This advisory keyword is set by the server during message delivery on
+506	   messages that arrive via such aliases.  These might be automatically
+507	   generated single-use addresses, service-specific addresses, or user-
+508	   created aliases for specific correspondents.
+
+510	   Supporting clients SHOULD display an indicator (such as a mask icon)
+511	   for messages with this keyword.  This helps users understand that the
+512	   message was received through a privacy-enhancing alias rather than
+513	   their primary address.  Clients might also provide related
+514	   functionality, such as the ability to disable the specific alias used
+515	   if it starts receiving unwanted messages.
+
+517	4.11.  $new
+
+519	   The $new keyword indicates that a message should be highlighted or
+520	   made more prominent to the user due to a recent system action, even
+521	   if the message itself is not new.
+
+523	   This advisory keyword is typically set by servers when a previously
+524	   snoozed message "awakens" and returns to the inbox after its snooze
+525	   period has elapsed.  It signals to clients that although this message
+526	   might have an older date, it should be treated as effectively new in
+527	   terms of user attention.
+
+529	   Supporting clients SHOULD display these messages with special visual
+530	   treatment to draw user attention, such as highlighting, bolding, or
+531	   placing them at the top of the message list, even if strict date
+532	   sorting would place them elsewhere.
+
+534	   Clients SHOULD clear this keyword when the user interacts with the
+535	   message, such as by opening, replying to, or otherwise acknowledging
+536	   it.  This prevents the message from remaining highlighted
+537	   indefinitely after the user has seen it.
+
+539	5.  Mailbox Name Attributes
+
+541	5.1.  Snoozed
+
+543	   The Snoozed mailbox name attribute identifies a mailbox that is used
+544	   to store messages that have been temporarily removed from the user's
+545	   attention and scheduled to reappear at a later time.
+
+547	   When a user chooses to "snooze" a message, the supporting server
+548	   SHOULD move the message to a mailbox with this attribute.  At the
+549	   specified "awaken" time, the server will automatically move the
+550	   message back to its original location (typically the inbox) and may
+551	   mark it with the $new keyword to ensure it receives proper attention.
+
+553	   This attribute standardizes the location of snoozed messages across
+554	   clients, allowing them to identify and manage snoozed messages
+555	   consistently.  However, this attribute merely identifies the storage
+556	   location for snoozed messages and does not itself define the snoozing
+557	   mechanism or interface.
+
+559	   Supporting clients MAY present the contents of this mailbox
+560	   differently from regular mailboxes, such as organizing messages by
+561	   their scheduled "awaken" time rather than received date, or providing
+562	   specialized interfaces for adjusting the snooze duration.
+
+564	5.2.  Scheduled
+
+566	   The Scheduled mailbox name attribute identifies a mailbox that
+567	   contains messages that have been composed but are scheduled to be
+568	   sent at a future time rather than immediately.
+
+570	   When a user composes a message and chooses to send it at a later date
+571	   or time, the supporting server SHOULD store the message in a mailbox
+572	   with this attribute until the scheduled sending time.  Once that time
+573	   is reached, the server will send the message and typically move it to
+574	   the \Sent mailbox or delete it according to server policy.
+
+576	   This attribute standardizes the location of scheduled messages across
+577	   clients, enabling users to review, edit, or cancel scheduled messages
+578	   before they are sent, regardless of which client was used to schedule
+579	   them.
+
+581	   Supporting clients SHOULD present the contents of this mailbox in a
+582	   way that highlights the scheduled sending time and SHOULD allow users
+583	   to modify or cancel scheduled messages before they are sent.
+
+585	5.3.  Memos
+
+587	   The Memos mailbox name attribute identifies a mailbox designated for
+588	   storing messages that have the $memo keyword.  These messages are
+589	   user-created notes or annotations related to other messages.
+
+591	   When a user creates a memo (a note-to-self regarding another
+592	   message), clients SHOULD store these messages in a mailbox with this
+593	   attribute.  This separation allows clients to handle memos
+594	   differently from regular messages, presenting them as annotations
+595	   rather than standalone communications.
+
+597	   Storing memos in a designated mailbox helps prevent them from
+598	   cluttering the user's inbox or other message folders, while still
+599	   maintaining them as proper email messages for compatibility and
+600	   synchronization purposes.
+
+602	   Supporting clients SHOULD NOT display the contents of this mailbox as
+603	   regular messages in their interface, but instead SHOULD present them
+604	   contextually alongside the messages they annotate when those messages
+605	   are viewed.
+
+607	6.  IANA Considerations
+
+609	   The following 16 IMAP/JMAP keywords are registered in the _IMAP and
+610	   JMAP Keywords_ registry, as established in [RFC5788].
+
+612	6.1.  IMAP/JMAP Keyword Registrations
+
+614	6.1.1.  $notify keyword registration
+
+616	   IMAP/JMAP keyword name:  $notify
+617	   Purpose:  Indicate to the client that a notification should be shown
+618	      for this message.
+619	   Private or Shared on a server:  SHARED
+620	   Is it an advisory keyword or may it cause an automatic action:  This
+621	      keyword can cause an automatic action.
+622	   When/by whom the keyword is set/cleared:  This keyword is set by the
+623	      server on delivery when a message meets certain criteria.  It may
+624	      be cleared by a client when the user interacts with the message.
+625	   Related keywords:  None
+626	   Related IMAP capabilities:  None
+627	   Security considerations:  None
+628	   Published specification:  This document
+629	   Intended usage:  COMMON
+630	   Scope:  BOTH
+631	   Owner/Change controller:  IESG
+
+633	6.1.2.  $muted keyword registration
+
+635	   IMAP/JMAP keyword name:  $muted
+636	   Purpose:  Indicate to the server that the user is not interested in
+637	      future replies to a particular thread.
+638	   Private or Shared on a server:  SHARED
+639	   Is it an advisory keyword or may it cause an automatic action:  This
+640	      keyword can cause an automatic action.
+641	   When/by whom the keyword is set/cleared:  This keyword is set and
+642	      cleared by the client.
+643	   Related keywords:  Mutually exclusive with $followed.  If both are
+644	      specified on a thread, servers MUST behave as though only
+645	      $followed were set.
+646	   Related IMAP capabilities:  None
+647	   Security considerations:  Muting a thread can mean a user won't see a
+648	      reply.  If someone compromises a user's account, they may mute
+649	      threads where they don't want the user to see the reply, for
+650	      example when sending phishing to the user's contacts.  There are
+651	      many other ways an attacker with access to the user's mailbox can
+652	      also achieve this however, so this is not greatly increasing the
+653	      attack surface.
+654	   Published specification:  This document
+655	   Intended usage:  COMMON
+656	   Scope:  BOTH
+657	   Owner/Change controller:  IESG
+
+659	6.1.3.  $followed keyword registration
+
+661	   IMAP/JMAP keyword name:  $followed
+662	   Purpose:  Indicate to the server that the user is particularly
+663	      interested in future replies to a particular thread.
+664	   Private or Shared on a server:  SHARED
+665	   Is it an advisory keyword or may it cause an automatic action:  This
+666	      keyword can cause automatic action.
+667	   When/by whom the keyword is set/cleared:  This keyword is set and
+668	      cleared by the client.
+669	   Related keywords:  Mutually exclusive with $muted.  If both are
+670	      specified on a thread, servers MUST behave as though only
+671	      $followed were set.
+672	   Related IMAP capabilities:  None
+673	   Security considerations:  None
+674	   Published specification:  This document
+675	   Intended usage:  COMMON
+676	   Scope:  BOTH
+677	   Owner/Change controller:  IESG
+
+679	6.1.4.  $memo keyword registration
+
+681	   IMAP/JMAP keyword name:  $memo
+682	   Purpose:  Indicate to the client that a message is a note-to-self
+683	      from the user regarding another message in the same thread.
+684	   Private or Shared on a server:  SHARED
+685	   Is it an advisory keyword or may it cause an automatic action:  This
+686	      keyword is advisory.
+687	   When/by whom the keyword is set/cleared:  This keyword is set and
+688	      cleared by the client based on user interaction.
+689	   Related keywords:  The $memo and $hasmemo keywords are mutually
+690	      exclusive.
+691	   Related IMAP capabilities:  None
+692	   Security considerations:  None
+693	   Published specification:  This document
+694	   Intended usage:  COMMON
+695	   Scope:  BOTH
+696	   Owner/Change controller:  IESG
+
+698	6.1.5.  $hasmemo keyword registration
+
+700	   IMAP/JMAP keyword name:  $hasmemo
+701	   Purpose:  Indicate to the client that a message has an associated
+702	      memo with the $memo keyword.
+
+704	   Private or Shared on a server:  SHARED
+705	   Is it an advisory keyword or may it cause an automatic action:  This
+706	      keyword is advisory.
+707	   When/by whom the keyword is set/cleared:  This keyword is set and
+708	      cleared by the client based on user interaction.
+709	   Related keywords:  The $memo and $hasmemo keywords are mutually
+710	      exclusive.
+711	   Related IMAP capabilities:  None
+712	   Security considerations:  None
+713	   Published specification:  This document
+714	   Intended usage:  COMMON
+715	   Scope:  BOTH
+716	   Owner/Change controller:  IESG
+
+718	6.1.6.  $hasattachment keyword registration
+
+720	   IMAP/JMAP keyword name:  $hasattachment
+721	   Purpose:  Indicate to the client that a message has an attachment.
+722	   Private or Shared on a server:  SHARED
+723	   Is it an advisory keyword or may it cause an automatic action:  This
+724	      keyword is advisory.
+725	   When/by whom the keyword is set/cleared:  This keyword is set by the
+726	      server on delivery.
+727	   Related keywords:  $hasnoattachment
+728	   Related IMAP capabilities:  None
+729	   Security considerations:  None
+730	   Published specification:  This document
+731	   Intended usage:  COMMON
+732	   Scope:  BOTH
+733	   Owner/Change controller:  IESG
+
+735	6.1.7.  $hasnoattachment keyword registration
+
+737	   IMAP/JMAP keyword name:  $hasnoattachment
+738	   Purpose:  Indicate to the client that a message does not have an
+739	      attachment.
+740	   Private or Shared on a server:  SHARED
+741	   Is it an advisory keyword or may it cause an automatic action:  This
+742	      keyword is advisory.
+743	   When/by whom the keyword is set/cleared:  This keyword is set by the
+744	      server on delivery.
+745	   Related keywords:  None
+746	   Related IMAP capabilities:  None
+747	   Security considerations:  None
+748	   Published specification:  This document
+749	   Intended usage:  COMMON
+750	   Scope:  BOTH
+751	   Owner/Change controller:  IESG
+
+753	6.1.8.  $autosent keyword registration
+
+755	   IMAP/JMAP keyword name:  $autosent
+756	   Purpose:  Indicate to the client that a message was sent
+757	      automatically as a response due to a user rule or setting.
+758	   Private or Shared on a server:  SHARED
+759	   Is it an advisory keyword or may it cause an automatic action:  This
+760	      keyword is advisory.
+761	   When/by whom the keyword is set/cleared:  This keyword is set by the
+762	      server on delivery.
+763	   Related keywords:  None
+764	   Related IMAP capabilities:  None
+765	   Security considerations:  None
+766	   Published specification:  This document
+767	   Intended usage:  COMMON
+768	   Scope:  BOTH
+769	   Owner/Change controller:  IESG
+
+771	6.1.9.  $unsubscribed keyword registration
+
+773	   IMAP/JMAP keyword name:  $unsubscribed
+774	   Purpose:  Indicate to the client that it has unsubscribed from the
+775	      thread this message is on.
+776	   Private or Shared on a server:  SHARED
+777	   Is it an advisory keyword or may it cause an automatic action:  This
+778	      keyword is advisory.
+779	   When/by whom the keyword is set/cleared:  This keyword is set and
+780	      cleared by the client based on user interaction.
+781	   Related keywords:  None
+782	   Related IMAP capabilities:  None
+783	   Security considerations:  None
+784	   Published specification:  This document
+785	   Intended usage:  COMMON
+786	   Scope:  BOTH
+787	   Owner/Change controller:  IESG
+
+789	6.1.10.  $canunsubscribe keyword registration
+
+791	   IMAP/JMAP keyword name:  $canunsubscribe
+792	   Purpose:  Indicate to the client that this message has an [RFC8058]-
+793	      compliant List-Unsubscribe header.
+794	   Private or Shared on a server:  SHARED
+795	   Is it an advisory keyword or may it cause an automatic action:  This
+796	      keyword is advisory.
+797	   When/by whom the keyword is set/cleared:  This keyword is set by the
+798	      server on delivery.
+799	   Related keywords:  None
+800	   Related IMAP capabilities:  None
+801	   Security considerations:  None
+802	   Published specification:  This document
+803	   Intended usage:  COMMON
+804	   Scope:  BOTH
+805	   Owner/Change controller:  IESG
+
+807	6.1.11.  $imported keyword registration
+
+809	   IMAP/JMAP keyword name:  $imported
+810	   Purpose:  Indicate to the client that this message was imported from
+811	      another mailbox.
+812	   Private or Shared on a server:  SHARED
+813	   Is it an advisory keyword or may it cause an automatic action:  This
+814	      keyword is advisory.
+815	   When/by whom the keyword is set/cleared:  This keyword is set by the
+816	      server on delivery.
+817	   Related keywords:  None
+818	   Related IMAP capabilities:  None
+819	   Security considerations:  None
+820	   Published specification:  This document
+821	   Intended usage:  COMMON
+822	   Scope:  BOTH
+823	   Owner/Change controller:  IESG
+
+825	6.1.12.  $istrusted keyword registration
+
+827	   IMAP/JMAP keyword name:  $istrusted
+828	   Purpose:  Indicate to the client that the authenticity of the from
+829	      name and email address have been verified with complete confidence
+830	      by the server.
+831	   Private or Shared on a server:  SHARED
+832	   Is it an advisory keyword or may it cause an automatic action:  This
+833	      keyword is advisory.
+834	   When/by whom the keyword is set/cleared:  This keyword is set by the
+835	      server on delivery.
+836	   Related keywords:  None
+837	   Related IMAP capabilities:  None
+838	   Security considerations:  Servers should make sure this keyword is
+839	      only set for messages that really are trusted.
+840	   Published specification:  This document
+841	   Intended usage:  COMMON
+842	   Scope:  BOTH
+843	   Owner/Change controller:  IESG
+
+845	6.1.13.  $maskedemail keyword registration
+
+847	   IMAP/JMAP keyword name:  $maskedemail
+848	   Purpose:  Indicate to the client that the message was received via an
+849	      alias created for an individual sender.
+850	   Private or Shared on a server:  SHARED
+851	   Is it an advisory keyword or may it cause an automatic action:  This
+852	      keyword is advisory.
+853	   When/by whom the keyword is set/cleared:  This keyword is set by the
+854	      server on delivery.
+855	   Related keywords:  None
+856	   Related IMAP capabilities:  None
+857	   Security considerations:  None
+858	   Published specification:  This document
+859	   Intended usage:  LIMITED
+860	   Scope:  BOTH
+861	   Owner/Change controller:  IESG
+
+863	6.1.14.  $new keyword registration
+
+865	   IMAP/JMAP keyword name:  $new
+866	   Purpose:  Indicate to the client that a message should be made more
+867	      prominent to the user due to a recent action.
+868	   Private or Shared on a server:  SHARED
+869	   Is it an advisory keyword or may it cause an automatic action:  This
+870	      keyword is advisory.
+871	   When/by whom the keyword is set/cleared:  This keyword is set by the
+872	      server based on a timer.  Clients can clear the keyword based on
+873	      user interaciton.
+874	   Related keywords:  None
+875	   Related IMAP capabilities:  None
+876	   Security considerations:  None
+877	   Published specification:  This document
+878	   Intended usage:  LIMITED
+879	   Scope:  BOTH
+880	   Owner/Change controller:  IESG
+
+882	6.1.15.  $MailFlagBit0 keyword registration
+
+884	   IMAP/JMAP keyword name:  $MailFlagBit0
+885	   Purpose:  0 bit part of a 3-bit bitmask that defines the color of the
+886	      flag when the has the system flag \Flagged set.  See Section 3 for
+887	      details.
+888	   Private or Shared on a server:  SHARED
+889	   Is it an advisory keyword or may it cause an automatic action:  No
+890	   When/by whom the keyword is set/cleared:  This keyword is set by a
+891	      client as the result of a user action to "flag" a message for
+892	      urgent/special attention.
+893	   Related keywords:  $MailFlagBit1, $MailFlagBit2
+894	   Related IMAP capabilities:  None
+895	   Security considerations:  None
+896	   Published specification:  This document
+897	   Intended usage:  COMMON
+898	   Owner/Change controller:  IESG
+
+900	6.1.16.  $MailFlagBit1 keyword registration
+
+902	   IMAP/JMAP keyword name:  $MailFlagBit1
+903	   Purpose:  0 bit part of a 3-bit bitmask that defines the color of the
+904	      flag when the has the system flag \Flagged set.  See Section 3 for
+905	      details.
+906	   Private or Shared on a server:  SHARED
+907	   Is it an advisory keyword or may it cause an automatic action:  No
+908	   When/by whom the keyword is set/cleared:  This keyword is set by a
+909	      client as the result of a user action to "flag" a message for
+910	      urgent/special attention.
+911	   Related keywords:  $MailFlagBit0, $MailFlagBit2
+912	   Related IMAP capabilities:  None
+913	   Security considerations:  None
+914	   Published specification:  This document
+915	   Intended usage:  COMMON
+916	   Owner/Change controller:  IESG
+
+918	6.1.17.  $MailFlagBit2 keyword registration
+
+920	   IMAP/JMAP keyword name:  $MailFlagBit2
+921	   Purpose:  0 bit part of a 3-bit bitmask that defines the color of the
+922	      flag when the has the system flag \Flagged set.  See Section 3 for
+923	      details.
+924	   Private or Shared on a server:  SHARED
+925	   Is it an advisory keyword or may it cause an automatic action:  No
+926	   When/by whom the keyword is set/cleared:  This keyword is set by a
+927	      client as the result of a user action to "flag" a message for
+928	      urgent/special attention.
+929	   Related keywords:  $MailFlagBit0, $MailFlagBit1
+930	   Related IMAP capabilities:  None
+931	   Security considerations:  None
+932	   Published specification:  This document
+933	   Intended usage:  COMMON
+934	   Owner/Change controller:  IESG
+
+936	6.2.  IMAP Mailbox Name Attributes Registrations
+
+938	   The following 3 IMAP/JMAP mailbox name attributes are registered in
+939	   the IMAP/JMAP Mailbox Name Attributes Registry, as established in
+940	   [RFC8457].
+
+942	   Note that none of the attributes in this section have an implied
+943	   backslash.  This sets them apart from those specified in Section 2 of
+944	   [RFC6154].
+
+946	6.2.1.  Snoozed mailbox name attribute registration
+
+948	   Attribute Name:  Snoozed
+949	   Description:  Identifies the mailbox where temporarily snoozed
+950	      messages are stored.
+951	   Reference:  This document.
+952	   Usage Notes:
+
+954	6.2.2.  Scheduled mailbox name attribute registration
+
+956	   Attribute Name:  Scheduled
+957	   Description:  Identifies the mailbox where messages scheduled to be
+958	      sent at a later time are stored.
+959	   Reference:  This document.
+960	   Usage Notes:
+
+962	6.2.3.  Memos mailbox name attribute registration
+
+964	   Attribute Name:  Memos
+965	   Description:  Identifies the mailbox where user-created memo messages
+966	      are stored.
+967	   Reference:  This document.
+968	   Usage Notes:
+
+970	7.  Security Considerations
+
+972	   The security considerations for the $istrusted and $muted keywords
+973	   are described in Section 6.1.12 and Section 6.1.2 respectively.
+
+975	   Besides that this document should not affect the security of the
+976	   Internet.
+
+978	8.  References
+
+980	8.1.  Normative References
+
+982	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+983	              Requirement Levels", BCP 14, RFC 2119,
+984	              DOI 10.17487/RFC2119, March 1997,
+985	              <https://www.rfc-editor.org/info/rfc2119>.
+
+987	   [RFC5788]  Melnikov, A. and D. Cridland, "IMAP4 Keyword Registry",
+988	              RFC 5788, DOI 10.17487/RFC5788, March 2010,
+989	              <https://www.rfc-editor.org/info/rfc5788>.
+
+991	   [RFC6154]  Leiba, B. and J. Nicolson, "IMAP LIST Extension for
+992	              Special-Use Mailboxes", RFC 6154, DOI 10.17487/RFC6154,
+993	              March 2011, <https://www.rfc-editor.org/info/rfc6154>.
+
+995	   [RFC8058]  Levine, J. and T. Herkula, "Signaling One-Click
+996	              Functionality for List Email Headers", RFC 8058,
+997	              DOI 10.17487/RFC8058, January 2017,
+998	              <https://www.rfc-editor.org/info/rfc8058>.
+
+1000	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+1001	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+1002	              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+1004	   [RFC8457]  Leiba, B., Ed., "IMAP "$Important" Keyword and
+1005	              "\Important" Special-Use Attribute", RFC 8457,
+1006	              DOI 10.17487/RFC8457, September 2018,
+1007	              <https://www.rfc-editor.org/info/rfc8457>.
+
+1009	   [RFC8474]  Gondwana, B., Ed., "IMAP Extension for Object
+1010	              Identifiers", RFC 8474, DOI 10.17487/RFC8474, September
+1011	              2018, <https://www.rfc-editor.org/info/rfc8474>.
+
+1013	   [RFC8621]  Jenkins, N. and C. Newman, "The JSON Meta Application
+1014	              Protocol (JMAP) for Mail", RFC 8621, DOI 10.17487/RFC8621,
+1015	              August 2019, <https://www.rfc-editor.org/info/rfc8621>.
+
+1017	   [RFC9051]  Melnikov, A., Ed. and B. Leiba, Ed., "Internet Message
+1018	              Access Protocol (IMAP) - Version 4rev2", RFC 9051,
+1019	              DOI 10.17487/RFC9051, August 2021,
+1020	              <https://www.rfc-editor.org/info/rfc9051>.
+
+1022	Authors' Addresses
+
+1024	   Neil Jenkins (editor)
+1025	   Fastmail
+1026	   PO Box 234, Collins St West
+1027	   Melbourne  VIC 8007
+1028	   Australia
+1029	   Email: neilj@fastmailteam.com
+1030	   URI:   https://www.fastmail.com
+
+1032	   Daniel Eggert (editor)
+1033	   Apple Inc
+1034	   One Apple Park Way
+1035	   Cupertino,  CA 95014
+1036	   United States of America
+1037	   Email: deggert@apple.com
+1038	   URI:   https://www.apple.com
+
+
+
+
+
+
+
+
+
