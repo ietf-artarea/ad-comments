@@ -1,0 +1,2914 @@
+idnits 2.17.1 
+
+draft-ietf-core-href-25.txt:
+-(3): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(25): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(609): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(611): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(614): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(616): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(618): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(620): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(1284): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(1350): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(1371): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(1375): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(1385): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(1388): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(1391): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(1398): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(2826): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+  == There are 40 instances of lines with non-ascii characters in the
+     document.
+
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     Summary: 0 errors (**), 0 flaws (~~), 1 warning (==), 0 comments (--).
+
+--------------------------------------------------------------------------------
+
+
+2	CoRE Working Group                                       C. Bormann, Ed.
+3	Internet-Draft                                    Universität Bremen TZI
+4	Updates: 7595 (if approved)                                  H. Birkholz
+5	Intended status: Standards Track                          Fraunhofer SIT
+6	Expires: 31 March 2026                                 27 September 2025
+
+8	                    Constrained Resource Identifiers
+9	                        draft-ietf-core-href-25
+
+11	Abstract
+
+13	   The Constrained Resource Identifier (CRI) is a complement to the
+14	   Uniform Resource Identifier (URI) that represents the URI components
+15	   in Concise Binary Object Representation (CBOR) rather than as a
+16	   sequence of characters.  This approach simplifies parsing,
+17	   comparison, and reference resolution in environments with severe
+18	   limitations on processing power, code size, and memory size.
+
+20	   This RFC updates RFC 7595 to add a note on how the "URI Schemes"
+21	   registry of RFC 7595 cooperates with the "CRI Scheme Numbers"
+22	   registry created by the present RFC.
+
+24	   // (This "cref" paragraph will be removed by the RFC editor:) The
+25	   // present revision –25 contains a few more tweaks to address follow-
+26	   // on AD review comments as well as comments from the ARTART review.
+27	   // It is intended to be ready for IESG evaluation.
+
+29	About This Document
+
+31	   This note is to be removed before publishing as an RFC.
+
+33	   Status information for this document may be found at
+34	   https://datatracker.ietf.org/doc/draft-ietf-core-href/.
+
+36	   Discussion of this document takes place on the Constrained RESTful
+37	   Environments Working Group mailing list (mailto:core@ietf.org), which
+38	   is archived at https://mailarchive.ietf.org/arch/browse/core/.
+39	   Subscribe at https://www.ietf.org/mailman/listinfo/core/.
+
+41	   Source for this draft and an issue tracker can be found at
+42	   https://github.com/core-wg/href.
+
+44	Status of This Memo
+
+46	   This Internet-Draft is submitted in full conformance with the
+47	   provisions of BCP 78 and BCP 79.
+
+49	   Internet-Drafts are working documents of the Internet Engineering
+50	   Task Force (IETF).  Note that other groups may also distribute
+51	   working documents as Internet-Drafts.  The list of current Internet-
+52	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+54	   Internet-Drafts are draft documents valid for a maximum of six months
+55	   and may be updated, replaced, or obsoleted by other documents at any
+56	   time.  It is inappropriate to use Internet-Drafts as reference
+57	   material or to cite them other than as "work in progress."
+
+59	   This Internet-Draft will expire on 31 March 2026.
+
+61	Copyright Notice
+
+63	   Copyright (c) 2025 IETF Trust and the persons identified as the
+64	   document authors.  All rights reserved.
+
+66	   This document is subject to BCP 78 and the IETF Trust's Legal
+67	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+68	   license-info) in effect on the date of publication of this document.
+69	   Please review these documents carefully, as they describe your rights
+70	   and restrictions with respect to this document.  Code Components
+71	   extracted from this document must include Revised BSD License text as
+72	   described in Section 4.e of the Trust Legal Provisions and are
+73	   provided without warranty as described in the Revised BSD License.
+
+75	Table of Contents
+
+77	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
+78	     1.1.  Notational Conventions  . . . . . . . . . . . . . . . . .   5
+79	   2.  From URIs to CRIs: Considerations and Constraints . . . . . .   5
+80	     2.1.  The CRI interchange data model  . . . . . . . . . . . . .   5
+81	     2.2.  CRI References: The discard Component . . . . . . . . . .   9
+82	     2.3.  Constraints not expressed by the data model . . . . . . .  10
+83	   3.  Creation and Normalization  . . . . . . . . . . . . . . . . .  11
+84	   4.  Comparison  . . . . . . . . . . . . . . . . . . . . . . . . .  12
+85	   5.  CRI References  . . . . . . . . . . . . . . . . . . . . . . .  13
+86	     5.1.  CBOR Representation . . . . . . . . . . . . . . . . . . .  13
+87	       5.1.1.  scheme-name and scheme-id . . . . . . . . . . . . . .  17
+88	       5.1.2.  The discard Section . . . . . . . . . . . . . . . . .  17
+89	       5.1.3.  Examples  . . . . . . . . . . . . . . . . . . . . . .  18
+90	       5.1.4.  Specific Terminology  . . . . . . . . . . . . . . . .  18
+91	     5.2.  Ingesting and encoding a CRI Reference  . . . . . . . . .  18
+92	       5.2.1.  Error handling and extensibility  . . . . . . . . . .  19
+93	     5.3.  Reference Resolution  . . . . . . . . . . . . . . . . . .  21
+94	   6.  Relationship between CRIs, URIs, and IRIs . . . . . . . . . .  21
+95	     6.1.  Converting CRI (references) to URI (references) . . . . .  22
+96	   7.  Extending CRIs  . . . . . . . . . . . . . . . . . . . . . . .  25
+97	     7.1.  Extended CRI: Stand-In Items  . . . . . . . . . . . . . .  27
+98	     7.2.  Extended CRI: Accommodating Percent Encoding (PET)  . . .  27
+99	   8.  Integration into CoAP and ACE . . . . . . . . . . . . . . . .  29
+100	     8.1.  Converting Between CoAP CRIs and Sets of CoAP Options . .  29
+101	       8.1.1.  Decomposing a Request CRI into a set of CoAP
+102	               Options . . . . . . . . . . . . . . . . . . . . . . .  30
+103	       8.1.2.  Composing a Request CRI from a Set of CoAP Options  .  31
+104	     8.2.  CoAP Options for Forward-Proxies  . . . . . . . . . . . .  32
+105	       8.2.1.  Proxy-CRI . . . . . . . . . . . . . . . . . . . . . .  32
+106	       8.2.2.  Proxy-Scheme-Number . . . . . . . . . . . . . . . . .  33
+107	     8.3.  ACE AIF . . . . . . . . . . . . . . . . . . . . . . . . .  33
+108	   9.  Implementation Status . . . . . . . . . . . . . . . . . . . .  34
+109	   10. Security Considerations . . . . . . . . . . . . . . . . . . .  34
+110	   11. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  35
+111	     11.1.  CRI Scheme Numbers Registry  . . . . . . . . . . . . . .  35
+112	       11.1.1.  Instructions for the Designated Expert . . . . . . .  35
+113	       11.1.2.  Structure of Entries . . . . . . . . . . . . . . . .  36
+114	       11.1.3.  Initial Registrations  . . . . . . . . . . . . . . .  37
+115	     11.2.  Update to "Uniform Resource Identifier (URI) Schemes"
+116	            Registry . . . . . . . . . . . . . . . . . . . . . . . .  37
+117	     11.3.  CBOR Diagnostic Notation Application-extension Identifiers
+118	            Registry . . . . . . . . . . . . . . . . . . . . . . . .  37
+119	     11.4.  CBOR Tags Registry . . . . . . . . . . . . . . . . . . .  37
+120	     11.5.  CoAP Option Numbers Registry . . . . . . . . . . . . . .  38
+121	     11.6.  Media-Type subparameters for ACE AIF . . . . . . . . . .  38
+122	     11.7.  Content-Format for CRI in AIF  . . . . . . . . . . . . .  39
+123	   12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  39
+124	     12.1.  Normative References . . . . . . . . . . . . . . . . . .  39
+125	     12.2.  Informative References . . . . . . . . . . . . . . . . .  42
+126	   Appendix A.  Examples of Corner Cases . . . . . . . . . . . . . .  44
+127	   Appendix B.  CBOR Extended Diagnostic Notation (EDN): The "cri"
+128	           Extension . . . . . . . . . . . . . . . . . . . . . . . .  46
+129	     B.1.  cri: ABNF Definition of URI Representation of a CRI . . .  47
+130	   Appendix C.  Mapping Scheme Numbers to Scheme Names . . . . . . .  49
+131	   Appendix D.  Change Log . . . . . . . . . . . . . . . . . . . . .  58
+132	   Acknowledgements  . . . . . . . . . . . . . . . . . . . . . . . .  61
+133	   Contributors  . . . . . . . . . . . . . . . . . . . . . . . . . .  61
+134	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  62
+
+136	1.  Introduction
+
+138	   The Uniform Resource Identifier (URI) [STD66] and its most common
+139	   usage, the URI reference, are the Internet standard for linking to
+140	   resources in hypertext formats such as HTML [W3C.REC-html52-20171214]
+141	   or the HTTP "Link" header field [RFC8288].
+
+143	   A URI reference is a sequence of characters chosen from the
+144	   repertoire of US-ASCII characters (Section 4.1 of RFC 3986 [STD66]).
+145	   The individual components of a URI reference are delimited by a
+146	   number of reserved characters, which necessitates the use of a
+147	   character escape mechanism called "percent-encoding" when these
+148	   reserved characters are used in a non-delimiting function.  The
+149	   resolution of URI references (Section 5 of RFC 3986 [STD66]) involves
+150	   parsing a character sequence into its components, combining those
+151	   components with the components of a base URI, merging path
+152	   components, removing dot-segments ("." and "..", see Section 3.3 of
+153	   RFC 3986 [STD66]), and recomposing the result back into a character
+154	   sequence.
+
+156	   Overall, the proper handling of URI references is quite intricate.
+157	   This can be a problem especially in constrained environments
+158	   [RFC7228][I-D.ietf-iotops-7228bis], where nodes often have severe
+159	   code size and memory size limitations.  As a result, many
+160	   implementations in such environments support only an ad-hoc,
+161	   informally-specified, bug-ridden, non-interoperable subset.
+
+163	   This document defines the _Constrained Resource Identifier (CRI)_ by
+164	   constraining URIs to a simplified subset and representing their
+165	   components in Concise Binary Object Representation (CBOR) [STD94]
+166	   instead of a sequence of characters.  Analogously, _CRI references_
+167	   are to CRIs what URI references are to URIs.
+
+169	   CRIs and CRI references allow typical operations on URIs and URI
+170	   references such as parsing, comparison, and reference resolution
+171	   (including all corner cases) to be implemented in a comparatively
+172	   small amount of code and to be less prone to bugs and
+173	   interoperability issues.
+
+175	   As a result of simplification, however, _Simple CRIs_ (i.e., not
+176	   using CRI extensions, see Section 7) are not capable of expressing
+177	   all URIs permitted by the generic syntax of [STD66] (hence the
+178	   "constrained" in "Constrained Resource Identifier").  The supported
+179	   subset includes all URIs of the Constrained Application Protocol
+180	   (CoAP) [RFC7252], most URIs of the Hypertext Transfer Protocol (HTTP)
+181	   [STD97], Uniform Resource Names (URNs) [RFC8141], and other similar
+182	   URIs.  The exact constraints are defined in Section 2.  CRI
+183	   extensions (Section 7) can be defined to address some of the
+184	   constraints and/or to provide more convenient representations for
+185	   certain areas of application.
+
+187	   This RFC creates a "CRI Scheme Numbers" registry and updates RFC7595
+188	   to add a note on how this new registry cooperates with the "URI
+189	   Schemes" registry that RFC7595 describes.
+
+191	1.1.  Notational Conventions
+
+193	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+194	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+195	   "OPTIONAL" in this document are to be interpreted as described in
+196	   [BCP14] (RFC2119) (RFC8174) when, and only when, they appear in all
+197	   capitals, as shown here.
+
+199	   In this specification, the term "byte" is used in its now customary
+200	   sense as a synonym for "octet".
+
+202	   Terms defined in this document appear in _italics_ where they are
+203	   introduced (in the plaintext form of this document, they are rendered
+204	   as the new term surrounded by underscores).
+
+206	   The general structure of data items is shown in the Concise Data
+207	   Definition Language (CDDL) [RFC8610] including its control extensions
+208	   [RFC9165].  Specific examples are notated in CBOR Extended Diagnostic
+209	   Notation (EDN), as originally introduced in Section 8 of RFC 8949
+210	   [STD94] and extended in Appendix G of [RFC8610].
+211	   ([I-D.ietf-cbor-edn-literals] more rigorously defines and further
+212	   extends EDN.)
+
+214	2.  From URIs to CRIs: Considerations and Constraints
+
+216	2.1.  The CRI interchange data model
+
+218	   A Constrained Resource Identifier consists of the same five
+219	   components as a URI: scheme, authority, path, query, and fragment.
+
+221	   Many components of a URI can be "absent", i.e., they are optional.
+222	   This is not mirrored in CRIs, where all components are part of all
+223	   CRIs.  Some CRI components can have values that are null or empty
+224	   arrays.  By defining a default value for each of certain components,
+225	   they often can be elided at the tail of the serialized form during
+226	   interchange.  (Note that some subcomponents such as port numbers or
+227	   userinfo are optional in a CRI as well and therefore can be absent
+228	   from a CRI.)
+
+230	   In a CRI reference, components can additionally be _not set_
+231	   (indicated by interchanging a discard value instead of scheme and
+232	   authority, or by null for the scheme, path and query components that
+233	   can otherwise not have that value).  (For example, for a CRI
+234	   reference where authority is either not set or has either of the
+235	   NOAUTHORITY values, the equivalent URI reference's authority is
+236	   absent.)
+237	   The components are subject to the considerations and constraints
+238	   listed in this section.  Note that CRI extensions can relax
+239	   constraints; for example, see Section 7.2 for partially relaxing
+240	   constraint C0.
+
+242	   C0.   Text strings in CRIs ("CRI text strings") are CBOR text strings
+243	         (i.e., in UTF-8 form [STD63]) that represent Unicode strings
+244	         (see Definition D80 in [Unicode]) in Unicode Normalization Form
+245	         C (NFC) (see Definition D120 in [Unicode] and specifically
+246	         Section 3, Paragraph 7).
+
+248	   C1.   The scheme name can be any CRI text string that matches the
+249	         syntax of a URI scheme (see Section 3.1 of RFC 3986 [STD66],
+250	         which constrains scheme names to a subset of ASCII), in its
+251	         canonical form.  (The canonical form as per Section 3.1 of RFC
+252	         3986 [STD66] requires alphabetic characters to be in
+253	         lowercase.)  The scheme is always present.
+
+255	   C2.   An authority is always a host identified by an IP address or a
+256	         "registered name" (see C5 below), along with optional port
+257	         information, and optionally preceded by user information.
+
+259	         Alternatively, URIs can be formed without an authority.  The
+260	         two cases for this defined in Section 3.3 of RFC 3986 [STD66]
+261	         are modeled by two different special values used in the CRI
+262	         authority component:
+
+264	         *  the path can be root-based (zero or more path segments that
+265	            are each started in the URI with "/", as when the authority
+266	            is present), or
+
+268	         *  the path can be rootless, which requires at least one path
+269	            segment, the first one of which has non-zero length and is
+270	            not started in the URI with "/" (such as in
+271	            mailto:info@example.org or in URNs [RFC8141]).
+
+273	         (Note that, in Figure 2, no-authority is marked as a feature,
+274	         as not all CRI implementations will support authority-less
+275	         URIs.)
+
+277	   C3.   A userinfo is a text string built out of unreserved characters
+278	         (Section 2.3 of RFC 3986 [STD66]) or "sub-delims" (Section 2.2
+279	         of RFC 3986 [STD66]); any other character needs to be percent-
+280	         encoded (Section 7.2).  Note that this excludes the ":"
+281	         character, which is commonly deprecated as a way to delimit a
+282	         cleartext password in a userinfo.
+
+284	   C4.   An IP address can be either an IPv4 address or an IPv6 address
+285	         (optionally with a zone identifier; see Section 6.1, Paragraph
+286	         4).  Future versions of IP are not supported (it is likely that
+287	         a binary mapping would be strongly desirable, and that cannot
+288	         be designed ahead of time, so these versions need to be added
+289	         as a future extension if needed).
+
+291	   C5.   A _registered name_ is represented as a sequence of one or more
+292	         lowercase CRI text string _labels_ that do not contain dots
+293	         (".").  (These labels joined with dots (".") in between them
+294	         result in the CRI equivalent of a URI registered name as per
+295	         Section 3.2.2 of RFC 3986 [STD66].  The syntax may be further
+296	         restricted by the scheme.  A URI registered name can be empty,
+297	         for which case a scheme can define a default for the host.)
+
+299	   C6.   A port is always an integer in the range from 0 to 65535.
+300	         Ports outside this range, empty ports (port subcomponents with
+301	         no digits, see Section 3.2.3 of RFC 3986 [STD66]), or ports
+302	         with redundant leading zeros, are not supported.
+
+304	   C7.   If the scheme's port handling is known to the CRI creator, it
+305	         is RECOMMENDED to omit the port if and only if the port would
+306	         be the same as the scheme's default port (provided the scheme
+307	         defines such a default port) or the scheme is not using ports.
+
+309	   C8.   A path consists of zero or more path segments.  Note that a
+310	         path of just a single zero-length path segment is allowed —
+311	         this is considered equivalent to a path of zero path segments
+312	         by HTTP and CoAP, but this equivalence does not hold for CRIs
+313	         in general as they only perform normalization on the Syntax-
+314	         Based Normalization level (Section 6.2.2 of RFC 3986 [STD66]),
+315	         not on the scheme-specific Scheme-Based Normalization level
+316	         (Section 6.2.3 of RFC 3986 [STD66]).
+
+318	         (A CRI implementation may want to offer scheme-cognizant
+319	         interfaces, performing this scheme-specific normalization for
+320	         schemes it knows.  The interface could assert which schemes the
+321	         implementation knows and provide pre-normalized CRIs.  This can
+322	         also relieve the application from removing a lone zero-length
+323	         path segment before putting path segments into CoAP Options,
+324	         i.e., from performing the check and jump in item 8 of
+325	         Section 6.4 of [RFC7252].  See also SP1 in Appendix A.)
+
+327	   C9.   A path segment can be any CRI text string, with the exception
+328	         of the special "." and ".." complete path segments.  Note that
+329	         this includes the zero-length string.
+
+331	         If no authority is present in a CRI, the leading path segment
+332	         cannot be empty.  (See also SP1 in Appendix A.)
+
+334	   C10.  Queries are optional in URIs; there is a difference between an
+335	         absent query and a present query that is the empty string.  A
+336	         CRI represents its query component as an array of zero or more
+337	         CRI text strings, called "query parameters."  Zero query
+338	         parameters (an empty array) is equivalent to a URI where the
+339	         query is absent; a single query parameter that is the empty
+340	         string is equivalent to a URI with a present, but empty, query
+341	         string.  URI query strings are often in the form of "key=value"
+342	         pairs joined by ampersand characters.  A query string present
+343	         in a URI is represented in a CRI by splitting its text up on
+344	         any ampersand ("&") characters into one or more query
+345	         parameters, which may contain certain characters (including
+346	         ampersands) that were percent-encoded in the URI.  When
+347	         converting a CRI to a URI, one or more query parameters are
+348	         constructed into a URI query by joining them together with
+349	         ampersand characters, where certain characters (including
+350	         ampersands) present in the query parameters are percent-
+351	         encoded.  (This matches the structure and encoding of the
+352	         target URI in CoAP requests.)
+
+354	   C11.  A fragment identifier can be any CRI text string.  Fragment
+355	         identifiers are optional in URIs; in CRIs there is a difference
+356	         between a null fragment identifier and a fragment identifier
+357	         that is the empty string.
+
+359	   C12.  The syntax of registered names, path segments, query
+360	         parameters, and fragment identifiers may be further restricted
+361	         and sub-structured by the scheme.  There is no support,
+362	         however, for escaping sub-delimiters that are not intended to
+363	         be used in a delimiting function.
+
+365	   C13.  When converting a CRI to a URI, any character that is outside
+366	         the allowed character range or is a delimiter in the URI syntax
+367	         is percent-encoded.  For CRIs, percent-encoding always uses the
+368	         UTF-8 encoding form (see Definition D92 in [Unicode]) to
+369	         convert the character to a sequence of bytes, which are then
+370	         converted to a sequence of %HH triplets.
+
+372	   Examples for URIs at or beyond the boundaries of these constraints
+373	   are in SP2 in Appendix A.
+
+375	2.2.  CRI References: The discard Component
+
+377	   As with URI references and URIs, CRI references are a shorthand for a
+378	   CRI that is expressed relative to a base CRI.  URI and CRI references
+379	   often _discard_ part or all of the trailing path segments of the base
+380	   URI or CRI.
+
+382	   In a URI reference, this is expressed by syntax for its path
+383	   component such as leading special path segments . (to protect a colon
+384	   in the first path component) and .. (to discard one more segment) or
+385	   a leading slash (to discard all segments) before giving the path
+386	   segments to be added at the end of the (now truncated) base URI.  For
+387	   use in CRI references, we instead add in a discard component as an
+388	   alternative to the scheme and authority components, making the
+389	   specification of discarding base URI path segments separate from
+390	   adding new path segments from the CRI reference.
+
+392	   The discarding intent of a CRI reference is thus fully condensed to a
+393	   single value in its discard component:
+
+395	   *  An unsigned integer as the discard component specifies the number
+396	      of path segments to be discarded from the base CRI (note that this
+397	      includes the value 0 which cannot be expressed in URI references
+398	      that then add any path component);
+
+400	   *  the value true as the discard component specifies discarding all
+401	      path segments from the base CRI.
+
+403	   Note that path components can be empty; ftp://example.com/a/ includes
+404	   the two path components "a" and ""; the latter is the one that will
+405	   be discarded when the URI reference "b" is resolved with
+406	   ftp://example.com/a/ as its base URI.
+
+408	        +--------------------+-----------------------------------+
+409	        | CRI reference      | URI reference                     |
+410	        +--------------------+-----------------------------------+
+411	        | [0, ["a"]]         | (cannot be expressed)             |
+412	        | [1, ["a"]]         | a                                 |
+413	        | [1, ["this:that"]] | ./this:that                       |
+414	        |                    | (Section 4.2 of RFC 3986 [STD66]) |
+415	        | [1, ["a", "b"]]    | a/b                               |
+416	        | [2, ["a"]]         | ../a                              |
+417	        | [3, ["a"]]         | ../../a                           |
+418	        | [true, ["a"]]      | /a                                |
+419	        +--------------------+-----------------------------------+
+
+421	           Table 1: URI reference equivalents of CRI reference
+422	                       examples with discard values
+
+424	   If a scheme or authority is present in a CRI reference, the discard
+425	   component is implicitly equivalent to a value of true and thus not
+426	   included in the interchanged data item.
+
+428	2.3.  Constraints not expressed by the data model
+
+430	   There are syntactically valid CRIs and CRI references that cannot be
+431	   converted into a URI or URI reference, respectively.
+
+433	   CRI references of this kind can be acceptable -- they still can be
+434	   resolved and result in a valid full CRI that can be converted back.
+435	   Examples of this are:
+
+437	   *  [0, ["p"]]: appends a slash and the path segment "p" to its base,
+438	      sets the query to an empty array and the fragment to null
+
+440	   *  [0, null, []]: leaves the path alone but sets the query to an
+441	      empty array and the fragment to null
+
+443	   (Full) CRIs that do not correspond to a valid URI are not valid on
+444	   their own, and cannot be used.  Normatively they are characterized by
+445	   the Section 6.1 process not producing a valid and syntax-normalized
+446	   URI.  For easier understanding, they are listed here:
+
+448	   *  CRIs (and CRI references) containing dot-segments (path segment
+449	      "." or "..").
+
+451	      These segments would be removed by the remove_dot_segments
+452	      algorithm of [STD66], and thus never produce a normalized URI
+453	      after resolution.
+
+455	      (In CRI references, the discard value is used to afford segment
+456	      removal (see Section 2.2), and with "." being an unreserved
+457	      character, expressing them as "%2e" and "%2e%2e" is not even
+458	      viable, let alone practical).
+
+460	   *  CRIs without authority whose path starts with a leading empty
+461	      segment followed by at least one more segment.
+
+463	      When converted to URIs, these would violate the requirement that
+464	      in absence of an authority, a URI's path cannot begin with two
+465	      slash characters.  (E.g., two leading empty segments would be
+466	      indistinguishable from a URI with a shorter path and a present but
+467	      empty authority component.)  (Compare C9.)
+
+469	   *  CRIs without authority that are rootless and have an empty path
+470	      component (e.g., ["a", true, []]), which would be
+471	      indistinguishable from its root-based equivalent (["a", null, []])
+472	      as both would have the URI a:.
+
+474	3.  Creation and Normalization
+
+476	   In general, resource identifiers are generated when a resource is
+477	   initially created or exposed under a certain resource identifier.
+
+479	   The naming authority that creates a Constrained Resource Identifier
+480	   SHOULD be the authority that governs the namespace of the resource
+481	   identifier (see also [BCP190]).  For example, for the resources of an
+482	   HTTP origin server, that server is responsible for creating the CRIs
+483	   for those resources.  If the naming authority creates a URI instead
+484	   that can be obtained as a conversion result from a CRI (Section 6.1)
+485	   that CRI can be considered to have been created by the naming
+486	   authority.
+
+488	   The naming authority MUST ensure that any CRI created satisfies the
+489	   required constraints defined in Section 2.  The creation of a CRI
+490	   fails if the CRI cannot be validated to satisfy all of the required
+491	   constraints.
+
+493	   If a naming authority creates a CRI from user input, the following
+494	   normalizations can increase the likelihood that the resulting CRI
+495	   will be valid:
+
+497	   *  map the scheme name to lowercase (C1);
+
+499	   *  map the registered name to NFC (C0) and split it on embedded dots
+500	      (C5);
+
+502	   *  elide the port if it is the default port for the scheme (C7);
+
+504	   *  map path segments (C9), query parameters (C10), and the fragment
+505	      identifier (C11) to NFC form (C0).
+
+507	   Once a CRI has been created, it can be used and transferred without
+508	   further normalization.  All operations that operate on a CRI SHOULD
+509	   rely on the assumption that the CRI is appropriately pre-normalized.
+510	   (This does not contradict the requirement that, when CRIs are
+511	   transferred, recipients must operate on as-good-as untrusted input
+512	   and fail gracefully in the face of malicious inputs.)
+
+514	   Note that the processing of CRIs does not imply that all the
+515	   constraints continuously need to be checked and enforced.
+516	   Specifically, the text normalization constraints (NFC) can be
+517	   expanded as: The recipient of a CRI MAY reasonably expect the text
+518	   strings to be in NFC form, but as with any input MUST NOT fail
+519	   (beyond possibly not being able to process the specific CRI) if they
+520	   are not.  So the onus of fulfilling the expectation is on the
+521	   original creator of the CRI, not on each processor (including
+522	   consumer).  This consideration extends to the sources the CRI creator
+523	   uses in building the text strings, which the CRI creator MAY in turn
+524	   expect to be in NFC form if that expectation is reasonable.  See
+525	   Appendix C of [MNU] for some background.
+
+527	   CRIs have been designed with the objective that, after the above
+528	   normalization, conversion of two distinct CRIs to URIs do not yield
+529	   the "same" URI, including equivalence under syntax-based
+530	   normalization (Section 6.2.2 of RFC 3986 [STD66]), but not including
+531	   scheme-based or protocol-based normalization.  Note that this
+532	   objective exclusively applies to (full) CRIs, not to CRI references:
+533	   these need to be resolved relative to a base URI, with results that
+534	   may be equivalent or not depending on the base.
+
+536	4.  Comparison
+
+538	   One of the most common operations on CRIs is comparison: determining
+539	   whether two CRIs are equivalent, without dereferencing the CRIs
+540	   (i.e., using them to access their respective resource(s)).
+
+542	   Determination of equivalence or difference of CRIs is based on simple
+543	   component-wise comparison.  If two CRIs are identical component-by-
+544	   component (using code-point-by-code-point comparison for components
+545	   that are Unicode strings) then it is safe to conclude that they are
+546	   equivalent.
+
+548	   This comparison mechanism is designed to minimize false negatives
+549	   while strictly avoiding false positives.  The constraints defined in
+550	   Section 2 imply the most common forms of syntax- and scheme-based
+551	   normalizations in URIs, but do not comprise scheme-based or protocol-
+552	   based normalizations that require accessing the resources or detailed
+553	   knowledge of the scheme's dereference algorithm (such as the Scheme-
+554	   Based Normalization (Section 6.2.3 of RFC 3986 [STD66]) specified for
+555	   http(s) in Section 4.2.3 of RFC 9110 [STD97] that would classify
+556	   https://example.org:443 as equivalent to https://example.org).  False
+557	   negatives can be caused, for example, by CRIs that are not
+558	   appropriately pre-normalized and by resource aliases.
+
+560	   When CRIs are compared to select (or avoid) a network action, such as
+561	   retrieval of a representation, fragment components (if any) do not
+562	   play a role and typically are excluded from the comparison.
+
+564	5.  CRI References
+
+566	   The most common usage of a Constrained Resource Identifier is to
+567	   embed it in resource representations, e.g., to express a hyperlink
+568	   between the represented resource and the resource identified by the
+569	   CRI.
+
+571	   Section 5.1 first defines the representation of CRIs in Concise
+572	   Binary Object Representation (CBOR) [STD94].  When reduced
+573	   representation size is desired, CRIs are often not represented
+574	   directly.  Instead, CRIs are indirectly referenced through _CRI
+575	   references_. These take advantage of hierarchical locality and
+576	   provide a very compact encoding.  The CBOR representation of CRI
+577	   references also is specified in Section 5.1.
+
+579	   The only operation defined on a CRI reference is _reference
+580	   resolution_: the act of transforming a CRI reference into a CRI.  An
+581	   application MUST implement this operation by applying the algorithm
+582	   specified in Section 5.3 (or any algorithm that is functionally
+583	   equivalent to it).
+
+585	   The reverse operation of transforming a CRI into a CRI reference is
+586	   not specified in detail in this document; implementations are free to
+587	   use any algorithm as long as reference resolution of the resulting
+588	   CRI reference yields the original CRI.  Notably, a CRI reference is
+589	   not required to satisfy all of the constraints of a CRI; the only
+590	   requirement on a CRI reference is that reference resolution MUST
+591	   yield the original CRI.
+
+593	   When testing for equivalence or difference, it is rarely appropriate
+594	   for applications to directly compare CRI references; instead, the
+595	   references are typically resolved to their respective CRIs before
+596	   comparison.
+
+598	5.1.  CBOR Representation
+
+600	   // RFC Ed.: throughout this section, please replace RFC-XXXX with the
+601	   // RFC number of this specification and remove this note.
+
+603	   A CRI or CRI reference is encoded as a CBOR array (Major type 4 in
+604	   Section 3.1 of RFC 8949 [STD94]).  Figure 1 has a coarse
+605	   visualization of the structure of this array, without going into the
+606	   details of the elements.
+
+608	   cri-reference:
+609	       │├──╮── scheme ── authority ──╭── local-part ──┤│
+610	           │                         │
+611	           ╰──────── discard ────────╯
+
+613	   local-part:
+614	           ╭─────────────────────>─────────────────────╮
+615	           │                                           │
+616	           │          ╭──────────────>──────────────╮  │
+617	           │          │                             │  │
+618	           │          │           ╭──────>───────╮  │  │
+619	           │          │           │              │  │  │
+620	       │├──╯── path ──╯── query ──╯── fragment ──╰──╰──╰──┤│
+
+622	           Figure 1: Overall Structure of a CRI or CRI Reference
+
+624	   Figure 2 has a more detailed description of the structure, in CDDL.
+
+626	   ; not expressed in this CDDL spec: trailing defaults to be left off
+
+628	   RFC-XXXX-Definitions = [CRI, CRI-Reference]
+
+630	   CRI = [
+631	     scheme,
+632	     authority / no-authority,
+633	     path,                    ; use [] for empty path
+634	     query,                   ; use [] for empty query
+635	     fragment / null
+636	   ]
+
+638	   CRI-Reference = [
+639	     ((scheme / null, authority / no-authority)
+640	      // discard),            ; relative reference
+641	     path / null,             ; null is explicitly not set
+642	     query / null,            ; null is explicitly not set
+643	     fragment / null
+644	   ]
+
+646	   scheme      = scheme-id / (scheme-name .feature "scheme-name")
+647	   scheme-id   = nint              ; -1 - scheme-number
+648	   scheme-name = text .regexp "[a-z][a-z0-9+.-]*"
+
+650	   no-authority = NOAUTH-ROOTBASED / NOAUTH-ROOTLESS
+651	   NOAUTH-ROOTBASED = null .feature "no-authority"
+652	   NOAUTH-ROOTLESS = true .feature "no-authority"
+
+654	   authority   = [?userinfo, host, ?port]
+655	   userinfo    = (false, text .feature "userinfo")
+656	   host        = (host-ip // host-name)
+657	   host-name   = (*text)      ; lowercase, NFC labels; no dot
+658	   host-ip     = (bytes .size (4/16), ?zone-id)
+659	   zone-id     = text
+660	   port        = 0..65535
+
+662	   discard     = DISCARD-ALL / 0..127
+663	   DISCARD-ALL = true
+664	   path        = [*text]
+665	   query       = [*text]
+666	   fragment    = text
+
+668	                 Figure 2: CDDL for CRI CBOR representation
+
+670	   We call the elements of the top-level array _sections_. The sections
+671	   containing the rules scheme, authority, path, query, fragment
+672	   correspond to the components of a URI and thus of a CRI, as described
+673	   in Section 2.  For use in CRI references, the discard section (see
+674	   also Section 2.2) provides an alternative to the scheme and authority
+675	   sections.
+
+677	   This CDDL specification is simplified for exposition and needs to be
+678	   augmented by the following rules for interchange of CRIs and CRI
+679	   references:
+
+681	   *  Trailing default values (Table 2) MUST be removed.
+
+683	   *  Two leading null values (scheme and authority both not given) MUST
+684	      be represented by using the discard alternative instead.
+
+686	   *  An empty path in a CRI is represented as the empty array [].  Note
+687	      that for CRI-Reference there is a difference between empty paths
+688	      and paths that are not set, represented by [] and null,
+689	      respectively.
+
+691	   *  An empty query in a CRI (no query parameters, not even an empty
+692	      string) is represented as the empty array []; note that this is
+693	      equivalent to the absence of the question mark in a URI, while the
+694	      equivalent of just a question mark in a URI is an array with a
+695	      single query parameter represented by an empty string [""]).  Note
+696	      that for CRI-Reference there is a difference between providing a
+697	      query as above and a query that is not set, represented by null.
+
+699	   *  An empty outer array ([]) is not a valid CRI.  It is a valid CRI
+700	      reference, equivalent to [0] as per Section 5.2, which essentially
+701	      copies the base CRI up to and including the path section, setting
+702	      query and fragment to absent.
+
+704	                       +-----------+---------------+
+705	                       | Section   | Default Value |
+706	                       +-----------+---------------+
+707	                       | scheme    | –             |
+708	                       | authority | null          |
+709	                       | discard   | 0             |
+710	                       | path      | []            |
+711	                       | query     | []            |
+712	                       | fragment  | null          |
+713	                       +-----------+---------------+
+
+715	                          Table 2: Default Values
+716	                              for CRI Sections
+
+718	   For interchange as separate encoded data items, CRIs MUST NOT use
+719	   indefinite length encoding (see Section 3.2 of RFC 8949 [STD94]).
+720	   This requirement is relaxed for specifications that embed CRIs into
+721	   an encompassing CBOR representation that does provide for indefinite
+722	   length encoding; those specifications that are selective in where
+723	   they provide for indefinite length encoding are RECOMMENDED to not
+724	   provide it for embedded CRIs.
+
+726	5.1.1.  scheme-name and scheme-id
+
+728	   In the scheme section, a CRI scheme is usually given as a negative
+729	   integer scheme-id derived from the _scheme number_. Optionally, it
+730	   can instead be identified by its scheme-name (a text string giving
+731	   the scheme name as in URIs' scheme section, mapped to lower case).
+732	   (Note that, in Figure 2, scheme-name is marked as a feature, as only
+733	   less constrained CRI implementations might support scheme-name.)
+
+735	   Scheme numbers are unsigned integers that are mapped to and from URI
+736	   scheme names by the "CRI Scheme Numbers" registry (Section 11.1).
+737	   The relationship of a scheme number to its scheme-id is as follows:
+
+739	   scheme-id = -1 - scheme-number
+740	   scheme-number = -1 - scheme-id
+
+742	   For example, the scheme-name coap has the (unsigned integer) scheme-
+743	   number 0 which is represented in a (negative integer) scheme-id -1.
+
+745	5.1.2.  The discard Section
+
+747	   The discard section can be used in a CRI reference when neither a
+748	   scheme nor an authority is present.  It then expresses the operations
+749	   performed on a base CRI by CRI references that are equivalent to URI
+750	   references with relative paths and path prefixes such as "/", "./",
+751	   "../", "../../", etc.
+752	   "." and ".." are not available in CRIs and are therefore expressed
+753	   using discard after a normalization step, as is the presence or
+754	   absence of a leading "/" (see Section 2.2 for examples).
+
+756	   E.g., a simple URI reference "foo" specifies to remove one trailing
+757	   segment, if any, from the base URI's path, which is represented in
+758	   the equivalent CRI reference discard section as the value 1;
+759	   similarly "../foo" removes two trailing segments, if any, represented
+760	   as 2; and "/foo" removes all segments, represented in the discard
+761	   section as the value true.  The exact semantics of the section values
+762	   are defined by Section 5.3.
+
+764	   Most URI references that Section 4.2 of RFC 3986 [STD66] calls
+765	   "relative references" (i.e., references that need to undergo a
+766	   resolution process to obtain a URI) correspond to the CRI reference
+767	   form that starts with discard.  The exception are relative references
+768	   with an authority (called a "network-path reference" in Section 4.2
+769	   of RFC 3986 [STD66]), which discard the entire path of the base CRI.
+770	   These CRI references never carry a discard section: the value of
+771	   discard defaults to true.
+
+773	5.1.3.  Examples
+
+775	   [-1,             / scheme-id -- equivalent to "coap" /
+776	    [h'C6336401',   / host /
+777	     61616],        / port /
+778	    [".well-known", / path /
+779	     "core"]
+780	   ]
+
+782	        Figure 3: CRI for coap://198.51.100.1:61616/.well-known/core
+
+784	   [true,                  / discard /
+785	    [".well-known",        / path /
+786	     "core"],
+787	    ["rt=temperature-c"]  / query /
+788	   ]
+
+790	       Figure 4: CRI Reference for /.well-known/core?rt=temperature-c
+
+792	   [-6,                / scheme-id -- equivalent to "did" /
+793	    true,              / authority = NOAUTH-ROOTLESS /
+794	    ["web:alice:bob"]  / path /
+795	   ]
+
+797	                    Figure 5: CRI for did:web:alice:bob
+
+799	5.1.4.  Specific Terminology
+
+801	   A CRI reference is considered _well-formed_ if it matches the
+802	   structure as expressed in Figure 2 in CDDL, with the additional
+803	   requirement that trailing null values are removed from the array.
+
+805	   A CRI reference is considered a _full_ CRI if it is well-formed and
+806	   the sequence of sections starts with a non-null scheme.
+
+808	   A CRI reference is considered _relative_ if it is well-formed and the
+809	   sequence of sections is empty or starts with a section other than
+810	   those that would constitute a scheme.
+
+812	5.2.  Ingesting and encoding a CRI Reference
+
+814	   From an abstract point of view, a CRI reference is a data structure
+815	   with six sections:
+
+817	   scheme, authority, discard, path, query, fragment
+
+819	   We refer to this as the _abstract form_, while the _interchange form_
+820	   (Figure 2) has either two sections for scheme and authority or one
+821	   section for discard, but never both of these alternatives.
+
+823	   Each of the sections in the abstract form can be _not set_ ("null"),
+824	   except for discard, which is always an unsigned integer or true.  If
+825	   scheme and/or authority are non-null, discard is set to true.
+
+827	   When ingesting a CRI reference that is in interchange form, those
+828	   sections are filled in from interchange form (sections not set are
+829	   filled with null), and the following steps are performed:
+
+831	   *  If the array is empty, replace it with [0].
+
+833	   *  If discard is present in interchange form (i.e., the outer array
+834	      starts with true or an unsigned integer), set scheme and authority
+835	      to null.
+
+837	   *  If scheme and/or authority are present in interchange form (i.e.,
+838	      the outer array starts with null, a text string, or a negative
+839	      integer), set discard to true.
+
+841	   Upon encoding the abstract form into interchange form, the inverse
+842	   processing is performed: If scheme and/or authority are not null, the
+843	   discard value is not transferred (it must be true in this case).  If
+844	   they are both null, they are both left out and only discard is
+845	   transferred.  Trailing null values are removed from the array.  As a
+846	   special case, an empty array is sent in place for a remaining [0]
+847	   (URI reference "").
+
+849	5.2.1.  Error handling and extensibility
+
+851	   It is recommended that specifications that describe the use of CRIs
+852	   in CBOR-based protocols use the error handling mechanisms outlined in
+853	   this section.  Implementations of this document MUST adhere to these
+854	   rules unless a containing document overrides them.
+
+856	   When encountering a CRI that is well-formed in terms of CBOR, but
+857	   that
+
+859	   *  is not well-formed as a CRI,
+
+861	   *  does not meet the other requirements on CRIs that are not covered
+862	      by the term "well-formed", or
+
+864	   *  uses features not supported by the implementation,
+865	   the CRI is treated as "unprocessable".
+
+867	   When encountering an unprocessable CRI, the processor skips the
+868	   entire CRI top-level array, including any CBOR items contained
+869	   therein, and continues processing the CBOR items surrounding the
+870	   unprocessable CRI.  (Note: this skipping can be implemented in
+871	   bounded memory for CRIs that do not use indefinite length encoding,
+872	   as mandated for CRIs as separate encoded data items in Section 5.1,
+873	   Paragraph 10.)
+
+875	   The unprocessable CRI is treated as an opaque identifier that is
+876	   distinct from all processable CRIs, and distinct from all
+877	   unprocessable CRIs with different CBOR representations.  It is up to
+878	   the implementation whether unprocessable CRIs with identical
+879	   representations are treated as identical to each other or not.
+880	   Unprocessable CRIs cannot be dereferenced, and it is an error to
+881	   query any of their components.
+
+883	   This mechanism ensures that CRI extensions (using originally defined
+884	   features or later extensions) can be used without extending the
+885	   compatibility hazard to the containing document.  For example, if a
+886	   collection of possible interaction targets contains several CRIs,
+887	   some of which use the "no-authority" feature, an application
+888	   consuming that collection that does not support that feature can
+889	   still offer the supported interaction targets.
+
+891	   The duty of checking validity is with the recipients that rely on
+892	   this validity.  An intermediary that does not use the detailed
+893	   information in a CRI (or merely performs reference resolution) MAY
+894	   pass on a CRI/CRI reference without having fully checked it, relying
+895	   on the producer having generated a valid CRI/CRI reference.  This is
+896	   true for both Simple CRIs (e.g., checking for valid UTF-8) and for
+897	   extensions (e.g., checking both for valid UTF-8 and the minimal use
+898	   of PET elements in the text-or-pet feature as per Section 7.2).
+
+900	   A system that is checking a CRI for some reason but is not its
+901	   ultimate recipient needs to consider the tension between security
+902	   requirements and the danger of ossification [RFC9170]: If the system
+903	   rejects anything that it does not know, it prevents the other
+904	   components from making use of extensions.  If it passes through
+905	   extensions unknown to it, that might allow semantics pass through
+906	   that the system should have been designed to filter out.
+
+908	5.3.  Reference Resolution
+
+910	   The term "relative" implies that a "base CRI" exists against which
+911	   the relative reference is applied.  Aside from fragment-only
+912	   references, relative references are only usable when a base CRI is
+913	   known.
+
+915	   The following steps define the process of resolving any well-formed
+916	   CRI reference against a base CRI so that the result is a full CRI in
+917	   the form of an CRI reference:
+
+919	   1.  Establish the base CRI of the CRI reference (compare Section 5.1
+920	       of RFC 3986 [STD66]) and express it in the form of an abstract
+921	       (full) CRI reference.
+
+923	   2.  Initialize a buffer with the sections from the base CRI.
+
+925	   3.  If the value of discard is true in the CRI reference (which is
+926	       implicitly the case when scheme and/or authority are present in
+927	       the reference), replace the path in the buffer with the empty
+928	       array, set query to empty and fragment to null, and set a true
+929	       authority to null.  If the value of discard is an unsigned
+930	       integer, remove as many elements from the end of the path array;
+931	       if it is non-zero, set query to empty and fragment to null.
+
+933	       Set discard to true in the buffer.
+
+935	   4.  If the path section is non-null in the CRI reference, append all
+936	       elements from the path array to the array in the path section in
+937	       the buffer; set query to empty and fragment to null.
+
+939	   5.  If query is non-null in the CRI reference, set fragment to null
+940	       in the buffer.  Apart from the path and discard, copy all non-
+941	       null sections from the CRI reference to the buffer in sequence.
+
+943	   6.  Return the sections in the buffer as the resolved CRI.
+
+945	6.  Relationship between CRIs, URIs, and IRIs
+
+947	   CRIs are meant to replace both Uniform Resource Identifiers (URIs)
+948	   [STD66] and Internationalized Resource Identifiers (IRIs) [RFC3987]
+949	   in constrained environments [RFC7228][I-D.ietf-iotops-7228bis].
+950	   Applications in these environments may never need to use URIs and
+951	   IRIs directly, especially when the resource identifier is used simply
+952	   for identification purposes or when the CRI can be directly converted
+953	   into a CoAP request.
+
+955	   However, it may be necessary in other environments to determine the
+956	   associated URI or IRI of a CRI, and vice versa.  Applications can
+957	   perform these conversions as follows:
+
+959	   CRI to URI
+960	      A CRI is converted to a URI as specified in Section 6.1.
+
+962	   URI to CRI
+963	      The method of converting a URI to a CRI is unspecified;
+964	      implementations are free to use any algorithm as long as
+965	      converting the resulting CRI back to a URI yields an equivalent
+966	      URI.
+
+968	      Note that CRIs are defined to enable implementing conversions from
+969	      or to URIs analogously to processing URIs into CoAP Options and
+970	      back, with the exception that item 8 of Section 6.4 of [RFC7252]
+971	      and item 7 of Section 6.5 of [RFC7252] do not apply to CRI
+972	      processing.  See SP1 in Appendix A for more details.
+
+974	   CRI to IRI
+975	      A CRI can be converted to an IRI by first converting it to a URI
+976	      as specified in Section 6.1, and then converting the URI to an IRI
+977	      as described in Section 3.2 of [RFC3987].
+
+979	   IRI to CRI
+980	      An IRI can be converted to a CRI by first converting it to a URI
+981	      as described in Section 3.1 of [RFC3987], and then converting the
+982	      URI to a CRI as described above.
+
+984	   Everything about CRI references, URI references, and IRI references
+985	   in this section also applies to CRIs, URIs, and IRIs.
+
+987	6.1.  Converting CRI (references) to URI (references)
+
+989	   Applications MUST convert a CRI reference to a URI reference by
+990	   determining the components of the URI reference according to the
+991	   following steps and then recomposing the components to a URI
+992	   reference string as specified in Section 5.3 of RFC 3986 [STD66].
+
+994	   scheme
+995	      If the CRI reference contains a scheme section, the scheme
+996	      component of the URI reference consists of the value of that
+997	      section, if text (scheme-name); or, if a negative integer is given
+998	      (scheme-id), the lower case scheme name corresponding to the
+999	      scheme-id as per Section 5.1.1.  Otherwise, the scheme component
+1000	      is not set.
+
+1002	   authority
+1003	      If the CRI reference contains a host-name or host-ip item, the
+1004	      authority component of the URI reference consists of a host
+1005	      subcomponent, optionally followed by a colon (":") character and a
+1006	      port subcomponent, optionally preceded by a userinfo subcomponent.
+1007	      Otherwise, the authority component is not set.
+
+1009	      The host subcomponent consists of the value of the host-name or
+1010	      host-ip item.
+
+1012	      The userinfo subcomponent, if present, is turned into a single
+1013	      string by appending a "@".  Otherwise, both the subcomponent and
+1014	      the "@" sign are omitted.  Any character in the value of the
+1015	      userinfo element that is not in the set of unreserved characters
+1016	      (Section 2.3 of RFC 3986 [STD66]) or "sub-delims" (Section 2.2 of
+1017	      RFC 3986 [STD66]) or a colon (":") MUST be percent-encoded.
+
+1019	      The host-name is turned into a single string by joining the
+1020	      elements separated by dots (".").  Any character in the elements
+1021	      of a host-name item that is not in the set of unreserved
+1022	      characters (Section 2.3 of RFC 3986 [STD66]) or "sub-delims"
+1023	      (Section 2.2 of RFC 3986 [STD66]) MUST be percent-encoded.  If
+1024	      there are dots (".") in such elements, the conversion fails
+1025	      (percent-encoding is not able to represent such elements, as
+1026	      normalization would turn the percent-encoding back to the
+1027	      unreserved character that a dot is.)
+
+1029	         |  As an implementation note, an implementation with scheme-
+1030	         |  specific knowledge that knows it will have to interface with
+1031	         |  DNS might implement a shortcut to using the ToASCII
+1032	         |  procedure (Section 4.1 of [RFC3490]) as discussed in more
+1033	         |  detail in Section 3.1 of [RFC3987].  Such an optimization is
+1034	         |  formally outside the scope of the CRI specification, which
+1035	         |  is scheme-independent and is in terms of IRIs and URIs.
+1036	         |  // Editor's note: Some other RFCs reference RFC5890 as the
+1037	         |  source of
+1038	         |  // ToASCII, since that is the document that replaces RFC3490
+1039	         |  and at
+1040	         |  // least mentions ToASCII.  Unfortunately, this doesn’t
+1041	         |  define
+1042	         |  // ToASCII (pointing to RFC 3490 instead), so we consider
+1043	         |  these
+1044	         |  // references broken.  Instead, we reference RFC 3490, which
+1045	         |  is the
+1046	         |  // document that actually does define ToASCII.  RFC 3987
+1047	         |  (IRIs)
+1048	         |  // references RFC 3490, too, kind of keeping it alive.
+
+1050	   The value of a host-ip item MUST be represented as a string that
+1051	   matches the "IPv4address" or "IP-literal" rule (Section 3.2.2 of RFC
+1052	   3986 [STD66]).
+
+1054	   The inclusion of zone-ids [RFC4007] in URIs has a complex history and
+1055	   currently has no interoperable representation (the previous
+1056	   specification for this, [RFC6874], is now obsoleted by [RFC9844];
+1057	   more background information is available in
+1058	   [I-D.schinazi-httpbis-link-local-uri-bcp]).  The CRI specification
+1059	   does not define a conversion from a CRI containing a zone-id to a
+1060	   URI.  As keeping a zone-id with an IP address in a URI turned out to
+1061	   be useful while [RFC6874] was in effect, CRIs maintain a position in
+1062	   the grammar to optionally store a zone-id.  This can be used by
+1063	   consenting CRI implementations to exchange zone information without
+1064	   being concerned by the lack of a specification at the URI syntax
+1065	   level.  The goal is to achieve approximate feature parity with the
+1066	   zone-id support in [I-D.ietf-netmod-rfc6991-bis], which also contains
+1067	   further clarifications on the use of zone-ids with IP addresses.
+
+1069	   If the CRI reference contains a port item, the port subcomponent
+1070	   consists of the value of that item in decimal notation.  Otherwise,
+1071	   the colon (":") character and the port subcomponent are both omitted.
+
+1073	   path  If the CRI reference contains a discard item of value true, the
+1074	      path component is considered _rooted_.  If it contains a discard
+1075	      item of value 0 and the path item is present, the conversion
+1076	      fails.  If it contains a positive discard item, the path component
+1077	      is considered _unrooted_ and prefixed by as many "../" components
+1078	      as the discard value minus one indicates.  If the discard value is
+1079	      1 and the first element of the path contains a :, the path
+1080	      component is prefixed by "./" (this avoids the first element to
+1081	      appear as supplying a URI scheme; compare path-noscheme in
+1082	      Section 4.2 of RFC 3986 [STD66]).
+
+1084	      If the discard item is not present and the CRI reference contains
+1085	      an authority that is true, the path component of the URI reference
+1086	      is considered unrooted.  Otherwise, the path component is
+1087	      considered rooted.
+
+1089	      If the CRI reference contains one or more path items, the path
+1090	      component is constructed by concatenating the sequence of
+1091	      representations of these items.  These representations generally
+1092	      contain a leading slash ("/") character and the value of each
+1093	      item, processed as discussed below.  The leading slash character
+1094	      is omitted for the first path item only if the path component is
+1095	      considered "unrooted".
+
+1097	      Any character in the value of a path item that is not in the set
+1098	      of unreserved characters or "sub-delims" or a colon (":") or
+1099	      commercial at ("@") character MUST be percent-encoded.
+
+1101	      If the authority component is present (not null or true) and the
+1102	      path component does not match the "path-abempty" rule (Section 3.3
+1103	      of RFC 3986 [STD66]), the conversion fails.
+
+1105	      If the authority component is not present, but the scheme
+1106	      component is, and the path component does not match the "path-
+1107	      absolute", "path-rootless" (authority == true) or "path-empty"
+1108	      rule (Section 3.3 of RFC 3986 [STD66]), the conversion fails.
+
+1110	      If neither the authority component nor the scheme component are
+1111	      present, and the path component does not match the "path-
+1112	      absolute", "path-noscheme" or "path-empty" rule (Section 3.3 of
+1113	      RFC 3986 [STD66]), the conversion fails.
+
+1115	   query  If the CRI reference contains one or more query items, the
+1116	      query component of the URI reference consists of the value of each
+1117	      item, separated by an ampersand ("&") character.  Otherwise, the
+1118	      query component is not set.
+
+1120	      Any character in the value of a query item that is not in the set
+1121	      of unreserved characters or "sub-delims" or a colon (":"),
+1122	      commercial at ("@"), slash ("/"), or question mark ("?") character
+1123	      MUST be percent-encoded.  Additionally, any ampersand character
+1124	      ("&") in the item value MUST be percent-encoded.
+
+1126	   fragment  If the CRI reference contains a fragment item, the fragment
+1127	      component of the URI reference consists of the value of that item.
+1128	      Otherwise, the fragment component is not set.
+
+1130	      Any character in the value of a fragment item that is not in the
+1131	      set of unreserved characters or "sub-delims" or a colon (":"),
+1132	      commercial at ("@"), slash ("/"), or question mark ("?") character
+1133	      MUST be percent-encoded.
+
+1135	7.  Extending CRIs
+
+1137	   The CRI structure described up to this point, without enabling any
+1138	   feature ("scheme-name", "no-authority", "userinfo"), is termed the
+1139	   _Basic CRI_. It should be sufficient for all applications that use
+1140	   the CoAP protocol, as well as most other protocols employing URIs.
+
+1142	   With one or more of the three features enabled, we speak of _Simple
+1143	   CRIs_, which cover a larger subset of protocols that employ URIs.  To
+1144	   overcome remaining limitations, _Extended Forms_ of CRIs may be
+1145	   defined to enable further applications.  They will generally extend
+1146	   the CRI structure to accommodate more potential values of text
+1147	   components of URIs, such as userinfo, hostnames, paths, queries, and
+1148	   fragments.
+
+1150	   Extensions may also be defined to afford a more natural
+1151	   representation of the information in a URI. _Stand-in Items_
+1152	   (Section 7.1) are one way to provide such representations.  For
+1153	   instance, information that needs to be base64-encoded in a URI can be
+1154	   represented in a CRI in its natural form as a byte string instead.
+
+1156	   Extensions are or will be necessary to cover two limitations of
+1157	   Simple CRIs:
+
+1159	   *  Simple CRIs do not support IPvFuture (Section 3.2.2 of RFC 3986
+1160	      [STD66]).  Definition of such an extension probably best waits
+1161	      until a wider use of new IP literal formats is planned.
+
+1163	   *  More important in practice:
+
+1165	      Simple CRIs do not support URI components that _require_ percent-
+1166	      encoding (Section 2.1 of RFC 3986 [STD66]) to represent them in
+1167	      the URI syntax, except where that percent-encoding is used to
+1168	      escape the main delimiter in use.
+
+1170	      E.g., the URI
+
+1172	      https://alice/3%2f4-inch
+
+1174	      is represented by the Basic CRI
+
+1176	      [-4, ["alice"], ["3/4-inch"]]
+
+1178	      However, percent-encoding that is used at the application level is
+1179	      not supported by Simple CRIs:
+
+1181	      did:web:alice:7%3A1-balun
+
+1183	      CRIs have been designed to relieve implementations operating on
+1184	      CRIs from string scanning, which both helps constrained
+1185	      implementations and implementations that need to achieve high
+1186	      throughput.
+
+1188	      An extension supporting application-level percent-encoded text in
+1189	      CRIs is described in Section 7.2.
+
+1191	   Consumers of CRIs will generally notice when an extended form is in
+1192	   use, by finding structures that do not match the CDDL rules given in
+1193	   Figure 2.  Future definitions of extended forms need to strive to be
+1194	   distinguishable in their structures from the extended form presented
+1195	   here as well as other future forms.
+
+1197	   Extensions to CRIs are not intended to change encoding constraints;
+1198	   e.g., Section 5.1, Paragraph 10 is applicable to extended forms of
+1199	   CRIs as well.  This also ensures that recipients of CRIs can deal
+1200	   with unprocessable CRIs as described in Section 5.2.1.
+
+1202	7.1.  Extended CRI: Stand-In Items
+
+1204	   Application specifications that use CRIs may explicitly enable the
+1205	   use of "stand-in" items (tags or simple values).  These are data
+1206	   items used in place of original representation items such as strings
+1207	   or arrays, where the tag or simple value is defined to stand for a
+1208	   data item that can be used in the position of the stand-in item.
+1209	   Examples would be (1) tags such as 21 to 23 (Section 3.4.5.2 of RFC
+1210	   8949 [STD94]) or 108 (Section 2.1 of
+1211	   [I-D.bormann-cbor-notable-tags]), which stand for text string
+1212	   components but internally employ more compact byte string
+1213	   representations, or (2) reference tags and simple values as defined
+1214	   in [I-D.ietf-cbor-packed].
+
+1216	   Application specifications need to be explicit about which stand-in
+1217	   items are allowed; otherwise, inconsistent interpretations at
+1218	   different places in a system can lead to check/use vulnerabilities.
+
+1220	   (Note that specifications that define CBOR tags may be employed in
+1221	   CRI extensions without actually using the tags defined there as
+1222	   stand-in tags; e.g., compare the way IP addresses are represented in
+1223	   Basic CRIs with [RFC9164].)
+
+1225	7.2.  Extended CRI: Accommodating Percent Encoding (PET)
+
+1227	   This section presents a method to represent percent-encoded segments
+1228	   of userinfo, hostnames, paths, and queries, as well as fragments.
+
+1230	   The four CDDL rules
+
+1232	   userinfo    = (false, text .feature "userinfo")
+1233	   host-name   = (*text)
+1234	   path        = [*text]
+1235	   query       = [*text]
+1236	   fragment    = text
+
+1238	   are replaced with
+1239	   userinfo    = (false, text-or-pet .feature "userinfo")
+1240	   host-name   = (*text-or-pet)
+1241	   path        = [*text-or-pet]
+1242	   query       = [*text-or-pet]
+1243	   fragment    = text-or-pet
+
+1245	   text-or-pet = text /
+1246	       text-pet-sequence .feature "text-or-pet"
+
+1248	   ; text1 and pet1 alternating, at least one pet1:
+1249	   text-pet-sequence = [?text1, ((+(pet1, text1), ?pet1) // pet1)]
+1250	   ; pet is percent-encoded bytes
+1251	   pet1 = bytes .ne ''
+1252	   text1 = text .ne ""
+
+1254	   That is, for each of the host-name, path, and query segments, and for
+1255	   the userinfo and fragment components, an alternate representation is
+1256	   provided besides a simple text string: a non-empty array of
+1257	   alternating non-blank text and byte strings, the text strings of
+1258	   which stand for non-percent-encoded text, while the byte strings
+1259	   retain the special semantics of percent-encoded text without actually
+1260	   being percent-encoded.
+
+1262	   The abovementioned DID URI
+
+1264	   did:web:alice:7%3A1-balun
+
+1266	   can now be represented as:
+
+1268	   [-6, true, [["web:alice:7", ':', "1-balun"]]]
+
+1270	   (Note that, in CBOR diagnostic notation, single quotes delimit
+1271	   literals for byte strings, double quotes for text strings.)
+
+1273	   To yield a valid CRI using the text-or-pet feature, the use of byte
+1274	   strings MUST be minimal.  Both the following examples are therefore
+1275	   not valid:
+
+1277	   [-6, true, [["web:alice:", '7:', "1-balun"]]]
+
+1279	   [-6, true, [["web:alice:7", ':1', "-balun"]]]
+
+1281	   An algorithm for constructing a valid text-pet-sequence might
+1282	   repeatedly examine the byte sequences in each byte string; if such a
+1283	   sequence stands for an unreserved ASCII character, or constitutes a
+1284	   valid UTF-8 character ≥ U+0080, move this character over into a text
+1285	   string by appending it to the end of the preceding text string,
+1286	   prepending it to the start of the following text string, or splitting
+1287	   the byte string and inserting a new text string with this character,
+1288	   all while preserving the order of the bytes.  (Note that the
+1289	   properties of UTF-8 make this a simple linear process; working around
+1290	   the NFC constraint C0 in this way may be more complex.)
+
+1292	      |  Unlike the text elements of a path or a query, which through
+1293	      |  CoAP's heritage are designed to be processable element by
+1294	      |  element, a text-pet-sequence does not usually produce a
+1295	      |  semantically meaningful division into array elements.  This
+1296	      |  consequence of the flexibility in delimiters offered in URIs is
+1297	      |  demonstrated by this example, which structurally singles out
+1298	      |  the one ':' that is _not_ a delimiter at the application level.
+1299	      |  Applications specifically designed for using CRIs will
+1300	      |  generally avoid using the text-or-pet feature.  Applications
+1301	      |  using existing URI structures that require text-pet-sequence
+1302	      |  elements for their representation typically need to process
+1303	      |  them byte by byte.
+
+1305	8.  Integration into CoAP and ACE
+
+1307	   This section discusses ways in which CRIs can be used in the context
+1308	   of the CoAP protocol [RFC7252] and of Authorization for Constrained
+1309	   Environments (ACE), specifically the Authorization Information Format
+1310	   (AIF) [RFC9237].
+
+1312	8.1.  Converting Between CoAP CRIs and Sets of CoAP Options
+
+1314	   This section provides an analogue to Sections 6.4 and 6.5 of
+1315	   [RFC7252]: Computing a set of CoAP options from a request CRI
+1316	   (Section 8.1.1) and computing a request CRI from a set of COAP
+1317	   options (Section 8.1.2).
+
+1319	   As with Sections 6.4 and 6.5 of [RFC7252], the (intended or actually
+1320	   used) request's destination transport address is considered an
+1321	   additional parameter to these algorithms, usually used to be able to
+1322	   elide (by supplying default values for) CoAP options that would
+1323	   contain components of this transport address.  As with Sections 6.4
+1324	   and 6.5 of [RFC7252], the text in this section speaks about the
+1325	   request's destination IP address and the request's destination UDP
+1326	   port as components of the request's destination transport address
+1327	   used in this way; transports that do not have these components or
+1328	   have other components that are to be used in this way need to specify
+1329	   their own URI conversion, which then applies here as well.
+
+1331	   This section makes use of the mapping between CRI scheme numbers and
+1332	   URI scheme names shown in Table 3:
+
+1334	                  +-------------------+-----------------+
+1335	                  | CRI scheme number | URI scheme name |
+1336	                  +-------------------+-----------------+
+1337	                  | 0                 | coap            |
+1338	                  | 1                 | coaps           |
+1339	                  | 6                 | coap+tcp        |
+1340	                  | 7                 | coaps+tcp       |
+1341	                  | 24                | coap+ws         |
+1342	                  | 25                | coaps+ws        |
+1343	                  +-------------------+-----------------+
+
+1345	                    Table 3: Mapping CRI scheme numbers
+1346	                            and URI scheme names
+
+1348	8.1.1.  Decomposing a Request CRI into a set of CoAP Options
+
+1350	   The steps to parse a request's options from a CRI »cri« (and from the
+1351	   request's intended destination IP address) are as follows.  These
+1352	   steps either result in zero or more of the Uri-Host, Uri-Port, Uri-
+1353	   Path, and Uri-Query Options being included in the request, or they
+1354	   fail.
+
+1356	   Where the following speaks of deriving a text-string for a CoAP
+1357	   Option value from a data item in the CRI, the presence of any text-
+1358	   pet-sequence subitem (Section 7.2) in this item fails this algorithm.
+
+1360	   1.  If »cri« is not a full CRI, then fail this algorithm.
+
+1362	   2.  Translate the scheme-id into a URI scheme name as per
+1363	       Section 5.1.1 and Table 3; if a scheme-id that corresponds to a
+1364	       scheme number not in this list is being used, or if a scheme-name
+1365	       is being used, fail this algorithm.  Remember the specific
+1366	       variant of CoAP to be used based on this URI scheme name.
+
+1368	   3.  If the »cri«'s fragment component is non-null, then fail this
+1369	       algorithm.
+
+1371	   4.  If the host component of »cri« is a host-name, include a Uri-Host
+1372	       Option and let that option's value be the text string values of
+1373	       the host-name elements joined by dots.
+
+1375	       If the host component of »cri« is a host-ip, check whether the IP
+1376	       address given represents the request's destination IP address
+1377	       (and the zone-ids of both addresses also match by being absent or
+1378	       by pointing to the same interface).  Only if it does not, include
+1379	       a Uri-Host Option, and let that option's value be the text value
+1380	       of the URI representation of the IP address, as derived in
+1381	       Section 6.1, Paragraph 3 (note that zone-ids are never present in
+1382	       Uri-Host Options).
+
+1384	   5.  If the port subcomponent in a »cri« is not absent, then let
+1385	       »port« be that subcomponent's unsigned integer value; otherwise,
+1386	       let »port« be the default port number for the scheme.
+
+1388	   6.  If »port« does not equal the request's destination port, include
+1389	       a Uri-Port Option and let that option's value be »port«.
+
+1391	   7.  If the value of the path component of »cri« is empty or consists
+1392	       of a single empty string, then move to the next step.
+
+1394	       Otherwise, for each element in the »path« component, include a
+1395	       Uri-Path Option and let that option's value be the text string
+1396	       value of that element.
+
+1398	   8.  If the value of the query component of »cri« is non-empty, then,
+1399	       for each element in the query component, include a Uri-Query
+1400	       Option and let that option's value be the text string value of
+1401	       that element.
+
+1403	8.1.2.  Composing a Request CRI from a Set of CoAP Options
+
+1405	   The steps to construct a CRI from a request's options (and the
+1406	   destination IP address on which the request was received) are as
+1407	   follows.  These steps either result in a CRI or they fail.
+
+1409	   1.  Based on the variant of CoAP used in the request, choose a
+1410	       scheme-id as per Section 5.1.1 and table Table 3.  Use that as
+1411	       the first value in the resulting CRI array.
+
+1413	   2.  If the request includes a Uri-Host Option, insert an authority
+1414	       with its value determined as follows: If the value of the Uri-
+1415	       Host Option is a reg-name, split it on any dots in the name and
+1416	       use the resulting text string values as the elements of the host-
+1417	       name array.  If the value is an IP-literal or IPv4address,
+1418	       represent the IP address as a byte string of the correct length
+1419	       in host-ip; if a zone-id can be extracted from the request's
+1420	       destination IP address and if the IP address is ambiguous in the
+1421	       context of the local system, append the zone-id.  If the value is
+1422	       none of the three, fail this algorithm.
+
+1424	       If the request does not include a Uri-Host Option, insert an
+1425	       authority with host-ip being the byte string that represents the
+1426	       request's destination IP address and, if one is present in the
+1427	       request's destination address, add a zone-id.
+
+1429	   3.  If the request includes a Uri-Port Option, let »port« be that
+1430	       option's value.  Otherwise, let »port« be the request's
+1431	       destination port.  If »port« is not the default port for the
+1432	       scheme, then insert the integer value of »port« as the value of
+1433	       port in the authority.  Otherwise, elide the port.
+
+1435	   4.  Insert a path component that contains an array built from the
+1436	       text string values of the Uri-Path Options in the request, or an
+1437	       empty array if no such options are present.
+
+1439	   5.  Insert a query component that contains an array built from the
+1440	       text string values of the Uri-Query Options in the request, or an
+1441	       empty array if no such options are present.
+
+1443	8.2.  CoAP Options for Forward-Proxies
+
+1445	   Apart from the above procedures to convert CoAP CRIs to and from sets
+1446	   of CoAP Options, two additional CoAP Options are defined in
+1447	   Section 5.10.2 of [RFC7252] that support requests to forward-proxies:
+
+1449	   *  Proxy-Uri, and
+
+1451	   *  its more lightweight variant, Proxy-Scheme
+
+1453	   This section defines analogues of these that employ CRIs and the URI
+1454	   Scheme numbering provided by the present specification.
+
+1456	8.2.1.  Proxy-CRI
+
+1458	    +--------+---+---+---+---+-----------+--------+--------+---------+
+1459	    | No.    | C | U | N | R | Name      | Format | Length | Default |
+1460	    +--------+---+---+---+---+-----------+--------+--------+---------+
+1461	    | TBD235 | x | x | - |   | Proxy-Cri | opaque | 1-1023 | (none)  |
+1462	    +--------+---+---+---+---+-----------+--------+--------+---------+
+
+1464	                      Table 4: Proxy-Cri CoAP Option
+
+1466	   The Proxy-CRI Option carries an encoded CBOR data item that
+1467	   represents a full CRI.  It is used analogously to Proxy-Uri as
+1468	   defined in Section 5.10.2 of [RFC7252].  The Proxy-Cri Option MUST
+1469	   take precedence over any of the Uri-Host, Uri-Port, Uri-Path or Uri-
+1470	   Query options, as well as over any Proxy-Uri Option (each of which
+1471	   MUST NOT be included in a request containing the Proxy-Cri Option).
+
+1473	8.2.2.  Proxy-Scheme-Number
+
+1475	   +--------+-+-+-+-+---------------------+--------+--------+---------+
+1476	   | No.    |C|U|N|R| Name                | Format | Length | Default |
+1477	   +--------+-+-+-+-+---------------------+--------+--------+---------+
+1478	   | TBD239 |x|x|-| | Proxy-Scheme-Number | uint   | 0-3    | (none)  |
+1479	   +--------+-+-+-+-+---------------------+--------+--------+---------+
+
+1481	                 Table 5: Proxy-Scheme-Number CoAP Option
+
+1483	   The Proxy-Scheme-Number Option carries a CRI Scheme Number
+1484	   represented as a CoAP unsigned integer.  It is used analogously to
+1485	   Proxy-Scheme as defined in Section 5.10.2 of [RFC7252].
+
+1487	   The Proxy-Scheme Option MUST NOT be included in a request that also
+1488	   contains the Proxy-Scheme-Number Option; servers MUST reject the
+1489	   request if this is the case.
+
+1491	   As per Section 3.2 of [RFC7252], CoAP Options are only defined as one
+1492	   of empty, (text) string, opaque (byte string), or uint (unsigned
+1493	   integer).  The Option therefore carries an unsigned integer that
+1494	   represents the CRI scheme-number (which relates to a CRI scheme-id as
+1495	   defined in Section 5.1.1).  For instance, the scheme name "coap" has
+1496	   the scheme-number 0 and is represented as an unsigned integer by a
+1497	   zero-length CoAP Option value.
+
+1499	8.3.  ACE AIF
+
+1501	   The AIF (Authorization Information Format, [RFC9237]) defined by ACE
+1502	   by default uses the local part of a URI to identify a resource for
+1503	   which authorization is indicated.  The type and target of this
+1504	   information is an extension point, briefly called _Toid_ (Type of
+1505	   object identifier).  Section 11.6 registers "CRI-local-part" as a
+1506	   Toid.  Together with _Tperm_, an extension point for a way to
+1507	   indicate individual access rights (permissions), Section 2 of
+1508	   [RFC9237] defines its general Information Model as:
+
+1510	   AIF-Generic<Toid, Tperm> = [* [Toid, Tperm]]
+
+1512	   Using the definitions in Figure 2 together with the [RFC9237] default
+1513	   Tperm choice REST-method-set, this information model can be
+1514	   specialized as in:
+
+1516	   CRI-local-part = [path, ?query]
+1517	   AIF-CRI = AIF-Generic<CRI-local-part, REST-method-set>
+
+1519	9.  Implementation Status
+
+1521	   (Boilerplate as per Section 2.1 of [RFC7942]:)
+
+1523	   This section records the status of known implementations of the
+1524	   protocol defined by this specification at the time of posting of this
+1525	   Internet-Draft, and is based on a proposal described in [RFC7942].
+1526	   The description of implementations in this section is intended to
+1527	   assist the IETF in its decision processes in progressing drafts to
+1528	   RFCs.  Please note that the listing of any individual implementation
+1529	   here does not imply endorsement by the IETF.  Furthermore, no effort
+1530	   has been spent to verify the information presented here that was
+1531	   supplied by IETF contributors.  This is not intended as, and must not
+1532	   be construed to be, a catalog of available implementations or their
+1533	   features.  Readers are advised to note that other implementations may
+1534	   exist.
+
+1536	   According to [RFC7942], "this will allow reviewers and working groups
+1537	   to assign due consideration to documents that have the benefit of
+1538	   running code, which may serve as evidence of valuable experimentation
+1539	   and feedback that have made the implemented protocols more mature.
+1540	   It is up to the individual working groups to use this information as
+1541	   they see fit".
+
+1543	   A golang implementation of revision -10 of this document is found at:
+1544	   https://github.com/thomas-fossati/href.  A Rust implementation is
+1545	   available at https://codeberg.org/chrysn/cri-ref; it is being updated
+1546	   to revision -18 at the time of writing.  A python implementation is
+1547	   available as part of https://gitlab.com/chrysn/micrurus but is based
+1548	   on revision -05.
+
+1550	10.  Security Considerations
+
+1552	   Parsers of CRI references must operate on input that is assumed to be
+1553	   untrusted.  This means that parsers MUST fail gracefully in the face
+1554	   of malicious inputs.  Additionally, parsers MUST be prepared to deal
+1555	   with resource exhaustion (e.g., resulting from the allocation of big
+1556	   data items) or exhaustion of the call stack (stack overflow).  See
+1557	   Section 10 of RFC 8949 [STD94] for additional security considerations
+1558	   relating to CBOR.
+
+1560	   The security considerations discussed in Section 7 of RFC 3986
+1561	   [STD66] and Section 8 of [RFC3987] for URIs and IRIs also apply to
+1562	   CRIs.  The security considerations discussed for URIs in Section 6 of
+1563	   [RFC9237] apply analogously to AIF-CRI Section 8.3.
+
+1565	11.  IANA Considerations
+
+1567	   // RFC-editor: Please replace all references to Appendix C by a
+1568	   // reference to the IANA registry.
+
+1570	   // RFC Ed.: throughout this section, please replace RFC-XXXX with the
+1571	   // RFC number of this specification and remove this note.
+
+1573	11.1.  CRI Scheme Numbers Registry
+
+1575	   This specification defines a new "CRI Scheme Numbers" registry in the
+1576	   "Constrained RESTful Environments (CoRE) Parameters" registry group
+1577	   [IANA.core-parameters], with the policy "Expert Review" (Section 4.5
+1578	   of RFC 8126 [BCP26]).  The objective is to have CRI scheme number
+1579	   values registered for all registered URI schemes (Uniform Resource
+1580	   Identifier (URI) Schemes registry), as well as exceptionally for
+1581	   certain text strings that the Designated Expert considers widely used
+1582	   in constrained applications in place of URI scheme names.
+
+1584	11.1.1.  Instructions for the Designated Expert
+
+1586	   The expert is instructed to be frugal in the allocation of CRI scheme
+1587	   number values whose scheme-id values (Section 5.1.1) have short
+1588	   representations (1+0 and 1+1 encoding), keeping them in reserve for
+1589	   applications that are likely to enjoy wide use and can make good use
+1590	   of their shortness.
+
+1592	   When the expert notices that a registration has been made in the
+1593	   Uniform Resource Identifier (URI) Schemes registry (see also
+1594	   Section 11.2), the expert is requested to initiate a parallel
+1595	   registration in the CRI Scheme Numbers registry.  CRI scheme number
+1596	   values in the range between 1000 and 20000 (inclusive) should be
+1597	   assigned unless a shorter representation in CRIs appears desirable.
+
+1599	   The expert exceptionally also may make such a registration for text
+1600	   strings that have not been registered in the Uniform Resource
+1601	   Identifier (URI) Schemes registry if and only if the expert considers
+1602	   them to be in wide use in place of URI scheme names in constrained
+1603	   applications.  (Note that registrations in the CRI Scheme Numbers
+1604	   registry are oblivious to the details of any URI Schemes registry
+1605	   registration, so if a registration is later made in the URI Schemes
+1606	   registry that uses such a previously unregistered text string as a
+1607	   name, the CRI Scheme Numbers registration simply stays in place, even
+1608	   if the URI Schemes registration happens to be for something different
+1609	   from what the expert had in mind at the time for the CRI Scheme
+1610	   Numbers registration.  Also note that the initial registrations in
+1611	   Table 11 in Appendix C already include such registrations for the
+1612	   text strings "mqtt" and "mqtts".)
+
+1614	   A registration in the CRI Scheme Numbers registry does not imply that
+1615	   a URI scheme under this name exists or has been registered in the
+1616	   Uniform Resource Identifier (URI) Schemes registry -- it essentially
+1617	   is only providing an integer identifier for an otherwise
+1618	   uninterpreted text string.
+
+1620	   Any questions or issues that might interest a wider audience might be
+1621	   raised by the expert on the core-parameters@ietf.org mailing list for
+1622	   a time-limited discussion.
+
+1624	11.1.2.  Structure of Entries
+
+1626	   Each entry in the registry must include:
+
+1628	   CRI scheme number:
+1629	      An unsigned integer unique in this registry
+
+1631	   URI scheme name:
+1632	      a text string that would be acceptable for registration as a URI
+1633	      Scheme Name in the Uniform Resource Identifier (URI) Schemes
+1634	      registry
+
+1636	   Reference:
+1637	      a reference to a document, if available, or the registrant
+
+1639	   The Reference field can simply be a copy of the reference field for
+1640	   the URI-Scheme registration if that exists.  If not, it can contain
+1641	   helpful information (including the name of the registrant) that may
+1642	   be available for the registration, with the expectation that this
+1643	   will be updated if a URI-Scheme registration under that URI scheme
+1644	   name is later made.
+
+1646	11.1.3.  Initial Registrations
+
+1648	   The initial registrations for the CRI Scheme Numbers registry are
+1649	   provided in Table 11 in Appendix C.
+
+1651	11.2.  Update to "Uniform Resource Identifier (URI) Schemes" Registry
+
+1653	   RFC 7595 [BCP35] is updated to add the following note in the "Uniform
+1654	   Resource Identifier (URI) Schemes" Registry [IANA.uri-schemes]:
+
+1656	   |  The CRI Scheme Numbers Registry registers numeric identifiers for
+1657	   |  what essentially are URI Scheme names.  Registrants for the
+1658	   |  Uniform Resource Identifier (URI) Schemes Registry are requested
+1659	   |  to make a parallel registration in the CRI Scheme Numbers
+1660	   |  registry.  The number for this registration will be assigned by
+1661	   |  the Designated Expert for that registry.
+
+1663	11.3.  CBOR Diagnostic Notation Application-extension Identifiers
+1664	       Registry
+
+1666	   In the "Application-Extension Identifiers" registry in the "CBOR
+1667	   Diagnostic Notation" registry group [IANA.cbor-diagnostic-notation],
+1668	   IANA is requested to register the application-extension identifier
+1669	   cri as described in Table 6 and defined in Appendix B.
+
+1671	     +-----------------------+-------------+------------+-----------+
+1672	     | Application-extension | Description | Change     | Reference |
+1673	     | Identifier            |             | Controller |           |
+1674	     +-----------------------+-------------+------------+-----------+
+1675	     | cri                   | Constrained | IETF       | RFC-XXXX, |
+1676	     |                       | Resource    |            | Appendix  |
+1677	     |                       | Identifier  |            | B         |
+1678	     +-----------------------+-------------+------------+-----------+
+
+1680	             Table 6: CBOR Extended Diagnostic Notation (EDN)
+1681	                 Application-extension Identifier for CRI
+
+1683	11.4.  CBOR Tags Registry
+
+1685	   // RFC-Editor: This document uses the CPA (code point allocation)
+1686	   // convention described in [I-D.bormann-cbor-draft-numbers].  For
+1687	   // each usage of the term "CPA", please remove the prefix "CPA" from
+1688	   // the indicated value and replace the residue with the value
+1689	   // assigned by IANA; perform an analogous substitution for all other
+1690	   // occurrences of the prefix "CPA" in the document.  Finally, please
+1691	   // remove this note.
+
+1693	   In the "CBOR Tags" registry [IANA.cbor-tags], IANA is requested to
+1694	   assign the tags in Table 7 from the "specification required" space
+1695	   (suggested assignment: 99), with the present document as the
+1696	   specification reference.
+
+1698	             +-------+-----------+---------------+-----------+
+1699	             |   Tag | Data Item | Semantics     | Reference |
+1700	             +-------+-----------+---------------+-----------+
+1701	             | CPA99 | array     | CRI Reference | RFC-XXXX  |
+1702	             +-------+-----------+---------------+-----------+
+
+1704	                          Table 7: Values for Tags
+
+1706	11.5.  CoAP Option Numbers Registry
+
+1708	   // RFC-Editor: For each usage of the term "TBD", please remove the
+1709	   // prefix "TBD" from the indicated value and replace the residue with
+1710	   // the value actually assigned by IANA; perform an analogous
+1711	   // substitution for all other occurrences of the prefix "TBD" in the
+1712	   // document.  Finally, please remove this note.
+
+1714	   In the "CoAP Option Numbers" registry in the "CoRE Parameters"
+1715	   registry group [IANA.core-parameters], IANA is requested to register
+1716	   the CoAP Option Numbers as described in Table 8 and defined in
+1717	   Section 8.2.
+
+1719	               +--------+---------------------+-----------+
+1720	               | No.    | Name                | Reference |
+1721	               +--------+---------------------+-----------+
+1722	               | TBD235 | Proxy-Cri           | RFC-XXXX  |
+1723	               | TBD239 | Proxy-Scheme-Number | RFC-XXXX  |
+1724	               +--------+---------------------+-----------+
+
+1726	                     Table 8: New CoAP Option Numbers
+
+1728	11.6.  Media-Type subparameters for ACE AIF
+
+1730	   In the "Sub-Parameter Registry for application/aif+cbor and
+1731	   application/aif+json" in the "Media Type Sub-Parameter Registries"
+1732	   registry group [IANA.media-type-sub-parameters], IANA is requested to
+1733	   register:
+
+1735	       +-----------+----------------+---------------+-------------+
+1736	       | Parameter | Name           | Description/  | Reference   |
+1737	       |           |                | Specification |             |
+1738	       +-----------+----------------+---------------+-------------+
+1739	       | Toid      | CRI-local-part | local-part of | Section 8.3 |
+1740	       |           |                | CRI           | of RFC-XXXX |
+1741	       +-----------+----------------+---------------+-------------+
+
+1743	                      Table 9: ACE AIF Toid for CRI
+
+1745	11.7.  Content-Format for CRI in AIF
+
+1747	   IANA is requested to register a Content-Format identifier in the
+1748	   "CoAP Content-Formats" registry (range 256-999), within the
+1749	   "Constrained RESTful Environments (CoRE) Parameters" registry group
+1750	   [IANA.core-parameters], as follows:
+
+1752	    +------------------------------+----------------+-----+-----------+
+1753	    | Content Type                 | Content Coding | ID  | Reference |
+1754	    +------------------------------+----------------+-----+-----------+
+1755	    | application/                 | -              | TBD | RFC-XXXX  |
+1756	    | aif+cbor;Toid=CRI-local-part |                |     |           |
+1757	    +------------------------------+----------------+-----+-----------+
+
+1759	       Table 10: Content-Format for ACE AIF with CRI-local-part Toid
+
+1761	12.  References
+
+1763	12.1.  Normative References
+
+1765	   [BCP14]    Best Current Practice 14,
+1766	              <https://www.rfc-editor.org/info/bcp14>.
+1767	              At the time of writing, this BCP comprises the following:
+
+1769	              Bradner, S., "Key words for use in RFCs to Indicate
+1770	              Requirement Levels", BCP 14, RFC 2119,
+1771	              DOI 10.17487/RFC2119, March 1997,
+1772	              <https://www.rfc-editor.org/info/rfc2119>.
+
+1774	              Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+1775	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+1776	              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+1778	   [BCP26]    Best Current Practice 26,
+1779	              <https://www.rfc-editor.org/info/bcp26>.
+1780	              At the time of writing, this BCP comprises the following:
+
+1782	              Cotton, M., Leiba, B., and T. Narten, "Guidelines for
+1783	              Writing an IANA Considerations Section in RFCs", BCP 26,
+1784	              RFC 8126, DOI 10.17487/RFC8126, June 2017,
+1785	              <https://www.rfc-editor.org/info/rfc8126>.
+
+1787	   [BCP35]    Best Current Practice 35,
+1788	              <https://www.rfc-editor.org/info/bcp35>.
+1789	              At the time of writing, this BCP comprises the following:
+
+1791	              Thaler, D., Ed., Hansen, T., and T. Hardie, "Guidelines
+1792	              and Registration Procedures for URI Schemes", BCP 35,
+1793	              RFC 7595, DOI 10.17487/RFC7595, June 2015,
+1794	              <https://www.rfc-editor.org/info/rfc7595>.
+
+1796	   [I-D.ietf-netmod-rfc6991-bis]
+1797	              Schönwälder, J., "Common YANG Data Types", Work in
+1798	              Progress, Internet-Draft, draft-ietf-netmod-rfc6991-bis-
+1799	              18, 23 June 2025, <https://datatracker.ietf.org/doc/html/
+1800	              draft-ietf-netmod-rfc6991-bis-18>.
+
+1802	   [IANA.cbor-tags]
+1803	              IANA, "Concise Binary Object Representation (CBOR) Tags",
+1804	              <https://www.iana.org/assignments/cbor-tags>.
+
+1806	   [IANA.core-parameters]
+1807	              IANA, "Constrained RESTful Environments (CoRE)
+1808	              Parameters",
+1809	              <https://www.iana.org/assignments/core-parameters>.
+
+1811	   [IANA.media-type-sub-parameters]
+1812	              IANA, "Media Type Sub-Parameter Registries",
+1813	              <https://www.iana.org/assignments/media-type-sub-
+1814	              parameters>.
+
+1816	   [IANA.uri-schemes]
+1817	              IANA, "Uniform Resource Identifier (URI) Schemes",
+1818	              <https://www.iana.org/assignments/uri-schemes>.
+
+1820	   [RFC3987]  Duerst, M. and M. Suignard, "Internationalized Resource
+1821	              Identifiers (IRIs)", RFC 3987, DOI 10.17487/RFC3987,
+1822	              January 2005, <https://www.rfc-editor.org/rfc/rfc3987>.
+
+1824	   [RFC4007]  Deering, S., Haberman, B., Jinmei, T., Nordmark, E., and
+1825	              B. Zill, "IPv6 Scoped Address Architecture", RFC 4007,
+1826	              DOI 10.17487/RFC4007, March 2005,
+1827	              <https://www.rfc-editor.org/rfc/rfc4007>.
+
+1829	   [RFC8610]  Birkholz, H., Vigano, C., and C. Bormann, "Concise Data
+1830	              Definition Language (CDDL): A Notational Convention to
+1831	              Express Concise Binary Object Representation (CBOR) and
+1832	              JSON Data Structures", RFC 8610, DOI 10.17487/RFC8610,
+1833	              June 2019, <https://www.rfc-editor.org/rfc/rfc8610>.
+
+1835	   [RFC9165]  Bormann, C., "Additional Control Operators for the Concise
+1836	              Data Definition Language (CDDL)", RFC 9165,
+1837	              DOI 10.17487/RFC9165, December 2021,
+1838	              <https://www.rfc-editor.org/rfc/rfc9165>.
+
+1840	   [RFC9237]  Bormann, C., "An Authorization Information Format (AIF)
+1841	              for Authentication and Authorization for Constrained
+1842	              Environments (ACE)", RFC 9237, DOI 10.17487/RFC9237,
+1843	              August 2022, <https://www.rfc-editor.org/rfc/rfc9237>.
+
+1845	   [STD63]    Internet Standard 63,
+1846	              <https://www.rfc-editor.org/info/std63>.
+1847	              At the time of writing, this STD comprises the following:
+
+1849	              Yergeau, F., "UTF-8, a transformation format of ISO
+1850	              10646", STD 63, RFC 3629, DOI 10.17487/RFC3629, November
+1851	              2003, <https://www.rfc-editor.org/info/rfc3629>.
+
+1853	   [STD66]    Internet Standard 66,
+1854	              <https://www.rfc-editor.org/info/std66>.
+1855	              At the time of writing, this STD comprises the following:
+
+1857	              Berners-Lee, T., Fielding, R., and L. Masinter, "Uniform
+1858	              Resource Identifier (URI): Generic Syntax", STD 66,
+1859	              RFC 3986, DOI 10.17487/RFC3986, January 2005,
+1860	              <https://www.rfc-editor.org/info/rfc3986>.
+
+1862	   [STD94]    Internet Standard 94,
+1863	              <https://www.rfc-editor.org/info/std94>.
+1864	              At the time of writing, this STD comprises the following:
+
+1866	              Bormann, C. and P. Hoffman, "Concise Binary Object
+1867	              Representation (CBOR)", STD 94, RFC 8949,
+1868	              DOI 10.17487/RFC8949, December 2020,
+1869	              <https://www.rfc-editor.org/info/rfc8949>.
+
+1871	   [Unicode]  The Unicode Consortium, "The Unicode Standard, Version
+1872	              13.0.0", ISBN 978-1-936213-26-9, March 2020,
+1873	              <https://www.unicode.org/versions/Unicode13.0.0/>.  RFC
+1874	              Editor: please replace with version current at publication
+1875	              (probably 17.0.0) and check whether D80, D120, and D92 are
+1876	              still pointing to the same definitions as in 13.0.0.
+
+1878	12.2.  Informative References
+
+1880	   [BCP190]   Best Current Practice 190,
+1881	              <https://www.rfc-editor.org/info/bcp190>.
+1882	              At the time of writing, this BCP comprises the following:
+
+1884	              Nottingham, M., "URI Design and Ownership", BCP 190,
+1885	              RFC 8820, DOI 10.17487/RFC8820, June 2020,
+1886	              <https://www.rfc-editor.org/info/rfc8820>.
+
+1888	   [I-D.bormann-cbor-notable-tags]
+1889	              Bormann, C., "Notable CBOR Tags", Work in Progress,
+1890	              Internet-Draft, draft-bormann-cbor-notable-tags-13, 20
+1891	              July 2025, <https://datatracker.ietf.org/doc/html/draft-
+1892	              bormann-cbor-notable-tags-13>.
+
+1894	   [I-D.ietf-cbor-edn-literals]
+1895	              Bormann, C., "CBOR Extended Diagnostic Notation (EDN)",
+1896	              Work in Progress, Internet-Draft, draft-ietf-cbor-edn-
+1897	              literals-18, 7 July 2025,
+1898	              <https://datatracker.ietf.org/doc/html/draft-ietf-cbor-
+1899	              edn-literals-18>.
+
+1901	   [I-D.ietf-cbor-packed]
+1902	              Bormann, C. and M. Gütschow, "Packed CBOR", Work in
+1903	              Progress, Internet-Draft, draft-ietf-cbor-packed-16, 7
+1904	              July 2025, <https://datatracker.ietf.org/doc/html/draft-
+1905	              ietf-cbor-packed-16>.
+
+1907	   [I-D.ietf-iotops-7228bis]
+1908	              Bormann, C., Ersue, M., Keränen, A., and C. Gomez,
+1909	              "Terminology for Constrained-Node Networks", Work in
+1910	              Progress, Internet-Draft, draft-ietf-iotops-7228bis-02, 7
+1911	              July 2025, <https://datatracker.ietf.org/doc/html/draft-
+1912	              ietf-iotops-7228bis-02>.
+
+1914	   [I-D.schinazi-httpbis-link-local-uri-bcp]
+1915	              Schinazi, D., "Best Practices for Link-Local Connectivity
+1916	              in URI-Based Protocols", Work in Progress, Internet-Draft,
+1917	              draft-schinazi-httpbis-link-local-uri-bcp-03, 22 February
+1918	              2024, <https://datatracker.ietf.org/doc/html/draft-
+1919	              schinazi-httpbis-link-local-uri-bcp-03>.
+
+1921	   [MNU]      Bormann, C., "Modern Network Unicode", Work in Progress,
+1922	              Internet-Draft, draft-bormann-dispatch-modern-network-
+1923	              unicode-07, 30 August 2025,
+1924	              <https://datatracker.ietf.org/doc/html/draft-bormann-
+1925	              dispatch-modern-network-unicode-07>.
+
+1927	   [RFC3490]  Faltstrom, P., Hoffman, P., and A. Costello,
+1928	              "Internationalizing Domain Names in Applications (IDNA)",
+1929	              RFC 3490, DOI 10.17487/RFC3490, March 2003,
+1930	              <https://www.rfc-editor.org/rfc/rfc3490>.
+
+1932	   [RFC4180]  Shafranovich, Y., "Common Format and MIME Type for Comma-
+1933	              Separated Values (CSV) Files", RFC 4180,
+1934	              DOI 10.17487/RFC4180, October 2005,
+1935	              <https://www.rfc-editor.org/rfc/rfc4180>.
+
+1937	   [RFC6874]  Carpenter, B., Cheshire, S., and R. Hinden, "Representing
+1938	              IPv6 Zone Identifiers in Address Literals and Uniform
+1939	              Resource Identifiers", RFC 6874, DOI 10.17487/RFC6874,
+1940	              February 2013, <https://www.rfc-editor.org/rfc/rfc6874>.
+
+1942	   [RFC7228]  Bormann, C., Ersue, M., and A. Keranen, "Terminology for
+1943	              Constrained-Node Networks", RFC 7228,
+1944	              DOI 10.17487/RFC7228, May 2014,
+1945	              <https://www.rfc-editor.org/rfc/rfc7228>.
+
+1947	   [RFC7252]  Shelby, Z., Hartke, K., and C. Bormann, "The Constrained
+1948	              Application Protocol (CoAP)", RFC 7252,
+1949	              DOI 10.17487/RFC7252, June 2014,
+1950	              <https://www.rfc-editor.org/rfc/rfc7252>.
+
+1952	   [RFC7942]  Sheffer, Y. and A. Farrel, "Improving Awareness of Running
+1953	              Code: The Implementation Status Section", BCP 205,
+1954	              RFC 7942, DOI 10.17487/RFC7942, July 2016,
+1955	              <https://www.rfc-editor.org/rfc/rfc7942>.
+
+1957	   [RFC8141]  Saint-Andre, P. and J. Klensin, "Uniform Resource Names
+1958	              (URNs)", RFC 8141, DOI 10.17487/RFC8141, April 2017,
+1959	              <https://www.rfc-editor.org/rfc/rfc8141>.
+
+1961	   [RFC8288]  Nottingham, M., "Web Linking", RFC 8288,
+1962	              DOI 10.17487/RFC8288, October 2017,
+1963	              <https://www.rfc-editor.org/rfc/rfc8288>.
+
+1965	   [RFC9164]  Richardson, M. and C. Bormann, "Concise Binary Object
+1966	              Representation (CBOR) Tags for IPv4 and IPv6 Addresses and
+1967	              Prefixes", RFC 9164, DOI 10.17487/RFC9164, December 2021,
+1968	              <https://www.rfc-editor.org/rfc/rfc9164>.
+
+1970	   [RFC9170]  Thomson, M. and T. Pauly, "Long-Term Viability of Protocol
+1971	              Extension Mechanisms", RFC 9170, DOI 10.17487/RFC9170,
+1972	              December 2021, <https://www.rfc-editor.org/rfc/rfc9170>.
+
+1974	   [RFC9844]  Carpenter, B. and R. Hinden, "Entering IPv6 Zone
+1975	              Identifiers in User Interfaces", RFC 9844,
+1976	              DOI 10.17487/RFC9844, August 2025,
+1977	              <https://www.rfc-editor.org/rfc/rfc9844>.
+
+1979	   [STD97]    Internet Standard 97,
+1980	              <https://www.rfc-editor.org/info/std97>.
+1981	              At the time of writing, this STD comprises the following:
+
+1983	              Fielding, R., Ed., Nottingham, M., Ed., and J. Reschke,
+1984	              Ed., "HTTP Semantics", STD 97, RFC 9110,
+1985	              DOI 10.17487/RFC9110, June 2022,
+1986	              <https://www.rfc-editor.org/info/rfc9110>.
+
+1988	   [W3C.REC-html52-20171214]
+1989	              Danilo, A., Ed., Eicholz, A., Ed., Moon, S., Ed.,
+1990	              Faulkner, S., Ed., and T. Leithead, Ed., "HTML 5.2", W3C
+1991	              REC REC-html52-20171214, W3C REC-html52-20171214, 14
+1992	              December 2017,
+1993	              <https://www.w3.org/TR/2017/REC-html52-20171214/>.
+
+1995	Appendix A.  Examples of Corner Cases
+
+1997	   This appendix lists a few corner cases of URI semantics that
+1998	   implementers of CRIs need to be aware of, but that are not
+1999	   representative of the normal operation of CRIs.
+
+2001	   Additional test vectors may be available through the CoRE WG Wiki,
+2002	   https://wiki.ietf.org/group/core (https://wiki.ietf.org/group/core).
+
+2004	   SP1.  Initial (Lone/Leading) Empty Path Segments:
+
+2006	   *  _Lone empty path segments:_ As per [STD66], s://x is distinct from
+2007	      s://x/ -- i.e., a URI with an empty path ([] in CRI) is different
+2008	      from one with a lone empty path segment ([""]).  However, in HTTP
+2009	      and CoAP, they are implicitly aliased (for CoAP, in item 8 of
+2010	      Section 6.4 of [RFC7252]).  As per item 7 of Section 6.5 of
+2011	      [RFC7252], recomposition of a URI without Uri-Path Options from
+2012	      the other URI-related CoAP Options produces s://x/, not s://x --
+2013	      CoAP prefers the lone empty path segment form.  Similarly, after
+2014	      discussing HTTP semantics, Section 6.2.3 of RFC 3986 [STD66]
+2015	      states:
+
+2017	   |  In general, a URI that uses the generic syntax for authority with
+2018	   |  an empty path should be normalized to a path of "/".
+
+2020	   *  _Leading empty path segments without authority_: Somewhat related,
+2021	      note also that URIs and URI references that do not carry an
+2022	      authority cannot represent leading empty path segments (i.e., that
+2023	      are followed by further path segments): s://x//foo works, but in a
+2024	      s://foo URI or an (absolute-path) URI reference of the form //foo
+2025	      the double slash would be mis-parsed as leading in to an
+2026	      authority.
+
+2028	   SP2.  Constraints (Section 2) of CRIs/basic CRIs
+
+2030	         While most URIs in everyday use can be converted to CRIs and
+2031	         back to URIs matching the input after syntax-based
+2032	         normalization of the URI, these URIs illustrate the constraints
+2033	         by example:
+
+2035	         *  https://host%ffname, https://example.com/x?data=%ff
+
+2037	            All URI components must, after percent decoding, be valid
+2038	            UTF-8 encoded text.  Bytes that are not valid UTF-8 show up,
+2039	            for example, in BitTorrent web seeds.
+
+2041	            These URIs can be expressed when using the text-or-pet
+2042	            feature.
+
+2044	         *  https://example.com/component%3bone;component%3btwo,
+2045	            http://example.com/component%3dequals
+
+2047	            While delimiters can be used in an escaped and unescaped
+2048	            form in URIs with generally distinct meanings, basic CRIs
+2049	            (i.e., without percent-encoded text Section 7.2) only
+2050	            support one escapable delimiter character per component,
+2051	            which is the delimiter by which the component is split up in
+2052	            the CRI.
+
+2054	            Note that the separators . (for authority parts), / (for
+2055	            paths), & (for query parameters) are special in that they
+2056	            are syntactic delimiters of their respective components in
+2057	            CRIs (note that . is doubly special because it is not a
+2058	            reserved character in [STD66] and therefore any percent-
+2059	            encoding would be normalized away).
+
+2061	            Thus, the following examples _are_ convertible to basic CRIs
+2062	            without the text-or-pet feature:
+
+2064	            https://example.com/path%2fcomponent/second-component
+
+2066	            https://example.com/x?ampersand=%26&questionmark=?
+
+2068	         *  https://alice@example.com/
+
+2070	            The user information can be expressed in CRIs if the
+2071	            "userinfo" feature is present.  The URI https://@example.com
+2072	            is represented as [-4, [false, "", "example", "com"]]; the
+2073	            false serves as a marker that the next element is the
+2074	            userinfo.
+
+2076	            The rules explicitly cater for unencoded ":" in userinfo
+2077	            (without needing the text-or-pet feature).  (We opted for
+2078	            including this syntactic feature instead of disabling it as
+2079	            a mechanism against potential uses of colons for the
+2080	            deprecated inclusion of unencrypted secrets.)
+
+2082	Appendix B.  CBOR Extended Diagnostic Notation (EDN): The "cri"
+2083	             Extension
+
+2085	   [I-D.ietf-cbor-edn-literals] more rigorously defines and further
+2086	   extends the CBOR Extended Diagnostic Notation (EDN), as originally
+2087	   introduced in Section 8 of RFC 8949 [STD94] and extended in
+2088	   Appendix G of [RFC8610].  Among others, it provides an extension
+2089	   point for "application-extension identifiers" that can be used to
+2090	   notate CBOR data items in application-specific ways.
+
+2092	   The present document defines and registers (Section 11.3) the
+2093	   application-extension identifier "cri", which can be used to notate
+2094	   an EDN literal for a CRI reference as defined in this document.
+
+2096	   The text of the literal is a URI Reference as per [STD66] or an IRI
+2097	   Reference as per [RFC3987].
+
+2099	   The value of the literal is a CRI reference that can be converted to
+2100	   the text of the literal using the procedure of Section 6.1.  Note
+2101	   that there may be more than one CRI reference that can be converted
+2102	   to the URI/IRI reference given; implementations are expected to favor
+2103	   the simplest variant available and make non-surprising choices
+2104	   otherwise.  In the all-upper-case variant of the app-prefix, the
+2105	   value is enclosed in a tag number CPA99.
+
+2107	   // RFC-Editor: This document uses the CPA (code point allocation)
+2108	   // convention described in [I-D.bormann-cbor-draft-numbers].  For
+2109	   // each usage of the term "CPA", please remove the prefix "CPA" from
+2110	   // the indicated value and replace the residue with the value
+2111	   // assigned by IANA; perform an analogous substitution for all other
+2112	   // occurrences of the prefix "CPA" in the document.  Finally, please
+2113	   // remove this note.
+
+2115	   As an example, the CBOR diagnostic notation
+
+2117	   cri'https://example.com/bottarga/shaved'
+2118	   CRI'https://example.com/bottarga/shaved'
+
+2120	   is equivalent to
+
+2122	   [-4, ["example", "com"], ["bottarga", "shaved"]]
+2123	   CPA99([-4, ["example", "com"], ["bottarga", "shaved"]])
+
+2125	   See Appendix B.1 for an ABNF definition for the content of cri
+2126	   literals.
+
+2128	B.1.  cri: ABNF Definition of URI Representation of a CRI
+
+2130	   It can be expected that implementations of the application-extension
+2131	   identifier "cri" will make use of platform-provided URI
+2132	   implementations, which will include a URI parser.
+
+2134	   In case such a URI parser is not available or inconvenient to
+2135	   integrate, a grammar of the content of cri literals is provided by
+2136	   the ABNF for URI-reference in Section 4.1 of RFC 3986 [STD66] with
+2137	   certain re-arrangements taken from Figure 5 of
+2138	   [I-D.ietf-cbor-edn-literals]; these are reproduced in Figure 6.  If
+2139	   the content is not ASCII only (i.e., for IRIs), first apply
+2140	   Section 3.1 of [RFC3987] and apply this grammar to the result.
+
+2142	   app-string-cri = URI-reference
+2143	   ; ABNF from RFC 3986:
+
+2145	   URI           = scheme ":" hier-part [ "?" query ] [ "#" fragment ]
+
+2147	   hier-part     = "//" authority path-abempty
+2148	                    / path-absolute
+2149	                    / path-rootless
+2150	                    / path-empty
+
+2152	   URI-reference = URI / relative-ref
+
+2154	   absolute-URI  = scheme ":" hier-part [ "?" query ]
+
+2156	   relative-ref  = relative-part [ "?" query ] [ "#" fragment ]
+
+2158	   relative-part = "//" authority path-abempty
+2159	                    / path-absolute
+2160	                    / path-noscheme
+2161	                    / path-empty
+
+2163	   scheme        = ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )
+
+2165	   authority     = [ userinfo "@" ] host [ ":" port ]
+2166	   userinfo      = *( unreserved / pct-encoded / sub-delims / ":" )
+2167	   host          = IP-literal / IPv4address / reg-name
+2168	   port          = *DIGIT
+
+2170	   IP-literal    = "[" ( IPv6address / IPvFuture  ) "]"
+
+2172	   IPvFuture     = "v" 1*HEXDIG "." 1*( unreserved / sub-delims / ":" )
+
+2174	   ; Use IPv6address, h16, ls32, IPv4adress, dec-octet as re-arranged
+2175	   ; for PEG Compatibility in Figure 5 of [I-D.ietf-cbor-edn-literals]:
+
+2177	   IPv6address   =                            6( h16 ":" ) ls32
+2178	                 /                       "::" 5( h16 ":" ) ls32
+2179	                 / [ h16               ] "::" 4( h16 ":" ) ls32
+2180	                 / [ h16 *1( ":" h16 ) ] "::" 3( h16 ":" ) ls32
+2181	                 / [ h16 *2( ":" h16 ) ] "::" 2( h16 ":" ) ls32
+2182	                 / [ h16 *3( ":" h16 ) ] "::"    h16 ":"   ls32
+2183	                 / [ h16 *4( ":" h16 ) ] "::"              ls32
+2184	                 / [ h16 *5( ":" h16 ) ] "::"              h16
+2185	                 / [ h16 *6( ":" h16 ) ] "::"
+
+2187	   h16           = 1*4HEXDIG
+2188	   ls32          = ( h16 ":" h16 ) / IPv4address
+2189	   IPv4address   = dec-octet "." dec-octet "." dec-octet "." dec-octet
+2190	   dec-octet     = "25" %x30-35         ; 250-255
+2191	                 / "2" %x30-34 DIGIT    ; 200-249
+2192	                 / "1" 2DIGIT           ; 100-199
+2193	                 / %x31-39 DIGIT        ; 10-99
+2194	                 / DIGIT                ; 0-9
+2195	   ALPHA         = %x41-5a / %x61-7a
+2196	   DIGIT         = %x30-39
+2197	   HEXDIG        = DIGIT / "A" / "B" / "C" / "D" / "E" / "F"
+2198	   ; case insensitive matching, i.e., including lower case
+
+2200	   reg-name      = *( unreserved / pct-encoded / sub-delims )
+
+2202	   path          = path-abempty    ; begins with "/" or is empty
+2203	                    / path-absolute   ; begins with "/" but not "//"
+2204	                    / path-noscheme   ; begins with a non-colon segment
+2205	                    / path-rootless   ; begins with a segment
+2206	                    / path-empty      ; zero characters
+
+2208	   path-abempty  = *( "/" segment )
+2209	   path-absolute = "/" [ segment-nz *( "/" segment ) ]
+2210	   path-noscheme = segment-nz-nc *( "/" segment )
+2211	   path-rootless = segment-nz *( "/" segment )
+2212	   path-empty    = 0<pchar>
+
+2214	   segment       = *pchar
+2215	   segment-nz    = 1*pchar
+2216	   segment-nz-nc = 1*( unreserved / pct-encoded / sub-delims / "@" )
+2217	                    ; non-zero-length segment without any colon ":"
+
+2219	   pchar         = unreserved / pct-encoded / sub-delims / ":" / "@"
+
+2221	   query         = *( pchar / "/" / "?" )
+
+2223	   fragment      = *( pchar / "/" / "?" )
+
+2225	   pct-encoded   = "%" HEXDIG HEXDIG
+
+2227	   unreserved    = ALPHA / DIGIT / "-" / "." / "_" / "~"
+2228	   reserved      = gen-delims / sub-delims
+2229	   gen-delims    = ":" / "/" / "?" / "#" / "[" / "]" / "@"
+2230	   sub-delims    = "!" / "$" / "&" / "'" / "(" / ")"
+2231	                    / "*" / "+" / "," / ";" / "="
+
+2233	          Figure 6: ABNF Definition of URI Representation of a CRI
+
+2235	Appendix C.  Mapping Scheme Numbers to Scheme Names
+
+2237	   This section is to be removed before publishing as an RFC.
+
+2239	   // RFC Ed.: throughout this section, please replace RFC-XXXX with the
+2240	   // RFC number of this specification and remove this note.
+
+2242	   Table 11 defines the initial mapping from CRI scheme numbers to URI
+2243	   scheme names.
+
+2245	    +------------+--------------------------------------+------------+
+2246	    | CRI scheme | URI scheme name                      | Reference  |
+2247	    | number     |                                      |            |
+2248	    +------------+--------------------------------------+------------+
+2249	    | 0          | coap                                 | [RFC-XXXX] |
+2250	    | 1          | coaps                                | [RFC-XXXX] |
+2251	    | 2          | http                                 | [RFC-XXXX] |
+2252	    | 3          | https                                | [RFC-XXXX] |
+2253	    | 4          | urn                                  | [RFC-XXXX] |
+2254	    | 5          | did                                  | [RFC-XXXX] |
+2255	    | 6          | coap+tcp                             | [RFC-XXXX] |
+2256	    | 7          | coaps+tcp                            | [RFC-XXXX] |
+2257	    | 24         | coap+ws                              | [RFC-XXXX] |
+2258	    | 25         | coaps+ws                             | [RFC-XXXX] |
+2259	    | 1059       | ms-gamingoverlay                     | [RFC-XXXX] |
+2260	    | 1165       | snmp                                 | [RFC-XXXX] |
+2261	    | 1220       | cast                                 | [RFC-XXXX] |
+2262	    | 1242       | openid                               | [RFC-XXXX] |
+2263	    | 1273       | hs20                                 | [RFC-XXXX] |
+2264	    | 1319       | z39.50                               | [RFC-XXXX] |
+2265	    | 1328       | dweb                                 | [RFC-XXXX] |
+2266	    | 1466       | psyc                                 | [RFC-XXXX] |
+2267	    | 1528       | ms-people                            | [RFC-XXXX] |
+2268	    | 1560       | ms-uup                               | [RFC-XXXX] |
+2269	    | 1562       | ms-personacard                       | [RFC-XXXX] |
+2270	    | 1578       | jar                                  | [RFC-XXXX] |
+2271	    | 1658       | wpid                                 | [RFC-XXXX] |
+2272	    | 1762       | payment                              | [RFC-XXXX] |
+2273	    | 1895       | news                                 | [RFC-XXXX] |
+2274	    | 1905       | irc6                                 | [RFC-XXXX] |
+2275	    | 1926       | turns                                | [RFC-XXXX] |
+2276	    | 1946       | data                                 | [RFC-XXXX] |
+2277	    | 1982       | ens                                  | [RFC-XXXX] |
+2278	    | 2154       | things                               | [RFC-XXXX] |
+2279	    | 2284       | resource                             | [RFC-XXXX] |
+2280	    | 2326       | skype                                | [RFC-XXXX] |
+2281	    | 2406       | videotex                             | [RFC-XXXX] |
+2282	    | 2442       | dpp                                  | [RFC-XXXX] |
+2283	    | 2747       | upt                                  | [RFC-XXXX] |
+2284	    | 2754       | platform                             | [RFC-XXXX] |
+2285	    | 2790       | ed2k                                 | [RFC-XXXX] |
+2286	    | 2796       | taler                                | [RFC-XXXX] |
+2287	    | 2806       | fm                                   | [RFC-XXXX] |
+2288	    | 2945       | ms-newsandinterests                  | [RFC-XXXX] |
+2289	    | 3005       | xmlrpc.beep                          | [RFC-XXXX] |
+2290	    | 3018       | ark                                  | [RFC-XXXX] |
+2291	    | 3119       | wss                                  | [RFC-XXXX] |
+2292	    | 3143       | tel                                  | [RFC-XXXX] |
+2293	    | 3255       | vscode-insiders                      | [RFC-XXXX] |
+2294	    | 3342       | geo                                  | [RFC-XXXX] |
+2295	    | 3348       | rtmfp                                | [RFC-XXXX] |
+2296	    | 3358       | mtqp                                 | [RFC-XXXX] |
+2297	    | 3365       | filesystem                           | [RFC-XXXX] |
+2298	    | 3375       | teapots                              | [RFC-XXXX] |
+2299	    | 3503       | proxy                                | [RFC-XXXX] |
+2300	    | 3524       | sms                                  | [RFC-XXXX] |
+2301	    | 3634       | jms                                  | [RFC-XXXX] |
+2302	    | 3646       | mid                                  | [RFC-XXXX] |
+2303	    | 3690       | ms-calculator                        | [RFC-XXXX] |
+2304	    | 3775       | gitoid                               | [RFC-XXXX] |
+2305	    | 3783       | calculator                           | [RFC-XXXX] |
+2306	    | 3786       | about                                | [RFC-XXXX] |
+2307	    | 3795       | facetime                             | [RFC-XXXX] |
+2308	    | 3818       | ari                                  | [RFC-XXXX] |
+2309	    | 3837       | ymsgr                                | [RFC-XXXX] |
+2310	    | 3886       | dict                                 | [RFC-XXXX] |
+2311	    | 3906       | ldaps                                | [RFC-XXXX] |
+2312	    | 3920       | rtmp                                 | [RFC-XXXX] |
+2313	    | 3959       | ms-settings-proximity                | [RFC-XXXX] |
+2314	    | 4053       | fax                                  | [RFC-XXXX] |
+2315	    | 4102       | ms-drive-to                          | [RFC-XXXX] |
+2316	    | 4153       | res                                  | [RFC-XXXX] |
+2317	    | 4183       | webcal                               | [RFC-XXXX] |
+2318	    | 4193       | embedded                             | [RFC-XXXX] |
+2319	    | 4315       | xftp                                 | [RFC-XXXX] |
+2320	    | 4327       | browserext                           | [RFC-XXXX] |
+2321	    | 4355       | session                              | [RFC-XXXX] |
+2322	    | 4373       | dav                                  | [RFC-XXXX] |
+2323	    | 4419       | ipps                                 | [RFC-XXXX] |
+2324	    | 4515       | uuid-in-package                      | [RFC-XXXX] |
+2325	    | 4549       | dhttp                                | [RFC-XXXX] |
+2326	    | 4559       | web3                                 | [RFC-XXXX] |
+2327	    | 4590       | iris.lwz                             | [RFC-XXXX] |
+2328	    | 4598       | diaspora                             | [RFC-XXXX] |
+2329	    | 4613       | ms-widgets                           | [RFC-XXXX] |
+2330	    | 4619       | rtsps                                | [RFC-XXXX] |
+2331	    | 4674       | beshare                              | [RFC-XXXX] |
+2332	    | 4709       | gtalk                                | [RFC-XXXX] |
+2333	    | 4714       | hxxps                                | [RFC-XXXX] |
+2334	    | 4747       | xrcp                                 | [RFC-XXXX] |
+2335	    | 4882       | sgn                                  | [RFC-XXXX] |
+2336	    | 4929       | eid                                  | [RFC-XXXX] |
+2337	    | 4951       | submit                               | [RFC-XXXX] |
+2338	    | 5099       | ar                                   | [RFC-XXXX] |
+2339	    | 5109       | ms-settings-airplanemode             | [RFC-XXXX] |
+2340	    | 5134       | steam                                | [RFC-XXXX] |
+2341	    | 5150       | adt                                  | [RFC-XXXX] |
+2342	    | 5152       | ms-appinstaller                      | [RFC-XXXX] |
+2343	    | 5188       | bb                                   | [RFC-XXXX] |
+2344	    | 5217       | udp                                  | [RFC-XXXX] |
+2345	    | 5296       | example                              | [RFC-XXXX] |
+2346	    | 5347       | ms-remotedesktop                     | [RFC-XXXX] |
+2347	    | 5410       | ms-sttoverlay                        | [RFC-XXXX] |
+2348	    | 5425       | irc                                  | [RFC-XXXX] |
+2349	    | 5472       | sieve                                | [RFC-XXXX] |
+2350	    | 5477       | machineProvisioningProgressReporter  | [RFC-XXXX] |
+2351	    | 5480       | lvlt                                 | [RFC-XXXX] |
+2352	    | 5492       | sftp                                 | [RFC-XXXX] |
+2353	    | 5536       | ms-excel                             | [RFC-XXXX] |
+2354	    | 5557       | dlna-playcontainer                   | [RFC-XXXX] |
+2355	    | 5705       | go                                   | [RFC-XXXX] |
+2356	    | 5717       | fido                                 | [RFC-XXXX] |
+2357	    | 5728       | chrome                               | [RFC-XXXX] |
+2358	    | 5823       | shc                                  | [RFC-XXXX] |
+2359	    | 5825       | swidpath                             | [RFC-XXXX] |
+2360	    | 5883       | microsoft.windows.camera.picker      | [RFC-XXXX] |
+2361	    | 5990       | crid                                 | [RFC-XXXX] |
+2362	    | 6007       | at                                   | [RFC-XXXX] |
+2363	    | 6024       | hcp                                  | [RFC-XXXX] |
+2364	    | 6030       | content-type                         | [RFC-XXXX] |
+2365	    | 6109       | jabber                               | [RFC-XXXX] |
+2366	    | 6144       | dlna-playsingle                      | [RFC-XXXX] |
+2367	    | 6189       | ms-spd                               | [RFC-XXXX] |
+2368	    | 6341       | opaquelocktoken                      | [RFC-XXXX] |
+2369	    | 6349       | soldat                               | [RFC-XXXX] |
+2370	    | 6380       | z39.50s                              | [RFC-XXXX] |
+2371	    | 6388       | ms-media-stream-id                   | [RFC-XXXX] |
+2372	    | 6411       | ms-mixedrealitycapture               | [RFC-XXXX] |
+2373	    | 6462       | quic-transport                       | [RFC-XXXX] |
+2374	    | 6503       | ham                                  | [RFC-XXXX] |
+2375	    | 6516       | nfs                                  | [RFC-XXXX] |
+2376	    | 6609       | ut2004                               | [RFC-XXXX] |
+2377	    | 6632       | hydrazone                            | [RFC-XXXX] |
+2378	    | 6634       | adiumxtra                            | [RFC-XXXX] |
+2379	    | 6651       | tip                                  | [RFC-XXXX] |
+2380	    | 6658       | lpa                                  | [RFC-XXXX] |
+2381	    | 6730       | cstr                                 | [RFC-XXXX] |
+2382	    | 6755       | ms-settings-screenrotation           | [RFC-XXXX] |
+2383	    | 6774       | dab                                  | [RFC-XXXX] |
+2384	    | 6792       | ms-inputapp                          | [RFC-XXXX] |
+2385	    | 6808       | moz                                  | [RFC-XXXX] |
+2386	    | 6840       | acd                                  | [RFC-XXXX] |
+2387	    | 6863       | ms-access                            | [RFC-XXXX] |
+2388	    | 6883       | im                                   | [RFC-XXXX] |
+2389	    | 6903       | pttp                                 | [RFC-XXXX] |
+2390	    | 6924       | teamspeak                            | [RFC-XXXX] |
+2391	    | 6992       | payto                                | [RFC-XXXX] |
+2392	    | 7074       | secret-token                         | [RFC-XXXX] |
+2393	    | 7126       | iax                                  | [RFC-XXXX] |
+2394	    | 7225       | isostore                             | [RFC-XXXX] |
+2395	    | 7226       | bitcoincash                          | [RFC-XXXX] |
+2396	    | 7285       | smb                                  | [RFC-XXXX] |
+2397	    | 7364       | appdata                              | [RFC-XXXX] |
+2398	    | 7456       | dtn                                  | [RFC-XXXX] |
+2399	    | 7520       | feed                                 | [RFC-XXXX] |
+2400	    | 7667       | ssh                                  | [RFC-XXXX] |
+2401	    | 7743       | ms-transit-to                        | [RFC-XXXX] |
+2402	    | 7809       | ms-help                              | [RFC-XXXX] |
+2403	    | 7812       | vscode                               | [RFC-XXXX] |
+2404	    | 7856       | apt                                  | [RFC-XXXX] |
+2405	    | 7868       | ms-settings-notifications            | [RFC-XXXX] |
+2406	    | 7874       | shttp (OBSOLETE)                     | [RFC-XXXX] |
+2407	    | 7913       | ethereum                             | [RFC-XXXX] |
+2408	    | 7923       | tv                                   | [RFC-XXXX] |
+2409	    | 7942       | microsoft.windows.camera.multipicker | [RFC-XXXX] |
+2410	    | 8041       | msnim                                | [RFC-XXXX] |
+2411	    | 8085       | ms-remotedesktop-launch              | [RFC-XXXX] |
+2412	    | 8093       | spiffe                               | [RFC-XXXX] |
+2413	    | 8099       | redis                                | [RFC-XXXX] |
+2414	    | 8159       | z39.50r                              | [RFC-XXXX] |
+2415	    | 8251       | brid                                 | [RFC-XXXX] |
+2416	    | 8300       | tftp                                 | [RFC-XXXX] |
+2417	    | 8387       | content                              | [RFC-XXXX] |
+2418	    | 8454       | wais                                 | [RFC-XXXX] |
+2419	    | 8506       | view-source                          | [RFC-XXXX] |
+2420	    | 8519       | soap.beep                            | [RFC-XXXX] |
+2421	    | 8577       | attachment                           | [RFC-XXXX] |
+2422	    | 8601       | gopher                               | [RFC-XXXX] |
+2423	    | 8687       | ircs                                 | [RFC-XXXX] |
+2424	    | 8713       | callto                               | [RFC-XXXX] |
+2425	    | 8765       | bolo                                 | [RFC-XXXX] |
+2426	    | 8766       | notes                                | [RFC-XXXX] |
+2427	    | 8775       | ipn                                  | [RFC-XXXX] |
+2428	    | 8830       | ms-infopath                          | [RFC-XXXX] |
+2429	    | 9075       | ms-settings                          | [RFC-XXXX] |
+2430	    | 9136       | ms-useractivityset                   | [RFC-XXXX] |
+2431	    | 9154       | modem                                | [RFC-XXXX] |
+2432	    | 9186       | bitcoin                              | [RFC-XXXX] |
+2433	    | 9198       | ms-settings-privacy                  | [RFC-XXXX] |
+2434	    | 9204       | cap                                  | [RFC-XXXX] |
+2435	    | 9278       | com-eventbrite-attendee              | [RFC-XXXX] |
+2436	    | 9312       | pkcs11                               | [RFC-XXXX] |
+2437	    | 9318       | ipp                                  | [RFC-XXXX] |
+2438	    | 9338       | rediss                               | [RFC-XXXX] |
+2439	    | 9444       | grd                                  | [RFC-XXXX] |
+2440	    | 9453       | ms-screensketch                      | [RFC-XXXX] |
+2441	    | 9487       | matrix                               | [RFC-XXXX] |
+2442	    | 9520       | xcon-userid                          | [RFC-XXXX] |
+2443	    | 9535       | sips                                 | [RFC-XXXX] |
+2444	    | 9544       | simpleledger                         | [RFC-XXXX] |
+2445	    | 9585       | mvn                                  | [RFC-XXXX] |
+2446	    | 9770       | keyparc                              | [RFC-XXXX] |
+2447	    | 9805       | magnet                               | [RFC-XXXX] |
+2448	    | 9816       | vsls                                 | [RFC-XXXX] |
+2449	    | 9859       | drm                                  | [RFC-XXXX] |
+2450	    | 9875       | hcap                                 | [RFC-XXXX] |
+2451	    | 9910       | wtai                                 | [RFC-XXXX] |
+2452	    | 9965       | num                                  | [RFC-XXXX] |
+2453	    | 9981       | ms-settings-language                 | [RFC-XXXX] |
+2454	    | 10024      | bl                                   | [RFC-XXXX] |
+2455	    | 10119      | imap                                 | [RFC-XXXX] |
+2456	    | 10147      | query                                | [RFC-XXXX] |
+2457	    | 10176      | ves                                  | [RFC-XXXX] |
+2458	    | 10183      | ms-recall                            | [RFC-XXXX] |
+2459	    | 10196      | acr                                  | [RFC-XXXX] |
+2460	    | 10225      | barion                               | [RFC-XXXX] |
+2461	    | 10229      | acct                                 | [RFC-XXXX] |
+2462	    | 10238      | palm                                 | [RFC-XXXX] |
+2463	    | 10241      | ocf                                  | [RFC-XXXX] |
+2464	    | 10247      | lid                                  | [RFC-XXXX] |
+2465	    | 10317      | h323                                 | [RFC-XXXX] |
+2466	    | 10327      | aim                                  | [RFC-XXXX] |
+2467	    | 10333      | turn                                 | [RFC-XXXX] |
+2468	    | 10361      | ms-stickers                          | [RFC-XXXX] |
+2469	    | 10373      | ms-settings-location                 | [RFC-XXXX] |
+2470	    | 10380      | dvb                                  | [RFC-XXXX] |
+2471	    | 10467      | xcon                                 | [RFC-XXXX] |
+2472	    | 10518      | ms-screenclip                        | [RFC-XXXX] |
+2473	    | 10551      | pop                                  | [RFC-XXXX] |
+2474	    | 10583      | dat                                  | [RFC-XXXX] |
+2475	    | 10591      | ms-settings-nfctransactions          | [RFC-XXXX] |
+2476	    | 10640      | ms-settings-cloudstorage             | [RFC-XXXX] |
+2477	    | 10687      | afs                                  | [RFC-XXXX] |
+2478	    | 10740      | mqtt                                 | [RFC-XXXX] |
+2479	    | 10744      | gizmoproject                         | [RFC-XXXX] |
+2480	    | 10831      | amss                                 | [RFC-XXXX] |
+2481	    | 10868      | mailserver                           | [RFC-XXXX] |
+2482	    | 10926      | ni                                   | [RFC-XXXX] |
+2483	    | 10995      | telnet                               | [RFC-XXXX] |
+2484	    | 11055      | gg                                   | [RFC-XXXX] |
+2485	    | 11060      | blob                                 | [RFC-XXXX] |
+2486	    | 11072      | ms-settings-emailandaccounts         | [RFC-XXXX] |
+2487	    | 11130      | ms-project                           | [RFC-XXXX] |
+2488	    | 11255      | xri                                  | [RFC-XXXX] |
+2489	    | 11315      | msrp                                 | [RFC-XXXX] |
+2490	    | 11351      | ms-settings-connectabledevices       | [RFC-XXXX] |
+2491	    | 11393      | cabal                                | [RFC-XXXX] |
+2492	    | 11428      | nih                                  | [RFC-XXXX] |
+2493	    | 11467      | ms-whiteboard                        | [RFC-XXXX] |
+2494	    | 11533      | smp                                  | [RFC-XXXX] |
+2495	    | 11537      | vnc                                  | [RFC-XXXX] |
+2496	    | 11583      | graph                                | [RFC-XXXX] |
+2497	    | 11645      | dvx                                  | [RFC-XXXX] |
+2498	    | 11718      | lorawan                              | [RFC-XXXX] |
+2499	    | 11742      | lastfm                               | [RFC-XXXX] |
+2500	    | 11799      | w3                                   | [RFC-XXXX] |
+2501	    | 11804      | mumble                               | [RFC-XXXX] |
+2502	    | 11820      | thzp                                 | [RFC-XXXX] |
+2503	    | 11824      | feedready                            | [RFC-XXXX] |
+2504	    | 11857      | microsoft.windows.camera             | [RFC-XXXX] |
+2505	    | 11892      | wcr                                  | [RFC-XXXX] |
+2506	    | 11945      | ms-mobileplans                       | [RFC-XXXX] |
+2507	    | 11950      | ms-settings-lock                     | [RFC-XXXX] |
+2508	    | 11962      | ws                                   | [RFC-XXXX] |
+2509	    | 11999      | rtspu                                | [RFC-XXXX] |
+2510	    | 12029      | ms-settings-displays-topology        | [RFC-XXXX] |
+2511	    | 12052      | bluetooth                            | [RFC-XXXX] |
+2512	    | 12068      | file                                 | [RFC-XXXX] |
+2513	    | 12102      | mailto                               | [RFC-XXXX] |
+2514	    | 12174      | ms-launchremotedesktop               | [RFC-XXXX] |
+2515	    | 12237      | ilstring                             | [RFC-XXXX] |
+2516	    | 12242      | cvs                                  | [RFC-XXXX] |
+2517	    | 12337      | mms                                  | [RFC-XXXX] |
+2518	    | 12400      | ssb                                  | [RFC-XXXX] |
+2519	    | 12422      | iris.xpc                             | [RFC-XXXX] |
+2520	    | 12458      | starknet                             | [RFC-XXXX] |
+2521	    | 12478      | qb                                   | [RFC-XXXX] |
+2522	    | 12493      | mss                                  | [RFC-XXXX] |
+2523	    | 12502      | ventrilo                             | [RFC-XXXX] |
+2524	    | 12525      | ms-lockscreencomponent-config        | [RFC-XXXX] |
+2525	    | 12566      | icap                                 | [RFC-XXXX] |
+2526	    | 12569      | mupdate                              | [RFC-XXXX] |
+2527	    | 12599      | paparazzi                            | [RFC-XXXX] |
+2528	    | 12603      | ms-widgetboard                       | [RFC-XXXX] |
+2529	    | 12634      | fish                                 | [RFC-XXXX] |
+2530	    | 12644      | sip                                  | [RFC-XXXX] |
+2531	    | 12699      | mt                                   | [RFC-XXXX] |
+2532	    | 12705      | acap                                 | [RFC-XXXX] |
+2533	    | 12718      | casts                                | [RFC-XXXX] |
+2534	    | 12726      | reload                               | [RFC-XXXX] |
+2535	    | 12732      | spotify                              | [RFC-XXXX] |
+2536	    | 12806      | fuchsia-pkg                          | [RFC-XXXX] |
+2537	    | 12823      | ms-gamebarservices                   | [RFC-XXXX] |
+2538	    | 12876      | hyper                                | [RFC-XXXX] |
+2539	    | 12932      | dns                                  | [RFC-XXXX] |
+2540	    | 13014      | doi                                  | [RFC-XXXX] |
+2541	    | 13026      | ms-settings-power                    | [RFC-XXXX] |
+2542	    | 13062      | mtrust                               | [RFC-XXXX] |
+2543	    | 13068      | git                                  | [RFC-XXXX] |
+2544	    | 13094      | openpgp4fpr                          | [RFC-XXXX] |
+2545	    | 13098      | ms-secondary-screen-controller       | [RFC-XXXX] |
+2546	    | 13228      | mvrps                                | [RFC-XXXX] |
+2547	    | 13285      | snews                                | [RFC-XXXX] |
+2548	    | 13340      | smtp                                 | [RFC-XXXX] |
+2549	    | 13348      | pack                                 | [RFC-XXXX] |
+2550	    | 13362      | teliaeid                             | [RFC-XXXX] |
+2551	    | 13372      | mongodb                              | [RFC-XXXX] |
+2552	    | 13404      | afp                                  | [RFC-XXXX] |
+2553	    | 13440      | msrps                                | [RFC-XXXX] |
+2554	    | 13442      | ldap                                 | [RFC-XXXX] |
+2555	    | 13451      | mvrp                                 | [RFC-XXXX] |
+2556	    | 13499      | nntp                                 | [RFC-XXXX] |
+2557	    | 13608      | onenote                              | [RFC-XXXX] |
+2558	    | 13650      | sarif                                | [RFC-XXXX] |
+2559	    | 13680      | elsi                                 | [RFC-XXXX] |
+2560	    | 13829      | otpauth                              | [RFC-XXXX] |
+2561	    | 13846      | info                                 | [RFC-XXXX] |
+2562	    | 13862      | aaa                                  | [RFC-XXXX] |
+2563	    | 13923      | svn                                  | [RFC-XXXX] |
+2564	    | 13986      | iris                                 | [RFC-XXXX] |
+2565	    | 14010      | lbry                                 | [RFC-XXXX] |
+2566	    | 14034      | ms-search                            | [RFC-XXXX] |
+2567	    | 14090      | ms-browser-extension                 | [RFC-XXXX] |
+2568	    | 14153      | maps                                 | [RFC-XXXX] |
+2569	    | 14162      | swid                                 | [RFC-XXXX] |
+2570	    | 14168      | ms-officeapp                         | [RFC-XXXX] |
+2571	    | 14180      | ms-settings-bluetooth                | [RFC-XXXX] |
+2572	    | 14310      | ms-enrollment                        | [RFC-XXXX] |
+2573	    | 14347      | dntp                                 | [RFC-XXXX] |
+2574	    | 14364      | ms-walk-to                           | [RFC-XXXX] |
+2575	    | 14366      | ms-getoffice                         | [RFC-XXXX] |
+2576	    | 14367      | thismessage                          | [RFC-XXXX] |
+2577	    | 14460      | message                              | [RFC-XXXX] |
+2578	    | 14477      | prospero                             | [RFC-XXXX] |
+2579	    | 14526      | aaas                                 | [RFC-XXXX] |
+2580	    | 14595      | market                               | [RFC-XXXX] |
+2581	    | 14627      | stun                                 | [RFC-XXXX] |
+2582	    | 14667      | chrome-extension                     | [RFC-XXXX] |
+2583	    | 14709      | wasm-js                              | [RFC-XXXX] |
+2584	    | 14830      | itms                                 | [RFC-XXXX] |
+2585	    | 14860      | ms-whiteboard-cmd                    | [RFC-XXXX] |
+2586	    | 14867      | wifi                                 | [RFC-XXXX] |
+2587	    | 14868      | icon                                 | [RFC-XXXX] |
+2588	    | 14878      | ftp                                  | [RFC-XXXX] |
+2589	    | 14901      | stuns                                | [RFC-XXXX] |
+2590	    | 14906      | mqtts                                | [RFC-XXXX] |
+2591	    | 14936      | ms-settings-workplace                | [RFC-XXXX] |
+2592	    | 14962      | tn3270                               | [RFC-XXXX] |
+2593	    | 14972      | pres                                 | [RFC-XXXX] |
+2594	    | 14982      | p1                                   | [RFC-XXXX] |
+2595	    | 15026      | teapot                               | [RFC-XXXX] |
+2596	    | 15061      | android                              | [RFC-XXXX] |
+2597	    | 15118      | simplex                              | [RFC-XXXX] |
+2598	    | 15163      | ms-visio                             | [RFC-XXXX] |
+2599	    | 15202      | cid                                  | [RFC-XXXX] |
+2600	    | 15206      | unreal                               | [RFC-XXXX] |
+2601	    | 15230      | tool                                 | [RFC-XXXX] |
+2602	    | 15254      | ms-secondary-screen-setup            | [RFC-XXXX] |
+2603	    | 15267      | rtsp                                 | [RFC-XXXX] |
+2604	    | 15306      | xfire                                | [RFC-XXXX] |
+2605	    | 15358      | xmpp                                 | [RFC-XXXX] |
+2606	    | 15361      | ms-settings-cellular                 | [RFC-XXXX] |
+2607	    | 15461      | shelter                              | [RFC-XXXX] |
+2608	    | 15579      | v-event                              | [RFC-XXXX] |
+2609	    | 15639      | iris.beep                            | [RFC-XXXX] |
+2610	    | 15641      | wyciwyg                              | [RFC-XXXX] |
+2611	    | 15645      | ms-meetnow                           | [RFC-XXXX] |
+2612	    | 15679      | ms-search-repair                     | [RFC-XXXX] |
+2613	    | 15741      | wasm                                 | [RFC-XXXX] |
+2614	    | 15773      | ms-settings-camera                   | [RFC-XXXX] |
+2615	    | 15776      | ms-virtualtouchpad                   | [RFC-XXXX] |
+2616	    | 15805      | xmlrpc.beeps                         | [RFC-XXXX] |
+2617	    | 15972      | ipfs                                 | [RFC-XXXX] |
+2618	    | 15994      | ms-settings-wifi                     | [RFC-XXXX] |
+2619	    | 16051      | aw                                   | [RFC-XXXX] |
+2620	    | 16069      | first-run-pen-experience             | [RFC-XXXX] |
+2621	    | 16079      | oid                                  | [RFC-XXXX] |
+2622	    | 16134      | iris.xpcs                            | [RFC-XXXX] |
+2623	    | 16138      | drop                                 | [RFC-XXXX] |
+2624	    | 16194      | ms-publisher                         | [RFC-XXXX] |
+2625	    | 16281      | leaptofrogans                        | [RFC-XXXX] |
+2626	    | 16292      | rmi                                  | [RFC-XXXX] |
+2627	    | 16300      | soap.beeps                           | [RFC-XXXX] |
+2628	    | 16377      | tag                                  | [RFC-XXXX] |
+2629	    | 16585      | ms-word                              | [RFC-XXXX] |
+2630	    | 16632      | onenote-cmd                          | [RFC-XXXX] |
+2631	    | 16645      | ms-powerpoint                        | [RFC-XXXX] |
+2632	    | 16728      | hxxp                                 | [RFC-XXXX] |
+2633	    | 16729      | secondlife                           | [RFC-XXXX] |
+2634	    | 16884      | rsync                                | [RFC-XXXX] |
+2635	    | 16918      | vemmi                                | [RFC-XXXX] |
+2636	    | 16933      | ipns                                 | [RFC-XXXX] |
+2637	    | 17039      | swh                                  | [RFC-XXXX] |
+2638	    | 17068      | pwid                                 | [RFC-XXXX] |
+2639	    | 17097      | dtmi                                 | [RFC-XXXX] |
+2640	    | 17134      | dis                                  | [RFC-XXXX] |
+2641	    | 17170      | iotdisco                             | [RFC-XXXX] |
+2642	    | 17175      | ms-restoretabcompanion               | [RFC-XXXX] |
+2643	    | 17264      | service                              | [RFC-XXXX] |
+2644	    | 17315      | finger                               | [RFC-XXXX] |
+2645	    | 17361      | web+ap                               | [RFC-XXXX] |
+2646	    | 17381      | ms-eyecontrolspeech                  | [RFC-XXXX] |
+2647	    +------------+--------------------------------------+------------+
+
+2649	             Table 11: Mapping Scheme Numbers to Scheme Names
+
+2651	   The assignments from this table can be extracted from the XML form of
+2652	   this document (when stored in a file "this.xml") into CSV form
+2653	   [RFC4180] using this short Ruby program:
+
+2655	   require 'rexml/document'; include REXML
+2656	   XPath.each(Document.new(File.read("this.xml")),"/rfc/back//tr") {|r|
+2657	     puts XPath.each(r,"td").map{|d|d.text()}[0..1].join(",")}
+
+2659	Appendix D.  Change Log
+
+2661	   This section is to be removed before publishing as an RFC.
+
+2663	   Changes from -16 to -17
+
+2665	   (Provisional integration of active PRs, please see github.)
+
+2667	   Changes from -15 to -16
+
+2669	   *  Add note that CRI Scheme Number registrations are oblivious of the
+2670	      actual URI Scheme registrations (if any).
+
+2672	   *  Add information about how this RFC updates RFC7595 to abstract and
+2673	      introduction.
+
+2675	   Changes from -14 to -15
+
+2677	   *  Make scheme numbers unsigned and map them to negative numbers used
+2678	      as scheme-id values
+
+2680	   Changes from -09 to -14
+
+2682	   *  Editorial changes; move some examples to Appendix A, break up
+2683	      railroad diagram; mention commonalities with (and tiny difference
+2684	      from) CoAP Options; mention failure of percent-encoding for dots
+2685	      in host-name components
+
+2687	   *  Explicitly mention invalid case in Section 2.3, Paragraph 5, Item
+2688	      3 (rootless CRIs without authority that do not have a path
+2689	      component)
+
+2691	   *  Generalize Section 7, discuss PET (percent-encoded text) extension
+2692	      in more detail
+
+2694	   *  Add registry of URI scheme numbers (Appendix C, Section 11)
+
+2696	   *  Add user information to the authority ("userinfo" feature)
+
+2698	   *  Figure 2: Use separate rule for CRI, allow [] for query in CRI
+2699	      Reference; generalize scheme numbers, add userinfo; add list of
+2700	      additional requirements in prose (Section 5.1, Paragraph 7)
+
+2702	   *  Discuss Error handling and extensibility (Section 5.2.1)
+
+2704	   *  Conversion to URI: Handle : in first pathname component of a CRI-
+2705	      Reference (Section 6.1, Paragraph 6.2.1)
+
+2707	   *  Add Christian Amsüss as contributor
+
+2709	   *  Add CBOR EDN application-extension "cri" (see Appendix B and
+2710	      Section 11.3).
+
+2712	   *  Add Section on CoAP integration (and new CoAP Options Proxy-Cri
+2713	      and Proxy-Scheme-Number).
+
+2715	   Changes from -08 to -09
+
+2717	   *  Identify more esoteric features with a CDDL ".feature".
+
+2719	   *  Clarify that well-formedness requires removing trailing nulls.
+
+2721	   *  Fragments can contain PET.
+
+2723	   *  Percent-encoded text in PET is treated as byte strings.
+
+2725	   *  URIs with an authority but a completely empty path (e.g.,
+2726	      http://example.com): CRIs with an authority component no longer
+2727	      always produce at least a slash in the path component.
+
+2729	      For generic schemes, the conversion of scheme://example.com to a
+2730	      CRI is now possible because CRI produces a URI with an authority
+2731	      not followed by a slash following the updated rules of
+2732	      Section 6.1.  Schemes like http and coap do not distinguish
+2733	      between the empty path and the path containing a single slash when
+2734	      an authority is set (as recommended in [STD66]).  For these
+2735	      schemes, that equivalence allows implementations to convert the
+2736	      just-a-slash URI to a CRI with a zero length path array (which,
+2737	      however, when converted back, does not produce a slash after the
+2738	      authority).
+
+2740	      (Add an appendix "the small print" for more detailed discussion of
+2741	      pesky corner cases like this.)
+
+2743	   Changes from -07 to -08
+
+2745	   *  Fix the encoding of NOAUTH-NOSLASH / NOAUTH-LEADINGSLASH
+
+2747	   *  Add URN and DID schemes, add example.
+
+2749	   *  Add PET
+
+2751	   *  Remove hopeless attempt to encode "remote trailing nulls" rule in
+2752	      CDDL (which is not a transformation language).
+
+2754	   Changes from -06 to -07
+
+2756	   *  More explicitly discuss constraints (Section 2), add examples
+2757	      (Appendix A, Paragraph 7, Item 1).
+
+2759	   *  Make CDDL more explicit about special simple values.
+
+2761	   *  Lots of gratuitous changes from XML2RFC redefinition of <tt>
+2762	      semantics.
+
+2764	   Changes from -05 to -06
+
+2766	   *  rework authority:
+
+2768	      -  split reg-names at dots;
+
+2770	      -  add optional zone identifiers [RFC4007] to IP addresses
+
+2772	   Changes from -04 to -05
+
+2774	   *  Simplify CBOR structure.
+
+2776	   *  Add implementation status section.
+
+2778	   Changes from -03 to -04:
+
+2780	   *  Minor editorial improvements.
+
+2782	   *  Renamed path.type/path-type to discard.
+
+2784	   *  Renamed option to section, substructured into items.
+
+2786	   *  Simplified the table "resolution-variables".
+
+2788	   *  Use the CBOR structure inspired by Jim Schaad's proposals.
+
+2790	   Changes from -02 to -03:
+
+2792	   *  Expanded the set of supported schemes (#3).
+
+2794	   *  Specified creation, normalization and comparison (#9).
+
+2796	   *  Clarified the default value of the path.type option (#33).
+
+2798	   *  Removed the append-relation path.type option (#41).
+
+2800	   *  Renumbered the remaining path.types.
+
+2802	   *  Renumbered the option numbers.
+
+2804	   *  Restructured the document.
+
+2806	   *  Minor editorial improvements.
+
+2808	   Changes from -01 to -02:
+
+2810	   *  Changed the syntax of schemes to exclude upper case characters
+2811	      (#13).
+
+2813	   *  Minor editorial improvements (#34 #37).
+
+2815	   Changes from -00 to -01:
+
+2817	   *  None.
+
+2819	Acknowledgements
+
+2821	   CRIs were developed by Klaus Hartke for use in the Constrained
+2822	   RESTful Application Language (CoRAL).  The current author team is
+2823	   completing this work with a view to achieve good integration with the
+2824	   potential use cases, both inside and outside of CoRAL.
+
+2826	   Thanks to Christian Amsüss, Thomas Fossati, Ari Keränen, Jim Schaad,
+2827	   Dave Thaler, and Marco Tiloca for helpful comments and discussions
+2828	   that have shaped the document, as well as to the reviewers Mike
+2829	   Bishop and Arnt Gulbrandsen that added useful perspective during the
+2830	   IESG stage.
+
+2832	Contributors
+2833	   Klaus Hartke
+2834	   Ericsson
+2835	   Torshamnsgatan 23
+2836	   SE-16483 Stockholm
+2837	   Sweden
+2838	   Email: klaus.hartke@ericsson.com
+
+2840	   Christian Amsüss
+2841	   Austria
+2842	   Email: christian@amsuess.com
+
+2844	Authors' Addresses
+
+2846	   Carsten Bormann (editor)
+2847	   Universität Bremen TZI
+2848	   Postfach 330440
+2849	   D-28359 Bremen
+2850	   Germany
+2851	   Phone: +49-421-218-63921
+2852	   Email: cabo@tzi.org
+
+2854	   Henk Birkholz
+2855	   Fraunhofer SIT
+2856	   Rheinstrasse 75
+2857	   64295 Darmstadt
+2858	   Germany
+2859	   Email: henk.birkholz@sit.fraunhofer.de
+
+
+
+
+
+
+
+
+
