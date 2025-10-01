@@ -1,0 +1,211 @@
+# Document Shepherd Write-Up for Group Documents
+
+*The revision of the template used here is dated 4 July 2022.*
+
+## Document History
+
+1. Does the working group (WG) consensus represent the strong concurrence of a
+few individuals, with others being silent, or did it reach broad agreement?
+
+This is a substantial document addressing a somewhat specialized topic
+(multicast), so there is no surprise that there were only about four
+responses (all positive) to the second WGLC, albeit with several
+detailed reviews coming in earlier.
+
+2. Was there controversy about particular points, or were there decisions where
+the consensus was particularly rough?
+
+No.
+
+3. Has anyone threatened an appeal or otherwise indicated extreme discontent? If
+so, please summarize the areas of conflict in separate email messages to the
+responsible Area Director. (It should be in a separate email because this
+questionnaire is publicly available.)
+
+No.
+
+4. For protocol documents, are there existing implementations of the contents of
+the document? Have a significant number of potential implementers indicated
+plans to implement? Are any existing implementations reported somewhere,
+either in the document itself (as [<a href="/doc/rfc7942/">RFC 7942</a>][3] recommends) or elsewhere
+(where)?
+
+Yes.  Multicast CoAP is sufficiently entrenched that we didn't do a
+survey of existing implementations.  For these, the document provides
+information that will aid in their further development; several
+implementers have contributed reviews.
+
+## Additional Reviews
+
+5. Do the contents of this document closely interact with technologies in other
+IETF working groups or external organizations, and would it therefore benefit
+from their review? Have those reviews occurred? If yes, describe which
+reviews took place.
+
+The main technology outside of the CoRE WG this document interacts is
+IP multicast.  As the document is based on extensive implementation
+experience, we expect the usual directorate review to be sufficient.
+(The document also interacts with LAKE via OSCORE; several main LAKE
+contributors have reviewed, one is co-author.)
+
+6. Describe how the document meets any required formal expert review criteria,
+such as the MIB Doctor, YANG Doctor, media type, and URI type reviews.
+
+N/A
+
+7. If the document contains a YANG module, has the final version of the module
+been checked with any of the [recommended validation tools][4] for syntax and
+formatting validation? If there are any resulting errors or warnings, what is
+the justification for not fixing them at this time? Does the YANG module
+comply with the Network Management Datastore Architecture (NMDA) as specified
+in [<a href="/doc/rfc8342/">RFC 8342</a>][5]?
+
+N/A
+
+8. Describe reviews and automated checks performed to validate sections of the
+final version of the document written in a formal language, such as XML code,
+BNF rules, MIB definitions, CBOR's CDDL, etc.
+
+N/A
+
+## Document Shepherd Checks
+
+9. Based on the shepherd's review of the document, is it their opinion that this
+document is needed, clearly written, complete, correctly designed, and ready
+to be handed off to the responsible Area Director?
+
+Yes.
+
+10. Several IETF Areas have assembled [lists of common issues that their
+reviewers encounter][6]. For which areas have such issues been identified
+and addressed? For which does this still need to happen in subsequent
+reviews?
+
+The document interacts with such common issues mainly in the
+applications (ART), Internet (INT) and transport/transfer (WIT) areas.
+These issues have been a good part of the discussion in the WG and are
+believed to be properly addressed.
+
+11. What type of RFC publication is being requested on the IETF stream ([Best
+Current Practice][12], [Proposed Standard, Internet Standard][13],
+[Informational, Experimental or Historic][14])? Why is this the proper type
+of RFC? Do all Datatracker state attributes correctly reflect this intent?
+
+Proposed Standard, replacing <a href="/doc/rfc7390/">RFC 7390</a> which was Experimental.
+(Not all proposals in <a href="/doc/rfc7390/">RFC 7390</a> are part of this draft.)
+
+12. Have reasonable efforts been made to remind all authors of the intellectual
+property rights (IPR) disclosure obligations described in [<a href="/doc/bcp79/">BCP 79</a>][7]? To
+the best of your knowledge, have all required disclosures been filed? If
+not, explain why. If yes, summarize any relevant discussion, including links
+to publicly-available messages when applicable.
+
+Yes; authors (including a previous co-author) have replied to the IPR
+query that was issued with the WGLC.  No disclosures have been filed.
+
+13. Has each author, editor, and contributor shown their willingness to be
+listed as such? If the total number of authors and editors on the front page
+is greater than five, please provide a justification.
+
+Yes.  (We reduced the number of co-authors to two in the step from -12
+to -13.)
+
+14. Document any remaining I-D nits in this document. Simply running the [idnits
+tool][8] is not enough; please review the ["Content Guidelines" on
+<a href="http://authors.ietf.org">authors.ietf.org</a>][15]. (Also note that the current idnits tool generates
+some incorrect warnings; a rewrite is underway.)
+
+The idnits tool has several warnings about artwork being wide enough
+to be outdented, which we believe do not need action.
+
+There are two normative references to an Informational RFC: <a href="/doc/rfc7967/">RFC 7967</a>
+and <a href="/doc/rfc9053/">RFC 9053</a>.  (see 15, 17.)
+
+15. Should any informative references be normative or vice-versa? See the [IESG
+Statement on Normative and Informative References][16].
+
+<a href="/doc/rfc9053/">RFC 9053</a> is listed as a normative reference although only becomes
+normative through its use in normative references of this document.
+We believe listing it in the normative references could prevent
+surprises by readers that do not follow through on all normative
+references.
+
+16. List any normative references that are not freely available to anyone. Did
+the community have sufficient access to review any such normative
+references?
+
+(No such normative references.)
+
+17. Are there any normative downward references (see [<a href="/doc/rfc3967/">RFC 3967</a>][9] and [<a href="/doc/bcp97/">BCP
+97</a>][10]) that are not already listed in the [DOWNREF registry][17]? If so,
+list them.
+Yes.
+There are downreferences to:
+
+* <a href="/doc/rfc7967/">RFC 7967</a>, which is an Independent Stream document that exercises an
+extension point of <a href="/doc/rfc7252/">RFC 7252</a>; the new option 258 (No-Response) has
+since turned out to be useful in controlling a potential avalanche
+of responses to a multicast request.  Its use is therefore suggested
+in the passages dealing with amplification attacks.
+
+* <a href="/doc/draft-ietf-core-oscore-groupcomm/">draft-ietf-core-oscore-groupcomm</a>, which should be processed in a
+cluster with this document.
+
+* <a href="/doc/rfc9053/">RFC 9053</a> (COSE algorithms), which is mostly used by
+<a href="/doc/draft-ietf-core-oscore-groupcomm/">draft-ietf-core-oscore-groupcomm</a> but is listed as a normative
+reference here as well.
+
+18. Are there normative references to documents that are not ready to be
+submitted to the IESG for publication or are otherwise in an unclear state?
+If so, what is the plan for their completion?
+
+(<a href="/doc/draft-ietf-core-oscore-groupcomm/">draft-ietf-core-oscore-groupcomm</a> is expected to be submitted in close
+temporal proximity to this document.)
+
+19. Will publication of this document change the status of any existing RFCs? If
+so, does the Datatracker metadata correctly reflect this and are those RFCs
+listed on the title page, in the abstract, and discussed in the
+introduction? If not, explain why and point to the part of the document
+where the relationship of this document to these other RFCs is discussed.
+
+This document obsoletes <a href="/doc/rfc7390/">RFC 7390</a> (experimental RFC); it also updates <a href="/doc/rfc7252/">RFC 7252</a>
+and <a href="/doc/rfc7641/">RFC 7641</a>. This is listed on the title page and further explained in
+abstract and intro; Section 1.3 then goes into more details.
+
+20. Describe the document shepherd's review of the IANA considerations section,
+especially with regard to its consistency with the body of the document.
+Confirm that all aspects of the document requiring IANA assignments are
+associated with the appropriate reservations in IANA registries. Confirm
+that any referenced IANA registries have been clearly identified. Confirm
+that each newly created IANA registry specifies its initial contents,
+allocations procedures, and a reasonable name (see [<a href="/doc/rfc8126/">RFC 8126</a>][11]).
+
+This document has no actions for IANA.
+(It suggests making use of a registry established by <a href="/doc/rfc6690/">RFC 6690</a> in the
+"Constrained RESTful Environments (CoRE) Parameters" registry group,
+but these would be separate actions.)
+
+21. List any new IANA registries that require Designated Expert Review for
+future allocations. Are the instructions to the Designated Expert clear?
+Please include suggestions of designated experts, if appropriate.
+
+This document has no actions for IANA.
+
+[1]: <a href="https://www.ietf.org/about/groups/iesg/">https://www.ietf.org/about/groups/iesg/</a>
+[2]: <a href="https://www.rfc-editor.org/rfc/rfc4858.html">https://www.rfc-editor.org/rfc/rfc4858.html</a>
+[3]: <a href="https://www.rfc-editor.org/rfc/rfc7942.html">https://www.rfc-editor.org/rfc/rfc7942.html</a>
+[4]: <a href="https://wiki.ietf.org/group/ops/yang-review-tools">https://wiki.ietf.org/group/ops/yang-review-tools</a>
+[5]: <a href="https://www.rfc-editor.org/rfc/rfc8342.html">https://www.rfc-editor.org/rfc/rfc8342.html</a>
+[6]: <a href="https://wiki.ietf.org/group/iesg/ExpertTopics">https://wiki.ietf.org/group/iesg/ExpertTopics</a>
+[7]: <a href="https://www.rfc-editor.org/info/bcp79">https://www.rfc-editor.org/info/bcp79</a>
+[8]: <a href="https://www.ietf.org/tools/idnits/">https://www.ietf.org/tools/idnits/</a>
+[9]: <a href="https://www.rfc-editor.org/rfc/rfc3967.html">https://www.rfc-editor.org/rfc/rfc3967.html</a>
+[10]: <a href="https://www.rfc-editor.org/info/bcp97">https://www.rfc-editor.org/info/bcp97</a>
+[11]: <a href="https://www.rfc-editor.org/rfc/rfc8126.html">https://www.rfc-editor.org/rfc/rfc8126.html</a>
+[12]: <a href="https://www.rfc-editor.org/rfc/rfc2026.html#section-5">https://www.rfc-editor.org/rfc/rfc2026.html#section-5</a>
+[13]: <a href="https://www.rfc-editor.org/rfc/rfc2026.html#section-4.1">https://www.rfc-editor.org/rfc/rfc2026.html#section-4.1</a>
+[14]: <a href="https://www.rfc-editor.org/rfc/rfc2026.html#section-4.2">https://www.rfc-editor.org/rfc/rfc2026.html#section-4.2</a>
+[15]: <a href="https://authors.ietf.org/en/content-guidelines-overview">https://authors.ietf.org/en/content-guidelines-overview</a>
+[16]:
+<a href="https://www.ietf.org/about/groups/iesg/statements/normative-informative-references/">https://www.ietf.org/about/groups/iesg/statements/normative-informative-references/</a>
+[17]: <a href="https://datatracker.ietf.org/doc/downref/">https://datatracker.ietf.org/doc/downref/</a>
