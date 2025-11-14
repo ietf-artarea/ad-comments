@@ -1,0 +1,844 @@
+idnits 2.17.1 
+
+draft-ietf-dmarc-failure-reporting-20.txt:
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     No nits found.
+--------------------------------------------------------------------------------
+
+
+2	DMARC                                                      S. Jones (ed)
+3	Internet-Draft                                                 DMARC.org
+4	Obsoletes: 7489 (if approved)                             A. Vesely (ed)
+5	Updates: 6591 (if approved)                                         Tana
+6	Intended status: Standards Track                         7 November 2025
+7	Expires: 11 May 2026
+
+9	Domain-based Message Authentication, Reporting, and Conformance (DMARC)
+10	                           Failure Reporting
+11	                 draft-ietf-dmarc-failure-reporting-20
+
+13	Abstract
+
+15	   Domain-based Message Authentication, Reporting, and Conformance
+16	   (DMARC) is a mechanism by which a Domain Owner can request feedback
+17	   about email messages using their domain in the From: address field.
+18	   This document describes "failure reports," or "failed message
+19	   reports", which provide details about individual messages that failed
+20	   to authenticate according to the DMARC mechanism.
+
+22	Status of This Memo
+
+24	   This Internet-Draft is submitted in full conformance with the
+25	   provisions of BCP 78 and BCP 79.
+
+27	   Internet-Drafts are working documents of the Internet Engineering
+28	   Task Force (IETF).  Note that other groups may also distribute
+29	   working documents as Internet-Drafts.  The list of current Internet-
+30	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+32	   Internet-Drafts are draft documents valid for a maximum of six months
+33	   and may be updated, replaced, or obsoleted by other documents at any
+34	   time.  It is inappropriate to use Internet-Drafts as reference
+35	   material or to cite them other than as "work in progress."
+
+37	   This Internet-Draft will expire on 11 May 2026.
+
+39	Copyright Notice
+
+41	   Copyright (c) 2025 IETF Trust and the persons identified as the
+42	   document authors.  All rights reserved.
+
+44	   This document is subject to BCP 78 and the IETF Trust's Legal
+45	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+46	   license-info) in effect on the date of publication of this document.
+47	   Please review these documents carefully, as they describe your rights
+48	   and restrictions with respect to this document.  Code Components
+49	   extracted from this document must include Revised BSD License text as
+50	   described in Section 4.e of the Trust Legal Provisions and are
+51	   provided without warranty as described in the Revised BSD License.
+
+53	Table of Contents
+
+55	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
+56	     1.1.  Terminology . . . . . . . . . . . . . . . . . . . . . . .   3
+57	   2.  DMARC Failure Reports . . . . . . . . . . . . . . . . . . . .   4
+58	   3.  Other Failure Reports . . . . . . . . . . . . . . . . . . . .   5
+59	   4.  Reporting Format Update . . . . . . . . . . . . . . . . . . .   5
+60	   5.  Verifying External Destinations . . . . . . . . . . . . . . .   6
+61	     5.1.  Transport . . . . . . . . . . . . . . . . . . . . . . . .   7
+62	   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   7
+63	     6.1.  Feedback Report Header Fields Registry Update . . . . . .   7
+64	   7.  Privacy Considerations  . . . . . . . . . . . . . . . . . . .   7
+65	     7.1.  Data Exposure Considerations  . . . . . . . . . . . . . .   8
+66	     7.2.  Report Recipients . . . . . . . . . . . . . . . . . . . .   8
+67	     7.3.  Additional Damage . . . . . . . . . . . . . . . . . . . .   9
+68	   8.  Security Considerations . . . . . . . . . . . . . . . . . . .   9
+69	   9.  Normative References  . . . . . . . . . . . . . . . . . . . .   9
+70	   10. Informative References  . . . . . . . . . . . . . . . . . . .  11
+71	   Appendix A.  Example Failure Report . . . . . . . . . . . . . . .  11
+72	   Appendix B.  Change Log {change-log}  . . . . . . . . . . . . . .  14
+73	     B.1.  00 to 01  . . . . . . . . . . . . . . . . . . . . . . . .  15
+74	     B.2.  01 to 02  . . . . . . . . . . . . . . . . . . . . . . . .  15
+75	     B.3.  02 to 03  . . . . . . . . . . . . . . . . . . . . . . . .  15
+76	     B.4.  03 to 04  . . . . . . . . . . . . . . . . . . . . . . . .  16
+77	     B.5.  04 to 05  . . . . . . . . . . . . . . . . . . . . . . . .  16
+78	     B.6.  05 to 06  . . . . . . . . . . . . . . . . . . . . . . . .  16
+79	     B.7.  06 to 07  . . . . . . . . . . . . . . . . . . . . . . . .  16
+80	     B.8.  07 to 08  . . . . . . . . . . . . . . . . . . . . . . . .  16
+81	     B.9.  08 to 09  . . . . . . . . . . . . . . . . . . . . . . . .  16
+82	     B.10. 09 to 10  . . . . . . . . . . . . . . . . . . . . . . . .  16
+83	     B.11. 10 to 11  . . . . . . . . . . . . . . . . . . . . . . . .  16
+84	     B.12. 11 to 12  . . . . . . . . . . . . . . . . . . . . . . . .  17
+85	     B.13. 12 to 13  . . . . . . . . . . . . . . . . . . . . . . . .  17
+86	     B.14. 13 to 14  . . . . . . . . . . . . . . . . . . . . . . . .  17
+87	     B.15. 14 to 15  . . . . . . . . . . . . . . . . . . . . . . . .  17
+88	     B.16. 15 to 16  . . . . . . . . . . . . . . . . . . . . . . . .  17
+89	     B.17. 16 to 17  . . . . . . . . . . . . . . . . . . . . . . . .  17
+90	     B.18. 17 to 18  . . . . . . . . . . . . . . . . . . . . . . . .  17
+91	     B.19. 18 to 19  . . . . . . . . . . . . . . . . . . . . . . . .  17
+92	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  18
+
+94	1.  Introduction
+
+96	   RFC EDITOR: PLEASE REMOVE THE FOLLOWING PARAGRAPH BEFORE PUBLISHING:
+97	   The source for this draft is maintained in GitHub at:
+98	   https://github.com/ietf-wg-dmarc/draft-ietf-dmarc-failure-reporting
+99	   (https://github.com/ietf-wg-dmarc/draft-ietf-dmarc-failure-reporting)
+
+101	   Domain-based Message Authentication, Reporting, and Conformance
+102	   (DMARC) [I-D.ietf-dmarc-dmarcbis] is a mechanism by which a mail-
+103	   originating organization can express domain-level policies and
+104	   preferences for message validation, disposition, and reporting, that
+105	   a mail-receiving organization can use to improve mail handling.  This
+106	   document focuses on one type of reporting that can be requested under
+107	   DMARC.
+
+109	   Failure reports provide detailed information about the failure of a
+110	   single message, or a group of similar messages failing for the same
+111	   reason.  Their purpose is twofold.  On the one hand they are meant to
+112	   aid in cases where a Domain Owner wishes to determine the cause of
+113	   failures that were part of aggregate reports (see
+114	   [I-D.ietf-dmarc-aggregate-reporting]).  On the other hand, they can
+115	   allow the Domain Owner to quickly identify and address harmful
+116	   messages involving direct domain abuse.  It is important to note that
+117	   these reports can contain the header fields or sometimes the entire
+118	   content of a failed message, which may contain personally
+119	   identifiable information (PII).  The potential disclosure of PII
+120	   should be considered when deciding whether to request failure reports
+121	   as a Domain Owner, or what information to include or redact in
+122	   failure reports when creating them as a Mail Receiver, or whether to
+123	   create failure reports at all; see Section 7.
+
+125	1.1.  Terminology
+
+127	   There are a number of terms defined in Section 3.2 of
+128	   [I-D.ietf-dmarc-dmarcbis] that are used within this document.
+129	   Understanding those definitions will aid in reading this document.
+
+131	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+132	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+133	   "OPTIONAL" in this document are to be interpreted as described in BCP
+134	   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+135	   capitals, as shown here.
+
+137	2.  DMARC Failure Reports
+
+139	   Besides the header fields or the entire contents of a failed message,
+140	   failure reports supply details about transmission and DMARC
+141	   authentication, which may aid the Domain Owner in determining the
+142	   cause of an authentication failure.
+
+144	   Failure reports are normally generated and sent almost immediately
+145	   after the Mail Receiver detects a DMARC failure.  Rather than waiting
+146	   for an aggregate report, these reports are useful for quickly
+147	   notifying the Domain Owners when there is an authentication failure.
+148	   Failure reports also provide more information about the failed
+149	   message than is available in an aggregate report.  This allows the
+150	   failure report consumer to better determine whether the failure is of
+151	   a message that the domain owner intended to authenticate or one for
+152	   which use of its domain was not authorized.
+
+154	   These reports should include as much of the message header fields and
+155	   body as possible, consistent with the reporting party's privacy
+156	   policies, to enable the Domain Owner to diagnose the authentication
+157	   failure.
+
+159	   When a Domain Owner requests failure reports for the purpose of
+160	   forensic analysis, and the Mail Receiver is willing to provide such
+161	   reports, the Mail Receiver generates and sends a message using the
+162	   format described in [RFC6591]; this document updates that reporting
+163	   format, as described in Section 4.
+
+165	   The destination(s) to which failure reports are sent, and options for
+166	   when they will be sent, are defined by the "ruf" and "fo" tags as
+167	   defined in Section 4.7 of [I-D.ietf-dmarc-dmarcbis].
+
+169	   When multiple URIs are provided to receive failure reports, the
+170	   report generator MUST make an attempt to deliver to each of them.
+171	   External destinations MUST be verified, see Section 5.  Report
+172	   generators MUST NOT consider "ruf" tags in DMARC Policy Records
+173	   having a "psd=y" tag, unless there are specific agreements between
+174	   the interested parties.
+
+176	   Failure reports represent a possible denial-of-service attack that
+177	   could be perpetrated by an attacker who sends numerous messages
+178	   purporting to be from the intended victim Domain Owner but which fail
+179	   both SPF and DKIM; this would cause participating Mail Receivers to
+180	   send failure reports to the Domain Owner or its delegate(s),
+181	   potentially in large numbers.  Accordingly, participating Mail
+182	   Receivers are encouraged to aggregate these reports as much as is
+183	   practical, using the Incidents field of the Abuse Reporting Format
+184	   [RFC5965].  Indeed, the aim is not to count each and every failure,
+185	   but rather to report different failure conditions.  Various pruning
+186	   techniques are possible, including the following:
+
+188	   *  store reports for a period of time before sending them, allowing
+189	      detection, collection, and consolidation of like incidents;
+
+191	   *  apply rate limiting, such as a maximum number of reports per
+192	      minute that will be generated (and the remainder discarded.)
+
+194	3.  Other Failure Reports
+
+196	   This document describes only DMARC failure reports.  DKIM failure
+197	   reports and SPF failure reports are described in [RFC6591].  A Mail
+198	   Receiver generating DMARC failure reports MAY issue failure reports
+199	   specific to the failed authentication mechanism instead of, or in
+200	   addition to, DMARC failure reports, based on its own policy, the
+201	   failure in question, and the content of the "fo" tag in the retrieved
+202	   DMARC Policy Record.
+
+204	   Note that DKIM failure reports and SPF failure reports can also be
+205	   requested using the methods described in [RFC6651] and [RFC6652]
+206	   respectively.  Report Generators are free to follow any of the
+207	   specifications.
+
+209	4.  Reporting Format Update
+
+211	   Operators implementing this specification also implement an augmented
+212	   version of [RFC6591] as follows:
+
+214	   1.  A DMARC failure report includes the following ARF header fields,
+215	       with the indicated normative requirement levels:
+
+217	       *  Identity-Alignment (REQUIRED; defined below)
+
+219	       *  Delivery-Result (OPTIONAL)
+
+221	       *  DKIM-Domain, DKIM-Identity, DKIM-Selector (REQUIRED for DKIM
+222	          failures of an aligned identifier)
+
+224	       *  DKIM-Canonicalized-Header, DKIM-Canonicalized-Body (OPTIONAL
+225	          if reporting a DKIM failure)
+
+227	       *  SPF-DNS (REQUIRED for SPF failure of an aligned identifier)
+
+229	   2.  The "Identity-Alignment" field is defined to contain a comma-
+230	       separated list of authentication mechanism names that failed to
+231	       authenticate an aligned identity, or the keyword "none" if none
+232	       did.  ABNF ([RFC5234]):
+
+234	   id-align     = "Identity-Alignment:" [CFWS]
+235	                    ( "none" /
+236	                      dmarc-method *( [CFWS] "," [CFWS] dmarc-method ) )
+237	                    [CFWS]
+
+239	   dmarc-method = ( "dkim" / "spf" )
+240	                    ; each may appear at most once in an id-align
+
+242	   3.  Authentication Failure Type "dmarc" is defined for the Auth-
+243	       Failure field, which is to be used when a failure report is
+244	       generated because some or all of the authentication mechanisms
+245	       failed to produce aligned identifiers.  Note that a failure
+246	       report generator MAY also independently produce an ARF message
+247	       for any or all of the underlying authentication methods.
+
+249	5.  Verifying External Destinations
+
+251	   It is possible to specify destinations for failure reports that are
+252	   outside of the Organizational Domain of the DMARC Policy Record that
+253	   was requesting the reports.  These destinations are commonly referred
+254	   to as "external destinations" and may represent a different domain
+255	   controlled by the same organization, a contracted report processing
+256	   service, or some other arrangement.
+
+258	   Without this check, a bad actor could publish a DMARC Policy Record
+259	   that requests that failure reports be sent to an external
+260	   destination, then deliberately send messages that will generate
+261	   failure reports as a form of abuse.  Or, a Domain Owner could
+262	   incorrectly publish a DMARC Policy Record with an external
+263	   destination for failure reports, forcing the external destination to
+264	   deal with unwanted messages and potential privacy issues.
+
+266	   Therefore, in case of external destinations, a Mail Receiver who
+267	   generates failure reports MUST use the Verifying External
+268	   Destinations procedure described in Section 4 of
+269	   [I-D.ietf-dmarc-aggregate-reporting], substituting the "ruf" tag
+270	   where the "rua" tag appears in that procedure.`
+
+272	5.1.  Transport
+
+274	   Email streams carrying DMARC failure reports SHOULD be DMARC aligned.
+
+276	   Reporters MAY rate limit the number of failure reports sent to any
+277	   recipient to avoid overloading recipient systems.  Unaligned reports
+278	   may in turn produce subsequent failure reports that could cause mail
+279	   loops.
+
+281	6.  IANA Considerations
+
+283	6.1.  Feedback Report Header Fields Registry Update
+
+285	   IANA is requested to change the "Identity-Alignment" entry in the
+286	   "Feedback Report Header Fields" registry, which is part of
+287	   ""Messaging Abuse Reporting Format" registry, to refer to this
+288	   document.
+
+290	7.  Privacy Considerations
+
+292	   The generation and transmission of DMARC failure reports raise
+293	   significant privacy concerns that must be carefully considered before
+294	   deployment.
+
+296	   Given these factors, many large-scale providers limit or entirely
+297	   disable the generation of failure reports, preferring to rely on
+298	   aggregate reports, which provide statistical visibility without
+299	   exposing sensitive content.  Operators that choose to enable failure
+300	   reporting are strongly encouraged to:
+
+302	   *  Limit the scope and duration of use to targeted diagnostic
+303	      activities.
+304	   *  Ensure that reporting URIs are carefully controlled and validated.
+305	   *  Apply minimization techniques, such as redaction of message bodies
+306	      and header fields, to reduce sensitive data exposure.
+307	   *  Always transmit reports over secure channels.
+
+309	   In summary, while DMARC failure reports can offer diagnostic value,
+310	   the associated privacy concerns have led many operators to restrict
+311	   their use.  Aggregate reports remain the recommended mechanism for
+312	   gaining visibility into authentication results while preserving the
+313	   confidentiality of end-user communications.
+
+315	   Particular privacy-specific issues are explored below.
+
+317	7.1.  Data Exposure Considerations
+
+319	   Failure reports may include PII and non-public information (NPI) from
+320	   messages that fail to authenticate, since these reports may contain
+321	   message content as well as trace header fields.  These reports may
+322	   expose sender and recipient identifiers (e.g. RFC5322.From
+323	   addresses), and although the [RFC5965] format used for failed-message
+324	   reporting supports redaction ([RFC6590]), failed-message reporting is
+325	   capable of exposing the entire message to the Report Consumer.  They
+326	   may also expose PII, sensitive business data, or other confidential
+327	   communications to unintended recipients.  Such exposure can create
+328	   regulatory, legal, and operational risks for both senders and
+329	   receivers.  Examples include product launches, termination notices
+330	   for employees, or calendar data.  Even innocuous-seeming failures
+331	   (such as malformed or "broken" calendar invitations) can result in
+332	   the leakage of private communications.
+
+334	   Domain Owners requesting reports will receive information about mail
+335	   using their domain, but which they did not actually cause to be sent.
+336	   This might provide valuable insight into content used in abusive
+337	   messages, but it might also expose PII or NPI from legitimate
+338	   messages mistakenly or accidentally failing authentication.
+
+340	   Information about the final destination of mail, where it might
+341	   otherwise be obscured by intermediate systems, may be exposed through
+342	   a failure report.  A commonly cited example is exposure of members of
+343	   mailing lists when one list member sends messages to the list, and
+344	   failure reports are generated when that message is delivered to other
+345	   list members.  Those failure reports would be sent to the Domain
+346	   Owner of the list member posting the message, or their delegated
+347	   Report Consumer(s).
+
+349	   Similarly, when message forwarding arrangements exist, Domain Owners
+350	   requesting reports may receive information about mail forwarded to
+351	   domains that were not originally part of their messages' recipient
+352	   list.  This means that destinations previously unknown to the Domain
+353	   Owner may now become visible.
+
+355	7.2.  Report Recipients
+
+357	   A DMARC Policy Record can specify that reports should be sent to a
+358	   Report Consumer operating on behalf of the Domain Owner.  This might
+359	   be done when the Domain Owner sends reports to an entity to monitor
+360	   mail streams for deliverability, performance issues, or abuse.
+361	   Receipt of such data by third parties may or may not be permitted by
+362	   the Mail Receiver's privacy policy, terms of use, et cetera.  Domain
+363	   Owners and Mail Receivers should both review and understand whether
+364	   their own internal policies constrain the use and transmission of
+365	   DMARC reporting.
+
+367	   Some potential exists for Report Consumers to perform traffic
+368	   analysis, making it possible to obtain metadata about the Mail
+369	   Receiver's traffic.  In addition to verifying compliance with
+370	   policies, Mail Receivers need to consider that before sending reports
+371	   to a third party.  On the other hand, a Domain Owner may publish a
+372	   destination address that appears to be an Internal Report Consumer
+373	   but is actually a forwarding address; in this case, the final
+374	   destination of a report is not guaranteed.
+
+376	7.3.  Additional Damage
+
+378	   The risks associated with failure reports are compounded by volume
+379	   and content distribution concerns.  Partially or unredacted reports
+380	   may propagate large amounts of spam, phishing, or malware content,
+381	   all of which may require special handling by Report Consumers or
+382	   other recipients to avoid incidents.  This underscores the need to
+383	   avoid misconfiguration of the destinations in the "ruf" reporting
+384	   URIs, and the suggestions for redaction in this document, for example
+385	   using the method described in [RFC6590].  And all of these concerns
+386	   are heightened for high-volume domains.  To mitigate such concerns,
+387	   the following steps should be considered:
+
+389	   By report generators:
+
+391	   *  defang URIs by substituting hxxp for http;
+392	   *  remove malicious attachments such as word documents or pdfs.
+
+394	   By report consumers:
+
+396	   *  isolate report streams from other mail streams;
+397	   *  use sandboxes in evaluating failure reports;
+398	   *  use network segmentation;
+399	   *  limit access to failure reports to authorized individuals with
+400	      appropriate security training.
+
+402	8.  Security Considerations
+
+404	   While reviewing this document and its Security Considerations, the
+405	   reader should also review the Privacy Considerations above, as well
+406	   as the Privacy Considerations and Security Considerations in sections
+407	   10 and 11 of [I-D.ietf-dmarc-dmarcbis]; and in sections 7 and 8 of
+408	   [I-D.ietf-dmarc-aggregate-reporting].
+
+410	9.  Normative References
+
+412	   [I-D.ietf-dmarc-aggregate-reporting]
+413	              Brotman, A., "Domain-based Message Authentication,
+414	              Reporting, and Conformance (DMARC) Aggregate Reporting",
+415	              Work in Progress, Internet-Draft, draft-ietf-dmarc-
+416	              aggregate-reporting-32, 17 March 2025,
+417	              <https://datatracker.ietf.org/doc/html/draft-ietf-dmarc-
+418	              aggregate-reporting-32>.
+
+420	   [I-D.ietf-dmarc-dmarcbis]
+421	              Herr, T. and J. R. Levine, "Domain-based Message
+422	              Authentication, Reporting, and Conformance (DMARC)", Work
+423	              in Progress, Internet-Draft, draft-ietf-dmarc-dmarcbis-41,
+424	              4 April 2025, <https://datatracker.ietf.org/doc/html/
+425	              draft-ietf-dmarc-dmarcbis-41>.
+
+427	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+428	              Requirement Levels", BCP 14, RFC 2119,
+429	              DOI 10.17487/RFC2119, March 1997,
+430	              <https://www.rfc-editor.org/info/rfc2119>.
+
+432	   [RFC5234]  Crocker, D., Ed. and P. Overell, "Augmented BNF for Syntax
+433	              Specifications: ABNF", STD 68, RFC 5234,
+434	              DOI 10.17487/RFC5234, January 2008,
+435	              <https://www.rfc-editor.org/info/rfc5234>.
+
+437	   [RFC5965]  Shafranovich, Y., Levine, J., and M. Kucherawy, "An
+438	              Extensible Format for Email Feedback Reports", RFC 5965,
+439	              DOI 10.17487/RFC5965, August 2010,
+440	              <https://www.rfc-editor.org/info/rfc5965>.
+
+442	   [RFC6590]  Falk, J., Ed. and M. Kucherawy, Ed., "Redaction of
+443	              Potentially Sensitive Data from Mail Abuse Reports",
+444	              RFC 6590, DOI 10.17487/RFC6590, April 2012,
+445	              <https://www.rfc-editor.org/info/rfc6590>.
+
+447	   [RFC6591]  Fontana, H., "Authentication Failure Reporting Using the
+448	              Abuse Reporting Format", RFC 6591, DOI 10.17487/RFC6591,
+449	              April 2012, <https://www.rfc-editor.org/info/rfc6591>.
+
+451	   [RFC6692]  Clayton, R. and M. Kucherawy, "Source Ports in Abuse
+452	              Reporting Format (ARF) Reports", RFC 6692,
+453	              DOI 10.17487/RFC6692, July 2012,
+454	              <https://www.rfc-editor.org/info/rfc6692>.
+
+456	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+457	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+458	              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+460	10.  Informative References
+
+462	   [RFC6651]  Kucherawy, M., "Extensions to DomainKeys Identified Mail
+463	              (DKIM) for Failure Reporting", RFC 6651,
+464	              DOI 10.17487/RFC6651, June 2012,
+465	              <https://www.rfc-editor.org/info/rfc6651>.
+
+467	   [RFC6652]  Kitterman, S., "Sender Policy Framework (SPF)
+468	              Authentication Failure Reporting Using the Abuse Reporting
+469	              Format", RFC 6652, DOI 10.17487/RFC6652, June 2012,
+470	              <https://www.rfc-editor.org/info/rfc6652>.
+
+472	Appendix A.  Example Failure Report
+
+474	   This is the full content of a failure message, including the message
+475	   header.
+
+477	   Received: from gen.example (gen.example [192.0.2.1])
+478	     (TLS: TLS1.3,256bits,ECDHE_RSA_AES_256_GCM_SHA384)
+479	     by mail.consumer.example with ESMTPS
+480	     id 00000000005DC0DD.0000442E; Tue, 19 Jul 2022 07:57:50 +0200
+481	   DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+482	     d=gen.example; s=mail; t=1658210268;
+483	     bh=rCrh1aFDE8d/Fltt8wbcu48bLOu4OM23QXqphUZPAIM=;
+484	     h=From:To:Date:Subject:From;
+485	     b=IND9JkuwF9/5841kzxMbPeej0VYimVzNKozR2R89M8eYO2zOlCBblx507Gz0YK7mE
+486	      /h6pslWm0ODBVFzLlwY9CXv4Vu62QsN0RBIXHPjEXOkoM2VCD5zCd+5i5dtCFX7Mxh
+487	      LThb2ZJ3efklbSB9RQRwxcmRvCPV7z6lt/Ds9sucVE1RDODYHjx+iWnAUQrlos6ZQb
+488	      u/YOUGjf60LPpyljfPu3EpFwo80mSHyQlP/4S5KEykgPQMgCqLPPKvJwu1aAIDj+jG
+489	      q2ylO3fmc/ERDeDWACtR67YNabEKBWtjqCRLNxKttazViJTZ5drcLfpX0853KoougX
+490	      Rltp7zdoLdy4A==
+491	   From: DMARC Filter <DMARC@gen.example>;
+492	   To: dmarcfail@consumer.example
+493	   Date: Tue, 19 Jul 2022 00:57:48 -0500 (CDT)
+494	   Subject: FW: This is the original subject
+495	   Mime-Version: 1.0
+496	   Content-Type: multipart/report; report-type=feedback-report;
+497	     boundary="=_mime_boundary_"
+498	   Message-Id: <20220719055748.4AE9D403CC@gen.example>;
+
+500	   This is a MIME-formatted message.  If you see this text it means that
+501	   your E-mail software does not support MIME-formatted messages.
+
+503	   --=_mime_boundary_
+504	   Content-Type: text/plain; charset=utf-8
+505	   Content-Disposition: inline
+506	   Content-Transfer-Encoding: 7bit
+507	   This is an authentication failure report for an email message
+508	   received from IP 192.0.2.2 on Tue, 19 Jul 2022 00:57:48 -0500.
+
+510	   --=_mime_boundary_
+511	   Content-Type: message/feedback-report
+512	   Content-Transfer-Encoding: 7bit
+
+514	   Feedback-Type: auth-failure
+515	   Version: 1
+516	   User-Agent: DMARC-Filter/1.2.3
+517	   Auth-Failure: dmarc
+518	   Authentication-Results: gen.example;
+519	     dmarc=fail header.from=consumer.example
+520	   Identity-Alignment: dkim
+521	   DKIM-Domain: consumer.example
+522	   DKIM-Identity: @consumer.example
+523	   DKIM-Selector: epsilon
+524	   Original-Envelope-Id: 65E1A3F0A0
+525	   Original-Mail-From: author=gen.example@forwarder.example
+526	   Source-IP: 192.0.2.2
+527	   Source-Port: 12345
+528	   Reported-Domain: consumer.example
+
+530	   --=_mime_boundary_
+531	   Content-Type: message/rfc822; charset=utf-8
+532	   Content-Transfer-Encoding: 7bit
+
+534	   Authentication-Results: gen.example;
+535	     dkim=permerror header.d=forwarder.example header.b="EjCbN/c3";
+536	     dkim=temperror header.d=forwarder.example header.b="mQ8GEWPc";
+537	     dkim=permerror header.d=consumer.example header.b="hETrymCb";
+538	     dkim=neutral header.d=consumer.example header.b="C2nsAp3A";
+539	   Received: from mail.forwarder.example
+540	     (mail.forwarder.example [IPv6:2001:db8::23ac])
+541	     by mail.gen.example (Postfix) with ESMTP id 5E8B0C159826
+542	     for <x@gen.example>; Sun, 14 Aug 2022 07:58:29 -0700 (PDT)
+543	   Received: from mail.forwarder.example (localhost [127.0.0.1])
+544	     by mail.forwarder.example (Postfix) with ESMTP id 4Ln7Qw4fnvz6Bq
+545	     for <x@gen.example>; Tue, 19 Jul 2022 07:57:44 +0200
+546	   DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed;
+547	     d=forwarder.example; s=ed25519-59hs; t=1658210264;
+548	     x=1663210264; bh=KYH/g7ForvDbnyyDLYSjauMYMW6sEIqu75/9w3OIONg=;
+549	     h=Message-ID:Date:List-Id:List-Archive:List-Post:List-Help:
+550	      List-Subscribe:List-Unsubscribe:List-Owner:MIME-Version:Subject:
+551	      To:References:From:In-Reply-To:Content-Type:
+552	      Content-Transfer-Encoding:autocrypt:cc:content-transfer-encoding:
+553	      content-type:date:from:in-reply-to:message-id:mime-version:
+554	      openpgp:references:subject:to;
+
+556	     b=EjCbN/c3bTU4QkZH/zwTbYxBDp0k8kpmWSXh5h1M7T8J4vtRo+hvafJazT3ZRgq+7
+557	      +4dzEQwUhl+NOJYXXNUAA==
+558	   DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+559	     d=forwarder.example; s=rsa-wgJg; t=1658210264; x=1663210264;
+560	     bh=KYH/g7ForvDbnyyDLYSjauMYMW6sEIqu75/9w3OIONg=;
+561	     h=Message-ID:Date:List-Id:List-Archive:List-Post:List-Help:
+562	      List-Subscribe:List-Unsubscribe:List-Owner:MIME-Version:Subject:
+563	      To:References:From:In-Reply-To:Content-Type:
+564	      Content-Transfer-Encoding:autocrypt:cc:content-transfer-encoding:
+565	      content-type:date:from:in-reply-to:message-id:mime-version:
+566	      openpgp:references:subject:to;
+567	     b=mQ8GEWPcVpBpeqQ88pcbXpGHBT0J/Rwi8Zd2WZTXWWneQGRCOJLRcbBJpjqnrwtqd
+568	      76IqawH86tihz4Z/12J1GBCdNx1gfazsoI3yaqfooRDYg0mSyZHrYhQBmodnPcqZj4
+569	      /25L5278sc/UNrYO9az2n7R/skbVZ0bvSo2eEiGU8fcpO8+a5SKNYskhaviAI4eGIB
+570	      iRMdEP7gP8dESdnZguNbY5HI32UMDpPPNqajzd/BgcqbveYpRrWCDOhcY47POV7GHM
+571	      i/KLHiZXtJsL3/Pr/4TL+HTjdX8EDSsy1K5/JCvJCFsJHnSvkEaJQGLn/2m03eW9r8
+572	      9w1bQ90aY+VCQ==
+573	   X-Original-To: users@forwarder.example
+574	   Received: from mail.consumer.example
+575	     (mail.consumer.example [192.0.2.4])
+576	     (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+577	      key-exchange ECDHE (P-256) server-signature ECDSA (P-384)
+578	      server-digest SHA384)
+579	     (Client did not present a certificate)
+580	     by mail.forwarder.example (Postfix) with ESMTPS id 4Ln7Qs55xmz4nP
+581	     for <users@forwarder.example>;
+582	     Tue, 19 Jul 2022 07:57:41 +0200 (CEST)
+583	   Authentication-Results: mail.forwarder.example;
+584	     arc=none smtp.remote-ip=192.0.2.4
+585	   Authentication-Results: mail.forwarder.example;
+586	     dkim=pass (512-bit key; secure) header.d=consumer.example
+587	      header.i=@consumer.example header.a=ed25519-sha256
+588	      header.s=epsilon header.b=hETrymCb;
+589	     dkim=pass (1152-bit key; secure) header.d=consumer.example
+590	      header.i=@consumer.example header.a=rsa-sha256
+591	      header.s=delta header.b=C2nsAp3A
+592	   DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed;
+593	     d=consumer.example; s=epsilon; t=1658210255;
+594	     bh=KYH/g7ForvDbnyyDLYSjauMYMW6sEIqu75/9w3OIONg=;
+595	     h=Date:Subject:To:References:From:In-Reply-To;
+596	     b=hETrymCbz6T1Dyo5dCG9dk8rPykKLdhJCPFeJ9TiiP/kaoN2afpUYtj+SrI+I83lp
+597	      p1F/FfYSGy7zz3Q3OdxBA==
+598	   DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+599	     d=consumer.example; s=delta; t=1658210255;
+600	     bh=KYH/g7ForvDbnyyDLYSjauMYMW6sEIqu75/9w3OIONg=;
+601	     h=Date:To:References:From:In-Reply-To;
+602	     b=C2nsAp3AMNX33Nq7nN/StPo921xE3XGF8Ju3iAKdYB3EKhsril0N5IjWGlglJECst
+603	      jLNKSo7KWZZ2lkH/dVZ9Rs1GHT2uaKy1sc/xmNIC5rHdhrxammiwpTSo4PsT8disfc
+604	      3DVF6Q62n0EsdLFqcw1KY8A9inFqYKY2tqoo+y4zMtItqCYx3xjsj3I0IFLuX
+605	   Author: Message Author <author@consumer.example>
+606	   Received: from [192.0.2.8] (host-8-2-0-192.isp.example [192.0.2.8])
+607	     (AUTH: CRAM-MD5 uXDGrn@SYT0/k, TLS: TLS1.3,128bits,
+608	     ECDHE_RSA_AES_128_GCM_SHA256)
+609	     by mail.consumer.example with ESMTPSA
+610	     id 00000000005DC076.00004417; Tue, 19 Jul 2022 07:57:35 +0200
+611	   Message-ID: <2431dc66-b010-c9cc-4f2b-a1f889f8bdb4@consumer.example>
+612	   Date: Tue, 19 Jul 2022 07:57:33 +0200
+613	   List-Id: <users.forwarder.example>
+614	   List-Post: <mailto:users@forwarder.example>
+615	   List-Help: <mailto:users+help@forwarder.example>
+616	   List-Subscribe: <mailto:users+subscribe@forwarder.example>
+617	   List-Unsubscribe: <mailto:users+unsubscribe@forwarder.example>
+618	   List-Owner: <mailto:users+owner@forwarder.example>
+619	   Precedence: list
+620	   MIME-Version: 1.0
+621	   Subject: This is the original subject
+622	   Content-Language: en-US
+623	   To: users@forwarder.example
+624	   Authentication-Results: consumer.example; auth=pass (details omitted)
+625	   From: Message Author <author@consumer.example>
+626	   In-Reply-To: <20220718102753.0f6d9dde.cel@example.com>
+627	   Content-Type: text/plain; charset=UTF-8; format=flowed
+628	   Content-Transfer-Encoding: 8bit
+
+630	   [ Message body was here ]
+631	   --=_mime_boundary_--
+
+633	   The Source-Port field definition is given by [RFC6692]
+
+635	   In the final MIME entity, the local-parts of To and From addresses
+636	   are reported unredacted.  Since we know that the local parts are PII,
+637	   we can reduce the privacy risk by redacting them.  In the example,
+638	   the report generator could have replaced "users" with "lRLxexey" and
+639	   "author" with "RT47aVey" throughout the entity.
+
+641	   If the body of the message is not included, the last MIME entity
+642	   would have "Content-Type: text/rfc822-headers" instead of message/
+643	   rfc822.
+
+645	Appendix B.  Change Log {change-log}
+
+647	   [RFC Editor: Please remove this section prior to publication.]
+
+649	B.1.  00 to 01
+
+651	   *  Replace references to RFC7489 with references to I-D.ietf-dmarc-
+652	      dmarcbis.
+
+654	   *  Replace the 2nd paragraph in the Introduction with the text
+655	      proposed by Ned for Ticket #55, which enjoys some consensus:
+656	      https://mailarchive.ietf.org/arch/msg/dmarc/
+657	      HptVyJ9SgrfxWRbeGwORagPrhCw
+658	      (https://mailarchive.ietf.org/arch/msg/dmarc/
+659	      HptVyJ9SgrfxWRbeGwORagPrhCw)
+
+661	   *  Strike a spurious sentence about criticality of feedback, which
+662	      was meant for feedback in general, not failure reports.  In fact,
+663	      failure reports are not critical to establishing and maintaining
+664	      accurate authentication deployments.  Still attributable to Ticket
+665	      #55.
+
+667	   *  Remove the content of section "Verifying External Destinations"
+668	      and refer to I-D.ietf-dmarc-aggregate-reporting.
+
+670	   *  Remove the content of section "Security Considerations" and refer
+671	      to I-D.ietf-dmarc-dmarcbis.
+
+673	   *  Slightly tweak the wording of the example in Appendix A.1 so that
+674	      it makes sense standing alone.
+
+676	   *  Remove the sentence containing "must include any URI(s)", as the
+677	      issue arose <eref
+678	      target="https://mailarchive.ietf.org/arch/msg/dmarc/
+679	      mFk0qiTCy8tzghRvcxus01W_Blw"/>.
+
+681	   *  Add paragraph in Security Considerations, noting that note that
+682	      Organizational Domains are only an approximation...
+
+684	   *  Add a Transport section, mentioning DMARC conformance and failure
+685	      report mail loops (Ticket #28).
+
+687	B.2.  01 to 02
+
+689	   *  Add a sentence to make clear that counting failures is not the
+690	      aim.
+
+692	B.3.  02 to 03
+
+694	   *  Updated references.
+
+696	B.4.  03 to 04
+
+698	   *  Add an example report.
+
+700	   *  Remove the old Acknowledgements section.
+
+702	   *  Add a IANA Consideration section
+
+704	B.5.  04 to 05
+
+706	   *  Convert to markdown
+
+708	   *  Remove irrelevant material.
+
+710	B.6.  05 to 06
+
+712	   *  A Vesely was incorrectly removed from list of document editors.
+713	      Corrected.
+
+715	   *  Added Terminology section with recoomended boilerplate re:
+716	      RFC2119.
+
+718	B.7.  06 to 07
+
+720	   *  Reduce Terminology section
+
+722	   *  minor nits
+
+724	B.8.  07 to 08
+
+726	   *  Specify what detailed information a report contains, in the 1st
+727	      paragraph of Section 2
+
+729	   *  A couple of typos
+
+731	B.9.  08 to 09
+
+733	   *  Replace &lt; with < and &gt; with > in Appendix B
+
+735	B.10.  09 to 10
+
+737	   *  Add an informative section about other failure reports (DKIM, SPF)
+
+739	B.11.  10 to 11
+
+741	   *  Remove appendix with redundant examples - pull request by Daniel
+742	      K.
+
+744	B.12.  11 to 12
+
+746	   *  Reference Terminology in [I-D.ietf-dmarc-dmarcbis]
+747	   *  Expand the Verifying External Destinations section and reference
+748	      [I-D.ietf-dmarc-aggregate-reporting]
+
+750	B.13.  12 to 13
+
+752	   *  Update references to numbered sections of
+753	      [I-D.ietf-dmarc-dmarcbis] and [I-D.ietf-dmarc-aggregate-reporting]
+754	   *  Clarify potential information disclosures when failure reports are
+755	      sent
+756	   *  Minor edits for readability and clarity
+
+758	B.14.  13 to 14
+
+760	   *  In the introduction (last paragraph) mention that the purpose is
+761	      twofold, debug and anti-abuse.
+762	   *  In Section 2 (2nd paragraph) clarify that failure reports allow
+763	      better determining the failure reason.
+
+765	B.15.  14 to 15
+
+767	   *  Expanded Privacy Considerations section as discussed on list.
+768	   *  Add tentative IANA Consideration subsections.
+
+770	B.16.  15 to 16
+
+772	   *  Qualification of RFCs 6651/2 in Section 3.
+773	   *  Spell "Auth-Failure" at bullet 3 of Section 4.
+774	   *  Cite RFC 6590 when mentioning redaction.
+775	   *  s/using the wrong sending path/failing authentication/.
+776	   *  Remove unnecessary IANA Considerations.
+
+778	B.17.  16 to 17
+
+780	   *  Remove the last paragraph of Secority Considerations.
+
+782	B.18.  17 to 18
+
+784	   *  Reword the first purpose (Intro) and cite aggregate-reporting.
+785	   *  Forward reference to Privacy Consideration.
+786	   *  s/fo=/"fo"/, /ruf=/ruf/, /urls/URIs/.
+787	   *  Specify parent registry in IANA Considerations.
+
+789	B.19.  18 to 19
+
+791	   *  Remove the term "scalable" from Abstract and Introduction.
+
+793	   *  s/Sender Domain/Domain Owner/.
+794	   *  Reference to dmarcbis, section 3.2 on its own line.
+795	   *  Remove the phrase (sometimes referred to as "forensic reports").
+796	   *  Note that Domain Owner can use dot-forward to not decalre
+797	      consumer.
+798	   *  Mention we could have encrypted the example.
+799	   *  Don't mention MX.
+
+801	Authors' Addresses
+
+803	   Steven M Jones
+804	   DMARC.org
+805	   Email: smj@dmarc.org
+
+807	   Alessandro Vesely
+808	   Tana
+809	   Email: vesely@tana.it
+
+
+
+
+
+
+
+
+
