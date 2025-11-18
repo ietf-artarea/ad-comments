@@ -1,0 +1,692 @@
+idnits 2.17.1 
+
+draft-ietf-dnsop-cds-consistency-09.txt:
+-(479): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+  == There are 4 instances of lines with non-ascii characters in the document.
+
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     Summary: 0 errors (**), 0 flaws (~~), 1 warning (==), 0 comments (--).
+
+--------------------------------------------------------------------------------
+
+
+2	DNSOP Working Group                                         P. Thomassen
+3	Internet-Draft                     SSE - Secure Systems Engineering GmbH
+4	Updates: 7344, 7477 (if approved)                        15 October 2025
+5	Intended status: Standards Track
+6	Expires: 18 April 2026
+
+8	          Clarifications on CDS/CDNSKEY and CSYNC Consistency
+9	                  draft-ietf-dnsop-cds-consistency-09
+
+11	Abstract
+
+13	   Maintenance of DNS delegations requires occasional changes of the DS
+14	   and NS record sets on the parent side of the delegation.  For the
+15	   case of DS records, "Automating DNSSEC Delegation Trust Maintenance"
+16	   (RFC 7344) provides automation by allowing the child to publish CDS
+17	   and/or CDNSKEY records holding the prospective DS parameters which
+18	   the parent can ingest.  Similarly, "Child-to-Parent Synchronization
+19	   in DNS" (RFC 7477) specifies CSYNC records to indicate a desired
+20	   update of the delegation's NS (and glue) records.  Parent-side
+21	   entities (e.g., Registries and Registrars) can query these records
+22	   from the child and, after validation, use them to update the parent-
+23	   side Resource Record Sets (RRsets) of the delegation.
+
+25	   This document specifies that when performing such queries, parent-
+26	   side entities has to ensure that updates triggered via CDS/CDNSKEY
+27	   and CSYNC records are consistent across the child's authoritative
+28	   nameservers, before taking any action based on these records.
+
+30	   This document updates RFC 7344 and RFC 7477.
+
+32	Status of This Memo
+
+34	   This Internet-Draft is submitted in full conformance with the
+35	   provisions of BCP 78 and BCP 79.
+
+37	   Internet-Drafts are working documents of the Internet Engineering
+38	   Task Force (IETF).  Note that other groups may also distribute
+39	   working documents as Internet-Drafts.  The list of current Internet-
+40	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+42	   Internet-Drafts are draft documents valid for a maximum of six months
+43	   and may be updated, replaced, or obsoleted by other documents at any
+44	   time.  It is inappropriate to use Internet-Drafts as reference
+45	   material or to cite them other than as "work in progress."
+
+47	   This Internet-Draft will expire on 18 April 2026.
+
+49	Copyright Notice
+
+51	   Copyright (c) 2025 IETF Trust and the persons identified as the
+52	   document authors.  All rights reserved.
+
+54	   This document is subject to BCP 78 and the IETF Trust's Legal
+55	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+56	   license-info) in effect on the date of publication of this document.
+57	   Please review these documents carefully, as they describe your rights
+58	   and restrictions with respect to this document.  Code Components
+59	   extracted from this document must include Revised BSD License text as
+60	   described in Section 4.e of the Trust Legal Provisions and are
+61	   provided without warranty as described in the Revised BSD License.
+
+63	Table of Contents
+
+65	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+66	     1.1.  Requirements Notation . . . . . . . . . . . . . . . . . .   4
+67	     1.2.  Terminology . . . . . . . . . . . . . . . . . . . . . . .   4
+68	   2.  Updates to RFC 7344 and RFC 7477  . . . . . . . . . . . . . .   4
+69	   3.  Processing Requirements . . . . . . . . . . . . . . . . . . .   4
+70	     3.1.  CDS and CDNSKEY . . . . . . . . . . . . . . . . . . . . .   6
+71	     3.2.  CSYNC . . . . . . . . . . . . . . . . . . . . . . . . . .   6
+72	   4.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   7
+73	   5.  Security Considerations . . . . . . . . . . . . . . . . . . .   7
+74	   6.  Implementation Status . . . . . . . . . . . . . . . . . . . .   8
+75	   7.  Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .   8
+76	   8.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   8
+77	     8.1.  Normative References  . . . . . . . . . . . . . . . . . .   8
+78	     8.2.  Informative References  . . . . . . . . . . . . . . . . .   9
+79	   Appendix A.  Failure Scenarios  . . . . . . . . . . . . . . . . .  10
+80	     A.1.  DS Breakage due to Replication Lag  . . . . . . . . . . .  10
+81	     A.2.  Escalation of Lame Delegation Takeover  . . . . . . . . .  10
+82	     A.3.  Multi-Provider (Permanent Multi-Signer) . . . . . . . . .  11
+83	       A.3.1.  DS Breakage . . . . . . . . . . . . . . . . . . . . .  11
+84	       A.3.2.  NS Breakage . . . . . . . . . . . . . . . . . . . . .  12
+85	     A.4.  Bogus Provider Change (Temporary Multi-Signer)  . . . . .  12
+86	   Appendix B.  Change History (to be removed before publication)  .  12
+87	   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  15
+
+89	1.  Introduction
+
+91	   [RFC7344] automates DNSSEC delegation trust maintenance by having the
+92	   child publish CDS and/or CDNSKEY records which hold the prospective
+93	   DS parameters.  Similarly, [RFC7477] specifies CSYNC records
+94	   indicating a desired update of the delegation's NS and associated
+95	   glue records.  Parent-side entities (e.g., Registries and Registrars)
+96	   can use these records to update the corresponding records of the
+97	   delegation.
+
+99	   For ingesting CSYNC records, Section 3.1 of [RFC7477] advocates that
+100	   Parental Agents limit queries to a single authoritative nameserver
+101	   (as typically done in normal resolution).  The corresponding
+102	   Section 6.1 of [RFC7344] (CDS/CDNSKEY) contains no provision for how
+103	   specifically queries for these records should be done.
+
+105	   Retrieving records from just one authoritative server (e.g., by
+106	   directing queries towards a trusted validating resolver) works fine
+107	   when all is in order.  However, problems may arise if CDS/CDNSKEY/
+108	   CSYNC record sets are inconsistent across authoritative nameservers,
+109	   either because they are out of sync (e.g., during a Key Signing Key
+110	   (KSK) rollover), or because they are not controlled by the same
+111	   entity (e.g., in a multi-signer setup [RFC8901]).
+
+113	   In such cases, if CDS/CDNSKEY/CSYNC records are retrieved from one
+114	   nameserver only ("naively", without a consistency check), each
+115	   nameserver can unilaterally trigger an update of the delegation's DS
+116	   or NS record set.
+
+118	   For example, a single provider in a multi-signer setup may
+119	   (accidentally or maliciously) cause another provider's trust anchors
+120	   and/or nameservers to be removed from the delegation.  This can occur
+121	   both when the multi-signer configuration is temporary (e.g., during a
+122	   provider change) and when it is permanent (e.g., for redundancy).  In
+123	   any case, a single provider should not be in the position to remove
+124	   the other providers' records from the delegation.
+
+126	   Similar breakage can occur when the delegation has lame nameservers,
+127	   where an attacker may illegitimately initialize a DS record set and
+128	   then manipulate the delegation's NS record set at will.  More
+129	   detailed examples are given in Appendix A.
+
+131	   For a CDS/CDNSKEY/CSYNC consumer, it is generally impossible to
+132	   estimate the impact of a requested delegation update unless all of
+133	   the child's authoritative nameservers are inspected.  At the same
+134	   time, applying an automated delegation update "MUST NOT break the
+135	   current delegation" ([RFC7344], Section 4.1), i.e., it must not
+136	   hamper availability or validatability of the Child's resolution.
+
+138	   This document therefore specifies that parent-side entities need to
+139	   ensure that the updates indicated by CDS/CDNSKEY and CSYNC record
+140	   sets are plausibly consistent across the child's nameservers, before
+141	   taking any action based on these records.
+
+143	   Readers are expected to be familiar with DNSSEC, including [RFC4033],
+144	   [RFC4034], [RFC4035], [RFC7344], and [RFC7477], and may refer to
+145	   [RFC6781] and [RFC8901] for an overview of DNSSEC operational
+146	   practices.
+
+148	1.1.  Requirements Notation
+
+150	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+151	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+152	   "OPTIONAL" in this document are to be interpreted as described in BCP
+153	   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+154	   capitals, as shown here.
+
+156	1.2.  Terminology
+
+158	   Multi-provider setup:  A constellation where several providers
+159	      independently operate authoritative DNS service for a domain,
+160	      usually for purposes of redundancy.  This includes setups both
+161	      with and without DNSSEC.
+162	   Multi-signer setup:  A multi-provider setup for a DNSSEC-enabled
+163	      domain with multiple independent signing entities [RFC8901].  Such
+164	      a setup may be permanent (for redundancy) or temporary (for
+165	      continuity of DNSSEC operation while changing the provider of a
+166	      domain that normally uses a single one).
+
+168	   Otherwise, the terminology in this document is as defined in
+169	   [RFC7344].
+
+171	2.  Updates to RFC 7344 and RFC 7477
+
+173	   Section 4.1 of [RFC7344] lists acceptance rules for CDS/CDNSKEY
+174	   records.  This list is extended with the consistency requirements
+175	   defined in this document.  This document does not modify any other
+176	   part of [RFC7344].
+
+178	   Sections 3.1 and 4.2 of [RFC7477] have logic for deciding from which
+179	   nameserver to query CSYNC information.  This logic is replaced with
+180	   the CSYNC consistency requirements defined in this document.
+
+182	3.  Processing Requirements
+
+184	   Consistency requirements that apply equally to CDS/CDNSKEY and CSYNC
+185	   are listed first; type-specific consistency criteria are described in
+186	   separate subsections.
+
+188	   In order to determine plausible consistency of CDS/CDNSKEY or CSYNC
+189	   RRsets across the child's nameservers, the Parental Agent MUST fetch
+190	   all IP addresses for each nameserver hostname as listed in the
+191	   Child's delegation from the Parent using a validating resolver, and
+192	   including glue records if available.  Before acting on any CDS/
+193	   CDNSKEY or CSYNC record for the child, the Parental Agent MUST have
+194	   established plausible consistency by querying all of these IP
+195	   addresses for the record set(s) in question, as per the guidelines
+196	   spelled out in the following subsections.
+
+198	   In all cases, consistency is REQUIRED across received responses only.
+199	   (A NODATA response is a received response.)
+
+201	   When a response cannot be obtained from a given nameserver, the
+202	   Parental Agent SHOULD attempt to obtain it at a later time, before
+203	   concluding that the nameserver is permanently unreachable and
+204	   removing it from consideration.  A configurable retry schedule with
+205	   exponential back-off is RECOMMENDED (e.g., after 5, 10, 20, 40, ...
+206	   minutes).  To sidestep localized routing issues, the Parental Agent
+207	   MAY also attempt contacting the nameserver from another vantage
+208	   point.
+
+210	   If an inconsistent state is encountered, the Parental Agent MUST
+211	   abort the operation.  Specifically, it MUST NOT delete or alter any
+212	   existing RRset that would have been deleted or altered, and MUST NOT
+213	   create any RRsets that would have been created, had the nameservers
+214	   given consistent responses.
+
+216	   To accommodate transient inconsistencies (e.g., replication delays),
+217	   implementations MAY be configurable to undertake a retry of the full
+218	   process, repeating all queries (suggested default: enabled).  A
+219	   schedule with exponential back-off is RECOMMENDED.
+
+221	   Any pending queries can immediately be dequeued when encountering a
+222	   response that confirms the status quo, either implicitly (NODATA) or
+223	   explicitly.  This is because any subsequent responses could only
+224	   confirm that nothing needs to happen, or give an inconsistent result
+225	   in which case nothing needs to happen.  Queries MAY be continued
+226	   across all nameservers for reporting purposes.
+
+228	   Existing requirements for ensuring integrity remain in effect.  In
+229	   particular, DNSSEC signatures MUST be requested and validated for all
+230	   queries unless otherwise noted.
+
+232	3.1.  CDS and CDNSKEY
+
+234	   To retrieve a Child's CDS/CDNSKEY RRset for DNSSEC delegation trust
+235	   maintenance, the Parental Agent, knowing both the Child zone name and
+236	   its NS hostnames, MUST ascertain that queries are made against all
+237	   (reachable) nameservers listed in the Child's delegation from the
+238	   Parent, and ensure that each key referenced in any of the received
+239	   answers is also referenced in all other received responses, or that
+240	   responses consistently indicate a request for removal of the entire
+241	   DS RRset ([RFC8078], Section 6).
+
+243	   In other words, CDS/CDNSKEY records at the Child zone apex must be
+244	   fetched directly from each (reachable) authoritative server as
+245	   determined by the delegation's NS record set.  When a key is
+246	   referenced in a CDS record set but not the CDNSKEY record set (or
+247	   vice versa), or returned by one nameserver but is missing from at
+248	   least one other nameserver's answer, the CDS/CDNSKEY state MUST be
+249	   considered inconsistent.  Similarly, the state MUST be considered
+250	   inconsistent if there is a CDS or CDNSKEY response that indicates a
+251	   removal request for the DS RRset whereas another response indicates
+252	   no change (NODATA) or a DS update.
+
+254	   During initial DS provisioning (DNSSEC bootstrapping), conventional
+255	   DNSSEC validation for CDS/CDNSKEY responses is not (yet) available;
+256	   in this case, authenticated bootstrapping ([RFC9615]) should be used.
+
+258	3.2.  CSYNC
+
+260	   A CSYNC-based workflow generally consists of (1) querying the CSYNC
+261	   (and possibly SOA) record to determine which data records shall be
+262	   synchronized from child to parent, and (2) querying for these data
+263	   records (e.g. NS), before placing them in the parent zone.  If the
+264	   below conditions are not met during these steps, the CSYNC state MUST
+265	   be considered inconsistent.
+
+267	   When querying the CSYNC record, the Parental Agent MUST ascertain
+268	   that queries are made against all (reachable) nameservers listed in
+269	   the Child's delegation from the Parent, and ensure that the record's
+270	   immediate flag and type bitmap are equal across received responses.
+
+272	   The CSYNC record's SOA serial field and soaminimum flag might
+273	   legitimately differ across nameservers (such as in multi-provider
+274	   setups); equality is thus not required across responses.  Instead,
+275	   for a given response, processing of these values MUST occur with
+276	   respect to the SOA record as obtained from the same nameserver.  If
+277	   the resulting per-nameserver assessments of whether the update is
+278	   permissible do not all agree, the CSYNC state MUST be considered
+279	   inconsistent.
+
+281	   Further, when retrieving the data record sets as indicated in the
+282	   CSYNC record (such as NS or A/AAAA records), the Parental Agent MUST
+283	   ascertain that all queries are made against all (reachable)
+284	   nameservers listed in the delegation, and ensure that all return
+285	   responses with equal rdata sets (including all empty).
+
+287	   Other CSYNC processing rules from Section 3 of [RFC7477] remain in
+288	   place without modification.  For example, when the NS type flag is
+289	   present, associated NS processing has to occur before potential glue
+290	   updates to ensure that glue addresses match the right set of
+291	   nameservers.  Also, when the type bitmap contains the A/AAAA flags,
+292	   corresponding address queries are only to be sent for NS hostnames
+293	   "that are in bailiwick", while out-of-bailiwick NS records are
+294	   ignored.  Refer to Sections 3.2.2 and 4.3 [RFC7477] for more details.
+
+296	   CSYNC-based updates may cause validation or even insecure resolution
+297	   to break (e.g., by changing the delegation to a set of nameservers
+298	   that do not serve required DNSKEY records or do not know the zone at
+299	   all).  Parental Agents SHOULD check that CSYNC-based updates, if
+300	   applied, do not break the delegation.
+
+302	4.  IANA Considerations
+
+304	   This document has no IANA actions.
+
+306	5.  Security Considerations
+
+308	   The level of rigor mandated by this document is needed to prevent
+309	   publication of half-baked DS or delegation NS RRsets (authorized only
+310	   under an insufficient subset of authoritative nameservers), ensuring
+311	   that a single operator cannot unilaterally modify the delegation (add
+312	   or remove trust anchors or nameservers) when other operators are
+313	   present.  This applies both when the setup is intentional and when it
+314	   is unintentional (such as in the case of lame delegation hijacking).
+
+316	   As a consequence, the delegation's records can only be modified when
+317	   zones are synchronized across operators, unanimously reflecting the
+318	   domain owner's intentions.  Both availability and integrity of the
+319	   domain's DNS service benefit from this policy.
+
+321	   In order to resolve situations in which consensus about child zone
+322	   contents cannot be reached (e.g. because one of the nameserver
+323	   operators is uncooperative), Parental Agents SHOULD continue to
+324	   accept DS and NS/glue update requests from the domain owner via an
+325	   authenticated out-of-band channel (such as EPP [RFC5730]),
+326	   irrespective of the adoption of automated delegation maintenance.
+327	   Availability of such an interface also enables recovery from a
+328	   situation where the private key is no longer available for signing
+329	   the CDS/CDNSKEY or CSYNC records in the child zone.
+
+331	6.  Implementation Status
+
+333	   *Note to the RFC Editor*: please remove this entire section before
+334	   publication.
+
+336	   This draft has been implemented by
+
+338	   *  TANGO Registry Services
+339	   *  CORE Registry
+
+341	7.  Acknowledgments
+
+343	   In order of first contribution or review: Viktor Dukhovni, Wes
+344	   Hardaker, Libor Peltan, Oli Schacher, David Blacka, Charlie Kaufman,
+345	   Michael Bauland, Patrick Mevzek, Joe Abley, Ondřej Caletka, Ondřej
+346	   Surý, Mohamed Boucadair.
+
+348	8.  References
+
+350	8.1.  Normative References
+
+352	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+353	              Requirement Levels", BCP 14, RFC 2119,
+354	              DOI 10.17487/RFC2119, March 1997,
+355	              <https://www.rfc-editor.org/info/rfc2119>.
+
+357	   [RFC4033]  Arends, R., Austein, R., Larson, M., Massey, D., and S.
+358	              Rose, "DNS Security Introduction and Requirements",
+359	              RFC 4033, DOI 10.17487/RFC4033, March 2005,
+360	              <https://www.rfc-editor.org/info/rfc4033>.
+
+362	   [RFC4034]  Arends, R., Austein, R., Larson, M., Massey, D., and S.
+363	              Rose, "Resource Records for the DNS Security Extensions",
+364	              RFC 4034, DOI 10.17487/RFC4034, March 2005,
+365	              <https://www.rfc-editor.org/info/rfc4034>.
+
+367	   [RFC4035]  Arends, R., Austein, R., Larson, M., Massey, D., and S.
+368	              Rose, "Protocol Modifications for the DNS Security
+369	              Extensions", RFC 4035, DOI 10.17487/RFC4035, March 2005,
+370	              <https://www.rfc-editor.org/info/rfc4035>.
+
+372	   [RFC5730]  Hollenbeck, S., "Extensible Provisioning Protocol (EPP)",
+373	              STD 69, RFC 5730, DOI 10.17487/RFC5730, August 2009,
+374	              <https://www.rfc-editor.org/info/rfc5730>.
+
+376	   [RFC7344]  Kumari, W., Gudmundsson, O., and G. Barwood, "Automating
+377	              DNSSEC Delegation Trust Maintenance", RFC 7344,
+378	              DOI 10.17487/RFC7344, September 2014,
+379	              <https://www.rfc-editor.org/info/rfc7344>.
+
+381	   [RFC7477]  Hardaker, W., "Child-to-Parent Synchronization in DNS",
+382	              RFC 7477, DOI 10.17487/RFC7477, March 2015,
+383	              <https://www.rfc-editor.org/info/rfc7477>.
+
+385	   [RFC8078]  Gudmundsson, O. and P. Wouters, "Managing DS Records from
+386	              the Parent via CDS/CDNSKEY", RFC 8078,
+387	              DOI 10.17487/RFC8078, March 2017,
+388	              <https://www.rfc-editor.org/info/rfc8078>.
+
+390	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+391	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+392	              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+394	   [RFC9615]  Thomassen, P. and N. Wisiol, "Automatic DNSSEC
+395	              Bootstrapping Using Authenticated Signals from the Zone's
+396	              Operator", RFC 9615, DOI 10.17487/RFC9615, July 2024,
+397	              <https://www.rfc-editor.org/info/rfc9615>.
+
+399	8.2.  Informative References
+
+401	   [LAME1]    Akiwate, G., Jonker, M., Sommese, R., Foster, I., Voelker,
+402	              G. M., Savage, S., Claffy, K., and ACM, "Unresolved
+403	              Issues: Prevalence, Persistence, and Perils of Lame
+404	              Delegations", Proceedings of the ACM Internet Measurement
+405	              Conference, DOI 10.1145/3419394.3423623, 27 October 2020,
+406	              <http://dx.doi.org/10.1145/3419394.3423623>.
+
+408	   [LAME2]    Akiwate, G., Savage, S., Voelker, G. M., Claffy, K C, and
+409	              ACM, "Risky BIZness: risks derived from registrar name
+410	              management", Proceedings of the 21st ACM Internet
+411	              Measurement Conference, DOI 10.1145/3487552.3487816, 2
+412	              November 2021,
+413	              <http://dx.doi.org/10.1145/3487552.3487816>.
+
+415	   [RFC6781]  Kolkman, O., Mekking, W., and R. Gieben, "DNSSEC
+416	              Operational Practices, Version 2", RFC 6781,
+417	              DOI 10.17487/RFC6781, December 2012,
+418	              <https://www.rfc-editor.org/info/rfc6781>.
+
+420	   [RFC8901]  Huque, S., Aras, P., Dickinson, J., Vcelak, J., and D.
+421	              Blacka, "Multi-Signer DNSSEC Models", RFC 8901,
+422	              DOI 10.17487/RFC8901, September 2020,
+423	              <https://www.rfc-editor.org/info/rfc8901>.
+
+425	Appendix A.  Failure Scenarios
+
+427	   The following scenarios are examples of how things can go wrong when
+428	   consistency is not enforced by the parent during CDS/CDNSKEY/CSYNC
+429	   processing.  Other scenarios that cause similar (or perhaps even
+430	   more) harm may exist.
+
+432	   The common feature of these scenarios is that if one nameserver steps
+433	   out of line and the parent is not careful, DNS resolution and/or
+434	   validation will break down.  When several DNS providers are involved,
+435	   this undermines the very guarantees of operator independence that
+436	   multi-provider configurations are intended to provide.
+
+438	A.1.  DS Breakage due to Replication Lag
+
+440	   If an authoritative nameserver is lagging behind during a key
+441	   rollover, the parent may see different CDS/CDNSKEY RRsets depending
+442	   on the nameserver contacted.  This may cause old and new DS RRsets to
+443	   be deployed in an alternating fashion and without the awareness of
+444	   the zone maintainer, who may then inadvertently break the chain of
+445	   trust by prematurely removing a DNSKEY still referenced by a (stale)
+446	   CDS/CDNSKEY RRset.
+
+448	   While foreseen in Section 6.2 of [RFC7344], the solution specified
+449	   there requires parents to keep state on CDS/CDNSKEY RRsets.  This
+450	   document achieves the same without this burden, and in case the
+451	   parent reports consistency errors downstream, can also help detection
+452	   of the child-side replication issue by the operator.
+
+454	A.2.  Escalation of Lame Delegation Takeover
+
+456	   A delegation may include a non-existent NS hostname, for example due
+457	   to a typo or when the nameserver's domain registration has expired.
+458	   (Re-)registering such a non-resolvable nameserver domain allows a
+459	   third party to run authoritative DNS service for all domains
+460	   delegated to that NS hostname, serving responses different from the
+461	   legitimate ones.
+
+463	   This strategy for hijacking (at least part of the) DNS traffic and
+464	   spoofing responses is not new, but surprisingly common
+465	   [LAME1][LAME2].  It is also known that DNSSEC reduces the impact of
+466	   such an attack, as validating resolvers will reject illegitimate
+467	   responses due to lack of signatures consistent with the delegation's
+468	   DS records.
+
+470	   On the other hand, if the delegation is not protected by DNSSEC, the
+471	   rogue nameserver is not only able to serve unauthorized responses
+472	   without detection; it is even possible for the attacker to escalate
+473	   the nameserver takeover to a full domain takeover.
+
+475	   In particular, the rogue nameserver can publish CDS/CDNSKEY records.
+476	   If those are processed by the parent without ensuring consistency
+477	   with other authoritative nameservers, the delegation will, with some
+478	   patience, get secured with the attacker's DNSSEC keys.  Of course, as
+479	   the parent’s query (or sometimes queries) need to hit the attacker's
+480	   nameserver, this requires some statistical luck; but eventually it
+481	   will succeed.  As responses served by the remaining legitimate
+482	   nameservers are not signed with these keys, validating resolvers will
+483	   start rejecting them.
+
+485	   Once DNSSEC is established, the attacker can use CSYNC to remove
+486	   other nameservers from the delegation at will (and potentially add
+487	   new ones under their control), or change glue records to point to the
+488	   attacker's nameservers.  This enables the attacker to position
+489	   themself as the only party providing authoritative DNS service for
+490	   the victim domain, significantly augmenting the attack's impact.
+
+492	A.3.  Multi-Provider (Permanent Multi-Signer)
+
+494	A.3.1.  DS Breakage
+
+496	   While performing a key rollover and adjusting the corresponding CDS/
+497	   CDNSKEY records, a provider could accidentally publish CDS/CDNSKEY
+498	   records that only include its own keys.
+
+500	   When the parent happens to retrieve the records from a nameserver
+501	   controlled by this provider, the other providers' DS records would be
+502	   removed from the delegation.  As a result, the zone is broken at
+503	   least for some queries.
+
+505	A.3.2.  NS Breakage
+
+507	   A similar scenario affects the CSYNC record, which is used to update
+508	   the delegation's NS record set at the parent.  The issue occurs, for
+509	   example, when a provider accidentally includes only their own set of
+510	   hostnames in the local NS record set, or publishes an otherwise
+511	   flawed NS record set.
+
+513	   If the parent then observes a CSYNC signal and fetches the flawed NS
+514	   record set without ensuring consistency across nameservers, the
+515	   delegation may be updated in a way that breaks resolution or silently
+516	   reduces the multi-provider setup to a single-provider setup.
+
+518	A.4.  Bogus Provider Change (Temporary Multi-Signer)
+
+520	   Transferring DNS service for a domain name from one (signing) DNS
+521	   provider to another, without going insecure, necessitates a brief
+522	   period during which the domain is operated in multi-signer mode:
+523	   First, the providers include each other's signing keys as DNSKEY and
+524	   CDS/CDNSKEY records in their copy of the zone.  Once the parent
+525	   learns about the updated CDS/CDNSKEY record set at the old provider,
+526	   the delegation's DS record set is updated.  Then, after waiting for
+527	   cache expiration, the new provider's NS hostnames can be added to the
+528	   zone's NS record set, so that queries start balancing across both
+529	   providers.  To conclude the hand-over, the old provider is removed by
+530	   inverting these steps with swapped roles.
+
+532	   The multi-signer phase of this process breaks when the new provider,
+533	   perhaps unaware of the situation and its intricacies, fails to
+534	   include the old provider's keys in the DNSKEY (and CDS/CDNSKEY)
+535	   record sets.  One obvious consequence of that is that whenever the
+536	   resolver happens to retrieve the DNSKEY record set from the new
+537	   provider, the old provider's RRSIGs do no longer validate, causing
+538	   SERVFAIL to be returned.
+
+540	   However, an even worse consequence can occur when the parent performs
+541	   their next CDS/CDNSKEY scan: It may then happen that the incorrect
+542	   CDS/CDNSKEY record set is fetched from the new provider and used to
+543	   update the delegation's DS record set.  As a result, the old provider
+544	   (who still appears in the delegation) is prematurely removed from the
+545	   domain's DNSSEC chain of trust.  The new DS record set authenticates
+546	   the new provider's DNSKEYs only, and DNSSEC validation fails for all
+547	   answers served by the old provider.
+
+549	Appendix B.  Change History (to be removed before publication)
+
+551	   *  draft-ietf-dnsop-cds-consistency-09
+552	   |  Editorial changes
+553	   |
+554	   |  Nits from Mohamed Boucadair
+
+556	   *  draft-ietf-dnsop-cds-consistency-08
+
+558	   |  Take into account RFC 7344 Section 6.2 for Appendix A.1
+559	   |  considerations
+
+561	   *  draft-ietf-dnsop-cds-consistency-07
+
+563	   |  Clarify that "all nameservers" means fetching all delegation NS
+564	   |  IPs
+
+566	   *  draft-ietf-dnsop-cds-consistency-06
+
+568	   |  Editorial changes from Dnsdir early review
+569	   |
+570	   |  Add Implementation Status
+
+572	   *  draft-ietf-dnsop-cds-consistency-05
+
+574	   |  Editorial overhaul
+
+576	   *  draft-ietf-dnsop-cds-consistency-04
+
+578	   |  Clarify that existing CSYNC NS and glue processing rules remain in
+579	   |  place
+580	   |
+581	   |  Editorial changes
+582	   |
+583	   |  Clean up "multi-homing" and define "multi-provider"/"multi-signer"
+
+585	   *  draft-ietf-dnsop-cds-consistency-03
+
+587	   |  Clarify that CSYNC updates should not break delegations
+588	   |
+589	   |  Describe consistency requirements for CSYNC soaminimum
+590	   |
+591	   |  Editorial changes
+
+593	   *  draft-ietf-dnsop-cds-consistency-02
+
+595	   |  Retry before assuming a nameserver is permanently unreachable
+
+597	   *  draft-ietf-dnsop-cds-consistency-01
+
+599	   |  Make nits tool happy
+600	   |
+601	   |  New failure mode: DS Breakage due to Replication Lag
+602	   |
+603	   |  Point out zero overhead if nothing changed, and need for OOB
+604	   |  interface
+605	   |
+606	   |  Editorial changes
+607	   |
+608	   |  Moved Failure Scenarios to appendix
+
+610	   *  draft-ietf-dnsop-cds-consistency-00
+
+612	   |  Point out zero overhead if nothing changed, and need for OOB
+613	   |  interface
+614	   |
+615	   |  Editorial changes.
+
+617	   *  draft-thomassen-dnsop-cds-consistency-03
+
+619	   |  Describe risk from lame delegations
+620	   |
+621	   |  Acknowledgments
+622	   |
+623	   |  Say what is being updated
+624	   |
+625	   |  Editorial changes.
+626	   |
+627	   |  Retry mechanism to resolve inconsistencies
+
+629	   *  draft-thomassen-dnsop-cds-consistency-02
+
+631	   |  Don't ignore DoE responses from individual nameservers (instead,
+632	   |  require consistency across all responses received)
+
+634	   *  draft-thomassen-dnsop-cds-consistency-01
+
+636	   |  Allow for nameservers that don't respond or provide DoE (i.e.
+637	   |  require consistency only among the non-empty answers received)
+638	   |
+639	   |  Define similar requirements for CSYNC.
+640	   |
+641	   |  Editorial changes.
+
+643	   *  draft-thomassen-dnsop-cds-consistency-00
+
+645	   |  Initial public draft.
+
+647	Author's Address
+
+649	   Peter Thomassen
+650	   SSE - Secure Systems Engineering GmbH
+651	   Hauptstraße 3
+652	   10827 Berlin
+653	   Germany
+654	   Email: pth@systemsecurity.com
+
+
+
+
+
+
+
+
+
