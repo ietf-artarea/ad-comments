@@ -1,0 +1,1833 @@
+idnits 2.17.1 
+
+draft-ietf-rats-msg-wrap-21.txt:
+-(775): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(1755): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+  == There are 4 instances of lines with non-ascii characters in the document.
+
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     Summary: 0 errors (**), 0 flaws (~~), 1 warning (==), 0 comments (--).
+
+--------------------------------------------------------------------------------
+
+
+2	Remote ATtestation ProcedureS                                H. Birkholz
+3	Internet-Draft                                            Fraunhofer SIT
+4	Intended status: Standards Track                                N. Smith
+5	Expires: 22 May 2026                                         Independent
+6	                                                              T. Fossati
+7	                                                                  Linaro
+8	                                                           H. Tschofenig
+9	                                                                   H-BRS
+10	                                                                D. Glaze
+11	                                                              Google LLC
+12	                                                        18 November 2025
+
+14	                 RATS Conceptual Messages Wrapper (CMW)
+15	                      draft-ietf-rats-msg-wrap-21
+
+17	Abstract
+
+19	   The Conceptual Messages introduced by the RATS architecture (RFC
+20	   9334) are protocol-agnostic data units that are conveyed between RATS
+21	   roles during remote attestation procedures.  Conceptual Messages
+22	   describe the meaning and function of such data units within RATS data
+23	   flows without specifying a wire format, encoding, transport
+24	   mechanism, or processing details.  The initial set of Conceptual
+25	   Messages is defined in Section 8 of RFC 9334 and includes Evidence,
+26	   Attestation Results, Endorsements, Reference Values, and Appraisal
+27	   Policies.
+
+29	   This document introduces the Conceptual Message Wrapper (CMW) that
+30	   provides a common structure to encapsulate these messages.  It
+31	   defines a dedicated CBOR tag, corresponding JSON Web Token (JWT) and
+32	   CBOR Web Token (CWT) claims, and an X.509 extension.
+
+34	   This allows CMWs to be used in CBOR-based protocols, web APIs using
+35	   JWTs and CWTs, and PKIX artifacts like X.509 certificates.
+36	   Additionally, the draft defines a media type and a CoAP content
+37	   format to transport CMWs over protocols like HTTP, MIME, and CoAP.
+
+39	   The goal is to improve the interoperability and flexibility of remote
+40	   attestation protocols.  By introducing a shared message format like
+41	   the CMW, we can consistently support different attestation message
+42	   types, evolve message serialization formats without breaking
+43	   compatibility, and avoid having to redefine how messages are handled
+44	   in each protocol.
+
+46	Discussion Venues
+
+48	   This note is to be removed before publishing as an RFC.
+
+50	   Discussion of this document takes place on the Remote ATtestation
+51	   ProcedureS Working Group mailing list (rats@ietf.org), which is
+52	   archived at https://mailarchive.ietf.org/arch/browse/rats/.
+
+54	   Source for this draft and an issue tracker can be found at
+55	   https://github.com/thomas-fossati/draft-ftbs-rats-msg-wrap.
+
+57	Status of This Memo
+
+59	   This Internet-Draft is submitted in full conformance with the
+60	   provisions of BCP 78 and BCP 79.
+
+62	   Internet-Drafts are working documents of the Internet Engineering
+63	   Task Force (IETF).  Note that other groups may also distribute
+64	   working documents as Internet-Drafts.  The list of current Internet-
+65	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+67	   Internet-Drafts are draft documents valid for a maximum of six months
+68	   and may be updated, replaced, or obsoleted by other documents at any
+69	   time.  It is inappropriate to use Internet-Drafts as reference
+70	   material or to cite them other than as "work in progress."
+
+72	   This Internet-Draft will expire on 22 May 2026.
+
+74	Copyright Notice
+
+76	   Copyright (c) 2025 IETF Trust and the persons identified as the
+77	   document authors.  All rights reserved.
+
+79	   This document is subject to BCP 78 and the IETF Trust's Legal
+80	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+81	   license-info) in effect on the date of publication of this document.
+82	   Please review these documents carefully, as they describe your rights
+83	   and restrictions with respect to this document.  Code Components
+84	   extracted from this document must include Revised BSD License text as
+85	   described in Section 4.e of the Trust Legal Provisions and are
+86	   provided without warranty as described in the Revised BSD License.
+
+88	Table of Contents
+
+90	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   4
+91	   2.  Conventions and Definitions . . . . . . . . . . . . . . . . .   5
+92	   3.  Conceptual Message Wrappers . . . . . . . . . . . . . . . . .   6
+93	     3.1.  Record CMW  . . . . . . . . . . . . . . . . . . . . . . .   6
+94	       3.1.1.  CM Type . . . . . . . . . . . . . . . . . . . . . . .   8
+95	     3.2.  Tag CMW . . . . . . . . . . . . . . . . . . . . . . . . .   8
+96	       3.2.1.  How To Plug in a New Tag CMW  . . . . . . . . . . . .   9
+97	     3.3.  Collection CMW  . . . . . . . . . . . . . . . . . . . . .   9
+98	     3.4.  Demuxing  . . . . . . . . . . . . . . . . . . . . . . . .  11
+99	   4.  Cryptographic Protection of CMWs  . . . . . . . . . . . . . .  11
+100	     4.1.  Signing CBOR CMW using COSE Sign1 . . . . . . . . . . . .  12
+101	     4.2.  Signing JSON CMW using JWS  . . . . . . . . . . . . . . .  12
+102	     4.3.  Transporting CMW in COSE and JOSE Web Tokens  . . . . . .  13
+103	       4.3.1.  Encoding Requirements . . . . . . . . . . . . . . . .  13
+104	     4.4.  Transporting CMW in PKIX Formats  . . . . . . . . . . . .  14
+105	       4.4.1.  ASN.1 Module  . . . . . . . . . . . . . . . . . . . .  14
+106	       4.4.2.  Compatibility with DICE ConceptualMessageWrapper  . .  15
+107	   5.  Examples  . . . . . . . . . . . . . . . . . . . . . . . . . .  16
+108	     5.1.  JSON-encoded Record . . . . . . . . . . . . . . . . . . .  16
+109	     5.2.  CBOR-encoded Record . . . . . . . . . . . . . . . . . . .  16
+110	     5.3.  CBOR-encoded Tag CMW  . . . . . . . . . . . . . . . . . .  16
+111	     5.4.  CBOR-encoded Record with explicit CM indicator  . . . . .  17
+112	     5.5.  CBOR-encoded Collection . . . . . . . . . . . . . . . . .  17
+113	     5.6.  JSON-encoded Collection . . . . . . . . . . . . . . . . .  18
+114	     5.7.  Use in JWT  . . . . . . . . . . . . . . . . . . . . . . .  18
+115	   6.  Collected CDDL  . . . . . . . . . . . . . . . . . . . . . . .  19
+116	   7.  Implementation Status . . . . . . . . . . . . . . . . . . . .  22
+117	     7.1.  Project Veraison  . . . . . . . . . . . . . . . . . . . .  22
+118	   8.  Privacy Considerations  . . . . . . . . . . . . . . . . . . .  23
+119	   9.  Security Considerations . . . . . . . . . . . . . . . . . . .  23
+120	     9.1.  CMW Protection  . . . . . . . . . . . . . . . . . . . . .  23
+121	     9.2.  Using Collection CMWs for Evidence of Composite or Layered
+122	           Devices . . . . . . . . . . . . . . . . . . . . . . . . .  24
+123	     9.3.  Integrating CMW into Protocols  . . . . . . . . . . . . .  24
+124	   10. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  24
+125	     10.1.  CWT cmw Claim Registration . . . . . . . . . . . . . . .  25
+126	     10.2.  JWT cmw Claim Registration . . . . . . . . . . . . . . .  25
+127	     10.3.  +jws Structured Syntax Suffix  . . . . . . . . . . . . .  25
+128	       10.3.1.  Registry Contents  . . . . . . . . . . . . . . . . .  26
+129	     10.4.  RATS Conceptual Message Wrapper (CMW) Indicators
+130	            Registry . . . . . . . . . . . . . . . . . . . . . . . .  26
+131	       10.4.1.  Structure of Entries . . . . . . . . . . . . . . . .  26
+132	       10.4.2.  Provisional Registration . . . . . . . . . . . . . .  27
+133	     10.5.  Media Types  . . . . . . . . . . . . . . . . . . . . . .  28
+134	       10.5.1.  application/cmw+cbor . . . . . . . . . . . . . . . .  28
+135	       10.5.2.  application/cmw+json . . . . . . . . . . . . . . . .  29
+136	       10.5.3.  application/cmw+cose . . . . . . . . . . . . . . . .  29
+137	       10.5.4.  application/cmw+jws  . . . . . . . . . . . . . . . .  30
+138	     10.6.  CoAP Content-Formats . . . . . . . . . . . . . . . . . .  30
+139	       10.6.1.  Registering new CoAP Content-Formats for Parameterized
+140	               CMW Media Types . . . . . . . . . . . . . . . . . . .  31
+141	       10.6.2.  RFC9277 CBOR Tags  . . . . . . . . . . . . . . . . .  31
+142	     10.7.  New SMI Numbers Registrations  . . . . . . . . . . . . .  32
+143	   11. References  . . . . . . . . . . . . . . . . . . . . . . . . .  33
+144	     11.1.  Normative References . . . . . . . . . . . . . . . . . .  33
+145	     11.2.  Informative References . . . . . . . . . . . . . . . . .  35
+
+147	   Appendix A.  Registering and Using CMWs . . . . . . . . . . . . .  38
+148	   Appendix B.  Open Issues  . . . . . . . . . . . . . . . . . . . .  38
+149	   Acknowledgments . . . . . . . . . . . . . . . . . . . . . . . . .  39
+150	   Contributors  . . . . . . . . . . . . . . . . . . . . . . . . . .  39
+151	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  39
+
+153	1.  Introduction
+
+155	   The Conceptual Messages introduced by the Remote ATtestation
+156	   procedureS (RATS) architecture [RFC9334] are protocol-agnostic data
+157	   units that are conveyed between RATS roles during remote attestation
+158	   procedures.  Conceptual Messages describe the meaning and function of
+159	   such data units within RATS data flows without specifying a wire
+160	   format, encoding, transport mechanism, or processing details.  The
+161	   initial set of Conceptual Messages is defined in Section 8 of
+162	   [RFC9334] and includes Evidence, Attestation Results, Endorsements,
+163	   Reference Values, and Appraisal Policies.
+
+165	   Each conceptual message can have multiple claims encoding and
+166	   serialization formats (Section 9 of [RFC9334]).  Throughout their
+167	   lifetime, RATS conceptual messages are typically transported over
+168	   different protocols.  For example,
+
+170	   *  In a "background check" topology, Evidence (e.g., EAT [RFC9711])
+171	      first flows from the Attester to the Relying Party and then from
+172	      the Relying Party to the Verifier, each leg following a separate
+173	      protocol path.
+
+175	   *  In a "passport" topology, an attestation result payload (e.g.,
+176	      Attestation Results for Secure Interactions (AR4SI)
+177	      [I-D.ietf-rats-ar4si]) is initially sent from the Verifier to the
+178	      Attester, and later, via a different channel, from the Attester to
+179	      the Relying Party.
+
+181	   By using the CMW format outlined in this document, protocol designers
+182	   can avoid the need to update protocol specifications to accommodate
+183	   different conceptual messages and serialization formats used by
+184	   various attestation technologies.  This approach streamlines the
+185	   implementation process for developers, enabling easier support for
+186	   diverse attestation technologies.  For instance, a Relying Party
+187	   application implementer does not need to parse attestation-related
+188	   messages, such as Evidence from Attesters on IoT devices with Trusted
+189	   Platform Modules (TPM) or servers using confidential computing
+190	   hardware like Intel Trust Domain Extensions (TDX).  Instead, they can
+191	   leverage the CMW format, remaining agnostic to the specific
+192	   attestation technology.
+
+194	   A further design goal is extensibility.  This means that adding
+195	   support for new conceptual messages and new attestation technologies
+196	   should not change the core of the processor, and that a CMW stack can
+197	   be designed to offer a plug-in interface for both encoding and
+198	   decoding.  To achieve this, the format must provide consistent
+199	   message encapsulation and explicit typing.  These features allow for
+200	   selecting the appropriate message handler based on its type
+201	   identifier.  An opaque message can then be passed between the core
+202	   and the handler.
+
+204	   This document defines two encapsulation formats for RATS conceptual
+205	   messages that aim to achieve the goals stated above.
+
+207	   These encapsulation formats have been specifically designed to
+208	   possess the following characteristics:
+
+210	   *  They are self-describing, which means that they can convey precise
+211	      typing information without relying on the framing provided by the
+212	      embedding protocol or the storage system.
+
+214	   *  They are based on media types [RFC6838], which allows the cost of
+215	      their registration to be spread across numerous usage scenarios.
+
+217	   A protocol designer could use these formats, for example, to convey
+218	   Evidence, Endorsements and Reference Values in certificates and CRLs
+219	   extensions ([DICE-arch]), to embed Attestation Results or Evidence as
+220	   first-class authentication credentials in TLS handshake messages
+221	   [I-D.fossati-tls-attestation] [I-D.fossati-tls-exported-attestation],
+222	   to transport attestation-related payloads in RESTful APIs, or for
+223	   stable storage of Attestation Results in the form of file system
+224	   objects.
+
+226	   This document also defines corresponding CBOR tag, JSON Web Tokens
+227	   (JWT) and CBOR Web Tokens (CWT) claims, as well as an X.509
+228	   extension.  These allow embedding the wrapped conceptual messages
+229	   into CBOR-based protocols, web APIs, and PKIX formats and protocols.
+230	   In addition, a Media Type and a CoAP Content-Format are defined for
+231	   transporting CMWs in HTTP, MIME, CoAP and other Internet protocols.
+
+233	2.  Conventions and Definitions
+
+235	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+236	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+237	   "OPTIONAL" in this document are to be interpreted as described in
+238	   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+239	   capitals, as shown here.
+
+241	   In this document, CDDL [RFC8610] [RFC9165] is used to describe the
+242	   data formats.
+
+244	   The reader is assumed to be familiar with the vocabulary and concepts
+245	   defined in [RFC9334].
+
+247	   This document reuses the terms defined in Section 2 of [RFC9193]
+248	   (e.g., "Content-Type").
+
+250	3.  Conceptual Message Wrappers
+
+252	   A RATS Conceptual Message Wrapper (CMW) has a tree structure.  Leaf
+253	   nodes are of type "Record" (Section 3.1), or "Tag" (Section 3.2).
+254	   Intermediate nodes are of type "Collection" (Section 3.3); they hold
+255	   together multiple CMW items.
+
+257	   The following snippet outlines the productions associated with the
+258	   top-level types.
+
+260	   start = cmw
+
+262	   cmw = json-cmw / cbor-cmw
+
+264	   json-cmw = json-record / json-collection
+265	   cbor-cmw = cbor-record / cbor-collection / $cbor-tag
+
+267	   The complete CDDL can be found in Section 6.
+
+269	   Section 4.3 and Section 4.4 describe the transport of CMWs using CBOR
+270	   and JSON Web Tokens and PKIX formats, including Certificate Signing
+271	   Requests (CSRs), X.509 Certificates, and Certificate Revocation Lists
+272	   (CRLs).
+
+274	   This document only defines an encapsulation, not a security format.
+275	   It is the responsibility of the Attester to ensure that the CMW
+276	   contents have the necessary security protection.  Security
+277	   considerations are discussed in Section 9.
+
+279	3.1.  Record CMW
+
+281	   The format of the Record CMW is shown in Figure 1.  The JSON [STD90]
+282	   and CBOR [STD94] representations are provided separately.  Both the
+283	   json-record and cbor-record have the same fields except for slight
+284	   differences in the types discussed below.
+
+286	   json-record = [
+287	     type: media-type
+288	     value: base64url-string
+289	     ? ind: uint .bits cm-type
+290	   ]
+
+292	   cbor-record = [
+293	     type: coap-content-format-type / media-type
+294	     value: bytes
+295	     ? ind: uint .bits cm-type
+296	   ]
+
+298	                Figure 1: CDDL definition of the Record CMW
+
+300	   Each contains two or three members:
+
+302	   type:
+303	      Either a text string representing a Content-Type (e.g., an EAT
+304	      media type [RFC9782]) or an unsigned integer corresponding to a
+305	      CoAP Content-Format ID (Section 12.3 of [RFC7252]).  The latter is
+306	      not used in the JSON serialization.
+
+308	   value:
+309	      The RATS conceptual message serialized according to the value
+310	      defined in the type member.  When using JSON, the value field MUST
+311	      be encoded as Base64 using the URL and filename safe alphabet
+312	      (Section 5 of [RFC4648]) without padding.  This always applies,
+313	      even if the conceptual message format is already textual (e.g., a
+314	      JWT EAT).  When using CBOR, the value field MUST be encoded as a
+315	      CBOR byte string.
+
+317	   ind:
+318	      An optional bitmap with a maximum size of 4 bytes that indicates
+319	      which conceptual message types are carried in the value field.
+320	      Any combination (i.e., any value between 1 and 2^32-1 inclusive)
+321	      is allowed.  Only five bits are registered at the time of writing,
+322	      so, the acceptable values are currently limited to 1 to 31.  This
+323	      is useful only if the type is potentially ambiguous and there is
+324	      no further context available to the CMW consumer to decide.  For
+325	      example, this might be the case if the base media type is not
+326	      profiled (e.g., application/eat+cwt), if the value field contains
+327	      multiple conceptual messages with different types (e.g., both
+328	      Reference Values and Endorsements within the same application/
+329	      rim+cose), or if the same profile identifier is shared by
+330	      different conceptual messages.  The value MUST be non-zero.  The
+331	      absence of conceptual message indicator information is indicated
+332	      by omitting the ind field entirely.  For further details, see
+333	      Section 3.1.1.
+
+335	3.1.1.  CM Type
+
+337	   The cm-type type is the control type for the ind field.  As such, it
+338	   indicates which bits are allowed to be set in the ind byte string.
+
+340	   cm-type = &(
+341	     reference-values: 0
+342	     endorsements: 1
+343	     evidence: 2
+344	     attestation-results: 3
+345	     appraisal-policy: 4
+346	   )
+
+348	                  Figure 2: CDDL definition of the CM Type
+
+350	   The cm-type currently has five allowed values: Reference Values,
+351	   Endorsements, Evidence, Attestation Results, and Appraisal Policy, as
+352	   defined in Section 8 of [RFC9334].  Note that that an Appraisal
+353	   Policy may refer to the appraisal of Evidence or Attestation Results,
+354	   depending on whether the consumer of the conceptual message is a
+355	   Verifier or a Relying Party.
+
+357	   Future specifications that extend the RATS Conceptual Messages set
+358	   can add new values to the cm-type using the process defined in
+359	   Section 10.4.
+
+361	3.2.  Tag CMW
+
+363	   Tag CMWs derive their tag numbers from a corresponding CoAP Content-
+364	   Format ID using the TN() transform defined in Appendix B of
+365	   [RFC9277].  Such CBOR tag numbers are in range [1668546817,
+366	   1668612095].
+
+368	   The RATS conceptual message is first serialized according to the
+369	   Content-Format ID and then encoded as a CBOR byte string, to which
+370	   the TN-derived tag number is prepended.
+
+372	   The Tag CMW is defined in Figure 3 using two different macros.  One
+373	   for CBOR-encoded types, the other for all other types.  Both macros
+374	   take the CBOR tag number tn as a parameter.  The tag-cm-cbor macro
+375	   takes the CDDL definition of the associated conceptual message fmt as
+376	   a second parameter.
+
+378	   tag-cm-cbor<tn, fmt> = #6.<tn>(bytes .cbor fmt)
+
+380	   tag-cm-data<tn> = #6.<tn>(bytes)
+
+382	              Figure 3: CDDL definition of the Tag CMW macros
+
+384	3.2.1.  How To Plug in a New Tag CMW
+
+386	   To plug a new Tag CMW into the CDDL defined in Section 6, the $cbor-
+387	   tag type socket must be extended with a new instance of the Tag CMW
+388	   macro (i.e., one of tag-cm-cbor or tag-cm-data).
+
+390	   For instance, if a conceptual message of type my-evidence has a TN-
+391	   derived CBOR tag 1668576819, $cbor-tag would be extended as follows:
+
+393	   $cbor-tag /= tag-cm-cbor<1668576819, my-evidence>
+
+395	   my-evidence = {
+396	     &(eat_nonce: 10) => bytes .size (8..64)
+397	   }
+
+399	   Instead, if a (non-CBOR) conceptual message has a TN-derived CBOR tag
+400	   1668576935, $cbor-tag would be extended as follows:
+
+402	   $cbor-tag /= tag-cm-data<1668576935>
+
+404	   Note that since this specification defines no Tag CMW, the socket is
+405	   currently empty.
+
+407	3.3.  Collection CMW
+
+409	   Layered Attesters and composite devices (Sections 3.2 and 3.3 of
+410	   [RFC9334]) generate Evidence that consists of multiple parts.  For
+411	   example, in data center servers, it is not uncommon for separate
+412	   attesting environments (AE) to serve a subsection of the entire
+413	   machine.  One AE might measure and attest to what was booted on the
+414	   main CPU, while another AE might measure and attest to what was
+415	   booted on a SmartNIC plugged into a PCIe slot, and a third AE might
+416	   measure and attest to what was booted on the machine's GPU.  To allow
+417	   aggregation of multiple, potentially non-homogeneous evidence formats
+418	   collected from different AEs, this document defines a Collection CMW
+419	   as a container that holds several CMW items, each with a label that
+420	   is unique within the scope of the Collection.
+
+422	   Although originally designed to support layered Attester and
+423	   composite device use cases, the Collection CMW can be adapted for
+424	   other scenarios that require the aggregation of RATS conceptual
+425	   messages.  For instance, Collections may be used to group
+426	   Endorsements, Reference Values, Attestation Results, and more.  A
+427	   single Collection CMW can contain a mix of different message types,
+428	   and it can also be used to carry messages related to multiple devices
+429	   simultaneously.
+
+431	   The Collection CMW (Figure 4) is defined as a CBOR map or JSON object
+432	   containing CMW values.  The position of a cmw entry in the cmw-
+433	   collection is not significant.  Labels can be strings (or integers in
+434	   the CBOR serialization) that serve as a mnemonic for different
+435	   conceptual messages in the Collection.
+
+437	   A Collection MUST have at least one CMW entry.
+
+439	   The "__cmwc_t" key is reserved for associating an optional type with
+440	   the overall Collection and MUST NOT be used for any purpose other
+441	   than described here.
+
+443	   The value of the "__cmwc_t" key is either a Uniform Resource
+444	   Identifier (URI) or an object identifier (OID).  The OID is always
+445	   absolute and never relative.  The URI MUST be in the absolute form
+446	   (Section 4.3 of [RFC3986]).
+
+448	   The "__cmwc_t" key functions similar to an EAT profile claim (see
+449	   Section 4.3.2 of [RFC9711]), but at a higher level.  It can be used
+450	   to indicate basics like CBOR serialization and COSE algorithms just
+451	   as a profile in EAT does.  It provides a namespace in which the
+452	   collection labels are interpreted.  At the higher level, it can be
+453	   used to describe the allowed CMW collection assembly (this is
+454	   somewhat parallel to the way EAT profiles indicate which claims are
+455	   required and/or allowed).  For an example of a "__cmwc_t" that is
+456	   defined for a bundle of endorsements and reference values, see
+457	   Section 4.3.1 of [I-D.ietf-rats-corim].
+
+459	   Since the Collection CMW is recursive (a Collection CMW is itself a
+460	   CMW), implementations MAY limit the allowed depth of nesting.
+
+462	   json-collection = {
+463	     ? "__cmwc_t": ~uri / oid
+464	     + &(label: text) => json-cmw
+465	   }
+
+467	   cbor-collection = {
+468	     ? "__cmwc_t": ~uri / oid
+469	     + &(label: (int / text)) => cbor-cmw
+470	   }
+
+472	              Figure 4: CDDL definition of the Collection CMW
+
+474	3.4.  Demuxing
+
+476	   The split in the JSON/CBOR decoding path is expected to occur via the
+477	   media type or content format (see Section 10.5 and Section 10.6,
+478	   respectively), or via the container context of the embedded CMW (see
+479	   Section 10.1 and Section 10.2 for CWT/JWT, and Section 10.7 for
+480	   X.509).
+
+482	   The following pseudocode illustrates how a one-byte look-ahead is
+483	   sufficient to determine how to decode the remaining byte buffer.
+
+485	   func CMWTypeDemux(b []byte) CMWType {
+486	     if len(b) == 0 {
+487	       return Unknown
+488	     }
+
+490	     switch b[0] {
+491	     case 0x82: // 2-elements cbor-record (w/o ind field)
+492	     case 0x83: // 3-elements cbor-record (w/ ind field)
+493	     case 0x9f: // start of cbor-record using indefinite-length encoding
+494	       return CBORRecord
+495	     case 0xda: // tag-cm-cbor (CBOR Tag in the TN range)
+496	       return CBORTag
+497	     case 0x5b: // ASCII '[', start of json-record
+498	       return JSONRecord
+499	     case 0x7b: // ASCII '{', start of json-collection
+500	       return JSONCollection
+501	     case 0xa0..0xbb: // CBOR map start values, start of cbor-collection
+502	     case 0xbf:       // ditto
+503	       return CBORCollection
+504	     }
+
+506	     return Unknown
+507	   }
+
+509	   This code is provided for informational purposes only.  It is not
+510	   expected that implementations will follow this demuxing strategy.
+
+512	4.  Cryptographic Protection of CMWs
+
+514	   This section highlights a number of mechanisms through which protocol
+515	   designers can add data origin authentication, integrity, and, if used
+516	   with a challenge-response protocol, anti-replay protection when
+517	   employing CMWs.  These properties must be evaluated carefully in the
+518	   context of the overall security model of the protocol.
+
+520	4.1.  Signing CBOR CMW using COSE Sign1
+
+522	   A CBOR CMW can be signed using COSE [STD96].  A signed-cbor-cmw is a
+523	   COSE_Sign1 with the following layout:
+
+525	   signed-cbor-cmw = [
+526	     protected: bytes .cbor signed-cbor-cmw-protected-hdr
+527	     unprotected: signed-cbor-cmw-unprotected-hdr
+528	     payload: bytes .cbor cbor-cmw
+529	     signature: bytes
+530	   ]
+
+532	   The payload MUST be the CBOR-encoded Tag, Record, or Collection CMW.
+
+534	   signed-cbor-cmw-protected-hdr = {
+535	     1 => int                            ; alg
+536	     3 => "application/cmw+cbor" / 10000 ; cty
+537	     * cose.label => cose.values
+538	   }
+
+540	   signed-cbor-cmw-unprotected-hdr = {
+541	     * cose.label => cose.values
+542	   }
+
+544	   cose.label = int / text
+545	   cose.values = any
+
+547	   ; Note: 10000 is a placeholder for the CoAP C-F codepoint corresponding
+548	   ; to 'application/cmw+cbor'.  This CDDL fragment needs to be updated
+549	   ; (and this note removed) once the relevant C-F codepoint has been
+550	   ; assigned by IANA.
+
+552	   The protected header MUST include the signature algorithm identifier.
+553	   The protected header MUST include either the content type
+554	   application/cmw+cbor or the CoAP Content-Format TBD1.  Other header
+555	   parameters MAY be added to the header buckets, for example a kid that
+556	   identifies the signing key.
+
+558	4.2.  Signing JSON CMW using JWS
+
+560	   A JSON CMW can be signed using JSON Web Signature (JWS) [RFC7515].  A
+561	   signed-json-cmw is a JWS object with the following layout:
+
+563	   signed-json-cmw = {
+564	     "protected": text .b64u (text .json signed-json-cmw-protected-hdr)
+565	     ? "header": text .b64u (text .json signed-json-cmw-unprotected-hdr)
+566	     "payload": text .b64u (text .json json-cmw)
+567	     "signature": text .b64u bytes
+568	   }
+
+570	   The payload MUST be the JSON-encoded Record, or Collection CMW.
+
+572	   signed-json-cmw-protected-hdr = {
+573	     "alg": text
+574	     "cty": "application/cmw+json"
+575	     * text => text
+576	   }
+
+578	   signed-json-cmw-unprotected-hdr = {
+579	     * text => text
+580	   }
+
+582	   The protected header MUST include the signature algorithm identifier.
+583	   The protected header MUST include the content type application/
+584	   cmw+json.  Other header parameters MAY be added to the header
+585	   buckets, for example a kid that identifies the signing key.
+
+587	   For clarity, the above uses the Flattened JSON Serialization
+588	   (Section 7.2.2 of [RFC7515]).  However, the Compact Serialization
+589	   (Section 3.1 of [RFC7515]) can also be used.
+
+591	4.3.  Transporting CMW in COSE and JOSE Web Tokens
+
+593	   To facilitate the embedding of CMWs in CBOR-based protocols and web
+594	   APIs, this document defines two "cmw" claims for use with JSON Web
+595	   Tokens (JWT) and CBOR Web Tokens (CWT).
+
+597	   The definitions for these claims can be found in Section 10.2 and
+598	   Section 10.1, respectively.
+
+600	4.3.1.  Encoding Requirements
+
+602	   A Collection CMW carried in a "cmw" JWT claim MUST be a json-
+603	   collection.  A Collection CMW carried in a "cmw" CWT claim MUST be a
+604	   cbor-collection.
+
+606	   A Record CMW carried in a "cmw" JWT claim MUST be a json-record.  A
+607	   Record CMW carried in a "cmw" CWT claim MUST be a cbor-record.
+
+609	4.4.  Transporting CMW in PKIX Formats
+
+611	   CMW may need to be transported in PKIX formats, such as Certificate
+612	   Signing Requests (CSRs) or in X.509 Certificates and Certificate
+613	   Revocation Lists (CRLs).
+
+615	   The use of CMW in CSRs is documented in
+616	   [I-D.ietf-lamps-csr-attestation], while one of the possible
+617	   applications in X.509 Certificates and CRLs is detailed in
+618	   Section 6.1 of [DICE-arch].
+
+620	   This section outlines the CMW extension designed to carry CMW
+621	   objects.  Section 8 discusses some privacy considerations related to
+622	   the transport of CMW in X.509 formats.
+
+624	   The CMW extension MAY be included in X.509 Certificates, CRLs
+625	   [RFC5280], and CSRs.
+
+627	   The CMW extension MUST be identified by the following object
+628	   identifier:
+
+630	   id-pe-cmw  OBJECT IDENTIFIER ::=
+631	           { iso(1) identified-organization(3) dod(6) internet(1)
+632	             security(5) mechanisms(5) pkix(7) id-pe(1) 35 }
+
+634	   This extension SHOULD NOT be marked critical.  In cases where the
+635	   wrapped Conceptual Message is essential for granting resource access,
+636	   and there is a risk that legacy relying parties would bypass crucial
+637	   controls, it is acceptable to mark the extension as critical.
+
+639	   The CMW extension MUST have the following syntax:
+
+641	   CMW ::= CHOICE {
+642	       json UTF8String,
+643	       cbor OCTET STRING
+644	   }
+
+646	   The CMW MUST include the serialized CMW object in either JSON or CBOR
+647	   format, utilizing the appropriate CHOICE entry.
+
+649	   The DER-encoded CMW is the value of the OCTET STRING for the
+650	   extnValue field of the extension.
+
+652	4.4.1.  ASN.1 Module
+
+654	   This section provides an ASN.1 module [X.680] for the CMW extension,
+655	   following the conventions established in [RFC5912] and [RFC6268].
+
+657	   CMWExtn
+658	     { iso(1) identified-organization(3) dod(6) internet(1)
+659	       security(5) mechanisms(5) pkix(7) id-mod(0)
+660	       id-mod-cmw-extn(TBD) }
+
+662	   DEFINITIONS IMPLICIT TAGS ::=
+663	   BEGIN
+
+665	   IMPORTS
+666	     EXTENSION
+667	     FROM PKIX-CommonTypes-2009  -- RFC 5912
+668	       { iso(1) identified-organization(3) dod(6) internet(1)
+669	         security(5) mechanisms(5) pkix(7) id-mod(0)
+670	         id-mod-pkixCommon-02(57) } ;
+
+672	   -- CMW Extension
+
+674	   ext-CMW EXTENSION ::= {
+675	     SYNTAX CMW
+676	     IDENTIFIED BY id-pe-cmw }
+
+678	   -- CMW Extension OID
+
+680	   id-pe-cmw  OBJECT IDENTIFIER  ::=
+681	      { iso(1) identified-organization(3) dod(6) internet(1)
+682	        security(5) mechanisms(5) pkix(7) id-pe(1) 35 }
+
+684	   -- CMW Extension Syntax
+
+686	   CMW ::= CHOICE {
+687	       json UTF8String,
+688	       cbor OCTET STRING
+689	   }
+
+691	   END
+
+693	4.4.2.  Compatibility with DICE ConceptualMessageWrapper
+
+695	   Section 6.1.8 of [DICE-arch] specifies the ConceptualMessageWrapper
+696	   (CMW) format and its corresponding object identifier.  The CMW format
+697	   outlined in [DICE-arch] permits only a subset of the CMW grammar
+698	   defined in this document.  In particular, the Collection format
+699	   cannot be encoded using DICE CMWs.
+
+701	5.  Examples
+
+703	   The (equivalent) examples in Section 5.1, Section 5.2, and
+704	   Section 5.3 assume that the Media-Type-Name application/
+705	   vnd.example.rats-conceptual-msg has been registered alongside a
+706	   corresponding CoAP Content-Format ID 30001.  The CBOR tag 1668576935
+707	   is derived applying the TN() transform as described in Section 3.2.
+
+709	   All the examples focus on the wrapping aspects.  The wrapped messages
+710	   are not instances of real Conceptual Messages.
+
+712	5.1.  JSON-encoded Record
+
+714	   [
+715	     "application/vnd.example.rats-conceptual-msg",
+716	     "I0faVQ"
+717	   ]
+
+719	5.2.  CBOR-encoded Record
+
+721	   [
+722	     30001,
+723	     h'2347da55'
+724	   ]
+
+726	   with the following wire representation:
+
+728	   82             # array(2)
+729	      19 7531     # unsigned(30001)
+730	      44          # bytes(4)
+731	         2347da55 # "#G\xDAU"
+
+733	   Note that a Media-Type-Name can also be used with the CBOR-encoded
+734	   Record form, for example if it is known that the receiver cannot
+735	   handle CoAP Content-Formats, or (unlike the case in point) if a CoAP
+736	   Content-Format ID has not been registered.
+
+738	   [
+739	     "application/vnd.example.rats-conceptual-msg",
+740	     h'2347da55'
+741	   ]
+
+743	5.3.  CBOR-encoded Tag CMW
+
+745	   1668576935(h'2347da55')
+
+747	   with the following wire representation:
+
+749	   da 637476a7    # tag(1668576935)
+750	      44          # bytes(4)
+751	         2347da55 # "#G\xDAU"
+
+753	5.4.  CBOR-encoded Record with explicit CM indicator
+
+755	   This is an example of a signed CoRIM (Concise Reference Integrity
+756	   Manifest) [I-D.ietf-rats-corim] with an explicit ind value of
+757	   0b0000_0011 (3), indicating that the wrapped message contains both
+758	   Reference Values and Endorsements.
+
+760	   [
+761	     "application/rim+cose",
+762	     h'd28440a044d901f5a040',
+763	     3
+764	   ]
+
+766	   with the following wire representation:
+
+768	   =============== NOTE: '\' line wrapping per RFC 8792 ================
+
+770	   83                                      # array(3)
+771	      74                                   # text(20)
+772	         6170706c69636174696f6e2f72696d2b636f7365 # "application/rim+\
+773	                                                                   cose"
+774	      4a                                   # bytes(10)
+775	         d28440a044d901f5a040              # "҄@\xA0D\xD9\u0001\xF5\xA0\
+776	                                                                      @"
+777	      03                                   # unsigned(3)
+
+779	5.5.  CBOR-encoded Collection
+
+781	   The following example is a CBOR-encoded Collection CMW that assembles
+782	   conceptual messages from three attesters: Evidence for attesters A
+783	   and B and Attestation Results for attester C.  It is given an
+784	   explicit "__cmwc_t" using the URI form.
+
+786	   {
+787	     "__cmwc_t": "tag:example.com,2024:composite-attester",
+788	     / attester A / 0: [
+789	       30001,
+790	       h'2347da55',
+791	       4
+792	     ],
+793	     / attester B / 1: 1668576935(h'2347da55'),
+794	     / attester C / 2: [
+795	       "application/eat+jwt",
+796	       h'2e2e2e',
+797	       8
+798	     ]
+799	   }
+
+801	5.6.  JSON-encoded Collection
+
+803	   The following example is a JSON-encoded Collection CMW that assembles
+804	   Evidence from two attesters.
+
+806	   {
+807	     "__cmwc_t": "tag:example.com,2024:another-composite-attester",
+808	     "attester A": [
+809	       "application/eat-ucs+json",
+810	       "e30K",
+811	       4
+812	     ],
+813	     "attester B": [
+814	       "application/eat-ucs+cbor",
+815	       "oA",
+816	       4
+817	     ]
+818	   }
+
+820	5.7.  Use in JWT
+
+822	   The following example shows the use of the "cmw" JWT claim to
+823	   transport a Collection CMW in a JWT Claims Set [RFC7519]:
+
+825	   {
+826	     "cmw": {
+827	       "__cmwc_t": "tag:example.com,2024:another-composite-attester",
+828	       "attester A": [
+829	         "application/eat-ucs+json",
+830	         "e30K",
+831	         4
+832	       ],
+833	       "attester B": [
+834	         "application/eat-ucs+cbor",
+835	         "oA",
+836	         4
+837	       ]
+838	     },
+839	     "iss": "evidence collection daemon",
+840	     "exp": 1300819380
+841	   }
+
+843	6.  Collected CDDL
+
+845	   This appendix contains all the CDDL definitions included in this
+846	   specification.
+
+848	   start = cmw
+
+850	   cmw = json-cmw / cbor-cmw
+
+852	   json-cmw = json-record / json-collection
+853	   cbor-cmw = cbor-record / cbor-collection / $cbor-tag
+
+855	   json-record = [
+856	     type: media-type
+857	     value: base64url-string
+858	     ? ind: uint .bits cm-type
+859	   ]
+
+861	   cbor-record = [
+862	     type: coap-content-format-type / media-type
+863	     value: bytes
+864	     ? ind: uint .bits cm-type
+865	   ]
+
+867	   tag-cm-cbor<tn, fmt> = #6.<tn>(bytes .cbor fmt)
+
+869	   tag-cm-data<tn> = #6.<tn>(bytes)
+
+871	   json-collection = {
+872	     ? "__cmwc_t": ~uri / oid
+873	     + &(label: text) => json-cmw
+874	   }
+
+876	   cbor-collection = {
+877	     ? "__cmwc_t": ~uri / oid
+878	     + &(label: (int / text)) => cbor-cmw
+879	   }
+
+881	   media-type = text .abnf ("Content-Type" .cat Content-Type-ABNF)
+882	   base64url-string = text .regexp "[A-Za-z0-9_-]+"
+
+884	   coap-content-format-type = uint .size 2
+
+886	   oid = text .regexp "([0-2])((\\.0)|(\\.[1-9][0-9]*))*"
+
+888	   cm-type = &(
+889	     reference-values: 0
+890	     endorsements: 1
+891	     evidence: 2
+892	     attestation-results: 3
+893	     appraisal-policy: 4
+894	   )
+
+896	   Content-Type-ABNF = '
+
+898	   Content-Type   = Media-Type-Name *( *SP ";" *SP parameter )
+899	   parameter      = token "=" ( token / quoted-string )
+
+901	   token          = 1*tchar
+902	   tchar          = "!" / "#" / "$" / "%" / "&" / "\'" / "*"
+903	                  / "+" / "-" / "." / "^" / "_" / "`" / "|" / "~"
+904	                  / DIGIT / ALPHA
+905	   quoted-string  = %x22 *( qdtext / quoted-pair ) %x22
+906	   qdtext         = SP / %x21 / %x23-5B / %x5D-7E
+907	   quoted-pair    = "\\" ( SP / VCHAR )
+
+909	   Media-Type-Name = type-name "/" subtype-name
+
+911	   type-name = restricted-name
+912	   subtype-name = restricted-name
+
+914	   restricted-name = restricted-name-first *126restricted-name-chars
+915	   restricted-name-first  = ALPHA / DIGIT
+916	   restricted-name-chars  = ALPHA / DIGIT / "!" / "#" /
+917	                            "$" / "&" / "-" / "^" / "_"
+918	   restricted-name-chars =/ "." ; Characters before first dot always
+919	                                ; specify a facet name
+920	   restricted-name-chars =/ "+" ; Characters after last plus always
+921	                                ; specify a structured syntax suffix
+
+923	   DIGIT     =  %x30-39           ; 0 - 9
+924	   POS-DIGIT =  %x31-39           ; 1 - 9
+925	   ALPHA     =  %x41-5A / %x61-7A ; A - Z / a - z
+926	   SP        =  %x20
+927	   VCHAR     =  %x21-7E           ; printable ASCII (no SP)
+928	   '
+
+930	   signed-cbor-cmw = [
+931	     protected: bytes .cbor signed-cbor-cmw-protected-hdr
+932	     unprotected: signed-cbor-cmw-unprotected-hdr
+933	     payload: bytes .cbor cbor-cmw
+934	     signature: bytes
+935	   ]
+
+937	   signed-cbor-cmw-protected-hdr = {
+938	     1 => int                            ; alg
+939	     3 => "application/cmw+cbor" / 10000 ; cty
+940	     * cose.label => cose.values
+941	   }
+
+943	   signed-cbor-cmw-unprotected-hdr = {
+944	     * cose.label => cose.values
+945	   }
+
+947	   cose.label = int / text
+948	   cose.values = any
+
+950	   signed-json-cmw = {
+951	     "protected": text .b64u (text .json signed-json-cmw-protected-hdr)
+952	     ? "header": text .b64u (text .json signed-json-cmw-unprotected-hdr)
+953	     "payload": text .b64u (text .json json-cmw)
+954	     "signature": text .b64u bytes
+955	   }
+
+957	   signed-json-cmw-protected-hdr = {
+958	     "alg": text
+959	     "cty": "application/cmw+json"
+960	     * text => text
+961	   }
+
+963	   signed-json-cmw-unprotected-hdr = {
+964	     * text => text
+965	   }
+
+967	7.  Implementation Status
+
+969	   // RFC Editor: Please remove the entire section before publication,
+970	   as well as the reference to RFC 7942.
+
+972	   This section records the status of known implementations of the
+973	   protocol defined by this specification at the time of posting of this
+974	   Internet-Draft, and is based on a proposal described in [RFC7942].
+975	   The description of implementations in this section is intended to
+976	   assist the IETF in its decision processes in progressing drafts to
+977	   RFCs.  Please note that the listing of any individual implementation
+978	   here does not imply endorsement by the IETF.  Furthermore, no effort
+979	   has been spent to verify the information presented here that was
+980	   supplied by IETF contributors.  This is not intended as, and must not
+981	   be construed to be, a catalog of available implementations or their
+982	   features.  Readers are advised to note that other implementations may
+983	   exist.
+
+985	   According to [RFC7942], "this will allow reviewers and working groups
+986	   to assign due consideration to documents that have the benefit of
+987	   running code, which may serve as evidence of valuable experimentation
+988	   and feedback that have made the implemented protocols more mature.
+989	   It is up to the individual working groups to use this information as
+990	   they see fit".
+
+992	7.1.  Project Veraison
+
+994	   The organization responsible for these implementations is Project
+995	   Veraison, a Linux Foundation project hosted at the Confidential
+996	   Computing Consortium.
+
+998	   The organisation hosts two libraries which allow encoding, decoding,
+999	   and manipulation of CMW payloads: one for the Golang ecosystem
+1000	   (https://github.com/veraison/cmw), and one for Rust
+1001	   (https://github.com/veraison/rust-cmw).  These implementations cover
+1002	   all the features presented in this draft.  The maturity level is
+1003	   alpha.  The license is Apache 2.0.  The developers can be contacted
+1004	   on the Zulip channel: https://veraison.zulipchat.com/#narrow/
+1005	   stream/383526-CMW/.
+
+1007	8.  Privacy Considerations
+
+1009	   The privacy considerations outlined in Section 11 of [RFC9334] are
+1010	   fully applicable.  In particular, when a CMW contains Personally
+1011	   Identifying Information (PII), which is the case for Evidence and
+1012	   sometimes for other conceptual messages as well, care must be taken
+1013	   to prevent unintended recipients from accessing it.  Generally,
+1014	   utilizing secure channels between the parties exchanging CMWs can
+1015	   help address or mitigate these concerns.  A specific scenario arises
+1016	   when a public key certificate is issued based on Evidence information
+1017	   provided by the certificate requestor to the issuing Certification
+1018	   Authority (CA).  For instance, an individual seeking a publicly-
+1019	   trusted code signing certificate may be willing to disclose the
+1020	   details of the hardware where their code signing keys are stored
+1021	   (e.g., HSM model, patch level, etc.).  However, they likely do not
+1022	   want this information to be publicly accessible.  Applications that
+1023	   intend to publicly "broadcast" Evidence claims received from a third
+1024	   party via X.509 Certificates should define a Certificate Practices
+1025	   Statement [RFC3647] that clearly specifies the circumstances under
+1026	   which the CA can include such data in the issued certificate.  Note
+1027	   that the aforementioned consideration does not apply to cases where
+1028	   X.509 Certificates are explicitly designed as a security envelope for
+1029	   Evidence claims, such as in DICE [DICE-arch].
+
+1031	9.  Security Considerations
+
+1033	   The security considerations discussed in Section 12.2 of [RFC9334]
+1034	   concerning the protection of conceptual messages are fully
+1035	   applicable.  The following subsections provide further elaboration on
+1036	   these points, particularly in relation to Collection CMWs.
+
+1038	9.1.  CMW Protection
+
+1040	   CMW Records, Tags, and Collections alone do not offer authenticity,
+1041	   integrity protection, or confidentiality.  It is the responsibility
+1042	   of the designer for each use case to determine the necessary security
+1043	   properties and implement them accordingly.
+
+1045	   RATS conceptual messages are typically secured using cryptography.
+1046	   If the messages are already protected, no additional security
+1047	   requirements are imposed by this encapsulation.  If an adversary
+1048	   attempts to modify the payload encapsulation, it will result in
+1049	   incorrect processing of the encapsulated message, leading to an
+1050	   error.  If the messages are not protected, additional security must
+1051	   be added at a different layer.  For example, a cbor-record containing
+1052	   an Unprotected CWT Claims Set (UCCS) [RFC9781] can be signed as
+1053	   described in Section 4.1.
+
+1055	   Section 4 describes a number of methods that can be used to add
+1056	   cryptographic protection to CMW.
+
+1058	9.2.  Using Collection CMWs for Evidence of Composite or Layered Devices
+
+1060	   When a Collection CMW is used to encapsulate Evidence for composite
+1061	   or layered attestation of a single device, all Evidence messages
+1062	   within the CMW MUST be cryptographically bound together to prevent an
+1063	   attacker from replacing Evidence from a compromised device with that
+1064	   from a non-compromised device.  If the Collection CMW is not
+1065	   protected from tampering by external security measures (such as
+1066	   object security primitives) or internal mechanisms (such as intra-
+1067	   item binding), an attacker could manipulate the Collection's contents
+1068	   to deceive the Verifier into accepting bogus Evidence as genuine.
+
+1070	   Authenticity and integrity protection is expected to be provided by
+1071	   the underlying attestation technology.  For example, key material
+1072	   used to sign/bind an entire Collection CMW should be an attestation
+1073	   key, handled as described in Section 12.1 of [RFC9334].  The binding
+1074	   does not necessarily have to be a signature over the Collection CMW,
+1075	   it might also be achieved through identifiers, linking claims (e.g.,
+1076	   nonces) across CMW collection items, signing or hashing between the
+1077	   members of the Collection.  It is the responsibility of the Attester
+1078	   who creates the Collection CMW to ensure that the contents of the
+1079	   Collection are integrity-protected.
+
+1081	9.3.  Integrating CMW into Protocols
+
+1083	   When CMW is integrated into some hosting protocol (for example,
+1084	   attested CSR [I-D.ietf-lamps-csr-attestation] or attested TLS
+1085	   [I-D.fossati-tls-attestation]
+1086	   [I-D.fossati-tls-exported-attestation]), it is up to that hosting
+1087	   protocol to describe how CMW is intended to be used and how it fits
+1088	   into the overall security model.
+
+1090	   Such an analysis should consider the types of conceptual messages
+1091	   allowed, including the permitted combinations, the protection
+1092	   requirements, the interface with the hosting protocol, and any other
+1093	   security-relevant aspect arising from the interaction between the CMW
+1094	   assembly and the hosting protocol.
+
+1096	10.  IANA Considerations
+
+1098	   // RFC Editor: Please replace "RFCthis" with the RFC number assigned
+1099	   to this document.
+
+1101	   // RFC Editor: This document uses the CPA (code point allocation)
+1102	   convention described in [I-D.bormann-cbor-draft-numbers].  For each
+1103	   usage of the term "CPA", please remove the prefix "CPA" from the
+1104	   indicated value and replace the residue with the value assigned by
+1105	   IANA; perform an analogous substitution for all other occurrences of
+1106	   the prefix "CPA" in the document.  Finally, please remove this note.
+
+1108	10.1.  CWT cmw Claim Registration
+
+1110	   IANA is requested to add a new cmw claim to the "CBOR Web Token (CWT)
+1111	   Claims" registry [IANA.cwt] as follows:
+
+1113	   *  Claim Name: cmw
+
+1115	   *  Claim Description: A RATS Conceptual Message Wrapper
+
+1117	   *  JWT Claim Name: cmw
+
+1119	   *  Claim Key: CPA299
+
+1121	   *  Claim Value Type(s): CBOR map, CBOR array, or CBOR tag
+
+1123	   *  Change Controller: IETF
+
+1125	   *  Specification Document(s): Section 3.1, Section 3.3 and
+1126	      Section 3.2 of RFCthis
+
+1128	10.2.  JWT cmw Claim Registration
+
+1130	   IANA is requested to add a new cmw claim to the "JSON Web Token
+1131	   Claims" registry of the "JSON Web Token (JWT)" registry group
+1132	   [IANA.jwt] as follows:
+
+1134	   *  Claim Name: cmw
+
+1136	   *  Claim Description: A RATS Conceptual Message Wrapper
+
+1138	   *  Change Controller: IETF
+
+1140	   *  Specification Document(s): Section 3.1 and Section 3.3 of RFCthis
+
+1142	10.3.  +jws Structured Syntax Suffix
+
+1144	   IANA is requested to register the +jws structured syntax suffix in
+1145	   the "Structured Syntax Suffixes" registry
+1146	   [IANA.media-type-structured-suffix] in the manner described in
+1147	   [RFC6838], which can be used to indicate that the media type is
+1148	   encoded as JSON Web Signature (JWS) [RFC7515].
+
+1150	10.3.1.  Registry Contents
+
+1152	   Name:  JSON Web Signature (JWS)
+1153	   +suffix:  +jws
+1154	   References:  [RFC7515]
+1155	   Encoding Considerations:  binary; values are represented as a JSON
+1156	      Object or as a series of base64url-encoded values each separated
+1157	      from the next by a single period ('.') character.
+1158	   Interoperability Considerations:  n/a
+1159	   Fragment Identifier Considerations:  n/a
+1160	   Security Considerations:  See Section 10 of [RFC7515]
+1161	   Contact:  RATS WG mailing list (rats@ietf.org), or IETF Security Area
+1162	      (saag@ietf.org)
+1163	   Author/Change Controller:  Remote ATtestation ProcedureS (RATS)
+1164	      Working Group.  The IETF has change control over this
+1165	      registration.
+
+1167	10.4.  RATS Conceptual Message Wrapper (CMW) Indicators Registry
+
+1169	   This specification defines a new "RATS Conceptual Message Wrapper
+1170	   (CMW) Indicators" registry, with "IETF Review" policy (Section 4.8 of
+1171	   [BCP26]).
+
+1173	   The objective is to register CMW Indicator values for all RATS
+1174	   Conceptual Messages (see Section 8 of [RFC9334]).
+
+1176	   This registry is to be added to the Remote Attestation Procedures
+1177	   (RATS) registry group at [IANA.rats].
+
+1179	   Indicator values should be added in ascending order, with no gaps
+1180	   between them.
+
+1182	   Acceptable values correspond to the RATS conceptual messages defined
+1183	   by the RATS architecture [RFC9334] and any updates to it.
+
+1185	10.4.1.  Structure of Entries
+
+1187	   Each entry in the registry must include:
+
+1189	   Indicator value:
+1190	      A number corresponding to the bit position in the ind bitmap
+1191	      (Section 3.1).
+
+1193	   Conceptual Message name:
+1194	      A text string describing the RATS conceptual message this
+1195	      indicator corresponds to.
+
+1197	   Reference:
+
+1199	      A reference to a document, if available, or the registrant.
+
+1201	   The initial registrations for the registry are detailed in Table 1.
+
+1203	       +=================+=========================+===============+
+1204	       | Indicator value | Conceptual Message name | Reference     |
+1205	       +=================+=========================+===============+
+1206	       | 0               | Reference Values        | Section 3.1.1 |
+1207	       |                 |                         | of RFCthis    |
+1208	       +-----------------+-------------------------+---------------+
+1209	       | 1               | Endorsements            | Section 3.1.1 |
+1210	       |                 |                         | of RFCthis    |
+1211	       +-----------------+-------------------------+---------------+
+1212	       | 2               | Evidence                | Section 3.1.1 |
+1213	       |                 |                         | of RFCthis    |
+1214	       +-----------------+-------------------------+---------------+
+1215	       | 3               | Attestation Results     | Section 3.1.1 |
+1216	       |                 |                         | of RFCthis    |
+1217	       +-----------------+-------------------------+---------------+
+1218	       | 4               | Appraisal Policy        | Section 3.1.1 |
+1219	       |                 |                         | of RFCthis    |
+1220	       +-----------------+-------------------------+---------------+
+1221	       | 5-31            | Unassigned              |               |
+1222	       +-----------------+-------------------------+---------------+
+
+1224	             Table 1: CMW Indicators Registry Initial Contents
+
+1226	10.4.2.  Provisional Registration
+
+1228	   // RFC Editor: Please remove this section before publication, as well
+1229	   as the reference to the provisional CMW Indicators registry.
+
+1231	   Before the creation of the registry by IANA, new codepoints can be
+1232	   added to the provisional CMW Indicators registry (https://github.com/
+1233	   ietf-rats-wg/draft-ietf-rats-msg-wrap/blob/main/provisional/cmw-
+1234	   indicators-registry.md) by following the documented procedure.
+
+1236	   Table 1 will be regularly updated, prior to publication of this
+1237	   specification as an RFC, to match the contents of the provisional
+1238	   registry.
+
+1240	   The provisional registry will be discontinued once IANA establishes
+1241	   the permanent registry, which is expected to coincide with the
+1242	   publication of the current document.
+
+1244	10.5.  Media Types
+
+1246	   IANA is requested to add the following media types to the "Media
+1247	   Types" registry [IANA.media-types].
+
+1249	     +==========+======================+============================+
+1250	     | Name     | Template             | Reference                  |
+1251	     +==========+======================+============================+
+1252	     | cmw+cbor | application/cmw+cbor | Section 3.1, Section 3.2   |
+1253	     |          |                      | and Section 3.3 of RFCthis |
+1254	     +----------+----------------------+----------------------------+
+1255	     | cmw+json | application/cmw+json | Section 3.1 and            |
+1256	     |          |                      | Section 3.3 of RFCthis     |
+1257	     +----------+----------------------+----------------------------+
+1258	     | cmw+cose | application/cmw+cose | Section 4.1 of RFCthis     |
+1259	     +----------+----------------------+----------------------------+
+1260	     | cmw+jws  | application/cmw+jws  | Section 4.2 of RFCthis     |
+1261	     +----------+----------------------+----------------------------+
+
+1263	                         Table 2: CMW Media Types
+
+1265	10.5.1.  application/cmw+cbor
+
+1267	   Type name:  application
+1268	   Subtype name:  cmw+cbor
+1269	   Required parameters:  n/a
+1270	   Optional parameters:  cmwc_t (Collection CMW type in string format.
+1271	      OIDs must use the dotted-decimal notation.  The parameter value is
+1272	      case-insensitive.  It must not be used for CMW that are not
+1273	      Collections.)
+1274	   Encoding considerations:  binary (CBOR)
+1275	   Security considerations:  Section 9 of RFCthis
+1276	   Interoperability considerations:  n/a
+1277	   Published specification:  RFCthis
+1278	   Applications that use this media type:  Attesters, Verifiers,
+1279	      Endorsers and Reference-Value providers, Relying Parties that need
+1280	      to transfer CMW payloads over HTTP(S), CoAP(S), and other
+1281	      transports.
+1282	   Fragment identifier considerations:  The syntax and semantics of
+1283	      fragment identifiers are as specified for "application/cbor".  (No
+1284	      fragment identification syntax is currently defined for
+1285	      "application/cbor".)
+1286	   Person & email address to contact for further information:  RATS WG
+1287	      mailing list (rats@ietf.org)
+1288	   Intended usage:  COMMON
+1289	   Restrictions on usage:  none
+1290	   Author/Change controller:  IETF
+1291	   Provisional registration:  no
+
+1293	10.5.2.  application/cmw+json
+
+1295	   Type name:  application
+1296	   Subtype name:  cmw+json
+1297	   Required parameters:  n/a
+1298	   Optional parameters:  cmwc_t (Collection CMW type in string format.
+1299	      OIDs must use the dotted-decimal notation.  The parameter value is
+1300	      case-insensitive.  It must not be used for CMW that are not
+1301	      Collections.)
+1302	   Encoding considerations:  binary (JSON is UTF-8-encoded text)
+1303	   Security considerations:  Section 9 of RFCthis
+1304	   Interoperability considerations:  n/a
+1305	   Published specification:  RFCthis
+1306	   Applications that use this media type:  Attesters, Verifiers,
+1307	      Endorsers and Reference-Value providers, Relying Parties that need
+1308	      to transfer CMW payloads over HTTP(S), CoAP(S), and other
+1309	      transports.
+1310	   Fragment identifier considerations:  The syntax and semantics of
+1311	      fragment identifiers are as specified for "application/json".  (No
+1312	      fragment identification syntax is currently defined for
+1313	      "application/json".)
+1314	   Person & email address to contact for further information:  RATS WG
+1315	      mailing list (rats@ietf.org)
+1316	   Intended usage:  COMMON
+1317	   Restrictions on usage:  none
+1318	   Author/Change controller:  IETF
+1319	   Provisional registration:  no
+
+1321	10.5.3.  application/cmw+cose
+
+1323	   Type name:  application
+1324	   Subtype name:  cmw+cose
+1325	   Required parameters:  n/a
+1326	   Optional parameters:  cmwc_t (Collection CMW type in string format.
+1327	      OIDs must use the dotted-decimal notation.  The parameter value is
+1328	      case-insensitive.  It must not be used for CMW that are not
+1329	      Collections.)  Note that the cose-type parameter is explicitly not
+1330	      supported, as it is understood to be "cose-sign1".
+1331	   Encoding considerations:  binary (CBOR)
+1332	   Security considerations:  Section 9 of RFCthis
+1333	   Interoperability considerations:  n/a
+1334	   Published specification:  RFCthis
+1335	   Applications that use this media type:  Attesters, Verifiers,
+1336	      Endorsers and Reference-Value providers, Relying Parties that need
+1337	      to transfer CMW payloads over HTTP(S), CoAP(S), and other
+1338	      transports.
+1339	   Fragment identifier considerations:  n/a
+1340	   Person & email address to contact for further information:  RATS WG
+1341	      mailing list (rats@ietf.org)
+1342	   Intended usage:  COMMON
+1343	   Restrictions on usage:  none
+1344	   Author/Change controller:  IETF
+1345	   Provisional registration:  no
+
+1347	10.5.4.  application/cmw+jws
+
+1349	   Type name:  application
+1350	   Subtype name:  cmw+jws
+1351	   Required parameters:  n/a
+1352	   Optional parameters:  cmwc_t (Collection CMW type in string format.
+1353	      OIDs must use the dotted-decimal notation.  The parameter value is
+1354	      case-insensitive.  It must not be used for CMW that are not
+1355	      Collections.)
+1356	   Encoding considerations:  8bit; values are represented as a JSON
+1357	      Object or as a series of base64url-encoded values each separated
+1358	      from the next by a single period ('.') character.
+1359	   Security considerations:  Section 9 of RFCthis
+1360	   Interoperability considerations:  n/a
+1361	   Published specification:  RFCthis
+1362	   Applications that use this media type:  Attesters, Verifiers,
+1363	      Endorsers and Reference-Value providers, Relying Parties that need
+1364	      to transfer CMW payloads over HTTP(S), CoAP(S), and other
+1365	      transports.
+1366	   Fragment identifier considerations:  n/a
+1367	   Person & email address to contact for further information:  RATS WG
+1368	      mailing list (rats@ietf.org)
+1369	   Intended usage:  COMMON
+1370	   Restrictions on usage:  none
+1371	   Author/Change controller:  IETF
+1372	   Provisional registration:  no
+
+1374	10.6.  CoAP Content-Formats
+
+1376	   IANA is requested to register the following Content-Format IDs in the
+1377	   "CoAP Content-Formats" registry, within the "Constrained RESTful
+1378	   Environments (CoRE) Parameters" registry group
+1379	   [IANA.core-parameters]:
+
+1381	   +==============+================+======+============================+
+1382	   | Content-Type | Content        | ID   | Reference                  |
+1383	   |              | Coding         |      |                            |
+1384	   +==============+================+======+============================+
+1385	   | application/ | -              | TBD1 | Section 3.1, Section 3.2   |
+1386	   | cmw+cbor     |                |      | and Section 3.3 of RFCthis |
+1387	   +--------------+----------------+------+----------------------------+
+1388	   | application/ | -              | TBD2 | Section 3.1 and            |
+1389	   | cmw+json     |                |      | Section 3.3 of RFCthis     |
+1390	   +--------------+----------------+------+----------------------------+
+1391	   | application/ | -              | TBD3 | Section 4.1 of RFCthis     |
+1392	   | cmw+cose     |                |      |                            |
+1393	   +--------------+----------------+------+----------------------------+
+1394	   | application/ | -              | TBD4 | Section 4.2 of RFCthis     |
+1395	   | cmw+jws      |                |      |                            |
+1396	   +--------------+----------------+------+----------------------------+
+
+1398	                     Table 3: New CoAP Content Formats
+
+1400	   If possible, TBD1, TBD2, TBD3 and TBD4 should be assigned in the
+1401	   256..9999 range.
+
+1403	10.6.1.  Registering new CoAP Content-Formats for Parameterized CMW
+1404	         Media Types
+
+1406	   New CoAP Content-Formats can be created based on parameterized
+1407	   instances of the application/cmw+json, application/cmw+cbor,
+1408	   application/cmw+cose and application/cmw+jws media types.
+
+1410	   When assigning a new CoAP Content-Format ID for a CMW media type that
+1411	   utilizes the cmwc_t parameter, the registrar must check (directly or
+1412	   through the Designated Expert) that:
+
+1414	   *  The corresponding CMW is a Collection (Section 3.3), and
+
+1416	   *  The cmwc_t value is either a (non-relative) OID or an absolute
+1417	      URI.
+
+1419	10.6.2.  RFC9277 CBOR Tags
+
+1421	   // RFC Editor: Once IANA has allocated TBD1..TBD4, please replace the
+1422	   placeholders in the first column of Table 4 with the values computed
+1423	   using the TN() formula in Appendix B of [RFC9277].  Similarly,
+1424	   replace the macro parameters in Figure 5.
+
+1426	   Registering the CoAP Content-Formats listed in Table 3 automatically
+1427	   allocates CBOR Tags in the range [1668546817, 1668612095], using the
+1428	   TN() transform defined in Appendix B of [RFC9277].  The allocated
+1429	   CBOR Tag numbers and the corresponding data items are listed in
+1430	   Table 4.
+
+1432	   +============+======================================================+
+1433	   | Tag        | Tag Content                                          |
+1434	   | Number     |                                                      |
+1435	   +============+======================================================+
+1436	   | TN(TBD1)   | bytes .cbor cbor-cmw                                 |
+1437	   +------------+------------------------------------------------------+
+1438	   | TN(TBD2)   | bytes-wrapped json-cmw                               |
+1439	   +------------+------------------------------------------------------+
+1440	   | TN(TBD3)   | bytes .cbor signed-cbor-cmw                          |
+1441	   +------------+------------------------------------------------------+
+1442	   | TN(TBD4)   | bytes-wrapped signed-json-cmw or equivalent using    |
+1443	   |            | JWS Compact Serialization (Section 3.1 of [RFC7515]) |
+1444	   +------------+------------------------------------------------------+
+
+1446	                       Table 4: TN-derived CBOR Tags
+
+1448	   Figure 5 extends the $cbor-tag socket defined in Section 3.2 to add
+1449	   the definitions of the associated Tag CMWs.  Note that CMWs in Tag
+1450	   and Record form are excluded from the productions.  This is because
+1451	   they can already be represented as a CMW, so the extra wrapping would
+1452	   be redundant.
+
+1454	   $cbor-tag /= tag-cm-cbor<1668547091, cbor-collection>
+1455	   $cbor-tag /= tag-cm-cbor<1668547092, signed-cbor-cmw>
+1456	   $cbor-tag /= tag-cm-data<1668547093> ; bytes(cmw+json collection)
+1457	   $cbor-tag /= tag-cm-data<1668547094> ; bytes(cmw+jws)
+
+1459	                       Figure 5: Tag CMW definitions
+
+1461	10.7.  New SMI Numbers Registrations
+
+1463	   IANA has assigned an object identifier (OID) for the CMW extension
+1464	   defined in Section 4.4 in the "SMI Security for PKIX Certificate
+1465	   Extension" registry of the "SMI Numbers" [IANA.smi-numbers] registry
+1466	   group as follows:
+
+1468	   +=========+=============+========================+
+1469	   | Decimal | Description | References             |
+1470	   +=========+=============+========================+
+1471	   | 35      | id-pe-cmw   | Section 4.4 of RFCthis |
+1472	   +---------+-------------+------------------------+
+
+1474	             Table 5: New CMW Extension OID
+
+1476	   IANA is requested to assign an object identifier (OID) for the ASN.1
+1477	   Module defined in Section 4.4.1 in the "SMI Security for PKIX Module
+1478	   Identifier" registry of the "SMI Numbers" [IANA.smi-numbers] registry
+1479	   group:
+
+1481	   +=========+=================+==========================+
+1482	   | Decimal | Description     | References               |
+1483	   +=========+=================+==========================+
+1484	   | TBD     | id-mod-cmw-extn | Section 4.4.1 of RFCthis |
+1485	   +---------+-----------------+--------------------------+
+
+1487	                Table 6: New ASN.1 Module OID
+
+1489	11.  References
+
+1491	11.1.  Normative References
+
+1493	   [BCP26]    Cotton, M., Leiba, B., and T. Narten, "Guidelines for
+1494	              Writing an IANA Considerations Section in RFCs", BCP 26,
+1495	              RFC 8126, DOI 10.17487/RFC8126, June 2017,
+1496	              <https://www.rfc-editor.org/rfc/rfc8126>.
+
+1498	   [IANA.core-parameters]
+1499	              IANA, "Constrained RESTful Environments (CoRE)
+1500	              Parameters",
+1501	              <https://www.iana.org/assignments/core-parameters>.
+
+1503	   [IANA.cwt] IANA, "CBOR Web Token (CWT) Claims",
+1504	              <https://www.iana.org/assignments/cwt>.
+
+1506	   [IANA.jwt] IANA, "JSON Web Token (JWT)",
+1507	              <https://www.iana.org/assignments/jwt>.
+
+1509	   [IANA.media-type-structured-suffix]
+1510	              IANA, "Structured Syntax Suffixes",
+1511	              <https://www.iana.org/assignments/media-type-structured-
+1512	              suffix>.
+
+1514	   [IANA.media-types]
+1515	              IANA, "Media Types",
+1516	              <https://www.iana.org/assignments/media-types>.
+
+1518	   [IANA.rats]
+1519	              IANA, "Remote Attestation Procedures (RATS)",
+1520	              <https://www.iana.org/assignments/rats>.
+
+1522	   [IANA.smi-numbers]
+1523	              IANA, "Structure of Management Information (SMI) Numbers
+1524	              (MIB Module Registrations)",
+1525	              <https://www.iana.org/assignments/smi-numbers>.
+
+1527	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+1528	              Requirement Levels", BCP 14, RFC 2119,
+1529	              DOI 10.17487/RFC2119, March 1997,
+1530	              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+1532	   [RFC3986]  Berners-Lee, T., Fielding, R., and L. Masinter, "Uniform
+1533	              Resource Identifier (URI): Generic Syntax", STD 66,
+1534	              RFC 3986, DOI 10.17487/RFC3986, January 2005,
+1535	              <https://www.rfc-editor.org/rfc/rfc3986>.
+
+1537	   [RFC4648]  Josefsson, S., "The Base16, Base32, and Base64 Data
+1538	              Encodings", RFC 4648, DOI 10.17487/RFC4648, October 2006,
+1539	              <https://www.rfc-editor.org/rfc/rfc4648>.
+
+1541	   [RFC5280]  Cooper, D., Santesson, S., Farrell, S., Boeyen, S.,
+1542	              Housley, R., and W. Polk, "Internet X.509 Public Key
+1543	              Infrastructure Certificate and Certificate Revocation List
+1544	              (CRL) Profile", RFC 5280, DOI 10.17487/RFC5280, May 2008,
+1545	              <https://www.rfc-editor.org/rfc/rfc5280>.
+
+1547	   [RFC6838]  Freed, N., Klensin, J., and T. Hansen, "Media Type
+1548	              Specifications and Registration Procedures", BCP 13,
+1549	              RFC 6838, DOI 10.17487/RFC6838, January 2013,
+1550	              <https://www.rfc-editor.org/rfc/rfc6838>.
+
+1552	   [RFC7252]  Shelby, Z., Hartke, K., and C. Bormann, "The Constrained
+1553	              Application Protocol (CoAP)", RFC 7252,
+1554	              DOI 10.17487/RFC7252, June 2014,
+1555	              <https://www.rfc-editor.org/rfc/rfc7252>.
+
+1557	   [RFC7515]  Jones, M., Bradley, J., and N. Sakimura, "JSON Web
+1558	              Signature (JWS)", RFC 7515, DOI 10.17487/RFC7515, May
+1559	              2015, <https://www.rfc-editor.org/rfc/rfc7515>.
+
+1561	   [RFC7519]  Jones, M., Bradley, J., and N. Sakimura, "JSON Web Token
+1562	              (JWT)", RFC 7519, DOI 10.17487/RFC7519, May 2015,
+1563	              <https://www.rfc-editor.org/rfc/rfc7519>.
+
+1565	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+1566	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+1567	              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+1569	   [RFC8610]  Birkholz, H., Vigano, C., and C. Bormann, "Concise Data
+1570	              Definition Language (CDDL): A Notational Convention to
+1571	              Express Concise Binary Object Representation (CBOR) and
+1572	              JSON Data Structures", RFC 8610, DOI 10.17487/RFC8610,
+1573	              June 2019, <https://www.rfc-editor.org/rfc/rfc8610>.
+
+1575	   [RFC9165]  Bormann, C., "Additional Control Operators for the Concise
+1576	              Data Definition Language (CDDL)", RFC 9165,
+1577	              DOI 10.17487/RFC9165, December 2021,
+1578	              <https://www.rfc-editor.org/rfc/rfc9165>.
+
+1580	   [RFC9277]  Richardson, M. and C. Bormann, "On Stable Storage for
+1581	              Items in Concise Binary Object Representation (CBOR)",
+1582	              RFC 9277, DOI 10.17487/RFC9277, August 2022,
+1583	              <https://www.rfc-editor.org/rfc/rfc9277>.
+
+1585	   [STD90]    Bray, T., Ed., "The JavaScript Object Notation (JSON) Data
+1586	              Interchange Format", STD 90, RFC 8259,
+1587	              DOI 10.17487/RFC8259, December 2017,
+1588	              <https://www.rfc-editor.org/rfc/rfc8259>.
+
+1590	   [STD94]    Bormann, C. and P. Hoffman, "Concise Binary Object
+1591	              Representation (CBOR)", STD 94, RFC 8949,
+1592	              DOI 10.17487/RFC8949, December 2020,
+1593	              <https://www.rfc-editor.org/rfc/rfc8949>.
+
+1595	   [X.680]    International Telephone and Telegraph Consultative
+1596	              Committee, "Specification of Abstract Syntax Notation One
+1597	              (ASN.1): Specification of Basic Notation",
+1598	              CCITT Recommendation X.680, July 1994.
+
+1600	11.2.  Informative References
+
+1602	   [DICE-arch]
+1603	              Trusted Computing Group, "DICE Attestation Architecture",
+1604	              January 2024, <https://trustedcomputinggroup.org/wp-
+1605	              content/uploads/DICE-Attestation-Architecture-Version-1.1-
+1606	              Revision-18_pub.pdf>.
+
+1608	   [I-D.bormann-cbor-draft-numbers]
+1609	              Bormann, C., "Managing CBOR codepoints in Internet-
+1610	              Drafts", Work in Progress, Internet-Draft, draft-bormann-
+1611	              cbor-draft-numbers-06, 7 July 2025,
+1612	              <https://datatracker.ietf.org/doc/html/draft-bormann-cbor-
+1613	              draft-numbers-06>.
+
+1615	   [I-D.fossati-tls-attestation]
+1616	              Tschofenig, H., Sheffer, Y., Howard, P., Mihalcea, I.,
+1617	              Deshpande, Y., Niemi, A., and T. Fossati, "Using
+1618	              Attestation in Transport Layer Security (TLS) and Datagram
+1619	              Transport Layer Security (DTLS)", Work in Progress,
+1620	              Internet-Draft, draft-fossati-tls-attestation-09, 30 April
+1621	              2025, <https://datatracker.ietf.org/doc/html/draft-
+1622	              fossati-tls-attestation-09>.
+
+1624	   [I-D.fossati-tls-exported-attestation]
+1625	              Fossati, T., Sardar, M. U., Reddy.K, T., Sheffer, Y.,
+1626	              Tschofenig, H., and I. Mihalcea, "Remote Attestation with
+1627	              Exported Authenticators", Work in Progress, Internet-
+1628	              Draft, draft-fossati-tls-exported-attestation-02, 3 July
+1629	              2025, <https://datatracker.ietf.org/doc/html/draft-
+1630	              fossati-tls-exported-attestation-02>.
+
+1632	   [I-D.ietf-lamps-csr-attestation]
+1633	              Ounsworth, M., Tschofenig, H., Birkholz, H., Wiseman, M.,
+1634	              and N. Smith, "Use of Remote Attestation with
+1635	              Certification Signing Requests", Work in Progress,
+1636	              Internet-Draft, draft-ietf-lamps-csr-attestation-21, 5
+1637	              October 2025, <https://datatracker.ietf.org/doc/html/
+1638	              draft-ietf-lamps-csr-attestation-21>.
+
+1640	   [I-D.ietf-rats-ar4si]
+1641	              Voit, E., Birkholz, H., Hardjono, T., Fossati, T., and V.
+1642	              Scarlata, "Attestation Results for Secure Interactions",
+1643	              Work in Progress, Internet-Draft, draft-ietf-rats-ar4si-
+1644	              09, 15 August 2025,
+1645	              <https://datatracker.ietf.org/doc/html/draft-ietf-rats-
+1646	              ar4si-09>.
+
+1648	   [I-D.ietf-rats-corim]
+1649	              Birkholz, H., Fossati, T., Deshpande, Y., Smith, N., and
+1650	              W. Pan, "Concise Reference Integrity Manifest", Work in
+1651	              Progress, Internet-Draft, draft-ietf-rats-corim-09, 20
+1652	              October 2025, <https://datatracker.ietf.org/doc/html/
+1653	              draft-ietf-rats-corim-09>.
+
+1655	   [RFC3647]  Chokhani, S., Ford, W., Sabett, R., Merrill, C., and S.
+1656	              Wu, "Internet X.509 Public Key Infrastructure Certificate
+1657	              Policy and Certification Practices Framework", RFC 3647,
+1658	              DOI 10.17487/RFC3647, November 2003,
+1659	              <https://www.rfc-editor.org/rfc/rfc3647>.
+
+1661	   [RFC5912]  Hoffman, P. and J. Schaad, "New ASN.1 Modules for the
+1662	              Public Key Infrastructure Using X.509 (PKIX)", RFC 5912,
+1663	              DOI 10.17487/RFC5912, June 2010,
+1664	              <https://www.rfc-editor.org/rfc/rfc5912>.
+
+1666	   [RFC6268]  Schaad, J. and S. Turner, "Additional New ASN.1 Modules
+1667	              for the Cryptographic Message Syntax (CMS) and the Public
+1668	              Key Infrastructure Using X.509 (PKIX)", RFC 6268,
+1669	              DOI 10.17487/RFC6268, July 2011,
+1670	              <https://www.rfc-editor.org/rfc/rfc6268>.
+
+1672	   [RFC7942]  Sheffer, Y. and A. Farrel, "Improving Awareness of Running
+1673	              Code: The Implementation Status Section", BCP 205,
+1674	              RFC 7942, DOI 10.17487/RFC7942, July 2016,
+1675	              <https://www.rfc-editor.org/rfc/rfc7942>.
+
+1677	   [RFC9193]  Keränen, A. and C. Bormann, "Sensor Measurement Lists
+1678	              (SenML) Fields for Indicating Data Value Content-Format",
+1679	              RFC 9193, DOI 10.17487/RFC9193, June 2022,
+1680	              <https://www.rfc-editor.org/rfc/rfc9193>.
+
+1682	   [RFC9334]  Birkholz, H., Thaler, D., Richardson, M., Smith, N., and
+1683	              W. Pan, "Remote ATtestation procedureS (RATS)
+1684	              Architecture", RFC 9334, DOI 10.17487/RFC9334, January
+1685	              2023, <https://www.rfc-editor.org/rfc/rfc9334>.
+
+1687	   [RFC9711]  Lundblade, L., Mandyam, G., O'Donoghue, J., and C.
+1688	              Wallace, "The Entity Attestation Token (EAT)", RFC 9711,
+1689	              DOI 10.17487/RFC9711, April 2025,
+1690	              <https://www.rfc-editor.org/rfc/rfc9711>.
+
+1692	   [RFC9781]  Birkholz, H., O'Donoghue, J., Cam-Winget, N., and C.
+1693	              Bormann, "A Concise Binary Object Representation (CBOR)
+1694	              Tag for Unprotected CBOR Web Token Claims Sets (UCCS)",
+1695	              RFC 9781, DOI 10.17487/RFC9781, May 2025,
+1696	              <https://www.rfc-editor.org/rfc/rfc9781>.
+
+1698	   [RFC9782]  Lundblade, L., Birkholz, H., and T. Fossati, "Entity
+1699	              Attestation Token (EAT) Media Types", RFC 9782,
+1700	              DOI 10.17487/RFC9782, May 2025,
+1701	              <https://www.rfc-editor.org/rfc/rfc9782>.
+
+1703	   [STD96]    Schaad, J., "CBOR Object Signing and Encryption (COSE):
+1704	              Structures and Process", STD 96, RFC 9052,
+1705	              DOI 10.17487/RFC9052, August 2022,
+1706	              <https://www.rfc-editor.org/rfc/rfc9052>.
+
+1708	Appendix A.  Registering and Using CMWs
+
+1710	   Figure 6 describes the registration preconditions for using CMWs in
+1711	   either Record CMW or Tag CMW forms.  When using Collection CMW, the
+1712	   preconditions apply for each entry in the Collection.
+
+1714	                     .---------------.   .---------.
+1715	                    | Reuse EAT/CoRIM | | Register  |
+1716	                    | media type(s)   | | new media |
+1717	                    | + profile       | | type      |
+1718	                     `---+----+------'   `-+----+--'
+1719	                         |    |            |    |
+1720	                         |  .-+------------+-.  |
+1721	                         | |  |  Register  |  | |
+1722	                       .-(-+-'   new CoAP   `-+-(-.
+1723	                      |  | |  Content-Format  | |  |
+1724	                      |  |  `-------+--------'  |  |
+1725	                      |  |          |           |  |
+1726	                      |  |          v           |  |
+1727	                      |  |   .--------------.   |  |
+1728	                      |  |  | Automatically  |  |  |
+1729	                      |  |  | derive CBOR    |  |  |
+1730	                      |  |  | tag [RFC9277]  |  |  |
+1731	                      |  |   `------+-------'   |  |
+1732	                      |  |          |           |  |
+1733	                      |  |          |           |  |
+1734	                      |  |          |           |  |
+1735	                      |  |          v           |  |
+1736	                      |  |   .----------------. |  |
+1737	                      |  |  /    Tag CMW     /  |  |
+1738	                      v  v `----------------'   v  v
+1739	                  .--------------------------------------.
+1740	                 /             Record CMW               /
+1741	                `--------------------------------------'
+
+1743	                       Figure 6: How To Create a CMW
+
+1745	Appendix B.  Open Issues
+
+1747	   The list of currently open issues for this documents can be found at
+1748	   https://github.com/thomas-fossati/draft-ftbs-rats-msg-wrap/issues.
+
+1750	   // RFC Editor: please remove before publication.
+
+1752	Acknowledgments
+
+1754	   The authors would like to thank Alexey Melnikov, Benjamin Schwartz,
+1755	   Brian Campbell, Carl Wallace, Carsten Bormann, Christian Amsüss, Dave
+1756	   Thaler, Deb Cooley, Ionuț Mihalcea, Michael B.  Jones, Mike
+1757	   Ounsworth, Michael StJohns, Mohit Sethi, Paul Howard, Peter Yee, Russ
+1758	   Housley, Steven Bellock, Tim Bray, Tom Jones, and Usama Sardar for
+1759	   their reviews and suggestions.
+
+1761	   The definition of a Collection CMW has been modelled on a proposal
+1762	   originally made by Simon Frost for an EAT-based Evidence collection
+1763	   type.  The Collection CMW aims at superseding it by generalizing the
+1764	   allowed Evidence formats.
+
+1766	Contributors
+
+1768	   Laurence Lundblade
+1769	   Security Theory LLC
+1770	   Email: lgl@securitytheory.com
+
+1772	   Laurence made significant contributions to enhancing the security
+1773	   requirements and considerations for Collection CMWs.
+
+1775	Authors' Addresses
+
+1777	   Henk Birkholz
+1778	   Fraunhofer SIT
+1779	   Email: henk.birkholz@ietf.contact
+
+1781	   Ned Smith
+1782	   Independent
+1783	   Email: ned.smith.ietf@outlook.com
+
+1785	   Thomas Fossati
+1786	   Linaro
+1787	   Email: thomas.fossati@linaro.org
+
+1789	   Hannes Tschofenig
+1790	   University of Applied Sciences Bonn-Rhein-Sieg
+1791	   Email: Hannes.Tschofenig@gmx.net
+1792	   Dionna Glaze
+1793	   Google LLC
+1794	   Email: dionnaglaze@google.com
+
+
+
+
+
+
+
+
+
