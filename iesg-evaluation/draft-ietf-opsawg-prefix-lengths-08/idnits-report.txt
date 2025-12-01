@@ -1,0 +1,1344 @@
+idnits 2.17.1 
+
+draft-ietf-opsawg-prefix-lengths-08.txt:
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     No nits found.
+--------------------------------------------------------------------------------
+
+
+2	Network Working Group                                          O. Gasser
+3	Internet-Draft                                                    IPinfo
+4	Intended status: Standards Track                                 R. Bush
+5	Expires: 23 April 2026                             IIJ Research & Arrcus
+6	                                                              M. Candela
+7	                                                                     NTT
+8	                                                              R. Housley
+9	                                                          Vigil Security
+10	                                                         20 October 2025
+
+12	                   Publishing End-Site Prefix Lengths
+13	                  draft-ietf-opsawg-prefix-lengths-08
+
+15	Abstract
+
+17	   This document specifies how to augment the Routing Policy
+18	   Specification Language (RPSL) inetnum: class to refer specifically to
+19	   prefixlen files which are comma-separated values (CSV) files used to
+20	   specify end-site prefix lengths.  This document also describes an
+21	   optional scheme that uses the Resource Public Key Infrastructure
+22	   (RPKI) to authenticate the prefixlen files.
+
+24	Status of This Memo
+
+26	   This Internet-Draft is submitted in full conformance with the
+27	   provisions of BCP 78 and BCP 79.
+
+29	   Internet-Drafts are working documents of the Internet Engineering
+30	   Task Force (IETF).  Note that other groups may also distribute
+31	   working documents as Internet-Drafts.  The list of current Internet-
+32	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+34	   Internet-Drafts are draft documents valid for a maximum of six months
+35	   and may be updated, replaced, or obsoleted by other documents at any
+36	   time.  It is inappropriate to use Internet-Drafts as reference
+37	   material or to cite them other than as "work in progress."
+
+39	   This Internet-Draft will expire on 23 April 2026.
+
+41	Copyright Notice
+
+43	   Copyright (c) 2025 IETF Trust and the persons identified as the
+44	   document authors.  All rights reserved.
+
+46	   This document is subject to BCP 78 and the IETF Trust's Legal
+47	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+48	   license-info) in effect on the date of publication of this document.
+49	   Please review these documents carefully, as they describe your rights
+50	   and restrictions with respect to this document.  Code Components
+51	   extracted from this document must include Revised BSD License text as
+52	   described in Section 4.e of the Trust Legal Provisions and are
+53	   provided without warranty as described in the Revised BSD License.
+
+55	Table of Contents
+
+57	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+58	   2.  Requirements Language . . . . . . . . . . . . . . . . . . . .   3
+59	   3.  prefixlen Files . . . . . . . . . . . . . . . . . . . . . . .   3
+60	     3.1.  End-site prefix length without CGN or proxies . . . . . .   4
+61	     3.2.  End-site prefix length with CGN or proxies  . . . . . . .   4
+62	     3.3.  Not specifying any end-site prefix length . . . . . . . .   5
+63	     3.4.  Longest prefix matching . . . . . . . . . . . . . . . . .   5
+64	     3.5.  Processing prefixlen files  . . . . . . . . . . . . . . .   5
+65	   4.  inetnum: Class  . . . . . . . . . . . . . . . . . . . . . . .   6
+66	   5.  Fetching prefixlen Data . . . . . . . . . . . . . . . . . . .   8
+67	   6.  Authenticating prefixlen Data (Optional)  . . . . . . . . . .   9
+68	   7.  Operational Considerations  . . . . . . . . . . . . . . . . .  12
+69	   8.  Implementation Status . . . . . . . . . . . . . . . . . . . .  13
+70	   9.  Security Considerations . . . . . . . . . . . . . . . . . . .  14
+71	   10. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  15
+72	   11. Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .  15
+73	   12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  15
+74	     12.1.  Normative References . . . . . . . . . . . . . . . . . .  15
+75	     12.2.  Informative References . . . . . . . . . . . . . . . . .  17
+76	   Appendix A.  Example  . . . . . . . . . . . . . . . . . . . . . .  20
+77	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  28
+
+79	1.  Introduction
+
+81	   Internet service providers (ISPs) delegate IP addresses or entire IP
+82	   prefixes to their users.  Similarly, cloud providers assign customers
+83	   who use their services such as virtual machines a prefix of a
+84	   specific size.  Therefore, there are a multitude of variations of
+85	   different end-site prefix length present in the Internet.  Currently,
+86	   there is no easy way for content providers to know the end-site
+87	   prefix size of someone accessing their service.  Knowing the correct
+88	   end-site's prefix size has multiple implications such as:
+
+90	   *  Blocklisting/throttling: In IPv4, IP addresses can be blocked
+91	      using variable prefix lengths for different prefixes, such as /22
+92	      for prefix A, /27 for prefix B, or /32 to block a single IPv4
+93	      address.  In IPv6 on the other hand, blocking at e.g. the /48 or
+94	      /56 level could lead to overblocking (throwing multiple VMs from
+95	      different users into the same bucket), while blocking at more
+96	      fine-granular levels e.g. /64, /96, or even /128 to block a single
+97	      IPv6 address would lead to filling up space in the blocklist
+98	      pretty quickly.  The use of temporary addresses in IPv6 [RFC8981]
+99	      might lead to unwanted unblocking when addresses are blocked at a
+100	      too fine-granular level (e.g. /128).  All these issues apply to
+101	      throttling as well.  [I-D.ietf-opsec-ipv6-addressing] also raises
+102	      this issue.
+
+104	   *  Rate limiting/CAPTCHAs: A similar issue arises on the Web, where
+105	      neighboring prefixes might be thrown together (e.g. in the same
+106	      /48 or /56, even though the ISP hands out /64s), which leads to
+107	      people "jointly" running into rate limits and then either being
+108	      blocked from a service or having to solve annoying CAPTCHAs.
+
+110	   *  Geolocation: Getting the right prefix size for IPv6 geolocation is
+111	      similarly hard.  If you aggregate too much, you throw together
+112	      different clients in different locations, and if you aggregate too
+113	      little, you fill up the geolocation database with unnecessary
+114	      entries.
+
+116	   This document specifies how to augment the Routing Policy
+117	   Specification Language (RPSL) [RFC2725] inetnum: class to refer
+118	   specifically to prefixlen files and how to use them.  In all places
+119	   inetnum: is used, inet6num: should also be assumed [RFC4012].
+
+121	   The reader may find [INETNUM] and [INET6NUM] informative, and
+122	   certainly more verbose, descriptions of the inetnum: database
+123	   classes.
+
+125	   An optional means for authenticating prefixlen data is also defined
+126	   in Section 6.
+
+128	2.  Requirements Language
+
+130	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+131	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+132	   "OPTIONAL" in this document are to be interpreted as described in BCP
+133	   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+134	   capitals, as shown here.
+
+136	3.  prefixlen Files
+
+138	   prefixlen files are CSV (Comma Separated Values) files in UTF-8
+139	   [RFC3629] text format; not HTML, richtext, or other formats.  Lines
+140	   MUST be delimited by a line break (CRLF), and blank lines MUST be
+141	   ignored.  Text from a '#' character to the end of the current line
+142	   MUST be treated as a comment only and is similarly ignored.  The
+143	   first field of each non-ignored line specifies the prefix in
+144	   question, the second field the end-site prefix length within that
+145	   prefix as an integer, and the third field the number of end-sites
+146	   within an end-site prefix length for networks using Carrier-Grade NAT
+147	   (CGN) [RFC6598].  Note that all three fields MUST be present.  This
+148	   means there MUST be exactly two commas in each non-commented line
+149	   delimiting the three fields.  The first field MUST NOT be empty on
+150	   lines which are not comments, while the second and third field can be
+151	   empty in certain scenarios.
+
+153	3.1.  End-site prefix length without CGN or proxies
+
+155	   If an ISP delegates /56 IPv6 prefixes of the 2001:db8::/32 range, and
+156	   /32 IPv4 prefixes (i.e. a single IPv4 address) of the 192.0.2.0/24
+157	   range to its customers without the use of Carrier-Grade NAT (CGN)
+158	   [RFC6598] or proxy techniques, it would create a prefix length file
+159	   containing the following example entries:
+
+161	       2001:db8::/32,56,1
+162	       192.0.2.0/24,32,1
+
+164	   Note the third field being set to '1', which signals the absence of
+165	   CGN or proxies.
+
+167	3.2.  End-site prefix length with CGN or proxies
+
+169	   prefixlen files can also be used to signal the presence of Carrier-
+170	   Grade NAT (CGN) [RFC6598] or proxies in networks.  This is especially
+171	   useful for cases where multiple end-sites behind a CGN or proxy
+172	   service accessing a service at the same time might run into rate
+173	   limiting issues by service providers.  In case a prefixlen file
+174	   signals the presence of a CGN, service providers can treat these
+175	   prefixes in a way that rate limits are adjusted.  To signal the
+176	   presence of a CGN, the number of CGN end-sites are specified in the
+177	   third field.  For example, a CGN prefix 192.0.2.0/24 containing 4000
+178	   CGN end sites would be specified as follows:
+
+180	       192.0.2.0/24,24,4000
+
+182	   Note the second field in the above example set to '24', signaling
+183	   that the 4000 CGN end-sites are present in the complete 192.0.2.0/24
+184	   prefix.
+
+186	   If on the other hand these 4000 CGN end-sites are distributed 1000
+187	   each in the four /26 sub-prefixes within 192.0.2.0/24, this is
+188	   specified as follows:
+
+190	       192.0.2.0/24,26,1000
+
+192	   It is important to note that the third field denoting the number of
+193	   CGN end-sites is referring to the prefix length specified in the
+194	   second field.
+
+196	   Note that this specification can be applied to IPv6 networks as well.
+
+198	3.3.  Not specifying any end-site prefix length
+
+200	   If an ISP delegates /32 IPv4 prefixes (i.e. a single IPv4 address) of
+201	   the 192.0.2.0/24 range to its customers without the use of Carrier-
+202	   Grade NAT (CGN), and it has a special sub-prefix 192.0.2.0/28 where
+203	   this policy does not apply, it can signal so with the following
+204	   prefix length file:
+
+206	       192.0.2.0/24,32,
+207	       192.0.2.0/28,,
+
+209	   If both the second and third fields are empty, this means that the
+210	   publisher does not want to disclose any prefix length information.
+211	   Any prefix length information from covering prefixes (192.0.2.0/24 in
+212	   our example) MUST be discarded for sub-prefixes specified in
+213	   prefixlen files (192.0.2.0/28 in our example).
+
+215	3.4.  Longest prefix matching
+
+217	   Prefix length files can contain sub-prefixes entries of a parent
+218	   prefix, which needs to be taken into account when processing these
+219	   files.  For example, if a cloud provider assigns /120 IPv6 prefixes
+220	   to each customer VM and a /64 prefix to premium customers, it would
+221	   create a prefix length file containing the following example entries:
+
+223	       2001:db8::/32,120,
+224	       2001:db8:abcd::/48,64,
+
+226	   Note that the second entry in the above example is a subprefix of the
+227	   first entry.  Therefore, longest prefix matching has to be performed
+228	   when parsing prefixlen files.
+
+230	3.5.  Processing prefixlen files
+
+232	   Multiple entries with exactly the same prefix MUST be considered an
+233	   error, and consumer implementations SHOULD log the repeated entries
+234	   for further administrative review.  Publishers SHOULD take measures
+235	   to ensure there is one and only one entry per prefix.
+
+237	   Upon encountering an erroneous entry in a prefixlen file, consumer
+238	   implementations SHOULD skip that entry, log the error, and continue
+239	   processing the remaining entries.
+
+241	   Content providers and other parties who wish to differentiate
+242	   services based on end site prefixes need to find the relevant
+243	   prefixlen data.  In Section 4, this document specifies how to find
+244	   the relevant prefixlen file given an IP address.
+
+246	   prefixlen data for large providers with significant horizontal scale
+247	   and high granularity can be quite large.  The size of a file can be
+248	   even larger if an unsigned prefixlen file combines data for many
+249	   prefixes, if dual IPv4/IPv6 spaces are represented, etc.
+
+251	   This document also suggests an optional signature to strongly
+252	   authenticate the data in the prefixlen files.  The same approach to
+253	   signatures is used in this document that was used in [RFC9632].
+
+255	4.  inetnum: Class
+
+257	   The original RPSL specifications starting with [RIPE81], [RIPE181],
+258	   and a trail of subsequent documents were written by the RIPE
+259	   community.  The IETF standardized RPSL in [RFC2622] and [RFC4012].
+260	   Since then, it has been modified and extensively enhanced in the
+261	   Regional Internet Registry (RIR) community, mostly by RIPE [RIPE-DB].
+262	   At the time of publishing this document, change control of RPSL
+263	   effectively lies in the operator community.
+
+265	   The RPSL, and [RFC2725] and [RFC4012] used by the Regional Internet
+266	   Registries (RIRs), specify the inetnum: database class.  Each of
+267	   these objects describes an IP address range and its attributes.  The
+268	   inetnum: objects form a hierarchy ordered on the address space.
+
+270	   Ideally, RPSL would be augmented to define a new RPSL prefixlen:
+271	   attribute in the inetnum: class.  Absent implementation of the
+272	   prefixlen: attribute in a particular RIR database, this document
+273	   defines the syntax of a prefixlen remarks: attribute, which contains
+274	   an HTTPS URL of a prefixlen file.  The format of the inetnum:
+275	   prefixlen remarks: attribute MUST be as in this example, "remarks:
+276	   Prefixlen ", where the token "Prefixlen" MUST be case-sensitive,
+277	   followed by a URL that will vary, but it MUST refer only to a single
+278	   prefixlen file.
+
+280	       inetnum: 192.0.2.0/24 # example
+281	       remarks: Prefixlen https://example.com/prefixlen
+
+283	   While we leave global agreement of RPSL modification to the relevant
+284	   parties, we specify that a proper prefixlen: attribute in the
+285	   inetnum: class MUST be "prefixlen:" and MUST be followed by a single
+286	   URL that will vary, but it MUST refer only to a single prefixlen
+287	   file.
+
+289	       inetnum: 192.0.2.0/24 # example
+290	       prefixlen: https://example.com/prefixlen
+
+292	   The URL uses HTTPS, so the WebPKI provides authentication, integrity,
+293	   and confidentiality for the fetched prefixlen file.  However, the
+294	   WebPKI can not provide authentication of IP address space assignment.
+295	   In contrast, the RPKI (see [RFC6481]) can be used to authenticate IP
+296	   space assignment; see optional authentication in Section 6.
+
+298	   An approach to introduce a new RPSL attribute of type extref: for
+299	   generic external references is described in
+300	   [I-D.ymbk-opsawg-rpsl-extref].  With this extref approach a prefixlen
+301	   can be referenced as follows:
+
+303	             inetnum: 192.0.2.0/24 # example
+304	             extref: Prefixlen https://example.com/prefixlen
+
+306	   Until all producers of inetnum: objects, i.e., the RIRs, state that
+307	   they have migrated to supporting a prefixlen: or extref: attribute,
+308	   consumers looking at inetnum: objects to find prefixlen URLs MUST be
+309	   able to consume the remarks:, prefixlen:, and extref: forms.
+
+311	   The migration not only implies that the RIRs support the prefixlen:
+312	   or extref: attributes, but that all registrants have migrated any
+313	   inetnum: objects from remarks: to prefixlen: or extref: attributes.
+
+315	   Any particular inetnum: object SHOULD have, at most, one prefixlen
+316	   reference, whether a remarks:, extref:, or prefixlen: attribute when
+317	   it is implemented.  As the remarks: form can not be formally checked
+318	   by the RIR, this can not be formally enforced.  A prefixlen: or
+319	   extref: attribute is preferred, of course, if the RIR supports it.
+320	   If there is more than one type of attribute in the inetnum: object,
+321	   the prefixlen: attribute MUST be prioritized over the extref:
+322	   attribute and the extref: attribute MUST be prioritized over the
+323	   remarks: attribute.
+
+325	   For inetnum: instances covering the same address range, a signed
+326	   prefixlen file MUST be preferred over an unsigned file.  If none are
+327	   signed, or more than one is signed, the (signed) inetnum: with the
+328	   most recent last-modified: attribute MUST be preferred.
+
+330	   If a prefixlen file describes multiple disjoint ranges of IP address
+331	   space, there are likely to be prefixlen references from multiple
+332	   inetnum: objects.  Files with prefixlen references from multiple
+333	   inetnum: objects are not compatible with the signing procedure in
+334	   Section 6.
+
+336	   An unsigned, and only an unsigned, prefixlen file MAY be referenced
+337	   by multiple inetnum: instances and MAY contain prefixes from more
+338	   than one registry.
+
+340	   When fetching, the most specific inetnum: object with a prefixlen
+341	   reference MUST be used.
+
+343	   It is significant that prefixlen data may have finer granularity than
+344	   the inetnum: that refers to them.  For example, an inetnum: object
+345	   for an address range P could refer to a prefixlen file in which P has
+346	   been subdivided into one or more longer prefixes.
+
+348	   Backward compatibility issues regarding the implementation of new
+349	   RPSL attributes are covered by Section 10.2 of [RFC2622].
+
+351	5.  Fetching prefixlen Data
+
+353	   This document provides a guideline for how interested parties should
+354	   fetch and read prefixlen files.
+
+356	   To minimize the load on RIRs' WHOIS [RFC3912] services, the RIR's FTP
+357	   [RFC0959] services SHOULD be used for large-scale access to gather
+358	   inetnum: instances with prefixlen references.  This uses efficient
+359	   bulk access instead of fetching via brute-force search through the IP
+360	   space.
+
+362	   On the other hand, RIRs are converging on RDAP support which includes
+363	   geofeed data, see [I-D.ietf-regext-rdap-geofeed].  It is hoped that
+364	   this will be extended, or generalized, to support prefixlen data.
+
+366	   When reading data from an unsigned prefixlen file, one MUST ignore
+367	   data outside the referring inetnum: object's address range.  This is
+368	   to avoid importing data about ranges not under the control of the
+369	   operator.  Note that signed files MUST only contain prefixes within
+370	   the referring inetnum:'s range as mandated in Section 6.
+
+372	   If prefixlen files are fetched, other prefix length information from
+373	   the inetnum: MUST be ignored.
+
+375	   Given an address range of interest, the most specific inetnum: object
+376	   with a prefixlen reference MUST be used to fetch the prefixlen file.
+377	   For example, if the fetching party finds the following inetnum:
+378	   objects:
+
+380	       inetnum: 192.0.2.0/24 # example
+381	       remarks: Prefixlen https://example.com/prefixlen_1
+
+383	       inetnum: 192.0.2.0/26 # example
+384	       remarks: Prefixlen https://example.com/prefixlen_2
+
+386	   An application looking for prefixlen data for 192.0.2.0/29, MUST
+387	   ignore data in prefixlen_1 because 192.0.2.0/29 is within the more
+388	   specific 192.0.2.0/26 inetnum: covering that address range and that
+389	   inetnum: does have a prefixlen reference.
+
+391	6.  Authenticating prefixlen Data (Optional)
+
+393	   The question arises whether a particular prefixlen data set is valid,
+394	   i.e., is authorized by the "owner" of the IP address space and is
+395	   authoritative in some sense.  The inetnum: that points to the
+396	   prefixlen file provides some assurance.  Unfortunately, the RPSL in
+397	   some repositories is weakly authenticated at best.  An approach where
+398	   RPSL was signed per [RFC7909] would be good, except it would have to
+399	   be deployed by all RPSL registries, and there is a fair number of
+400	   them.
+
+402	   The remainder of this section specifies an optional authenticator for
+403	   the prefixlen data set that follows the Signed Object Template for
+404	   the Resource Public Key Infrastructure (RPKI) [RFC6488].
+
+406	   A single optional authenticator MAY be appended to a prefixlen file.
+407	   It is a digest of the main body of the file signed by the private key
+408	   of the relevant RPKI certificate for a covering address range.  The
+409	   following format bundles the relevant RPKI certificate with a
+410	   signature over the prefixlen text.
+
+412	   The canonicalization procedure converts the data from their internal
+413	   character representation to the UTF-8 [RFC3629] character encoding,
+414	   and the <CRLF> sequence MUST be used to denote the end of each line
+415	   of text.  A blank line is represented solely by the <CRLF> sequence.
+416	   For robustness, any non-printable characters MUST NOT be changed by
+417	   canonicalization.  Trailing blank lines MUST NOT appear at the end of
+418	   the file.  That is, the file must not end with multiple consecutive
+419	   <CRLF> sequences.  Any end-of-file marker used by an operating system
+420	   is not considered to be part of the file content.  When present, such
+421	   end-of-file markers MUST NOT be covered by the digital signature.
+
+423	   If the authenticator is not in the canonical form described above,
+424	   then, the authenticator is invalid.
+
+426	   Borrowing detached signatures from [RFC5485], after file
+427	   canonicalization, the Cryptographic Message Syntax (CMS) [RFC5652] is
+428	   used to create a detached DER-encoded signature that is then Base64
+429	   encoded with padding (as defined in Section 4 of [RFC4648]) and line
+430	   wrapped to 72 or fewer characters.  The same digest algorithm MUST be
+431	   used for calculating the message digest of the content being signed,
+432	   which is the prefixlen file, and for calculating the message digest
+433	   on the SignerInfo SignedAttributes [RFC8933].  The message digest
+434	   algorithm identifier MUST appear in both the CMS SignedData
+435	   DigestAlgorithmIdentifiers and the SignerInfo
+436	   DigestAlgorithmIdentifier [RFC5652].  The RPKI certificate covering
+437	   the prefixlen inetnum: object's address range is included in the CMS
+438	   SignedData certificates field [RFC5652].
+
+440	   The address range of the signing certificate MUST cover all prefixes
+441	   in the signed prefixlen file.  If not, the authenticator is invalid.
+
+443	   The signing certificate MUST NOT include the Autonomous System
+444	   Identifier Delegation certificate extension [RFC3779].  If it is
+445	   present, the authenticator is invalid.
+
+447	   As with many other RPKI signed objects, the IP Address Delegation
+448	   certificate extension MUST NOT use the "inherit" capability defined
+449	   in Section 2.2.3.5 of [RFC3779].  If "inherit" is used, the
+450	   authenticator is invalid.
+
+452	   An IP Address Delegation extension using "inherit" would complicate
+453	   processing.  The implementation would have to build the certification
+454	   path from the end-entity to the trust anchor, then validate the path
+455	   from the trust anchor to the end-entity, and then the parameter would
+456	   have to be remembered when the validated public key was used to
+457	   validate a signature on a CMS object.  Having to remember things from
+458	   certification path validation for use with CMS object processing
+459	   would be quite complex and error-prone.  And, the certificates do not
+460	   get that much bigger by repeating the information.
+
+462	   An address range A "covers" address range B if the range of B is
+463	   identical to or a subset of A.  "Address range" is used here because
+464	   inetnum: objects and RPKI certificates need not align on Classless
+465	   Inter-Domain Routing (CIDR) [RFC4632] prefix boundaries, while those
+466	   of the lines in a prefixlen file do align.
+
+468	   The Certification Authority (CA) MUST generate a new End Entity (EE)
+469	   certificate for each signing of a particular prefixlen file.  The
+470	   private key associated with the EE certificate SHOULD sign only one
+471	   prefixlen file.  That is, a new key pair SHOULD be generated for each
+472	   new version of a particular prefixlen file.  When the EE certificate
+473	   is used in this fashion, it is termed a "one-time-use" EE certificate
+474	   (see Section 3 of [RFC6487]).
+
+476	   On the other hand, verifying the signature has no similar complexity;
+477	   the certificate, which is validated in the RPKI, contains the needed
+478	   public key.  The RPKI trust anchors for the RIRs are available to the
+479	   party performing signature validation.  Validation of the CMS
+480	   signature over the prefixlen file involves:
+
+482	   1.  Obtaining the signer's certificate from the CMS SignedData
+483	       CertificateSet [RFC5652].  The certificate SubjectKeyIdentifier
+484	       extension [RFC5280] MUST match the SubjectKeyIdentifier in the
+485	       CMS SignerInfo SignerIdentifier [RFC5652].  If the key
+486	       identifiers do not match, then validation MUST fail.
+
+488	   2.  Validating the signer's certificate MUST ensure that it is part
+489	       of the current [RFC9286] manifest and that all resources are
+490	       covered by the RPKI certificate.
+
+492	   3.  Construct and validate the certification path for the signer's
+493	       certificate.  All of the needed certificates are expected to be
+494	       readily available in the RPKI repository.  The certification path
+495	       MUST be valid according to the validation algorithm in [RFC5280]
+496	       and the additional checks specified in [RFC3779] associated with
+497	       the IP Address Delegation certificate extension.  If
+498	       certification path validation is unsuccessful, then validation
+499	       MUST fail.
+
+501	   4.  Validating the CMS SignedData as specified in [RFC5652] using the
+502	       public key from the validated signer's certificate.  If the
+503	       signature validation is unsuccessful, then validation MUST fail.
+
+505	   5.  Confirming that the eContentType object identifier (OID) is id-
+506	       ct-prefixlenCSVwithCRLF (1.2.840.113549.1.9.16.1.TBD).  This OID
+507	       MUST appear within both the eContentType in the encapContentInfo
+508	       object and the ContentType signed attribute in the signerInfo
+509	       object (see [RFC6488]).
+
+511	   6.  Verifying that the IP Address Delegation certificate extension
+512	       [RFC3779] covers all of the address ranges of the prefixlen file.
+513	       If all of the address ranges are not covered, then validation
+514	       MUST fail.
+
+516	   All of the above steps MUST be successful to consider the prefixlen
+517	   file signature as valid.
+
+519	   The authenticator MUST be hidden as a series of "#" comments at the
+520	   end of the prefixlen file.  The following simple example is
+521	   cryptographically incorrect:
+
+523	       # RPKI Signature: 192.0.2.0 - 192.0.2.255
+524	       # MIIGlwYJKoZIhvcNAQcCoIIGiDCCBoQCAQMxDTALBglghkgBZQMEAgEwDQYLKoZ
+525	       # IhvcNAQkQAS+gggSxMIIErTCCA5WgAwIBAgIUJ605QIPX8rW5m4Zwx3WyuW7hZu
+526	       ...
+527	       # imwYkXpiMxw44EZqDjl36MiWsRDLdgoijBBcGbibwyAfGeR46k5raZCGvxG+4xa
+528	       # O8PDTxTfIYwAnBjRBKAqAZ7yX5xHfm58jUXsZJ7Ileq1S7G6Kk=
+529	       # End Signature: 192.0.2.0 - 192.0.2.255
+
+531	   A correct and full example is in Appendix A.
+
+533	   The CMS signature does not cover the signature lines.
+
+535	   The bracketing "# RPKI Signature:" and "# End Signature:" MUST be
+536	   present as shown in the example.  The RPKI Signature's IP address
+537	   range MUST match that of the prefixlen URL in the inetnum: that
+538	   points to the prefixlen file.
+
+540	7.  Operational Considerations
+
+542	   To create the needed inetnum: objects, an operator wishing to
+543	   register the location of their prefixlen file needs to coordinate
+544	   with their Regional Internet Registry (RIR) or National Internet
+545	   Registry (NIR) and/or any provider Local Internet Registry (LIR) that
+546	   has assigned address ranges to them.  RIRs/NIRs provide means for
+547	   assignees to create and maintain inetnum: objects.  They also provide
+548	   means of assigning or sub-assigning IP address resources and allowing
+549	   the assignee to create WHOIS data, including inetnum: objects,
+550	   thereby referring to prefixlen files.
+
+552	   The prefixlen files MUST be published via and fetched using HTTPS
+553	   [RFC9110].
+
+555	   When using data from a prefixlen file, one MUST ignore data outside
+556	   the referring inetnum: object's inetnum: attribute address range.
+
+558	   If and only if the prefixlen file is not signed per Section 6, then
+559	   multiple inetnum: objects MAY refer to the same prefixlen file, and
+560	   the consumer MUST use only lines in the prefixlen file where the
+561	   prefix is covered by the address range of the inetnum: object's URL
+562	   it has followed.
+
+564	   If the prefixlen file is signed, and the signer's certificate is
+565	   replaced with another certificate, then the signature in the
+566	   prefixlen file MUST be updated so that it can be properly validated
+567	   with the new certificate.
+
+569	   It is good key hygiene to use a given key for only one purpose.  To
+570	   dedicate a signing private key for signing a prefixlen file, an RPKI
+571	   Certification Authority (CA) may issue a subordinate certificate
+572	   exclusively for the purpose shown in Appendix A.
+
+574	   Harvesting and publishing aggregated prefixlen data outside of the
+575	   RPSL model SHOULD be avoided as it can have the effect that more
+576	   specifics from one aggregatee could undesirably affect the less
+577	   specifics of a different aggregatee.  Moreover, publishing aggregated
+578	   prefixlen data prevents the reader of the data to perform the checks
+579	   described in Section 5 and Section 6.
+
+581	   An anonymized version of bulk WHOIS data is openly available for all
+582	   RIRs except ARIN, which requires an authorization.  However, for
+583	   users without such authorization, the same result can be achieved
+584	   with extra RDAP effort.  There is open-source code to pass over such
+585	   data across all RIRs, collect all prefixlen references, and process
+586	   them [PREFIXLEN-FINDER].
+
+588	   To prevent undue load on RPSL and prefixlen servers, entity-fetching
+589	   prefixlen data using these mechanisms MUST NOT do frequent real-time
+590	   lookups. prefixlen servers SHOULD send an HTTP Expires header
+591	   [RFC9111] to signal when prefixlen data should be refetched.  If an
+592	   HTTP Expires or Cache-Control header is present, it MUST be honored
+593	   by clients.  As the data change very infrequently, in the absence of
+594	   such an HTTP header signal, collectors SHOULD NOT fetch more
+595	   frequently than weekly.  It would be polite not to fetch at magic
+596	   times such as midnight UTC, the first of the month, etc., because too
+597	   many others are likely to do the same.
+
+599	8.  Implementation Status
+
+601	   At the time of publishing this document, the prefixlen: attribute in
+602	   inetnum objects has not yet been implemented by any RIR database.
+
+604	   Registrants in databases which do not yet support the prefixlen:
+605	   attribute are using the remarks:, or equivalent, attribute.
+
+607	   At the time of publishing this document, the registry data published
+608	   by ARIN are not the same RPSL as that of the other registries (see
+609	   [RFC7485] for a survey of the WHOIS Tower of Babel); therefore, when
+610	   fetching from ARIN via FTP [RFC0959], WHOIS [RFC3912], the
+611	   Registration Data Access Protocol (RDAP) [RFC9082], etc., the
+612	   "NetRange" attribute/key must be treated as "inetnum", and the
+613	   "Comment" attribute must be treated as "remarks".
+
+615	   [rpki-client] can be used to authenticate a signed prefixlen file.
+
+617	9.  Security Considerations
+
+619	   The consumer of prefixlen data SHOULD fetch and process the data
+620	   themselves.  Importing datasets produced and/or processed by a third
+621	   party places significant trust in the third party.
+
+623	   As mentioned in Section 6, some RPSL repositories have weak, if any,
+624	   authentication.  This allows spoofing of inetnum: objects pointing to
+625	   malicious prefixlen files.  Section 6 suggests an unfortunately
+626	   complex method for stronger authentication based on the RPKI.
+
+628	   For example, if an inetnum: for a wide address range (e.g., a /16)
+629	   points to an RPKI-signed prefixlen file, a customer or attacker could
+630	   publish an unsigned equal or narrower (e.g., a /24) inetnum: in a
+631	   WHOIS registry that has weak authorization, abusing the rule that the
+632	   most-specific inetnum: object with a prefixlen reference MUST be
+633	   used.
+
+635	   If signatures were mandatory, the above attack would be stymied, but
+636	   of course that is not happening anytime soon.
+
+638	   The RPSL providers have had to throttle fetching from their servers
+639	   due to too-frequent queries.  Usually, they throttle by the querying
+640	   IP address or block.  Similar defenses will likely need to be
+641	   deployed by prefixlen file servers.
+
+643	   As prefixlen files disclose which parts of a prefix belong to an end
+644	   site, attackers could better focus DDoS traffic towards a website
+645	   hosted by a cloud provider by overwhelming only IP addresses from
+646	   that specific end site.  Furthermore, information collected from
+647	   prefixlen files could allow for more targeted IPv6 scanning/
+648	   reconnaissance, where scanners (be it benevolent or malicious ones)
+649	   can target specific sub-prefixes which they deem more interesting.
+
+651	   It is possible for publishers of prefixlen data to specify incorrect
+652	   prefixlen data about their prefixes.  This could either be done by
+653	   mistake or on purpose.  One example could be a malicious network
+654	   operator trying to overflow the storage of databases that consume
+655	   prefixlen data by setting a very specific prefix size (e.g., /128 for
+656	   large blocks of IPv6 address space).  In another example a network
+657	   operator might annotate their prefixes as using CGN to go around
+658	   legitimate blocking or throttling.  A third example would be a
+659	   malicious provider publishing fake small allocations, so on receipt
+660	   of complaints, they could plausibly respond by saying that they
+661	   stopped the actions of a bad customer and move their malicious
+662	   activities to a different prefix.  As a fourth example, network
+663	   operators could overwhelm consumers by publishing prefixlen files
+664	   containing millions or even billions of entries (e.g., enumerating
+665	   all possible /96 subprefixes of a /32 IPv6 prefix).  Therefore, care
+666	   should be taken when processing prefixlen data, as with any external
+667	   third-party data.
+
+669	10.  IANA Considerations
+
+671	   IANA is asked to register object identifiers for one content type in
+672	   the "SMI Security for S/MIME CMS Content Type
+673	   (1.2.840.113549.1.9.16.1)" registry as follows:
+
+675	   Description             OID                         Specification
+676	   -----------------------------------------------------------------
+677	   id-ct-prefixlenCSVwithCRLF  1.2.840.113549.1.9.16.1.47  [RFC-TBD]
+
+679	   In the SMI Security for S/MIME CMS Content Type
+680	   (1.2.840.113549.1.9.16.1) in the Structure of Management Information
+681	   (SMI) Numbers (MIB Module Registrations) registry group located at:
+682	   https://www.iana.org/assignments/smi-numbers/ there is no existing
+683	   registration for prefixlen files yet.  On publication of this
+684	   document, that reference needs to be changed to the new [ RFC-to-be
+685	   ].
+
+687	11.  Acknowledgments
+
+689	   Thanks to the authors of [RFC8805] and [RFC9632] and the folk they
+690	   acknowledge from whom ideas and text have been liberally
+691	   expropriated.  Thanks to John R.  Levine for providing useful
+692	   feedback on the draft.
+
+694	12.  References
+
+696	12.1.  Normative References
+
+698	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+699	              Requirement Levels", BCP 14, RFC 2119,
+700	              DOI 10.17487/RFC2119, March 1997,
+701	              <https://www.rfc-editor.org/info/rfc2119>.
+
+703	   [RFC2622]  Alaettinoglu, C., Villamizar, C., Gerich, E., Kessens, D.,
+704	              Meyer, D., Bates, T., Karrenberg, D., and M. Terpstra,
+705	              "Routing Policy Specification Language (RPSL)", RFC 2622,
+706	              DOI 10.17487/RFC2622, June 1999,
+707	              <https://www.rfc-editor.org/info/rfc2622>.
+
+709	   [RFC2725]  Villamizar, C., Alaettinoglu, C., Meyer, D., and S.
+710	              Murphy, "Routing Policy System Security", RFC 2725,
+711	              DOI 10.17487/RFC2725, December 1999,
+712	              <https://www.rfc-editor.org/info/rfc2725>.
+
+714	   [RFC3629]  Yergeau, F., "UTF-8, a transformation format of ISO
+715	              10646", STD 63, RFC 3629, DOI 10.17487/RFC3629, November
+716	              2003, <https://www.rfc-editor.org/info/rfc3629>.
+
+718	   [RFC3779]  Lynn, C., Kent, S., and K. Seo, "X.509 Extensions for IP
+719	              Addresses and AS Identifiers", RFC 3779,
+720	              DOI 10.17487/RFC3779, June 2004,
+721	              <https://www.rfc-editor.org/info/rfc3779>.
+
+723	   [RFC4012]  Blunk, L., Damas, J., Parent, F., and A. Robachevsky,
+724	              "Routing Policy Specification Language next generation
+725	              (RPSLng)", RFC 4012, DOI 10.17487/RFC4012, March 2005,
+726	              <https://www.rfc-editor.org/info/rfc4012>.
+
+728	   [RFC4648]  Josefsson, S., "The Base16, Base32, and Base64 Data
+729	              Encodings", RFC 4648, DOI 10.17487/RFC4648, October 2006,
+730	              <https://www.rfc-editor.org/info/rfc4648>.
+
+732	   [RFC5280]  Cooper, D., Santesson, S., Farrell, S., Boeyen, S.,
+733	              Housley, R., and W. Polk, "Internet X.509 Public Key
+734	              Infrastructure Certificate and Certificate Revocation List
+735	              (CRL) Profile", RFC 5280, DOI 10.17487/RFC5280, May 2008,
+736	              <https://www.rfc-editor.org/info/rfc5280>.
+
+738	   [RFC5652]  Housley, R., "Cryptographic Message Syntax (CMS)", STD 70,
+739	              RFC 5652, DOI 10.17487/RFC5652, September 2009,
+740	              <https://www.rfc-editor.org/info/rfc5652>.
+
+742	   [RFC6481]  Huston, G., Loomans, R., and G. Michaelson, "A Profile for
+743	              Resource Certificate Repository Structure", RFC 6481,
+744	              DOI 10.17487/RFC6481, February 2012,
+745	              <https://www.rfc-editor.org/info/rfc6481>.
+
+747	   [RFC6487]  Huston, G., Michaelson, G., and R. Loomans, "A Profile for
+748	              X.509 PKIX Resource Certificates", RFC 6487,
+749	              DOI 10.17487/RFC6487, February 2012,
+750	              <https://www.rfc-editor.org/info/rfc6487>.
+
+752	   [RFC6488]  Lepinski, M., Chi, A., and S. Kent, "Signed Object
+753	              Template for the Resource Public Key Infrastructure
+754	              (RPKI)", RFC 6488, DOI 10.17487/RFC6488, February 2012,
+755	              <https://www.rfc-editor.org/info/rfc6488>.
+
+757	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+758	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+759	              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+761	   [RFC8933]  Housley, R., "Update to the Cryptographic Message Syntax
+762	              (CMS) for Algorithm Identifier Protection", RFC 8933,
+763	              DOI 10.17487/RFC8933, October 2020,
+764	              <https://www.rfc-editor.org/info/rfc8933>.
+
+766	   [RFC9110]  Fielding, R., Ed., Nottingham, M., Ed., and J. Reschke,
+767	              Ed., "HTTP Semantics", STD 97, RFC 9110,
+768	              DOI 10.17487/RFC9110, June 2022,
+769	              <https://www.rfc-editor.org/info/rfc9110>.
+
+771	   [RFC9286]  Austein, R., Huston, G., Kent, S., and M. Lepinski,
+772	              "Manifests for the Resource Public Key Infrastructure
+773	              (RPKI)", RFC 9286, DOI 10.17487/RFC9286, June 2022,
+774	              <https://www.rfc-editor.org/info/rfc9286>.
+
+776	12.2.  Informative References
+
+778	   [I-D.ietf-opsec-ipv6-addressing]
+779	              Gont, F. and G. Gont, "Implications of IPv6 Addressing on
+780	              Security Operations", Work in Progress, Internet-Draft,
+781	              draft-ietf-opsec-ipv6-addressing-00, 2 June 2023,
+782	              <https://datatracker.ietf.org/doc/html/draft-ietf-opsec-
+783	              ipv6-addressing-00>.
+
+785	   [I-D.ietf-regext-rdap-geofeed]
+786	              Singh, J. and T. Harrison, "Registration Data Access
+787	              Protocol (RDAP) Extension for Geofeed Data", Work in
+788	              Progress, Internet-Draft, draft-ietf-regext-rdap-geofeed-
+789	              14, 5 June 2025, <https://datatracker.ietf.org/doc/html/
+790	              draft-ietf-regext-rdap-geofeed-14>.
+
+792	   [I-D.ymbk-opsawg-rpsl-extref]
+793	              Bush, R. and T. Harrison, "Generalized RPSL External
+794	              Reference", Work in Progress, Internet-Draft, draft-ymbk-
+795	              opsawg-rpsl-extref-02, 4 November 2024,
+796	              <https://datatracker.ietf.org/doc/html/draft-ymbk-opsawg-
+797	              rpsl-extref-02>.
+
+799	   [INET6NUM] RIPE NCC, "Description of the INET6NUM Object", October
+800	              2019, <https://www.ripe.net/manage-ips-and-
+801	              asns/db/support/documentation/ripe-database-documentation/
+802	              rpsl-object-types/4-2-descriptions-of-primary-
+803	              objects/4-2-3-description-of-the-inet6num-object>.
+
+805	   [INETNUM]  RIPE NCC, "Description of the INETNUM Object", June 2020,
+806	              <https://www.ripe.net/manage-ips-and-
+807	              asns/db/support/documentation/ripe-database-documentation/
+808	              rpsl-object-types/4-2-descriptions-of-primary-
+809	              objects/4-2-4-description-of-the-inetnum-object>.
+
+811	   [PREFIXLEN-FINDER]
+812	              "prefixlen-finder", commit 5f557a4, June 2021,
+813	              <https://github.com/massimocandela/prefixlen-finder>.
+
+815	   [RFC0959]  Postel, J. and J. Reynolds, "File Transfer Protocol",
+816	              STD 9, RFC 959, DOI 10.17487/RFC0959, October 1985,
+817	              <https://www.rfc-editor.org/info/rfc959>.
+
+819	   [RFC3912]  Daigle, L., "WHOIS Protocol Specification", RFC 3912,
+820	              DOI 10.17487/RFC3912, September 2004,
+821	              <https://www.rfc-editor.org/info/rfc3912>.
+
+823	   [RFC4632]  Fuller, V. and T. Li, "Classless Inter-domain Routing
+824	              (CIDR): The Internet Address Assignment and Aggregation
+825	              Plan", BCP 122, RFC 4632, DOI 10.17487/RFC4632, August
+826	              2006, <https://www.rfc-editor.org/info/rfc4632>.
+
+828	   [RFC5485]  Housley, R., "Digital Signatures on Internet-Draft
+829	              Documents", RFC 5485, DOI 10.17487/RFC5485, March 2009,
+830	              <https://www.rfc-editor.org/info/rfc5485>.
+
+832	   [RFC6598]  Weil, J., Kuarsingh, V., Donley, C., Liljenstolpe, C., and
+833	              M. Azinger, "IANA-Reserved IPv4 Prefix for Shared Address
+834	              Space", BCP 153, RFC 6598, DOI 10.17487/RFC6598, April
+835	              2012, <https://www.rfc-editor.org/info/rfc6598>.
+
+837	   [RFC7485]  Zhou, L., Kong, N., Shen, S., Sheng, S., and A. Servin,
+838	              "Inventory and Analysis of WHOIS Registration Objects",
+839	              RFC 7485, DOI 10.17487/RFC7485, March 2015,
+840	              <https://www.rfc-editor.org/info/rfc7485>.
+
+842	   [RFC7909]  Kisteleki, R. and B. Haberman, "Securing Routing Policy
+843	              Specification Language (RPSL) Objects with Resource Public
+844	              Key Infrastructure (RPKI) Signatures", RFC 7909,
+845	              DOI 10.17487/RFC7909, June 2016,
+846	              <https://www.rfc-editor.org/info/rfc7909>.
+
+848	   [RFC8805]  Kline, E., Duleba, K., Szamonek, Z., Moser, S., and W.
+849	              Kumari, "A Format for Self-Published IP Geolocation
+850	              Feeds", RFC 8805, DOI 10.17487/RFC8805, August 2020,
+851	              <https://www.rfc-editor.org/info/rfc8805>.
+
+853	   [RFC8981]  Gont, F., Krishnan, S., Narten, T., and R. Draves,
+854	              "Temporary Address Extensions for Stateless Address
+855	              Autoconfiguration in IPv6", RFC 8981,
+856	              DOI 10.17487/RFC8981, February 2021,
+857	              <https://www.rfc-editor.org/info/rfc8981>.
+
+859	   [RFC9082]  Hollenbeck, S. and A. Newton, "Registration Data Access
+860	              Protocol (RDAP) Query Format", STD 95, RFC 9082,
+861	              DOI 10.17487/RFC9082, June 2021,
+862	              <https://www.rfc-editor.org/info/rfc9082>.
+
+864	   [RFC9111]  Fielding, R., Ed., Nottingham, M., Ed., and J. Reschke,
+865	              Ed., "HTTP Caching", STD 98, RFC 9111,
+866	              DOI 10.17487/RFC9111, June 2022,
+867	              <https://www.rfc-editor.org/info/rfc9111>.
+
+869	   [RFC9632]  Bush, R., Candela, M., Kumari, W., and R. Housley,
+870	              "Finding and Using Geofeed Data", RFC 9632,
+871	              DOI 10.17487/RFC9632, August 2024,
+872	              <https://www.rfc-editor.org/info/rfc9632>.
+
+874	   [RIPE-DB]  RIPE NCC, "RIPE Database Documentation",
+875	              <https://www.ripe.net/manage-ips-and-
+876	              asns/db/support/documentation/ripe-database-
+877	              documentation>.
+
+879	   [RIPE181]  RIPE NCC, "Representation Of IP Routing Policies In A
+880	              Routing Registry", October 1994,
+881	              <https://www.ripe.net/publications/docs/ripe-181>.
+
+883	   [RIPE81]   RIPE NCC, "Representation Of IP Routing Policies In The
+884	              RIPE Database", February 1993,
+885	              <https://www.ripe.net/publications/docs/ripe-081>.
+
+887	   [rpki-client]
+888	              Snijders, J., "Example on how to use rpki-client to
+889	              authenticate a signed prefixlen", September 2023,
+890	              <https://sobornost.net/~job/
+891	              using_prefixlen_authenticators.txt>.
+
+893	Appendix A.  Example
+
+895	   This appendix provides an example, including a trust anchor, a
+896	   Certificate Revocation List (CRL) signed by the trust anchor, a CA
+897	   certificate subordinate to the trust anchor, a CRL signed by the CA,
+898	   an end-entity certificate subordinate to the CA for signing the
+899	   prefixlen, and a detached signature.
+
+901	   The trust anchor is represented by a self-signed certificate.  As
+902	   usual in the RPKI, the trust anchor has authority over all IPv4
+903	   address blocks, all IPv6 address blocks, and all Autonomous System
+904	   (AS) numbers.
+
+906	      -----BEGIN CERTIFICATE-----
+907	      MIIEQTCCAymgAwIBAgIUEggycNoFVRjAuN/Fw7URu0DEZNAwDQYJKoZIhvcNAQEL
+908	      BQAwFTETMBEGA1UEAxMKZXhhbXBsZS10YTAeFw0yMzA5MTkyMDMzMzlaFw0zMzA5
+909	      MTYyMDMzMzlaMBUxEzARBgNVBAMTCmV4YW1wbGUtdGEwggEiMA0GCSqGSIb3DQEB
+910	      AQUAA4IBDwAwggEKAoIBAQDQprR+g/i4JyObVURTp1JpGM23vGPyE5fDKFPqV7rw
+911	      M1Amm7cnew66U02IzV0X5oiv5nSGfRX5UxsbR+vwPBMceQyDgS5lexFiv4fB/Vjf
+912	      DT2qX/UjsLL9QOeaSOh7ToJSLjmtpa0D9iz7ful3hdxRjpMMZiE/reX9/ymdpW/E
+913	      dg0F6+T9WGZE1miPeIjl5OZwnmLHCftkN/aaYk1iPNjNniHYIOjC1jSpABmoZyTj
+914	      sgrwLE2F1fIRkVkwASqToq/D5v9voXaYYaXUNJb4H/5wenRuvT5O/n6PXh70rMQy
+915	      F5yzLs96ytxqg5gGX9kabVnvxFU8nHfPa0rhlwfTJnljAgMBAAGjggGHMIIBgzAd
+916	      BgNVHQ4EFgQUwL1SXb7SeLIW7LOjQ5XSBguZCDIwHwYDVR0jBBgwFoAUwL1SXb7S
+917	      eLIW7LOjQ5XSBguZCDIwDwYDVR0TAQH/BAUwAwEB/zAOBgNVHQ8BAf8EBAMCAQYw
+918	      GAYDVR0gAQH/BA4wDDAKBggrBgEFBQcOAjCBuQYIKwYBBQUHAQsEgawwgakwPgYI
+919	      KwYBBQUHMAqGMnJzeW5jOi8vcnBraS5leGFtcGxlLm5ldC9yZXBvc2l0b3J5L2V4
+920	      YW1wbGUtdGEubWZ0MDUGCCsGAQUFBzANhilodHRwczovL3JyZHAuZXhhbXBsZS5u
+921	      ZXQvbm90aWZpY2F0aW9uLnhtbDAwBggrBgEFBQcwBYYkcnN5bmM6Ly9ycGtpLmV4
+922	      YW1wbGUubmV0L3JlcG9zaXRvcnkvMCcGCCsGAQUFBwEHAQH/BBgwFjAJBAIAATAD
+923	      AwEAMAkEAgACMAMDAQAwIQYIKwYBBQUHAQgBAf8EEjAQoA4wDDAKAgEAAgUA////
+924	      /zANBgkqhkiG9w0BAQsFAAOCAQEAa9eLY9QAmnlZOIyOzbpta5wqcOUQV/yR7o/0
+925	      1zkEZaSavKBt19lMK6AXZurx1T5jyjIwG7bEtZZThjtH2m80V5kc2tsFjSq/yp7N
+926	      JBclMHVd3tXse9If3nXYF4bxRIcir1lXlAbYN+Eo1U3i5qJO+fxouzt7Merk2Dih
+927	      nsenTeXKzN7tfmuCYZZHCC8viCoJWdH+o1uRM4TiQApZsUJ8sF4TABrrRJmA/Ed5
+928	      v0CTBbgqTx7yg0+VarFLPdnjYgtpoCJqwE2C1UpX15rZSaLVuGXtbwXd/cHEg5vF
+929	      W6QTsMeMQFEUa6hkicDGtxLTUdhckBgmCGoF2nlZii5f1BTWAg==
+930	      -----END CERTIFICATE-----
+
+932	   The CRL issued by the trust anchor.
+
+934	      -----BEGIN X509 CRL-----
+935	      MIIBjjB4AgEBMA0GCSqGSIb3DQEBCwUAMBUxEzARBgNVBAMTCmV4YW1wbGUtdGEX
+936	      DTIzMDkyMzE1NTUzOFoXDTIzMTAyMzE1NTUzOFqgLzAtMB8GA1UdIwQYMBaAFMC9
+937	      Ul2+0niyFuyzo0OV0gYLmQgyMAoGA1UdFAQDAgEEMA0GCSqGSIb3DQEBCwUAA4IB
+938	      AQCngOu+Nq3WC4y/pHtLoheAOtNg32WWsKPNiEyL+QalmOtURUsWMzOq41bmoPzQ
+939	      NDQoRmXe9mvohAVRe0CnM7A07HOtSfjw5aoouPXGTtfwEomHG2CYk+2U1bvxgZyA
+940	      E1c5TvyhkabFMO0+857wqxRP+ht9NV0lMX6kUFlEOCw3ELVd9oNNRBwKQtXj1huM
+941	      6Sf26va2a1tnC5zP01hN+EY3S9T5T1gcgPGBcqRWKoXJEbRzCrLsb/TMj5cMpIje
+942	      AHZoBojVAmvL1AIH/BnGAQj0+XqaJ0axHvlqJa8iX8QwKqhp+o6sv/atY2QDDRmE
+943	      Yjq/VrBVKu5VsDY2Lr29HszA
+944	      -----END X509 CRL-----
+
+946	   The CA certificate is issued by the trust anchor.  This certificate
+947	   grants authority over one IPv4 address block (192.0.2.0/24) and two
+948	   AS numbers (64496 and 64497).
+
+950	      -----BEGIN CERTIFICATE-----
+951	      MIIE7DCCA9SgAwIBAgIUcyCzS10hdfG65kbRq7toQAvRDLkwDQYJKoZIhvcNAQEL
+952	      BQAwFTETMBEGA1UEAxMKZXhhbXBsZS10YTAeFw0yMzA5MjMxNTU1MzhaFw0yNDA5
+953	      MjIxNTU1MzhaMDMxMTAvBgNVBAMTKDNBQ0UyQ0VGNEZCMjFCN0QxMUUzRTE4NEVG
+954	      QzFFMjk3QjM3Nzg2NDIwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDc
+955	      zz1qwTxC2ocw5rqp8ktm2XyYkl8riBVuqlXwfefTxsR2YFpgz9vkYUd5Az9EVEG7
+956	      6wGIyZbtmhK63eEeaqbKz2GHub467498BXeVrYysO+YuIGgCEYKznNDZ4j5aaDbo
+957	      j5+4/z0Qvv6HEsxQd0f8br6lKJwgeRM6+fm7796HNPB0aqD7Zj9NRCLXjbB0DCgJ
+958	      liH6rXMKR86ofgll9V2mRjesvhdKYgkGbOif9rvxVpLJ/6zdru5CE9yeuJZ59l+n
+959	      YH/r6PzdJ4Q7yKrJX8qD6A60j4+biaU4MQ72KpsjhQNTTqF/HRwi0N54GDaknEwE
+960	      TnJQHgLJDYqww9yKWtjjAgMBAAGjggIUMIICEDAdBgNVHQ4EFgQUOs4s70+yG30R
+961	      4+GE78Hil7N3hkIwHwYDVR0jBBgwFoAUwL1SXb7SeLIW7LOjQ5XSBguZCDIwDwYD
+962	      VR0TAQH/BAUwAwEB/zAOBgNVHQ8BAf8EBAMCAQYwGAYDVR0gAQH/BA4wDDAKBggr
+963	      BgEFBQcOAjBDBgNVHR8EPDA6MDigNqA0hjJyc3luYzovL3Jwa2kuZXhhbXBsZS5u
+964	      ZXQvcmVwb3NpdG9yeS9leGFtcGxlLXRhLmNybDBOBggrBgEFBQcBAQRCMEAwPgYI
+965	      KwYBBQUHMAKGMnJzeW5jOi8vcnBraS5leGFtcGxlLm5ldC9yZXBvc2l0b3J5L2V4
+966	      YW1wbGUtdGEuY2VyMIG5BggrBgEFBQcBCwSBrDCBqTA+BggrBgEFBQcwCoYycnN5
+967	      bmM6Ly9ycGtpLmV4YW1wbGUubmV0L3JlcG9zaXRvcnkvZXhhbXBsZS1jYS5tZnQw
+968	      NQYIKwYBBQUHMA2GKWh0dHBzOi8vcnJkcC5leGFtcGxlLm5ldC9ub3RpZmljYXRp
+969	      b24ueG1sMDAGCCsGAQUFBzAFhiRyc3luYzovL3Jwa2kuZXhhbXBsZS5uZXQvcmVw
+970	      b3NpdG9yeS8wHwYIKwYBBQUHAQcBAf8EEDAOMAwEAgABMAYDBADAAAIwIQYIKwYB
+971	      BQUHAQgBAf8EEjAQoA4wDDAKAgMA+/ACAwD78TANBgkqhkiG9w0BAQsFAAOCAQEA
+972	      arIrZWb22wFmP+hVjhdg3IsKHB6fQdMuUR0u2DyZTVvbL6C+HyGAH32pi5mR/QLX
+973	      FAfdqALaB7r68tQTGLIW6bGljT+BqUPJmZcj56x3cBLJlltxwFatTloypjFt3cls
+974	      xFCuuD9J2iBxc6odTKi6u0mhQjD+C9m4xkbe8XXWWx85IHm1s6rYbpGgiMWxBC80
+975	      qqAzmBHGROWKUEvh00EYIYdiAvyFcrj7QtDiRJL5TDOySVd9pWJkerDzhqwE1IaZ
+976	      rpHck+lkYTS7jTD++6v32HG62GdsmryOQUk3aU1rLb3kS8vzaGbrgHpGPid0Hd0x
+977	      ZSl1AoIMpp5mZ7/h9aW5+A==
+978	      -----END CERTIFICATE-----
+
+980	   The CRL issued by the CA.
+
+982	      -----BEGIN X509 CRL-----
+983	      MIIBrTCBlgIBATANBgkqhkiG9w0BAQsFADAzMTEwLwYDVQQDEygzQUNFMkNFRjRG
+984	      QjIxQjdEMTFFM0UxODRFRkMxRTI5N0IzNzc4NjQyFw0yMzA5MjMxNTU1MzhaFw0y
+985	      MzEwMjMxNTU1MzhaoC8wLTAfBgNVHSMEGDAWgBQ6zizvT7IbfRHj4YTvweKXs3eG
+986	      QjAKBgNVHRQEAwIBATANBgkqhkiG9w0BAQsFAAOCAQEACwCNzcAoqbMcUL1kBY65
+987	      YhL95OnBqAcuc99pD4i9c1BmVOl7bXU3cJqLaOZ6Z8CmN0kBbcHyqlHBJ9oA/aYD
+988	      ByhxsjzKk7jxtM2IlTpEvCEqvnGLSVihgS3h0NA+sgWqHGL3Rhcj6hVsi+j9GENc
+989	      T6F9np1mxbI3i2xhgeDJG1pryvH0hWXh7yJiYS8ItNEaIIXDT3szK/J9wnPjukTR
+990	      5MITiK9P3TCFujawb3O7rIT5PPgkM6eiCdwDgt6gjmw6cow5+rMjNHSRa+GOviSd
+991	      gXljVDfJvF4tKHmw59Jc2aFnSGfX1/ITDNiNfXYpUYFOcsqxkYf8F0uO7AtbRmTF
+992	      2w==
+993	      -----END X509 CRL-----
+
+995	   The end-entity certificate is issued by the CA.  This certificate
+996	   grants signature authority for one IPv4 address block (192.0.2.0/24).
+997	   Signature authority for AS numbers is not needed for prefixlen data
+998	   signatures, so no AS numbers are included in the end-entity
+999	   certificate.
+
+1001	      -----BEGIN CERTIFICATE-----
+1002	      MIIEVjCCAz6gAwIBAgIUJ605QIPX8rW5m4Zwx3WyuW7hZvAwDQYJKoZIhvcNAQEL
+1003	      BQAwMzExMC8GA1UEAxMoM0FDRTJDRUY0RkIyMUI3RDExRTNFMTg0RUZDMUUyOTdC
+1004	      Mzc3ODY0MjAeFw0yMzA5MjMxNTU1MzhaFw0yNDA3MTkxNTU1MzhaMDMxMTAvBgNV
+1005	      BAMTKDkxNDY1MkEzQkQ1MUMxNDQyNjAxOTg4ODlGNUM0NUFCRjA1M0ExODcwggEi
+1006	      MA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCycTQrOb/qB2W3i3Ki8PhA/DEW
+1007	      yii2TgGo9pgCwO9lsIRI6Zb/k+aSiWWP9kSczlcQgtPCVwr62hTQZCIowBN0BL0c
+1008	      K0/5k1imJdi5qdM3nvKswM8CnoR11vB8pQFwruZmr5xphXRvE+mzuJVLgu2V1upm
+1009	      BXuWloeymudh6WWJ+GDjwPXO3RiXBejBrOFNXhaFLe08y4DPfr/S/tXJOBm7QzQp
+1010	      tmbPLYtGfprYu45liFFqqP94UeLpISfXd36AKGzqTFCcc3EW9l5UFE1MFLlnoEog
+1011	      qtoLoKABt0IkOFGKeC/EgeaBdWLe469ddC9rQft5w6g6cmxG+aYDdIEB34zrAgMB
+1012	      AAGjggFgMIIBXDAdBgNVHQ4EFgQUkUZSo71RwUQmAZiIn1xFq/BToYcwHwYDVR0j
+1013	      BBgwFoAUOs4s70+yG30R4+GE78Hil7N3hkIwDgYDVR0PAQH/BAQDAgeAMBgGA1Ud
+1014	      IAEB/wQOMAwwCgYIKwYBBQUHDgIwYQYDVR0fBFowWDBWoFSgUoZQcnN5bmM6Ly9y
+1015	      cGtpLmV4YW1wbGUubmV0L3JlcG9zaXRvcnkvM0FDRTJDRUY0RkIyMUI3RDExRTNF
+1016	      MTg0RUZDMUUyOTdCMzc3ODY0Mi5jcmwwbAYIKwYBBQUHAQEEYDBeMFwGCCsGAQUF
+1017	      BzAChlByc3luYzovL3Jwa2kuZXhhbXBsZS5uZXQvcmVwb3NpdG9yeS8zQUNFMkNF
+1018	      RjRGQjIxQjdEMTFFM0UxODRFRkMxRTI5N0IzNzc4NjQyLmNlcjAfBggrBgEFBQcB
+1019	      BwEB/wQQMA4wDAQCAAEwBgMEAMAAAjANBgkqhkiG9w0BAQsFAAOCAQEAlxt25FUe
+1020	      e0+uCidTH+4p7At3u2ncgHcGTsag3UcoPjcE/I1JgQJRu9TiM4iNB1C7Lbdd131g
+1021	      MdliL5GQ3P4QfKnfkuPR6S1V8suq6ZT1KQRyLJx+EPgDN2rb/iji0TOK6RKPNBdG
+1022	      lXVLjth4x/uu1O4V54GLEhDAPQC8IUm5intL/Hx1M1x2ptN/+j5HD3XUXd3x13yi
+1023	      s6u758nbA7ND40JNhGG5JNGQgDchL4IQzIhylMNC+bKUiyyMHz3MqoVAklIB86IW
+1024	      Ucv72Mekq+i46T/w3RnaGn4x7RAJctVJWw3e5YMrFnQcuuaGOs0QcoxW7Bi4W7Eg
+1025	      8fK1fd/f6fjZ9w==
+1026	      -----END CERTIFICATE-----
+
+1028	   The end-entity certificate is displayed below in detail.  For
+1029	   brevity, the other two certificates are not.
+
+1031	         0 1110: SEQUENCE {
+1032	         4  830:  SEQUENCE {
+1033	         8    3:   [0] {
+1034	        10    1:    INTEGER 2
+1035	               :     }
+1036	        13   20:   INTEGER
+1037	               :    27 AD 39 40 83 D7 F2 B5 B9 9B 86 70 C7 75 B2 B9
+1038	               :    6E E1 66 F0
+1039	        35   13:   SEQUENCE {
+1040	        37    9:    OBJECT IDENTIFIER
+1041	               :     sha256WithRSAEncryption (1 2 840 113549 1 1 11)
+1042	        48    0:    NULL
+1043	               :     }
+1044	        50   51:   SEQUENCE {
+1045	        52   49:    SET {
+1046	        54   47:     SEQUENCE {
+1047	        56    3:      OBJECT IDENTIFIER commonName (2 5 4 3)
+1048	        61   40:      PrintableString
+1049	               :       '3ACE2CEF4FB21B7D11E3E184EFC1E297B3778642'
+1050	               :       }
+1051	               :      }
+1052	               :     }
+1053	       103   30:   SEQUENCE {
+1054	       105   13:    UTCTime 23/09/2023 15:55:38 GMT
+1055	       120   13:    UTCTime 19/07/2024 15:55:38 GMT
+1056	               :     }
+1057	       135   51:   SEQUENCE {
+1058	       137   49:    SET {
+1059	       139   47:     SEQUENCE {
+1060	       141    3:      OBJECT IDENTIFIER commonName (2 5 4 3)
+1061	       146   40:      PrintableString
+1062	               :       '914652A3BD51C144260198889F5C45ABF053A187'
+1063	               :       }
+1064	               :      }
+1065	               :     }
+1066	       188  290:   SEQUENCE {
+1067	       192   13:    SEQUENCE {
+1068	       194    9:     OBJECT IDENTIFIER
+1069	               :      rsaEncryption (1 2 840 113549 1 1 1)
+1070	       205    0:     NULL
+1071	               :      }
+1072	       207  271:    BIT STRING, encapsulates {
+1073	       212  266:     SEQUENCE {
+1074	       216  257:      INTEGER
+1075	               :      00 B2 71 34 2B 39 BF EA 07 65 B7 8B 72 A2 F0 F8
+1076	               :      40 FC 31 16 CA 28 B6 4E 01 A8 F6 98 02 C0 EF 65
+1077	               :      B0 84 48 E9 96 FF 93 E6 92 89 65 8F F6 44 9C CE
+1078	               :      57 10 82 D3 C2 57 0A FA DA 14 D0 64 22 28 C0 13
+1079	               :      74 04 BD 1C 2B 4F F9 93 58 A6 25 D8 B9 A9 D3 37
+1080	               :      9E F2 AC C0 CF 02 9E 84 75 D6 F0 7C A5 01 70 AE
+1081	               :      E6 66 AF 9C 69 85 74 6F 13 E9 B3 B8 95 4B 82 ED
+1082	               :      95 D6 EA 66 05 7B 96 96 87 B2 9A E7 61 E9 65 89
+1083	               :      F8 60 E3 C0 F5 CE DD 18 97 05 E8 C1 AC E1 4D 5E
+1084	               :      16 85 2D ED 3C CB 80 CF 7E BF D2 FE D5 C9 38 19
+1085	               :      BB 43 34 29 B6 66 CF 2D 8B 46 7E 9A D8 BB 8E 65
+1086	               :      88 51 6A A8 FF 78 51 E2 E9 21 27 D7 77 7E 80 28
+1087	               :      6C EA 4C 50 9C 73 71 16 F6 5E 54 14 4D 4C 14 B9
+1088	               :      67 A0 4A 20 AA DA 0B A0 A0 01 B7 42 24 38 51 8A
+1089	               :      78 2F C4 81 E6 81 75 62 DE E3 AF 5D 74 2F 6B 41
+1090	               :      FB 79 C3 A8 3A 72 6C 46 F9 A6 03 74 81 01 DF 8C
+1091	               :      EB
+1092	       477    3:      INTEGER 65537
+1093	               :       }
+1094	               :      }
+1095	               :     }
+1096	       482  352:   [3] {
+1097	       486  348:    SEQUENCE {
+1098	       490   29:     SEQUENCE {
+1099	       492    3:      OBJECT IDENTIFIER
+1100	               :       subjectKeyIdentifier (2 5 29 14)
+1101	       497   22:      OCTET STRING, encapsulates {
+1102	       499   20:       OCTET STRING
+1103	               :      91 46 52 A3 BD 51 C1 44 26 01 98 88 9F 5C 45 AB
+1104	               :      F0 53 A1 87
+1105	               :        }
+1106	               :       }
+1107	       521   31:     SEQUENCE {
+1108	       523    3:      OBJECT IDENTIFIER
+1109	               :       authorityKeyIdentifier (2 5 29 35)
+1110	       528   24:      OCTET STRING, encapsulates {
+1111	       530   22:       SEQUENCE {
+1112	       532   20:        [0]
+1113	               :      3A CE 2C EF 4F B2 1B 7D 11 E3 E1 84 EF C1 E2 97
+1114	               :      B3 77 86 42
+1115	               :         }
+1116	               :        }
+1117	               :       }
+1118	       554   14:     SEQUENCE {
+1119	       556    3:      OBJECT IDENTIFIER keyUsage (2 5 29 15)
+1120	       561    1:      BOOLEAN TRUE
+1121	       564    4:      OCTET STRING, encapsulates {
+1122	       566    2:       BIT STRING 7 unused bits
+1123	               :        '1'B (bit 0)
+1124	               :        }
+1125	               :       }
+1126	       570   24:     SEQUENCE {
+1127	       572    3:      OBJECT IDENTIFIER certificatePolicies (2 5 29 32)
+1128	       577    1:      BOOLEAN TRUE
+1129	       580   14:      OCTET STRING, encapsulates {
+1130	       582   12:       SEQUENCE {
+1131	       584   10:        SEQUENCE {
+1132	       586    8:         OBJECT IDENTIFIER
+1133	               :          resourceCertificatePolicy (1 3 6 1 5 5 7 14 2)
+1134	               :          }
+1135	               :         }
+1136	               :        }
+1137	               :       }
+1138	       596   97:     SEQUENCE {
+1139	       598    3:      OBJECT IDENTIFIER
+1140	               :       cRLDistributionPoints (2 5 29 31)
+1141	       603   90:      OCTET STRING, encapsulates {
+1142	       605   88:       SEQUENCE {
+1143	       607   86:        SEQUENCE {
+1144	       609   84:         [0] {
+1145	       611   82:          [0] {
+1146	       613   80:           [6]
+1147	               :          'rsync://rpki.example.net/repository/3ACE'
+1148	               :          '2CEF4FB21B7D11E3E184EFC1E297B3778642.crl'
+1149	               :            }
+1150	               :           }
+1151	               :          }
+1152	               :         }
+1153	               :        }
+1154	               :       }
+1155	       695  108:     SEQUENCE {
+1156	       697    8:      OBJECT IDENTIFIER
+1157	               :       authorityInfoAccess (1 3 6 1 5 5 7 1 1)
+1158	       707   96:      OCTET STRING, encapsulates {
+1159	       709   94:       SEQUENCE {
+1160	       711   92:        SEQUENCE {
+1161	       713    8:         OBJECT IDENTIFIER
+1162	               :          caIssuers (1 3 6 1 5 5 7 48 2)
+1163	       723   80:         [6]
+1164	               :          'rsync://rpki.example.net/repository/3ACE'
+1165	               :          '2CEF4FB21B7D11E3E184EFC1E297B3778642.cer'
+1166	               :          }
+1167	               :         }
+1168	               :        }
+1169	               :       }
+1170	       805   31:     SEQUENCE {
+1171	       807    8:      OBJECT IDENTIFIER
+1172	               :       ipAddrBlocks (1 3 6 1 5 5 7 1 7)
+1173	       817    1:      BOOLEAN TRUE
+1174	       820   16:      OCTET STRING, encapsulates {
+1175	       822   14:       SEQUENCE {
+1176	       824   12:        SEQUENCE {
+1177	       826    2:         OCTET STRING 00 01
+1178	       830    6:         SEQUENCE {
+1179	       832    4:          BIT STRING
+1180	               :           '010000000000000000000011'B
+1181	               :           }
+1182	               :          }
+1183	               :         }
+1184	               :        }
+1185	               :       }
+1186	               :      }
+1187	               :     }
+1188	               :    }
+1189	       838   13:  SEQUENCE {
+1190	       840    9:   OBJECT IDENTIFIER
+1191	               :    sha256WithRSAEncryption (1 2 840 113549 1 1 11)
+1192	       851    0:   NULL
+1193	               :    }
+1194	       853  257:  BIT STRING
+1195	               :   97 1B 76 E4 55 1E 7B 4F AE 0A 27 53 1F EE 29 EC
+1196	               :   0B 77 BB 69 DC 80 77 06 4E C6 A0 DD 47 28 3E 37
+1197	               :   04 FC 8D 49 81 02 51 BB D4 E2 33 88 8D 07 50 BB
+1198	               :   2D B7 5D D7 7D 60 31 D9 62 2F 91 90 DC FE 10 7C
+1199	               :   A9 DF 92 E3 D1 E9 2D 55 F2 CB AA E9 94 F5 29 04
+1200	               :   72 2C 9C 7E 10 F8 03 37 6A DB FE 28 E2 D1 33 8A
+1201	               :   E9 12 8F 34 17 46 95 75 4B 8E D8 78 C7 FB AE D4
+1202	               :   EE 15 E7 81 8B 12 10 C0 3D 00 BC 21 49 B9 8A 7B
+1203	               :   4B FC 7C 75 33 5C 76 A6 D3 7F FA 3E 47 0F 75 D4
+1204	               :   5D DD F1 D7 7C A2 B3 AB BB E7 C9 DB 03 B3 43 E3
+1205	               :   42 4D 84 61 B9 24 D1 90 80 37 21 2F 82 10 CC 88
+1206	               :   72 94 C3 42 F9 B2 94 8B 2C 8C 1F 3D CC AA 85 40
+1207	               :   92 52 01 F3 A2 16 51 CB FB D8 C7 A4 AB E8 B8 E9
+1208	               :   3F F0 DD 19 DA 1A 7E 31 ED 10 09 72 D5 49 5B 0D
+1209	               :   DE E5 83 2B 16 74 1C BA E6 86 3A CD 10 72 8C 56
+1210	               :   EC 18 B8 5B B1 20 F1 F2 B5 7D DF DF E9 F8 D9 F7
+1211	               :   }
+
+1213	   To allow reproduction of the signature results, the end-entity
+1214	   private key is provided.  For brevity, the other two private keys are
+1215	   not.
+
+1217	      -----BEGIN RSA PRIVATE KEY-----
+1218	      MIIEpQIBAAKCAQEAsnE0Kzm/6gdlt4tyovD4QPwxFsootk4BqPaYAsDvZbCESOmW
+1219	      /5Pmkollj/ZEnM5XEILTwlcK+toU0GQiKMATdAS9HCtP+ZNYpiXYuanTN57yrMDP
+1220	      Ap6EddbwfKUBcK7mZq+caYV0bxPps7iVS4LtldbqZgV7lpaHsprnYellifhg48D1
+1221	      zt0YlwXowazhTV4WhS3tPMuAz36/0v7VyTgZu0M0KbZmzy2LRn6a2LuOZYhRaqj/
+1222	      eFHi6SEn13d+gChs6kxQnHNxFvZeVBRNTBS5Z6BKIKraC6CgAbdCJDhRingvxIHm
+1223	      gXVi3uOvXXQva0H7ecOoOnJsRvmmA3SBAd+M6wIDAQABAoIBAQCyB0FeMuKm8bRo
+1224	      18aKjFGSPEoZi53srIz5bvUgIi92TBLez7ZnzL6Iym26oJ+5th+lCHGO/dqlhXio
+1225	      pI50C5Yc9TFbblb/ECOsuCuuqKFjZ8CD3GVsHozXKJeMM+/o5YZXQrORj6UnwT0z
+1226	      ol/JE5pIGUCIgsXX6tz9s5BP3lUAvVQHsv6+vEVKLxQ3wj/1vIL8O/CN036EV0GJ
+1227	      mpkwmygPjfECT9wbWo0yn3jxJb36+M/QjjUP28oNIVn/IKoPZRXnqchEbuuCJ651
+1228	      IsaFSqtiThm4WZtvCH/IDq+6/dcMucmTjIRcYwW7fdHfjplllVPve9c/OmpWEQvF
+1229	      t3ArWUt5AoGBANs4764yHxo4mctLIE7G7l/tf9bP4KKUiYw4R4ByEocuqMC4yhmt
+1230	      MPCfOFLOQet71OWCkjP2L/7EKUe9yx7G5KmxAHY6jOjvcRkvGsl6lWFOsQ8p126M
+1231	      Y9hmGzMOjtsdhAiMmOWKzjvm4WqfMgghQe+PnjjSVkgTt+7BxpIuGBAvAoGBANBg
+1232	      26FF5cDLpixOd3Za1YXsOgguwCaw3Plvi7vUZRpa/zBMELEtyOebfakkIRWNm07l
+1233	      nE+lAZwxm+29PTD0nqCFE91teyzjnQaLO5kkAdJiFuVV3icLOGo399FrnJbKensm
+1234	      FGSli+3KxQhCNIJJfgWzq4bE0ioAMjdGbYXzIYQFAoGBAM6tuDJ36KDU+hIS6wu6
+1235	      O2TPSfZhF/zPo3pCWQ78/QDb+Zdw4IEiqoBA7F4NPVLg9Y/H8UTx9r/veqe7hPOo
+1236	      Ok7NpIzSmKTHkc5XfZ60Zn9OLFoKbaQ40a1kXoJdWEu2YROaUlAe9F6/Rog6PHYz
+1237	      vLE5qscRbu0XQhLkN+z7bg5bAoGBAKDsbDEb/dbqbyaAYpmwhH2sdRSkphg7Niwc
+1238	      DNm9qWa1J6Zw1+M87I6Q8naRREuU1IAVqqWHVLr/ROBQ6NTJ1Uc5/qFeT2XXUgkf
+1239	      taMKv61tuyjZK3sTmznMh0HfzUpWjEhWnCEuB+ZYVdmO52ZGw2A75RdrILL2+9Dc
+1240	      PvDXVubRAoGAdqXeSWoLxuzZXzl8rsaKrQsTYaXnOWaZieU1SL5vVe8nK257UDqZ
+1241	      E3ng2j5XPTUWli+aNGFEJGRoNtcQvO60O/sFZUhu52sqq9mWVYZNh1TB5aP8X+pV
+1242	      iFcZOLUvQEcN6PA+YQK5FU11rAI1M0Gm5RDnVnUl0L2xfCYxb7FzV6Y=
+1243	      -----END RSA PRIVATE KEY-----
+
+1245	   Signing of "192.0.2.0/24,US,WA,Seattle," (terminated by CR and LF),
+1246	   yields the following detached CMS signature.
+
+1248	      # RPKI Signature: 192.0.2.0/24
+1249	      # MIIGQAYJKoZIhvcNAQcCoIIGMTCCBi0CAQMxDTALBglghkgBZQMEAgEwDQYLKoZ
+1250	      # IhvcNAQkQAS+gggRaMIIEVjCCAz6gAwIBAgIUJ605QIPX8rW5m4Zwx3WyuW7hZv
+1251	      # AwDQYJKoZIhvcNAQELBQAwMzExMC8GA1UEAxMoM0FDRTJDRUY0RkIyMUI3RDExR
+1252	      # TNFMTg0RUZDMUUyOTdCMzc3ODY0MjAeFw0yMzA5MjMxNTU1MzhaFw0yNDA3MTkx
+1253	      # NTU1MzhaMDMxMTAvBgNVBAMTKDkxNDY1MkEzQkQ1MUMxNDQyNjAxOTg4ODlGNUM
+1254	      # 0NUFCRjA1M0ExODcwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCycT
+1255	      # QrOb/qB2W3i3Ki8PhA/DEWyii2TgGo9pgCwO9lsIRI6Zb/k+aSiWWP9kSczlcQg
+1256	      # tPCVwr62hTQZCIowBN0BL0cK0/5k1imJdi5qdM3nvKswM8CnoR11vB8pQFwruZm
+1257	      # r5xphXRvE+mzuJVLgu2V1upmBXuWloeymudh6WWJ+GDjwPXO3RiXBejBrOFNXha
+1258	      # FLe08y4DPfr/S/tXJOBm7QzQptmbPLYtGfprYu45liFFqqP94UeLpISfXd36AKG
+1259	      # zqTFCcc3EW9l5UFE1MFLlnoEogqtoLoKABt0IkOFGKeC/EgeaBdWLe469ddC9rQ
+1260	      # ft5w6g6cmxG+aYDdIEB34zrAgMBAAGjggFgMIIBXDAdBgNVHQ4EFgQUkUZSo71R
+1261	      # wUQmAZiIn1xFq/BToYcwHwYDVR0jBBgwFoAUOs4s70+yG30R4+GE78Hil7N3hkI
+1262	      # wDgYDVR0PAQH/BAQDAgeAMBgGA1UdIAEB/wQOMAwwCgYIKwYBBQUHDgIwYQYDVR
+1263	      # 0fBFowWDBWoFSgUoZQcnN5bmM6Ly9ycGtpLmV4YW1wbGUubmV0L3JlcG9zaXRvc
+1264	      # nkvM0FDRTJDRUY0RkIyMUI3RDExRTNFMTg0RUZDMUUyOTdCMzc3ODY0Mi5jcmww
+1265	      # bAYIKwYBBQUHAQEEYDBeMFwGCCsGAQUFBzAChlByc3luYzovL3Jwa2kuZXhhbXB
+1266	      # sZS5uZXQvcmVwb3NpdG9yeS8zQUNFMkNFRjRGQjIxQjdEMTFFM0UxODRFRkMxRT
+1267	      # I5N0IzNzc4NjQyLmNlcjAfBggrBgEFBQcBBwEB/wQQMA4wDAQCAAEwBgMEAMAAA
+1268	      # jANBgkqhkiG9w0BAQsFAAOCAQEAlxt25FUee0+uCidTH+4p7At3u2ncgHcGTsag
+1269	      # 3UcoPjcE/I1JgQJRu9TiM4iNB1C7Lbdd131gMdliL5GQ3P4QfKnfkuPR6S1V8su
+1270	      # q6ZT1KQRyLJx+EPgDN2rb/iji0TOK6RKPNBdGlXVLjth4x/uu1O4V54GLEhDAPQ
+1271	      # C8IUm5intL/Hx1M1x2ptN/+j5HD3XUXd3x13yis6u758nbA7ND40JNhGG5JNGQg
+1272	      # DchL4IQzIhylMNC+bKUiyyMHz3MqoVAklIB86IWUcv72Mekq+i46T/w3RnaGn4x
+1273	      # 7RAJctVJWw3e5YMrFnQcuuaGOs0QcoxW7Bi4W7Eg8fK1fd/f6fjZ9zGCAaowggG
+1274	      # mAgEDgBSRRlKjvVHBRCYBmIifXEWr8FOhhzALBglghkgBZQMEAgGgazAaBgkqhk
+1275	      # iG9w0BCQMxDQYLKoZIhvcNAQkQAS8wHAYJKoZIhvcNAQkFMQ8XDTIzMDkyMzE1N
+1276	      # TUzOFowLwYJKoZIhvcNAQkEMSIEICvi8p5S8ckg2wTRhDBQzGijjyqs5T6I+4Vt
+1277	      # BHypfcEWMA0GCSqGSIb3DQEBAQUABIIBAKZND7pKdVdfpB6zaJN89wTt+sXd0io
+1278	      # 0WULMc+o6gRJFt3wmKNW2nYPrDbocJ+Q/rDMGxbp4QetJ0MQtn1+AYAS8v5jPDO
+1279	      # 4a63U4/mJ2D3wSnQsDP0lUVknqRzfnS66HgHqiOVdHB0U+OnMEJuqHNTLx0dknb
+1280	      # L3zwxyDJTHdo+dMB0U9xdcjwpsPM3xqg57EXj5EIQK5JbardXCjrsysAnEdktUY
+1281	      # oyayGNbbQelANYJcOmuHhSXArR+qqzvNP2MDRqqKEcpd65YW6FSnqlVMIBH2M3P
+1282	      # D2F0p3sdm4IeGAZWaERVB4AXO1PUFDNdhamr4XpIwqIoAig7xiLm7j8qu5Oc=
+1283	      # End Signature: 192.0.2.0/24
+
+1285	Authors' Addresses
+
+1287	   Oliver Gasser
+1288	   IPinfo
+1289	   Email: oliver@ipinfo.io
+1290	   Randy Bush
+1291	   IIJ Research & Arrcus
+1292	   5147 Crystal Springs
+1293	   Bainbridge Island, Washington 98110
+1294	   United States of America
+1295	   Email: randy@psg.com
+
+1297	   Massimo Candela
+1298	   NTT
+1299	   Siriusdreef 70-72
+1300	   2132 WT Hoofddorp
+1301	   Netherlands
+1302	   Email: massimo@ntt.net
+
+1304	   Russ Housley
+1305	   Vigil Security, LLC
+1306	   516 Dranesville Road
+1307	   Herndon, VA 20170
+1308	   United States of America
+1309	   Email: housley@vigilsec.com
+
+
+
+
+
+
+
+
+
