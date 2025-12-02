@@ -1,0 +1,1393 @@
+idnits 2.17.1 
+
+draft-ietf-sshm-ssh-agent-14.txt:
+-(1345): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+  == There is 1 instance of lines with non-ascii characters in the document.
+
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     Summary: 0 errors (**), 0 flaws (~~), 1 warning (==), 0 comments (--).
+
+--------------------------------------------------------------------------------
+
+
+2	Internet Engineering Task Force                                D. Miller
+3	Internet-Draft                                                   OpenSSH
+4	Intended status: Standards Track                         1 December 2025
+5	Expires: 4 June 2026
+
+7	                           SSH Agent Protocol
+8	                      draft-ietf-sshm-ssh-agent-14
+
+10	Abstract
+
+12	   This document specifies a key agent protocol for use in the Secure
+13	   Shell (SSH) protocol.
+
+15	Note
+
+17	   This note is to be removed before publishing as an RFC.
+
+19	   In the IANA considerations section, please replace "thisRFC" with
+20	   "RFC" and the assigned number, when known.
+
+22	Status of This Memo
+
+24	   This Internet-Draft is submitted in full conformance with the
+25	   provisions of BCP 78 and BCP 79.
+
+27	   Internet-Drafts are working documents of the Internet Engineering
+28	   Task Force (IETF).  Note that other groups may also distribute
+29	   working documents as Internet-Drafts.  The list of current Internet-
+30	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+32	   Internet-Drafts are draft documents valid for a maximum of six months
+33	   and may be updated, replaced, or obsoleted by other documents at any
+34	   time.  It is inappropriate to use Internet-Drafts as reference
+35	   material or to cite them other than as "work in progress."
+
+37	   This Internet-Draft will expire on 4 June 2026.
+
+39	Copyright Notice
+
+41	   Copyright (c) 2025 IETF Trust and the persons identified as the
+42	   document authors.  All rights reserved.
+
+44	   This document is subject to BCP 78 and the IETF Trust's Legal
+45	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+46	   license-info) in effect on the date of publication of this document.
+47	   Please review these documents carefully, as they describe your rights
+48	   and restrictions with respect to this document.  Code Components
+49	   extracted from this document must include Revised BSD License text as
+50	   described in Section 4.e of the Trust Legal Provisions and are
+51	   provided without warranty as described in the Revised BSD License.
+
+53	Table of Contents
+
+55	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
+56	     1.1.  Background  . . . . . . . . . . . . . . . . . . . . . . .   3
+57	     1.2.  Requirements Language . . . . . . . . . . . . . . . . . .   3
+58	   2.  Protocol Overview . . . . . . . . . . . . . . . . . . . . . .   4
+59	     2.1.  Background  . . . . . . . . . . . . . . . . . . . . . . .   4
+60	     2.2.  Terminology and units . . . . . . . . . . . . . . . . . .   4
+61	   3.  Protocol Messages . . . . . . . . . . . . . . . . . . . . . .   5
+62	     3.1.  Generic agent responses . . . . . . . . . . . . . . . . .   5
+63	     3.2.  Adding keys to the agent  . . . . . . . . . . . . . . . .   5
+64	       3.2.1.  DSA keys  . . . . . . . . . . . . . . . . . . . . . .   6
+65	       3.2.2.  ECDSA keys  . . . . . . . . . . . . . . . . . . . . .   7
+66	       3.2.3.  EDDSA keys  . . . . . . . . . . . . . . . . . . . . .   7
+67	       3.2.4.  RSA keys  . . . . . . . . . . . . . . . . . . . . . .   8
+68	       3.2.5.  Other keys  . . . . . . . . . . . . . . . . . . . . .   8
+69	       3.2.6.  Adding keys from a token  . . . . . . . . . . . . . .   8
+70	       3.2.7.  Key Constraints . . . . . . . . . . . . . . . . . . .   9
+71	     3.3.  Public key encoding . . . . . . . . . . . . . . . . . . .  10
+72	     3.4.  Removing keys from the agent  . . . . . . . . . . . . . .  11
+73	     3.5.  Requesting a list of keys . . . . . . . . . . . . . . . .  11
+74	     3.6.  Private key operations  . . . . . . . . . . . . . . . . .  12
+75	       3.6.1.  Signature flags . . . . . . . . . . . . . . . . . . .  13
+76	     3.7.  Locking and unlocking an agent  . . . . . . . . . . . . .  13
+77	     3.8.  Extension mechanism . . . . . . . . . . . . . . . . . . .  13
+78	       3.8.1.  Query extension . . . . . . . . . . . . . . . . . . .  14
+79	   4.  Connecting to an agent  . . . . . . . . . . . . . . . . . . .  15
+80	   5.  Forwarding access to an agent . . . . . . . . . . . . . . . .  15
+81	     5.1.  Advertising agent forwarding support  . . . . . . . . . .  15
+82	     5.2.  Requesting agent forwarding . . . . . . . . . . . . . . .  15
+83	     5.3.  Agent connection requests . . . . . . . . . . . . . . . .  16
+84	   6.  Protocol numbers  . . . . . . . . . . . . . . . . . . . . . .  17
+85	     6.1.  Message type numbers  . . . . . . . . . . . . . . . . . .  17
+86	       6.1.1.  Reserved message type numbers . . . . . . . . . . . .  18
+87	     6.2.  Constraint identifiers  . . . . . . . . . . . . . . . . .  18
+88	     6.3.  Signature flags . . . . . . . . . . . . . . . . . . . . .  18
+89	   7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  19
+90	     7.1.  Guidance for Designated Experts . . . . . . . . . . . . .  19
+91	     7.2.  New registry: SSH agent protocol message type numbers . .  19
+92	     7.3.  New registry: SSH agent key constraint numbers  . . . . .  22
+93	     7.4.  New registry: SSH agent signature flags . . . . . . . . .  23
+94	     7.5.  New registry: SSH agent extension request names . . . . .  23
+95	     7.6.  Additions to SSH Extension Names  . . . . . . . . . . . .  24
+96	     7.7.  Additions to SSH Connection Protocol Channel Request
+97	           Names . . . . . . . . . . . . . . . . . . . . . . . . . .  24
+98	     7.8.  Additions to SSH Connection Protocol Channel Types  . . .  24
+99	   8.  Security Considerations . . . . . . . . . . . . . . . . . . .  25
+100	   9.  Implementation Status . . . . . . . . . . . . . . . . . . . .  26
+101	   10. References  . . . . . . . . . . . . . . . . . . . . . . . . .  27
+102	     10.1.  Normative References . . . . . . . . . . . . . . . . . .  28
+103	     10.2.  Informative References . . . . . . . . . . . . . . . . .  29
+104	   Acknowledgments . . . . . . . . . . . . . . . . . . . . . . . . .  30
+105	   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  30
+
+107	1.  Introduction
+
+109	   Secure Shell (SSH) [RFC4251] is a protocol for secure remote
+110	   connections [RFC4253] and login [RFC4254] over untrusted networks.
+111	   It supports multiple authentication mechanisms [RFC4252], including
+112	   public key authentication.  This document specifies the protocol for
+113	   interacting with a key management component, usually referred to as
+114	   "an agent", that holds private keys.  SSH clients (and possibly SSH
+115	   servers) can invoke the agent via this protocol to perform operations
+116	   using public and private keys held in the agent.
+
+118	   Holding keys in an agent offers usability and security advantages to
+119	   loading and unwrapping them at each use, as each key unwrapping may
+120	   require entry of a pass-phrase.  Access to an agent may optionally be
+121	   forwarded across an SSH connection, thereby allowing remote systems
+122	   to use stored keys without directly exposing the key material to the
+123	   remote system.  Finally, the agent may be implemented as a dedicated
+124	   component that presents a smaller attack surface than a key loaded
+125	   into a full SSH server or client, and which may be subject to special
+126	   protection from the wider system.
+
+128	1.1.  Background
+
+130	   This section is to be removed before publishing as an RFC.
+
+132	   This agent protocol is already widely used and a de-facto standard,
+133	   having been implemented by a number of popular SSH clients and
+134	   servers for many years.  The purpose of this document is to describe
+135	   the protocol as it has been implemented.
+
+137	1.2.  Requirements Language
+
+139	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+140	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+141	   "OPTIONAL" in this document are to be interpreted as described in BCP
+142	   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+143	   capitals, as shown here.
+
+145	2.  Protocol Overview
+
+147	   The agent protocol is a packetised request-response protocol, solely
+148	   driven by the client.  It consists of a number of requests sent from
+149	   a client to an agent and a set of reply messages that are sent in
+150	   response.  At no time does the agent send messages except in response
+151	   to a client request.  Replies are sent in order.
+
+153	   These requests include the ability to load keys into an agent, remove
+154	   some or all keys from an agent and to perform signature operations
+155	   using previously-loaded keys.
+
+157	   Agents MAY implement support for only a subset of operations or
+158	   available key types, and MAY additionally refuse arbitrary operations
+159	   in particular contexts.  For example, an agent may allow only clients
+160	   local to itself to add or remove keys, or make particular subsets of
+161	   keys available to a given client.  For this reason, clients of the
+162	   agent SHOULD be prepared to fail gracefully if any operation is
+163	   refused.
+
+165	2.1.  Background
+
+167	   This section is to be removed before publishing as an RFC.
+
+169	   Note that this protocol is separate to and incompatible with the one
+170	   described in the similarly-named [draft-ietf-secsh-agent-02] which
+171	   expired in 2004.
+
+173	2.2.  Terminology and units
+
+175	   Henceforth in this document, "agent" will be used to refer to a key
+176	   management component that implements the responder side of this
+177	   protocol.  "Client" will refer to a tool that implements the
+178	   requester side of the protocol to communicate with an agent.  If it
+179	   is pertinent that the client in question is a [RFC4251] Secure Shell
+180	   client, then it will be explicitly referred to as an "SSH client".
+181	   Similarly, "SSH server" will be used to refer to Secure Shell
+182	   servers.
+
+184	   All encoding data types ("byte", "uint32", "string", etc.) are as
+185	   specified in Section 5 of [RFC4251].  Additionally, the type "byte[]"
+186	   without a specified length within the square brackets indicates an
+187	   unadorned sequence of zero or more bytes where the length is
+188	   determined by context.
+
+190	   All length units are given in bytes unless otherwise specified.
+
+192	3.  Protocol Messages
+
+194	   Messages consist of a length, type and contents.
+
+196	       uint32            length
+197	       byte              type
+198	       byte[length - 1]  contents
+
+200	   In the sections below, the "length" field is omitted.  For clarity,
+201	   the symbolic names of the message types are shown; their numeric
+202	   values are listed in Section 6.1 below.
+
+204	3.1.  Generic agent responses
+
+206	   The following generic messages may be sent by the agent in response
+207	   to requests from the client.  On success the agent MUST reply either
+208	   with the single-byte response:
+
+210	       byte              SSH_AGENT_SUCCESS
+
+212	   or a request-specific success message that may contain additional
+213	   fields.  On failure, the agent MUST reply with the single-byte
+214	   response:
+
+216	       byte              SSH_AGENT_FAILURE
+
+218	   or a request-specific failure message that may contain additional
+219	   fields.  SSH_AGENT_FAILURE messages MUST also be sent in reply to
+220	   requests with unknown or unsupported types.
+
+222	3.2.  Adding keys to the agent
+
+224	   Keys may be added to the agent using the SSH_AGENTC_ADD_IDENTITY or
+225	   SSH_AGENTC_ADD_ID_CONSTRAINED messages.  The latter variant allows
+226	   adding keys with optional constraints on their usage.
+
+228	   The generic format for the key SSH_AGENTC_ADD_IDENTITY message is:
+
+230	       byte             SSH_AGENTC_ADD_IDENTITY
+231	       string           key type
+232	       byte[]           key data
+233	       string           comment
+
+235	   Here "key type" is the specified key type name, for example "ssh-rsa"
+236	   for an RSA key as defined by [RFC4253].  "key data" consists of the
+237	   public and private components of the key and vary by key type, as
+238	   specified in subsections 3.2.1 through 3.2.4 for commonly used key
+239	   types.  "comment" is a human-readable key name or comment as a UTF-8
+240	   string that may serve to identify the key in user-visible messages.
+241	   This string may be of zero length.
+
+243	   The SSH_AGENTC_ADD_ID_CONSTRAINED is similar, but adds an extra
+244	   field:
+
+246	       byte             SSH_AGENTC_ADD_ID_CONSTRAINED
+247	       string           key type
+248	       byte[]           key data
+249	       string           comment
+250	       constraint[]     constraints
+
+252	   Constraints are used to place limits on the validity or use of keys.
+253	   Section 3.2.7 details constraint types and their format.  Clients
+254	   SHOULD prefer the SSH_AGENTC_ADD_IDENTITY message over sending an
+255	   SSH_AGENTC_ADD_ID_CONSTRAINED with an empty constraints field, though
+256	   both are valid and equivalent.
+
+258	   An agent MUST reply with SSH_AGENT_SUCCESS if the key was
+259	   successfully loaded as a result of one of these messages, or
+260	   SSH_AGENT_FAILURE otherwise.
+
+262	   An agent MAY support only a subset of the key types defined here and
+263	   MAY support additional key types as described below.  If an agent
+264	   does not recognise the type name in a request to add a key, then it
+265	   MUST respond with an SSH_AGENT_FAILURE reply.
+
+267	3.2.1.  DSA keys
+
+269	   DSA keys have key type "ssh-dss" and are defined in [RFC4253].  They
+270	   may be added to the agent using the following message.  The
+271	   "constraints" field is only present for the
+272	   SSH_AGENTC_ADD_ID_CONSTRAINED message.
+
+274	       byte             SSH_AGENTC_ADD_IDENTITY or
+275	                        SSH_AGENTC_ADD_ID_CONSTRAINED
+276	       string           "ssh-dss"
+277	       mpint            p
+278	       mpint            q
+279	       mpint            g
+280	       mpint            y
+281	       mpint            x
+282	       string           comment
+283	       constraint[]     constraints
+
+285	   The "p", "q", "g" values are the DSA domain parameters. "y" and "x"
+286	   are the public and private keys respectively.  These values are as
+287	   defined by Section 4.1 of [FIPS.186-4].
+
+289	3.2.2.  ECDSA keys
+
+291	   ECDSA keys have key types starting with "ecdsa-sha2-" and are defined
+292	   in [RFC5656].  They may be added to the agent using the following
+293	   message.  The "constraints" field is only present for the
+294	   SSH_AGENTC_ADD_ID_CONSTRAINED message.
+
+296	       byte             SSH_AGENTC_ADD_IDENTITY or
+297	                        SSH_AGENTC_ADD_ID_CONSTRAINED
+298	       string           key type
+299	       string           ecdsa_curve_name
+300	       string           Q
+301	       mpint            d
+302	       string           comment
+303	       constraint[]     constraints
+
+305	   The values "Q" and "d" are the ECDSA public and private values
+306	   respectively.  Both are defined by Section 6.2 of [FIPS.186-5].
+
+308	3.2.3.  EDDSA keys
+
+310	   [RFC8709] defines Ed25519 and Ed448 with key type names "ssh-ed25519"
+311	   and "ssh-ed448" respectively.  These may be added to the agent using
+312	   the following message.  The "constraints" field is only present for
+313	   the SSH_AGENTC_ADD_ID_CONSTRAINED message.
+
+315	       byte             SSH_AGENTC_ADD_IDENTITY or
+316	                        SSH_AGENTC_ADD_ID_CONSTRAINED
+317	       string           "ssh-ed25519" or "ssh-ed448"
+318	       string           ENC(A)
+319	       string           k || ENC(A)
+320	       string           comment
+321	       constraint[]     constraints
+
+323	   The first value is the EDDSA public key ENC(A).  The second value is
+324	   a concatenation of the private key k and the public ENC(A) key (this
+325	   redundant repetition of the public key is to maintain compatibility
+326	   with widely deployed implementations).  The contents and
+327	   interpretation of the ENC(A) and k values are defined by Section 3.2
+328	   of [RFC8032].
+
+330	3.2.4.  RSA keys
+
+332	   RSA keys have key type "ssh-rsa" and are defined in [RFC4253].  They
+333	   may be added to the agent using the following message.  The
+334	   "constraints" field is only present for the
+335	   SSH_AGENTC_ADD_ID_CONSTRAINED message.
+
+337	       byte             SSH_AGENTC_ADD_IDENTITY or
+338	                        SSH_AGENTC_ADD_ID_CONSTRAINED
+339	       string           "ssh-rsa"
+340	       mpint            n
+341	       mpint            e
+342	       mpint            d
+343	       mpint            iqmp
+344	       mpint            p
+345	       mpint            q
+346	       string           comment
+347	       constraint[]     constraints
+
+349	   "n" is the public composite modulus.  "e" is the public exponent.
+350	   "d" is the private exponent.  "p" and "q" are its constituent private
+351	   prime factors.  "iqmp" is the inverse of "q" modulo "p".  All these
+352	   values except "iqmp" (which can be calculated from the others) are
+353	   defined by Section 5.1 of [FIPS.186-5].
+
+355	3.2.5.  Other keys
+
+357	   Agents and their clients MAY support additional key types not
+358	   documented here.  Vendor-specific key types MUST use the domain-
+359	   qualified naming convention defined in Section 6 of [RFC4251] until
+360	   code-points are allocated by IANA.
+
+362	3.2.6.  Adding keys from a token
+
+364	   Keys hosted on smart-cards or other hardware tokens may be added
+365	   using the SSH_AGENTC_ADD_SMARTCARD_KEY and
+366	   SSH_AGENTC_ADD_SMARTCARD_KEY_CONSTRAINED requests.  Note that
+367	   "constraints" field is only included for the
+368	   SSH_AGENTC_ADD_SMARTCARD_KEY_CONSTRAINED variant of this message.
+
+370	       byte             SSH_AGENTC_ADD_SMARTCARD_KEY or
+371	                        SSH_AGENTC_ADD_SMARTCARD_KEY_CONSTRAINED
+372	       string           token id
+373	       string           PIN
+374	       constraint[]     constraints
+
+376	   Here "token id" is an opaque identifier for the hardware token and
+377	   "PIN" is an optional password or PIN to unlock the key.  The
+378	   interpretation of "token id" is not defined by the protocol but is
+379	   left solely up to the agent.
+
+381	   Typically, only the public components of any keys supported on a
+382	   hardware token will be loaded into an agent so, strictly speaking,
+383	   this message really arranges future private key operations to be
+384	   delegated to the hardware token in question.
+
+386	   An agent MUST reply with SSH_AGENT_SUCCESS if one or more keys were
+387	   successfully loaded as a result of one of these messages, or
+388	   SSH_AGENT_FAILURE if no keys were found.  The agent MUST also return
+389	   SSH_AGENT_FAILURE if the "token id" was not recognised or if the
+390	   agent doesn't support token-hosted keys at all.
+
+392	3.2.7.  Key Constraints
+
+394	   A number of constraints may be used in the constrained variants of
+395	   the key add messages.  Each constraint is represented by a type byte
+396	   followed by zero or more value bytes.
+
+398	   Zero or more constraints may be specified when adding a key with one
+399	   of the *_CONSTRAINED requests.  Multiple constraints are appended
+400	   consecutively to the end of the request:
+
+402	       byte             constraint1_type
+403	       byte[]           constraint1_data
+404	       byte             constraint2_type
+405	       byte[]           constraint2_data
+406	       ....
+407	       byte             constraintN_type
+408	       byte[]           constraintN_data
+
+410	   To fully parse a constraint, it is necessary to know its structure
+411	   beforehand and it is not possible to safely recover when an
+412	   unrecognised constraint is encountered.  Given this, if an agent does
+413	   not recognise or support a requested constraint it MUST abort
+414	   parsing, refuse the request and return an SSH_AGENT_FAILURE message
+415	   to the client.
+
+417	   The following constraints are defined.
+
+419	3.2.7.1.  Key lifetime constraint
+
+421	   This constraint requests that the agent limit the key's lifetime by
+422	   deleting it after the specified duration (in seconds) has elapsed
+423	   from the time the key was added to the agent.
+
+425	       byte             SSH_AGENT_CONSTRAIN_LIFETIME
+426	       uint32           seconds
+
+428	3.2.7.2.  Key confirmation constraint
+
+430	   This constraint requests that the agent require explicit user
+431	   confirmation for each private key operation using the key.  For
+432	   example, the agent could present a confirmation dialog before
+433	   completing a signature operation.
+
+435	       byte             SSH_AGENT_CONSTRAIN_CONFIRM
+
+437	3.2.7.3.  Constraint extensions
+
+439	   Agents may implement experimental or private-use constraints through
+440	   an extension constraint that supports named constraints.
+
+442	       byte             SSH_AGENT_CONSTRAIN_EXTENSION
+443	       string           extension name
+444	       byte[]           extension-specific details
+
+446	   The extension name MUST consist of a UTF-8 string suffixed by the
+447	   implementation domain following the naming scheme defined in
+448	   Section 6 of [RFC4251], e.g.  "foo@example.com".
+
+450	   Note, given the above requirement to reject keys with unsupported
+451	   constraints, a constraint extension is only usable when both client
+452	   and agent support it.  Otherwise, the agent will be required to
+453	   reject the key.  This is desirable, as the constraint extension may
+454	   specify limits on the key that, if ignored, may result in the key
+455	   being available in situations the user did not intend (i.e. the agent
+456	   will fail safely).
+
+458	3.3.  Public key encoding
+
+460	   Keys previously loaded into an agent are referred to by their public
+461	   key blob, which is the standard SSH wire encoding for public keys.
+462	   SSH protocol key encodings are defined in [RFC4253] for "ssh-rsa" and
+463	   "ssh-dss" keys, in [RFC5656] for "ecdsa-sha2-*" keys and in [RFC8709]
+464	   for "ssh-ed25519" and "ssh-ed448" keys.
+
+466	3.4.  Removing keys from the agent
+
+468	   A client may request that an agent remove all keys that it stores:
+
+470	       byte             SSH_AGENTC_REMOVE_ALL_IDENTITIES
+
+472	   On receipt of such a message, an agent MUST delete all keys that it
+473	   is holding and MUST reply with SSH_AGENT_SUCCESS.
+
+475	   Specific keys may also be removed:
+
+477	       byte             SSH_AGENTC_REMOVE_IDENTITY
+478	       string           key blob
+
+480	   Where "key blob" is the standard public key encoding of the key to be
+481	   removed (Section 3.3).
+
+483	   An agent MUST reply with SSH_AGENT_SUCCESS if the key was deleted or
+484	   SSH_AGENT_FAILURE if it was not found.
+
+486	   Token-hosted keys may be removed from an agent using:
+
+488	       byte             SSH_AGENTC_REMOVE_SMARTCARD_KEY
+489	       string           token id
+490	       string           PIN
+
+492	   Where "token id" is an opaque identifier for the hardware token and
+493	   "PIN" is an optional password or PIN (not typically used), both
+494	   encoded using UTF-8.  Requesting deletion of token-hosted keys MUST
+495	   cause the agent to remove all keys it loaded from the device matching
+496	   "token id".  Note: this operation affects the agent only, it SHOULD
+497	   NOT caese the keys be deleted from the token itself.
+
+499	   An agent MUST reply with SSH_AGENT_SUCCESS if the key was deleted or
+500	   SSH_AGENT_FAILURE if it was not found.
+
+502	3.5.  Requesting a list of keys
+
+504	   A client may request a list of keys from an agent using the following
+505	   message:
+
+507	       byte             SSH_AGENTC_REQUEST_IDENTITIES
+
+509	   The agent MUST reply with a message with the following preamble.
+
+511	       byte             SSH_AGENT_IDENTITIES_ANSWER
+512	       uint32           nkeys
+
+514	   Where "nkeys" indicates the number of keys to follow.  Following the
+515	   preamble are zero or more keys, each encoded as:
+
+517	       string           key blob
+518	       string           comment
+
+520	   Where "key blob" is the standard public key encoding of the key
+521	   (Section 3.3) and "comment" is a human-readable comment encoded as a
+522	   UTF-8 string.
+
+524	3.6.  Private key operations
+
+526	   A client may request the agent perform a private key signature
+527	   operation using the following message:
+
+529	       byte             SSH_AGENTC_SIGN_REQUEST
+530	       string           key blob
+531	       string           data
+532	       uint32           flags
+
+534	   Where "key blob" is the key requested to perform the signature
+535	   (encoded as per Section 3.3), "data" is the data to be signed and
+536	   "flags" is a bitfield containing the bitwise OR of zero or more
+537	   signature flags (see below).
+
+539	   If the agent does not support the requested flags, or is otherwise
+540	   unable or unwilling to generate the signature (for example, because
+541	   it doesn't have the specified key, or the user refused confirmation
+542	   of a constrained key), it MUST reply with an SSH_AGENT_FAILURE
+543	   message.
+
+545	   On success, the agent MUST reply with:
+
+547	       byte             SSH_AGENT_SIGN_RESPONSE
+548	       string           signature
+
+550	   The signature format is specific to the algorithm of the key type in
+551	   use.  SSH protocol signature formats are defined in [RFC4253] for
+552	   "ssh-rsa" and "ssh-dss" keys, in [RFC5656] for "ecdsa-sha2-*" keys
+553	   and in [RFC8709] for "ssh-ed25519" and "ssh-ed448" keys.
+
+555	3.6.1.  Signature flags
+
+557	   Two flags are currently defined for signature request messages:
+558	   SSH_AGENT_RSA_SHA2_256 and SSH_AGENT_RSA_SHA2_512 (defined in
+559	   Section 6.3).  These two flags are only valid for "ssh-rsa" keys and
+560	   request that the agent return a signature using the "rsa-sha2-256" or
+561	   "rsa-sha2-512" signature methods respectively.  These signature
+562	   schemes are defined in [RFC8332].
+
+564	3.7.  Locking and unlocking an agent
+
+566	   The agent protocol supports requesting that an agent temporarily lock
+567	   itself with a pass-phrase.  When locked, an agent MUST suspend
+568	   processing of sensitive operations (private key signature operations
+569	   at the very least) until it has been unlocked with the same pass-
+570	   phrase.
+
+572	   The following message requests agent locking
+
+574	       byte             SSH_AGENTC_LOCK
+575	       string           passphrase
+
+577	   The agent MUST reply with SSH_AGENT_SUCCESS if locked successfully or
+578	   SSH_AGENT_FAILURE otherwise (e.g. if the agent was already locked).
+
+580	   The following message requests unlocking an agent:
+
+582	       byte             SSH_AGENTC_UNLOCK
+583	       string           passphrase
+
+585	   If the agent is already locked and the pass-phrase matches the one
+586	   used to lock it then it MUST unlock and reply with SSH_AGENT_SUCCESS.
+587	   If the agent is already unlocked or if the pass-phrase does not match
+588	   it MUST reply with SSH_AGENT_FAILURE.
+
+590	3.8.  Extension mechanism
+
+592	   The agent protocol includes an optional extension mechanism that
+593	   allows vendor-specific and experimental messages to be sent via the
+594	   agent protocol.  Extension requests from the client consist of:
+
+596	       byte             SSH_AGENTC_EXTENSION
+597	       string           extension type
+598	       byte[]           extension request-specific contents
+
+600	   The extension type indicates the type of the extension message as a
+601	   UTF-8 string.  Implementation-specific extensions MUST be suffixed by
+602	   the implementation domain following the extension naming scheme
+603	   defined in Section 6 of [RFC4251], e.g. "foo@example.com".
+
+605	   An agent that does not support extensions of the supplied type MUST
+606	   reply with an empty SSH_AGENT_FAILURE message.  This reply is also
+607	   sent by agents that do not support the extension mechanism at all.
+
+609	   The contents of successful extension reply messages are specific to
+610	   the extension type.  Successful extension requests MUST return either
+611	   SSH_AGENT_SUCCESS on success or an extension-specific response
+612	   message:
+
+614	       byte             SSH_AGENT_EXTENSION_RESPONSE
+615	       string           extension type
+616	       byte[]           extension response-specific contents
+
+618	   Where the extension type is the same as that in the request.
+
+620	   Extension failure SHOULD be signaled using an
+621	   SSH_AGENT_EXTENSION_FAILURE message:
+
+623	       byte             SSH_AGENT_EXTENSION_FAILURE
+
+625	   Extensions SHOULD NOT use the standard SSH_AGENT_FAILURE message.
+626	   This allows failed requests to be distinguished from the extension
+627	   not being supported.
+
+629	3.8.1.  Query extension
+
+631	   A single, optional extension request "query" is defined to allow a
+632	   client to query which, if any, extensions are supported by an agent.
+
+634	       byte             SSH_AGENTC_EXTENSION
+635	       string           "query"
+
+637	   If an agent supports the query extension it SHOULD reply with a list
+638	   of supported extension names.
+
+640	       byte             SSH_AGENT_EXTENSION_RESPONSE
+641	       string           "query"
+642	       string[]         supported extension types
+
+644	4.  Connecting to an agent
+
+646	   Agents are exposed to the local system using a connection-oriented
+647	   endpoint.  On Unix-like systems, it is typical to arrange for the
+648	   agent to listen on a filesystem-based Unix domain socket.  On
+649	   Microsoft Windows, it is usual to use a Windows Named Pipe.  Access
+650	   to these endpoints should be controlled as discussed in Section 8.
+
+652	   In both cases, it is common to expose the name or address of the
+653	   listening endpoint via an environment variable named "SSH_AUTH_SOCK".
+654	   Clients of an agent will use this variable to locate and connect to
+655	   the listening agent.  Agents alternately MAY use an implicit
+656	   mechanism for clients to locate their endpoint, such as a default
+657	   per-user location.
+
+659	5.  Forwarding access to an agent
+
+661	   The agent protocol may be forwarded over an SSH connection, using the
+662	   [RFC4254] connection protocol, allowing agent forwarding to be
+663	   requested for any session channel, using a model that is similar to
+664	   the connection protocol's support for X11 Forwarding (Section 6.3 of
+665	   [RFC4254]).  This feature is OPTIONAL for SSH protocol and agent
+666	   implementations.
+
+668	5.1.  Advertising agent forwarding support
+
+670	   Support for agent forwarding may be advertised by an SSH server using
+671	   the [RFC8308] extension mechanism using the name "agent-forward" in
+672	   the SSH_MSG_EXT_INFO message.
+
+674	       string           "agent-forward"
+675	       string           "0" (version)
+
+677	   Note that this protocol substantially predates the existence of the
+678	   [RFC8308] extension mechanism and several widely-deployed SSH
+679	   implementations that support agent forwarding do not advertise their
+680	   ability to do so.  SSH Clients MAY opportunistically attempt to
+681	   request agent forwarding in the absence of an [RFC8308] advertisement
+682	   using the vendor-specific names mentioned below.  Likewise, SSH
+683	   servers MAY implement the vendor-specific names in addition to the
+684	   one described here.
+
+686	5.2.  Requesting agent forwarding
+
+688	   An SSH client may request agent forwarding for a previously-opened
+689	   session (Section 6.1 of [RFC4254]) using the following channel
+690	   request.  This request is sent after the channel has been opened, but
+691	   before a shell, command or subsystem has been executed.
+
+693	       byte             SSH_MSG_CHANNEL_REQUEST
+694	       uint32           channel_id
+695	       string           "agent-req" or "auth-agent-req@openssh.com"
+696	       boolean          want_reply
+
+698	   Where channel_id is the identifier for an established session channel
+699	   (as returned from a previous SSH_MSG_CHANNEL_OPEN request, and the
+700	   want_reply flag indicates whether the SSH server should respond with
+701	   a confirmation of whether the request was successful (as specified in
+702	   Section 5.4 of [RFC4254])
+
+704	   If an SSH server accepts this request, typically it will arrange to
+705	   make an endpoint (e.g. a listening socket) available and advertise
+706	   this fact to the subordinate session.  Most implementations on Unix-
+707	   like systems do this by providing a user-private listening Unix
+708	   domain socket and recording its location in an environment variable
+709	   SSH_AUTH_SOCK.
+
+711	   As mentioned previously, many deployed implementations only support
+712	   the pre-standardisation "auth-agent-req@openssh.com" request name.
+713	   The "agent-req" name SHOULD only be used if support was explicitly
+714	   advertised as per Section 5.1.
+
+716	5.3.  Agent connection requests
+
+718	   After an SSH client has requested that a session have agent
+719	   forwarding enabled, the SSH server later may request a connection to
+720	   the forwarded agent.  The SSH server does this by requesting a
+721	   dedicated channel to communicate with the SSH client's agent.
+
+723	       byte             SSH_MSG_CHANNEL_OPEN
+724	       string           "agent-connect" or "auth-agent@openssh.com"
+725	       uint32           channel_id
+726	       uint32           local_window
+727	       uint32           local_maxpacket
+
+729	   The channel_id, local_window and local_maxpacket fields should be
+730	   interpreted as specified by Section 5.1 of [RFC4254].
+
+732	   As above, the "agent-connect" open type name SHOULD only be used if
+733	   support was explicitly advertised as per Section 5.1.
+
+735	   An SSH client SHOULD be prepared to handle multiple concurrent
+736	   forwarded connections to a client-side agent, otherwise requests to
+737	   access the agent from the remote side that happen to overlap prior
+738	   requests may fail.  Overlapping requests may occur because the SSH
+739	   connection protocol [RFC4254] allows multiple user sessions over a
+740	   single [RFC4253] transport, which may each request use of the agentcw
+741	   independently and potentially concurrently.
+
+743	   An SSH client MAY accept agent connection requests (subject to
+744	   authorisation) without a prior agent forwarding request having been
+745	   made to support the situation where agent forwarding without opening
+746	   a session is desired.  Similarly, an SSH client MAY continue to
+747	   accept agent connection requests after the session for which agent
+748	   forwarding was requested has closed.
+
+750	   An SSH client MUST refuse unauthorised agent connection requests,
+751	   when agent forwarding is neither requested nor desired by the SSH
+752	   client but an SSH server sends an agent connection request anyway.
+
+754	   Because the "agent-connect" request contains no identifier to
+755	   distinguish which session channel originated the connection request,
+756	   an SSH connection can effectively forward access to only a single SSH
+757	   client-side agent using this protocol (although there may be multiple
+758	   concurrent connections to that single agent).
+
+760	6.  Protocol numbers
+
+762	6.1.  Message type numbers
+
+764	   The following numbers are used as message types for requests from the
+765	   client to the agent.
+
+767	       SSH_AGENTC_REQUEST_IDENTITIES                  11
+768	       SSH_AGENTC_SIGN_REQUEST                        13
+769	       SSH_AGENTC_ADD_IDENTITY                        17
+770	       SSH_AGENTC_REMOVE_IDENTITY                     18
+771	       SSH_AGENTC_REMOVE_ALL_IDENTITIES               19
+772	       SSH_AGENTC_ADD_SMARTCARD_KEY                   20
+773	       SSH_AGENTC_REMOVE_SMARTCARD_KEY                21
+774	       SSH_AGENTC_LOCK                                22
+775	       SSH_AGENTC_UNLOCK                              23
+776	       SSH_AGENTC_ADD_ID_CONSTRAINED                  25
+777	       SSH_AGENTC_ADD_SMARTCARD_KEY_CONSTRAINED       26
+778	       SSH_AGENTC_EXTENSION                           27
+
+780	   The following numbers are used as message types for replies from the
+781	   agent to the client.
+
+783	       SSH_AGENT_FAILURE                               5
+784	       SSH_AGENT_SUCCESS                               6
+785	       SSH_AGENT_IDENTITIES_ANSWER                     12
+786	       SSH_AGENT_SIGN_RESPONSE                         14
+787	       SSH_AGENT_EXTENSION_FAILURE                     28
+788	       SSH_AGENT_EXTENSION_RESPONSE                    29
+
+790	6.1.1.  Reserved message type numbers
+
+792	   The following message type numbers are reserved for implementations
+793	   that implement support for the legacy SSH protocol version 1: 1-4,
+794	   7-10, 15-16 and 24 (inclusive).  These message numbers MAY be used by
+795	   an implementation supporting the legacy protocol but MUST NOT be
+796	   reused otherwise.
+
+798	   Message number 0 is also reserved and MUST NOT be used.
+
+800	   The range of message numbers 240-255 are reserved for Private Use
+801	   extensions to the agent protocol and MUST NOT be used by generic
+802	   implementations.
+
+804	6.2.  Constraint identifiers
+
+806	   The following numbers are used to identify key constraints.  These
+807	   are only used in key constraints and are not sent as message numbers.
+
+809	       SSH_AGENT_CONSTRAIN_LIFETIME                    1
+810	       SSH_AGENT_CONSTRAIN_CONFIRM                     2
+811	       SSH_AGENT_CONSTRAIN_EXTENSION                   255
+
+813	   The constraint identifier 0 is reserved.
+
+815	6.3.  Signature flags
+
+817	   The following numbers may be present in signature request
+818	   (SSH_AGENTC_SIGN_REQUEST) messages.  These flags form a bit field by
+819	   taking the logical OR of zero or more flags.
+
+821	       SSH_AGENT_RSA_SHA2_256                          0x00000002
+822	       SSH_AGENT_RSA_SHA2_512                          0x00000004
+
+824	   The flag value 1 is reserved for historical implementations.
+
+826	7.  IANA Considerations
+
+828	   This protocol requires four registries be established, one for
+829	   message type numbers, one for constraints, one for signature request
+830	   flags and one for extension request names.  Additionally, new
+831	   codepoints are requested in three existing registries.
+
+833	7.1.  Guidance for Designated Experts
+
+835	   When a Designated Expert (DE) is asked to review additions to the new
+836	   registries described above (Section 7.2, Section 7.3, Section 7.4 and
+837	   Section 7.5), they are requested to verify that suitable
+838	   documentation as described in [RFC8126] exists and is permanently and
+839	   publicly available.  The DE is also requested to check the clarity of
+840	   purpose and use of the requested code points.  The DE should also
+841	   verify that specifications produced in the IETF that request code
+842	   points in these registries have been made available to the SSHM
+843	   working group and the ssh@ietf.org mailing list for review.  Requests
+844	   for code points made for specifications produced outside the IETF
+845	   should not conflict with active IETF work or prior IETF
+846	   specifications.
+
+848	   The available number of code points in the SSH agent protocol numbers
+849	   (Section 7.2) and SSH agent signature flags (Section 7.4) registries
+850	   are limited, so the DE is requested to ensure the use of code points
+851	   is very well justified.  For the SSH agent protocol numbers, named
+852	   extension requests (Section 7.5) provide an alternative for most uses
+853	   with no practical limitation on the number of available code points.
+
+855	7.2.  New registry: SSH agent protocol message type numbers
+
+857	   This registry, titled "SSH agent protocol message type numbers"
+858	   records the message type numbers for client requests and agent
+859	   responses.  It should be created in the Secure Shell (SSH) Protocol
+860	   Parameters registry group [IANA-SSH].  Its initial state should
+861	   consist of the following numbers and reservations.  Future message
+862	   number allocations shall occur via Expert Review as per [RFC8126].
+
+864	   +===========+==========================================+===========+
+865	   | Number(s) | Identifier                               | Reference |
+866	   +===========+==========================================+===========+
+867	   | 0         | reserved                                 | thisrfc,  |
+868	   |           |                                          | Section   |
+869	   |           |                                          | 6.1.1     |
+870	   +-----------+------------------------------------------+-----------+
+871	   | 1         | reserved                                 | thisrfc,  |
+872	   |           |                                          | Section   |
+873	   |           |                                          | 6.1.1     |
+874	   +-----------+------------------------------------------+-----------+
+875	   | 2         | reserved                                 | thisrfc,  |
+876	   |           |                                          | Section   |
+877	   |           |                                          | 6.1.1     |
+878	   +-----------+------------------------------------------+-----------+
+879	   | 3         | reserved                                 | thisrfc,  |
+880	   |           |                                          | Section   |
+881	   |           |                                          | 6.1.1     |
+882	   +-----------+------------------------------------------+-----------+
+883	   | 4         | reserved                                 | thisrfc,  |
+884	   |           |                                          | Section   |
+885	   |           |                                          | 6.1.1     |
+886	   +-----------+------------------------------------------+-----------+
+887	   | 5         | SSH_AGENT_FAILURE                        | thisrfc,  |
+888	   |           |                                          | Section   |
+889	   |           |                                          | 6.1       |
+890	   +-----------+------------------------------------------+-----------+
+891	   | 6         | SSH_AGENT_SUCCESS                        | thisrfc,  |
+892	   |           |                                          | Section   |
+893	   |           |                                          | 6.1       |
+894	   +-----------+------------------------------------------+-----------+
+895	   | 7         | reserved                                 | thisrfc,  |
+896	   |           |                                          | Section   |
+897	   |           |                                          | 6.1.1     |
+898	   +-----------+------------------------------------------+-----------+
+899	   | 8         | reserved                                 | thisrfc,  |
+900	   |           |                                          | Section   |
+901	   |           |                                          | 6.1.1     |
+902	   +-----------+------------------------------------------+-----------+
+903	   | 9         | reserved                                 | thisrfc,  |
+904	   |           |                                          | Section   |
+905	   |           |                                          | 6.1.1     |
+906	   +-----------+------------------------------------------+-----------+
+907	   | 10        | reserved                                 | thisrfc,  |
+908	   |           |                                          | Section   |
+909	   |           |                                          | 6.1.1     |
+910	   +-----------+------------------------------------------+-----------+
+911	   | 11        | SSH_AGENTC_REQUEST_IDENTITIES            | thisrfc,  |
+912	   |           |                                          | Section   |
+913	   |           |                                          | 6.1       |
+914	   +-----------+------------------------------------------+-----------+
+915	   | 12        | SSH_AGENT_IDENTITIES_ANSWER              | thisrfc,  |
+916	   |           |                                          | Section   |
+917	   |           |                                          | 6.1       |
+918	   +-----------+------------------------------------------+-----------+
+919	   | 13        | SSH_AGENTC_SIGN_REQUEST                  | thisrfc,  |
+920	   |           |                                          | Section   |
+921	   |           |                                          | 6.1       |
+922	   +-----------+------------------------------------------+-----------+
+923	   | 14        | SSH_AGENT_SIGN_RESPONSE                  | thisrfc,  |
+924	   |           |                                          | Section   |
+925	   |           |                                          | 6.1       |
+926	   +-----------+------------------------------------------+-----------+
+927	   | 15        | reserved                                 | thisrfc,  |
+928	   |           |                                          | Section   |
+929	   |           |                                          | 6.1.1     |
+930	   +-----------+------------------------------------------+-----------+
+931	   | 16        | reserved                                 | thisrfc,  |
+932	   |           |                                          | Section   |
+933	   |           |                                          | 6.1.1     |
+934	   +-----------+------------------------------------------+-----------+
+935	   | 17        | SSH_AGENTC_ADD_IDENTITY                  | thisrfc,  |
+936	   |           |                                          | Section   |
+937	   |           |                                          | 6.1       |
+938	   +-----------+------------------------------------------+-----------+
+939	   | 18        | SSH_AGENTC_REMOVE_IDENTITY               | thisrfc,  |
+940	   |           |                                          | Section   |
+941	   |           |                                          | 6.1       |
+942	   +-----------+------------------------------------------+-----------+
+943	   | 19        | SSH_AGENTC_REMOVE_ALL_IDENTITIES         | thisrfc,  |
+944	   |           |                                          | Section   |
+945	   |           |                                          | 6.1       |
+946	   +-----------+------------------------------------------+-----------+
+947	   | 20        | SSH_AGENTC_ADD_SMARTCARD_KEY             | thisrfc,  |
+948	   |           |                                          | Section   |
+949	   |           |                                          | 6.1       |
+950	   +-----------+------------------------------------------+-----------+
+951	   | 21        | SSH_AGENTC_REMOVE_SMARTCARD_KEY          | thisrfc,  |
+952	   |           |                                          | Section   |
+953	   |           |                                          | 6.1       |
+954	   +-----------+------------------------------------------+-----------+
+955	   | 22        | SSH_AGENTC_LOCK                          | thisrfc,  |
+956	   |           |                                          | Section   |
+957	   |           |                                          | 6.1       |
+958	   +-----------+------------------------------------------+-----------+
+959	   | 23        | SSH_AGENTC_UNLOCK                        | thisrfc,  |
+960	   |           |                                          | Section   |
+961	   |           |                                          | 6.1       |
+962	   +-----------+------------------------------------------+-----------+
+963	   | 24        | reserved                                 | thisrfc,  |
+964	   |           |                                          | Section   |
+965	   |           |                                          | 6.1.1     |
+966	   +-----------+------------------------------------------+-----------+
+967	   | 25        | SSH_AGENTC_ADD_ID_CONSTRAINED            | thisrfc,  |
+968	   |           |                                          | Section   |
+969	   |           |                                          | 6.1       |
+970	   +-----------+------------------------------------------+-----------+
+971	   | 26        | SSH_AGENTC_ADD_SMARTCARD_KEY_CONSTRAINED | thisrfc,  |
+972	   |           |                                          | Section   |
+973	   |           |                                          | 6.1       |
+974	   +-----------+------------------------------------------+-----------+
+975	   | 27        | SSH_AGENTC_EXTENSION                     | thisrfc,  |
+976	   |           |                                          | Section   |
+977	   |           |                                          | 6.1       |
+978	   +-----------+------------------------------------------+-----------+
+979	   | 28        | SSH_AGENT_EXTENSION_FAILURE              | thisrfc,  |
+980	   |           |                                          | Section   |
+981	   |           |                                          | 6.1       |
+982	   +-----------+------------------------------------------+-----------+
+983	   | 29        | SSH_AGENT_EXTENSION_RESPONSE             | thisrfc,  |
+984	   |           |                                          | Section   |
+985	   |           |                                          | 6.1       |
+986	   +-----------+------------------------------------------+-----------+
+987	   | 240-255   | Private Use                              | thisrfc,  |
+988	   |           |                                          | Section   |
+989	   |           |                                          | 6.1       |
+990	   +-----------+------------------------------------------+-----------+
+
+992	                                 Table 1
+
+994	7.3.  New registry: SSH agent key constraint numbers
+
+996	   This registry, titled "SSH agent key constraint numbers" records the
+997	   message numbers for key use constraints.  It should be created in the
+998	   Secure Shell (SSH) Protocol Parameters registry group [IANA-SSH].
+999	   Its initial state should consist of the following numbers.  Future
+1000	   key constraint number allocations shall occur via Expert Review as
+1001	   per [RFC8126].
+
+1003	     +========+===============================+======================+
+1004	     | Number | Identifier                    | Reference            |
+1005	     +========+===============================+======================+
+1006	     | 1      | SSH_AGENT_CONSTRAIN_LIFETIME  | thisrfc, Section 6.2 |
+1007	     +--------+-------------------------------+----------------------+
+1008	     | 2      | SSH_AGENT_CONSTRAIN_CONFIRM   | thisrfc, Section 6.2 |
+1009	     +--------+-------------------------------+----------------------+
+1010	     | 255    | SSH_AGENT_CONSTRAIN_EXTENSION | thisrfc, Section 6.2 |
+1011	     +--------+-------------------------------+----------------------+
+
+1013	                                  Table 2
+
+1015	7.4.  New registry: SSH agent signature flags
+
+1017	   This registry, titled "SSH agent signature flags" records the values
+1018	   for signature request (SSH_AGENTC_SIGN_REQUEST) flag values.  It
+1019	   should be created in the Secure Shell (SSH) Protocol Parameters
+1020	   registry group [IANA-SSH].  Its initial state should consist of the
+1021	   following numbers.  Note that as the flags are combined by bitwise
+1022	   OR, all flag values must be powers of two and the maximum available
+1023	   flag value is 0x80000000.
+
+1025	   Future signature flag allocations shall occur via Expert Review as
+1026	   per [RFC8126].
+
+1028	        +========+========================+======================+
+1029	        | Number | Identifier             | Reference            |
+1030	        +========+========================+======================+
+1031	        | 0x01   | reserved               | thisrfc, Section 6.3 |
+1032	        +--------+------------------------+----------------------+
+1033	        | 0x02   | SSH_AGENT_RSA_SHA2_256 | thisrfc, Section 6.3 |
+1034	        +--------+------------------------+----------------------+
+1035	        | 0x04   | SSH_AGENT_RSA_SHA2_512 | thisrfc, Section 6.3 |
+1036	        +--------+------------------------+----------------------+
+
+1038	                                 Table 3
+
+1040	7.5.  New registry: SSH agent extension request names
+
+1042	   This registry, titled "SSH agent extension request names" records the
+1043	   names used in the generic extension request message
+1044	   (SSH_AGENTC_EXTENSION).  It should be created in the Secure Shell
+1045	   (SSH) Protocol Parameters registry group [IANA-SSH].  Its initial
+1046	   state should consist of the following names.
+
+1048	   Future name allocations shall occur via Expert Review as per
+1049	   [RFC8126].
+
+1051	                +================+========================+
+1052	                | Extension Name | Reference              |
+1053	                +================+========================+
+1054	                | query          | thisrfc, Section 3.8.1 |
+1055	                +----------------+------------------------+
+
+1057	                                  Table 4
+
+1059	7.6.  Additions to SSH Extension Names
+
+1061	   IANA is requested to insert the following entries into the table
+1062	   Extension Names [IANA-SSH-EXT] in the Secure Shell (SSH) Protocol
+1063	   Parameters registry group [IANA-SSH].
+
+1065	                 +================+======================+
+1066	                 | Extension Name | Reference            |
+1067	                 +================+======================+
+1068	                 | agent-forward  | thisrfc, Section 5.1 |
+1069	                 +----------------+----------------------+
+
+1071	                                  Table 5
+
+1073	7.7.  Additions to SSH Connection Protocol Channel Request Names
+
+1075	   IANA is requested to insert the following entries into the table
+1076	   Connection Protocol Channel Request Names [IANA-SSH-CHANREQ] in the
+1077	   Secure Shell (SSH) Protocol Parameters registry group [IANA-SSH].
+
+1079	                  +==============+======================+
+1080	                  | Request Type | Reference            |
+1081	                  +==============+======================+
+1082	                  | agent-req    | thisrfc, Section 5.2 |
+1083	                  +--------------+----------------------+
+
+1085	                                  Table 6
+
+1087	7.8.  Additions to SSH Connection Protocol Channel Types
+
+1089	   IANA is requested to insert the following entries into the table
+1090	   Connection Protocol Channel Types [IANA-SSH-CHANTYPE] under Secure
+1091	   Shell (SSH) Protocol Parameters [IANA-SSH].
+
+1093	                 +===============+======================+
+1094	                 | Request Type  | Reference            |
+1095	                 +===============+======================+
+1096	                 | agent-connect | thisrfc, Section 5.3 |
+1097	                 +---------------+----------------------+
+
+1099	                                 Table 7
+
+1101	8.  Security Considerations
+
+1103	   The agent is a service that is tasked with retaining and providing
+1104	   controlled access to what are typically long-lived login
+1105	   authentication credentials.  It is by nature a sensitive and trusted
+1106	   software component.  Moreover, the agent protocol itself does not
+1107	   include any authentication or transport security; ability to
+1108	   communicate with an agent is usually sufficient to invoke it to
+1109	   perform private key operations.
+
+1111	   Since being able to access an agent is usually sufficient to perform
+1112	   private key operations, it is critically important that the agent
+1113	   only be exposed to its owner and their authorised delegates.  On
+1114	   Unix-like systems this may be achieved via filesystem permissions on
+1115	   the agent socket and/or identity checks on the client connected to a
+1116	   socket (e.g. SO_PEERCRED on some Unix-like systems).  On Windows,
+1117	   access to a named pipe may be controlled by attaching a security
+1118	   descriptor at the time of its creation.
+
+1120	   The primary design intention of an agent is that an attacker with
+1121	   unprivileged access to their victim's agent should be prevented from
+1122	   gaining a copy of any keys that have been loaded into it.  This may
+1123	   not preclude the attacker from stealing use of those keys (e.g.  if
+1124	   they have been loaded without a confirmation constraint).
+
+1126	   Given this, the agent should, as far as possible, prevent its memory
+1127	   being read by other processes to prevent theft of loaded keys.  This
+1128	   typically includes disabling debugging interfaces and preventing
+1129	   process memory dumps on abnormal termination.
+
+1131	   Another, more subtle, means by which keys may be stolen are via
+1132	   cryptographic side-channels.  Private key operations may leak
+1133	   information about the contents of keys via differences in timing,
+1134	   power use or by side effects in the memory subsystems (e.g. CPU
+1135	   caches) of the host running the agent.  For the case of a local
+1136	   attacker and an agent holding unconstrained keys, the only limit on
+1137	   the number of private key operations the attacker may be able to
+1138	   observe is the rate at which the CPU can perform signatures.  This
+1139	   grants the attacker an almost ideal oracle for side-channel attacks.
+1140	   While a full treatment of side-channel attacks is beyond the scope of
+1141	   this specification, agents SHOULD use cryptographic implementations
+1142	   that are resistant to side-channel attacks and MAY take additional
+1143	   measures to hide the actual time spent processing private key
+1144	   operations.  Failure to do so may expose keys to recovery through
+1145	   these side-channels.
+
+1147	   Forwarding access to a local agent over an SSH connection (Section 5)
+1148	   inherently creates a transitive trust relationship.  SSH
+1149	   implementations SHOULD NOT forward use of an agent by default and
+1150	   users SHOULD NOT forward use of an agent to hosts that are not fully
+1151	   trusted, as doing so could expose access to the user's keys to
+1152	   attackers on remote hosts.  Agents SHOULD implement additional
+1153	   controls over key visibility and use for forwarded agent connections,
+1154	   otherwise the user has only an all-or-nothing choice over whether to
+1155	   forward an agent.
+
+1157	   Implementation of token/smartcard-hosted keys requires some care too.
+1158	   On some systems, tokens may invoked by providing a path to shared
+1159	   library that must be loaded to make use of keys hosted on the device
+1160	   (a path to a library for a particular PKCS#11 module, for example).
+1161	   Loading a shared library on most platforms implies automatic
+1162	   execution of code in that library in the address space of the process
+1163	   that loads it.  To avoid loading of potentially-hostile code, agents
+1164	   that support loading token-hosted keys via library path SHOULD ensure
+1165	   that only trusted token provider libraries are loadable.  Additionaly
+1166	   agents SHOULD ensure that loaded token library code cannot gain
+1167	   access to other keys loaded in the agent and MAY disallow remote
+1168	   clients from loading token keys entirely.  Protection for existing
+1169	   keys from tokey library code may be achieved by loading the token
+1170	   library into a separate process to the agent and arranging for the
+1171	   agent to invoke token operations to this process via IPC.
+
+1173	   Finally, with respect to the agent locking functionality in
+1174	   Section 3.7, an agent SHOULD take countermeasures against brute-force
+1175	   guessing attacks against the pass-phrase.  This may take the form of
+1176	   enforced delays when an unlock attempt is made with an incorrect
+1177	   password (potentially increasing for subsequent failures), a lockout
+1178	   period where the agent refuses to accept further requests after some
+1179	   threshold of failed unlock attempts has been made and/or deletion of
+1180	   all keys held by the agent after a threshold of failed unlock
+1181	   attempts.
+
+1183	9.  Implementation Status
+
+1185	   This section is to be removed before publishing as an RFC.
+
+1187	   Note to editor: please also remove the orphaned reference to RFC7942.
+
+1189	   This section records the status of known implementations of the
+1190	   protocol defined by this specification at the time of posting of this
+1191	   Internet-Draft, and is based on a proposal described in [RFC7942].
+1192	   The description of implementations in this section is intended to
+1193	   assist the IETF in its decision processes in progressing drafts to
+1194	   RFCs.  Please note that the listing of any individual implementation
+1195	   here does not imply endorsement by the IETF.  Furthermore, no effort
+1196	   has been spent to verify the information presented here that was
+1197	   supplied by IETF contributors.  This is not intended as, and must not
+1198	   be construed to be, a catalog of available implementations or their
+1199	   features.  Readers are advised to note that other implementations may
+1200	   exist.
+
+1202	   According to [RFC7942], "this will allow reviewers and working groups
+1203	   to assign due consideration to documents that have the benefit of
+1204	   running code, which may serve as evidence of valuable experimentation
+1205	   and feedback that have made the implemented protocols more mature.
+1206	   It is up to the individual working groups to use this information as
+1207	   they see fit".
+
+1209	   The following projects maintain an implementation of this protocol:
+
+1211	   OpenSSH  OpenSSH is the originating implementation of this protocol
+1212	      and has supported it since 2000.
+
+1214	      Website: https://www.openssh.com/
+
+1216	   PuTTY  PuTTY is a popular SSH client implementation for multiple
+1217	      platforms that has included a compatible agent client since 2001.
+
+1219	      Website: https://www.chiark.greenend.org.uk/~sgtatham/putty/
+
+1221	   Dropbear  Dropbear is an SSH client and server implementation for
+1222	      Unix-like systems.  It has supported the agent protocol since
+1223	      2005.
+
+1225	      Website: https://matt.ucc.asn.au/dropbear/dropbear.html
+
+1227	   Paramiko  Paramiko is an SSH client and server implementation in the
+1228	      Python programming language.  It has supported an agent protocol
+1229	      implementation since 2005.
+
+1231	      Website: https://www.paramiko.org/
+
+1233	   Golang x/crypto/ssh/agent  The Go programming language project has
+1234	      supported an implementation of this protocol in its external "x"
+1235	      repository since 2015.
+
+1237	      Website: https://pkg.go.dev/golang.org/x/crypto/ssh/agent
+
+1239	   This list is not exhaustive.
+
+1241	10.  References
+1242	10.1.  Normative References
+
+1244	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+1245	              Requirement Levels", BCP 14, RFC 2119,
+1246	              DOI 10.17487/RFC2119, March 1997,
+1247	              <https://www.rfc-editor.org/info/rfc2119>.
+
+1249	   [RFC4251]  Ylonen, T. and C. Lonvick, Ed., "The Secure Shell (SSH)
+1250	              Protocol Architecture", RFC 4251, DOI 10.17487/RFC4251,
+1251	              January 2006, <https://www.rfc-editor.org/info/rfc4251>.
+
+1253	   [RFC4253]  Ylonen, T. and C. Lonvick, Ed., "The Secure Shell (SSH)
+1254	              Transport Layer Protocol", RFC 4253, DOI 10.17487/RFC4253,
+1255	              January 2006, <https://www.rfc-editor.org/info/rfc4253>.
+
+1257	   [RFC4254]  Ylonen, T. and C. Lonvick, Ed., "The Secure Shell (SSH)
+1258	              Connection Protocol", RFC 4254, DOI 10.17487/RFC4254,
+1259	              January 2006, <https://www.rfc-editor.org/info/rfc4254>.
+
+1261	   [RFC5656]  Stebila, D. and J. Green, "Elliptic Curve Algorithm
+1262	              Integration in the Secure Shell Transport Layer",
+1263	              RFC 5656, DOI 10.17487/RFC5656, December 2009,
+1264	              <https://www.rfc-editor.org/info/rfc5656>.
+
+1266	   [RFC8032]  Josefsson, S. and I. Liusvaara, "Edwards-Curve Digital
+1267	              Signature Algorithm (EdDSA)", RFC 8032,
+1268	              DOI 10.17487/RFC8032, January 2017,
+1269	              <https://www.rfc-editor.org/info/rfc8032>.
+
+1271	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+1272	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+1273	              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+1275	   [RFC8308]  Bider, D., "Extension Negotiation in the Secure Shell
+1276	              (SSH) Protocol", RFC 8308, DOI 10.17487/RFC8308, March
+1277	              2018, <https://www.rfc-editor.org/info/rfc8308>.
+
+1279	   [RFC8332]  Bider, D., "Use of RSA Keys with SHA-256 and SHA-512 in
+1280	              the Secure Shell (SSH) Protocol", RFC 8332,
+1281	              DOI 10.17487/RFC8332, March 2018,
+1282	              <https://www.rfc-editor.org/info/rfc8332>.
+
+1284	   [RFC8709]  Harris, B. and L. Velvindron, "Ed25519 and Ed448 Public
+1285	              Key Algorithms for the Secure Shell (SSH) Protocol",
+1286	              RFC 8709, DOI 10.17487/RFC8709, February 2020,
+1287	              <https://www.rfc-editor.org/info/rfc8709>.
+
+1289	   [FIPS.186-4]
+1290	              National Institute of Standards and Technology, "Digital
+1291	              Signature Standard (DSS)", FIPS PUB 186-4,
+1292	              DOI 10.6028/NIST.FIPS.186-4, July 2013,
+1293	              <https://doi.org/10.6028/NIST.FIPS.186-4>.
+
+1295	   [FIPS.186-5]
+1296	              National Institute of Standards and Technology, "Digital
+1297	              Signature Standard (DSS)", FIPS PUB 186-5,
+1298	              DOI 10.6028/NIST.FIPS.186-5, February 2023,
+1299	              <https://doi.org/10.6028/NIST.FIPS.186-5>.
+
+1301	10.2.  Informative References
+
+1303	   [RFC4252]  Ylonen, T. and C. Lonvick, Ed., "The Secure Shell (SSH)
+1304	              Authentication Protocol", RFC 4252, DOI 10.17487/RFC4252,
+1305	              January 2006, <https://www.rfc-editor.org/info/rfc4252>.
+
+1307	   [RFC7942]  Sheffer, Y. and A. Farrel, "Improving Awareness of Running
+1308	              Code: The Implementation Status Section", BCP 205,
+1309	              RFC 7942, DOI 10.17487/RFC7942, July 2016,
+1310	              <https://www.rfc-editor.org/info/rfc7942>.
+
+1312	   [RFC8126]  Cotton, M., Leiba, B., and T. Narten, "Guidelines for
+1313	              Writing an IANA Considerations Section in RFCs", BCP 26,
+1314	              RFC 8126, DOI 10.17487/RFC8126, June 2017,
+1315	              <https://www.rfc-editor.org/info/rfc8126>.
+
+1317	   [IANA-SSH-CHANREQ]
+1318	              IANA, "Connection Protocol Channel Types",
+1319	              <https://www.iana.org/assignments/ssh-parameters/>.
+
+1321	   [IANA-SSH] IANA, "Secure Shell (SSH) Protocol Parameters",
+1322	              <https://www.iana.org/assignments/ssh-parameters/ssh-
+1323	              parameters.xhtml>.
+
+1325	   [IANA-SSH-CHANTYPE]
+1326	              IANA, "Extension Names",
+1327	              <https://www.iana.org/assignments/ssh-parameters/>.
+
+1329	   [IANA-SSH-EXT]
+1330	              IANA, "Connection Protocol Channel Request Names",
+1331	              <https://www.iana.org/assignments/ssh-parameters/>.
+
+1333	   [draft-ietf-secsh-agent-02]
+1334	              Ylonen, T., Rinne, T. J., and S. Lehtinen, "Secure Shell
+1335	              Authentication Agent Protocol", January 2004,
+1336	              <https://datatracker.ietf.org/doc/html/draft-ietf-secsh-
+1337	              agent-02>.
+
+1339	Acknowledgments
+
+1341	   This protocol was designed and first implemented by Markus Friedl,
+1342	   based on a similar protocol for an agent to support the legacy SSH
+1343	   version 1 by Tatu Ylonen.
+
+1345	   Thanks to Simon Tatham, Niels Möller, James Spencer, Simon Josefsson,
+1346	   Matt Johnston, Jakub Jelen, Rich Salz, Caspar Schutijser, Florian
+1347	   Obser, Martin Thomson, Deb Cooley and Tero Kivinen who reviewed and
+1348	   helped improve this document.
+
+1350	Author's Address
+
+1352	   Damien Miller
+1353	   OpenSSH
+1354	   Email: djm@openssh.com
+1355	   URI:   https://www.openssh.com/
+
+
+
+
+
+
+
+
+
