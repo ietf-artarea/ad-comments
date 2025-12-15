@@ -1,0 +1,1028 @@
+idnits 2.17.1 
+
+draft-ietf-avtcore-rtp-haptics-09.txt:
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     No nits found.
+--------------------------------------------------------------------------------
+
+
+2	avtcore                                                          HS Yang
+3	Internet-Draft                                                 X. de Foy
+4	Updates: 9695 (if approved)                                 InterDigital
+5	Intended status: Standards Track                        17 November 2025
+6	Expires: 21 May 2026
+
+8	                     RTP Payload Format for Haptics
+9	                   draft-ietf-avtcore-rtp-haptics-09
+
+11	Abstract
+
+13	   This memo describes an RTP payload format for the MPEG-I haptic data.
+14	   A haptic media stream is composed of MIHS units including a MIHS
+15	   (MPEG-I Haptic Stream) unit header and zero or more MIHS packets.
+16	   The RTP Payload header format allows for packetization of a MIHS unit
+17	   in an RTP packet payload as well as fragmentation of a MIHS unit into
+18	   multiple RTP packets.  The original subtype registration for haptics/
+19	   hmpg, registered with IANA in RFC9695, did not include any required
+20	   or optional parameters.  This memo updates RFC9695 and the haptics/
+21	   hmpg registration to add optional parameters.
+
+23	Status of This Memo
+
+25	   This Internet-Draft is submitted in full conformance with the
+26	   provisions of BCP 78 and BCP 79.
+
+28	   Internet-Drafts are working documents of the Internet Engineering
+29	   Task Force (IETF).  Note that other groups may also distribute
+30	   working documents as Internet-Drafts.  The list of current Internet-
+31	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+33	   Internet-Drafts are draft documents valid for a maximum of six months
+34	   and may be updated, replaced, or obsoleted by other documents at any
+35	   time.  It is inappropriate to use Internet-Drafts as reference
+36	   material or to cite them other than as "work in progress."
+
+38	   This Internet-Draft will expire on 21 May 2026.
+
+40	Copyright Notice
+
+42	   Copyright (c) 2025 IETF Trust and the persons identified as the
+43	   document authors.  All rights reserved.
+
+45	   This document is subject to BCP 78 and the IETF Trust's Legal
+46	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+47	   license-info) in effect on the date of publication of this document.
+48	   Please review these documents carefully, as they describe your rights
+49	   and restrictions with respect to this document.  Code Components
+50	   extracted from this document must include Revised BSD License text as
+51	   described in Section 4.e of the Trust Legal Provisions and are
+52	   provided without warranty as described in the Revised BSD License.
+
+54	Table of Contents
+
+56	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+57	   2.  Conventions . . . . . . . . . . . . . . . . . . . . . . . . .   3
+58	   3.  Definition  . . . . . . . . . . . . . . . . . . . . . . . . .   3
+59	   4.  Haptic Format Description . . . . . . . . . . . . . . . . . .   4
+60	     4.1.  Overview of Haptic Coding . . . . . . . . . . . . . . . .   5
+61	     4.2.  MPEG-I Haptic Stream (MIHS) format  . . . . . . . . . . .   5
+62	   5.  Payload Format For Haptics  . . . . . . . . . . . . . . . . .   6
+63	     5.1.  RTP Header Usage  . . . . . . . . . . . . . . . . . . . .   6
+64	     5.2.  Payload Header  . . . . . . . . . . . . . . . . . . . . .   7
+65	     5.3.  Payload Structures  . . . . . . . . . . . . . . . . . . .   7
+66	       5.3.1.  Single Unit Payload Structure . . . . . . . . . . . .   8
+67	       5.3.2.  Fragmented Unit Payload Structure . . . . . . . . . .   9
+68	       5.3.3.  Aggregation Packet Payload Structure  . . . . . . . .  10
+69	     5.4.  MIHS Units Transmission Considerations  . . . . . . . . .  12
+70	   6.  Payload Format Parameters . . . . . . . . . . . . . . . . . .  13
+71	     6.1.  Media Type Registration Update  . . . . . . . . . . . . .  13
+72	     6.2.  Optional Parameters Definition  . . . . . . . . . . . . .  14
+73	     6.3.  SDP Parameter Registration  . . . . . . . . . . . . . . .  16
+74	   7.  SDP Considerations  . . . . . . . . . . . . . . . . . . . . .  16
+75	     7.1.  SDP Offer/Answer Considerations . . . . . . . . . . . . .  17
+76	     7.2.  Declarative SDP Considerations  . . . . . . . . . . . . .  19
+77	   8.  Congestion Control Considerations . . . . . . . . . . . . . .  19
+78	   9.  Security Considerations . . . . . . . . . . . . . . . . . . .  19
+79	   10. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  21
+80	   11. Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .  21
+81	   12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  21
+82	     12.1.  Normative References . . . . . . . . . . . . . . . . . .  21
+83	     12.2.  Informative References . . . . . . . . . . . . . . . . .  21
+84	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  23
+
+86	1.  Introduction
+
+88	   Haptics provides users with tactile effects in addition to audio and
+89	   video, allowing them to experience sensory immersion.  Haptic data is
+90	   mainly transmitted to devices that act as actuators and provides them
+91	   with information to operate according to the values defined in haptic
+92	   effects.  The IETF registered haptics as a primary media type akin to
+93	   audio and video [RFC9695].
+
+95	   The MPEG Haptics Coding standard [ISO.IEC.23090-31] defines the data
+96	   formats, metadata, and codec architecture to encode, decode,
+97	   synthesize and transmit haptic signals.  Within this MPEG standard, a
+98	   haptic media stream is composed of MIHS units including a MIHS
+99	   (MPEG-I Haptic Stream) unit header and zero or more MIHS packets.
+100	   The MIHS unit is a unit of packetization suitable for streaming, and
+101	   similar in essence to the NAL (Network Abstraction Layer) unit
+102	   defined in some video specifications.  This document describes how
+103	   haptic data (MIHS units) can be transmitted using the RTP protocol.
+104	   This document follows recommendations in [RFC8088] and [RFC2736] for
+105	   RTP payload format writers.
+
+107	2.  Conventions
+
+109	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+110	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+111	   "OPTIONAL" in this document are to be interpreted as described in BCP
+112	   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+113	   capitals, as shown here.
+
+115	3.  Definition
+
+117	   This document uses the definitions of the MPEG Haptics Coding
+118	   standard [ISO.IEC.23090-31].  Some of these terms are provided here
+119	   for convenience.
+
+121	   Actuator: component of a device for rendering haptic sensations.
+
+123	   Avatar: body (or part of body) representation.
+
+125	   Band: component in a channel for containing effects for a specific
+126	   range of frequencies.
+
+128	   Channel: component in a perception containing one or more bands
+129	   rendered on a device at a specific body location.
+
+131	   Device: physical system having one or more actuators configured to
+132	   render a haptic sensation corresponding with a given signal.
+
+134	   Effect: component of a band for defining a signal, consisting of a
+135	   haptic waveform or one or more haptic keyframes.
+
+137	   Experience: top level haptic component containing perceptions and
+138	   metadata.
+
+140	   Haptics: tactile sensations.
+
+142	   Keyframe: component of an effect mapping a position in time or space
+143	   to an effect parameter such as amplitude or frequency.
+
+145	   Metadata: global information about an experience, perception,
+146	   channel, or band.
+
+148	   MIHS unit: unit of packetization of the MPEG-I Haptic Stream format,
+149	   which is used as unit of payload in the format described in this
+150	   memo.  See Section 4 for details.
+
+152	   Modality: type of haptics, such as vibration, force, pressure,
+153	   position, velocity, or temperature.
+
+155	   Perception: haptic perception containing channels of a specific
+156	   modality.
+
+158	   Signal: representation of the haptics associated with a specific
+159	   modality to be rendered on a device.
+
+161	   Hmpg format: hmpg is a binary compressed format for haptics data.
+162	   Information is stored in a binary form and data compression is
+163	   applied on data at the band level.  The haptics/hmpg media subtype is
+164	   registered in [RFC9695] and updated by this memo.
+
+166	   Independent unit: a MIHS unit is independent if it can be decoded
+167	   independently from earlier units.  Independent units contain timing
+168	   information and are also called "sync units" in [ISO.IEC.23090-31].
+
+170	   Dependent unit: a MIHS unit is dependent if it requires earlier units
+171	   for decoding.  Dependent units do not contain timing information and
+172	   are also called "non-sync units" in [ISO.IEC.23090-31].
+
+174	   Time-independent effect: a haptic effect that occurs regardless of
+175	   time.  The tactile feedback of a texture is a representative example.
+176	   Time-independent effects are encoded in spatial MIHS units, defined
+177	   in Section 4.2.
+
+179	   Time-dependent effect: a haptic effect that varies over time.  For
+180	   example, tactile feedback for vibration and force are time-dependent
+181	   effects, and are encoded in temporal MIHS units, defined in
+182	   Section 4.2.
+
+184	4.  Haptic Format Description
+185	4.1.  Overview of Haptic Coding
+
+187	   The MPEG Haptics Coding standard specifies methods for efficient
+188	   transmission and rendering of haptic signals, to enable immersive
+189	   experiences.  It supports multiple types of perceptions, including
+190	   the most common vibrotactile (sense of touch that perceives
+191	   vibrations) and kinesthetic perceptions (tactile resistance or
+192	   force), but also other, less common perceptions, including for
+193	   example the sense of temperature or texture.  It also supports two
+194	   approaches for encoding haptic signals: a "quantized" approach based
+195	   on samples of measured data, and a "descriptive" approach where the
+196	   signal is synthesized using a combination of functions.  Both
+197	   quantized and descriptive data can be encoded in a human-readable
+198	   exchange format based on JSON (.hjif), or in a binary packetized
+199	   format for distribution and streaming (.hmpg).  This last format is
+200	   referred to as the MPEG-I Haptic Stream (MIHS) format and is a base
+201	   for the RTP payload format described in this document.
+
+203	4.2.  MPEG-I Haptic Stream (MIHS) format
+
+205	   MIHS is a stream format used to transport haptic data.  Haptic data
+206	   including haptic effects is packetized according to the MIHS format,
+207	   and delivered to actuators, which operate according to the provided
+208	   effects.  The MIHS format has two levels of packetization, MIHS units
+209	   and MIHS packets.
+
+211	   MIHS units are composed of a MIHS unit header and zero or more MIHS
+212	   packets.  Four types of MIHS units are defined.  An initialization
+213	   MIHS unit contains MIHS packets carrying metadata necessary to reset
+214	   and initialize a haptic decoder, including a timestamp.  A temporal
+215	   MIHS unit contains one or more MIHS packets defining time-dependent
+216	   effects and providing modalities such as pressure, velocity, and
+217	   acceleration.  The duration of a temporal unit is a positive number.
+218	   A spatial MIHS unit contains one or more MIHS packets providing time-
+219	   independent effects, such as vibrotactile texture, stiffness, and
+220	   friction.  The duration of a spatial unit is always zero.  A silent
+221	   MIHS unit indicates that there is no effect during a time interval
+222	   and its duration is a positive number.
+
+224	   A MIHS unit can be marked as independent or dependent.  When a
+225	   decoder processes an independent unit, it resets the previous effects
+226	   and therefore provides a haptic experience independent from any
+227	   previous MIHS unit.  A dependent unit is the continuation of previous
+228	   MIHS units and cannot be independently decoded and rendered without
+229	   having decoded previous MIHS unit(s).  Initialization and spatial
+230	   MIHS units are always independent units.  Temporal and silent MIHS
+231	   units can be dependent or independent units.
+
+233	   Figure 1 illustrates a succession of MIHS units in a MIHS stream.
+
+235	   +--------+ +-------+ +------------+ +-------------+ +-----------+
+236	   |Initial*| |Spatial| |  Temporal  | |Temporal Unit| |Silent Unit|
+237	   | Unit   |-| Unit  |-|Unit(indep.)|-| (dependent) |-| (indep.)  |
+238	   +--------+ +-------+ +------------+ +-------------+ +-----------+
+239	   *Initialization
+
+241	                      Figure 1: Example of MIHS stream
+
+243	5.  Payload Format For Haptics
+
+245	5.1.  RTP Header Usage
+
+247	   The RTP header is defined in [RFC3550] and represented in Figure 2.
+248	   Some of the header field values are interpreted as follows.
+
+250	    0                   1                   2                   3
+251	    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+252	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+253	   |V=2|P|X|  CC   |M|     PT      |       Sequence Number         |
+254	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+255	   |                           Timestamp                           |
+256	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+257	   |           Synchronization Source (SSRC) Identifier            |
+258	   +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+259	   |            Contributing Source (CSRC) Identifiers             |
+260	   |                             ....                              |
+261	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+263	                      Figure 2: RTP header for Haptic.
+
+265	   Payload type (PT): 7 bits.  The assignment of a payload type MUST be
+266	   performed either through the profile used or in a dynamic way.
+
+268	   TimeStamp (TS): 32 bits.  A timeStamp representing the sampling time
+269	   of the first sample of the MIHS unit in the RTP payload.  The clock
+270	   frequency MUST be set to the sample rate of the encoded haptic data
+271	   and is conveyed out-of-band (e.g., as an SDP parameter).
+
+273	   Marker bit (M): 1 bit.  The marker bit SHOULD be set to one in the
+274	   first non-silent RTP packet after a period of haptic silence.  This
+275	   enables jitter buffer adaptation and haptics device washout (i.e.,
+276	   reset to a neutral position) prior to the beginning of the burst with
+277	   minimal impact on the quality of experience for the end user.  The
+278	   marker bit in all other packets MUST be set to zero.
+
+280	5.2.  Payload Header
+
+282	   The RTP payload header follows the RTP header.  Figure 3 describes
+283	   the RTP payload header for Haptic.
+
+285	   +---------------+
+286	   |0|1|2|3|4|5|6|7|
+287	   +-+-+-+-+-+-+-+-+
+288	   |D| UT  |   L   |
+289	   +-+-----+-------+
+
+291	                  Figure 3: RTP Payload Header for Haptic.
+
+293	   D (Dependency, 1 bit): this field is used to indicate whether the
+294	   MIHS unit included in the RTP payload is, when its value is one,
+295	   dependent or, when its value is zero, independent.
+
+297	   UT (Unit Type, 3 bits): this field indicates the type of the MIHS
+298	   unit included in the RTP payload.  UT field values are listed in
+299	   Figure 4.
+
+301	   L (MIHS Layer, 4 bits): this field is an integer value which
+302	   indicates the priority order of the MIHS unit included in the RTP
+303	   payload, as determined by the haptic sender (e.g., by the haptic
+304	   codec), based on application-specific needs.  For example, the sender
+305	   may use the MIHS layer to prioritize perceptions with the largest
+306	   impact on the end-user experience.  Zero corresponds to the highest
+307	   priority.  The semantic of individual MIHS layers are not specified
+308	   and left for the application to assign.
+
+310	5.3.  Payload Structures
+
+312	   Three different types of RTP packet payload structures are specified.
+313	   A single unit packet contains a single MIHS unit in the payload.  A
+314	   fragmentation unit contains a subset of a MIHS unit.  An aggregation
+315	   packet contains multiple MIHS units in the payload.  The unit type
+316	   (UT) field of the RTP payload header, as shown in Figure 4,
+317	   identifies both the payload structure and, in the case of a single-
+318	   unit structure, also identifies the type of MIHS unit present in the
+319	   payload.
+
+321	   Unit     Payload   Packet Type Name
+322	   Type     Structure
+323	   --------------------------------------------
+324	   0        N/A       Reserved
+325	   1        Single    Initialization MIHS Unit
+326	   2        Single    Temporal MIHS Unit
+327	   3        Single    Spatial MIHS Unit
+328	   4        Single    Silent MIHS Unit
+329	   5        Aggr      Aggregation Packet(STAP)
+330	   6        Aggr      Aggregation Packet(MTAP)
+331	   7        Frag      Fragmentation Unit
+
+333	                Figure 4: Payload structure type for haptic
+
+335	   The payload structures are represented in Figure 5.  The single unit
+336	   payload structure is specified in Section 5.3.1.  The fragmented unit
+337	   payload structure is specified in Section 5.3.2.  The aggregation
+338	   packet payload structure is specified in Section 5.3.3.
+
+340	                                               +-------------------+
+341	                                               |     RTP Header    |
+342	                                               +-------------------+
+343	                                               | RTP Payload Header|
+344	                         +-------------------+ |   (UT = Aggr)     |
+345	                         |     RTP Header    | +-------------------+
+346	   +-------------------+ +-------------------+ |  MIHS unit 1 Size |
+347	   |     RTP Header    | | RTP Payload Header| +-------------------+
+348	   +-------------------+ |   (UT = Frag)     | |    MIHS Unit 1    |
+349	   | RTP Payload Header| +-------------------+ +-------------------+
+350	   +-------------------+ |     FU Header     | |  MIHS unit 2 Size |
+351	   |    RTP Payload    | +-------------------+ +-------------------+
+352	   | (Single MIHS unit)| |    RTP Payload    | |    ...            |
+353	   +-------------------+ +-------------------+ +-------------------+
+354	   (a) single unit      (b)fragmentation unit (c) aggregation packet
+
+356	                      Figure 5: RTP Transmission modes
+
+358	5.3.1.  Single Unit Payload Structure
+
+360	   In a single unit payload structure, as described in Figure 6, the RTP
+361	   packet contains the RTP header, followed by the payload header and
+362	   one single MIHS unit.  The payload header follows the structure
+363	   described in Section 5.2.  The payload contains a MIHS unit as
+364	   defined in [ISO.IEC.23090-31].
+
+366	    0                   1                   2                   3
+367	    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+368	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+369	   |                          RTP Header                           |
+370	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+371	   |Payload Header |                                               |
+372	   +---------------+                                               |
+373	   |                        MIHS Unit Data                         |
+374	   |                               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+375	   |                               :...OPTIONAL RTP padding        |
+376	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+378	                  Figure 6: Single Unit Payload Structure
+
+380	5.3.2.  Fragmented Unit Payload Structure
+
+382	   In a fragmented unit payload structure, as described in Figure 7, the
+383	   RTP packet contains the RTP header, followed by the payload header, a
+384	   Fragmented Unit (FU) header, and a MIHS unit fragment.  The payload
+385	   header follows the structure described in Section 5.2.  The value of
+386	   the UT field of the payload header is 7.  The FU header follows the
+387	   structure described in Figure 8.
+
+389	    0                   1                   2                   3
+390	    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+391	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+392	   |                          RTP Header                           |
+393	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+394	   |Payload Header | FU Header     |                               |
+395	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                               |
+396	   |                     MIHS Unit Fragment                        |
+397	   |                               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+398	   |                               :...OPTIONAL RTP Padding        |
+399	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+401	               Figure 7: Fragmentation Unit Payload Structure
+
+403	   FU headers are used to enable fragmenting a single MIHS unit into
+404	   multiple RTP packets.  Fragments of the same MIHS unit MUST be sent
+405	   in consecutive order with ascending RTP sequence numbers (with no
+406	   other RTP packets within the same RTP stream being sent between the
+407	   first and last fragment).  FUs MUST NOT be nested, i.e., an FU MUST
+408	   NOT contain a subset of another FU.
+
+410	   Figure 8 describes a FU header, including the following fields:
+
+412	   +-------------------------------+
+413	   | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 |
+414	   +---+---+---+---+---+---+---+---+
+415	   |FUS|FUE|   RSV     |     UT    |
+416	   +---+---+-----------+-----------+
+
+418	                    Figure 8: Fragmentation unit header
+
+420	   FUS (Fragmented Unit Start, 1 bit): this field MUST be set to 1 for
+421	   the first fragment, and 0 for the other fragments.
+
+423	   FUE (Fragmented Unit End, 1 bit): this field MUST be set to 1 for the
+424	   last fragment, and 0 for the other fragments.
+
+426	   RSV (Reserved, 3 bits): these bits MUST be set to 0 by the sender and
+427	   ignored by the receiver.
+
+429	   UT (Unit Type, 3 bits): this field indicates the type of the MIHS
+430	   unit this fragment belongs to, using values defined in Figure 4.
+
+432	   The use of MIHS unit fragmentation in RTP means that a media receiver
+433	   can receive some fragments, but not other fragments.  The missing
+434	   fragments will typically not be retransmitted by RTP.  This results
+435	   in partially received MIHS units, which can be either dropped or used
+436	   by the decoding application, based on implementation.
+
+438	5.3.3.  Aggregation Packet Payload Structure
+
+440	   In an aggregation packet, as described in Figure 9, the RTP packet
+441	   contains an RTP header, followed by a payload header, and, for each
+442	   aggregated MIHS Unit, a MIHS unit size followed by the MIHS unit.
+443	   The payload header follows the structure described in Section 5.2.
+
+445	        0                   1                   2                   3
+446	        0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+447	       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+448	       |                          RTP Header                           |
+449	       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+450	       |        RTP Payload Header     |       MIHS Unit 1 Size        |
+451	       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+452	       |                           MIHS Unit 1                         |
+453	       |                                                               |
+454	       :                                                               :
+455	       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+456	       |        MIHS Unit 2 Size     |                                 |
+457	       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                                 |
+458	       |                           MIHS Unit 2                         |
+459	       |                                                               |
+460	       |                               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+461	       |                               :...OPTIONAL RTP padding        |
+462	       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+464	                  Figure 9: Single-Time Aggregation Packet
+
+466	   Figure 9 shows a Single-Time Aggregation Packet (STAP), which can be
+467	   used to transmit multiple MIHS units that correspond to the same
+468	   timestamp.  For example, if two frequencies are used for the same
+469	   content, they can be transmitted at once in a STAP.  Multiple spatial
+470	   units can also be sent together in a STAP, since this type of haptics
+471	   data is time independent.  The MIHS unit length field (16 bits) holds
+472	   the length of the MIHS unit following it, in bytes.  The value of the
+473	   UT field of the payload header is 5.
+
+475	       0                   1                   2                   3
+476	       0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+477	       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+478	       |                          RTP Header                           |
+479	       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+480	       |        RTP Payload Header     |       MIHS Unit 1 Size        |
+481	       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+482	       |                           TS Offset           |               |
+483	       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               |
+484	       |                           MIHS Unit 1                         |
+485	       |                                                               |
+486	       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+487	       |       MIHS Unit 2 Size        |            TS Offset          |
+488	       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+489	       |   TS offset   |                                               |
+490	       |-+-+-+-+-+-+-+-+                                               |
+491	       |                          MIHS Unit 2                          |
+492	       |                               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+493	       |                               :...OPTIONAL RTP padding        |
+494	       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+496	                Figure 10: Multiple-time aggregation packet
+
+498	   Figure 10 shows a multi-time aggregation packet.  It is used to
+499	   transmit multiple MIHS units with different timestamps, in one RTP
+500	   packet.  Multi-time aggregation can help reduce the number of
+501	   packets, in environments where some delay is acceptable.  The value
+502	   of the UT field of the Payload Header is 6.  The MIHS unit length
+503	   field (16 bits) holds the length of the MIHS unit following it, in
+504	   bytes.  The timestamp offset field (TS offset, 16 bits) is present in
+505	   the MTAP case, and MUST be set to the value of (time of the MIHS unit
+506	   - RTP timestamp of the packet).  The timestamp offset of the earliest
+507	   aggregation unit MUST always be zero.  Therefore, the RTP timestamp
+508	   of the MTAP is identical to the earliest MIHS unit time.
+
+510	5.4.  MIHS Units Transmission Considerations
+
+512	   The following considerations apply for the streaming of MIHS units
+513	   over RTP:
+
+515	   The MIHS format enables variable duration units and uses
+516	   initialization MIHS units to declare the duration of subsequent non-
+517	   zero duration MIHS units, as well as the maximum variation of this
+518	   duration.  A sender SHOULD set constant or low-variability (e.g.,
+519	   lower than the playout buffer) durations in initialization MIHS
+520	   units, for RTP streaming.  This enables the receiver to determine
+521	   early (e.g., using a timer) when a unit has been lost and make the
+522	   decoder more robust to RTP packet loss.  If a sender sends MIHS units
+523	   with high duration variations, the receiver MAY need to wait for a
+524	   long period of time (e.g., the upper bound of the duration
+525	   variation), to determine if a MIHS unit was lost in transmission.
+526	   Whether this behavior is acceptable or not is application dependent.
+
+528	   The MIHS format uses silent MIHS units to signal haptic silence.  A
+529	   sender MAY decide not to send silent units, to save network
+530	   resources.  Since, from a receiver standpoint, a missed MIHS unit MAY
+531	   originate from a not-sent silent unit, or a lost packet, a sender MAY
+532	   send one, or a few, MIHS silent units at the beginning of a haptic
+533	   silence.  If a media receiver receives a MIHS silent unit, the
+534	   receiver SHOULD assume that silence is intended until the reception
+535	   of a non-silent MIHS unit.  This can reduce the number of false
+536	   detections of lost RTP packets by the decoder.
+
+538	   In some multimedia conference scenarios using an RTP video mixer
+539	   (e.g., when adding or selecting a new source), it is recommended to
+540	   use Full Intra Request (FIR) feedback messages with Haptics
+541	   [RFC5104].  The purpose of the FIR message is to cause an encoder to
+542	   send a decoder refresh point at the earliest opportunity.  In the
+543	   context of haptics, an appropriate decoder refresh point is an
+544	   initialization MIHS unit.  The initialization MIHS unit point enables
+545	   a decoder to be reset to a known state and be able decode all MIHS
+546	   units following it.
+
+548	6.  Payload Format Parameters
+
+550	   This section describes payload format parameters.  Section 6.1
+551	   updates the 'haptics' Media Type Registration and Section 6.2
+552	   specifies new optional parameters.  Section 6.3 further registers a
+553	   new token in the media sub-registry of the Session Description
+554	   Protocols (SDP) Parameters registry.
+
+556	6.1.  Media Type Registration Update
+
+558	   This memo updates the 'hmpg' haptic subtype defined in [RFC9695] for
+559	   use with the MPEG-I haptics streamable binary coding format described
+560	   in ISO/IEC 23090-31: Haptics coding [ISO.IEC.23090-31].  This memo
+561	   especially defines optional parameters for this type in Section 6.2.
+562	   The original subtype registration for haptics/hmpg, registered with
+563	   IANA in [RFC9695], did not include any required or optional
+564	   parameters.  This document introduces optional parameters to enable
+565	   extended functionality while maintaining backward compatibility.
+
+567	   A mapping of the parameters into the Session Description Protocol
+568	   (SDP) [RFC8866] is also provided for applications that use SDP.
+569	   Equivalent parameters could be defined elsewhere for use with control
+570	   protocols that do not use SDP.  The receiver MUST ignore any
+571	   parameter unspecified in this memo.
+
+573	   The following entries identify the media type being updated:
+
+575	   Type name: haptics
+
+577	   Subtype name: hmpg
+
+579	   The following entries are replaced by this memo:
+
+581	   Optional parameters: see section 6.2 of RFC XXX (note to RFC editor:
+582	   replace with this RFC's number).
+
+584	   Person & email address to contact for further information: Yeshwant
+585	   Muthusamy (yeshwant@yeshvik.com) and Hyunsik Yang
+586	   (hyunsik.yang@interdigital.com)
+
+588	6.2.  Optional Parameters Definition
+
+590	   _ver_ provides the year of the edition and amendment of ISO/IEC
+591	   23090-31 that this file conforms to, as defined in
+592	   [ISO.IEC.23090-31].  MPEG_haptics object.version is a string which
+593	   may hold values such as XXXX or XXXX-Y where XXXX is the year of
+594	   publication and Y is the amendment number, if any.  For the initial
+595	   release of the specifications, the value is "2023".
+
+597	   _profile_ indicates the profile used to generate the encoded stream
+598	   as defined in [ISO.IEC.23090-31]: MPEG_haptics object.profile is a
+599	   string which may in the initial release of the specifications hold
+600	   the values "simple-parametric" or "main".
+
+602	   _lvl_ indicates the level used to generate the encoded stream as
+603	   defined in [ISO.IEC.23090-31]: MPEG_haptics object.level is an
+604	   integer which may in the initial release of the specifications hold
+605	   the values 1 or 2.
+
+607	   _maxlod_ indicates the maximum level of details to use for the
+608	   avatar(s).  The avatar level of detail (LOD) is defined in
+609	   [ISO.IEC.23090-31]: MPEG_haptics.avatar object.lod is an integer
+610	   which MAY in the initial release of the specifications hold 0 or a
+611	   positive integer.
+
+613	   _avtypes_ indicates, using a comma-separated list, types of haptic
+614	   perception represented by the avatar(s).  The avatar type is defined
+615	   in [ISO.IEC.23090-31]: MPEG_haptics.avatar object.type is a string
+616	   which MAY in the initial release of the specifications hold values
+617	   among "Vibration", "Pressure", "Temperature", "Custom".
+
+619	   _modalities_ indicates, using a comma-separated list, haptic
+620	   perception modalities (e.g., pressure, acceleration, velocity,
+621	   position, temperature, etc.).  The perception modality is defined in
+622	   [ISO.IEC.23090-31]: MPEG_haptics.perception
+623	   object.perception_modality is a string which MAY in the initial
+624	   release of the specifications hold values among "Pressure",
+625	   "Acceleration", "Velocity", "Position", "Temperature",
+626	   "Vibrotactile", "Water", "Wind", "Force", "Electrotactile",
+627	   "Vibrotactile Texture", "Stiffness", "Friction", "Humidity", "User-
+628	   defined Temporal", "User-defined Spatial", "Other".
+
+630	   _bodypartmask_ indicates, using a bitmask, the location of the
+631	   devices or actuators on the body.  The body part mask is defined in
+632	   [ISO.IEC.23090-31]: MPEG_haptics.reference_device
+633	   object.body_part_mask is a 32-bit integer which MAY in the initial
+634	   release of the specifications hold a bit mask using bit positions
+635	   defined in table 7 of [ISO.IEC.23090-31].
+
+637	   _maxfreq_ indicates the maximum frequency of haptic data for
+638	   vibrotactile perceptions (Hz).  Maximum frequency is defined in
+639	   [ISO.IEC.23090-31]: MPEG_haptics.reference_device
+640	   object.maximum_frequency is defined as an integer or floating-point
+641	   number in the initial release of the specifications.
+
+643	   _minfreq_ indicates the minimum frequency of haptic data for
+644	   vibrotactile perceptions (Hz).  Minimum frequency is defined in
+645	   [ISO.IEC.23090-31]: MPEG_haptics.reference_device
+646	   object.minimum_frequency is defined as an integer or floating-point
+647	   number in the initial release of the specifications.
+
+649	   _dvctypes_ indicates, using a comma-separated list, the types of
+650	   actuators.  The device type is defined in [ISO.IEC.23090-31]:
+651	   MPEG_haptics.reference_device object.type is a string which MAY in
+652	   the initial release of the specifications hold values among "LRA",
+653	   "VCA", "ERM", "Piezo" or "Unknown".
+
+655	   _silencesupp_ indicates whether silence suppression SHOULD be used
+656	   (1) or not (0).  The default value SHALL be 0.
+
+658	6.3.  SDP Parameter Registration
+
+660	   This memo registers a 'haptics' token in the media sub-registry of
+661	   the Session Description Protocols (SDP) Parameters registry.  This
+662	   registration contains the required information elements outlined in
+663	   the SDP registration procedure defined in section 8.2 of [RFC8866].
+
+665	   (1) Contact Information:
+
+667	          Name: Hyunsik Yang
+668	          Email: hyunsik.yang@interdigital.com
+
+670	   (2) Name being registered (as it will appear in SDP): haptics
+
+672	   (3) Long-form name in English: haptics
+
+674	   (4) Type of name ('media', 'proto', 'fmt', 'bwtype', 'nettype', or
+675	   'addrtype'): media
+
+677	   (5) Purpose of the registered name:
+
+679	          The 'haptics' media type for the Session Description Protocol
+680	          is used to describe a media stream whose content can be
+681	          rendered as touch-related sensations.
+682	          The media subtype further describes the specific
+683	          format of the haptics stream.  The 'haptics' media type for
+684	          SDP is used to establish haptics media streams.
+
+686	   (6) Specification for the registered name: RFC XXXX
+
+688	   RFC Editor Note: Replace RFC XXXX with the published RFC number.
+
+690	7.  SDP Considerations
+
+692	   The mapping of above defined payload format media type to the
+693	   corresponding fields in the Session Description Protocol (SDP) is
+694	   done according to [RFC8866].
+
+696	   The media name in the "m=" line of SDP MUST be haptics.
+
+698	   The encoding name in the "a=rtpmap" line of SDP MUST be hmpg
+
+700	   The clock rate in the "a=rtpmap" line MAY be any sampling rate,
+701	   typically 8000.
+
+703	   The OPTIONAL parameters (defined in Section 6.2), when present, MUST
+704	   be included in the "a=fmtp" line of SDP.  This is expressed as a
+705	   media type string, in the form of a semicolon-separated list of
+706	   parameter=value pairs.
+
+708	   An example of media representation corresponding to the hmpg RTP
+709	   payload in SDP is as follows:
+
+711	   m=haptics 43291 UDP/TLS/RTP/SAVPF 115
+712	   a=rtpmap:115 hmpg/8000
+713	   a=fmtp:115 profile=main;lvl=1;ver=2023
+
+715	7.1.  SDP Offer/Answer Considerations
+
+717	   When using the offer/answer procedure described in [RFC3264] to
+718	   negotiate the use of haptic, the following considerations apply:
+
+720	   When used for a unidirectional stream, the SDP parameters represent
+721	   the properties of the sender (on the sending side) and of the
+722	   receiver (on the receiving side).  When used for a sendrecv stream,
+723	   the SDP parameters represent the properties of the receiver.
+
+725	   The receiver properties expressed using the SDP parameters 'ver',
+726	   'profile' and 'lvl' have a mandatory character, since they represent
+727	   implementation capabilities.  The ver, profile, lvl parameters MUST
+728	   be used symmetrically in SDP offer and answer.  That is, their values
+729	   in the answer MUST match those in the offer, either explicitly
+730	   signaled or implicitly inferred.  In the same session, ver, profile,
+731	   and lvl MUST NOT be changed in subsequent offers or answers.
+
+733	   The properties expressed using SDP parameters other than 'ver',
+734	   'profile' and 'lvl' are provided as recommendations for efficient
+735	   data transmission and are not binding, meaning that a sender is
+736	   encouraged but not required to conform to the parameters specified by
+737	   the receiver.  These properties MAY be set to different values in
+738	   offers and answers.  These properties MAY be updated in subsequent
+739	   offers or answers.
+
+741	   Any receiver compliant with [ISO.IEC.23090-31] MUST accept any stream
+742	   with a compatible version, profile and level.  A receiver supporting
+743	   a more general profile will accept a stream corresponding to a same
+744	   or less general profile (e.g., "main" is more general than "simple-
+745	   parametric").  A receiver supporting a given level will accept a
+746	   stream corresponding to a same or lower level.  A receiver supporting
+747	   a given version will accept a stream corresponding to the same
+748	   version and MAY accept other versions.  A receiver MAY ignore any
+749	   part of a received stream, e.g., that it does not have support for
+750	   rendering.
+
+752	   The haptic signal can be sampled at different rates.  The MPEG
+753	   Haptics Coding standard does not mandate a specific frequency.  A
+754	   typical sample rate is 8000Hz.
+
+756	   The parameter 'ver' indicates the version of the haptic standard
+757	   specification.  If it is not specified, the initial version of the
+758	   MPEG Haptic Coding specification SHOULD be assumed, although the
+759	   sender and receiver MAY use a specific value based on an out-of-band
+760	   agreement.  The parameter 'profile' is used to restrict the number of
+761	   tools used (e.g., the simple-parametric profile fits enable simpler
+762	   implementations than the main profile).  If it is not specified, the
+763	   most general profile "main" SHOULD be assumed, although the sender
+764	   and receiver MAY use a specific value based on an out-of-band
+765	   agreement.  The parameter 'lvl' is used to further characterize
+766	   implementations within a given profile, e.g., according to the
+767	   maximum supported number of channels, bands, and perceptions.  If it
+768	   is not specified, the most general level "2" SHOULD be assumed,
+769	   although the sender and receiver MAY use a specific version based on
+770	   an out-of-band agreement.  Other parameters can be used to indicate
+771	   bitstream properties as well as receiver capabilities.  The
+772	   parameters 'maxlod', 'avtypes', 'bodypartmask', 'maxfreq', 'minfreq',
+773	   'dvctypes', and 'modalities' can be sent by a sender to reflect the
+774	   characteristics of bitstreams and can be set by a receiver to reflect
+775	   the nature and capabilities of local actuator devices, or a preferred
+776	   set of bitstream properties.  For example, different receivers MAY
+777	   have different sets of local actuators, in which case these
+778	   parameters can be used to select a stream adapted to the receiver.
+779	   In some other cases, some receivers MAY indicate a preference for a
+780	   set of bitstream properties such as perceptions, min/max frequency,
+781	   or body-part-mask, which contribute the most to the user experience
+782	   for a given application, in which case these parameters can be used
+783	   to select a stream which include and possibly prioritizes those
+784	   properties.  For example, if the haptic stream server provides more
+785	   information than the body mask specified by the receiver, the
+786	   additional information can be either integrated into a single effect
+787	   or ignored by the receiver.
+
+789	   The parameter 'silencesupp' can be used to indicate sender and
+790	   receiver capabilities or preferences.  This parameter indicates
+791	   whether silence suppression SHOULD be used, as described in
+792	   Section 5.4.
+
+794	7.2.  Declarative SDP Considerations
+
+796	   When haptic content over RTP is offered with SDP in a declarative
+797	   style, the parameters capable of indicating both bitstream properties
+798	   as well as receiver capabilities are used to indicate only bitstream
+799	   properties.  For example, in this case, the parameters maxlod,
+800	   bodypartmask, maxfreq, minfreq, dvctypes, and modalities declare the
+801	   values used by the bitstream, not the capabilities for receiving
+802	   bitstreams.  A receiver of the SDP is required to support all
+803	   parameters and values of the parameters provided; otherwise, the
+804	   receiver MUST reject or not participate in the session.  It falls on
+805	   the creator of the session to use values that are expected to be
+806	   supported by the receiving application.
+
+808	8.  Congestion Control Considerations
+
+810	   The general congestion control considerations for transporting RTP
+811	   data apply to HMPG haptics over RTP as well [RFC3550].
+
+813	   It is possible to adapt network bandwidth usage by adjusting either
+814	   the encoder bit rate or by adjusting the stream content (e.g., level
+815	   of detail, body parts, actuator frequency range, target device types,
+816	   modalities).
+
+818	   In case of congestion, a receiver or intermediate node MAY prioritize
+819	   independent packets over dependent ones, since the non-reception of
+820	   an independent MIHS unit can prevent the decoding of multiple
+821	   subsequent dependent MIHS units.  In case of congestion, a receiver
+822	   or intermediate node MAY prioritize initialization MIHS units over
+823	   other units, since initialization MIHS units contain metadata used to
+824	   re-initialize the decoder, and MAY drop silent MIHS units before
+825	   other types of MIHS units, since a receiver MAY interpret a missing
+826	   MIHS unit as a silence.  It is also possible, using the layer field
+827	   of the RTP payload header, to allocate MIHS units to different layers
+828	   based on their content, to prioritize haptic data contributing the
+829	   most to the user experience.  In case of congestion, intermediate
+830	   nodes and receivers SHOULD use the MIHS layer value to determine the
+831	   relative importance of haptic RTP packets.
+
+833	9.  Security Considerations
+
+835	   This RTP payload format is subject to security threats commonly
+836	   associated with RTP payload formats, as well as threats specific to
+837	   the interaction of haptic devices with the physical world, and
+838	   threats associated with the use of compression by the codec.
+839	   Security consideration for threats commonly associated with RTP
+840	   payload formats are outlined in [RFC3550], as well as in RTP profiles
+841	   such as RTP/AVP [RFC3551]), RTP/AVPF [RFC4585], RTP/SAVP [RFC3711],
+842	   or RTP/SAVPF [RFC5124].
+
+844	   Haptic sensors and actuators operate within the physical environment.
+845	   This introduces the potential for information leakage through
+846	   sensors, or damage to actuators due to data tampering.  Additionally,
+847	   misusing the functionalities of actuators (such as force, position,
+848	   temperature, vibration, electro-tactile, etc.)  MAY pose a risk of
+849	   harm to the user, for example by setting keyframe parameters (e.g.,
+850	   amplitude, position, frequency) or channel gain to a value that
+851	   surpasses a permissible range.  While individual devices can
+852	   implement security measures to reduce or eliminate those risks on a
+853	   per-device basis, in some cases harm can be inflicted by setting
+854	   values which are permissible for the individual device.  For example,
+855	   causing contact with the physical environment or triggering
+856	   unexpected force feedback can potentially harm the user.  Each haptic
+857	   system should therefore implement system-dependent security measures,
+858	   which are more error prone.  To limit the risk that attackers exploit
+859	   weaknesses in haptic systems, it is important that haptic
+860	   transmission should be protected against malicious traffic injection
+861	   or tampering.
+
+863	   However, as "Securing the RTP Framework: Why RTP Does Not Mandate a
+864	   Single Media Security Solution" [RFC7202] discusses, it is not an RTP
+865	   payload format's responsibility to discuss or mandate what solutions
+866	   are used to meet the basic security goals like confidentiality,
+867	   integrity, and source authenticity for RTP in general.  The
+868	   responsibility for implementing security mechanisms lies with the
+869	   application developer.  They can find guidance on available security
+870	   mechanisms and important considerations in "Options for Securing RTP
+871	   Sessions" [RFC7201].  Applications SHOULD use one or more appropriate
+872	   strong security mechanisms.
+
+874	   The haptic codec used with this payload format uses a compression
+875	   algorithm (see sections 8.2.8.5 and 8.3.3.2 in [ISO.IEC.23090-31]).
+876	   An attacker MAY inject pathological datagrams into the stream which
+877	   are complex to decode and cause the receiver to be overloaded,
+878	   similarly to [RFC3551].
+
+880	   End-to-end security with authentication, integrity, or
+881	   confidentiality protection will prevent a Media-Aware Network Element
+882	   (MANE) from performing media-aware operations other than discarding
+883	   complete packets.  In the case of confidentiality protection, it will
+884	   even be prevented from discarding packets in a media-aware way.  To
+885	   be allowed to perform such operations, a MANE is required to be a
+886	   trusted entity that is included in the security context
+887	   establishment.
+
+889	10.  IANA Considerations
+
+891	   This memo updates a media type registration with IANA; see
+892	   Section 6.1.
+
+894	11.  Acknowledgments
+
+896	   Thanks to Philippe Guillotel, Quentin Galvane, Jonathan Lennox,
+897	   Marius Kleidl and Stephan Wenger for the comments and discussions
+898	   about this draft.
+
+900	12.  References
+
+902	12.1.  Normative References
+
+904	   [ISO.IEC.23090-31]
+905	              ISO/IEC, "Information technology - Coded representation of
+906	              immersive media", ISO/IEC 23090-31, 2024,
+907	              <https://www.iso.org/standard/86122.html>.
+
+909	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+910	              Requirement Levels", BCP 14, RFC 2119,
+911	              DOI 10.17487/RFC2119, March 1997,
+912	              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+914	   [RFC3550]  Schulzrinne, H., Casner, S., Frederick, R., and V.
+915	              Jacobson, "RTP: A Transport Protocol for Real-Time
+916	              Applications", STD 64, RFC 3550, DOI 10.17487/RFC3550,
+917	              July 2003, <https://www.rfc-editor.org/rfc/rfc3550>.
+
+919	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+920	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+921	              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+923	   [RFC8866]  Begen, A., Kyzivat, P., Perkins, C., and M. Handley, "SDP:
+924	              Session Description Protocol", RFC 8866,
+925	              DOI 10.17487/RFC8866, January 2021,
+926	              <https://www.rfc-editor.org/rfc/rfc8866>.
+
+928	   [RFC9695]  Muthusamy, Y. K. and C. Ullrich, "The 'haptics' Top-Level
+929	              Media Type", RFC 9695, DOI 10.17487/RFC9695, March 2025,
+930	              <https://www.rfc-editor.org/rfc/rfc9695>.
+
+932	12.2.  Informative References
+
+934	   [RFC2736]  Handley, M. and C. Perkins, "Guidelines for Writers of RTP
+935	              Payload Format Specifications", BCP 36, RFC 2736,
+936	              DOI 10.17487/RFC2736, December 1999,
+937	              <https://www.rfc-editor.org/rfc/rfc2736>.
+
+939	   [RFC3264]  Rosenberg, J. and H. Schulzrinne, "An Offer/Answer Model
+940	              with Session Description Protocol (SDP)", RFC 3264,
+941	              DOI 10.17487/RFC3264, June 2002,
+942	              <https://www.rfc-editor.org/rfc/rfc3264>.
+
+944	   [RFC3551]  Schulzrinne, H. and S. Casner, "RTP Profile for Audio and
+945	              Video Conferences with Minimal Control", STD 65, RFC 3551,
+946	              DOI 10.17487/RFC3551, July 2003,
+947	              <https://www.rfc-editor.org/rfc/rfc3551>.
+
+949	   [RFC3711]  Baugher, M., McGrew, D., Naslund, M., Carrara, E., and K.
+950	              Norrman, "The Secure Real-time Transport Protocol (SRTP)",
+951	              RFC 3711, DOI 10.17487/RFC3711, March 2004,
+952	              <https://www.rfc-editor.org/rfc/rfc3711>.
+
+954	   [RFC4585]  Ott, J., Wenger, S., Sato, N., Burmeister, C., and J. Rey,
+955	              "Extended RTP Profile for Real-time Transport Control
+956	              Protocol (RTCP)-Based Feedback (RTP/AVPF)", RFC 4585,
+957	              DOI 10.17487/RFC4585, July 2006,
+958	              <https://www.rfc-editor.org/rfc/rfc4585>.
+
+960	   [RFC5104]  Wenger, S., Chandra, U., Westerlund, M., and B. Burman,
+961	              "Codec Control Messages in the RTP Audio-Visual Profile
+962	              with Feedback (AVPF)", RFC 5104, DOI 10.17487/RFC5104,
+963	              February 2008, <https://www.rfc-editor.org/rfc/rfc5104>.
+
+965	   [RFC5124]  Ott, J. and E. Carrara, "Extended Secure RTP Profile for
+966	              Real-time Transport Control Protocol (RTCP)-Based Feedback
+967	              (RTP/SAVPF)", RFC 5124, DOI 10.17487/RFC5124, February
+968	              2008, <https://www.rfc-editor.org/rfc/rfc5124>.
+
+970	   [RFC7201]  Westerlund, M. and C. Perkins, "Options for Securing RTP
+971	              Sessions", RFC 7201, DOI 10.17487/RFC7201, April 2014,
+972	              <https://www.rfc-editor.org/rfc/rfc7201>.
+
+974	   [RFC7202]  Perkins, C. and M. Westerlund, "Securing the RTP
+975	              Framework: Why RTP Does Not Mandate a Single Media
+976	              Security Solution", RFC 7202, DOI 10.17487/RFC7202, April
+977	              2014, <https://www.rfc-editor.org/rfc/rfc7202>.
+
+979	   [RFC8088]  Westerlund, M., "How to Write an RTP Payload Format",
+980	              RFC 8088, DOI 10.17487/RFC8088, May 2017,
+981	              <https://www.rfc-editor.org/rfc/rfc8088>.
+
+983	Authors' Addresses
+
+985	   Hyunsik Yang
+986	   InterDigital
+987	   United States of America
+988	   Email: hyunsik.yang@interdigital.com
+
+990	   Xavier de Foy
+991	   InterDigital
+992	   Canada
+993	   Email: xavier.defoy@interdigital.com
+
+
+
+
+
+
+
+
+
