@@ -1,0 +1,645 @@
+idnits 2.17.1 
+
+draft-ietf-rift-kv-tie-structure-and-processing-06.txt:
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     No nits found.
+
+--------------------------------------------------------------------------------
+
+
+2	RIFT                                                        J. Head, Ed.
+3	Internet-Draft                                             T. Przygienda
+4	Intended status: Standards Track              Hewlett Packard Enterprise
+5	Expires: 12 June 2026                                    9 December 2025
+
+7	  Routing in Fat Trees (RIFT) Key/Value Topology Information Elements
+8	                        Structure and Processing
+9	           draft-ietf-rift-kv-tie-structure-and-processing-06
+
+11	Abstract
+
+13	   The RIFT (Routing in Fat Trees) protocol allows for key/value pairs
+14	   to be advertised within Key-Value Topology Information Elements (KV
+15	   TIEs).  The data contained within these KV TIEs can be used for any
+16	   imaginable purpose.
+
+18	   This document defines the various Key-Types (i.e., Well-Known, OUI,
+19	   and Experimental) and a method to structure corresponding values.  It
+20	   also defines a Well-Known Key Sub-Type used for testing tie-breaking
+21	   behavior.
+
+23	Requirements Language
+
+25	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+26	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+27	   "OPTIONAL" in this document are to be interpreted as described in BCP
+28	   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+29	   capitals, as shown here.
+
+31	Status of This Memo
+
+33	   This Internet-Draft is submitted in full conformance with the
+34	   provisions of BCP 78 and BCP 79.
+
+36	   Internet-Drafts are working documents of the Internet Engineering
+37	   Task Force (IETF).  Note that other groups may also distribute
+38	   working documents as Internet-Drafts.  The list of current Internet-
+39	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+41	   Internet-Drafts are draft documents valid for a maximum of six months
+42	   and may be updated, replaced, or obsoleted by other documents at any
+43	   time.  It is inappropriate to use Internet-Drafts as reference
+44	   material or to cite them other than as "work in progress."
+
+46	   This Internet-Draft will expire on 12 June 2026.
+
+48	Copyright Notice
+
+50	   Copyright (c) 2025 IETF Trust and the persons identified as the
+51	   document authors.  All rights reserved.
+
+53	   This document is subject to BCP 78 and the IETF Trust's Legal
+54	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+55	   license-info) in effect on the date of publication of this document.
+56	   Please review these documents carefully, as they describe your rights
+57	   and restrictions with respect to this document.  Code Components
+58	   extracted from this document must include Revised BSD License text as
+59	   described in Section 4.e of the Trust Legal Provisions and are
+60	   provided without warranty as described in the Revised BSD License.
+
+62	Table of Contents
+
+64	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+65	   2.  Key-Value Structure . . . . . . . . . . . . . . . . . . . . .   3
+66	     2.1.  Key Sub-Type  . . . . . . . . . . . . . . . . . . . . . .   4
+67	     2.2.  Experimental Key-Type . . . . . . . . . . . . . . . . . .   5
+68	     2.3.  Well-Known Key-Type . . . . . . . . . . . . . . . . . . .   5
+69	     2.4.  OUI Key-Type  . . . . . . . . . . . . . . . . . . . . . .   6
+70	   3.  Design Considerations . . . . . . . . . . . . . . . . . . . .   6
+71	     3.1.  Tie-Breaking Considerations . . . . . . . . . . . . . . .   6
+72	       3.1.1.  Southbound Key-Value TIE Tie-Break Sub-Type . . . . .   7
+73	     3.2.  Key Target  . . . . . . . . . . . . . . . . . . . . . . .   8
+74	       3.2.1.  Key Target Processing . . . . . . . . . . . . . . . .   9
+75	   4.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  10
+76	     4.1.  RIFT Key-Types  . . . . . . . . . . . . . . . . . . . . .  10
+77	       4.1.1.  RIFT Key-Types Requested Entries  . . . . . . . . . .  11
+78	     4.2.  RIFT Well-Known Key Sub-Types . . . . . . . . . . . . . .  11
+79	       4.2.1.  RIFT Well-Known Key Sub-Types Requested Entries . . .  11
+80	     4.3.  Expert Review Guidance  . . . . . . . . . . . . . . . . .  12
+81	   5.  Security Considerations . . . . . . . . . . . . . . . . . . .  12
+82	   6.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  12
+83	   7.  Normative References  . . . . . . . . . . . . . . . . . . . .  13
+84	   8.  Informative References  . . . . . . . . . . . . . . . . . . .  13
+85	   Appendix A.  Thrift Models  . . . . . . . . . . . . . . . . . . .  13
+86	     A.1.  southbound_kv.thrift  . . . . . . . . . . . . . . . . . .  13
+87	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  14
+
+89	1.  Introduction
+
+91	   The Routing in Fat Trees [RFC9692] protocol allows for key/value
+92	   pairs to be advertised within Key-Value Topology Information Elements
+93	   (KV TIEs).  There are no restrictions placed on the type of data that
+94	   is contained in KV TIEs nor what the data is used for.
+
+96	   For example, it might be beneficial to advertise overlay protocol
+97	   state from leaf nodes to the Top-of-Fabric (ToF) nodes.  This would
+98	   make it possible to view critical state of a fabric-wide service from
+99	   a single ToF node rather than retrieving and reconciling the same
+100	   state from multiple leaf nodes.
+
+102	2.  Key-Value Structure
+
+104	   This section describes the generic key structure and semantics,
+105	   Figure 1 further illustrates these components.
+
+107	      0                   1                   2                   3
+108	      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+109	     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+110	     |   Key-Type    |               Key Identifier                  |
+111	     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+112	     |                      Values (variable)                        |
+113	     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+115	                   Figure 1: Generic Key-Value Structure
+
+117	   *where:*
+
+119	      *Key-Type:*
+120	         A 1-byte value that identifies the Key-Type.  It MUST be a
+121	         reserved value from the RIFT Key-Type Registry that is defined
+122	         later in this document.
+
+124	         The range of valid values is 1 - 255 (2^8-1).
+
+126	         0 is an illegal value and MUST NOT be allocated to or used by
+127	         any implementation.  KV TIEs received with this value and MUST
+128	         be discarded and logged on receipt.
+
+130	      *Key Identifier:*
+131	         A 3-byte value that identifies the specific key and describes
+132	         and the semantics of any contained values.  It SHOULD be unique
+133	         within the context of the given Key-Type.
+
+135	         The range of valid values is 1 - 16777215 (2^24-1).
+
+137	         0 is an illegal value and MUST NOT be allocated to or used by
+138	         any implementation.  KV TIEs received with this value and MUST
+139	         be discarded and logged on receipt.
+
+141	      *Values:*
+142	         A variable length value that contains data associated with the
+143	         Key Identifier.  It SHOULD contain 1 or more elements.  The
+144	         semantics (i.e., existence, order, duplication, etc.) of any
+145	         contained values is governed by the particular key's
+146	         specification.
+
+148	2.1.  Key Sub-Type
+
+150	   The Key Sub-Type is a mechanism to further describe the key's
+151	   semantics.  This is illustrated by Figure 2.  The Key Sub-Type MUST
+152	   be used when the Key-Type is either Well-Known or Experimental in
+153	   order to avoid interoperability issues, but is OPTIONAL for other
+154	   Key-Types.
+
+156	      0                   1                   2                   3
+157	      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+158	     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+159	     |   Key-Type    |  Key Sub-Type |        Key Identifier         |
+160	     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+161	     |                      Values (variable)                        |
+162	     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+164	          Figure 2: Generic Key-Value Structure with Key Sub-Type
+
+166	   *where:*
+
+168	      *Key Sub-Type:*
+169	         A 1-byte value that identifies the Key Sub-Type which describes
+170	         the key and its semantics.
+
+172	         The range of valid values is 1 - 255 (2^8-1).
+
+174	         0 is an illegal value and MUST NOT be allocated to or used by
+175	         any implementation.  KV TIEs received with this value and MUST
+176	         be discarded and logged on receipt.
+
+178	      *Key Identifier:*
+179	         If the Key Sub-Type is used, it inherently reduces the Key
+180	         Identifier space from 3-bytes to 2-bytes.  The Key Identifier
+181	         SHOULD be unique within the context of the given Key Sub-Type.
+182	         The Key Identifier is otherwise unchanged.
+
+184	         The range of valid values is now 1 - 65535 (2^16-1).
+
+186	         0 is an illegal value and MUST NOT be allocated to or used by
+187	         any implementation.  KV TIEs received with this value and MUST
+188	         be discarded and logged on receipt.
+
+190	2.2.  Experimental Key-Type
+
+192	   This section reserves a value in the RIFT Key-Type Registry to
+193	   indicate an Experimental Key-Type.
+
+195	   As shown in Figure 3, the Key-Type will be used to identify the Key-
+196	   Type as Experimental.  The Experimental Key-Type MUST support the use
+197	   of a Key Sub-Type.  The Key Identifier will be used to identify the
+198	   specific key and the semantics of any contained values.
+
+200	      0                   1                   2                   3
+201	      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+202	     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+203	     |       1       |  Key Sub-Type |        Key Identifier         |
+204	     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+205	     |                 Experimental Values (variable)                |
+206	     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+208	                      Figure 3: Experimental Key-Type
+
+210	2.3.  Well-Known Key-Type
+
+212	   This section reserves a value in the RIFT Key-Type Registry to
+213	   indicate a Well-Known Key-Type.
+
+215	   As shown in Figure 4, the Key-Type will be used to identify the Key-
+216	   Type as Well-Known.  The Well-Known Key-Type MUST support the use of
+217	   a Key Sub-Type.  The Key Identifier will be used to identify the
+218	   specific key and the semantics of any contained values.
+
+220	      0                   1                   2                   3
+221	      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+222	     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+223	     |       2       |  Key Sub-Type |        Key Identifier         |
+224	     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+225	     |                 Well-Known Values (variable)                  |
+226	     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+228	                       Figure 4: Well-Known Key-Type
+
+230	2.4.  OUI Key-Type
+
+232	   This section reserves a value in the RIFT Key-Type Registry to
+233	   indicate an OUI (vendor-specific) Key-Type that any implementation
+234	   MAY support.
+
+236	   As shown in Figure 5, the Key-Type will be used to identify the Key-
+237	   Type as OUI.  The Key Identifier MUST use the implementing
+238	   organization's reserved OUI space to indicate the key and the
+239	   semantics of any contained values.
+
+241	      0                   1                   2                   3
+242	      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+243	     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+244	     |       3       |              OUI Key Identifier               |
+245	     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+246	     |               Vendor Specific Values (variable)               |
+247	     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+249	                           Figure 5: OUI Key-Type
+
+251	3.  Design Considerations
+
+253	   *NOTE:*This document uses the terms to denote directionality,
+254	   specifically, "northbound" meaning "toward the top of the fabric" and
+255	   "southbound" meaning "toward the bottom of the fabric".
+
+257	   While no restrictions are placed on Key-Value data or what it is used
+258	   for, it is RECOMMENDED that a serialized Thrift [THRIFT] model be
+259	   used for simpler interoperability.  [RIFT-AUTO-EVPN] is an example of
+260	   this type of implementation.
+
+262	   Key-Value elements SHOULD NOT be used to carry topology information
+263	   used by RIFT itself to perform distributed computations.
+
+265	   It is possible that deployments may have nodes with differing
+266	   software implementations where some nodes support a given KV TIE and
+267	   others do not.  In this scenario, nodes that receive KV TIEs that
+268	   they don't recognize (e.g., an unknown Key-Type) will continue to
+269	   flood them as specified in RIFT [RFC9692].
+
+271	3.1.  Tie-Breaking Considerations
+
+273	   In cases where KV TIEs are flooded southbound, policies SHOULD be
+274	   implemented in order to avoid network-wide flooding.
+
+276	   For networks with more than one ToF node, it is RECOMMENDED that
+277	   those ToF nodes contain identical KV TIE information when being
+278	   distributed southbound.  RIFT [RFC9692] requires that only one KV TIE
+279	   is selected when identical keys are received from multiple northbound
+280	   neighbors.  If this is not considered, then the tie-breaking rules
+281	   may cause a node to select a suboptimal KV TIE.  Consider a case
+282	   where failure conditions cause the ToF nodes to become split-brained.
+283	   While the key will be identical, the value(s) contained within may
+284	   differ.  The node(s) receiving these differing KV TIEs will select
+285	   the one from the ToF node with the highest System ID, potentially
+286	   leading to unintended effects.
+
+288	3.1.1.  Southbound Key-Value TIE Tie-Break Sub-Type
+
+290	   This section reserves a Key Sub-Type from the RIFT Well-Known Key
+291	   Sub-Types registry.
+
+293	   This Key-Value pair contains information that allows implementations
+294	   to test and verify proper tie-breaking behavior for the Southbound
+295	   Key store.  All implementations SHOULD support this Sub-Type.
+
+297	   All implementations SHOULD use the Appendix A.1 Thrift model
+
+299	      0                   1                   2                   3
+300	      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+301	     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+302	     |       3       |      127      |        Key Identifier         |
+303	     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+304	     |     (System ID,                                               |
+305	     |      Level),                                                  |
+306	     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+308	                  Figure 6: Southbound Tie-Break Sub-Type
+
+310	   *where:*
+
+312	      *System ID:*
+313	         A REQUIRED value indicating the node's unique System ID.
+
+315	      *Level:*
+316	         A RECOMMENDED value indicating the node's level.
+
+318	3.2.  Key Target
+
+320	   The Key Target is an OPTIONAL value that identifies group(s) of
+321	   node(s) that are intended to receive a given Key-Value TIE.  Key
+322	   Targets are 64-bits in length with a valid range of 0 -
+323	   18446744073709551615 (2^64-1), this will reduce the chances that Key
+324	   Target values collide.
+
+326	   Figure 7 illustrates the format.
+
+328	      0                   1                   2                   3
+329	      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+330	     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+331	     |                          Key Target                           |
+332	     |                                                               |
+333	     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+334	     |   Key-Type    |               Key Identifier                  |
+335	     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+336	     |                      Values (variable)                        |
+337	     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+339	                        Figure 7: Key Target Format
+
+341	   A value of all 0s indicates that every node is intended to receive
+342	   this Key-Value TIE and MUST NOT be used for any other reason.
+
+344	   A value of all 1s indicates that all leaf nodes are intended to
+345	   receive this Key-Value TIE and MUST NOT be used for any other reason.
+
+347	   Any other value MUST be derived from the following normative
+348	   algorithm.  Note that while the algorithm is shown using example code
+349	   written in [Rust], this document does not mandate the use of any
+350	   particular language for implementation.
+
+352	<CODE BEGINS>
+353	/// random seeds used in algorithms to increase entropy
+354	pub const RANDOMSEEDS: [UnsignedSystemID; 3] = [
+355	    67438371571u64,
+356	    37087353685,
+357	    88675895388,
+358	];
+
+360	/// given a system ID delivers the bits set by the according Bloom Filter in the southbound
+361	/// key value target.
+362	///
+363	/// @note: This is standardized and cannot be changed between releases!
+364	pub (crate) fn target2bits(target: UnsignedSystemID) -> KeyValueTargetType {
+365	    (0 as usize .. 3)
+366	        .map(|s| {
+367	            let rot = (target ^ RANDOMSEEDS[s]).rotate_left(s as _);
+368	            rot.to_ne_bytes().iter().fold(0, |v: u8, nv| v.rotate_right(4) ^ *nv) % 64
+369	        })
+370	        .fold(0, |v, nv| v | (1 << nv))
+371	}
+372	<CODE ENDS>
+
+374	               Figure 8: Key Target Standard Algorithm
+
+376	3.2.1.  Key Target Processing
+
+378	   Nodes that support the processing of Key Targets MUST only do so on
+379	   KV TIEs in the southbound direction.  Key Targets MUST NOT be present
+380	   on KV TIEs in the northbound direction and are otherwise ignored and
+381	   logged.
+
+383	   Nodes that do not support the processing of Key Targets MUST continue
+384	   to send KV TIEs to all nodes in the appropriate direction.
+385	   Additionally, Key Targets MUST be preserved when KV TIEs are re-
+386	   originated in the southbound direction.
+
+388	3.2.1.1.  Purging/Rollover
+
+390	   There are several reasons a node may select a different KV TIE.  For
+391	   example, the KV TIE is considered newer due to the sequence number
+392	   incrementing, there was a change in the original tie-breaking result
+393	   between multiple KV TIEs, or a loss of northbound connectivity to the
+394	   node that advertised the previously selected KV TIE.
+
+396	   Consider a case where Leaf-1, Leaf-2, and Leaf-3 are members of a
+397	   group of nodes represented by Key Target KT1.  If Leaf-2 is removed
+398	   from that group and a newer instance of the KV TIE needs to be
+399	   flooded Leaf-2 will have to maintain the older KV TIE in the LSDB
+400	   until the lifetime expires.  This could lead to suboptimal behavior
+401	   in the fabric.
+
+403	   If the new KV TIE being flooded does not include the previous Key
+404	   Target value, then implementations SHOULD flood the newer instance of
+405	   the KV TIE with a very short lifetime to nodes that belonged to the
+406	   previous Key Target but not the new Key Target.  This logic only
+407	   applies to KV TIEs being flooded in the southbound direction.
+
+409	4.  IANA Considerations
+
+411	   Per [RFC8126], IANA is requested to create two new registries in the
+412	   "Routing in Fat Trees (RIFT)" registry group at
+413	   https://www.iana.org/assignments/rift
+
+415	   *  RIFT Key-Types
+
+417	   *  RIFT Well-Known Key Sub-Types
+
+419	   The following sections detail each registry's individual requirements
+420	   and suggested values.
+
+422	   Experts reviewing requests for new values to either registry MUST
+423	   consider the items in the Expert Review Guidance (Section 4.3)
+424	   section.
+
+426	4.1.  RIFT Key-Types
+
+428	   This section requests that IANA create and help govern the following
+429	   registry:
+
+431	      *Registry Name:*
+432	         RIFT Key-Types
+
+434	      *Registration Procedures:*
+435	         Expert Review
+
+437	      *Description:*
+438	         Key-Type registry for the RIFT protocol.
+
+440	      *Reference:*
+441	         This document.
+
+443	4.1.1.  RIFT Key-Types Requested Entries
+
+445	   This section requests that IANA register the following suggested
+446	   values to the "RIFT Key-Types" registry.
+
+448	   +=======+==============+=============================+===========+
+449	   | Value | Key-Type     | Description                 | Reference |
+450	   +=======+==============+=============================+===========+
+451	   | 0     | Illegal      | Not allowed.                | This      |
+452	   |       |              |                             | document  |
+453	   +-------+--------------+-----------------------------+-----------+
+454	   | 1     | Experimental | Indicates that the Key-Type | This      |
+455	   |       |              | is Experimental.            | document. |
+456	   +-------+--------------+-----------------------------+-----------+
+457	   | 2     | Well-Known   | Indicates that the Key-Type | This      |
+458	   |       |              | is Well-Known.              | document. |
+459	   +-------+--------------+-----------------------------+-----------+
+460	   | 3     | OUI          | Indicates that the Key-Type | This      |
+461	   |       |              | is OUI (vendor specific).   | document. |
+462	   +-------+--------------+-----------------------------+-----------+
+
+464	               Table 1: RIFT Key-Types Requested Entries
+
+466	4.2.  RIFT Well-Known Key Sub-Types
+
+468	   This section requests that IANA create and help govern the following
+469	   registry:
+
+471	      *Registry Name:*
+472	         RIFT Well-Known Key Sub-Types
+
+474	      *Registration Procedures:*
+475	         Expert Review
+
+477	      *Description:*
+478	         Well-Known Key Sub-Types registry for the RIFT protocol.
+
+480	      *Reference:*
+481	         This document.
+
+483	4.2.1.  RIFT Well-Known Key Sub-Types Requested Entries
+
+485	   This section requests that IANA register the following suggested
+486	   values to the "RIFT Well-Known Key Sub-Types" Registry.
+
+488	   +=======+================+===========================+===========+
+489	   | Value | Key-Identifier | Description               | Reference |
+490	   +=======+================+===========================+===========+
+491	   | 0     | Illegal        | Not allowed.              | This      |
+492	   |       |                |                           | document. |
+493	   +-------+----------------+---------------------------+-----------+
+494	   | 127   | Southbound     | Used for Southbound       | This      |
+495	   |       | Tie-Break Key  | Keystore tie-breaking     | document. |
+496	   |       | Sub-Type       | testing and verification. |           |
+497	   +-------+----------------+---------------------------+-----------+
+
+499	        Table 2: RIFT Well-Known Key Sub-Types Requested Entries
+
+501	4.3.  Expert Review Guidance
+
+503	   Experts reviewing requests for values from the "RIFT Key-Types"
+504	   registry or the "RIFT Well-Known Key-Types" registry are responsible
+505	   for the following:
+
+507	   1.  Determining the existence of a specification that clearly defines
+508	       the purpose supporting the request and MUST contain all required
+509	       fields for given registry.
+
+511	       The document MUST also be permanent and publicly available.
+
+513	   2.  Ensuring that the specification properly defines if Key Sub-Types
+514	       are used and how the Key Identifier value is derived.
+
+516	   3.  Ensuring that any requests are made available to the RIFT working
+517	       group for review should the work originate from outside the RIFT
+518	       Working Group.
+
+520	   4.  Ensuring that any work produce outside of the IETF does not
+521	       conflict with any work that is already published or actively
+522	       pursuing being published.
+
+524	5.  Security Considerations
+
+526	   This document introduces no new security concerns to RIFT or other
+527	   specifications referenced in this document given that the Key-Value
+528	   TIEs are already extensively secured by the RIFT [RFC9692] protocol
+529	   specification itself.
+
+531	6.  Acknowledgements
+
+533	   Thanks to Italo Busi for his very thoughtful review which yielded and
+534	   improved spec.
+
+536	7.  Normative References
+
+538	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+539	              Requirement Levels", BCP 14, RFC 2119,
+540	              DOI 10.17487/RFC2119, March 1997,
+541	              <https://www.rfc-editor.org/info/rfc2119>.
+
+543	   [RFC8126]  Cotton, M., Leiba, B., and T. Narten, "Guidelines for
+544	              Writing an IANA Considerations Section in RFCs", June
+545	              2017, <https://www.rfc-editor.org/info/rfc8126>.
+
+547	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+548	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+549	              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+551	   [RFC9692]  Przygienda, T., Ed., Head, J., Ed., Sharma, A., Thubert,
+552	              P., Rijsman, B., and D. Afanasiev, "RIFT: Routing in Fat
+553	              Trees", RFC 9692, DOI 10.17487/RFC9692, April 2025,
+554	              <https://www.rfc-editor.org/info/rfc9692>.
+
+556	8.  Informative References
+
+558	   [RIFT-AUTO-EVPN]
+559	              Head, J., Przygienda, T., and W. Lin, "RIFT Auto-EVPN",
+560	              Work in Progress, draft-ietf-rift-auto-evpn-06, January
+561	              2025, <https://www.ietf.org/archive/id/draft-ietf-rift-
+562	              auto-evpn-06.html>.
+
+564	   [Rust]     Rust Foundation, "The Rust Reference",
+565	              <https://doc.rust-lang.org/reference/>.
+
+567	   [THRIFT]   Apache Software Foundation, "Thrift Language
+568	              Implementation and Documentation",
+569	              <https://github.com/apache/thrift/tree/0.15.0/doc>.
+
+571	Appendix A.  Thrift Models
+
+573	   This section contains the Thrift model that MAY be used to test
+574	   southbound Key-Value tie-breaking based on System ID.  Per the main
+575	   RIFT [RFC9692] specification, all signed values MUST be interpreted
+576	   as unsigned values.
+
+578	A.1.  southbound_kv.thrift
+579	   include "common.thrift"
+
+581	   namespace py southbound_kv
+582	   namespace rs models
+
+584	   const i8            GlobalSystemIdentifierKV  = 127
+
+586	   /** simple type to test correct tie-breaking based on system ID */
+587	   struct SystemIdentifierKV {
+588	       1:  required   common.SystemIDType         system_id,
+589	       2:  optional   common.LevelType            level,
+590	   }
+
+592	      Figure 9: RIFT Common Schema for Southbound Key-Value Tie-Break
+593	                                Key Sub-Type
+
+595	Authors' Addresses
+
+597	   Jordan Head (editor)
+598	   Hewlett Packard Enterprise
+599	   1137 Innovation Way
+600	   Sunnyvale, CA
+601	   United States of America
+602	   Email: jhead@juniper.net
+
+604	   Tony Przygienda
+605	   Hewlett Packard Enterprise
+606	   1137 Innovation Way
+607	   Sunnyvale, CA
+608	   United States of America
+609	   Email: prz@juniper.net
+
+
+
+
+
+
+
+
+
