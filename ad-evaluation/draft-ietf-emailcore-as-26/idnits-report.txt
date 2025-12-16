@@ -1,0 +1,1312 @@
+idnits 2.17.1 
+
+draft-ietf-emailcore-as-26.txt:
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     No nits found.
+--------------------------------------------------------------------------------
+
+
+2	EMAILCORE                                              J.C. Klensin, Ed.
+3	Internet-Draft
+4	Intended status: Standards Track                       K. Murchison, Ed.
+5	Expires: 11 May 2026                                            Fastmail
+6	                                                         7 November 2025
+
+8	         Applicability Statement for IETF Core Email Protocols
+9	                       draft-ietf-emailcore-as-26
+
+11	Abstract
+
+13	   Electronic mail is one of the oldest Internet applications that is
+14	   still in very active use.  While the basic protocols and formats for
+15	   mail transport and message formats have evolved slowly over the
+16	   years, events and thinking in more recent years have supplemented
+17	   those core protocols with additional features and suggestions for
+18	   their use.  This Applicability Statement describes the relationship
+19	   among many of those protocols and provides guidance and makes
+20	   recommendations for the use of features of the core protocols.
+
+22	Status of This Memo
+
+24	   This Internet-Draft is submitted in full conformance with the
+25	   provisions of BCP 78 and BCP 79.
+
+27	   Internet-Drafts are working documents of the Internet Engineering
+28	   Task Force (IETF).  Note that other groups may also distribute
+29	   working documents as Internet-Drafts.  The list of current Internet-
+30	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+32	   Internet-Drafts are draft documents valid for a maximum of six months
+33	   and may be updated, replaced, or obsoleted by other documents at any
+34	   time.  It is inappropriate to use Internet-Drafts as reference
+35	   material or to cite them other than as "work in progress."
+
+37	   This Internet-Draft will expire on 11 May 2026.
+
+39	Copyright Notice
+
+41	   Copyright (c) 2025 IETF Trust and the persons identified as the
+42	   document authors.  All rights reserved.
+
+44	   This document is subject to BCP 78 and the IETF Trust's Legal
+45	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+46	   license-info) in effect on the date of publication of this document.
+47	   Please review these documents carefully, as they describe your rights
+48	   and restrictions with respect to this document.  Code Components
+49	   extracted from this document must include Revised BSD License text as
+50	   described in Section 4.e of the Trust Legal Provisions and are
+51	   provided without warranty as described in the Revised BSD License.
+
+53	Table of Contents
+
+55	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
+56	     1.1.  Conventions Used in This Document . . . . . . . . . . . .   4
+57	   2.  Applicability of Some SMTP Provisions . . . . . . . . . . . .   4
+58	     2.1.  Handling of the Domain Argument to the EHLO Command . . .   4
+59	     2.2.  Use of Address Literals . . . . . . . . . . . . . . . . .   5
+60	     2.3.  Use of Addresses in Top-Level Domains . . . . . . . . . .   5
+61	     2.4.  Use of SMTP Extensions  . . . . . . . . . . . . . . . . .   5
+62	   3.  Applicability of Message Format Provisions  . . . . . . . . .   6
+63	     3.1.  Use of Empty Quoted Strings . . . . . . . . . . . . . . .   6
+64	     3.2.  Use of Received Header Fields . . . . . . . . . . . . . .   7
+65	       3.2.1.  Generation  . . . . . . . . . . . . . . . . . . . . .   7
+66	       3.2.2.  Consumption . . . . . . . . . . . . . . . . . . . . .   7
+67	     3.3.  Reuse of Existing Messages  . . . . . . . . . . . . . . .   7
+68	     3.4.  Group Syntax  . . . . . . . . . . . . . . . . . . . . . .   8
+69	   4.  Use of Email Addresses  . . . . . . . . . . . . . . . . . . .   8
+70	     4.1.  Case-Sensitivity, Delimiters, and Mailbox Equivalency . .   8
+71	     4.2.  Use of non-ASCII Characters . . . . . . . . . . . . . . .   9
+72	     4.3.  Use and Validation of Email Address Syntax  . . . . . . .   9
+73	   5.  Use of Multipurpose Internet Mail Extensions (MIME) . . . . .  11
+74	   6.  Confidentiality and Authentication with SMTP  . . . . . . . .  11
+75	     6.1.  Security at the Transport Layer . . . . . . . . . . . . .  12
+76	       6.1.1.  The TLS Protocol  . . . . . . . . . . . . . . . . . .  12
+77	       6.1.2.  Opportunistic Confidentiality . . . . . . . . . . . .  13
+78	       6.1.3.  Enforced Confidentiality, with Receiving Server
+79	               Authentication  . . . . . . . . . . . . . . . . . . .  13
+80	     6.2.  Message-Level Authentication  . . . . . . . . . . . . . .  14
+81	     6.3.  SMTP Authentication . . . . . . . . . . . . . . . . . . .  14
+82	     6.4.  Message-Level Confidentiality . . . . . . . . . . . . . .  15
+83	     6.5.  Confidentiality Requirements  . . . . . . . . . . . . . .  15
+84	   7.  Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .  16
+85	   8.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  16
+86	   9.  Security Considerations . . . . . . . . . . . . . . . . . . .  16
+87	   10. References  . . . . . . . . . . . . . . . . . . . . . . . . .  16
+88	     10.1.  Normative References . . . . . . . . . . . . . . . . . .  16
+89	     10.2.  Informative References . . . . . . . . . . . . . . . . .  17
+90	   Appendix A.  Change Log . . . . . . . . . . . . . . . . . . . . .  21
+91	     A.1.  Changes from draft-klensin-email-core-as-00 (2020-03-30) to
+92	            draft-ietf-emailcore-as-00 . . . . . . . . . . . . . . .  21
+93	     A.2.  Changes from draft-ietf-emailcore-as-00 (2020-10-06) to
+94	            -01  . . . . . . . . . . . . . . . . . . . . . . . . . .  21
+95	     A.3.  Changes from draft-ietf-emailcore-as-01 (2021-04-09) to
+96	            -02  . . . . . . . . . . . . . . . . . . . . . . . . . .  21
+
+98	     A.4.  Changes from draft-ietf-emailcore-as-02 (2021-08-06) to
+99	            -03  . . . . . . . . . . . . . . . . . . . . . . . . . .  21
+100	     A.5.  Changes from draft-ietf-emailcore-as-03 (2022-01-31) to
+101	            -04  . . . . . . . . . . . . . . . . . . . . . . . . . .  22
+102	     A.6.  Changes from draft-ietf-emailcore-as-04 (2022-05-21) to
+103	            -05  . . . . . . . . . . . . . . . . . . . . . . . . . .  22
+104	     A.7.  Changes from draft-ietf-emailcore-as-05 (2022-10-24) to
+105	            -06  . . . . . . . . . . . . . . . . . . . . . . . . . .  22
+106	     A.8.  Changes from draft-ietf-emailcore-as-06 (2022-11-07) to
+107	            -07  . . . . . . . . . . . . . . . . . . . . . . . . . .  22
+108	     A.9.  Changes from draft-ietf-emailcore-as-07 (2023-03-13) to
+109	            -08  . . . . . . . . . . . . . . . . . . . . . . . . . .  23
+110	     A.10. Changes from draft-ietf-emailcore-as-08 (2023-12-18) to
+111	            -09  . . . . . . . . . . . . . . . . . . . . . . . . . .  23
+112	     A.11. Changes from draft-ietf-emailcore-as-09 (2024-07-02) to
+113	            -10  . . . . . . . . . . . . . . . . . . . . . . . . . .  23
+114	     A.12. Changes from draft-ietf-emailcore-as-10 (2024-07-03) to
+115	            -11  . . . . . . . . . . . . . . . . . . . . . . . . . .  23
+116	     A.13. Changes from draft-ietf-emailcore-as-11 (2024-10-21) to
+117	            -12  . . . . . . . . . . . . . . . . . . . . . . . . . .  23
+118	     A.14. Changes from draft-ietf-emailcore-as-12 (2024-11-09) to
+119	            -13  . . . . . . . . . . . . . . . . . . . . . . . . . .  24
+120	     A.15. Changes from draft-ietf-emailcore-as-13 (2025-01-30) to
+121	            -14  . . . . . . . . . . . . . . . . . . . . . . . . . .  24
+122	     A.16. Changes from draft-ietf-emailcore-as-14 (2025-02-27) to
+123	            -15  . . . . . . . . . . . . . . . . . . . . . . . . . .  24
+124	     A.17. Changes from draft-ietf-emailcore-as-15 (2025-03-18) to
+125	            -16  . . . . . . . . . . . . . . . . . . . . . . . . . .  24
+126	     A.18. Changes from draft-ietf-emailcore-as-16 to -17  . . . . .  25
+127	     A.19. Changes from draft-ietf-emailcore-as-17 to -18  . . . . .  25
+128	     A.20. Changes from draft-ietf-emailcore-as-18 to -19  . . . . .  25
+129	     A.21. Changes from draft-ietf-emailcore-as-19 to -20  . . . . .  25
+130	     A.22. Changes from draft-ietf-emailcore-as-20 to -21  . . . . .  26
+131	     A.23. Changes from draft-ietf-emailcore-as-21 to -22  . . . . .  26
+132	     A.24. Changes from draft-ietf-emailcore-as-22 to -23  . . . . .  26
+133	     A.25. Changes from draft-ietf-emailcore-as-23 to -24  . . . . .  27
+134	     A.26. Changes from draft-ietf-emailcore-as-24 to -25  . . . . .  27
+135	     A.27. Changes from draft-ietf-emailcore-as-25 to -26  . . . . .  27
+136	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  27
+
+138	1.  Introduction
+
+140	   This document is an Applicability Statement [RFC2026], Section 3.2
+141	   that provides guidance in the use of the Internet's core email
+142	   specifications, the Simple Mail Transfer Protocol (SMTP)
+143	   [I-D.ietf-emailcore-rfc5321bis] and the Internet Message Format (IMF)
+144	   [I-D.ietf-emailcore-rfc5322bis], and some extensions and other
+145	   protocols that have been built on them.  In order to promote
+146	   interoperability amongst senders, receivers, and intermediaries, it
+147	   includes discussions and recommendations about selected features of
+148	   SMTP, IMF, and certain extensions to them that are required,
+149	   recommended, or to be avoided except in special cases.  Furthermore,
+150	   this document discusses some common mechanisms for confidentiality
+151	   and authentication in electronic mail.
+
+153	1.1.  Conventions Used in This Document
+
+155	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+156	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+157	   "OPTIONAL" in this document are to be interpreted as described in BCP
+158	   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+159	   capitals, as shown here.
+
+161	2.  Applicability of Some SMTP Provisions
+
+163	   Over the years since [RFC5321] was published in October 2008, usage
+164	   of SMTP has evolved, machines and network speeds have increased, and
+165	   the frequency with which most SMTP senders and receivers have to be
+166	   prepared to deal with systems that are disconnected from the Internet
+167	   for long periods or that require many hops to reach has decreased.
+168	   During the same period, the IETF has become much more sensitive to
+169	   privacy and security issues and the need to be more resistant or
+170	   robust against spam and other attacks.  In addition SMTP (and Message
+171	   Format) extensions have been introduced that are expected to evolve
+172	   the Internet's mail system to better accommodate environments in
+173	   which Basic Latin Script is not the norm.
+
+175	   This section describes configuration options and other considerations
+176	   about SMTP that may be appropriate under various circumstances and
+177	   discusses the applicability of other protocols that represent newer
+178	   work or that are intended to deal with relatively newer issues.
+
+180	2.1.  Handling of the Domain Argument to the EHLO Command
+
+182	   If the Domain argument to the EHLO command does not have an address
+183	   record in the DNS that matches the IP address of the client, the SMTP
+184	   server may refuse any mail from the client as part of established
+185	   anti-abuse practice.  Operational experience has demonstrated that
+186	   the lack of a matching address record for the domain name argument is
+187	   at best an indication of a poorly-configured MTA, and at worst that
+188	   of an abusive host.
+
+190	2.2.  Use of Address Literals
+
+192	   The address-literal ABNF non-terminal is used in various places in
+193	   [I-D.ietf-emailcore-rfc5321bis] grammar.  However, for SMTP
+194	   connections over the public internet, an address-literal as the
+195	   argument to the EHLO command or the Domain part of the Mailbox
+196	   argument to the MAIL FROM command is quite likely to result in the
+197	   message being rejected as a matter of policy at many sites, since
+198	   they are deemed to be signs of at best a misconfigured server, and at
+199	   worst either a compromised host or a server that's intentionally
+200	   configured to hide its identity.
+
+202	2.3.  Use of Addresses in Top-Level Domains
+
+204	   While addresses in top-level domains (TLDs) (i.e., single-label
+205	   domains) are syntactically valid, mail to these addresses has never
+206	   worked reliably.  A handful of country code TLDs have top level MX
+207	   records but they have never been widely used nor well supported.  In
+208	   2013 [RFC7085] found 18 TLDs with MX records, which dropped to 17 in
+209	   2021 and to 11 in 2025 despite many new TLDs having been added.
+
+211	   Mail sent to addresses with single label domains has typically
+212	   expected the address to be an abbreviation to be completed by a
+213	   search list, so mail to bob@sales would be completed to
+214	   bob@sales.example.com.  This shortcut has led to unfortunate
+215	   consequences; in one famous case, in 1991 when the .CS domain was
+216	   added to the root, mail in computer science departments started to
+217	   fail as mail to bob@cs was now treated as mail to Czechoslovakia.
+218	   Hence, for reliable service, mail SHOULD NOT use addresses that
+219	   contain single label domains.
+
+221	2.4.  Use of SMTP Extensions
+
+223	   As SMTP has evolved over the years, several extensions have become
+224	   ubiquitous.  As a result, the following extensions MUST be supported
+225	   by SMTP senders and receivers:
+
+227	   *  Secure SMTP over Transport Layer Security [RFC3207] (Cf.
+228	      discussion in Section 6.1.)
+
+230	   *  8-bit MIME [RFC6152]
+
+232	   Similarly, the following extensions SHOULD be supported by SMTP
+233	   senders and receivers:
+
+235	   *  Command Pipelining [RFC2920]
+
+237	   *  Internationalized Email [SMTPUTF8]
+238	   Delivery Status Notifications [RFC3461] requests, while recommended
+239	   and useful if supported, have not been widely implemented and
+240	   deployed.  Mail systems that send such requests should be prepared
+241	   for systems that receive them to not recognize or support them.  Note
+242	   that this extension for notification requests is distinct from the
+243	   format of notifications defined in [RFC3464] and [RFC6533], and the
+244	   special media type defined in [RFC6522].  All of those SHOULD be
+245	   supported.
+
+247	   Furthermore, while Enhanced Mail System Status Codes ([RFC3463],
+248	   [RFC5248]) are widely supported, they are not ubiquitous.
+249	   Nevertheless, they have been found to be useful to SMTP senders in
+250	   determining the exact reason for a transmission failure in a machine-
+251	   readable, language-independent manner, thus allowing them to present
+252	   more detailed and language-specific error messages to users.  Given
+253	   the usefulness of these enhanced codes, SMTP receivers are
+254	   RECOMMENDED to implement the SMTP Service Extension for Returning
+255	   Enhanced Error Codes [RFC2034] utilizing the codes registered in
+256	   [RFC5248].
+
+258	3.  Applicability of Message Format Provisions
+
+260	   This section describes considerations about the Internet Message
+261	   Format that may be appropriate under various circumstances.
+
+263	3.1.  Use of Empty Quoted Strings
+
+265	   The quoted-string ABNF non-terminal is used in various places in
+266	   [I-D.ietf-emailcore-rfc5322bis] grammar.  While it allows for empty
+267	   quoted string, such a construct is going to cause interoperability
+268	   issues when used in certain header fields.  In particular, use of
+269	   empty quoted strings is discouraged in "received-token" (a component
+270	   of a Received header field) and "local-part" (left hand side of email
+271	   addresses).  For example, all of the following email header fields
+272	   are non-interoperable:
+
+274	      Received: from node.example by x.y.test "" foo; 21 Nov 1997
+275	      10:01:22 -0600
+
+277	      From: "".bar@example.com
+
+279	      To: foo.""@example.net
+
+281	      Cc: ""@example.com
+
+283	   Use of empty quoted strings is fine in "display-name".  For example,
+284	   the following email header field is interoperable:
+
+286	      To: "" <test@example.com>
+
+288	3.2.  Use of Received Header Fields
+
+290	3.2.1.  Generation
+
+292	   Email addresses are commonly classified as Personally Identifiable
+293	   Information (PII).  Improper application of the FOR clause in
+294	   Received header fields can result in disclosure of PII.  As such, the
+295	   FOR clause SHOULD NOT be generated if the message copy is associated
+296	   with multiple recipients from multiple SMTP RCPT commands.
+297	   Otherwise, the value of the FOR clause MUST contain the RCPT address
+298	   that caused the message to be routed to the recipient of the given
+299	   copy of the message.
+
+301	   Note however, that if a mail system generates a FOR clause when there
+302	   is only a single recipient, and doesn't generate one when there are
+303	   multiple recipients, the absence of the field is an indication that
+304	   there is another recipient, which may allow someone to infer that a
+305	   "blind" copy is involved.
+
+307	3.2.2.  Consumption
+
+309	   Received header fields support analysis of handling and delivery
+310	   problems, as well as aiding evaluation of a message with suspicious
+311	   content or attributes.  The fields are easily created and have no
+312	   direct security or privacy protections, and the fields can contain
+313	   personally sensitive information.
+
+315	   Therefore, the fields do not warrant automatic trust and do warrant
+316	   careful consideration before disclosing to others.  They should be
+317	   used with care, for whatever information is deemed valuable, and
+318	   especially when syntax or values occur that are not defined by the
+319	   specifications [I-D.ietf-emailcore-rfc5321bis]
+320	   [I-D.ietf-emailcore-rfc5322bis].
+
+322	3.3.  Reuse of Existing Messages
+
+324	   Many mail user agents (MUAs) have functions which use an existing
+325	   email message as a template for editing a new message.  These
+326	   functions are different from traditional forwarding functions.  Those
+327	   generally preserve the original message as a body part or just the
+328	   message body as quoted text.  For example, an MUA may take an
+329	   existing message, allow the user to replace the originator and
+330	   destinations, edit parts of the body, and send it on to the new
+331	   recipients.  When performing such functions, the MUA SHOULD:
+
+333	   *  Remove all header fields unknown to the MUA
+334	   *  Remove any header fields that are only pertinent to the transport
+335	      of the original message, such as trace header fields (see
+336	      Section 3.6.7 of [I-D.ietf-emailcore-rfc5322bis])
+
+338	3.4.  Group Syntax
+
+340	   "Group" syntax [I-D.ietf-emailcore-rfc5322bis] [RFC6854] has been a
+341	   long-standing construct in the specification, going back to RFC 822
+342	   [RFC822], but it has had little use in all that time.  It is
+343	   therefore possible that use of it in a message will conform with the
+344	   specifications but not be supported by some implementations.
+
+346	4.  Use of Email Addresses
+
+348	4.1.  Case-Sensitivity, Delimiters, and Mailbox Equivalency
+
+350	   SMTP specifies that the local-part of an email address is case-
+351	   sensitive (see Section 2.4 of [I-D.ietf-emailcore-rfc5321bis]):
+
+353	           The local-part of a mailbox MUST BE treated as case
+354	           sensitive.  Therefore, SMTP implementations MUST take
+355	           care to preserve the case of mailbox local-parts.
+356	           In particular, for some hosts, the user "smith" is
+357	           different from the user "Smith".  However, exploiting
+358	           the case sensitivity of mailbox local-parts impedes
+359	           interoperability and is discouraged.
+
+361	   While case-sensitivity is specified as an absolute requirement, it is
+362	   important to stress that most implementations do not make case
+363	   distinctions in local parts (most treat "smith", "Smith", and "SMITH"
+364	   as the same), and most implementations do preserve the case that is
+365	   received (from SMTP or HTTP, from address books, or from user input).
+366	   Maximum interoperability will be achieved by keeping local-parts
+367	   unchanged (and especially making no attempt to change their case in
+368	   any way) and by assuming that local-parts that differ only in their
+369	   case probably refer to the same mailbox.  This is particularly
+370	   important for software that validates user-input fields, where case
+371	   changes are tempting, but must be avoided.
+
+373	   It is also important to note, as we encounter non-ASCII local-parts
+374	   over time, that case changes are both character-set dependent and
+375	   language dependent, and attempts to change case without having the
+376	   full context necessary are likely to be wrong often enough to matter.
+
+378	   Additionally, final delivery systems vary in how they interpret the
+379	   use of delimiters such as '+' and '.' in local-parts.  Some systems
+380	   make distinctions between local-parts such as "smith" and
+381	   "smith+foo", or "jane.doe" and "janedoe", while others treat them as
+382	   referring to the same mailboxes respectively.  Since only the final
+383	   delivery system can properly interpret the local-part of an address,
+384	   originating and transit/relay mail systems are discouraged from
+385	   making any assumptions as to address equivalence or from making any
+386	   changes to local-parts containing such delimiters.
+
+388	4.2.  Use of non-ASCII Characters
+
+390	   Proper generation and transmission of email addresses containing non-
+391	   ASCII characters is discussed in the SMTPUTF8 documents [SMTPUTF8]
+392	   with more details for the domain-part in the specifications for
+393	   Internationalized Domain Names [IDNA2008].  Section 9 of [RFC6530]
+394	   says: "a downgrade mechanism that transforms the local part of an
+395	   email address cannot be utilized in transit."  This is actually just
+396	   a special case of a principle, discussed in Section 2.3.11 of
+397	   [I-D.ietf-emailcore-rfc5321bis] and elsewhere, that nothing other
+398	   than the final delivery system should attempt to interpret or alter
+399	   the local-part of an address.  In particular, they MUST NOT:
+
+401	   *  use web URI percent encoding (see Section 2.1 of [RFC3986]) in
+402	      either the local-part or the domain-part of an address
+
+404	   *  perform Internationalized Domain Names for Applications (IDNA)
+405	      Punycode Conversion (see Section 4.4 of [RFC5891]) on the local-
+406	      part of an address
+
+408	   Neither of these encodings will produce an address that is guaranteed
+409	   to be treated as equivalent to the original one.
+
+411	   In some cases, servers or clients may be able to use local knowledge
+412	   to substitute ASCII addresses for specific non-ASCII addresses, but
+413	   that is beyond the scope of this memo.  See Section 8 of [RFC6530]
+414	   for further discussion.
+
+416	4.3.  Use and Validation of Email Address Syntax
+
+418	   Email addresses are frequently used as input to, or validated by,
+419	   forms managed by various libraries, some tied to Versions of
+420	   HyperText Markup Language (HTML) or other specs and others to client-
+421	   side libraries developed in Javascript or other languages.  In some
+422	   cases, those who define or supply those systems may have found and
+423	   corrected errors long ago, but old versions or interpretations are
+424	   still in use.  The allowed grammar for email addresses as
+425	   incorporated in those tools, and hence in various applications, may
+426	   be inconsistent with that allowed by the grammar for a "Mailbox" in
+427	   Section 4.1.2 of [I-D.ietf-emailcore-rfc5321bis], the grammars for
+428	   use of non-ASCII email addresses specified in the SMTPUTF8
+429	   specifications [SMTPUTF8], and common practices on the network.
+
+431	   Specifically, the following differences from the standards mentioned
+432	   above have been observed frequently enough that implementers should
+433	   be aware of them.  In no particular order, the important ones are:
+
+435	   *  Absence of support for quoted strings.
+
+437	   *  Even when restricted to the ASCII charset, some systems have a
+438	      restricted character repertoire as compared to the applicable
+439	      standards.  For domain names, only a limited set of characters
+440	      other than letters and digits are allowed.  As a particularly
+441	      important example for the local-part, the character "+", which is
+442	      heavily used in some email contexts, is sometimes not permitted,
+443	      as are characters that historically had special meanings in some
+444	      gateway contexts such as "%" and "/".
+
+446	   *  Some systems allow leading, trailing, or consecutive unquoted dots
+447	      ('.') in the local-part of email addresses, although few mail
+448	      systems support their use in that context.  Taking advantage of
+449	      that flexibility is NOT RECOMMENDED.
+
+451	   *  As of the time this document was written, many systems still do
+452	      not allow non-ASCII characters (as discussed in Section 4.2 above)
+453	      in either the local-part or the domain-part of an email address.
+
+455	   *  Additionally, some mail systems allow a trailing dot ('.') in the
+456	      domain part of email addresses (as allowed as a notation by the
+457	      basic Domain Names specification [RFC1035] but prohibited by
+458	      [I-D.ietf-emailcore-rfc5321bis]), and is hence not interoperable
+459	      with all systems.  Consequently, implementations are encouraged to
+460	      strip any trailing dots that might appear in the domain part of
+461	      email addresses.
+
+463	   More generally, mail systems that are not responsible for final
+464	   delivery of a message, but that intend to check the syntax of its
+465	   email addresses, should be aware that there are many reasons that
+466	   might cause a valid address to "look strange" or be rejected by tools
+467	   that are inconsistent with these email standards.
+
+469	   In addition to the specific examples above, the most common cases
+470	   include mechanisms for organizing messages on delivery systems and
+471	   security issues (particularly efforts to identify messages other than
+472	   those from the supposed sender).  Especially when a relay system is
+473	   involved, unless the mail system has special knowledge about the
+474	   message and its originator, the best option is to treat the address
+475	   as valid unless the address in question actually violates
+476	   restrictions of the SMTP [I-D.ietf-emailcore-rfc5321bis] syntax.
+477	   Section 6.4 of that document contains additional information that
+478	   might be helpful.
+
+480	   Installations defining rules for assigning or allocating email
+481	   addresses that expect the syntax of those addresses to be checked by
+482	   tools with their own, more restrictive, rules should use care to
+483	   consider both current and past versions of syntax specifications for
+484	   those mechanisms in their decisions, weighing them against local
+485	   needs and other restrictions.  Where those other rules allow syntax
+486	   variations that the IETF specifications cited above do not, those
+487	   variations should be avoided because they are unlikely to be accepted
+488	   across the Internet email environment.
+
+490	5.  Use of Multipurpose Internet Mail Extensions (MIME)
+
+492	   Although the Multipurpose Internet Mail Extensions (MIME) [RFC2045]
+493	   specification and its predecessors and updates have remained separate
+494	   from the Internet Message Format (IMF)
+495	   [I-D.ietf-emailcore-rfc5322bis] specification and its predecessors,
+496	   MIME features such as non-textual message bodies, multi-part message
+497	   bodies, and the use of character sets other than US-ASCII in message
+498	   bodies have become nearly ubiquitous in contemporary email.  As a
+499	   result, IMF generators and parsers are expected to support MIME.
+
+501	6.  Confidentiality and Authentication with SMTP
+
+503	   SMTP is specified without embedded mechanisms for authentication or
+504	   confidentiality; its traffic is therefore "in the clear".  Years of
+505	   operational experience have shown that such transmission exposes the
+506	   message to easy compromise, including wiretapping and spoofing.  To
+507	   mitigate these risks, several protocols, mechanisms, and extensions
+508	   have been developed that provide security services to email, most of
+509	   which are outside the SMTP protocol itself.  The most important of
+510	   these include, but are not limited to:
+
+512	   *  TLS [RFC8446], STARTTLS [RFC3207], Require TLS [RFC8689], MTA-STS
+513	      [RFC8461], and DANE for SMTP [RFC7672] offer confidentiality
+514	      services between SMTP Clients and the Servers to which they are
+515	      transmitting messages.
+
+517	   *  DKIM [RFC6376], DMARC [RFC7489], ARC [RFC8617], SPF [RFC7208], S/
+518	      MIME [RFC8551], OpenPGP [RFC9580], and Header Protection for
+519	      Cryptographically Protected E-mail [RFC9788], offer message level
+520	      authentication services.
+
+522	   *  SMTP Authentication [RFC4954] offers authentication services for
+523	      an SMTP client connecting to an SMTP server.
+
+525	   *  S/MIME [RFC8551] and OpenPGP [RFC9580] allow for message
+526	      confidentiality outside of the operation of SMTP and were
+527	      originally focused only on the message content.  Newer
+528	      specifications (see below) extend them to cover header
+529	      confidentiality as well.
+
+531	   The following sections discuss these facilities and their most common
+532	   uses.
+
+534	6.1.  Security at the Transport Layer
+
+536	   The Internet email environment has evolved over the years so that the
+537	   SMTP protocol itself can be used in conjunction with Transport Layer
+538	   Security (TLS) [RFC8446] protocol to provide both confidentiality and
+539	   server authentication in the transmission of messages.
+
+541	   It is important that the reader understand what is meant by the terms
+542	   "Authentication" and "Confidentiality" in this context, and for that
+543	   we will borrow directly from the TLS specification [RFC8446]
+544	   (although the pointers to other sections given are to this document).
+
+546	   *  Authentication is the process of establishing the identity of one
+547	      or more of the endpoints of a communication channel.  TLS can be
+548	      used without authentication (as described in Section 6.1.2), but
+549	      even when it does use authentication, it typically only
+550	      authenticates the server side of the communication channel (see
+551	      Section 6.1.3).
+
+553	   *  The term "confidentiality" describes a state where the data (i.e.,
+554	      the message) is transmitted in a way that it is only visible to
+555	      the endpoints of a communication channel.
+
+557	   It is not uncommon for implementers to use the term "encryption" to
+558	   mean "confidentiality", but this is not quite correct.  Rather,
+559	   encryption using TLS is the most common current method by which
+560	   confidentiality is achieved with SMTP, but that does not mean that
+561	   other methods might not be used or future ones developed.
+
+563	6.1.1.  The TLS Protocol
+
+565	   The TLS Protocol [RFC8446] provides confidentiality while the message
+566	   is in transit from an SMTP client to the next SMTP server.  Both
+567	   client and server will have access to the plain text of the message
+568	   and there is no guarantee that the message will be stored in an
+569	   encrypted fashion at its destination.  Furthermore, in situations
+570	   where a message traverses multiple hops through multiple SMTP
+571	   servers, each intermediate server will typically store the message in
+572	   plain text and hence have access to that plain text of the message.
+
+574	6.1.2.  Opportunistic Confidentiality
+
+576	   The most common implementation of message confidentiality is known as
+577	   "opportunistic TLS", which is frequently referred to as
+578	   "opportunistic encryption".  With this method, a receiving server
+579	   announces in its greeting that it is capable of supporting TLS
+580	   encryption through the presence of the "STARTTLS" keyword.  The
+581	   sending client then attempts to negotiate an encrypted connection,
+582	   and if successful, transmits the message in encrypted form; if
+583	   negotiation fails, the client falls back to sending the message in
+584	   clear text.
+
+586	   Opportunistic TLS is optional confidentiality due to provision for
+587	   falling back to transmission in the clear if a secure connection
+588	   cannot be established.  Opportunistic TLS is often configured to
+589	   provide confidentiality without authentication, where no effort is
+590	   made to authenticate the receiving server [RFC3207], Section 4.1.
+591	   Most modern implementations of SMTP support this method and so the
+592	   vast majority of email traffic is encrypted during its time
+593	   transiting from the client to the next server.
+
+595	   Note that opportunistic TLS via the STARTTLS [RFC3207] extension is
+596	   vulnerable to man-in-the-middle attacks.  Enforced confidentiality
+597	   (Section 6.1.3) can be used to mitigate these attacks.
+
+599	6.1.3.  Enforced Confidentiality, with Receiving Server Authentication
+
+601	   Three protocols exist that move message confidentiality from
+602	   opportunistic to enforced (with conditions as noted below) - Require
+603	   TLS [RFC8689], MTA-STS [RFC8461], and DANE for SMTP [RFC7672].
+
+605	   Require TLS allows sending clients to require that mail only be
+606	   transmitted encrypted with TLS.  If a TLS-protected SMTP session
+607	   (with authenticated certificate) can not be established with the
+608	   receiving server, the sending client will not transmit the message.
+
+610	   While they differ in their implementation details, receiving servers
+611	   relying on MTA-STS and DANE for SMTP can state that they only accept
+612	   mail if the transmission can be encrypted with TLS.  These two
+613	   protocols differ from Opportunistic TLS in that they require
+614	   receiving server authentication once the relevant receiver policy is
+615	   discovered.  In the case of MTA-STS, initial discovery and policy
+616	   refresh may be vulnerable to downgrade attack.  DANE policy discovery
+617	   is downgrade-resistant (relying on DNSSEC to prevent false denial or
+618	   tampering with policy lookup).
+
+620	   Note that MTA-STS and DANE for SMTP rely not only on the receiving
+621	   server but also the sending client supporting the protocol intended
+622	   to be used.  If the sending client does not support the protocol
+623	   requested by the receiving server, the sending client will use
+624	   Opportunistic TLS or clear-text to transmit the message.
+
+626	   Support for all of the protocols mentioned in this section is
+627	   increasing, but is not yet mandatory.
+
+629	6.2.  Message-Level Authentication
+
+631	   Protocols exist to allow for authentication of different identities
+632	   associated with an email message:
+
+634	   *  SPF [RFC7208] provides a method to ensure that the sending mail
+635	      server is authorized to originate mail from the sender's domain.
+
+637	   *  DKIM [RFC6376] permits a person, role, or organization to claim
+638	      some responsibility for an email message by associating a domain
+639	      name [RFC1034] with the message, which they are authorized to use.
+
+641	   *  DMARC [RFC7489] relies on SPF and DKIM to allow for validation of
+642	      the domain in the visible From header.
+
+644	   *  ARC [RFC8617] provides a method for each hop to record results of
+645	      authentication checks performed at that hop.
+
+647	   *  S/MIME [RFC8551] and OpenPGP [RFC9580], along with Header
+648	      Protection for Cryptographically Protected E-mail [RFC9788], allow
+649	      for email messages to be digitally signed, thereby providing a
+650	      method to verify that an email message was actually sent by the
+651	      entity claiming to be the sender.
+
+653	   A more detailed discussion of these mechanisms is out of scope for
+654	   this document.  All of them are, to greater or lesser degrees,
+655	   subject to risks of compromise on systems processing messages between
+656	   transport links as discussed above.
+
+658	6.3.  SMTP Authentication
+
+660	   SMTP Authentication [RFC4954], which is often abbreviated as SMTP
+661	   AUTH, is an extension to SMTP.
+
+663	   SMTP AUTH defines a method for a client to identify itself to a
+664	   Message Submission Agent (MSA) when presenting a message for
+665	   transmission, usually using ports 465 or 587 rather than the
+666	   traditional port 25.  The most common implementation of SMTP AUTH is
+667	   for a person to present a username and password to their mailbox
+668	   provider's outbound SMTP server when configuring their MUA for
+669	   sending mail.
+
+671	   SMTP AUTH MAY be used to limit unauthorized use of VRFY and EXPN
+672	   commands as described in Section 7.3 of
+673	   [I-D.ietf-emailcore-rfc5321bis].
+
+675	6.4.  Message-Level Confidentiality
+
+677	   Protocols such as S/MIME [RFC8551] and OpenPGP [RFC9580] exist to
+678	   allow for message confidentiality outside of the operation of SMTP.
+679	   In other words, using these protocols results in encryption of the
+680	   message body prior to its being submitted to the SMTP communications
+681	   channel.  Decryption of the message is then the responsibility of the
+682	   message recipient.  There are numerous implementations of S/MIME and
+683	   OpenPGP, too many to list here.  As both operate fully independent of
+684	   SMTP, a more detailed discussion is out of scope for this document.
+
+686	   Header Protection for Cryptographically Protected E-mail [RFC9788]
+687	   extends S/MIME such that some message headers can be encrypted.
+
+689	6.5.  Confidentiality Requirements
+
+691	   The vast majority of email sent on the Internet at present does not
+692	   use message-level confidentiality.  It has been recognized that
+693	   Internet traffic is exposed to both active attacks and passive
+694	   monitoring (see BCP61 [RFC3365] and BCP200 [RFC1984]), and therefore
+695	   that message transmission over SMTP is subject to both.  To mitigate
+696	   these risks, opportunistic confidentiality is now widely implemented
+697	   and used in Internet email, and some deployment and use of enforced
+698	   confidentiality is also now seen.  Therefore, confidentiality (for
+699	   example, the STARTTLS extension) MUST be implemented by SMTP servers
+700	   in order to at least provide over-the-wire confidentiality during an
+701	   individual SMTP exchange.  That said, there are many legacy
+702	   implementations of SMTP that are still in widespread use in both
+703	   private and Internet-connected networks and receiving server
+704	   implementations will often be expected to be capable of receiving
+705	   such messages.  Therefore, SMTP servers MUST be configurable to allow
+706	   for receiving messages without confidentiality between servers in
+707	   order to maximize interoperation.
+
+709	7.  Acknowledgments
+
+711	   The Emailcore group arose out of discussions on the ietf-smtp group
+712	   over changes and additions that should be made to the core email
+713	   protocols.  It was agreed upon that it was time to create a working
+714	   group that would fix many potential errors and opportunities for
+715	   misunderstandings within the RFCs.
+
+717	   Special thanks to the following for providing significant portions of
+718	   text for this document: Dave Crocker, Todd Herr, Tero Kivinen, Barry
+719	   Leiba, John Levine, Alexey Melnikov, Pete Resnick, and E.  Sam.
+
+721	8.  IANA Considerations
+
+723	   This memo includes no requests to or actions for IANA.  The IANA
+724	   registries associated with the protocol specifications they reference
+725	   are specified in their respective documents.  A companion document
+726	   [SMTP-IANA-cleanup] that will complete the work on reorganizing and
+727	   updating the email registries begun in
+728	   [I-D.ietf-emailcore-rfc5321bis] is under development.
+
+730	9.  Security Considerations
+
+732	   Security and privacy considerations are discussed throughout this
+733	   document as they pertain to the referenced specifications.  Special
+734	   note should be taken of the interaction between confidentiality and
+735	   authentication mechanisms that are applicable to Internet links and
+736	   therefore potentially sensitive to the multi-hop design of SMTP.
+737	   Unless the relevant messages and mechanisms are protected from
+738	   tampering or content exposure on systems that are the endpoints of
+739	   those links, the security of the mechanisms depends on trust in those
+740	   intermediate endpoints.
+
+742	10.  References
+
+744	10.1.  Normative References
+
+746	   [RFC2026]  Bradner, S., "The Internet Standards Process -- Revision
+747	              3", BCP 9, RFC 2026, DOI 10.17487/RFC2026, October 1996,
+748	              <https://www.rfc-editor.org/info/rfc2026>.
+
+750	   [RFC2045]  Freed, N. and N. Borenstein, "Multipurpose Internet Mail
+751	              Extensions (MIME) Part One: Format of Internet Message
+752	              Bodies", RFC 2045, DOI 10.17487/RFC2045, November 1996,
+753	              <https://www.rfc-editor.org/info/rfc2045>.
+
+755	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+756	              Requirement Levels", BCP 14, RFC 2119,
+757	              DOI 10.17487/RFC2119, March 1997,
+758	              <https://www.rfc-editor.org/info/rfc2119>.
+
+760	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+761	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+762	              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+764	10.2.  Informative References
+
+766	   [I-D.ietf-emailcore-rfc5321bis]
+767	              Klensin, J. C., "Simple Mail Transfer Protocol", Work in
+768	              Progress, Internet-Draft, draft-ietf-emailcore-rfc5321bis-
+769	              44, 31 July 2025, <https://datatracker.ietf.org/doc/html/
+770	              draft-ietf-emailcore-rfc5321bis-44>.
+
+772	   [I-D.ietf-emailcore-rfc5322bis]
+773	              Resnick, P., "Internet Message Format", Work in Progress,
+774	              Internet-Draft, draft-ietf-emailcore-rfc5322bis-12, 13
+775	              June 2024, <https://datatracker.ietf.org/doc/html/draft-
+776	              ietf-emailcore-rfc5322bis-12>.
+
+778	   [IDNA2008] Klensin, J., "Internationalized Domain Names for
+779	              Applications (IDNA): Definitions and Document Framework",
+780	              RFC 5890, DOI 10.17487/RFC5890, August 2010,
+781	              <https://www.rfc-editor.org/info/rfc5890>.
+
+783	              Klensin, J., "Internationalized Domain Names in
+784	              Applications (IDNA): Protocol", RFC 5891,
+785	              DOI 10.17487/RFC5891, August 2010,
+786	              <https://www.rfc-editor.org/info/rfc5891>.
+
+788	              Faltstrom, P., Ed., "The Unicode Code Points and
+789	              Internationalized Domain Names for Applications (IDNA)",
+790	              RFC 5892, DOI 10.17487/RFC5892, August 2010,
+791	              <https://www.rfc-editor.org/info/rfc5892>.
+
+793	              Alvestrand, H., Ed. and C. Karp, "Right-to-Left Scripts
+794	              for Internationalized Domain Names for Applications
+795	              (IDNA)", RFC 5893, DOI 10.17487/RFC5893, August 2010,
+796	              <https://www.rfc-editor.org/info/rfc5893>.
+
+798	              Klensin, J., "Internationalized Domain Names for
+799	              Applications (IDNA): Background, Explanation, and
+800	              Rationale", RFC 5894, DOI 10.17487/RFC5894, August 2010,
+801	              <https://www.rfc-editor.org/info/rfc5894>.
+
+803	   [RFC1034]  Mockapetris, P., "Domain names - concepts and facilities",
+804	              STD 13, RFC 1034, DOI 10.17487/RFC1034, November 1987,
+805	              <https://www.rfc-editor.org/info/rfc1034>.
+
+807	   [RFC1035]  Mockapetris, P., "Domain names - implementation and
+808	              specification", STD 13, RFC 1035, DOI 10.17487/RFC1035,
+809	              November 1987, <https://www.rfc-editor.org/info/rfc1035>.
+
+811	   [RFC1984]  IAB and IESG, "IAB and IESG Statement on Cryptographic
+812	              Technology and the Internet", BCP 200, RFC 1984,
+813	              DOI 10.17487/RFC1984, August 1996,
+814	              <https://www.rfc-editor.org/info/rfc1984>.
+
+816	   [RFC2034]  Freed, N., "SMTP Service Extension for Returning Enhanced
+817	              Error Codes", RFC 2034, DOI 10.17487/RFC2034, October
+818	              1996, <https://www.rfc-editor.org/info/rfc2034>.
+
+820	   [RFC2920]  Freed, N., "SMTP Service Extension for Command
+821	              Pipelining", STD 60, RFC 2920, DOI 10.17487/RFC2920,
+822	              September 2000, <https://www.rfc-editor.org/info/rfc2920>.
+
+824	   [RFC3207]  Hoffman, P., "SMTP Service Extension for Secure SMTP over
+825	              Transport Layer Security", RFC 3207, DOI 10.17487/RFC3207,
+826	              February 2002, <https://www.rfc-editor.org/info/rfc3207>.
+
+828	   [RFC3365]  Schiller, J., "Strong Security Requirements for Internet
+829	              Engineering Task Force Standard Protocols", BCP 61,
+830	              RFC 3365, DOI 10.17487/RFC3365, August 2002,
+831	              <https://www.rfc-editor.org/info/rfc3365>.
+
+833	   [RFC3461]  Moore, K., "Simple Mail Transfer Protocol (SMTP) Service
+834	              Extension for Delivery Status Notifications (DSNs)",
+835	              RFC 3461, DOI 10.17487/RFC3461, January 2003,
+836	              <https://www.rfc-editor.org/info/rfc3461>.
+
+838	   [RFC3463]  Vaudreuil, G., "Enhanced Mail System Status Codes",
+839	              RFC 3463, DOI 10.17487/RFC3463, January 2003,
+840	              <https://www.rfc-editor.org/info/rfc3463>.
+
+842	   [RFC3464]  Moore, K. and G. Vaudreuil, "An Extensible Message Format
+843	              for Delivery Status Notifications", RFC 3464,
+844	              DOI 10.17487/RFC3464, January 2003,
+845	              <https://www.rfc-editor.org/info/rfc3464>.
+
+847	   [RFC3986]  Berners-Lee, T., Fielding, R., and L. Masinter, "Uniform
+848	              Resource Identifier (URI): Generic Syntax", STD 66,
+849	              RFC 3986, DOI 10.17487/RFC3986, January 2005,
+850	              <https://www.rfc-editor.org/info/rfc3986>.
+
+852	   [RFC4954]  Siemborski, R., Ed. and A. Melnikov, Ed., "SMTP Service
+853	              Extension for Authentication", RFC 4954,
+854	              DOI 10.17487/RFC4954, July 2007,
+855	              <https://www.rfc-editor.org/info/rfc4954>.
+
+857	   [RFC5248]  Hansen, T. and J. Klensin, "A Registry for SMTP Enhanced
+858	              Mail System Status Codes", BCP 138, RFC 5248,
+859	              DOI 10.17487/RFC5248, June 2008,
+860	              <https://www.rfc-editor.org/info/rfc5248>.
+
+862	   [RFC5321]  Klensin, J., "Simple Mail Transfer Protocol", RFC 5321,
+863	              DOI 10.17487/RFC5321, October 2008,
+864	              <https://www.rfc-editor.org/info/rfc5321>.
+
+866	   [RFC6152]  Klensin, J., Freed, N., Rose, M., and D. Crocker, Ed.,
+867	              "SMTP Service Extension for 8-bit MIME Transport", STD 71,
+868	              RFC 6152, DOI 10.17487/RFC6152, March 2011,
+869	              <https://www.rfc-editor.org/info/rfc6152>.
+
+871	   [RFC6376]  Crocker, D., Ed., Hansen, T., Ed., and M. Kucherawy, Ed.,
+872	              "DomainKeys Identified Mail (DKIM) Signatures", STD 76,
+873	              RFC 6376, DOI 10.17487/RFC6376, September 2011,
+874	              <https://www.rfc-editor.org/info/rfc6376>.
+
+876	   [RFC6522]  Kucherawy, M., Ed., "The Multipart/Report Media Type for
+877	              the Reporting of Mail System Administrative Messages",
+878	              STD 73, RFC 6522, DOI 10.17487/RFC6522, January 2012,
+879	              <https://www.rfc-editor.org/info/rfc6522>.
+
+881	   [RFC6533]  Hansen, T., Ed., Newman, C., and A. Melnikov,
+882	              "Internationalized Delivery Status and Disposition
+883	              Notifications", RFC 6533, DOI 10.17487/RFC6533, February
+884	              2012, <https://www.rfc-editor.org/info/rfc6533>.
+
+886	   [RFC6854]  Leiba, B., "Update to Internet Message Format to Allow
+887	              Group Syntax in the "From:" and "Sender:" Header Fields",
+888	              RFC 6854, DOI 10.17487/RFC6854, March 2013,
+889	              <https://www.rfc-editor.org/info/rfc6854>.
+
+891	   [RFC7085]  Levine, J. and P. Hoffman, "Top-Level Domains That Are
+892	              Already Dotless", RFC 7085, DOI 10.17487/RFC7085, December
+893	              2013, <https://www.rfc-editor.org/info/rfc7085>.
+
+895	   [RFC7208]  Kitterman, S., "Sender Policy Framework (SPF) for
+896	              Authorizing Use of Domains in Email, Version 1", RFC 7208,
+897	              DOI 10.17487/RFC7208, April 2014,
+898	              <https://www.rfc-editor.org/info/rfc7208>.
+
+900	   [RFC7489]  Kucherawy, M., Ed. and E. Zwicky, Ed., "Domain-based
+901	              Message Authentication, Reporting, and Conformance
+902	              (DMARC)", RFC 7489, DOI 10.17487/RFC7489, March 2015,
+903	              <https://www.rfc-editor.org/info/rfc7489>.
+
+905	   [RFC7672]  Dukhovni, V. and W. Hardaker, "SMTP Security via
+906	              Opportunistic DNS-Based Authentication of Named Entities
+907	              (DANE) Transport Layer Security (TLS)", RFC 7672,
+908	              DOI 10.17487/RFC7672, October 2015,
+909	              <https://www.rfc-editor.org/info/rfc7672>.
+
+911	   [RFC822]   Crocker, D., "STANDARD FOR THE FORMAT OF ARPA INTERNET
+912	              TEXT MESSAGES", STD 11, RFC 822, DOI 10.17487/RFC0822,
+913	              August 1982, <https://www.rfc-editor.org/info/rfc822>.
+
+915	   [RFC8446]  Rescorla, E., "The Transport Layer Security (TLS) Protocol
+916	              Version 1.3", RFC 8446, DOI 10.17487/RFC8446, August 2018,
+917	              <https://www.rfc-editor.org/info/rfc8446>.
+
+919	   [RFC8461]  Margolis, D., Risher, M., Ramakrishnan, B., Brotman, A.,
+920	              and J. Jones, "SMTP MTA Strict Transport Security (MTA-
+921	              STS)", RFC 8461, DOI 10.17487/RFC8461, September 2018,
+922	              <https://www.rfc-editor.org/info/rfc8461>.
+
+924	   [RFC8551]  Schaad, J., Ramsdell, B., and S. Turner, "Secure/
+925	              Multipurpose Internet Mail Extensions (S/MIME) Version 4.0
+926	              Message Specification", RFC 8551, DOI 10.17487/RFC8551,
+927	              April 2019, <https://www.rfc-editor.org/info/rfc8551>.
+
+929	   [RFC8617]  Andersen, K., Long, B., Ed., Blank, S., Ed., and M.
+930	              Kucherawy, Ed., "The Authenticated Received Chain (ARC)
+931	              Protocol", RFC 8617, DOI 10.17487/RFC8617, July 2019,
+932	              <https://www.rfc-editor.org/info/rfc8617>.
+
+934	   [RFC8689]  Fenton, J., "SMTP Require TLS Option", RFC 8689,
+935	              DOI 10.17487/RFC8689, November 2019,
+936	              <https://www.rfc-editor.org/info/rfc8689>.
+
+938	   [RFC9580]  Wouters, P., Ed., Huigens, D., Winter, J., and Y. Niibe,
+939	              "OpenPGP", RFC 9580, DOI 10.17487/RFC9580, July 2024,
+940	              <https://www.rfc-editor.org/info/rfc9580>.
+
+942	   [RFC9788]  Gillmor, D. K., Hoeneisen, B., and A. Melnikov, "Header
+943	              Protection for Cryptographically Protected Email",
+944	              RFC 9788, DOI 10.17487/RFC9788, August 2025,
+945	              <https://www.rfc-editor.org/info/rfc9788>.
+
+947	   [SMTP-IANA-cleanup]
+948	              Melnikov, A., "Updates to SMTP related IANA registries",
+949	              <https://datatracker.ietf.org/doc/draft-ietf-emailcore-
+950	              iana-cleanup/>.  Work in progress.
+
+952	   [SMTPUTF8] Klensin, J. and Y. Ko, "Overview and Framework for
+953	              Internationalized Email", RFC 6530, DOI 10.17487/RFC6530,
+954	              February 2012, <https://www.rfc-editor.org/info/rfc6530>.
+
+956	              Yao, J. and W. Mao, "SMTP Extension for Internationalized
+957	              Email", RFC 6531, DOI 10.17487/RFC6531, February 2012,
+958	              <https://www.rfc-editor.org/info/rfc6531>.
+
+960	              Yang, A., Steele, S., and N. Freed, "Internationalized
+961	              Email Headers", RFC 6532, DOI 10.17487/RFC6532, February
+962	              2012, <https://www.rfc-editor.org/info/rfc6532>.
+
+964	Appendix A.  Change Log
+
+966	   RFC Editor: Please remove this appendix before publication.
+
+968	A.1.  Changes from draft-klensin-email-core-as-00 (2020-03-30) to draft-
+969	      ietf-emailcore-as-00
+
+971	   *  Change of filename, metadata, and date to reflect transition to WG
+972	      document for new emailcore WG.  No other substantive changes
+
+974	A.2.  Changes from draft-ietf-emailcore-as-00 (2020-10-06) to -01
+
+976	   *  Added co-authors (list is in alphabetical order for the present).
+
+978	   *  Updated references to 5321bis and 5322bis.
+
+980	   *  Added note at top, "This version is provided as a document
+981	      management convenience to update the author list and make an un-
+982	      expired version available to the WG.  There are no substantive
+983	      changes from the prior version", which should be removed for
+984	      version -02.
+
+986	A.3.  Changes from draft-ietf-emailcore-as-01 (2021-04-09) to -02
+
+988	   *  Added new editors and also added some issues the emailcore group
+989	      will be dealing with.
+
+991	   *  Added reference to RFC 6648.
+
+993	A.4.  Changes from draft-ietf-emailcore-as-02 (2021-08-06) to -03
+994	   *  Moved discussion of address-literals (issue #1) and domain names
+995	      in EHLO (issue #19) under SMTP Provisions section
+
+997	   *  Moved discussion of empty quoted-strings under Message Format
+998	      Provisions section
+
+1000	   *  Added text on use of addresses in TLDs (issue #50)
+
+1002	   *  Marked all authors as editors.
+
+1004	   *  Miscellaneous editorial changes.
+
+1006	A.5.  Changes from draft-ietf-emailcore-as-03 (2022-01-31) to -04
+
+1008	   *  Added requirements for SMTP extensions (issue #40).
+
+1010	A.6.  Changes from draft-ietf-emailcore-as-04 (2022-05-21) to -05
+
+1012	   *  Added text addressing use ofx enhanced status codes.
+
+1014	   *  Added text addressing confidentiality and authentication (issue
+1015	      #54).
+
+1017	A.7.  Changes from draft-ietf-emailcore-as-05 (2022-10-24) to -06
+
+1019	   *  Converted source to xml2rfc v3.
+
+1021	   *  Replaced placeholder Introduction with new text.
+
+1023	   *  Updated keywords boilerplate.
+
+1025	   *  Added text on interoperability of email addresses in general and
+1026	      use in HTML forms (issue #51).
+
+1028	   *  Added text stating that implementations are expected to support
+1029	      MIME (issue #65).
+
+1031	   *  Added placeholders for issues #38 and #55.
+
+1033	   *  Add list of contributors in Acknowledgments.
+
+1035	   *  Added minimal Security Considerations section.
+
+1037	A.8.  Changes from draft-ietf-emailcore-as-06 (2022-11-07) to -07
+
+1039	   *  Added text addressing use of FOR clause in Received header fields
+1040	      (issue #55).
+
+1042	   *  Miscellaneous editorial changes.
+
+1044	A.9.  Changes from draft-ietf-emailcore-as-07 (2023-03-13) to -08
+
+1046	   *  Added text addressing use of Received header fields by MUAs (issue
+1047	      #85).
+
+1049	   *  Added advice against use of Percent-Encoding non-ASCII characters
+1050	      in email addresses (issue #78).
+
+1052	   *  Miscellaneous editorial changes.
+
+1054	A.10.  Changes from draft-ietf-emailcore-as-08 (2023-12-18) to -09
+
+1056	   *  Acknowledge the existence of port 465 for submission (issue #80).
+
+1058	   *  Remove "Use of Time Zones in Date and Received Header Fields"
+1059	      placeholder (issue #66).
+
+1061	   *  Miscellaneous editorial changes.
+
+1063	A.11.  Changes from draft-ietf-emailcore-as-09 (2024-07-02) to -10
+
+1065	   *  Added Open Issues Section
+
+1067	   *  Removed placeholder for issue #38 - Clarify 78 octet limit versus
+1068	      998 line length limit (https://github.com/ietf-wg-
+1069	      emailcore/emailcore/issues/38)
+
+1071	   *  Applied "final" proposed text for issue #78 - Advice against using
+1072	      URL %-encoding on non-ASCII email addresses (https://github.com/
+1073	      ietf-wg-emailcore/emailcore/issues/78)
+
+1075	   *  Applied proposed text for issue #84 - Handling of Trace Header
+1076	      Fields by MUAs (https://github.com/ietf-wg-emailcore/emailcore/
+1077	      issues/84)
+
+1079	A.12.  Changes from draft-ietf-emailcore-as-10 (2024-07-03) to -11
+
+1081	   *  Added Open Issue #94 - Use of Quoted Strings (https://github.com/
+1082	      ietf-wg-emailcore/emailcore/issues/94)
+
+1084	A.13.  Changes from draft-ietf-emailcore-as-11 (2024-10-21) to -12
+
+1086	   *  Applied new proposed text to Section 3.1
+1087	   *  Applied new proposed text for issue #40 - Recommended SMTP
+1088	      Extensions (https://github.com/ietf-wg-emailcore/emailcore/
+1089	      issues/40)
+
+1091	   *  Applied new proposed text for issue #78 - Advice against using URL
+1092	      %-encoding on non-ASCII email addresses (https://github.com/ietf-
+1093	      wg-emailcore/emailcore/issues/78)
+
+1095	   *  Applied new proposed text for issue #84 - Handling of Trace Header
+1096	      Fields by MUAs (https://github.com/ietf-wg-emailcore/emailcore/
+1097	      issues/84)
+
+1099	   *  Applied new proposed text for issue #85 - What mail agents should
+1100	      do/not do with Received header fields (https://github.com/ietf-wg-
+1101	      emailcore/emailcore/issues/85)
+
+1103	A.14.  Changes from draft-ietf-emailcore-as-12 (2024-11-09) to -13
+
+1105	   *  Fixed discussion of Punycode (domain-part -> local-part) in
+1106	      Section 4.2
+
+1108	   *  Removed Keywords from discussion in Section 3.1
+
+1110	   *  Added example of empty display-name in Section 3.1
+
+1112	A.15.  Changes from draft-ietf-emailcore-as-13 (2025-01-30) to -14
+
+1114	   *  Added STARTTLS to the MUST implement list in Section 2.4
+
+1116	   *  Added Alexey Melnikov's proposed text for issue #93 - "VRFY, EXPN,
+1117	      and Security" should point to SMTP AUTH RFC (https://github.com/
+1118	      ietf-wg-emailcore/emailcore/issues/94)
+
+1120	   *  Applied (with some editorial changes), Tero Kivinen's proposed
+1121	      text to Section 6.
+
+1123	A.16.  Changes from draft-ietf-emailcore-as-14 (2025-02-27) to -15
+
+1125	   *  Miscellaneous editorial changes
+
+1127	A.17.  Changes from draft-ietf-emailcore-as-15 (2025-03-18) to -16
+
+1129	   *  Changed "FOR clause MUST NOT be generated if the message copy is
+1130	      associated with multiple recipients from multiple SMTP RCPT
+1131	      commands" to "SHOULD NOT".
+
+1133	   *  Reintroduced examples of non-interoperable local-parts containing
+1134	      empty quoted strings (issue #93 (https://github.com/ietf-wg-
+1135	      emailcore/emailcore/issues/94)).
+
+1137	   *  Added short descriptions of SPF and DKIM, and added S/MIME,
+1138	      OpenPGP, and Header Protection for Cryptographically Protected
+1139	      E-mail as methods of Message-Level Authentication (issues #110
+1140	      (https://github.com/ietf-wg-emailcore/emailcore/issues/94), #132
+1141	      (https://github.com/ietf-wg-emailcore/emailcore/issues/94), #133
+1142	      (https://github.com/ietf-wg-emailcore/emailcore/issues/94)).
+
+1144	A.18.  Changes from draft-ietf-emailcore-as-16 to -17
+
+1146	   *  Changed all instances of "optional confidentiality" to
+1147	      "opportunistic confidentiality" and all instances of "required
+1148	      confidentiality" to "enforced confidentiality".  (issue #113
+1149	      (https://github.com/ietf-wg-emailcore/emailcore/issues/113))
+
+1151	   *  Added Section "6.7 Confidentiality Requirements" (issue #113
+1152	      (https://github.com/ietf-wg-emailcore/emailcore/issues/113))
+
+1154	   *  Updated DKIM description to use a slight modification to the first
+1155	      sentence of RFC 6376 Introduction (issue #138 (https://github.com/
+1156	      ietf-wg-emailcore/emailcore/issues/138)).
+
+1158	A.19.  Changes from draft-ietf-emailcore-as-17 to -18
+
+1160	   *  Added text clarifying that hop-by-hop confidentiality does not
+1161	      guarantee end-to-end confidentiality.
+
+1163	A.20.  Changes from draft-ietf-emailcore-as-18 to -19
+
+1165	   *  Added text stating that STARTTLS is vulnerable to man-in-middle-
+1166	      attacks (issue #134 (https://github.com/ietf-wg-
+1167	      emailcore/emailcore/issues/134))
+
+1169	   *  Rewrote opening paragraph of Opportunistic Confidentiality based
+1170	      on Rob Sayre's suggestions (issue #135 (https://github.com/ietf-
+1171	      wg-emailcore/emailcore/issues/135))
+
+1173	   *  Rewrote text discussing use of email addresses in HTML forms and
+1174	      provided a more restricted Mailbox ABNF (issue #137
+1175	      (https://github.com/ietf-wg-emailcore/emailcore/issues/137))
+
+1177	A.21.  Changes from draft-ietf-emailcore-as-19 to -20
+
+1179	   *  Updated stats regarding MX records on top-level domains.
+
+1181	   *  Tweaked hop-by-hop confidentiality text again (Resnick).
+
+1183	   *  Made clear that TLS authentication is optional (Resnick/Sayre).
+
+1185	   *  Removed hop-by-hop paragraph in Opportunistic Confidentiality as
+1186	      its now discussed in TLS section (Sayre).
+
+1188	   *  Removed hop-by-hop paragraph in Enforced Confidentiality as its
+1189	      now discussed in TLS section (Sayre).
+
+1191	   *  Added reference to LAMPS documents in Message-Level
+1192	      Confidentiality (Sayre).
+
+1194	   *  Miscellaneous editorial changes.
+
+1196	A.22.  Changes from draft-ietf-emailcore-as-20 to -21
+
+1198	   *  Restructured Section 4.3 and eliminated the dependency of the
+1199	      discussion on deviations from the core email specs on, e.g.,
+1200	      various versions of HTML.
+1201	      Added new Section 4.4, and eliminated references that are now
+1202	      unnecessary.
+
+1204	   *  Minor editorial corrections.
+
+1206	A.23.  Changes from draft-ietf-emailcore-as-21 to -22
+
+1208	   *  Rewrote Section 4.3 to further reflect the "there are problems out
+1209	      there" approach, further reducing the dependencies associated with
+1210	      HTML.  Re-integrated the Section 4.4 material that was separated
+1211	      in -21.
+
+1213	   *  Rewrote and reorganized Section 6, grouping TLS-related material
+1214	      into another layer of subsections (Section 6.1) and applying a set
+1215	      of changes agreed by the WG.
+
+1217	   *  Numerous, but individually minor, editorial adjustments and
+1218	      corrections.
+
+1220	A.24.  Changes from draft-ietf-emailcore-as-22 to -23
+
+1222	   *  Corrected an error in which IDNA2008 documents were cited rather
+1223	      than SMTPUTF8 ones and tuned text slightly.
+
+1225	   *  Tuned discussions of S/MIME, PGP, and RFC 9788 slightly, including
+1226	      new text in Section 6.4
+
+1228	   *  Corrected an error in the description of Opportunistic TLS.
+
+1230	   *  A few small editorial changes/ corrections.
+
+1232	A.25.  Changes from draft-ietf-emailcore-as-23 to -24
+
+1234	   *  Added an informative reference to the iana-cleanup document to
+1235	      warn people that would be coming.
+
+1237	   *  Added a brief description/ comments about group syntax
+1238	      (Section Section 3.4.
+
+1240	   *  Small editorial correction.
+
+1242	A.26.  Changes from draft-ietf-emailcore-as-24 to -25
+
+1244	   *  Corrected the SMTP-iana-cleanup reference to point to the WG-
+1245	      adopted document, draft-ietf-emailcore-iana-cleanup, replacing the
+1246	      reference to draft-melnikov-smtp-iana-cleanup.
+
+1248	A.27.  Changes from draft-ietf-emailcore-as-25 to -26
+
+1250	   *  Removed a couple of misplaced and/or no longer relevent "out of
+1251	      scope" statements. (issue #140 (https://github.com/ietf-wg-
+1252	      emailcore/emailcore/issues/145))
+
+1254	   *  Clarify that Require TLS (RFC8689) also addresses the downgrade
+1255	      attack in STARTTLS (issue #144 (https://github.com/ietf-wg-
+1256	      emailcore/emailcore/issues/145)).
+
+1258	   *  Added text stating that MTA-STS is vulnerable to downgrade attacks
+1259	      during discovery (issue #145 (https://github.com/ietf-wg-
+1260	      emailcore/emailcore/issues/145)).
+
+1262	   *  Miscellaneous editoral changes.
+
+1264	Authors' Addresses
+
+1266	   John C Klensin (editor)
+1267	   1770 Massachusetts Ave, Ste 322
+1268	   Cambridge, MA 02140
+1269	   United States of America
+1270	   Phone: +1 617 245 1457
+1271	   Email: john-ietf@jck.com
+1272	   Kenneth Murchison (editor)
+1273	   Fastmail US LLC
+1274	   1429 Walnut Street - Suite 1201
+1275	   Philadelphia, PA 19102
+1276	   United States of America
+1277	   Email: murch@fastmailteam.com
+
+
+
+
+
+
+
+
+
