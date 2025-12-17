@@ -1,0 +1,368 @@
+idnits 2.17.1 
+
+draft-ietf-core-yang-sid-pen-04.txt:
+-(3): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(23): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(115): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(123): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(199): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(200): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(201): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(208): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(212): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+  == There are 12 instances of lines with non-ascii characters in the
+     document.
+
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     Summary: 0 errors (**), 0 flaws (~~), 1 warning (==), 0 comments (--).
+
+--------------------------------------------------------------------------------
+
+
+2	CoRE Working Group                                            C. Bormann
+3	Internet-Draft                                    Universität Bremen TZI
+4	Intended status: Informational                           8 December 2025
+5	Expires: 11 June 2026
+
+7	            YANG-CBOR: Allocating SID ranges for PEN holders
+8	                    draft-ietf-core-yang-sid-pen-04
+
+10	Abstract
+
+12	   YANG-CBOR (RFC 9254) defines YANG Schema Item iDentifiers (YANG SID),
+13	   globally unique 63-bit unsigned integers used to identify YANG items.
+14	   RFC 9595 defines ways to allocate these SIDs on the basis of IANA
+15	   registries.
+
+17	   The present specification employs these SID allocation mechanisms to
+18	   allocate ranges with 100 000 63-bit SIDs each for each of the first
+19	   1 000 000 holders of IANA-registered Private Enterprise Numbers
+20	   (PENs), as well as ranges with 10 000 32-bit SIDs each for each of
+21	   the first 100 000 holders.
+
+23	   // The present revision –04 is intended to address the feedback from
+24	   // the AD review and the IETF last call.  Note that due to a
+25	   // regression in the bib.ietf.org service (https://github.com/ietf-
+26	   // tools/bibxml-service/issues/489 (https://github.com/ietf-tools/
+27	   // bibxml-service/issues/489)), the reference
+28	   // [IANA.enterprise-numbers] may come out as "*** BROKEN REFERENCE
+29	   // ***" in some CI systems; this will certainly be fixed in the
+30	   // course of further processing.
+
+32	About This Document
+
+34	   This note is to be removed before publishing as an RFC.
+
+36	   Status information for this document may be found at
+37	   https://datatracker.ietf.org/doc/draft-ietf-core-yang-sid-pen/.
+
+39	   Discussion of this document takes place on the CoRE Working Group
+40	   mailing list (mailto:core@ietf.org), which is archived at
+41	   https://mailarchive.ietf.org/arch/browse/core/.  Subscribe at
+42	   https://www.ietf.org/mailman/listinfo/core/.
+
+44	   Source for this draft and an issue tracker can be found at
+45	   https://github.com/core-wg/sid-pen.
+
+47	Status of This Memo
+
+49	   This Internet-Draft is submitted in full conformance with the
+50	   provisions of BCP 78 and BCP 79.
+
+52	   Internet-Drafts are working documents of the Internet Engineering
+53	   Task Force (IETF).  Note that other groups may also distribute
+54	   working documents as Internet-Drafts.  The list of current Internet-
+55	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+57	   Internet-Drafts are draft documents valid for a maximum of six months
+58	   and may be updated, replaced, or obsoleted by other documents at any
+59	   time.  It is inappropriate to use Internet-Drafts as reference
+60	   material or to cite them other than as "work in progress."
+
+62	   This Internet-Draft will expire on 11 June 2026.
+
+64	Copyright Notice
+
+66	   Copyright (c) 2025 IETF Trust and the persons identified as the
+67	   document authors.  All rights reserved.
+
+69	   This document is subject to BCP 78 and the IETF Trust's Legal
+70	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+71	   license-info) in effect on the date of publication of this document.
+72	   Please review these documents carefully, as they describe your rights
+73	   and restrictions with respect to this document.  Code Components
+74	   extracted from this document must include Revised BSD License text as
+75	   described in Section 4.e of the Trust Legal Provisions and are
+76	   provided without warranty as described in the Revised BSD License.
+
+78	Table of Contents
+
+80	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
+81	   2.  Example . . . . . . . . . . . . . . . . . . . . . . . . . . .   3
+82	   3.  Discussion  . . . . . . . . . . . . . . . . . . . . . . . . .   4
+83	   4.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   5
+84	   5.  Security Considerations . . . . . . . . . . . . . . . . . . .   6
+85	   6.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   6
+86	     6.1.  Normative References  . . . . . . . . . . . . . . . . . .   6
+87	     6.2.  Informative References  . . . . . . . . . . . . . . . . .   6
+88	   Acknowledgments . . . . . . . . . . . . . . . . . . . . . . . . .   7
+89	   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .   7
+
+91	1.  Introduction
+
+93	   YANG-CBOR [RFC9254] defines YANG Schema Item iDentifiers (YANG SID),
+94	   globally unique 63-bit unsigned integers used to identify YANG items.
+95	   [RFC9595] defines ways to allocate these SIDs on the basis of IANA
+96	   registries.
+
+98	   The present specification employs these SID allocation mechanisms to
+99	   allocate ranges with 100 000 63-bit SIDs each for each of the first
+100	   1 000 000 holders of IANA-registered Private Enterprise Numbers
+101	   (PENs), as well as ranges with 10 000 32-bit SIDs each for each of
+102	   the first 100 000 holders.
+
+104	   IANA [is requested to allocate/has allocated] a mega-range with
+105	   100 billion 63-bit SIDs, for the SID numbers 300 000 000 000 to
+106	   399 999 999 999.
+
+108	   IANA also [is requested to allocate/has allocated] a mega-range with
+109	   1 billion 32-bit SIDs, for the SID numbers 3 000 000 000 to
+110	   3 999 999 999.
+
+112	   Private Enterprise Numbers (PENs) are registered in
+113	   [IANA.enterprise-numbers] in a low-threshold, low-overhead
+114	   registration process.  At the time of writing (~ 37 years after
+115	   creating this registry), around 65 000 PENs are registered.  In this
+116	   document, the registrant for a PEN is referred to as the "PEN
+117	   holder".
+
+119	   The present specification makes the following SID ranges available to
+120	   certain (current or future) PEN holders for allocation in a scheme
+121	   defined by the holder:
+
+123	   *  The holder of a PEN ppp ppp (< 1 000 000) can use the SID numbers
+124	      3pp ppp p00 000 to 3pp ppp p99 999.
+
+126	   *  The holder of a PEN pp ppp (< 100 000) can use the SID numbers
+127	      3 ppp pp0 000 to 3 ppp pp9 999.
+
+129	2.  Example
+
+131	   The Department for Mathematics and Computer Science of Universität
+132	   Bremen holds PEN 30810.
+
+134	   To this PEN holder, the present specification confers control over
+135	   the SID ranges:
+
+137	   *  3*03 081 0*00 000 up to 3*03 081 0*99 999, and
+138	   *  3 *308 10*0 000 up to 3 *308 10*9 999.
+
+140	   (The plaintext form of this document shows "*" characters around the
+141	   digits conveying the PEN, which are shown in *boldface* in the
+142	   typographic forms.)
+
+144	3.  Discussion
+
+146	   This allocation provides an extremely-low-threshold (zero-
+147	   interaction) way for PEN holders to get number space for the YANG
+148	   SIDs used in their YANG modules.  If a PEN is not already available
+149	   to the entity needing such number space, it can be obtained in a very
+150	   low-threshold process.  Employing this number space is, however, not
+151	   always the approach to recommend to a module author:
+
+153	   *  The larger of the two spaces uses 64-bit numbers.  The larger
+154	      representation size of the absolute value of the SID is of
+155	      comparatively little consequence due to the delta-encoding used
+156	      for SIDs in YANG-CBOR.
+
+158	   *  For the first 100 000 PEN holders, there also is a smaller space
+159	      that uses 32-bit numbers.  PEN numbers that have access to this
+160	      space are likely to run out before or around 2040; the expectation
+161	      is that by that time there will be enough opportunities to request
+162	      SID ranges within mega-ranges allocated by other registrants that
+163	      this mechanism is less needed.
+
+165	   *  This space has no infrastructure to discover the YANG module
+166	      behind a SID.  Of course, each PEN holder can provide such
+167	      infrastructure, but even then the problem remains of how to find
+168	      that infrastructure for a SID.  (Search engines may mitigate this
+169	      somewhat.)  On the other hand, in some cases this relative
+170	      obscurity may be exactly what a PEN holder wants to achieve by
+171	      using this mechanism.
+
+173	      If obscurity is not the intention, one or both of the following
+174	      approaches are encouraged:
+
+176	      -  The PEN holder can provide a public repository where their YANG
+177	         models can be found alongside the applicable SID files.  Such a
+178	         repository may be easy to set up using a popular git forge such
+179	         as, at the time of writing, GitHub.
+
+181	      -  Implementations that employ PEN-based SIDs can facilitate
+182	         information discovery by providing [I-D.ietf-core-yang-library]
+183	         or another form of YANG library [RFC8525].
+
+185	   Relying on the PEN registry might theoretically trigger a land-grab
+186	   by prospective writers of YANG modules.  However, PENs have been
+187	   around for decades (see Section 3.1.4 of [RFC1065], which continues
+188	   to be in force with no technical changes as Section 3.1.4 of RFC 1155
+189	   [STD16]), and such a land-grab has not occurred for the other
+190	   allocations implicitly provided by obtaining a PEN.
+
+192	4.  IANA Considerations
+
+194	   // RFC Ed.: throughout this section, please replace RFC-XXXX with the
+195	   // RFC number of this specification and remove this note.
+
+197	   As per Section 6.3 of [RFC9595], in the YANG-SID Mega-Ranges registry
+198	   within the YANG SIDs registry group, this document allocates two
+199	   mega-ranges, one with 1 billion SIDs ranging from 3 000 000 000 up to
+200	   3 999 999 999 (32-bit representation size), and one with 100 billion
+201	   SIDs ranging from 300 000 000 000 up to 399 999 999 999 (64-bit
+202	   representation size), as summarized in Table 1.
+
+204	   +===============+===============+==========+====+==================+
+205	   |Entry Point    |Size           |Allocation|Org | URL              |
+206	   |               |               |          |Name|                  |
+207	   +===============+===============+==========+====+==================+
+208	   |3 000 000 000  |1 000 000 000  |Private   |IANA| https://rfc-     |
+209	   |               |               |          |    | editor.org/info/ |
+210	   |               |               |          |    | rfcxxxx          |
+211	   +---------------+---------------+----------+----+------------------+
+212	   |300 000 000 000|100 000 000 000|Private   |IANA| https://rfc-     |
+213	   |               |               |          |    | editor.org/info/ |
+214	   |               |               |          |    | rfcxxxx          |
+215	   +---------------+---------------+----------+----+------------------+
+
+217	     Table 1: YANG-SID Mega-Range Allocations for use by PEN holders
+
+219	   An additional contact for the allocation is: IETF CORE Working Group
+220	   (core@ietf.org) or IETF Applications and Real-Time Area
+221	   (art@ietf.org).
+
+223	   The allocation policy inside the mega-range is "private".  The URL is
+224	   that of the present specification.
+
+226	   The management of the SID block of 100 000 SIDs each, ranging from
+227	   3pp ppp p00 000 to 3pp ppp p99 999, is delegated to the PEN holder
+228	   for PEN ppp ppp (i.e., the PEN holder for ppp ppp controls SID
+229	   3pp ppp p00 000 to 3pp ppp p99 999).
+
+231	   Similarly, the management of the SID block of 10 000 SIDs each,
+232	   ranging from 3 ppp pp0 000 to 3 ppp pp9 999, is delegated to the PEN
+233	   holder for PEN pp ppp (i.e., the PEN holder for pp ppp controls SID
+234	   3 ppp pp0 000 to 3 ppp pp9 999).
+
+236	   Section 6.3.2 of [RFC9595] requires an organization that requests an
+237	   entry in the "YANG-SID Mega-Ranges" registry to ensure the technical
+238	   capacity to manage the SID ranges within those mega-ranges for a
+239	   period of at least 10 years (Private ranges).  The individual SID
+240	   ranges within the mega-ranges allocated in this document are assigned
+241	   through the registration of PEN numbers.  The technical capacity to
+242	   ensure the sustained operation of the PEN number registry is derived
+243	   from the demonstrated capacity of IANA to maintain this registry as
+244	   well as the importance of a functioning PEN number registry in other
+245	   contexts.
+
+247	5.  Security Considerations
+
+249	   Section 5 (Security Considerations) of [RFC9595] applies, as well as
+250	   Section 8 (Security Considerations) of [RFC9254].  In particular, the
+251	   fact that a certain Private Enterprise Number appears in a SID is not
+252	   an indicator of provenance, i.e., it does not guarantee that the SID
+253	   or underlying YANG model actually does originate from the holder of
+254	   that PEN.  The requirement to ascertain the authoritative source of
+255	   this information, as discussed in the above security considerations,
+256	   remains.
+
+258	6.  References
+
+260	6.1.  Normative References
+
+262	   [IANA.enterprise-numbers]
+263	              "*** BROKEN REFERENCE ***".
+
+265	   [RFC9254]  Veillette, M., Ed., Petrov, I., Ed., Pelov, A., Bormann,
+266	              C., and M. Richardson, "Encoding of Data Modeled with YANG
+267	              in the Concise Binary Object Representation (CBOR)",
+268	              RFC 9254, DOI 10.17487/RFC9254, July 2022,
+269	              <https://www.rfc-editor.org/rfc/rfc9254>.
+
+271	   [RFC9595]  Veillette, M., Ed., Pelov, A., Ed., Petrov, I., Ed.,
+272	              Bormann, C., and M. Richardson, "YANG Schema Item
+273	              iDentifier (YANG SID)", RFC 9595, DOI 10.17487/RFC9595,
+274	              July 2024, <https://www.rfc-editor.org/rfc/rfc9595>.
+
+276	6.2.  Informative References
+
+278	   [I-D.ietf-core-yang-library]
+279	              Veillette, M. and I. Petrov, "Constrained YANG Module
+280	              Library", Work in Progress, Internet-Draft, draft-ietf-
+281	              core-yang-library-03, 11 January 2021,
+282	              <https://datatracker.ietf.org/doc/html/draft-ietf-core-
+283	              yang-library-03>.
+
+285	   [RFC1065]  McCloghrie, K. and M. Rose, "Structure and identification
+286	              of management information for TCP/IP-based internets",
+287	              RFC 1065, DOI 10.17487/RFC1065, August 1988,
+288	              <https://www.rfc-editor.org/rfc/rfc1065>.
+
+290	   [RFC8525]  Bierman, A., Bjorklund, M., Schoenwaelder, J., Watsen, K.,
+291	              and R. Wilton, "YANG Library", RFC 8525,
+292	              DOI 10.17487/RFC8525, March 2019,
+293	              <https://www.rfc-editor.org/rfc/rfc8525>.
+
+295	   [STD16]    Internet Standard 16,
+296	              <https://www.rfc-editor.org/info/std16>.
+297	              At the time of writing, this STD comprises the following:
+
+299	              Rose, M. and K. McCloghrie, "Structure and identification
+300	              of management information for TCP/IP-based internets",
+301	              STD 16, RFC 1155, DOI 10.17487/RFC1155, May 1990,
+302	              <https://www.rfc-editor.org/info/rfc1155>.
+
+304	              Rose, M. and K. McCloghrie, "Concise MIB definitions",
+305	              STD 16, RFC 1212, DOI 10.17487/RFC1212, March 1991,
+306	              <https://www.rfc-editor.org/info/rfc1212>.
+
+308	Acknowledgments
+
+310	   This document was inspired by the discussion of the authors of
+311	   [RFC9254] and [RFC9595] on how to handle Rob Wilton's feedback.
+
+313	Author's Address
+
+315	   Carsten Bormann
+316	   Universität Bremen TZI
+317	   Postfach 330440
+318	   D-28359 Bremen
+319	   Germany
+320	   Phone: +49-421-218-63921
+321	   Email: cabo@tzi.org
+
+
+
+
+
+
+
+
+
