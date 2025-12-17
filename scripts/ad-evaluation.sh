@@ -36,7 +36,7 @@ else
 fi
 
 # Download the URL using curl and save it to the download directory
-curl -s -o "$TARGET_DIR/idnits-report.txt" "https://author-tools.ietf.org/api/idnits?url=https://www.ietf.org/archive/id/$DRAFT_VERSION.txt&submitcheck=True"
+curl -s -o "$TARGET_DIR/idnits-report.txt" "https://author-tools.ietf.org/api/idnits?url=https://www.ietf.org/archive/id/$DRAFT_VERSION.txt"
 
 # Download the URL using curl and save it to the download directory
 curl -s "https://datatracker.ietf.org/doc/$DRAFT/shepherdwriteup/" | \
