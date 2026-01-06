@@ -10,6 +10,8 @@ CC @anewton1998
 * "Handling Ballot Positions":
   - https://ietf.org/about/groups/iesg/statements/handling-ballot-positions/
 
+## Thanks to the Reviewers
+
 ## Discuss
 
 As noted in https://www.ietf.org/blog/handling-iesg-ballot-positions/,

@@ -1,0 +1,580 @@
+idnits 2.17.1 
+
+draft-ietf-sipcore-retransmission-allowed-fixes-03.txt:
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/checklist :
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Miscellaneous warnings:
+  ----------------------------------------------------------------------------
+
+     (Using the creation date from RFC4119, updated by this document, for
+     RFC5378 checks: 2004-01-14)
+
+  -- The document seems to contain a disclaimer for pre-RFC5378 work, and may
+     have content which was first submitted before 10 November 2008.  The
+     disclaimer is necessary when there are original authors that you have
+     been unable to contact, or if some do not wish to grant the BCP78 rights
+     to the IETF Trust.  If you are able to get all authors (current and
+     original) to grant those rights, you can and should remove the
+     disclaimer; otherwise, the disclaimer is needed and you can ignore this
+     comment. (See the Legal Provisions document at
+     https://trustee.ietf.org/license-info for more information.)
+
+  -- The document date (9 December 2025) is 8 days in the past.  Is this
+     intentional?
+
+
+  Checking references for intended status: Proposed Standard
+  ----------------------------------------------------------------------------
+
+     (See RFCs 3967 and 4897 for information about using normative references
+     to lower-maturity documents in RFCs)
+
+  ** Downref: Normative reference to an Informational RFC: RFC 5606
+
+  ** Downref: Normative reference to an Informational RFC: RFC 7378
+
+
+     Summary: 2 errors (**), 0 flaws (~~), 0 warnings (==), 2 comments (--).
+
+     Run idnits with the --verbose option for more detailed information about
+     the items above.
+
+--------------------------------------------------------------------------------
+
+
+2	sipcore                                                         B. Rosen
+3	Internet-Draft                                              Unaffiliated
+4	Updates: 4119, 5606, 5774, 6442, 7378, 8262 (if                J. Martin
+5	         approved)                                           Comtech TCS
+6	Intended status: Standards Track                         9 December 2025
+7	Expires: 12 June 2026
+
+9	    A Comprehensive Errata for 'retransmission-allowed' XML Element
+10	           draft-ietf-sipcore-retransmission-allowed-fixes-03
+
+12	Abstract
+
+14	   This document fixes use of the 'retransmission-allowed' element of
+15	   PIDF-LO in six published RFCs.  All text and examples should show
+16	   'true' or 'false' to match the XML schema definitions, but some RFCs
+17	   incorrectly use 'yes' or 'no'.  This document updates RFC4119,
+18	   RFC5606, RFC5774, RFC6442, RFC7378, RFC8262.
+
+20	Status of This Memo
+
+22	   This Internet-Draft is submitted in full conformance with the
+23	   provisions of BCP 78 and BCP 79.
+
+25	   Internet-Drafts are working documents of the Internet Engineering
+26	   Task Force (IETF).  Note that other groups may also distribute
+27	   working documents as Internet-Drafts.  The list of current Internet-
+28	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+30	   Internet-Drafts are draft documents valid for a maximum of six months
+31	   and may be updated, replaced, or obsoleted by other documents at any
+32	   time.  It is inappropriate to use Internet-Drafts as reference
+33	   material or to cite them other than as "work in progress."
+
+35	   This Internet-Draft will expire on 12 June 2026.
+
+37	Copyright Notice
+
+39	   Copyright (c) 2025 IETF Trust and the persons identified as the
+40	   document authors.  All rights reserved.
+
+42	   This document is subject to BCP 78 and the IETF Trust's Legal
+43	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+44	   license-info) in effect on the date of publication of this document.
+45	   Please review these documents carefully, as they describe your rights
+46	   and restrictions with respect to this document.  Code Components
+47	   extracted from this document must include Revised BSD License text as
+48	   described in Section 4.e of the Trust Legal Provisions and are
+49	   provided without warranty as described in the Revised BSD License.
+
+51	Table of Contents
+
+53	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+54	     1.1.  Requirements Notation . . . . . . . . . . . . . . . . . .   3
+55	     1.2.  Additional Copyright Notice . . . . . . . . . . . . . . .   3
+56	   2.  Changes to Documents  . . . . . . . . . . . . . . . . . . . .   3
+57	     2.1.  RFC 4119 - A Presence-based GEOPRIV Location Object Format
+58	           (PIDF-LO) . . . . . . . . . . . . . . . . . . . . . . . .   3
+59	     2.2.  RFC 5606 - Implications of 'retransmission-allowed' for SIP
+60	           Location Conveyance . . . . . . . . . . . . . . . . . . .   4
+61	     2.3.  RFC 5774 - Considerations for Civic Addresses in PIDF-LO:
+62	           Guidelines and IANA Registry Definition . . . . . . . . .   6
+63	     2.4.  RFC 6442 - Location Conveyance for SIP  . . . . . . . . .   7
+64	     2.5.  RFC 7378 - Trustworthy Location . . . . . . . . . . . . .   8
+65	     2.6.  RFC 8262 - Content-ID Header Field in SIP . . . . . . . .   8
+66	   3.  General guidance to implementers  . . . . . . . . . . . . . .   8
+67	   4.  Security Considerations . . . . . . . . . . . . . . . . . . .   9
+68	   5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   9
+69	   6.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   9
+70	     6.1.  Normative References  . . . . . . . . . . . . . . . . . .   9
+71	     6.2.  Informative References  . . . . . . . . . . . . . . . . .  10
+72	   Contributors  . . . . . . . . . . . . . . . . . . . . . . . . . .  11
+73	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  11
+
+75	1.  Introduction
+
+77	   [RFC4119] defines the <retransmission-allowed> element as part of
+78	   PIDF-LO.  Section 2.2.5 "Schema Definitions" defines this element as
+79	   a boolean data type as described in W3C's "XML Schema Part 2:
+80	   Datatypes (Second Edition)".  As a boolean data type,
+81	   <retransmission-allowed> can have the following values: 'true',
+82	   'false', '0', or '1'.
+
+84	   Unfortunately the examples in the text of RFC 4119 used values 'yes'
+85	   and 'no', which are not allowed per section 2.2.5 "Schema
+86	   Definitions".  This problem was reported in errata id 1535
+87	   (https://www.rfc-editor.org/errata/eid1535) in 2008, and verified in
+88	   2010.
+
+90	   Since RFC 4119, there are another 13 RFCs with <retransmission-
+91	   allowed> example text.  Despite the RFC 4119 errata, 5 of these RFCs
+92	   incorrectly repeated the mistaken use of 'yes' and 'no' in their
+93	   examples of <retransmission-allowed>: [RFC5606], [RFC5774],
+94	   [RFC6442], [RFC7378], and [RFC8262].  The other 8 RFCs correctly use
+95	   'true' and 'false' in their examples: [RFC5580], [RFC5985],
+96	   [RFC6397], [RFC6753], [RFC6772], [RFC7199], [RFC7852], and [RFC8876].
+
+98	   Rather than submitting individual errata against the incorrect
+99	   examples in those 5 RFCs, this document updates them all to replace
+100	   all use of 'yes' with 'true', and all use of 'no' with 'false'.  The
+101	   original RFC 4119 is also updated here for completeness, to further
+102	   reinforce the existing errata id 1535 for RFC 4119.
+
+104	1.1.  Requirements Notation
+
+106	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+107	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+108	   "OPTIONAL" in this document are to be interpreted as described in
+109	   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+110	   capitals, as shown here.
+
+112	1.2.  Additional Copyright Notice
+
+114	   This document may contain material from IETF Documents or IETF
+115	   Contributions published or made publicly available before November
+116	   10, 2008.  The person(s) controlling the copyright in some of this
+117	   material may not have granted the IETF Trust the right to allow
+118	   modifications of such material outside the IETF Standards Process.
+119	   Without obtaining an adequate license from the person(s) controlling
+120	   the copyright in such materials, this document may not be modified
+121	   outside the IETF Standards Process, and derivative works of it may
+122	   not be created outside the IETF Standards Process, except to format
+123	   it for publication as an RFC or to translate it into languages other
+124	   than English.
+
+126	2.  Changes to Documents
+
+128	2.1.  RFC 4119 - A Presence-based GEOPRIV Location Object Format (PIDF-
+129	      LO)
+
+131	   [RFC4119] section 2.2.2 page 8, replace:
+
+133	      'retransmission-allowed': When the value of this element is 'no',
+134	      the Recipient of this Location Object is not permitted to share
+135	      the enclosed Location Information, or the object as a whole, with
+136	      other parties.  When the value of this element is 'yes',
+137	      distributing this Location is permitted (barring an existing out-
+138	      of-band agreement or obligation to the contrary).  By default, the
+139	      value MUST be assumed to be 'no'.  Implementations MUST include
+140	      this field, with a value of 'no', if the Rule Maker specifies no
+141	      preference.
+
+143	   With:
+
+145	      'retransmission-allowed': When the value of this element is
+146	      *'false'*, the Recipient of this Location Object is not permitted
+147	      to share the enclosed Location Information, or the object as a
+148	      whole, with other parties.  When the value of this element is
+149	      *'true'*, distributing this Location is permitted (barring an
+150	      existing out-of-band agreement or obligation to the contrary).  By
+151	      default, the value MUST be assumed to be *'false'*.
+152	      Implementations MUST include this field, with a value of
+153	      *'false'*, if the Rule Maker specifies no preference.
+
+155	   Section 2.3 "Example Location Objects", replace both occurrences of:
+
+157	      <gp:retransmission-allowed>no</gp:retransmission-allowed>
+
+159	   With:
+
+161	      <gp:retransmission-allowed>false</gp:retransmission-allowed>
+
+163	2.2.  RFC 5606 - Implications of 'retransmission-allowed' for SIP
+164	      Location Conveyance
+
+166	   [RFC5606] Section 2, replace:
+
+168	      These questions and concerns are particularly problematic when
+169	      <retransmission-allowed> is set to "no" (the default case).  This
+170	      core concern might be put as "to whom does <retransmission-
+171	      allowed> apply in location-based routing?"  More specifically:
+
+173	      Is any entity that reads LI bound by <retransmission-allowed>?  If
+174	      so, does that mean a proxy that performs location-based routing is
+175	      unable to forward a request and complete a SIP call if
+176	      \retransmission-allowed> is "no"?  Alternatively, must they strip
+177	      the location body from the message in order to complete the call?
+
+179	      If the proxy does not understand RFC 4119, it may forward a SIP
+180	      message containing a policy statement <retransmission-allowed> set
+181	      to "no".  Is any proxy that does understand RFC 4119 required to
+182	      parse the LI for this statement, even if it would not do so in
+183	      order to route the message?
+
+185	   With:
+
+187	      These questions and concerns are particularly problematic when
+188	      <retransmission-allowed> is set to *"false"* (the default case).
+189	      This core concern might be put as "to whom does <retransmission-
+190	      allowed> apply in location-based routing?"  More specifically:
+
+192	      Is any entity that reads LI bound by <retransmission-allowed>?  If
+193	      so, does that mean a proxy that performs location-based routing is
+194	      unable to forward a request and complete a SIP call if
+195	      \retransmission-allowed> is *"false"*?  Alternatively, must they
+196	      strip the location body from the message in order to complete the
+197	      call?
+
+199	      If the proxy does not understand RFC 4119, it may forward a SIP
+200	      message containing a policy statement <retransmission-allowed> set
+201	      to *"false"*.  Is any proxy that does understand RFC 4119 required
+202	      to parse the LI for this statement, even if it would not do so in
+203	      order to route the message?
+
+205	   Section 3.1, replace:
+
+207	      After extensive discussion in both GEOPRIV and SIP contexts, there
+208	      seems to be consensus that a solution for this problem must enable
+209	      location-based routing to work even when the <retransmission-
+210	      allowed> flag is set to "no".  A solution should also give the
+211	      Rule Maker the ability to allow or forbid the use of LI for
+212	      location-based routing and the ability to allow or forbid the use
+213	      of LI for the consumption of the endpoint.
+
+215	   With:
+
+217	      After extensive discussion in both GEOPRIV and SIP contexts, there
+218	      seems to be consensus that a solution for this problem must enable
+219	      location-based routing to work even when the <retransmission-
+220	      allowed> flag is set to *"false"*.  A solution should also give
+221	      the Rule Maker the ability to allow or forbid the use of LI for
+222	      location-based routing and the ability to allow or forbid the use
+223	      of LI for the consumption of the endpoint.
+
+225	   Section 3.2, replace:
+
+227	      Consensus has emerged that any SIP entity that receives a SIP
+228	      message containing LI through the operation of SIP's normal
+229	      routing procedures or as a result of location-based routing should
+230	      be considered an authorized recipient of that LI.  Because of this
+231	      presumption, one SIP element may pass the LI to another even if
+232	      the LO it contains has <retransmission-allowed> set to "no"; this
+233	      sees the passing of the SIP message as part of the delivery to
+234	      authorized recipients, rather than as retransmission.  SIP
+235	      entities are still enjoined from passing these messages outside
+236	      the normal routing to external entities if <retransmission-
+237	      allowed> is set to "no", as it is the passing to third parties
+238	      that <retransmission-allowed> is meant to control.
+
+240	   With:
+
+242	      Consensus has emerged that any SIP entity that receives a SIP
+243	      message containing LI through the operation of SIP's normal
+244	      routing procedures or as a result of location-based routing should
+245	      be considered an authorized recipient of that LI.  Because of this
+246	      presumption, one SIP element may pass the LI to another even if
+247	      the LO it contains has <retransmission-allowed> set to *"false"*;
+248	      this sees the passing of the SIP message as part of the delivery
+249	      to authorized recipients, rather than as retransmission.  SIP
+250	      entities are still enjoined from passing these messages outside
+251	      the normal routing to external entities if <retransmission-
+252	      allowed> is set to *"false"*, as it is the passing to third
+253	      parties that <retransmission-allowed> is meant to control.
+
+255	   Section 3.5, replace:
+
+257	      ... like the PIDF-LO <retransmission-allowed> being set to "no",
+258	      it is a ...
+
+260	   With:
+
+262	      ... like the PIDF-LO <retransmission-allowed> being set to
+263	      *"false"*, it is a ...
+
+265	   Section 3.6, replace:
+
+267	      ... it must not copy location if <retransmission-allowed> is "no".
+268	      ...
+
+270	   With:
+
+272	      ... it must not copy location if <retransmission-allowed> is
+273	      *"false"*. ...
+
+275	2.3.  RFC 5774 - Considerations for Civic Addresses in PIDF-LO:
+276	      Guidelines and IANA Registry Definition
+
+278	   [RFC5774] Section A.5 "Example", replace:
+
+280	      <gp:retransmission-allowed>yes</gp:retransmission-allowed>
+
+282	   With:
+
+284	      <gp:retransmission-allowed>true</gp:retransmission-allowed>
+
+286	2.4.  RFC 6442 - Location Conveyance for SIP
+
+288	   [RFC6442] section 4.4 page 18, replace:
+
+290	      This location error is specific to having the PIDF-LO [RFC4119]
+291	      <retransmission-allowed> element set to "no".  This location error
+292	      is stating it requires permission (i.e., PIDF-LO <retransmission-
+293	      allowed> element set to "yes") to process this SIP request
+294	      further.  If the LS sending the location information does not want
+295	      to give this permission, it will not change this permission in a
+296	      new request.  If the LS wants this message processed with the
+297	      <retransmission-allowed> element set to "yes", it MUST choose
+298	      another logical path (if one exists) for this SIP request.
+
+300	   With:
+
+302	      This location error is specific to having the PIDF-LO [RFC4119]
+303	      <retransmission-allowed> element set to *"false"*.  This location
+304	      error is stating it requires permission (i.e., PIDF-LO
+305	      <retransmission-allowed> element set to *"true"*) to process this
+306	      SIP request further.  If the LS sending the location information
+307	      does not want to give this permission, it will not change this
+308	      permission in a new request.  If the LS wants this message
+309	      processed with the <retransmission-allowed> element set to
+310	      *"false"*, it MUST choose another logical path (if one exists) for
+311	      this SIP request.
+
+313	   Errata id 4236 (https://www.rfc-editor.org/errata/eid4236)
+314	   incorrectly includes the following text
+
+316	      Section 5.1, 5.2 says:
+
+318	         <gbp:retransmission-allowed>false
+319	         </gbp:retransmission-allowed>
+
+321	      It should say:
+
+323	         <gbp:retransmission-allowed>no
+324	         </gbp:retransmission-allowed>
+
+326	   Sections 5.1 and 5.2 of RFC6442 are correct without any need for this
+327	   errata id 4236.  This errata should be ignored.
+
+329	2.5.  RFC 7378 - Trustworthy Location
+
+331	   [RFC7378] section 6 page 25, replace:
+
+333	      as noted in RFC5606, Section 3.2:
+
+335	         ...  Because of this presumption, one SIP element may pass the
+336	         LI to another even if the LO it contains has <retransmission-
+337	         allowed> set to "no"; this sees the passing of the SIP message
+338	         as part of the delivery to authorized recipients, rather than
+339	         as retransmission.  SIP entities are still enjoined from
+340	         passing these messages outside the normal routing to external
+341	         entities if <retransmission-allowed> is set to "no", as it is
+342	         the passing to third parties that <retransmission-allowed> is
+343	         meant to control.
+
+345	   With:
+
+347	      as noted in RFC5606, Section 3.2:
+
+349	         ...  Because of this presumption, one SIP element may pass the
+350	         LI to another even if the LO it contains has <retransmission-
+351	         allowed> set to *"false"*; this sees the passing of the SIP
+352	         message as part of the delivery to authorized recipients,
+353	         rather than as retransmission.  SIP entities are still enjoined
+354	         from passing these messages outside the normal routing to
+355	         external entities if <retransmission-allowed> is set to
+356	         *"false"*, as it is the passing to third parties that
+357	         <retransmission-allowed> is meant to control.
+
+359	2.6.  RFC 8262 - Content-ID Header Field in SIP
+
+361	   [RFC8262] section 1.4.1 "Example 1", replace:
+
+363	      <gbp:retransmission-allowed>no
+364	      </gbp:retransmission-allowed>
+
+366	   With:
+
+368	      <gbp:retransmission-allowed>false
+369	      </gbp:retransmission-allowed>
+
+371	3.  General guidance to implementers
+
+373	   Implementations that create <retransmission-allowed> MUST use only
+374	   values 'true', 'false', '0', or '1' as required by the schema in
+375	   section 2.2.5 of [RFC4119].  Implementations SHOULD use only values
+376	   'true' and 'false'.
+
+378	   Implementations that accept <retransmission-allowed> SHOULD treat
+379	   values 'yes' & 'no' as synonyms for 'true' & 'false'.
+
+381	4.  Security Considerations
+
+383	   The changes in this document does not require additional security
+384	   considerations beyond those already noted in the individual RFCs
+385	   affected by this RFC.
+
+387	5.  IANA Considerations
+
+389	   None
+
+391	6.  References
+
+393	6.1.  Normative References
+
+395	   [RFC4119]  Peterson, J., "A Presence-based GEOPRIV Location Object
+396	              Format", RFC 4119, DOI 10.17487/RFC4119, December 2005,
+397	              <https://www.rfc-editor.org/rfc/rfc4119>.
+
+399	   [RFC5606]  Peterson, J., Hardie, T., and J. Morris, "Implications of
+400	              'retransmission-allowed' for SIP Location Conveyance",
+401	              RFC 5606, DOI 10.17487/RFC5606, August 2009,
+402	              <https://www.rfc-editor.org/rfc/rfc5606>.
+
+404	   [RFC5774]  Wolf, K. and A. Mayrhofer, "Considerations for Civic
+405	              Addresses in the Presence Information Data Format Location
+406	              Object (PIDF-LO): Guidelines and IANA Registry
+407	              Definition", BCP 154, RFC 5774, DOI 10.17487/RFC5774,
+408	              March 2010, <https://www.rfc-editor.org/rfc/rfc5774>.
+
+410	   [RFC6442]  Polk, J., Rosen, B., and J. Peterson, "Location Conveyance
+411	              for the Session Initiation Protocol", RFC 6442,
+412	              DOI 10.17487/RFC6442, December 2011,
+413	              <https://www.rfc-editor.org/rfc/rfc6442>.
+
+415	   [RFC7378]  Tschofenig, H., Schulzrinne, H., and B. Aboba, Ed.,
+416	              "Trustworthy Location", RFC 7378, DOI 10.17487/RFC7378,
+417	              December 2014, <https://www.rfc-editor.org/rfc/rfc7378>.
+
+419	   [RFC8262]  Holmberg, C. and I. Sedlacek, "Content-ID Header Field in
+420	              the Session Initiation Protocol (SIP)", RFC 8262,
+421	              DOI 10.17487/RFC8262, October 2017,
+422	              <https://www.rfc-editor.org/rfc/rfc8262>.
+
+424	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+425	              Requirement Levels", BCP 14, RFC 2119,
+426	              DOI 10.17487/RFC2119, March 1997,
+427	              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+429	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+430	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+431	              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+433	6.2.  Informative References
+
+435	   [RFC5580]  Tschofenig, H., Ed., Adrangi, F., Jones, M., Lior, A., and
+436	              B. Aboba, "Carrying Location Objects in RADIUS and
+437	              Diameter", RFC 5580, DOI 10.17487/RFC5580, August 2009,
+438	              <https://www.rfc-editor.org/rfc/rfc5580>.
+
+440	   [RFC5985]  Barnes, M., Ed., "HTTP-Enabled Location Delivery (HELD)",
+441	              RFC 5985, DOI 10.17487/RFC5985, September 2010,
+442	              <https://www.rfc-editor.org/rfc/rfc5985>.
+
+444	   [RFC6397]  Manderson, T., "Multi-Threaded Routing Toolkit (MRT)
+445	              Border Gateway Protocol (BGP) Routing Information Export
+446	              Format with Geo-Location Extensions", RFC 6397,
+447	              DOI 10.17487/RFC6397, October 2011,
+448	              <https://www.rfc-editor.org/rfc/rfc6397>.
+
+450	   [RFC6753]  Winterbottom, J., Tschofenig, H., Schulzrinne, H., and M.
+451	              Thomson, "A Location Dereference Protocol Using HTTP-
+452	              Enabled Location Delivery (HELD)", RFC 6753,
+453	              DOI 10.17487/RFC6753, October 2012,
+454	              <https://www.rfc-editor.org/rfc/rfc6753>.
+
+456	   [RFC6772]  Schulzrinne, H., Ed., Tschofenig, H., Ed., Cuellar, J.,
+457	              Polk, J., Morris, J., and M. Thomson, "Geolocation Policy:
+458	              A Document Format for Expressing Privacy Preferences for
+459	              Location Information", RFC 6772, DOI 10.17487/RFC6772,
+460	              January 2013, <https://www.rfc-editor.org/rfc/rfc6772>.
+
+462	   [RFC7199]  Barnes, R., Thomson, M., Winterbottom, J., and H.
+463	              Tschofenig, "Location Configuration Extensions for Policy
+464	              Management", RFC 7199, DOI 10.17487/RFC7199, April 2014,
+465	              <https://www.rfc-editor.org/rfc/rfc7199>.
+
+467	   [RFC7852]  Gellens, R., Rosen, B., Tschofenig, H., Marshall, R., and
+468	              J. Winterbottom, "Additional Data Related to an Emergency
+469	              Call", RFC 7852, DOI 10.17487/RFC7852, July 2016,
+470	              <https://www.rfc-editor.org/rfc/rfc7852>.
+
+472	   [RFC8876]  Rosen, B., Schulzrinne, H., Tschofenig, H., and R.
+473	              Gellens, "Non-interactive Emergency Calls", RFC 8876,
+474	              DOI 10.17487/RFC8876, September 2020,
+475	              <https://www.rfc-editor.org/rfc/rfc8876>.
+
+477	Contributors
+
+479	   Gordon Hines
+480	   Comtech TCS
+481	   2401 Elliott Avenue
+482	   Seattle, WA 98121
+483	   United States of America
+484	   Email: skip.hines@comtech.com
+
+486	   Roger Marshall
+487	   Comtech TCS
+488	   2401 Elliott Avenue
+489	   Seattle, WA 98121
+490	   United States of America
+491	   Email: roger.marshall@comtech.com
+
+493	   Victor Burton
+494	   Comtech TCS
+495	   2401 Elliott Avenue
+496	   Seattle, WA 98121
+497	   United States of America
+498	   Email: victor.burton@comtech.com
+
+500	Authors' Addresses
+
+502	   Brian Rosen
+503	   Unaffiliated
+504	   Mars, PA
+505	   United States of America
+506	   Email: br@brianrosen.net
+
+508	   Jeff Martin
+509	   Comtech TCS
+510	   2401 Elliott Avenue
+511	   Seattle, WA 98121
+512	   United States of America
+513	   Email: jeff.martin@comtech.com
+
+
+
+
+
+
+
+
+
