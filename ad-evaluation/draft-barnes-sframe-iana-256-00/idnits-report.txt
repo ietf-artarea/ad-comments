@@ -1,0 +1,495 @@
+idnits 2.17.1 
+
+draft-barnes-sframe-iana-256-00.txt:
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/checklist :
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Miscellaneous warnings:
+  ----------------------------------------------------------------------------
+
+  == The copyright year in the IETF Trust and authors Copyright Line does not
+     match the current year
+
+  == The document doesn't use any RFC 2119 keywords, yet seems to have RFC
+     2119 boilerplate text.
+
+  -- The document date (18 September 2025) is 119 days in the past.  Is this
+     intentional?
+
+
+  Checking references for intended status: Informational
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+     Summary: 0 errors (**), 0 flaws (~~), 2 warnings (==), 1 comment (--).
+
+     Run idnits with the --verbose option for more detailed information about
+     the items above.
+--------------------------------------------------------------------------------
+
+
+2	Secure Media Frames                                            R. Barnes
+3	Internet-Draft                                                     Cisco
+4	Intended status: Informational                                  E. Omara
+5	Expires: 22 March 2026                                      A. Rosenberg
+6	                                                                   Apple
+7	                                                       18 September 2025
+
+9	                Updates to SFrame Cipher Suites Registry
+10	                    draft-barnes-sframe-iana-256-00
+
+12	Abstract
+
+14	   This document addresses two omissions in the Secure Frames (SFrame)
+15	   protocol specification.  First, the definition of the IANA registry
+16	   for SFrame ciphersuites omits several important fields.  This
+17	   document requests that IANA add those fields and defines the contents
+18	   of those fields for current entries.  Second, the AEAD construction
+19	   based on AES-CTR and HMAC is defined only for the 128-bit security
+20	   level.  This document registers parallel constructions at the 256-bit
+21	   security level.
+
+23	About This Document
+
+25	   This note is to be removed before publishing as an RFC.
+
+27	   The latest revision of this draft can be found at
+28	   https://bifurcation.github.io/sframe-iana-256/draft-barnes-sframe-
+29	   iana-256.html.  Status information for this document may be found at
+30	   https://datatracker.ietf.org/doc/draft-barnes-sframe-iana-256/.
+
+32	   Discussion of this document takes place on the Secure Media Frames
+33	   Working Group mailing list (mailto:sframe@ietf.org), which is
+34	   archived at https://mailarchive.ietf.org/arch/browse/sframe/.
+35	   Subscribe at https://www.ietf.org/mailman/listinfo/sframe/.
+
+37	   Source for this draft and an issue tracker can be found at
+38	   https://github.com/bifurcation/sframe-iana-256.
+
+40	Status of This Memo
+
+42	   This Internet-Draft is submitted in full conformance with the
+43	   provisions of BCP 78 and BCP 79.
+
+45	   Internet-Drafts are working documents of the Internet Engineering
+46	   Task Force (IETF).  Note that other groups may also distribute
+47	   working documents as Internet-Drafts.  The list of current Internet-
+48	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+50	   Internet-Drafts are draft documents valid for a maximum of six months
+51	   and may be updated, replaced, or obsoleted by other documents at any
+52	   time.  It is inappropriate to use Internet-Drafts as reference
+53	   material or to cite them other than as "work in progress."
+
+55	   This Internet-Draft will expire on 22 March 2026.
+
+57	Copyright Notice
+
+59	   Copyright (c) 2025 IETF Trust and the persons identified as the
+60	   document authors.  All rights reserved.
+
+62	   This document is subject to BCP 78 and the IETF Trust's Legal
+63	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+64	   license-info) in effect on the date of publication of this document.
+65	   Please review these documents carefully, as they describe your rights
+66	   and restrictions with respect to this document.  Code Components
+67	   extracted from this document must include Revised BSD License text as
+68	   described in Section 4.e of the Trust Legal Provisions and are
+69	   provided without warranty as described in the Revised BSD License.
+
+71	Table of Contents
+
+73	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+74	   2.  Conventions and Definitions . . . . . . . . . . . . . . . . .   3
+75	   3.  AES-256-CTR with HMAC-SHA512  . . . . . . . . . . . . . . . .   3
+76	   4.  Security Considerations . . . . . . . . . . . . . . . . . . .   3
+77	   5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   4
+78	     5.1.  "SFrame Cipher Suites" Registry Update  . . . . . . . . .   4
+79	     5.2.  Cipher Suites for AES-256-CTR with HMAC-SHA512  . . . . .   5
+80	   6.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   5
+81	     6.1.  Normative References  . . . . . . . . . . . . . . . . . .   5
+82	     6.2.  Informative References  . . . . . . . . . . . . . . . . .   6
+83	   Appendix A.  Test Vectors . . . . . . . . . . . . . . . . . . . .   6
+84	     A.1.  AEAD Encryption/Decryption Using AES-CTR and HMAC . . . .   6
+85	     A.2.  SFrame Encryption/Decryption  . . . . . . . . . . . . . .   7
+86	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  11
+
+88	1.  Introduction
+
+90	   The Secure Frames (SFrame) protocol specification defines an IANA
+91	   registry for cipher suites.  The initial definition in Section 8.1 of
+92	   [RFC9605] is missing several important fields.  This document
+93	   requests that IANA add those fields and defines the contents of those
+94	   fields for current entries.  We also define new entries that extend
+95	   the SFrame CTR+HMAC construction to support AES-256.
+
+97	   This document addresses two omissions in the Secure Frames (SFrame)
+98	   protocol specification [RFC9605].  First, the definition in
+99	   Section 8.1 of [RFC9605] of the IANA registry for SFrame ciphersuites
+100	   omits several important fields.  This document requests that IANA add
+101	   those fields and defines the contents of those fields for current
+102	   entries.  Second, the AEAD construction based on AES-CTR and HMAC (in
+103	   Section 4.5.1 of [RFC9605]) is defined only for the 128-bit security
+104	   level.  This document registers parallel constructions at the 256-bit
+105	   security level.
+
+107	2.  Conventions and Definitions
+
+109	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+110	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+111	   "OPTIONAL" in this document are to be interpreted as described in
+112	   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+113	   capitals, as shown here.
+
+115	3.  AES-256-CTR with HMAC-SHA512
+
+117	   Section 4.5.1 of [RFC9605] defines a compound authenticated
+118	   encryption construction, using the unauthenticated CTR mode of AES
+119	   for encryption and HMAC for authentication.
+
+121	   The original specification only defines cipher suite values for
+122	   instances of this construction using AES-128-CTR and HMAC-SHA256.
+123	   The construction works the same way when used with AES-256-CTR and
+124	   HMAC-SHA512.  The only differences are in the lengths of some SFrame-
+125	   internal fields:
+
+127	   *  The keys generated by SFrame-internal key derivation
+128	      (derive_key_salt) are longer to match the needs of AES-256-CTR and
+129	      HMAC-SHA512 (96 bytes vs 48 bytes for AES-128-CTR and HMAC-
+130	      SHA256).
+
+132	   *  The initial tag value tag in compute_tag is 64 bytes instead of 32
+133	      bytes.
+
+135	   Identifiers for cipher suites using AES-256-CTR and HMAC-SHA512 are
+136	   defined in Section 5.2.
+
+138	4.  Security Considerations
+
+140	   The registry changes in this document have no affect on the security
+141	   of SFrame.
+
+143	   The new algorithms registered by this document allow the CTR+HMAC
+144	   construction to be used in environments that require a 256-bit
+145	   security level.
+
+147	5.  IANA Considerations
+
+149	   This document makes two requests of IANA: Updating the columns in the
+150	   "SFrame Cipher Suites" registry and adding entries to the updated
+151	   registry for the new cipher suites defined in this document.
+
+153	5.1.  "SFrame Cipher Suites" Registry Update
+
+155	   The SFrame Cipher Suites registry should be updated to add the
+156	   following columns:
+
+158	   *  Nh: The size in bytes of the output of the hash function
+
+160	   *  Nka: For cipher suites using the compound AEAD described in
+161	      Section 4.5.1 of [RFC9605], the size in bytes of a key for the
+162	      underlying encryption algorithm
+
+164	   *  Nk: The size in bytes of a key for the encryption algorithm
+
+166	   *  Nn: The size in bytes of a nonce for the encryption algorithm
+
+168	   *  Nt: The overhead in bytes of the encryption algorithm (typically
+169	      the size of a "tag" that is added to the plaintext)
+
+171	   The "Change Controller" entry should be removed.
+
+173	   Table 1 illustrates the new structure of the registry, and provides
+174	   the required values for the currently registered entries.
+
+176	   +========+============================+==+===+==+==+==+=+===========+
+177	   | Value  | Name                       |Nh|Nka|Nk|Nn|Nt|R| Reference |
+178	   +========+============================+==+===+==+==+==+=+===========+
+179	   | 0x0000 | Reserved                   |- |-  |- |- |- |-| RFC 9605  |
+180	   +--------+----------------------------+--+---+--+--+--+-+-----------+
+181	   | 0x0001 | AES_128_CTR_HMAC_SHA256_80 |32|16 |48|12|10|Y| RFC 9605  |
+182	   +--------+----------------------------+--+---+--+--+--+-+-----------+
+183	   | 0x0002 | AES_128_CTR_HMAC_SHA256_64 |32|16 |48|12|8 |Y| RFC 9605  |
+184	   +--------+----------------------------+--+---+--+--+--+-+-----------+
+185	   | 0x0003 | AES_128_CTR_HMAC_SHA256_32 |32|16 |48|12|4 |Y| RFC 9605  |
+186	   +--------+----------------------------+--+---+--+--+--+-+-----------+
+187	   | 0x0004 | AES_128_GCM_SHA256_128     |32|n/a|16|12|16|Y| RFC 9605  |
+188	   +--------+----------------------------+--+---+--+--+--+-+-----------+
+189	   | 0x0005 | AES_256_GCM_SHA512_128     |64|n/a|32|12|16|Y| RFC 9605  |
+190	   +--------+----------------------------+--+---+--+--+--+-+-----------+
+191	   | 0xF000 | Reserved for Private Use   |- |-  |- |- |- |-| RFC 9605  |
+192	   | -      |                            |  |   |  |  |  | |           |
+193	   | 0xFFFF |                            |  |   |  |  |  | |           |
+194	   +--------+----------------------------+--+---+--+--+--+-+-----------+
+
+196	      Table 1: New structure and contents of the SFrame Cipher Suites
+197	                                  registry
+
+199	5.2.  Cipher Suites for AES-256-CTR with HMAC-SHA512
+
+201	   The following new entries should be added to the SFrame Cipher Suites
+202	   registry:
+
+204	    +======+============================+==+===+==+==+==+=+===========+
+205	    |Value | Name                       |Nh|Nka|Nk|Nn|Nt|R| Reference |
+206	    +======+============================+==+===+==+==+==+=+===========+
+207	    |0x0006| AES_256_CTR_HMAC_SHA512_80 |64|32 |96|12|10|Y| RFC XXXX  |
+208	    +------+----------------------------+--+---+--+--+--+-+-----------+
+209	    |0x0007| AES_256_CTR_HMAC_SHA512_64 |64|32 |96|12|8 |Y| RFC XXXX  |
+210	    +------+----------------------------+--+---+--+--+--+-+-----------+
+211	    |0x0008| AES_256_CTR_HMAC_SHA512_32 |64|32 |96|12|4 |Y| RFC XXXX  |
+212	    +------+----------------------------+--+---+--+--+--+-+-----------+
+
+214	             Table 2: New entries SFrame Cipher Suites registry
+
+216	6.  References
+
+218	6.1.  Normative References
+
+220	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+221	              Requirement Levels", BCP 14, RFC 2119,
+222	              DOI 10.17487/RFC2119, March 1997,
+223	              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+225	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+226	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+227	              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+229	   [RFC9605]  Omara, E., Uberti, J., Murillo, S. G., Barnes, R., Ed.,
+230	              and Y. Fablet, "Secure Frame (SFrame): Lightweight
+231	              Authenticated Encryption for Real-Time Media", RFC 9605,
+232	              DOI 10.17487/RFC9605, August 2024,
+233	              <https://www.rfc-editor.org/rfc/rfc9605>.
+
+235	6.2.  Informative References
+
+237	   [TestVectors]
+238	              "SFrame Test Vectors", September 2025,
+239	              <https://github.com/bifurcation/sframe-iana-256/blob/main/
+240	              test-vectors/test-vectors-aes256.json>.
+
+242	Appendix A.  Test Vectors
+
+244	   This section provides a set of test vectors that implementations can
+245	   use to verify that they correctly implement SFrame encryption and
+246	   decryption with the cipher suites registered in this document.  Test
+247	   vectors are provided for both the AES-256-CTR-HMAC construction and
+248	   for full SFrame encryption with the new cipher suites.
+
+250	   All values are either numeric or byte strings.  Numeric values are
+251	   represented as hex values, prefixed with 0x.  Byte strings are
+252	   represented in hex encoding.
+
+254	   Line breaks and whitespace within values are inserted to conform to
+255	   the width requirements of the RFC format.  They should be removed
+256	   before use.
+
+258	   These test vectors are also available in JSON format at
+259	   [TestVectors].  In the JSON test vectors, numeric values are JSON
+260	   numbers and byte string values are JSON strings containing the hex
+261	   encoding of the byte strings.
+
+263	A.1.  AEAD Encryption/Decryption Using AES-CTR and HMAC
+
+265	   For each case, we provide:
+
+267	   *  cipher_suite: The index of the cipher suite in use (see
+268	      Section 5.1)
+
+270	   *  key: The key input to encryption/decryption
+271	   *  enc_key: The encryption subkey produced by the derive_subkeys()
+272	      algorithm
+
+274	   *  auth_key: The encryption subkey produced by the derive_subkeys()
+275	      algorithm
+
+277	   *  nonce: The nonce input to encryption/decryption
+
+279	   *  aad: The aad input to encryption/decryption
+
+281	   *  pt: The plaintext
+
+283	   *  ct: The ciphertext
+
+285	   An implementation should verify that the following are true, where
+286	   AEAD.Encrypt and AEAD.Decrypt are as defined in Section 4.5.1 of
+287	   [RFC9605]:
+
+289	   *  AEAD.Encrypt(key, nonce, aad, pt) == ct
+
+291	   *  AEAD.Decrypt(key, nonce, aad, ct) == pt
+
+293	   The other values in the test vector are intermediate values provided
+294	   to facilitate debugging of test failures.
+
+296	A.2.  SFrame Encryption/Decryption
+
+298	   For each case, we provide:
+
+300	   *  cipher_suite: The index of the cipher suite in use (see
+301	      Section 5.1)
+
+303	   *  kid: A KID value
+
+305	   *  ctr: A CTR value
+
+307	   *  base_key: The base_key input to the derive_key_salt algorithm
+
+309	   *  sframe_key_label: The label used to derive sframe_key in the
+310	      derive_key_salt algorithm
+
+312	   *  sframe_salt_label: The label used to derive sframe_salt in the
+313	      derive_key_salt algorithm
+
+315	   *  sframe_secret: The sframe_secret variable in the derive_key_salt
+316	      algorithm
+
+318	   *  sframe_key: The sframe_key value produced by the derive_key_salt
+319	      algorithm
+
+321	   *  sframe_salt: The sframe_salt value produced by the derive_key_salt
+322	      algorithm
+
+324	   *  metadata: The metadata input to the SFrame encrypt algorithm
+
+326	   *  pt: The plaintext
+
+328	   *  ct: The SFrame ciphertext
+
+330	   An implementation should verify that the following are true, where
+331	   encrypt and decrypt are as defined in Section 4.4 of [RFC9605], using
+332	   an SFrame context initialized with base_key assigned to kid:
+
+334	   *  encrypt(ctr, kid, metadata, plaintext) == ct
+
+336	   *  decrypt(metadata, ct) == pt
+
+338	   The other values in the test vector are intermediate values provided
+339	   to facilitate debugging of test failures.
+
+341	   cipher_suite: 0x0006
+342	   kid: 0x0000000000000123
+343	   ctr: 0x0000000000004567
+344	   base_key: 000102030405060708090a0b0c0d0e0f
+345	   sframe_key_label: 534672616d6520312e30205365637265
+346	                     74206b65792000000000000001230006
+347	   sframe_salt_label: 534672616d6520312e30205365637265
+348	                      742073616c7420000000000000012300
+349	                      06
+350	   sframe_secret: 0fc3ea6de6aac97a35f194cf9bed94d4
+351	                  b5230f1cb45a785c9fe5dce9c188938a
+352	                  b6ba005bc4c0a19181599e9d1bcf7b74
+353	                  aca48b60bf5e254e546d809313e083a3
+354	   sframe_key: 3c343886ec1c79278836863e00fe934c
+355	               8894460cfa367ebdc4856b0a9268a4f4
+356	               fb99437876819394ef90b10ee12602d0
+357	               23f7128ee50f2314c2cc3cff4c56616d
+358	               2fe03ad2a254cc2ed29b2a4d3f2534c0
+359	               dda9e7c391ad1917ea07aa221dd4b224
+360	   sframe_salt: e082f7ce012ad30c87c49e3f
+361	   metadata: 4945544620534672616d65205747
+362	   nonce: e082f7ce012ad30c87c4db58
+363	   aad: 99012345674945544620534672616d65
+364	        205747
+365	   pt: 64726166742d696574662d736672616d
+366	       652d656e63
+367	   ct: 9901234567b369e03ec6467ad505ddc8
+368	       4914115069280c5c797555be6e32cde6
+369	       ac25bc9e
+
+371	   cipher_suite: 0x0007
+372	   kid: 0x0000000000000123
+373	   ctr: 0x0000000000004567
+374	   base_key: 000102030405060708090a0b0c0d0e0f
+375	   sframe_key_label: 534672616d6520312e30205365637265
+376	                     74206b65792000000000000001230007
+377	   sframe_salt_label: 534672616d6520312e30205365637265
+378	                      742073616c7420000000000000012300
+379	                      07
+380	   sframe_secret: 0fc3ea6de6aac97a35f194cf9bed94d4
+381	                  b5230f1cb45a785c9fe5dce9c188938a
+382	                  b6ba005bc4c0a19181599e9d1bcf7b74
+383	                  aca48b60bf5e254e546d809313e083a3
+384	   sframe_key: 7271d6c6cbccd2e2343d480ebea65718
+385	               a7bb379eefcf3f8d107c1e2a76e75529
+386	               3a497fd9e4e8291b965161987ef4ef24
+387	               983eabb06cb0a392defaab18654780a3
+388	               9c106ffa4a47d4183a6e593cd0c1bcab
+389	               2b9c6dcf049215845bfb7580c4dea80e
+390	   sframe_salt: 46b4367993a314910d4d9f3d
+391	   metadata: 4945544620534672616d65205747
+392	   nonce: 46b4367993a314910d4dda5a
+393	   aad: 99012345674945544620534672616d65
+394	        205747
+395	   pt: 64726166742d696574662d736672616d
+396	       652d656e63
+397	   ct: 990123456797cb5644d8831ff8bdc080
+398	       249990b24b569144cab2a87be22c20d9
+399	       7976
+
+401	   cipher_suite: 0x0008
+402	   kid: 0x0000000000000123
+403	   ctr: 0x0000000000004567
+404	   base_key: 000102030405060708090a0b0c0d0e0f
+405	   sframe_key_label: 534672616d6520312e30205365637265
+406	                     74206b65792000000000000001230008
+407	   sframe_salt_label: 534672616d6520312e30205365637265
+408	                      742073616c7420000000000000012300
+409	                      08
+410	   sframe_secret: 0fc3ea6de6aac97a35f194cf9bed94d4
+411	                  b5230f1cb45a785c9fe5dce9c188938a
+412	                  b6ba005bc4c0a19181599e9d1bcf7b74
+413	                  aca48b60bf5e254e546d809313e083a3
+414	   sframe_key: afe92c81e0df8c00fab619e0559fe5ae
+415	               efce1ef77789d4c728af1b1c1f2e3552
+416	               c405d274415a5291ec075c2d9954c450
+417	               fbd36682a4e978494808b703ce78b409
+418	               f9fec29b91e6e703a75c4131377c80c9
+419	               d51b8906088092452e2593eb142eea2d
+420	   sframe_salt: f6de647bac1263524cfb6533
+421	   metadata: 4945544620534672616d65205747
+422	   nonce: f6de647bac1263524cfb2054
+423	   aad: 99012345674945544620534672616d65
+424	        205747
+425	   pt: 64726166742d696574662d736672616d
+426	       652d656e63
+427	   ct: 9901234567112a94a288b85b49ffef1d
+428	       279f2830165c39d76cac8884011c
+
+430	Authors' Addresses
+
+432	   Richard Barnes
+433	   Cisco
+434	   Email: rlb@ipv.sx
+
+436	   Emad Omara
+437	   Apple
+438	   Email: eomara@apple.com
+
+440	   Aron Rosenberg
+441	   Apple
+442	   Email: aron.rosenberg@apple.com
+
+
+
+
+
+
+
+
+
