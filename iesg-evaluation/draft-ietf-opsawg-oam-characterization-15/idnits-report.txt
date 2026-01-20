@@ -1,0 +1,583 @@
+idnits 2.17.1 
+
+draft-ietf-opsawg-oam-characterization-15.txt:
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     No nits found.
+--------------------------------------------------------------------------------
+
+
+2	OPS Area Working Group                                      C. Pignataro
+3	Internet-Draft                                      Blue Fern Consulting
+4	Updates: 6291 (if approved)                                    A. Farrel
+5	Intended status: Best Current Practice                Old Dog Consulting
+6	Expires: 10 July 2026                                         T. Mizrahi
+7	                                                                  Huawei
+8	                                                          6 January 2026
+
+10	                  Guidelines for Characterizing "OAM"
+11	               draft-ietf-opsawg-oam-characterization-15
+
+13	Abstract
+
+15	   As the IETF continues to produce and standardize different
+16	   Operations, Administration, and Maintenance (OAM) protocols and
+17	   technologies, various qualifiers and modifiers are prepended to the
+18	   OAM abbreviation.  While, at first glance, the most used appear to be
+19	   well understood, the same qualifier may be interpreted differently in
+20	   different contexts.  A case in point is the qualifiers "in-band" and
+21	   "out-of-band" which have their origins in the radio lexicon, and
+22	   which have been extrapolated into other communication networks.  This
+23	   document recommends not to use these two terms when referring to OAM.
+
+25	   This document considers some common qualifiers and modifiers that are
+26	   prepended, within the context of packet networks, to the OAM
+27	   abbreviation and lays out guidelines for their use in future IETF
+28	   work.
+
+30	   This document updates RFC6291 by adding to the guidelines for the use
+31	   of the term "OAM".  It does not modify any other part of RFC6291.
+
+33	Status of This Memo
+
+35	   This Internet-Draft is submitted in full conformance with the
+36	   provisions of BCP 78 and BCP 79.
+
+38	   Internet-Drafts are working documents of the Internet Engineering
+39	   Task Force (IETF).  Note that other groups may also distribute
+40	   working documents as Internet-Drafts.  The list of current Internet-
+41	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+43	   Internet-Drafts are draft documents valid for a maximum of six months
+44	   and may be updated, replaced, or obsoleted by other documents at any
+45	   time.  It is inappropriate to use Internet-Drafts as reference
+46	   material or to cite them other than as "work in progress."
+
+48	   This Internet-Draft will expire on 10 July 2026.
+
+50	Copyright Notice
+
+52	   Copyright (c) 2026 IETF Trust and the persons identified as the
+53	   document authors.  All rights reserved.
+
+55	   This document is subject to BCP 78 and the IETF Trust's Legal
+56	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+57	   license-info) in effect on the date of publication of this document.
+58	   Please review these documents carefully, as they describe your rights
+59	   and restrictions with respect to this document.  Code Components
+60	   extracted from this document must include Revised BSD License text as
+61	   described in Section 4.e of the Trust Legal Provisions and are
+62	   provided without warranty as described in the Revised BSD License.
+
+64	Table of Contents
+
+66	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+67	   2.  In-Band and Out-of-Band OAM . . . . . . . . . . . . . . . . .   3
+68	   3.  Terminology and Guidance  . . . . . . . . . . . . . . . . . .   3
+69	     3.1.  Recommendation  . . . . . . . . . . . . . . . . . . . . .   4
+70	     3.2.  Active, Passive, and Hybrid OAM . . . . . . . . . . . . .   4
+71	     3.3.  Path Followed OAM . . . . . . . . . . . . . . . . . . . .   6
+72	     3.4.  Packet Forwarding Treatment OAM . . . . . . . . . . . . .   6
+73	     3.5.  Using Multiple Criteria . . . . . . . . . . . . . . . . .   7
+74	     3.6.  Summary of Terms  . . . . . . . . . . . . . . . . . . . .   8
+75	   4.  Security Considerations . . . . . . . . . . . . . . . . . . .   9
+76	   5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   9
+77	   6.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .   9
+78	   7.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   9
+79	     7.1.  Normative References  . . . . . . . . . . . . . . . . . .   9
+80	     7.2.  Informative References  . . . . . . . . . . . . . . . . .  10
+81	   Appendix A.  Examples of the Use of the Term In-Band  . . . . . .  11
+82	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  12
+
+84	1.  Introduction
+
+86	   It is not uncommon for historical and popular terms to have nuances
+87	   in how they are interpreted or understood.  This was, for example,
+88	   the case with the abbreviation for Operations, Administration, and
+89	   Maintenance, "OAM", and [RFC6291] provides guidelines for its use as
+90	   well as definitions of its constituent parts.
+
+92	   Characterizations or qualifiers for "OAM" within packet networks
+93	   often encounter similar problems of interpretation, such as with the
+94	   adjective phrases "in-band" and "out-of-band" (Section 2).  This
+95	   document considers some common qualifiers and modifiers that are
+96	   prepended to the OAM abbreviation, and lays out guidelines for their
+97	   use in future IETF work to achieve consistent and unambiguous
+98	   characterization (Section 3).  While this document introduces new
+99	   terminology, it is does not update or change the meaning of
+100	   terminology found in existing RFCs.
+
+102	2.  In-Band and Out-of-Band OAM
+
+104	   Historically, the terms "in-band" and "out-of-band" were used
+105	   extensively in radio communications as well as in telephony signaling
+106	   [RFC4733].  In both these cases, there is an actual "Band" (i.e., a
+107	   "Channel" or "Frequency") to be within or outside.
+
+109	   While those terms, useful in their simplicity, continued to be
+110	   broadly used to mean "within something" and "outside something", a
+111	   challenge is presented for IP communications and packet-switched
+112	   networks (PSNs) which do not have a "band" per se, and, in fact, have
+113	   multiple "somethings" that OAM traffic can be carried within or
+114	   outside.  A frequently encountered case is the use of "in-band" to
+115	   mean either In-Data-Packet or on-path.
+
+117	   There are many examples of "in-band OAM" and "out-of-band OAM" in
+118	   published RFCs.  For instance, the term "in-band" appears in both
+119	   Virtual Circuit Connectivity Verification (VCCV) [RFC5085] and OAM
+120	   for Deterministic Networking (DetNet) [RFC9551].  While the context
+121	   in each of these documents is clear, the term carries different
+122	   meanings in each case.  These two examples, as well as other examples
+123	   of uses of the term "in-band" in other documents are described in
+124	   Appendix A.
+
+126	   Generally speaking, within the IETF, the terms "in-band" and "out-of-
+127	   band" cannot be reliably understood consistently and unambiguously.
+128	   Context-specific definitions of these terms are inconsistent and
+129	   therefore cannot be generalized.  More importantly, the terms are not
+130	   self-defining to any further extent and cannot be understood by
+131	   someone exposed to them for the first time, since there is no "band"
+132	   in IP.
+
+134	   While interpreting existing documents, it is important to understand
+135	   the semantics of what the term "band" refers to, and to be more
+136	   explicit if those documents are updated.  This document does not
+137	   change the meaning of any terms in any prior RFCs.
+
+139	3.  Terminology and Guidance
+140	3.1.  Recommendation
+
+142	   This document recommends avoiding the terms "in-band" and "out-of-
+143	   band" when referring to OAM.  Instead, it encourages the use of more
+144	   fine-grained and descriptive terminology.  The document also presents
+145	   alternative terms and definitions for use in future IETF documents
+146	   referencing OAM, without precluding the use of other precise,
+147	   descriptive terms that do not rely on the "-band" convention.
+
+149	   The terminology presented in this section classifies OAM according to
+150	   three criteria: whether it operates in an active, passive, or hybrid
+151	   mode (Section 3.2); whether it follows the same path as data traffic
+152	   (Section 3.3); and whether it receives the same treatment as data
+153	   traffic (Section 3.4).
+
+155	3.2.  Active, Passive, and Hybrid OAM
+
+157	   [RFC7799] provides clear definitions for active and passive
+158	   performance assessment, enabling the construction of metrics and
+159	   methods to be described as either "Active" or "Passive".  Even though
+160	   [RFC7799] does not explicitly use these terms as modifiers of "OAM",
+161	   they are widely used in practice and are included here for clarity.
+162	   The terms "Active", "Passive" and "Hybrid", as described below, are
+163	   consistent with [RFC7799].  This document does not update or change
+164	   the terms of [RFC7799].
+
+166	   Active OAM:
+167	      Uses dedicated OAM packets.
+
+169	   Passive OAM:
+170	      Relies on the observation of one or more existing data packet
+171	      streams and does not use dedicated OAM packets and does not modify
+172	      data packets.
+
+174	   Hybrid OAM:
+175	      Uses a combination of Active Methods and Passive Methods, which
+176	      may include augmentation or modification of the stream of
+177	      interest.  [RFC7799] makes a distinction between Hybrid Type I,
+178	      referring to a single stream of interest, and Hybrid Type II,
+179	      referring to two or more streams of interest.
+
+181	   This document defines the term In-Data-Packet OAM as a more specific
+182	   and narrowly scoped instance within the broader category of Hybrid
+183	   OAM.  This new term allows for a more fine-grained classification of
+184	   OAM mechanisms, as the broad category of Hybrid OAM includes a
+185	   diverse set of possible OAM methods.
+
+187	   In-Data-Packet OAM:
+
+189	      OAM-related information is carried in the packets that also carry
+190	      the data traffic.  This is a specific case of Hybrid OAM.  It was
+191	      sometimes referred to as "in-band".
+
+193	   Note that In-Data-Packet OAM is a specific case of Hybrid Type I, as
+194	   it is applied to a single stream of interest.
+
+196	   The following examples illustrate the terms Active, Passive, Hybrid,
+197	   and In-Data-Packet OAM:
+
+199	   *  The MPLS echo request/reply messages [RFC8029] are an example of
+200	      "Active OAM", since they are described as "An MPLS echo request/
+201	      reply is a (possibly MPLS-labeled) IPv4 or IPv6 UDP packet".
+
+203	   *  Monitoring a packet stream by maintaining counters for the packets
+204	      within the stream is an example of "Passive OAM".
+
+206	   *  An example of "Hybrid Type I OAM" that is also "In-Data-Packet
+207	      OAM", is an IOAM (In Situ OAM) [RFC9197] trace option that is
+208	      incorporated into data packets of a single stream of interest.
+209	      According to [RFC9197], IOAM '...records OAM information within
+210	      the packet while the packet traverses a particular network domain.
+211	      The term "in situ" refers to the fact that the OAM data is added
+212	      to the data packets rather than being sent within packets
+213	      specifically dedicated to OAM.'
+
+215	   *  Another example of "Hybrid Type I OAM" that is also "In-Data-
+216	      Packet OAM" is Alternate Marking [RFC9341], when applied to data
+217	      packets of a single stream.  In this case a small number of bits
+218	      in the packet header is used for marking a subset of packets in a
+219	      flow.
+
+221	   *  An example of "Hybrid Type I OAM" which is not classified as "In-
+222	      Data-Packet OAM" is Direct Loss Measurement [RFC6374], in which
+223	      user packets are not modified by the protocol.  Instead, OAM
+224	      packets are used for carrying information about observed network
+225	      characteristics, namely user packet counter values, allowing for
+226	      packet loss computation.
+
+228	   *  Another example of "Hybrid Type I OAM" which is not "In-Data-
+229	      Packet OAM" is the case where a packet stream is (actively)
+230	      generated while an existing stream of interest is (passively)
+231	      observed.  This example was introduced in [RFC7799] as a Hybrid
+232	      Type I method.  Extending this example, if the packets of the
+233	      active stream include an IOAM trace option, the method is
+234	      characterized by the more general term, Hybrid Type I.
+
+236	3.3.  Path Followed OAM
+
+238	   Path-Congruent OAM:
+239	      The OAM information follows the exact same forwarding path as the
+240	      observed data traffic.
+
+242	   Non-Path-Congruent OAM:
+243	      The OAM information is not guaranteed to follow the exact same
+244	      forwarding path as the observed data traffic.
+
+246	   In this document, the term "path-congruent packets" describes packets
+247	   that follow the exact same path (i.e., traverse the same nodes and
+248	   links) within a network.  Note that this definition does not describe
+249	   how the packets are treated in queues within the nodes on the path.
+
+251	   An example of "Path-Congruent OAM" is the Virtual Circuit
+252	   Connectivity Verification (VCCV) Type 1 (Section 5.1.1 of [RFC5085]),
+253	   which was also referred to as In-Band VCCV.  The term "congruent"
+254	   also appears in Section 2 of [RFC6669] in the context of path
+255	   sharing.
+
+257	3.4.  Packet Forwarding Treatment OAM
+
+259	   Equal-Forwarding-Treatment OAM:
+260	      The OAM packets receive the same forwarding (e.g., QoS) treatment
+261	      as user data packets.
+
+263	   Different-Forwarding-Treatment OAM:
+264	      The OAM packets might receive different forwarding (e.g., QoS)
+265	      treatment than user data packets.
+
+267	   The motivation for Equal-Forwarding-Treatment OAM lies in the desire
+268	   to ensure that OAM packets experience the same network conditions as
+269	   the user data they are intended to monitor.  This includes not only
+270	   traversing the same topological path but also receiving identical
+271	   Quality of Service (QoS) treatment, such as queuing, scheduling, and
+272	   traffic shaping.  When both topological and forwarding treatment
+273	   equivalence are achieved, the OAM packets are said to exhibit fate-
+274	   sharing [RFC7276] with the data traffic.  Fate-sharing ensures that
+275	   any impairments or anomalies affecting the user traffic are also
+276	   reflected in the behavior of the OAM packets, thereby making the
+277	   results of the OAM observations more operationally meaningful and
+278	   actionable.  Without such equivalence, discrepancies in treatment
+279	   could lead to misleading measurements or diagnostics, and even
+280	   inadequate corrective actions, reducing the utility of the OAM
+281	   mechanism for performance monitoring, fault detection and mitigation.
+
+283	   An example of "Equal-Forwarding-Treatment OAM" is presented in
+284	   [RFC9551] in the context of Deterministic Networking (DetNet) OAM:
+285	   "it traverses the same set of links and interfaces receiving the same
+286	   QoS and Packet Replication, Elimination, and Ordering Functions
+287	   (PREOF) treatment as the monitored DetNet flow".
+
+289	3.5.  Using Multiple Criteria
+
+291	   OAM protocols and tools can be classified according to the three
+292	   criteria that were described in the previous sections.  However, not
+293	   all criteria are applicable to all OAM protocols, and not all
+294	   combinations are necessarily possible.  For example:
+
+296	   *  Passive OAM relies solely on observing existing data traffic and
+297	      does not generate dedicated OAM packets.  As such, the path
+298	      congruence and forwarding treatment criteria are not relevant,
+299	      since no dedicated OAM packets are exchanged between the
+300	      measurement points.
+
+302	   *  Non-Path-Congruent OAM, by nature, cannot be Equal-Forwarding-
+303	      Treatment.
+
+305	   When defining a new OAM mechanism or analyzing an existing one, it is
+306	   recommended to explicitly consider which of these criteria are
+307	   applicable and to describe the mechanism accordingly.  As a first
+308	   step, all OAM mechanisms can be classified according to the first
+309	   criterion, as Active, Passive, or Hybrid/In-Data-Packet.  Further
+310	   classification according to the other two criteria should be
+311	   considered on a case-by-case basis.
+
+313	   A few examples of OAM classification according to the three criteria
+314	   are presented below:
+
+316	   *  IP Ping, which uses ICMP Echo messages, can be classified as
+317	      Active OAM.  Since it is not guaranteed to follow the same path or
+318	      receive the same treatment as user data packets, it is classified
+319	      as Non-Path-Congruent and, consequently, as Different-Forwarding-
+320	      Treatment.
+
+322	   *  When an IOAM trace option [RFC9197] is incorporated in data
+323	      packets it can be classified as In-Data-Packet, Path-Congruent and
+324	      Equal-Forwarding-Treatment.
+
+326	   *  VCCV [RFC5085], as discussed above, is classified as Active, Path-
+327	      Congruent, and Different-Forwarding-Treatment.
+
+329	   *  MPLS Inferred Loss Measurement (ILM) (Section 3 of [RFC6374]) uses
+330	      specially generated test messages, and therefore can be classified
+331	      as Active.  It is also Path-Congruent, and can be deployed either
+332	      as Equal- or Different-Forwarding-Treatment OAM.  MPLS Direct Loss
+333	      Measurement (DLM) (Section 3 of [RFC6374]) uses OAM messages that
+334	      carry counters that count user data traffic.  Hence, it is
+335	      classified as Hybrid Type I OAM, and as in the Inferred Loss
+336	      Measurement, it is Path-Congruent, and can be either Equal- or
+337	      Different-Forwarding-Treatment OAM.
+
+339	   In measurement protocols, accurate results depend on path congruence
+340	   and equal forwarding treatment.  In contrast, these properties are
+341	   not always required in other OAM protocols.  For example,
+342	   Bidirectional Forwarding Detection (BFD) [RFC5880] control packets
+343	   are often sent with the highest priority, which means they do not
+344	   adhere to the equal forwarding treatment property.
+
+346	   This multi-dimensional classification enables a more precise and
+347	   consistent understanding of OAM mechanisms.
+
+349	3.6.  Summary of Terms
+
+351	   This section summarizes the terminology:
+
+353	   Active OAM:
+354	      Uses dedicated OAM packets.
+
+356	   Passive OAM:
+357	      Relies on the observation of one or more existing data packet
+358	      streams and does not use dedicated OAM packets and does not modify
+359	      data packets.
+
+361	   Hybrid OAM:
+362	      Uses a combination of Active Methods and Passive Methods, which
+363	      may include augmentation or modification of the stream of
+364	      interest.  [RFC7799] makes a distinction between Hybrid Type I,
+365	      referring to a single stream of interest, and Hybrid Type II,
+366	      referring to two or more streams of interest.
+
+368	   In-Data-Packet OAM:
+369	      OAM-related information is carried in the packets that also carry
+370	      the data traffic.  This is a specific case of Hybrid OAM.  It was
+371	      sometimes referred to as "in-band".
+
+373	   Path-Congruent OAM:
+374	      The OAM information follows the exact same forwarding path as the
+375	      observed data traffic.
+
+377	   Non-Path-Congruent OAM:
+378	      The OAM information is not guaranteed to follow the exact same
+379	      forwarding path as the observed data traffic.
+
+381	   Equal-Forwarding-Treatment OAM:
+382	      The OAM packets receive the same forwarding (e.g., QoS) treatment
+383	      as user data packets.
+
+385	   Different-Forwarding-Treatment OAM:
+386	      The OAM packets might receive different forwarding (e.g., QoS)
+387	      treatment than user data packets.
+
+389	4.  Security Considerations
+
+391	   Security is improved when terms are used with precision, and their
+392	   definitions are unambiguous.
+
+394	5.  IANA Considerations
+
+396	   This document has no IANA actions.
+
+398	6.  Acknowledgements
+
+400	   The creation of this document was triggered when observing one of
+401	   many on-mailing-list discussions of what these terms mean, and how to
+402	   abbreviate them.  Participants on that mailing thread include,
+403	   alphabetically: Adrian Farrel, Alexander Vainshtein, Florian Kauer,
+404	   Frank Brockners, Greg Mirsky, Italo Busi, Loa Andersson, Med
+405	   Boucadair, Michael Richardson, Quan Xiong, Stewart Bryant, Tom Petch,
+406	   Eduard Vasilenko, and Xiao Min.
+
+408	   The authors wish to thank, chronologically, Hesham Elbakoury, Michael
+409	   Richardson, Stewart Bryant, Greg Mirsky, Med Boucadair, Loa
+410	   Andersson, Thomas Graf, Alex Huang Feng, Xiao Min, Dhruv Dhody, Henk
+411	   Birkholz, Alex Huang Feng, Tom Petch, Roni Even, Tim Chown, Marcus
+412	   Ihlar, Med Boucadair, Benoit Claise, Chongfeng Xie, Robert Sparks,
+413	   Kyle Rose, and Mach Chen for their thorough review and useful
+414	   feedback comments that greatly improved this document.
+
+416	7.  References
+
+418	7.1.  Normative References
+
+420	   [RFC6291]  Andersson, L., van Helvoort, H., Bonica, R., Romascanu,
+421	              D., and S. Mansfield, "Guidelines for the Use of the "OAM"
+422	              Acronym in the IETF", BCP 161, RFC 6291,
+423	              DOI 10.17487/RFC6291, June 2011,
+424	              <https://www.rfc-editor.org/info/rfc6291>.
+
+426	   [RFC7799]  Morton, A., "Active and Passive Metrics and Methods (with
+427	              Hybrid Types In-Between)", RFC 7799, DOI 10.17487/RFC7799,
+428	              May 2016, <https://www.rfc-editor.org/info/rfc7799>.
+
+430	7.2.  Informative References
+
+432	   [I-D.ietf-raw-architecture]
+433	              Thubert, P., "Reliable and Available Wireless
+434	              Architecture", Work in Progress, Internet-Draft, draft-
+435	              ietf-raw-architecture-30, 25 July 2025,
+436	              <https://datatracker.ietf.org/doc/html/draft-ietf-raw-
+437	              architecture-30>.
+
+439	   [P4-INT-2.1]
+440	              "In-band Network Telemetry (INT) Dataplane Specification,
+441	              Version 2.1", 11 November 2020,
+442	              <https://p4.org/p4-spec/docs/INT_v2_1.pdf>.
+
+444	   [RFC4733]  Schulzrinne, H. and T. Taylor, "RTP Payload for DTMF
+445	              Digits, Telephony Tones, and Telephony Signals", RFC 4733,
+446	              DOI 10.17487/RFC4733, December 2006,
+447	              <https://www.rfc-editor.org/info/rfc4733>.
+
+449	   [RFC5085]  Nadeau, T., Ed. and C. Pignataro, Ed., "Pseudowire Virtual
+450	              Circuit Connectivity Verification (VCCV): A Control
+451	              Channel for Pseudowires", RFC 5085, DOI 10.17487/RFC5085,
+452	              December 2007, <https://www.rfc-editor.org/info/rfc5085>.
+
+454	   [RFC5880]  Katz, D. and D. Ward, "Bidirectional Forwarding Detection
+455	              (BFD)", RFC 5880, DOI 10.17487/RFC5880, June 2010,
+456	              <https://www.rfc-editor.org/info/rfc5880>.
+
+458	   [RFC6374]  Frost, D. and S. Bryant, "Packet Loss and Delay
+459	              Measurement for MPLS Networks", RFC 6374,
+460	              DOI 10.17487/RFC6374, September 2011,
+461	              <https://www.rfc-editor.org/info/rfc6374>.
+
+463	   [RFC6669]  Sprecher, N. and L. Fang, "An Overview of the Operations,
+464	              Administration, and Maintenance (OAM) Toolset for MPLS-
+465	              Based Transport Networks", RFC 6669, DOI 10.17487/RFC6669,
+466	              July 2012, <https://www.rfc-editor.org/info/rfc6669>.
+
+468	   [RFC7276]  Mizrahi, T., Sprecher, N., Bellagamba, E., and Y.
+469	              Weingarten, "An Overview of Operations, Administration,
+470	              and Maintenance (OAM) Tools", RFC 7276,
+471	              DOI 10.17487/RFC7276, June 2014,
+472	              <https://www.rfc-editor.org/info/rfc7276>.
+
+474	   [RFC8029]  Kompella, K., Swallow, G., Pignataro, C., Ed., Kumar, N.,
+475	              Aldrin, S., and M. Chen, "Detecting Multiprotocol Label
+476	              Switched (MPLS) Data-Plane Failures", RFC 8029,
+477	              DOI 10.17487/RFC8029, March 2017,
+478	              <https://www.rfc-editor.org/info/rfc8029>.
+
+480	   [RFC9197]  Brockners, F., Ed., Bhandari, S., Ed., and T. Mizrahi,
+481	              Ed., "Data Fields for In Situ Operations, Administration,
+482	              and Maintenance (IOAM)", RFC 9197, DOI 10.17487/RFC9197,
+483	              May 2022, <https://www.rfc-editor.org/info/rfc9197>.
+
+485	   [RFC9232]  Song, H., Qin, F., Martinez-Julia, P., Ciavaglia, L., and
+486	              A. Wang, "Network Telemetry Framework", RFC 9232,
+487	              DOI 10.17487/RFC9232, May 2022,
+488	              <https://www.rfc-editor.org/info/rfc9232>.
+
+490	   [RFC9341]  Fioccola, G., Ed., Cociglio, M., Mirsky, G., Mizrahi, T.,
+491	              and T. Zhou, "Alternate-Marking Method", RFC 9341,
+492	              DOI 10.17487/RFC9341, December 2022,
+493	              <https://www.rfc-editor.org/info/rfc9341>.
+
+495	   [RFC9551]  Mirsky, G., Theoleyre, F., Papadopoulos, G., Bernardos,
+496	              CJ., Varga, B., and J. Farkas, "Framework of Operations,
+497	              Administration, and Maintenance (OAM) for Deterministic
+498	              Networking (DetNet)", RFC 9551, DOI 10.17487/RFC9551,
+499	              March 2024, <https://www.rfc-editor.org/info/rfc9551>.
+
+501	Appendix A.  Examples of the Use of the Term In-Band
+
+503	   This appendix provides a few examples of the use of the term "in-
+504	   band".  These are intended to highlight the varying interpretations
+505	   of the term across different contexts, which led to the guidelines in
+506	   this document.
+
+508	   In-Data-Packet OAM was in some cases referred to as "in-band".
+509	   Initially, "In situ OAM" [RFC9197] was also referred to as "In-band
+510	   OAM", but was renamed due to the overloaded meaning of "In-band OAM".
+511	   Further, [RFC9232] also intertwines the terms "in-band" with "in
+512	   situ".  Other similar uses, including [P4-INT-2.1], still use
+513	   variations of "in-band", "in band", or "inband".
+
+515	   Path-Congruent OAM was sometimes referred to as "in-band".  As
+516	   described in [RFC5085], "The VCCV message travels in-band with the
+517	   Session and follows the exact same path as the user data for the
+518	   session".  The term "in-band" is also used in Section 2 of [RFC6669]
+519	   with the same meaning.  Non-Path-Congruent OAM was referred to in
+520	   [RFC5085] as Out-of-Band.
+
+522	   The property of "Equal-Forwarding-Treatment" is referred to in
+523	   [RFC9551] as "In-band OAM".  Similarly, the property of "Different-
+524	   Forwarding-Treatment OAM" can be found in the following definition in
+525	   [RFC9551]: "Out-of-band OAM: an active OAM method whose path through
+526	   the DetNet domain may not be topologically identical to the path of
+527	   the monitored DetNet flow, its test packets may receive different QoS
+528	   and/or PREOF treatment, or both."  [I-D.ietf-raw-architecture] uses
+529	   similar text.
+
+531	Authors' Addresses
+
+533	   Carlos Pignataro
+534	   Blue Fern Consulting
+535	   United States of America
+536	   Email: cpignata@gmail.com, carlos@bluefern.consulting
+
+538	   Adrian Farrel
+539	   Old Dog Consulting
+540	   United Kingdom
+541	   Email: adrian@olddog.co.uk
+
+543	   Tal Mizrahi
+544	   Huawei
+545	   Matam
+546	   Haifa 3190501
+547	   Israel
+548	   Email: tal.mizrahi.phd@gmail.com
+
+
+
+
+
+
+
+
+
