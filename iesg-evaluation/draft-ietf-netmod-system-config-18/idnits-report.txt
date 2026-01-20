@@ -1,0 +1,1468 @@
+idnits 2.17.1 
+
+draft-ietf-netmod-system-config-18.txt:
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+  == There is 1 instance of lines with non-ascii characters in the document.
+
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     Summary: 0 errors (**), 0 flaws (~~), 1 warning (==), 0 comments (--).
+
+--------------------------------------------------------------------------------
+
+
+2	NETMOD                                                        Q. Ma, Ed.
+3	Internet-Draft                                                     Q. Wu
+4	Updates: 8342 (if approved)                                       Huawei
+5	Intended status: Standards Track                                 C. Feng
+6	Expires: 17 July 2026                                    13 January 2026
+
+8	                      System-defined Configuration
+9	                   draft-ietf-netmod-system-config-18
+
+11	Abstract
+
+13	   The Network Management Datastore Architecture (NMDA) in RFC 8342
+14	   defines several configuration datastores holding configuration.  The
+15	   contents of these configuration datastores are controlled by clients.
+16	   This document introduces the concept of system configuration
+17	   datastore holding configuration controlled by the system on which a
+18	   server is running.  The system configuration can be referenced (e.g.,
+19	   leafref) by configuration explicitly created by clients.
+
+21	   This document updates RFC 8342.
+
+23	Status of This Memo
+
+25	   This Internet-Draft is submitted in full conformance with the
+26	   provisions of BCP 78 and BCP 79.
+
+28	   Internet-Drafts are working documents of the Internet Engineering
+29	   Task Force (IETF).  Note that other groups may also distribute
+30	   working documents as Internet-Drafts.  The list of current Internet-
+31	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+33	   Internet-Drafts are draft documents valid for a maximum of six months
+34	   and may be updated, replaced, or obsoleted by other documents at any
+35	   time.  It is inappropriate to use Internet-Drafts as reference
+36	   material or to cite them other than as "work in progress."
+
+38	   This Internet-Draft will expire on 17 July 2026.
+
+40	Copyright Notice
+
+42	   Copyright (c) 2026 IETF Trust and the persons identified as the
+43	   document authors.  All rights reserved.
+
+45	   This document is subject to BCP 78 and the IETF Trust's Legal
+46	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+47	   license-info) in effect on the date of publication of this document.
+48	   Please review these documents carefully, as they describe your rights
+49	   and restrictions with respect to this document.  Code Components
+50	   extracted from this document must include Revised BSD License text as
+51	   described in Section 4.e of the Trust Legal Provisions and are
+52	   provided without warranty as described in the Revised BSD License.
+
+54	Table of Contents
+
+56	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
+57	     1.1.  Terminology . . . . . . . . . . . . . . . . . . . . . . .   3
+58	     1.2.  Requirements Language . . . . . . . . . . . . . . . . . .   5
+59	     1.3.  Updates to RFC 8342 . . . . . . . . . . . . . . . . . . .   5
+60	   2.  Kinds of System Configuration . . . . . . . . . . . . . . . .   5
+61	     2.1.  Always-Present  . . . . . . . . . . . . . . . . . . . . .   6
+62	     2.2.  Conditionally-Present . . . . . . . . . . . . . . . . . .   6
+63	   3.  The System Configuration Datastore (<system>) . . . . . . . .   6
+64	   4.  Conceptual Model of Datastores  . . . . . . . . . . . . . . .   7
+65	   5.  Static Characteristics  . . . . . . . . . . . . . . . . . . .   9
+66	     5.1.  Read-only to Clients  . . . . . . . . . . . . . . . . . .   9
+67	     5.2.  No Changes to <operational> . . . . . . . . . . . . . . .   9
+68	   6.  Dynamic Behaviors . . . . . . . . . . . . . . . . . . . . . .   9
+69	     6.1.  May Change via Software Upgrades or Resource Changes  . .   9
+70	     6.2.  Referencing System Configuration  . . . . . . . . . . . .   9
+71	     6.3.  Modifying (Overriding) System Configuration . . . . . . .  10
+72	     6.4.  Configuring Descendant nodes of System Configuration  . .  10
+73	   7.  The "ietf-system-datastore" Module  . . . . . . . . . . . . .  10
+74	     7.1.  Data Model Overview . . . . . . . . . . . . . . . . . . .  10
+75	     7.2.  YANG Module . . . . . . . . . . . . . . . . . . . . . . .  11
+76	     7.3.  Example Usage . . . . . . . . . . . . . . . . . . . . . .  12
+77	   8.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  13
+78	     8.1.  The "IETF XML" Registry . . . . . . . . . . . . . . . . .  13
+79	     8.2.  The "YANG Module Names" Registry  . . . . . . . . . . . .  13
+80	   9.  Operational Considerations  . . . . . . . . . . . . . . . . .  13
+81	   10. Security Considerations . . . . . . . . . . . . . . . . . . .  14
+82	     10.1.  Considerations for the "ietf-system-datastore" YANG
+83	            Module . . . . . . . . . . . . . . . . . . . . . . . . .  14
+84	     10.2.  Considerations for System Configuration  . . . . . . . .  14
+85	   11. References  . . . . . . . . . . . . . . . . . . . . . . . . .  14
+86	     11.1.  Normative References . . . . . . . . . . . . . . . . . .  14
+87	     11.2.  Informative References . . . . . . . . . . . . . . . . .  15
+88	   Appendix A.  Example of Dynamic Behaviors . . . . . . . . . . . .  17
+89	     A.1.  Referencing System-defined Nodes  . . . . . . . . . . . .  17
+90	     A.2.  Modifying a System-instantiated Leaf's Value  . . . . . .  23
+91	     A.3.  Configuring Descendant Nodes of a System-defined Node . .  24
+92	   Appendix B.  Key Use Cases  . . . . . . . . . . . . . . . . . . .  25
+93	     B.1.  Device Powers On  . . . . . . . . . . . . . . . . . . . .  27
+94	     B.2.  Client Commits Configuration  . . . . . . . . . . . . . .  27
+95	     B.3.  Operator Installs Card into a Chassis . . . . . . . . . .  29
+96	     B.4.  Client further Commits Configuration  . . . . . . . . . .  30
+
+98	   Acknowledgements  . . . . . . . . . . . . . . . . . . . . . . . .  32
+99	   Contributors  . . . . . . . . . . . . . . . . . . . . . . . . . .  32
+100	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  33
+
+102	1.  Introduction
+
+104	   The Network Management Datastore Architecture (NMDA) [RFC8342]
+105	   defines system configuration as the configuration that is supplied by
+106	   the device itself and appears in <operational> when it is in use
+107	   (Figure 2 in [RFC8342]).
+
+109	   However, there is a desire to enable a server to better expose the
+110	   system configuration, regardless of whether it is in use.  For
+111	   example, some implementations define the system configuration which
+112	   must be referenced to be active.  NETCONF/RESTCONF clients can
+113	   benefit from a standard mechanism to retrieve what system
+114	   configuration is available on a server.
+
+116	   Some servers allow the descendant nodes of system-defined
+117	   configuration to be configured or modified.  For example, the system
+118	   configuration may contain an almost empty physical interface, whose
+119	   existence in the system configuration is tied to the presence of
+120	   particular hardware, while the client needs to be able to add,
+121	   modify, or remove a number of descendant nodes.  Some descendant
+122	   nodes may not be modifiable (e.g., the interface "type" set by the
+123	   system).
+
+125	   This document updates the NMDA defined in [RFC8342] with a read-only
+126	   conventional configuration datastore called "system" to expose
+127	   system-defined configuration.  The solution enables configuration
+128	   explicitly created by the clients to reference nodes defined in
+129	   <system>, override system-provided values, and configure descendant
+130	   nodes of system-defined configuration.
+
+132	   The solution defined in this document requires the use of NMDA for
+133	   both clients and servers.  Conformance to this document requires NMDA
+134	   servers implement the "ietf-system-datastore" YANG module
+135	   (Section 7).
+
+137	1.1.  Terminology
+
+139	   This document assumes that the reader is familiar with the contents
+140	   of [RFC6241], [RFC7950], [RFC8342], and [RFC8525] and uses
+141	   terminologies from those documents.  The terms "device" and "server"
+142	   are used interchangeably in this document.
+
+144	   The following terms are defined in this document:
+
+146	   system configuration:  RFC 8342 defines it as "Configuration that is
+147	      supplied by the device itself."  The definition herein refines
+148	      that definition of system configuration to represent configuration
+149	      present in the system configuration datastore (regardless of
+150	      whether it is applied or referenced).  It may also be referred to
+151	      as "system-defined configuration" or "system-provided
+152	      configuration" throughout this document.
+
+154	   system configuration datastore:  A configuration datastore holding
+155	      configuration provided by the system itself.  This datastore is
+156	      referred to as "<system>".
+
+158	   This document redefines the term "conventional configuration
+159	   datastore" in Section 3 of [RFC8342] to add "system" to the list of
+160	   conventional configuration datastores:
+
+162	   conventional configuration datastore:  One of the following set of
+163	      configuration datastores: <running>, <startup>, <candidate>,
+164	      <system>, and <intended>.  These datastores share a common
+165	      datastore schema, and protocol operations allow copying data
+166	      between these datastores.  The term "conventional" is chosen as a
+167	      generic umbrella term for these datastores.  Note while protocol
+168	      operations allow copying data between conventional datastores, the
+169	      read-only nature of datastores such as <system> and <intended>
+170	      restricts clients from copying data into them.
+
+172	   system node:  An instance in the data tree that is provided by the
+173	      system itself.  System node may also be called "system-defined
+174	      node" or "system-provided node" throughout this document.
+
+176	   referenced node:  A referenced node is one of:
+
+178	      *  Targets of leafref values defined via the "path" statement.
+
+180	      *  Targets of "instance-identifier" type values.
+
+182	      *  Nodes present in an XPath expression of "when" constraints.
+
+184	      *  Nodes present in an XPath expression of "must" constraints.
+
+186	      *  Nodes defined to satisfy the "mandatory true" constraints.
+
+188	      *  Nodes defined to satisfy the "min-elements" constraints.
+
+190	1.2.  Requirements Language
+
+192	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+193	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+194	   "OPTIONAL" in this document are to be interpreted as described in BCP
+195	   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+196	   capitals, as shown here.
+
+198	1.3.  Updates to RFC 8342
+
+200	   This document updates RFC 8342 to define a configuration datastore
+201	   called "system" to hold system configuration (Section 3), it also
+202	   redefines the term "conventional configuration datastore" from
+203	   [RFC8342] to add "system" to the list of conventional configuration
+204	   datastores.
+
+206	   Configuration in <running> is merged with <system> to create the
+207	   contents of <intended> after the configuration transformations (e.g.,
+208	   template expansion, removal of inactive configuration defined in
+209	   [RFC8342]) have been performed, as described in Section 4.
+
+211	   This document also updates the definition of "intended" origin
+212	   metadata annotation identity defined in Section 5.3.4 of [RFC8342].
+213	   The "intended" identity of origin value defined in [RFC8342]
+214	   represents the origin of configuration provided by <intended>, this
+215	   document updates its definition as the origin source of configuration
+216	   explicitly provided by clients, and allows a subset of configuration
+217	   in <intended> that flows from <system> yet is not configured or
+218	   overridden explicitly in <running> to use "system" as its origin
+219	   value.  As per Section 5.3.4 of [RFC8342], all configuration with
+220	   origin value being reported as "intended" MUST originate from
+221	   <running>, which includes any configuration in <system> that has been
+222	   copied into <running>.  Configuration that is in <system> and not
+223	   also present in <running> MUST be reported as origin "system" in
+224	   <operational>.
+
+226	2.  Kinds of System Configuration
+
+228	   This document defines two types of system configuration.
+229	   Configuration that is always-present and configuration that is
+230	   conditionally-present.  These types of system configuration are
+231	   described in Section 2.1 and Section 2.2, respectively.
+
+233	2.1.  Always-Present
+
+235	   Always-present refers to system configuration which is generated in
+236	   <system> when the device is powered on, irrespective of whether
+237	   physical resources are present or whether a special functionality is
+238	   enabled.  An example of always-present system configuration is an
+239	   always-existing loopback interface.
+
+241	2.2.  Conditionally-Present
+
+243	   Conditionally-present refers to system configuration which is
+244	   generated in <system> based on specific conditions being met in a
+245	   system.  For example, if a physical resource is present (e.g., an
+246	   interface card is inserted), the system automatically detects it and
+247	   loads the associated configuration; when the physical resource is not
+248	   present (an interface card is removed), the system configuration will
+249	   automatically be removed from <system>.  Another example is when a
+250	   special functionality (e.g., a license or feature) is enabled,
+251	   specific configuration may be created by the system.
+
+253	3.  The System Configuration Datastore (<system>)
+
+255	   Following guidelines for defining datastores in the Appendix A of
+256	   [RFC8342], this document introduces a new datastore resource named
+257	   "system" that represents the system configuration.  NMDA servers
+258	   compliant with this document MUST implement a system configuration
+259	   datastore, and they SHOULD also implement <intended>.
+
+261	   *  Name: "system".
+
+263	   *  YANG modules: all.
+
+265	   *  YANG nodes: all "config true" data nodes up to the root of the
+266	      tree, generated by the system.
+
+268	   *  Management operations: The datastore can be read using network
+269	      management protocols such as NETCONF and RESTCONF, but its
+270	      contents cannot be changed by management operations via NETCONF
+271	      and RESTCONF protocols.
+
+273	   *  Origin: This document does not define any new origin identity.
+274	      The "system" identity of origin metadata annotation [RFC7952] is
+275	      used to indicate the origin of a data item provided by the system.
+
+277	   *  Protocols: YANG-driven management protocols, such as NETCONF and
+278	      RESTCONF.
+
+280	   *  Defining YANG module: "ietf-system-datastore" (Section 7).
+
+282	   The system configuration datastore doesn't persist across reboots.
+
+284	4.  Conceptual Model of Datastores
+
+286	   Clients may provide configuration nodes that reference nodes defined
+287	   in <system>, override system-provided values, and configure
+288	   descendant nodes of system-defined configuration in <running>, as
+289	   detailed in Section 6.
+
+291	   To ensure the validity of <intended>, configuration in <running> is
+292	   merged with <system> to become <intended>, in which process,
+293	   configuration appearing in <running> takes precedence over the same
+294	   node in <system>.  Since it is unspecified how to merge configuration
+295	   before transformations, if <system> or <running> includes
+296	   configuration that requires further transformation (e.g., template
+297	   expansion, removal of inactive configuration defined in [RFC8342])
+298	   before it can be applied, configuration transformations MUST be
+299	   performed independently on each datastore before <running> is merged
+300	   with <system>.
+
+302	   Whenever configuration in <system> changes, the server MUST also
+303	   immediately update and validate <intended>.
+
+305	   As a result, Figure 2 in Section 5 of [RFC8342] is updated with the
+306	   below conceptual model of datastores which incorporates the system
+307	   configuration datastore.
+
+309	                +-------------+                 +-----------+
+310	                | <candidate> |                 | <startup> |
+311	                |  (ct, rw)   |<---+      +---->| (ct, rw)  |
+312	                +-------------+    |      |     +-----------+
+313	                       |           |      |           |
+314	 +-----------+         |        +-----------+         |
+315	 | <system>  |         +------->| <running> |<--------+
+316	 | (ct, ro)  |                  | (ct, rw)  |
+317	 +-----------+                  +-----------+
+318	      |                              |
+319	      |                              |
+320	      |                              | // configuration transformations,
+321	      +--------------+---------------+ // e.g., removal of nodes marked
+322	                     |                 // as "inactive", expansion of
+323	                     |                 // templates
+324	                     v
+325	               +------------+
+326	               | <intended> |  // subject to validation
+327	               | (ct, ro)   |
+328	               +------------+
+329	                      |       // changes applied, subject to
+330	                      |       // local factors, e.g., missing
+331	                      |       // resources, delays
+332	  dynamic             |
+333	  configuration       |   +-------- learned configuration
+334	  datastores -----+   |   +-------- default configuration
+335	                  |   |   |
+336	                  v   v   v
+337	              +---------------+
+338	              | <operational> | <-- system state
+339	              | (ct + cf, ro) |
+340	              +---------------+
+
+342	 ct = config true; cf = config false
+343	 rw = read-write; ro = read-only
+344	 boxes denote named datastores
+
+346	              Figure 1: Architectural Model of Datastores
+
+348	   Configuration in <system> cannot be deleted by clients (e.g., a list
+349	   entry can never be removed from <system> through protocol
+350	   operations), even though a node defined in <system> may be overridden
+351	   in <running>.  If the system initializes a value for a particular
+352	   leaf which is overridden by the client with a different value in
+353	   <running> (Section 6.3), and if the node in <running> is removed at a
+354	   later time, the system-initialized value defined in <system> appears
+355	   in <intended> and may come into use eventually if applied
+356	   successfully.
+
+358	   Configuration may disappear from <system> due to, e.g., resources no
+359	   longer available.  In such cases, configuration for missing resources
+360	   can still remain in <running> and <intended>, but it will not be
+361	   applied and appear in <operational>.  This is further clarified in
+362	   Section 5.3.2 of [RFC8342].
+
+364	5.  Static Characteristics
+
+366	5.1.  Read-only to Clients
+
+368	   The system datastore is read-only (i.e., edits towards <system>
+369	   directly MUST be denied), though the client may be allowed to provide
+370	   configuration that overrides the value of a system-initialized node
+371	   (see Section 6.3).
+
+373	5.2.  No Changes to <operational>
+
+375	   This work does not change the definition of <operational>; it
+376	   clarifies origin reporting, i.e., the origin of nodes sourced from
+377	   <system> is reported as "system" unless explicitly configured or
+378	   overridden in <running>. <system> enables system-generated nodes to
+379	   be defined like configuration, i.e., made visible to clients in order
+380	   for being referenced or configurable prior to present in
+381	   <operational>. "config false" nodes are out of scope, hence existing
+382	   "config false" nodes are not impacted by this work.
+
+384	6.  Dynamic Behaviors
+
+386	6.1.  May Change via Software Upgrades or Resource Changes
+
+388	   The contents of <system> MAY change dynamically under various
+389	   conditions, such as license change, software upgrade, and system-
+390	   controlled resources change (see Section 2.2).  The updates of system
+391	   configuration may be obtained through YANG notifications (e.g., on-
+392	   change notification) [RFC8639][RFC8641].
+
+394	   If system configuration changes (e.g., during a software upgrade),
+395	   <running> SHOULD remain a valid configuration data tree.  Any
+396	   mechanisms to achieve this are outside the scope of this document.
+
+398	6.2.  Referencing System Configuration
+
+400	   Clients may create configuration data in <running> that references
+401	   nodes in <system>.  Some implementations may define system nodes
+402	   solely as a convenience for clients to reference.  It is also
+403	   possible for the clients to define their customized nodes for
+404	   reference.
+
+406	   Appendix A.1 provides an example of a client referencing system-
+407	   defined nodes.
+
+409	6.3.  Modifying (Overriding) System Configuration
+
+411	   In some cases, a server may allow some parts of system configuration
+412	   (e.g., a leaf's value) to be modified.  Modification of system
+413	   configuration is achieved by the client writing configuration data in
+414	   <running> that overrides the values of matched configuration nodes at
+415	   the corresponding level in <system>.  Configurations defined in
+416	   <running> take precedence over system configuration nodes in <system>
+417	   if the server allows the nodes to be modified (some implementations
+418	   may have immutable system configuration which is identified by the
+419	   server using immutable metadata annotation, see
+420	   [I-D.ietf-netmod-immutable-flag] for details).
+
+422	   Appendix A.2 provides an example of a client overriding a system-
+423	   instantiated leaf's value.
+
+425	6.4.  Configuring Descendant nodes of System Configuration
+
+427	   A server may also allow a client to add nodes to a list entry in
+428	   <system> by writing those additional nodes in <running>.  Those
+429	   additional data nodes may not exist in <system> (i.e., an addition
+430	   rather than an override).
+
+432	   Appendix A.3 provides an example of a client configuring descendant
+433	   nodes of a system-defined node.
+
+435	7.  The "ietf-system-datastore" Module
+
+437	7.1.  Data Model Overview
+
+439	   This YANG module defines a new YANG identity named "system" that uses
+440	   the "ds:conventional" identity defined in [RFC8342] as its base.  A
+441	   client can discover the system configuration datastore support on the
+442	   server by reading the YANG library information from the operational
+443	   state datastore.
+
+445	   The system datastore is defined as a conventional configuration
+446	   datastore and shares a common datastore schema with other
+447	   conventional datastores.
+
+449	   The following diagram illustrates the relationship amongst the
+450	   "identity" statements defined in the "ietf-system-datastore" and
+451	   "ietf-datastores" YANG modules:
+
+453	   Identities:
+454	       +--- datastore
+455	       |  +--- conventional
+456	       |  |  +--- running
+457	       |  |  +--- candidate
+458	       |  |  +--- startup
+459	       |  |  +--- system
+460	       |  |  +--- intended
+461	       |  +--- dynamic
+462	       |  +--- operational
+
+464	   The diagram above uses syntax that is similar to but not defined in
+465	   [RFC8340].
+
+467	7.2.  YANG Module
+
+469	   <CODE BEGINS> file "ietf-system-datastore@2026-01-14.yang"
+
+471	   module ietf-system-datastore {
+472	     yang-version 1.1;
+473	     namespace "urn:ietf:params:xml:ns:yang:ietf-system-datastore";
+474	     prefix sysds;
+
+476	     import ietf-datastores {
+477	       prefix ds;
+478	       reference
+479	         "RFC 8342: Network Management Datastore Architecture(NMDA)";
+480	     }
+
+482	     organization
+483	       "IETF NETMOD (Network Modeling) Working Group";
+484	     contact
+485	       "WG Web:   <https://datatracker.ietf.org/wg/netmod/>
+486	        WG List:  <mailto:netmod@ietf.org>
+
+488	        Author: Qiufang Ma
+489	                <mailto:maqiufang1@huawei.com>
+490	        Author: Qin Wu
+491	                <mailto:bill.wu@huawei.com>
+492	        Author: Chong Feng
+493	                <mailto:fengchongllly@gmail.com>";
+494	     description
+495	       "This module defines a new YANG identity that uses the
+496	        ds:conventional identity defined in [RFC8342].
+
+498	        Copyright (c) 2026 IETF Trust and the persons identified
+499	        as authors of the code. All rights reserved.
+
+501	        Redistribution and use in source and binary forms, with
+502	        or without modification, is permitted pursuant to, and
+503	        subject to the license terms contained in, the Revised
+504	        BSD License set forth in Section 4.c of the IETF Trust's
+505	        Legal Provisions Relating to IETF Documents
+506	        (https://trustee.ietf.org/license-info).
+
+508	        This version of this YANG module is part of RFC XXXX
+509	        (https://www.rfc-editor.org/info/rfcXXXX); see the RFC
+510	        itself for full legal notices.";
+
+512	     revision 2026-01-14 {
+513	       description
+514	         "Initial version.";
+515	       reference
+516	         "RFC XXXX: System-defined Configuration";
+517	     }
+
+519	     identity system {
+520	       base ds:conventional;
+521	       description
+522	         "This read-only datastore contains the configuration
+523	          provided by the system itself.";
+524	     }
+525	   }
+
+527	   <CODE ENDS>
+
+529	7.3.  Example Usage
+
+531	   The following example shows how the configuration in <system> could
+532	   be retrieved in a NETCONF <get-data> RPC operation.  The example uses
+533	   the "example-application" fictional data model defined in
+534	   Appendix A.1.
+
+536	   <rpc message-id="101"
+537	        xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+538	     <get-data xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-nmda"
+539	        xmlns:sysds="urn:ietf:params:xml:ns:yang:ietf-system-datastore">
+540	       <datastore>sysds:system</datastore>
+541	       <subtree-filter>
+542	         <applications xmlns="urn:example:application"/>
+543	       </subtree-filter>
+544	     </get-data>
+545	   </rpc>
+546	   When using the RESTCONF protocol, the system configuration datastore
+547	   can be accessed via the resource: {+restconf}/ds/ietf-system-
+548	   datastore:system.  The following example uses an HTTP GET method to
+549	   request "applications" configuration:
+
+551	   GET /restconf/ds/ietf-system-datastore:system/\
+552	      example-application:applications HTTP/1.1
+553	   Host: example.com
+554	   Accept: application/yang-data+xml
+
+556	8.  IANA Considerations
+
+558	8.1.  The "IETF XML" Registry
+
+560	   This document registers one XML namespace URI in the 'IETF XML
+561	   registry', following the format defined in [RFC3688].
+
+563	      URI: urn:ietf:params:xml:ns:yang:ietf-system-datastore
+564	      Registrant Contact: The IESG.
+565	      XML: N/A, the requested URIs are XML namespaces.
+
+567	8.2.  The "YANG Module Names" Registry
+
+569	   This document registers one YANG module in the 'YANG Module Names'
+570	   registry, defined in [RFC6020].
+
+572	         name: ietf-system-datastore
+573	         prefix: sysds
+574	         namespace: urn:ietf:params:xml:ns:yang:ietf-system-datastore
+575	         maintained by IANA? N
+576	         RFC: XXXX // RFC Ed.: replace XXXX and remove this comment
+
+578	9.  Operational Considerations
+
+580	   System configuration exists regardless of whether the server
+581	   implements <system> or not.  The introduction of <system> provides a
+582	   standardized way to expose system configuration within NMDA.
+
+584	   NMDA clients that are not aware of <system> will continue to operate
+585	   correctly.  They will interact only with datastores such as
+586	   <running>, <candidate>, <intended>, and <operational> as before.  The
+587	   presence of <system> does not change the fundamental behavior for
+588	   such legacy clients.  Operators should be aware that to fully
+589	   leverage the capabilities defined in this document, client
+590	   applications need to be updated to recognize and interact with system
+591	   configuration.
+
+593	10.  Security Considerations
+
+595	10.1.  Considerations for the "ietf-system-datastore" YANG Module
+
+597	   This section is modeled after the template described in Section 3.7
+598	   of [I-D.ietf-netmod-rfc8407bis].
+
+600	   The "ietf-system-datastore" YANG module defines a data model that is
+601	   designed to be accessed via YANG-based management protocols, such as
+602	   NETCONF [RFC6241] and RESTCONF [RFC8040].  These protocols have to
+603	   use a secure transport layer (e.g., SSH [RFC4252], TLS
+604	   [I-D.ietf-tls-rfc8446bis], and QUIC [RFC9000]) and have to use mutual
+605	   authentication.
+
+607	   The Network Configuration Access Control Model (NACM) [RFC8341]
+608	   provides the means to restrict access for particular NETCONF or
+609	   RESTCONF users to a preconfigured subset of all available NETCONF or
+610	   RESTCONF protocol operations and content.
+
+612	   The YANG module only defines an identity that uses the
+613	   "ds:conventional" identity as its base.  The module by itself does
+614	   not expose any data nodes that are writable, data nodes that contain
+615	   read-only state, or RPCs.  As such, there are no additional security
+616	   issues related to the YANG module that need to be considered.
+
+618	10.2.  Considerations for System Configuration
+
+620	   The system datastore, while read-only to clients, may contain
+621	   sensitive information such as hardware identifiers, security
+622	   policies, and critical system resources.  Read access to sensitive
+623	   system nodes and subtrees within the datastore MUST be controlled to
+624	   prevent unauthorized disclosure.  Implementations are strongly
+625	   advised to log all access attempts to sensitive system configuration
+626	   for audit purposes.
+
+628	   Furthermore, while <system> cannot be modified directly, system
+629	   configuration may be overridden as a merging result (Section 6.3).
+630	   An attacker may configure a leaf that shadows a sensitive node in
+631	   <system>.  Misconfiguration in <running> could lead to unintended
+632	   system behavior including security policy bypass and availability
+633	   risks.  Unauthorized modification to sensitive contents MUST be
+634	   prevented to avoid those negative effects on the network.
+
+636	11.  References
+
+638	11.1.  Normative References
+
+640	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+641	              Requirement Levels", BCP 14, RFC 2119,
+642	              DOI 10.17487/RFC2119, March 1997,
+643	              <https://www.rfc-editor.org/info/rfc2119>.
+
+645	   [RFC7950]  Bjorklund, M., Ed., "The YANG 1.1 Data Modeling Language",
+646	              RFC 7950, DOI 10.17487/RFC7950, August 2016,
+647	              <https://www.rfc-editor.org/info/rfc7950>.
+
+649	   [RFC8341]  Bierman, A. and M. Bjorklund, "Network Configuration
+650	              Access Control Model", STD 91, RFC 8341,
+651	              DOI 10.17487/RFC8341, March 2018,
+652	              <https://www.rfc-editor.org/info/rfc8341>.
+
+654	   [RFC8342]  Bjorklund, M., Schoenwaelder, J., Shafer, P., Watsen, K.,
+655	              and R. Wilton, "Network Management Datastore Architecture
+656	              (NMDA)", RFC 8342, DOI 10.17487/RFC8342, March 2018,
+657	              <https://www.rfc-editor.org/info/rfc8342>.
+
+659	   [RFC8639]  Voit, E., Clemm, A., Gonzalez Prieto, A., Nilsen-Nygaard,
+660	              E., and A. Tripathy, "Subscription to YANG Notifications",
+661	              RFC 8639, DOI 10.17487/RFC8639, September 2019,
+662	              <https://www.rfc-editor.org/info/rfc8639>.
+
+664	   [RFC8641]  Clemm, A. and E. Voit, "Subscription to YANG Notifications
+665	              for Datastore Updates", RFC 8641, DOI 10.17487/RFC8641,
+666	              September 2019, <https://www.rfc-editor.org/info/rfc8641>.
+
+668	11.2.  Informative References
+
+670	   [I-D.ietf-netmod-immutable-flag]
+671	              Ma, Q., Wu, Q., Lengyel, B., and H. Li, "YANG Metadata
+672	              Annotation for Immutable Flag", Work in Progress,
+673	              Internet-Draft, draft-ietf-netmod-immutable-flag-06, 27
+674	              November 2025, <https://datatracker.ietf.org/doc/html/
+675	              draft-ietf-netmod-immutable-flag-06>.
+
+677	   [I-D.ietf-netmod-rfc8407bis]
+678	              Bierman, A., Boucadair, M., and Q. Wu, "Guidelines for
+679	              Authors and Reviewers of Documents Containing YANG Data
+680	              Models", Work in Progress, Internet-Draft, draft-ietf-
+681	              netmod-rfc8407bis-28, 5 June 2025,
+682	              <https://datatracker.ietf.org/doc/html/draft-ietf-netmod-
+683	              rfc8407bis-28>.
+
+685	   [I-D.ietf-tls-rfc8446bis]
+686	              Rescorla, E., "The Transport Layer Security (TLS) Protocol
+687	              Version 1.3", Work in Progress, Internet-Draft, draft-
+688	              ietf-tls-rfc8446bis-14, 13 September 2025,
+689	              <https://datatracker.ietf.org/doc/html/draft-ietf-tls-
+690	              rfc8446bis-14>.
+
+692	   [RFC3688]  Mealling, M., "The IETF XML Registry", BCP 81, RFC 3688,
+693	              DOI 10.17487/RFC3688, January 2004,
+694	              <https://www.rfc-editor.org/info/rfc3688>.
+
+696	   [RFC4252]  Ylonen, T. and C. Lonvick, Ed., "The Secure Shell (SSH)
+697	              Authentication Protocol", RFC 4252, DOI 10.17487/RFC4252,
+698	              January 2006, <https://www.rfc-editor.org/info/rfc4252>.
+
+700	   [RFC6020]  Bjorklund, M., Ed., "YANG - A Data Modeling Language for
+701	              the Network Configuration Protocol (NETCONF)", RFC 6020,
+702	              DOI 10.17487/RFC6020, October 2010,
+703	              <https://www.rfc-editor.org/info/rfc6020>.
+
+705	   [RFC6241]  Enns, R., Ed., Bjorklund, M., Ed., Schoenwaelder, J., Ed.,
+706	              and A. Bierman, Ed., "Network Configuration Protocol
+707	              (NETCONF)", RFC 6241, DOI 10.17487/RFC6241, June 2011,
+708	              <https://www.rfc-editor.org/info/rfc6241>.
+
+710	   [RFC7952]  Lhotka, L., "Defining and Using Metadata with YANG",
+711	              RFC 7952, DOI 10.17487/RFC7952, August 2016,
+712	              <https://www.rfc-editor.org/info/rfc7952>.
+
+714	   [RFC8040]  Bierman, A., Bjorklund, M., and K. Watsen, "RESTCONF
+715	              Protocol", RFC 8040, DOI 10.17487/RFC8040, January 2017,
+716	              <https://www.rfc-editor.org/info/rfc8040>.
+
+718	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+719	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+720	              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+722	   [RFC8340]  Bjorklund, M. and L. Berger, Ed., "YANG Tree Diagrams",
+723	              BCP 215, RFC 8340, DOI 10.17487/RFC8340, March 2018,
+724	              <https://www.rfc-editor.org/info/rfc8340>.
+
+726	   [RFC8525]  Bierman, A., Bjorklund, M., Schoenwaelder, J., Watsen, K.,
+727	              and R. Wilton, "YANG Library", RFC 8525,
+728	              DOI 10.17487/RFC8525, March 2019,
+729	              <https://www.rfc-editor.org/info/rfc8525>.
+
+731	   [RFC9000]  Iyengar, J., Ed. and M. Thomson, Ed., "QUIC: A UDP-Based
+732	              Multiplexed and Secure Transport", RFC 9000,
+733	              DOI 10.17487/RFC9000, May 2021,
+734	              <https://www.rfc-editor.org/info/rfc9000>.
+
+736	Appendix A.  Example of Dynamic Behaviors
+
+738	   This section presents some sample data models and corresponding
+739	   contents of various datastores with different dynamic behaviors
+740	   described in Section 6.  The XML snippets are used only for
+741	   illustration purposes.  Note this section does not show the contents
+742	   of <intended> as they are related to the configuration in
+743	   <operational> assuming the intended configuration is applied
+744	   successfully.  Also note that if the "origin" metadata annotation for
+745	   configuration is unspecified in snippets, it is inherited from its
+746	   parent node.
+
+748	A.1.  Referencing System-defined Nodes
+
+750	   In this subsection, the following fictional module is used:
+
+752	   module example-application {
+753	     yang-version 1.1;
+754	     namespace "urn:example:application";
+755	     prefix "ex-app";
+
+757	     import ietf-inet-types {
+758	       prefix "inet";
+759	     }
+760	     container applications {
+761	       list application {
+762	         key "name";
+763	         leaf name {
+764	           type string;
+765	         }
+766	         leaf app-id {
+767	           type string;
+768	         }
+769	         leaf protocol {
+770	           type enumeration {
+771	             enum tcp;
+772	             enum udp;
+773	           }
+774	           mandatory true;
+775	         }
+776	         leaf destination-port {
+777	           default "0";
+778	           type inet:port-number;
+779	         }
+780	         leaf description {
+781	           type string;
+782	         }
+783	         container security-protection {
+784	           presence "Indicates that security protection is enabled.";
+785	           leaf risk-level {
+786	             type enumeration {
+787	               enum high;
+788	               enum low;
+789	             }
+790	           }
+791	           //additional leafs for security-specific configuration...
+792	         }
+793	       }
+794	     }
+795	   }
+
+797	   A fictional ACL YANG module is used as follows, which defines a
+798	   leafref for the leaf-list "application" data node to refer to an
+799	   existing application name.
+
+801	   module example-acl {
+802	     yang-version 1.1;
+803	     namespace "urn:example:acl";
+804	     prefix "ex-acl";
+
+806	     import example-application {
+807	       prefix "ex-app";
+808	     }
+
+810	     import ietf-inet-types {
+811	       prefix "inet";
+812	     }
+
+814	     container acl {
+815	       list acl-rule {
+816	         key "name";
+817	         leaf name {
+818	           type string;
+819	         }
+820	         container matches {
+821	           choice l3 {
+822	             container ipv4 {
+823	               leaf src-address {
+824	                 type inet:ipv4-prefix;
+825	               }
+826	               leaf dst-address {
+827	                 type inet:ipv4-prefix;
+828	               }
+829	             }
+830	           }
+831	           choice applications {
+832	             leaf-list application {
+833	               type leafref {
+834	                 path "/ex-app:applications/ex-app:application"
+835	                    + "/ex-app:name";
+836	               }
+837	             }
+838	           }
+839	         }
+840	         leaf packet-action {
+841	           type enumeration {
+842	             enum forward;
+843	             enum drop;
+844	             enum redirect;
+845	           }
+846	         }
+847	       }
+848	     }
+
+850	   }
+
+852	   The server may predefine some applications as a convenience for
+853	   clients, these applications are immediately-present system
+854	   configuration.  When the device is powered on, the system-
+855	   instantiated application entries may be present in <system> as
+856	   follows:
+
+858	   <applications xmlns="urn:example:application">
+859	     <application>
+860	       <name>ftp</name>
+861	       <app-id>001</app-id>
+862	       <protocol>tcp</protocol>
+863	       <destination-port>21</destination-port>
+864	       <security-protection>
+865	         <risk-level>low</risk-level>
+866	       </security-protection>
+867	     </application>
+868	     <application>
+869	       <name>tftp</name>
+870	       <app-id>002</app-id>
+871	       <protocol>udp</protocol>
+872	       <destination-port>69</destination-port>
+873	       <security-protection>
+874	         <risk-level>low</risk-level>
+875	       </security-protection>
+876	     </application>
+877	     <application>
+878	       <name>smtp</name>
+879	       <app-id>003</app-id>
+880	       <protocol>tcp</protocol>
+881	       <destination-port>25</destination-port>
+882	       <security-protection>
+883	         <risk-level>low</risk-level>
+884	       </security-protection>
+885	     </application>
+886	   </applications>
+
+888	   The client may also define customized applications.  Those
+889	   applications may be present in <running> as follows:
+
+891	   <applications xmlns="urn:example:application">
+892	     <application>
+893	       <name>my-smtp</name>
+894	       <app-id>101</app-id>
+895	       <protocol>tcp</protocol>
+896	       <destination-port>2345</destination-port>
+897	       <description>customized smtp application</description>
+898	       <security-protection>
+899	         <risk-level>high</risk-level>
+900	       </security-protection>
+901	     </application>
+902	     <application>
+903	       <name>my-foo</name>
+904	       <app-id>102</app-id>
+905	       <protocol>udp</protocol>
+906	       <destination-port>1024</destination-port>
+907	       <description>customized application</description>
+908	     </application>
+909	   </applications>
+
+911	   If a client configures an ACL rule referencing some system-provided
+912	   or customized applications, the configuration of ACL rule may be
+913	   shown as follows:
+
+915	   <acl xmlns="urn:example:acl">
+916	     <acl-rule>
+917	       <name>allow-access-to-ftp-tftp</name>
+918	       <matches>
+919	         <ipv4>
+920	           <src-address>198.51.100.0/24</src-address>
+921	           <dst-address>192.0.2.0/24</dst-address>
+922	         </ipv4>
+923	         <application>ftp</application>
+924	         <application>tftp</application>
+925	         <application>my-smtp</application>
+926	       </matches>
+927	       <packet-action>forward</packet-action>
+928	     </acl-rule>
+929	   </acl>
+
+931	   As different entries of application configuration in <system> and
+932	   <running> are merged to create <intended>, and there are no merging
+933	   conflicts in the contents between <system> and <running>,
+934	   <operational> might contain the configuration of applications with
+935	   the values of origin reflecting the source of entries as follows:
+
+937	   <applications xmlns="urn:example:application"
+938	                 xmlns:or="urn:ietf:params:xml:ns:yang:ietf-origin"
+939	                 or:origin="or:intended">
+940	     <application>
+941	       <name>my-smtp</name>
+942	       <app-id>101</app-id>
+943	       <protocol>tcp</protocol>
+944	       <destination-port>2345</destination-port>
+945	       <description>customized smtp application</description>
+946	       <security-protection>
+947	         <risk-level>high</risk-level>
+948	       </security-protection>
+949	     </application>
+950	     <application>
+951	       <name>my-foo</name>
+952	       <app-id>102</app-id>
+953	       <protocol>udp</protocol>
+954	       <destination-port>1024</destination-port>
+955	       <description>customized application</description>
+956	     </application>
+957	     <application or:origin="or:system">
+958	       <name>ftp</name>
+959	       <app-id>001</app-id>
+960	       <protocol>tcp</protocol>
+961	       <destination-port>21</destination-port>
+962	       <security-protection>
+963	         <risk-level>low</risk-level>
+964	       </security-protection>
+965	     </application>
+966	     <application or:origin="or:system">
+967	       <name>tftp</name>
+968	       <app-id>002</app-id>
+969	       <protocol>udp</protocol>
+970	       <destination-port>69</destination-port>
+971	       <security-protection>
+972	         <risk-level>low</risk-level>
+973	       </security-protection>
+974	     </application>
+975	     <application or:origin="or:system">
+976	       <name>smtp</name>
+977	       <app-id>003</app-id>
+978	       <protocol>tcp</protocol>
+979	       <destination-port>25</destination-port>
+980	       <security-protection>
+981	         <risk-level>low</risk-level>
+982	       </security-protection>
+983	     </application>
+984	   </applications>
+
+986	A.2.  Modifying a System-instantiated Leaf's Value
+
+988	   This subsection uses the following fictional interface YANG module:
+
+990	   module example-interface {
+991	     yang-version 1.1;
+992	     namespace "urn:example:interface";
+993	     prefix "ex-if";
+
+995	     import ietf-inet-types {
+996	       prefix "inet";
+997	     }
+
+999	     container interfaces {
+1000	       list interface {
+1001	         key name;
+1002	         leaf name {
+1003	           type string;
+1004	         }
+1005	         leaf description {
+1006	           type string;
+1007	         }
+1008	         leaf mtu {
+1009	           type uint32;
+1010	         }
+1011	         leaf-list ip-address {
+1012	           type inet:ip-address;
+1013	         }
+1014	       }
+1015	     }
+1016	   }
+
+1018	   Suppose the system provides an always-present loopback interface
+1019	   (named "lo0") with an MTU value "65536", a default IPv4 address of
+1020	   "127.0.0.1", and a default IPv6 address of "::1".  The configuration
+1021	   of "lo0" interface may be present in <system> as follows:
+
+1023	   <interfaces xmlns="urn:example:interface">
+1024	     <interface>
+1025	       <name>lo0</name>
+1026	       <mtu>65536</mtu>
+1027	       <ip-address>127.0.0.1</ip-address>
+1028	       <ip-address>::1</ip-address>
+1029	     </interface>
+1030	   </interfaces>
+1031	   A client modifies the value of MTU to 9216 by adding the following
+1032	   configuration into <running>:
+
+1034	   <interfaces xmlns="urn:example:interface">
+1035	     <interface>
+1036	       <name>lo0</name>
+1037	       <mtu>9216</mtu>
+1038	     </interface>
+1039	   </interfaces>
+
+1041	   Since the MTU value provided by the client takes precedence over the
+1042	   system-provided value, and the "origin" value of configuration
+1043	   provided by the client is set to "intended", the configuration of
+1044	   interfaces that is present in <operational> may be as follows:
+
+1046	   <interfaces xmlns="urn:example:interface"
+1047	               xmlns:or="urn:ietf:params:xml:ns:yang:ietf-origin"
+1048	               or:origin="or:intended">
+1049	     <interface>
+1050	       <name>lo0</name>
+1051	       <mtu>9216</mtu>
+1052	       <ip-address or:origin="or:system">127.0.0.1</ip-address>
+1053	       <ip-address or:origin="or:system">::1</ip-address>
+1054	     </interface>
+1055	   </interfaces>
+
+1057	A.3.  Configuring Descendant Nodes of a System-defined Node
+
+1059	   Based on the example in Appendix A.2, imagine the client further adds
+1060	   the description node of a "lo0" interface in <running> as follows:
+
+1062	   <interfaces xmlns="urn:example:interface">
+1063	     <interface>
+1064	       <name>lo0</name>
+1065	       <description>loopback</description>
+1066	     </interface>
+1067	   </interfaces>
+
+1069	   The configuration of interface "lo0" is present in <operational> as
+1070	   follows:
+
+1072	   <interfaces xmlns="urn:example:interface"
+1073	               xmlns:or="urn:ietf:params:xml:ns:yang:ietf-origin"
+1074	               or:origin="or:intended">
+1075	     <interface>
+1076	       <name>lo0</name>
+1077	       <description>loopback</description>
+1078	       <mtu>9216</mtu>
+1079	       <ip-address or:origin="or:system">127.0.0.1</ip-address>
+1080	       <ip-address or:origin="or:system">::1</ip-address>
+1081	     </interface>
+1082	   </interfaces>
+
+1084	Appendix B.  Key Use Cases
+
+1086	   This section provides three use cases related to how <system>
+1087	   interacts with other datastores (e.g., <candidate>, <running>,
+1088	   <intended>, and <operational>).  The following fictional interface
+1089	   data model is used:
+
+1091	   module example-interface-management {
+1092	     yang-version 1.1;
+1093	     namespace "urn:example:interfacemgmt";
+1094	     prefix "ex-ifm";
+
+1096	     import ietf-inet-types {
+1097	       prefix "inet";
+1098	     }
+
+1100	     container interfaces {
+1101	       list interface {
+1102	         key "name";
+1103	         leaf name {
+1104	           type string;
+1105	         }
+1106	         leaf type {
+1107	           type enumeration {
+1108	             enum ethernet;
+1109	             enum atm;
+1110	             enum loopback;
+1111	           }
+1112	         }
+1113	         leaf enabled {
+1114	           type boolean;
+1115	           default "true";
+1116	         }
+1117	         leaf-list ip-address {
+1118	           type inet:ip-address;
+1119	         }
+1120	         leaf speed {
+1121	           when "../type = 'ethernet'";
+1122	           type enumeration {
+1123	             enum 10Mb;
+1124	             enum 100Mb;
+1125	           }
+1126	         }
+1127	         leaf description {
+1128	           type string;
+1129	         }
+1130	       }
+1131	     }
+1132	   }
+
+1134	   For each use case, corresponding sample configuration in <running>,
+1135	   <system>, <intended> and <operational> are shown.  The XML snippets
+1136	   are used only for illustration purposes.
+
+1138	B.1.  Device Powers On
+
+1140	   When the device is powered on, suppose the system provides an always-
+1141	   present loopback interface (named "lo0") which is not explicitly
+1142	   configured in <running>.  Thus, no configuration for interfaces
+1143	   appears in <running>;
+
+1145	   And the contents of <system> are:
+
+1147	   <interfaces xmlns="urn:example:interfacemgmt">
+1148	     <interface>
+1149	       <name>lo0</name>
+1150	       <type>loopback</type>
+1151	       <ip-address>127.0.0.1</ip-address>
+1152	       <ip-address>::1</ip-address>
+1153	       <description>system-defined interface</description>
+1154	     </interface>
+1155	   </interfaces>
+
+1157	   In this case, the configuration of loopback interface is only present
+1158	   in <system>, the configuration of interface in <intended> would be
+1159	   identical to the one in <system> shown above.
+
+1161	   And <operational> will show the system-provided loopback interface,
+1162	   note that <operational> also includes the default value specified in
+1163	   the YANG module:
+
+1165	   <interfaces xmlns="urn:example:interfacemgmt"
+1166	               xmlns:or="urn:ietf:params:xml:ns:yang:ietf-origin"
+1167	               or:origin="or:system">
+1168	     <interface>
+1169	       <name>lo0</name>
+1170	       <type>loopback</type>
+1171	       <enabled or:origin="or:default">true</enabled>
+1172	       <ip-address>127.0.0.1</ip-address>
+1173	       <ip-address>::1</ip-address>
+1174	       <description>system-defined interface</description>
+1175	     </interface>
+1176	   </interfaces>
+
+1178	B.2.  Client Commits Configuration
+
+1180	   If a client creates an interface "et-0/0/0" but the interface does
+1181	   not physically exist at this point, what is in <running> appears as
+1182	   follows:
+
+1184	   <interfaces xmlns="urn:example:interfacemgmt">
+1185	     <interface>
+1186	       <name>et-0/0/0</name>
+1187	       <ip-address>192.168.10.10</ip-address>
+1188	       <description>pre-provisioned interface</description>
+1189	     </interface>
+1190	   </interfaces>
+
+1192	   And the contents of <system> remain unchanged, only containing the
+1193	   "lo0" loopback interface, since the interface "et-0/0/0" is not
+1194	   physically present:
+
+1196	   <interfaces xmlns="urn:example:interfacemgmt">
+1197	     <interface>
+1198	       <name>lo0</name>
+1199	       <type>loopback</type>
+1200	       <ip-address>127.0.0.1</ip-address>
+1201	       <ip-address>::1</ip-address>
+1202	       <description>system-defined interface</description>
+1203	     </interface>
+1204	   </interfaces>
+
+1206	   The contents of <intended> represent the merged data of <system> and
+1207	   <running>:
+
+1209	   <interfaces xmlns="urn:example:interfacemgmt">
+1210	     <interface>
+1211	       <name>lo0</name>
+1212	       <type>loopback</type>
+1213	       <ip-address>127.0.0.1</ip-address>
+1214	       <ip-address>::1</ip-address>
+1215	       <description>system-defined interface</description>
+1216	     </interface>
+1217	     <interface>
+1218	       <name>et-0/0/0</name>
+1219	       <ip-address>192.168.10.10</ip-address>
+1220	       <description>pre-provisioned interface</description>
+1221	     </interface>
+1222	   </interfaces>
+
+1224	   Since the interface named "et-0/0/0" does not exist, the associated
+1225	   configuration is not present in <operational>, which appears as
+1226	   follows:
+
+1228	   <interfaces xmlns="urn:example:interfacemgmt"
+1229	               xmlns:or="urn:ietf:params:xml:ns:yang:ietf-origin"
+1230	               or:origin="or:intended">
+1231	     <interface or:origin="or:system">
+1232	       <name>lo0</name>
+1233	       <type>loopback</type>
+1234	       <enabled or:origin="or:default">true</enabled>
+1235	       <ip-address>127.0.0.1</ip-address>
+1236	       <ip-address>::1</ip-address>
+1237	       <description>system-defined interface</description>
+1238	     </interface>
+1239	   </interfaces>
+
+1241	B.3.  Operator Installs Card into a Chassis
+
+1243	   When the interface is installed by the operator, the system will
+1244	   detect it and generate the associated conditionally-present interface
+1245	   configuration in <system>.  The contents of <running> keep unchanged:
+
+1247	   <interfaces xmlns="urn:example:interfacemgmt">
+1248	     <interface>
+1249	       <name>et-0/0/0</name>
+1250	       <ip-address>192.168.10.10</ip-address>
+1251	       <description>pre-provisioned interface</description>
+1252	     </interface>
+1253	   </interfaces>
+
+1255	   And <system> might appear as follows:
+
+1257	   <interfaces xmlns="urn:example:interfacemgmt">
+1258	     <interface>
+1259	       <name>lo0</name>
+1260	       <type>loopback</type>
+1261	       <ip-address>127.0.0.1</ip-address>
+1262	       <ip-address>::1</ip-address>
+1263	       <description>system-defined interface</description>
+1264	     </interface>
+1265	     <interface>
+1266	       <name>et-0/0/0</name>
+1267	       <type>ethernet</type>
+1268	       <description>system-defined interface</description>
+1269	     </interface>
+1270	   </interfaces>
+
+1272	   Then <intended> contains the merged configuration of <system> and
+1273	   <running>:
+
+1275	   <interfaces xmlns="urn:example:interfacemgmt">
+1276	     <interface>
+1277	       <name>lo0</name>
+1278	       <type>loopback</type>
+1279	       <ip-address>127.0.0.1</ip-address>
+1280	       <ip-address>::1</ip-address>
+1281	       <description>system-defined interface</description>
+1282	     </interface>
+1283	     <interface>
+1284	       <name>et-0/0/0</name>
+1285	       <type>ethernet</type>
+1286	       <ip-address>192.168.10.10</ip-address>
+1287	       <description>pre-provisioned interface</description>
+1288	     </interface>
+1289	   </interfaces>
+
+1291	   And the contents of <operational> appear as follows:
+
+1293	   <interfaces xmlns="urn:example:interfacemgmt"
+1294	               xmlns:or="urn:ietf:params:xml:ns:yang:ietf-origin"
+1295	               or:origin="or:intended">
+1296	     <interface or:origin="or:system">
+1297	       <name>lo0</name>
+1298	       <type>loopback</type>
+1299	       <enabled or:origin="or:default">true</enabled>
+1300	       <ip-address>127.0.0.1</ip-address>
+1301	       <ip-address>::1</ip-address>
+1302	       <description>system-defined interface</description>
+1303	     </interface>
+1304	     <interface>
+1305	       <name>et-0/0/0</name>
+1306	       <type or:origin="or:system">ethernet</type>
+1307	       <enabled or:origin="or:default">true</enabled>
+1308	       <ip-address>192.168.10.10</ip-address>
+1309	       <description>pre-provisioned interface</description>
+1310	     </interface>
+1311	   </interfaces>
+
+1313	B.4.  Client further Commits Configuration
+
+1315	   If the client further sets the speed of interface "et-0/0/0" in
+1316	   <running>:
+
+1318	   <interfaces xmlns="urn:example:interfacemgmt">
+1319	     <interface>
+1320	       <name>et-0/0/0</name>
+1321	       <speed>10Mb</speed>
+1322	     </interface>
+1323	   </interfaces>
+
+1325	   The contents of <system> keep unchanged:
+
+1327	   <interfaces xmlns="urn:example:interfacemgmt">
+1328	     <interface>
+1329	       <name>lo0</name>
+1330	       <type>loopback</type>
+1331	       <ip-address>127.0.0.1</ip-address>
+1332	       <ip-address>::1</ip-address>
+1333	       <description>system-defined interface</description>
+1334	     </interface>
+1335	     <interface>
+1336	       <name>et-0/0/0</name>
+1337	       <type>ethernet</type>
+1338	       <description>system-defined interface</description>
+1339	     </interface>
+1340	   </interfaces>
+
+1342	   And the contents of <intended> which represents a merged results of
+1343	   <running> and <system> are as follows:
+
+1345	   <interfaces xmlns="urn:example:interfacemgmt">
+1346	     <interface>
+1347	       <name>lo0</name>
+1348	       <type>loopback</type>
+1349	       <ip-address>127.0.0.1</ip-address>
+1350	       <ip-address>::1</ip-address>
+1351	       <description>system-defined interface</description>
+1352	     </interface>
+1353	     <interface>
+1354	       <name>et-0/0/0</name>
+1355	       <type>ethernet</type>
+1356	       <ip-address>192.168.10.10</ip-address>
+1357	       <speed>10Mb</speed>
+1358	       <description>pre-provisioned interface</description>
+1359	     </interface>
+1360	   </interfaces>
+
+1362	   And <operational> would appear as follows:
+
+1364	   <interfaces xmlns="urn:example:interfacemgmt"
+1365	               xmlns:or="urn:ietf:params:xml:ns:yang:ietf-origin"
+1366	               or:origin="or:intended">
+1367	     <interface or:origin="or:system">
+1368	       <name>lo0</name>
+1369	       <type>loopback</type>
+1370	       <enabled>true</enabled>
+1371	       <ip-address>127.0.0.1</ip-address>
+1372	       <ip-address>::1</ip-address>
+1373	       <description>system-defined interface</description>
+1374	     </interface>
+1375	     <interface>
+1376	       <name>et-0/0/0</name>
+1377	       <type or:origin="or:system">ethernet</type>
+1378	       <enabled or:origin="or:default">true</enabled>
+1379	       <ip-address>192.168.10.10</ip-address>
+1380	       <speed>10Mb</speed>
+1381	       <description>pre-provisioned interface</description>
+1382	     </interface>
+1383	   </interfaces>
+
+1385	Acknowledgements
+
+1387	   The authors would like to thank for following for discussions and
+1388	   providing input to this document: Balazs Lengyel, Robert Wilton,
+1389	   Juergen Schoenwaelder, Andy Bierman, Martin Bjorklund, Mohamed
+1390	   Boucadair, Michal Vaško, Alexander Clemm, and Timothy Carey.
+
+1392	Contributors
+
+1394	   Kent Watsen
+1395	   Watsen Networks
+1396	   Email: kent+ietf@watsen.net
+
+1398	   Jan Lindblad
+1399	   Cisco Systems
+1400	   Email: jlindbla@cisco.com
+
+1402	   Jason Sterne
+1403	   Nokia
+1404	   Email: jason.sterne@nokia.com
+
+1406	   Chongfeng Xie
+1407	   China Telecom
+1408	   Beijing
+1409	   China
+1410	   Email: xiechf@chinatelecom.cn
+
+1412	Authors' Addresses
+
+1414	   Qiufang Ma (editor)
+1415	   Huawei
+1416	   101 Software Avenue, Yuhua District
+1417	   Nanjing
+1418	   Jiangsu, 210012
+1419	   China
+1420	   Email: maqiufang1@huawei.com
+
+1422	   Qin Wu
+1423	   Huawei
+1424	   101 Software Avenue, Yuhua District
+1425	   Nanjing
+1426	   Jiangsu, 210012
+1427	   China
+1428	   Email: bill.wu@huawei.com
+
+1430	   Chong Feng
+1431	   Email: fengchongllly@gmail.com
+
+
+
+
+
+
+
+
+
