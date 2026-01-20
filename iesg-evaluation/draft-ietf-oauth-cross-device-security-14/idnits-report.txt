@@ -1,0 +1,2978 @@
+idnits 2.17.1 
+
+draft-ietf-oauth-cross-device-security-14.txt:
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+  == There are 3 instances of lines with non-ascii characters in the document.
+
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     Summary: 0 errors (**), 0 flaws (~~), 1 warning (==), 0 comments (--).
+
+--------------------------------------------------------------------------------
+
+
+2	oauth                                                       P. Kasselman
+3	Internet-Draft                                                   Defakto
+4	Intended status: Best Current Practice                           D. Fett
+5	Expires: 9 July 2026                                            Authlete
+6	                                                               F. Skokan
+7	                                                                    Okta
+8	                                                          5 January 2026
+
+10	           Cross-Device Flows: Security Best Current Practice
+11	               draft-ietf-oauth-cross-device-security-14
+
+13	Abstract
+
+15	   This document describes threats against cross-device flows along with
+16	   practical mitigations, protocol selection guidance, and a summary of
+17	   formal analysis results identified as relevant to the security of
+18	   cross-device flows.  It serves as a security guide to system
+19	   designers, architects, product managers, security specialists, fraud
+20	   analysts and engineers implementing cross-device flows.
+
+22	Discussion Venues
+
+24	   This note is to be removed before publishing as an RFC.
+
+26	   Discussion of this document takes place on the Web Authorization
+27	   Protocol Working Group mailing list (oauth@ietf.org), which is
+28	   archived at https://mailarchive.ietf.org/arch/browse/oauth/.
+
+30	   Source for this draft and an issue tracker can be found at
+31	   https://github.com/oauth-wg/oauth-cross-device-security.
+
+33	Status of This Memo
+
+35	   This Internet-Draft is submitted in full conformance with the
+36	   provisions of BCP 78 and BCP 79.
+
+38	   Internet-Drafts are working documents of the Internet Engineering
+39	   Task Force (IETF).  Note that other groups may also distribute
+40	   working documents as Internet-Drafts.  The list of current Internet-
+41	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+43	   Internet-Drafts are draft documents valid for a maximum of six months
+44	   and may be updated, replaced, or obsoleted by other documents at any
+45	   time.  It is inappropriate to use Internet-Drafts as reference
+46	   material or to cite them other than as "work in progress."
+
+48	   This Internet-Draft will expire on 9 July 2026.
+
+50	Copyright Notice
+
+52	   Copyright (c) 2026 IETF Trust and the persons identified as the
+53	   document authors.  All rights reserved.
+
+55	   This document is subject to BCP 78 and the IETF Trust's Legal
+56	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+57	   license-info) in effect on the date of publication of this document.
+58	   Please review these documents carefully, as they describe your rights
+59	   and restrictions with respect to this document.  Code Components
+60	   extracted from this document must include Revised BSD License text as
+61	   described in Section 4.e of the Trust Legal Provisions and are
+62	   provided without warranty as described in the Revised BSD License.
+
+64	Table of Contents
+
+66	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   4
+67	     1.1.  Cross-Device Authorization  . . . . . . . . . . . . . . .   5
+68	     1.2.  Cross-Device Session Transfer . . . . . . . . . . . . . .   6
+69	     1.3.  Defending Against Cross-Device Attacks  . . . . . . . . .   7
+70	     1.4.  Conventions and Terminology . . . . . . . . . . . . . . .   7
+71	   2.  Best Practices  . . . . . . . . . . . . . . . . . . . . . . .   7
+72	   3.  Cross-Device Flow Patterns  . . . . . . . . . . . . . . . . .   8
+73	     3.1.  Cross-Device Authorization  . . . . . . . . . . . . . . .   9
+74	       3.1.1.  User-Transferred Session Data Pattern . . . . . . . .  10
+75	       3.1.2.  Backchannel-Transferred Session Pattern . . . . . . .  12
+76	       3.1.3.  User-Transferred Authorization Data Pattern . . . . .  14
+77	     3.2.  Cross-Device Session Transfer . . . . . . . . . . . . . .  16
+78	       3.2.1.  Cross-Device Session Transfer Pattern . . . . . . . .  16
+79	     3.3.  Examples of Cross-Device Flows  . . . . . . . . . . . . .  18
+80	       3.3.1.  Example A1: Authorize Access to a Video Streaming
+81	               Service (User-Transferred Session Data Pattern) . . .  18
+82	       3.3.2.  Example A2: Authorize Access to Productivity Services
+83	               (User-Transferred Session Data Pattern) . . . . . . .  18
+84	       3.3.3.  Example A3: Authorize Use of a Bike Sharing Scheme
+85	               (User-Transferred Session Data Pattern) . . . . . . .  19
+86	       3.3.4.  Example A4: Authorize a Financial Transaction
+87	               (Backchannel-Transferred Session Pattern) . . . . . .  19
+88	       3.3.5.  Example A5: Add a Device to a Network (Cross-Device
+89	               Session Transfer Pattern) . . . . . . . . . . . . . .  19
+90	       3.3.6.  Example A6: Remote Onboarding (User-Transferred Session
+91	               Data Pattern) . . . . . . . . . . . . . . . . . . . .  19
+92	       3.3.7.  Example A7: Application Bootstrap (Cross-Device Session
+93	               Transfer Pattern) . . . . . . . . . . . . . . . . . .  20
+94	       3.3.8.  Example A8: Access a Productivity Application
+95	               (User-Transferred Authorization Data Pattern) . . . .  20
+96	       3.3.9.  Example A9: Administer a System
+97	               (Backchannel-Transferred Session Pattern) . . . . . .  20
+
+99	   4.  Cross-Device Flow Exploits  . . . . . . . . . . . . . . . . .  20
+100	     4.1.  Cross-Device Authorization Flow Exploits  . . . . . . . .  21
+101	       4.1.1.  User-Transferred Session Data Pattern Exploits  . . .  21
+102	       4.1.2.  Backchannel-Transferred Session Pattern Exploits  . .  25
+103	       4.1.3.  User-Transferred Authorization Data Pattern
+104	               Exploits  . . . . . . . . . . . . . . . . . . . . . .  27
+105	     4.2.  Cross-Device Session Transfer Exploits  . . . . . . . . .  29
+106	     4.3.  Examples of Cross-Device Flow Exploits  . . . . . . . . .  31
+107	       4.3.1.  Example B1: Illicit Access to a Video Streaming Service
+108	               (User-Transferred Session Data Pattern) . . . . . . .  31
+109	       4.3.2.  Example B2: Illicit Access to Productivity Services
+110	               (User-Transferred Session Data Pattern) . . . . . . .  32
+111	       4.3.3.  Example B3: Illicit Access to Physical Assets
+112	               (User-Transferred Session Data Pattern) . . . . . . .  32
+113	       4.3.4.  Example B4: Illicit Transaction Authorization
+114	               (Backchannel-Transferred Session Pattern) . . . . . .  33
+115	       4.3.5.  Example B5: Illicit Network Join (Cross-Device Session
+116	               Transfer Pattern) . . . . . . . . . . . . . . . . . .  34
+117	       4.3.6.  Example B6: Illicit Onboarding (User-Transferred
+118	               Session Data Pattern) . . . . . . . . . . . . . . . .  34
+119	       4.3.7.  Example B7: Illicit Application Bootstrap (Cross-Device
+120	               Session Transfer Pattern) . . . . . . . . . . . . . .  34
+121	       4.3.8.  Example B8: Account Takeover (User-Transferred Session
+122	               Data Pattern) . . . . . . . . . . . . . . . . . . . .  35
+123	       4.3.9.  Example B9: Illicit Access to Administration
+124	               Capabilities Through Consent Request Overload
+125	               (Backchannel-Transferred Session Pattern) . . . . . .  35
+126	       4.3.10. Out of Scope  . . . . . . . . . . . . . . . . . . . .  35
+127	   5.  Cross-Device Protocols and Standards  . . . . . . . . . . . .  35
+128	   6.  Mitigating Against Cross-Device Flow Attacks  . . . . . . . .  37
+129	     6.1.  Practical Mitigations . . . . . . . . . . . . . . . . . .  38
+130	       6.1.1.  Establish Proximity . . . . . . . . . . . . . . . . .  38
+131	       6.1.2.  Short Lived/Timebound QR or User Codes  . . . . . . .  41
+132	       6.1.3.  One-Time or Limited Use Codes . . . . . . . . . . . .  41
+133	       6.1.4.  Unique Codes  . . . . . . . . . . . . . . . . . . . .  41
+134	       6.1.5.  Content Filtering . . . . . . . . . . . . . . . . . .  42
+135	       6.1.6.  Detect and Remediate  . . . . . . . . . . . . . . . .  42
+136	       6.1.7.  Trusted Devices . . . . . . . . . . . . . . . . . . .  43
+137	       6.1.8.  Trusted Networks  . . . . . . . . . . . . . . . . . .  44
+138	       6.1.9.  Limited Scopes  . . . . . . . . . . . . . . . . . . .  44
+139	       6.1.10. Short Lived Tokens  . . . . . . . . . . . . . . . . .  44
+140	       6.1.11. Rate Limits . . . . . . . . . . . . . . . . . . . . .  45
+141	       6.1.12. Sender-Constrained Tokens . . . . . . . . . . . . . .  45
+142	       6.1.13. User Education  . . . . . . . . . . . . . . . . . . .  46
+143	       6.1.14. User Experience . . . . . . . . . . . . . . . . . . .  46
+144	       6.1.15. Authenticate-then-Initiate  . . . . . . . . . . . . .  47
+145	       6.1.16. Request Initiation Verification . . . . . . . . . . .  48
+146	       6.1.17. Request Binding with Out-of-Band Data . . . . . . . .  48
+147	       6.1.18. Practical Mitigation Summary  . . . . . . . . . . . .  49
+148	     6.2.  Protocol Selection  . . . . . . . . . . . . . . . . . . .  51
+149	       6.2.1.  IETF OAuth 2.0 Device Authorization Grant RFC8628:  .  51
+150	       6.2.2.  OpenID Foundation Client Initiated Back-Channel
+151	               Authentication (CIBA):  . . . . . . . . . . . . . . .  52
+152	       6.2.3.  FIDO2/WebAuthn  . . . . . . . . . . . . . . . . . . .  53
+153	       6.2.4.  Protocol Selection Summary  . . . . . . . . . . . . .  54
+154	     6.3.  Foundational Pillars  . . . . . . . . . . . . . . . . . .  55
+155	   7.  Security Considerations . . . . . . . . . . . . . . . . . . .  57
+156	   8.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  57
+157	   9.  Conclusion  . . . . . . . . . . . . . . . . . . . . . . . . .  57
+158	   10. Contributors  . . . . . . . . . . . . . . . . . . . . . . . .  57
+159	   11. References  . . . . . . . . . . . . . . . . . . . . . . . . .  57
+160	     11.1.  Normative References . . . . . . . . . . . . . . . . . .  57
+161	     11.2.  Informative References . . . . . . . . . . . . . . . . .  59
+162	   Appendix A.  Document History . . . . . . . . . . . . . . . . . .  61
+163	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  67
+
+165	1.  Introduction
+
+167	   Protocol flows that span multiple end-user devices are in widespread
+168	   use today.  These flows are often referred to as cross-device flows.
+169	   A common example is a user that uses their mobile phone to scan a QR
+170	   code from their smart TV, giving an app on the TV access to their
+171	   video streaming service.  Besides QR codes, other mechanisms are
+172	   often used such as PIN codes that the user has to enter on one of the
+173	   devices, or push notifications to a mobile app that the user has to
+174	   approve.
+
+176	   In all cases, it is up to the user to decide whether to grant
+177	   authorization or not.  However, the QR code or PIN are transferred
+178	   via an unauthenticated channel, leaving it up to the user to decide
+179	   in which context an authorization is requested.  This may be
+180	   exploited by attackers to gain unauthorized access to a user's
+181	   resources.
+
+183	   To accommodate the various nuances of cross-device flows, this
+184	   document distinguishes between use cases where the cross-device flow
+185	   is used to authorize access to a resource (cross-device authorization
+186	   flows) and use cases where the cross-device flow is used to transfer
+187	   an existing session (cross-device session transfer flows).
+
+189	1.1.  Cross-Device Authorization
+
+191	   Cross-device authorization flows enable a user to initiate an
+192	   authorization flow on one device (the Consumption Device) and then
+193	   use a second, personally trusted, device (Authorization Device) to
+194	   authorize the Consumption Device to access a resource (e.g., access
+195	   to a service).  The Device Authorization Grant [RFC8628] and Client-
+196	   Initiated Backchannel Authentication [CIBA] are two examples of
+197	   popular cross-device authorization flows.
+
+199	   In these flows, the Consumption Device and the Authorization Device
+200	   are not directly connected and there are no technical mechanisms for
+201	   the Authorization Device and Consumption Device to establish mutual
+202	   authentication.  It is left to the user to decide whether the source
+203	   of the authorization request (the Consumption Device) should be
+204	   trusted before they scan a QR code, enter a user code, or accept an
+205	   authorization request pushed to their Authorization Device.  The
+206	   transfer of the authorization request and context between the
+207	   Consumption Device and Authorization Device is done over an
+208	   unauthenticated channel.  The only mitigation against this
+209	   unauthenticated channel is the user's judgement.
+
+211	   Cross-Device Consent Phishing (CDCP) attacks exploit the
+212	   unauthenticated channel between the Consumption Device and
+213	   Authorization Device using social engineering techniques commonly
+214	   used in phishing attacks to gain unauthorized access to the user's
+215	   data.
+
+217	   Note: This document uses the terms "social engineering" and
+218	   "phishing" as described in the NIST Computer Security Resource Center
+219	   Glossary [NISTGlossary].
+
+221	   Several publications have emerged in the public domain ([ARTDCPHISH],
+222	   [DCFLOWPHISH], [NEWDCPHISH], [DEFCON29], [DCATTACK], [SQPHISH]),
+223	   describing how the unauthenticated channel can be exploited using
+224	   social engineering techniques borrowed from phishing.  Unlike
+225	   traditional phishing attacks, these attacks don't harvest
+226	   credentials.  Instead, they skip the step of collecting credentials
+227	   by persuading users to grant authorization using their Authorization
+228	   Devices.
+
+230	   Once the user grants authorization, the attacker has access to the
+231	   user's resources and in some cases is able to collect access and
+232	   refresh tokens.  Once in possession of the access and refresh tokens,
+233	   the attacker may use these tokens to execute lateral attacks and gain
+234	   additional access, or monetize the tokens by selling them.  These
+235	   attacks are effective even when multi-factor authentication is
+236	   deployed, since the attacker's aim is not to capture and replay the
+237	   credentials, but rather to persuade the user to grant authorization.
+
+239	1.2.  Cross-Device Session Transfer
+
+241	   Session transfer flows enable a user to transfer access to a service
+242	   or network from a device on which the user is already authenticated
+243	   to a second device such as a mobile phone.  In these flows, the user
+244	   is authenticated and then authorizes the session transfer on one
+245	   device, referred to as the Authorization Device (e.g., a personal
+246	   computer, web portal or application), and transfers the session to
+247	   the device where they will continue to consume the session, referred
+248	   to as the Consumption Device (e.g., a mobile phone or portable
+249	   device).
+
+251	   The session may be transferred by showing the user a session transfer
+252	   code on the Authorization Device, which is then entered on the
+253	   Consumption Device.  This flow may be streamlined by rendering the
+254	   session transfer code as a QR code on the Authorization Device and
+255	   scanned by the Consumption Device.
+
+257	   The session transfer preserves state information, including
+258	   authentication state, at the second device to avoid additional
+259	   configuration and optimize the user experience.  These flows are
+260	   often used to add new devices to a network, onboard customers to a
+261	   mobile application, or provision new credentials (e.g.,
+262	   [OpenID.SIOPV2]).
+
+264	   In these cross-device session transfer flows, the channel between the
+265	   Authorization Device and the Consumption Device is unauthenticated.
+
+267	   Cross-Device Session Phishing (CDSP) attacks exploit the
+268	   unauthenticated channel between the Authorization Device and
+269	   Consumption Device by using social engineering techniques to convince
+270	   the user to send the session transfer code to the attacker.  These
+271	   attacks borrow techniques from traditional phishing attacks, but
+272	   instead of collecting passwords, attackers collect session transfer
+273	   codes and other artefacts that allow them to setup a session and then
+274	   use it to access a user's data.
+
+276	1.3.  Defending Against Cross-Device Attacks
+
+278	   This document provides guidance to implementers to defend against
+279	   Cross-Device Consent Phishing and Cross-Device Session Phishing
+280	   attacks.  This guidance includes:
+
+282	   1.  Practical mitigations for susceptible protocols (Section 6.1).
+
+284	   2.  Protocol selection guidance to avoid using susceptible protocols
+285	       (Section 6.2).
+
+287	   3.  Results from formal analysis of susceptible protocols
+288	       (Section 6.3).
+
+290	1.4.  Conventions and Terminology
+
+292	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+293	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+294	   "OPTIONAL" in this document are to be interpreted as described in BCP
+295	   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+296	   capitals, as shown here.
+
+298	   This specification uses the terms "access token", "refresh token",
+299	   "authorization server", "resource server", "authorization endpoint",
+300	   "authorization request", and "client" defined by The OAuth 2.0
+301	   Authorization Framework [RFC6749].
+
+303	2.  Best Practices
+
+305	   This section describes the set of security mechanisms and measures to
+306	   secure cross-device protocols against Cross-Device Consent Phishing
+307	   and Cross-Device Session Phishing attacks that the OAuth working
+308	   group considers best practices at the time of writing this
+309	   specification.
+
+311	   1.  Implementers MUST perform a risk assessment before implementing
+312	       cross-device flows, weighing the risks from Cross-Device Consent
+313	       Phishing and Cross-Device Session Phishing attacks against
+314	       benefits for users.
+
+316	   2.  Implementers SHOULD avoid cross-device flows if risks cannot be
+317	       sufficiently mitigated.
+
+319	   3.  Implementers SHOULD follow the guidance provided in Section 6.2
+320	       for protocol selection.
+
+322	   4.  Implementers MUST implement practical mitigations as listed in
+323	       Section 6.1 that are appropriate for the use case, architecture,
+324	       and selected protocols.
+
+326	   5.  Implementers SHOULD implement proximity checks as defined in
+327	       Section 6.1.1 if possible.
+
+329	   These best practices apply to the Device Authorization Grant
+330	   ([RFC8628]) as well as other cross-device protocols such as the
+331	   Client Initiated Backchannel Authentication [CIBA], Self-Issued
+332	   OpenID Provider v2 [OpenID.SIOPV2], OpenID for Verifiable
+333	   Presentations [OpenID.VP], the Pre-Authorized Code Flow in
+334	   ([OpenID.VCI]) and other cross-device protocols that rely on the user
+335	   to authenticate the channel between devices.
+
+337	   Section 3 provides details about susceptible protocols and Section 4
+338	   provides attack descriptions.  Section 6.1 provides details about the
+339	   security mechanisms and mitigations, Section 6.2 provides protocol
+340	   selection guidance and Section 6.3 provides details from formal
+341	   analysis of protocols that apply to cross device flows.
+
+343	3.  Cross-Device Flow Patterns
+
+345	   Cross-device flows enable a user to initiate an interaction on one
+346	   device (e.g., a smart TV) and complete or continue it on a second
+347	   device (e.g., a mobile phone).  This specification addresses two
+348	   distinct cross-device use cases:
+
+350	   *  *Cross-Device Authorization:* In the cross-device authorization
+351	      use case, the second device is used to authenticate the user or
+352	      grant authorization before passing control back to the first
+353	      device as described in Section 3.1.
+
+355	   *  *Cross-Device Session Transfer* In the cross-device session
+356	      transfer use case, the user is already authenticated on the first
+357	      device, before the session is transferred to the second device
+358	      without requiring the user to re-authenticate as described in
+359	      Section 3.2.
+
+361	   These flows typically involve using a mobile phone to scan a QR code
+362	   or enter a user code displayed on the first device (e.g., Smart TV,
+363	   Kiosk, Personal Computer or other electronic devices).
+
+365	3.1.  Cross-Device Authorization
+
+367	   In a cross-device authorization flow, a user attempts to access a
+368	   service on one device, referred to as the Consumption Device, (e.g.,
+369	   a smart TV) and then uses a second device, referred to as the
+370	   Authorization Device (e.g., a smartphone), to authorize access to a
+371	   resource (e.g., access to a streaming service) on the Consumption
+372	   Device.
+
+374	   Cross-device authorization flows have several benefits, including:
+
+376	   *  Authorization on devices with limited input capabilities: End-
+377	      users can authorize devices with limited input capabilities to
+378	      access content (e.g., smart TVs, digital whiteboards, printers or
+379	      similarly constrained devices).
+
+381	   *  Secure authentication on shared or public devices: End-users can
+382	      perform authentication and authorization using a personally
+383	      trusted device, without risk of disclosing their credentials to a
+384	      public or shared device.
+
+386	   *  Ubiquitous multi-factor authentication: Enables a user to use
+387	      multi-factor authentication, independent of the device on which
+388	      the service is being accessed (e.g., a kiosk, smart TV or shared
+389	      Personal Computer).
+
+391	   *  Convenience of a single, portable, credential store: Users can
+392	      keep all their credentials in a mobile wallet or mobile phone that
+393	      they already carry with them.
+
+395	   There are three cross-device flow patterns for transferring the
+396	   authorization request between the Consumption Device and the
+397	   Authorization Device.
+
+399	   *  *User-Transferred Session Data Pattern:* In the first pattern, the
+400	      user initiates the authorization process with the authorization
+401	      server by copying information from the Consumption Device to the
+402	      Authorization Device, before authorizing an action.  By
+403	      transferring the data from the Consumption Device to the
+404	      Authorization Device, the user transfers the authorization
+405	      session.  For example the user may read a code displayed on the
+406	      Consumption Device and enter it on the Authorization Device, or
+407	      they may scan a QR code displayed on the Consumption Device with
+408	      the Authorization Device.  The Device Authorization Grant
+409	      ([RFC8628]) is an example of a cross-device flow that follows this
+410	      pattern.
+
+412	   *  *Backchannel-Transferred Session Pattern:* In the second pattern,
+413	      the OAuth client on the Consumption Device is responsible for
+414	      transferring the session and initiating authorization on the
+415	      Authorization Device via a backchannel with the Authorization
+416	      Server.  For example the user may attempt an online purchase on a
+417	      Consumption Device (e.g., a personal computer) and receive an
+418	      authorization request on their Authorization Device (e.g., mobile
+419	      phone).  The Client Initiated Backchannel Authentication [CIBA] is
+420	      an example of a cross-device flow that follow this pattern.
+
+422	   *  *User-Transferred Authorization Data Pattern:* In the third
+423	      pattern, the OAuth client on the Consumption Device triggers the
+424	      authorization request via a backchannel with the Authorization
+425	      Server.  Authorization data (e.g., a 6 digit authorization code)
+426	      is displayed on the Authorization Device, which the user transfers
+427	      to Consumption Device (e.g., by manually entering it).  For
+428	      example the user may attempt to access data in an enterprise
+429	      application and receive a 6 digit authorization code on their
+430	      Authorization Device (e.g., mobile phone) that they enter on
+431	      Consumption Device.  Note: The use of a 6 digit code is
+432	      illustrative and reflects common practice at the time of writing.
+433	      Code length may vary based on usability and risk considerations,
+434	      and specifying the appropriate length is out of scope for this
+435	      document.
+
+437	3.1.1.  User-Transferred Session Data Pattern
+
+439	   The Device Authorization Grant ([RFC8628]) is an example of a cross-
+440	   device flow that relies on the user copying information from the
+441	   Consumption Device to the Authorization Device by either entering
+442	   data manually or scanning a QR code.  The figure below shows a
+443	   typical example of this flow:
+
+445	                +--------------+                       +---------------+
+446	                |  Consumption |--(B) Request -------->|               |
+447	                |    Device    |      QR/User Code     |               |
+448	                |              |                       |               |
+449	                |              |<-(C) Return ----------|               |
+450	       +------->|              |      QR/User Code     |               |
+451	       |        |              |                       |               |
+452	       |        |              |--(D) Poll for ------->|               |
+453	      (A) User  |              |      Authorization    |               |
+454	       |  Start |              |                       |               |
+455	       |  Flow  |              |<-(J) Grant -----------| Authorization |
+456	       |        |              |      Authorization    |     Server    |
+457	       |        +--------------+                       |               |
+458	       |                                               |               |
+459	   +------+                                            |               |
+460	   | User |                                            |               |
+461	   +------+                                            |               |
+462	    |   |                                              |               |
+463	    |  (E) Scan QR code or enter User Code             |               |
+464	    |   |                                              |               |
+465	    |   |       +--------------+                       |               |
+466	    |   +------>| Authorization|                       |               |
+467	    |           |    Device    |--(F) Send QR code --->|               |
+468	    |           |              |      or user code     |               |
+469	    |           |              |                       |               |
+470	    |           |              |<-(G) Request user ----|               |
+471	    |           |              |     Authentication and|               |
+472	    |           |              |     Authorization     |               |
+473	    +-(H) User->|              |                       |               |
+474	   Authenticates|              |                       |               |
+475	   and grants   |              |                       |               |
+476	   Authorization|              |                       |               |
+477	                |              |--(I) Authentication ->|               |
+478	                |              |      and Authorization|               |
+479	                |              |      Completes        |               |
+480	                +--------------+                       +---------------+
+
+482	   Figure: User-Transferred Session Data Pattern
+
+484	   *  (A) The user takes an action on the Consumption Device by starting
+485	      a purchase, adding a device to a network or connecting a service
+486	      to the Consumption Device.
+
+488	   *  (B) The Consumption Device requests a QR code or user code from an
+489	      Authorization Server.
+
+491	   *  (C) The Authorization Server returns a QR code or user code to the
+492	      Consumption Device, which displays it to the user with
+493	      instructions to scan the QR code or enter the user code using the
+494	      Authorization Device.
+
+496	   *  (D) The Consumption Device starts polling the Authorization Server
+497	      to find out if the user granted authorization.
+
+499	   *  (E) The user scans the QR code or enters the user code on the
+500	      Authorization Device.
+
+502	   *  (F) The QR code or user code is sent to the Authorization Server
+
+504	   *  (G) The Authorization Server validates the QR code or user code
+505	      and prompts the user to authenticate and accept or decline the
+506	      authorization request.
+
+508	   *  (H) The user authenticates and grants authorization using the
+509	      Authorization Device.
+
+511	   *  (I) The user is authenticated and authorization is granted to
+512	      access the user's resources (there may be several additional
+513	      messages, depending on the authentication protocol, user interface
+514	      and other implementation details).
+
+516	   *  (J) The Authorization Server grants authorization (e.g. by issuing
+517	      tokens) to the Consumption Device to access the user's resources.
+
+519	3.1.2.  Backchannel-Transferred Session Pattern
+
+521	   The Client Initiated Backchannel Authentication [CIBA] transfers the
+522	   session on the backchannel with the Authorization Server to request
+523	   authorization on the Authorization Device.  The figure below shows an
+524	   example of this flow.
+
+526	                +--------------+                       +---------------+
+527	       +------->|  Consumption |--(B) Backchannel ---->|               |
+528	       |        |     Device   |      Authorization    |               |
+529	       |        |              |      Request          |               |
+530	       |        |              |                       | Authorization |
+531	       |        |              |<-(F) Grant------------|     Server    |
+532	       |        +--------------+      Authorization    |               |
+533	      (A) User                                         |               |
+534	       |  Start                                        |               |
+535	       |  Flow                                         |               |
+536	       |                                               |               |
+537	   +------+                                            |               |
+538	   | User |                                            |               |
+539	   +------+                                            |               |
+540	       |                                               |               |
+541	      (D) User Authenticate                            |               |
+542	       |  and Authorize Action                         |               |
+543	       |                                               |               |
+544	       |        +--------------+                       |               |
+545	       |        | Authorization|                       |               |
+546	       |        |    Device    |<-(C) Request User ----|               |
+547	       +------->|              |      Authentication   |               |
+548	                |              |      and Authorization|               |
+549	                |              |                       |               |
+550	                |              |--(E) Authentication ->|               |
+551	                |              |      and Authorization|               |
+552	                |              |      Completes        |               |
+553	                +--------------+                       +---------------+
+
+555	   Figure: Backchannel-Transferred Session Pattern
+
+557	   *  (A) The user takes an action on the Consumption Device by starting
+558	      a purchase, adding a device to a network or connecting a service
+559	      to the Consumption Device.
+
+561	   *  (B) The client on the Consumption Device requests user
+562	      authorization on the backchannel from the Authorization Server and
+563	      instructs the user to authorize the request on the Authorization
+564	      Device and waits for a response from the Authorization Server.
+
+566	   *  (C) The Authorization Server requests user authentication and
+567	      authorization on the user's Authorization Device.
+
+569	   *  (D) If the user is unauthenticated, they use their Authorization
+570	      Device to authenticate and grant authorization to the
+571	      Authorization Server.
+
+573	   *  (E) The user is authenticated and authorization is granted to
+574	      access the user's resources (there may be several additional
+575	      messages, depending on the authentication protocol, user interface
+576	      and other implementation details).
+
+578	   *  (F) The Authorization Server grants authorization (e.g. by issuing
+579	      tokens) to the Consumption Device to access the user's resources.
+
+581	   The Authorization Server may use a variety of mechanisms to request
+582	   user authorization, including a push notification to a dedicated app
+583	   on a mobile phone, or sending a text message with a link to an
+584	   endpoint where the user can authenticate and authorize an action.
+
+586	3.1.3.  User-Transferred Authorization Data Pattern
+
+588	   Examples of the user-transferred authorization data pattern include
+589	   flows in which the Consumption Device requests the Authorization
+590	   Server to send authorization data (e.g., a 6 digit authorization code
+591	   in a text message, e-mail or mobile application) to the Authorization
+592	   Device.  Once the Authorization Device receives the authorization
+593	   data, the user enters it on the Consumption Device.  The Consumption
+594	   Device sends the authorization data back to the Authorization Server
+595	   for validation before gaining access to the user's resources.  The
+596	   figure below shows an example of this flow.
+
+598	                +--------------+                       +---------------+
+599	       +------->|  Consumption |--(B) Backchannel ---->|               |
+600	       |        |     Device   |      Authorization    |               |
+601	       |        |              |      Request          |               |
+602	       |        |              |                       | Authorization |
+603	       |        |              |<-(F) Grant------------|     Server    |
+604	       |        +--------------+      Authorization    |               |
+605	      (A) User       ^                                 |               |
+606	       |  Start      |                                 |               |
+607	       |  Flow      (E) User Enters                    |               |
+608	       |             |  Authorization                  |               |
+609	   +------+          |  Data                           |               |
+610	   | User |----------+                                 |               |
+611	   +------+                                            |               |
+612	       ^                                               |               |
+613	      (D) User Copies                                  |               |
+614	       |  Authorization Data                           |               |
+615	       |                                               |               |
+616	       |        +--------------+                       |               |
+617	       |        | Authorization|                       |               |
+618	       |        |    Device    |<-(C) Send ------------|               |
+619	       +--------|              |      Authorization    |               |
+620	                |              |      Data             |               |
+621	                +--------------+                       +---------------+
+
+623	   Figure: User-Transferred Authorization Data Pattern
+
+625	   *  (A) The user takes an action on the Consumption Device by starting
+626	      a purchase, adding a device to a network or connecting a service
+627	      to the Consumption Device.
+
+629	   *  (B) The client on the Consumption Device requests user
+630	      authorization on the backchannel from the Authorization Server.
+
+632	   *  (C) The Authorization Server sends authorization data (e.g., a 6
+633	      digit authorization code) to the Authorization Device.  Examples
+634	      of mechanisms that may be used to distribute the authorization
+635	      data include text messages, email or a mobile application.
+
+637	   *  (D) The user reads and copies the authorization data (e.g., the 6
+638	      digit authorization code) received on the Authorization Device.
+
+640	   *  (E) The user enters the authorization data on the Consumption
+641	      Device.
+
+643	   *  (F) The Authorization Server issues tokens or grants authorization
+644	      to the Consumption Device to access the user's resources.
+
+646	   The Authorization Server may choose to authenticate the user before
+647	   sending the authorization data.
+
+649	3.2.  Cross-Device Session Transfer
+
+651	   Session transfer flows enable a user to transfer access to a service
+652	   or network from a device on which the user is already authenticated
+653	   to a second device such as a mobile phone.  In these flows, the user
+654	   is authenticated and then authorizes the session transfer on one
+655	   device, referred to as the Authorization Device (e.g., a personal
+656	   computer, web portal or application), and transfers the session to
+657	   the device where they will continue to consume the session, referred
+658	   to as the Consumption Device (e.g., a mobile phone or portable
+659	   device).
+
+661	   The session transfer preserves state information, including
+662	   authentication state, at the second device to avoid additional
+663	   configuration and optimize the user experience.  These flows are
+664	   often used to add new devices to a network, onboard customers to a
+665	   mobile application, or provision new credentials (e.g.,
+666	   [OpenID.SIOPV2]).
+
+668	3.2.1.  Cross-Device Session Transfer Pattern
+
+670	   In this flow, the user is authenticated and starts the flow by
+671	   authorizing the transfer of the session on the Authorization Device.
+672	   The Authorization Device requests a session transfer code that may be
+673	   rendered as a QR code on the Authorization Device.  When the user
+674	   scans the QR code or enters it on the Consumption Device where they
+675	   would like the session to continue, the Consumption Device presents
+676	   it to the Authorization Server.  The Authorization Server then
+677	   transfers the session to the Consumption Device.  This may include
+678	   transferring authentication and authorization state to optimize the
+679	   user experience.  This type of flow is used, for example, for adding
+680	   new devices to networks, bootstrapping new applications, or
+681	   provisioning new credentials.  The Pre-Authorized Code Flow in
+682	   ([OpenID.VCI]) is an instance of using this pattern to provision a
+683	   new credential.  The figure below shows a typical flow.
+
+685	               +---------------+                       +---------------+
+686	     +-------->| Authorization |                       | Authorization |
+687	     |         |    Device     |--(B) Session -------->|     Server    |
+688	     |         |               |      Transfer Request |               |
+689	     |         |               |                       |               |
+690	     |         |               |<-(C) Session ---------|               |
+691	     |         |               |      Transfer Code    |               |
+692	     |         |               |                       |               |
+693	     |         +---------------+                       |               |
+694	    (A) User      |                                    |               |
+695	     |  Start    (D) User Views                        |               |
+696	     |  Flow      |  Session Transfer Code             |               |
+697	     |            v  or QR Code                        |               |
+698	   +---------------------------+                       |               |
+699	   |           User            |                       |               |
+700	   +---------------------------+                       |               |
+701	                      |                                |               |
+702	                     (E) Enter Session Transfer Code   |               |
+703	                      |  or Scan QR code               |               |
+704	                      |                                |               |
+705	                      v                                |               |
+706	               +---------------+                       |               |
+707	               |  Consumption  |                       |               |
+708	               |     Device    |--(F) Present -------->|               |
+709	               |               |      Session Transfer |               |
+710	               |               |      Code             |               |
+711	               |               |                       |               |
+712	               |               |<-(G) Return Session --|               |
+713	               |               |      Context          |               |
+714	               +---------------+                       +---------------+
+
+716	   Figure: Cross-Dvice Session Transfer Pattern
+
+718	   *  (A) The user is authenticated on the Authorization Device and
+719	      authorizes the transfer of the session to the Consumption Device.
+
+721	   *  (B) The user starts the flow and is authenticated on their
+722	      Authorization Device before they authorize the transfer of the
+723	      session to the Consumption Device.
+
+725	   *  (C) The Authorization Server responds with a session transfer
+726	      code, which may be rendered as a QR code on the Authorization
+727	      Device.
+
+729	   *  (D) The user views the session transfer code, which may be
+730	      rendered as a QR code.
+
+732	   *  (E) The user enters the session transfer code the Consumption
+733	      Device (e.g., their mobile phone).  If the session transfer code
+734	      is rendered as a QR code, the user scans the QR code with the
+735	      target Consumption Device.
+
+737	   *  (F) The client on the Consumption Device presents the session
+738	      transfer code to the Authorization Server.
+
+740	   *  (G) The Authorization Server verifies the session transfer code
+741	      and returns the session context information needed to resume the
+742	      session on the Consumption Device.  The user resumes the session
+743	      they initiated and authorized on the Authorization Device and
+744	      proceeds to access the information on the Consumption Device.
+
+746	3.3.  Examples of Cross-Device Flows
+
+748	   The following examples illustrate the above flows in a diverse range
+749	   of practical settings.  Corresponding examples off how these flows
+750	   may be exploited are documented in Section 4.3.
+
+752	3.3.1.  Example A1: Authorize Access to a Video Streaming Service (User-
+753	        Transferred Session Data Pattern)
+
+755	   An end-user sets up a new smart TV and wants to connect it to their
+756	   favorite streaming service.  The streaming service displays a QR code
+757	   on the TV that the user scans with their mobile phone.  The user is
+758	   redirected to the streaming service provider's web page and asked to
+759	   enter their credentials to authorize the smart TV to access the
+760	   streaming service.  The user enters their credentials and grants
+761	   authorization, after which the streaming service is available on the
+762	   smart TV.  Section 4.3.1 illustrates an exploit that applies to this
+763	   scenario.
+
+765	3.3.2.  Example A2: Authorize Access to Productivity Services (User-
+766	        Transferred Session Data Pattern)
+
+768	   An employee wants to access their files on an interactive whiteboard
+769	   in a conference room.  The interactive whiteboard displays a URL and
+770	   a code.  The user enters the URL on their personal computer and is
+771	   prompted for the code.  Once they enter the code, the user is asked
+772	   to authenticate and authorize the interactive whiteboard to access
+773	   their files.  The user enters their credentials and authorizes the
+774	   transaction and the interactive whiteboard retrieves their files and
+775	   allows the user to interact with the content.  Section 4.3.2
+776	   describes an exploit relevant to this example.
+
+778	3.3.3.  Example A3: Authorize Use of a Bike Sharing Scheme (User-
+779	        Transferred Session Data Pattern)
+
+781	   An end-user wants to rent a bicycle from a bike sharing scheme.  The
+782	   bicycles are locked in bicycle racks on sidewalks throughout a city.
+783	   To unlock and use a bicycle, the user scans a QR code on the bicycle
+784	   using their mobile phone.  Scanning the QR code redirects the user to
+785	   the bicycle sharing scheme's authorization page where the user
+786	   authenticates and authorizes payment for renting the bicycle.  Once
+787	   authorized, the bicycle sharing service unlocks the bicycle, allowing
+788	   the user to use it to cycle around the city.  Section 4.3.3 outlines
+789	   an exploit relevant to this situation.
+
+791	3.3.4.  Example A4: Authorize a Financial Transaction (Backchannel-
+792	        Transferred Session Pattern)
+
+794	   An end-user makes an online purchase.  Before completing the
+795	   purchase, they get a notification on their mobile phone, asking them
+796	   to authorize the transaction.  The user opens their app and
+797	   authenticates to the service before authorizing the transaction.
+798	   Section 4.3.4 describes two exploits relevant to this example.
+
+800	3.3.5.  Example A5: Add a Device to a Network (Cross-Device Session
+801	        Transfer Pattern)
+
+803	   An employee is issued with a personal computer that is already joined
+804	   to a network.  The employee wants to add their mobile phone to the
+805	   network to allow it to access corporate data and services (e.g.,
+806	   files and e-mail).  The employee is logged-in on the personal
+807	   computer where they initiate the process of adding their mobile phone
+808	   to the network.  The personal computer displays a QR code which
+809	   authorizes the user to join their mobile phone to the network.  The
+810	   employee scans the QR code with their mobile phone and the mobile
+811	   phone is joined to the network.  The employee can start accessing
+812	   corporate data and services on their mobile device.  Section 4.3.5
+813	   gives an example of how this flow may be exploited.
+
+815	3.3.6.  Example A6: Remote Onboarding (User-Transferred Session Data
+816	        Pattern)
+
+818	   A new employee is directed to an onboarding portal to provide
+819	   additional information to confirm their identity on their first day
+820	   with their new employer.  Before activating the employee's account,
+821	   the onboarding portal requests that the employee present a government
+822	   issued ID, proof of a background check and proof of their
+823	   qualifications.  The onboarding portal displays a QR code, which the
+824	   user scans with their mobile phone.  Scanning the QR code invokes the
+825	   employee's digital wallet on their mobile phone, and the employee is
+826	   asked to present digital versions of an identity document (e.g., a
+827	   driving license), proof of a background check by an identity
+828	   verifier, and proof of their qualifications.  The employee authorizes
+829	   the release of the credentials and after completing the onboarding
+830	   process, their account is activated.  Section 4.3.6 provides an
+831	   example of an exploit for this use case.
+
+833	3.3.7.  Example A7: Application Bootstrap (Cross-Device Session Transfer
+834	        Pattern)
+
+836	   An employee is signed into an application on their personal computer
+837	   and wants to bootstrap the mobile application on their mobile phone.
+838	   The employee initiates the cross-device flow and is shown a QR code
+839	   in their application.  The employee launches the mobile application
+840	   on their phone and scans the QR code which results in the user being
+841	   signed into the application on the mobile phone.  Section 4.3.7
+842	   describes an exploit that applies to this scenario.
+
+844	3.3.8.  Example A8: Access a Productivity Application (User-Transferred
+845	        Authorization Data Pattern)
+
+847	   A user is accessing a Computer Aided Design (CAD) application.  When
+848	   accessing the application, authorization data in the form of a 6
+849	   digit authorization code is sent to the user's mobile phone.  The
+850	   user views the 6 digit authorization code on their phone and enters
+851	   it in the CAD application, after which the CAD application displays
+852	   the user's most recent designs.  Section 4.3.8 outlines an attack
+853	   relevant to this scenario.
+
+855	3.3.9.  Example A9: Administer a System (Backchannel-Transferred Session
+856	        Pattern)
+
+858	   A network administrator wants to access an adminstration portal used
+859	   to configure network assets and deploy new applications.  When
+860	   attempting to access the service, the network administrator receives
+861	   a notification in an app on their mobile device, requesting them to
+862	   confirm access to the portal.  The network administrator approves the
+863	   request on their mobile phone and is granted access to the portal.
+864	   Section 4.3.9 describes how an attacker might exploit this flow.
+
+866	4.  Cross-Device Flow Exploits
+
+868	   Attackers exploit the absence of an authenticated channel between the
+869	   two devices used in a cross-device flow by using social engineering
+870	   techniques typically used in phishing attacks.
+
+872	   In cross-device authorization flows the attacker uses these social
+873	   engineering techniques by changing the context in which the
+874	   authorization request is presented to convince the user to grant
+875	   authorization when they shouldn't.  These attacks are also known as
+876	   Cross-Device Consent Phishing (CDCP) attacks.
+
+878	   In cross-device session transfer flows the attacker uses these social
+879	   engineering techniques to convince the user to initiate a session
+880	   transfer and send them a session transfer code.  Once the attacker is
+881	   in posession of this session transfer code, they present it to the
+882	   Authorization Server to transfer the session and access the user's
+883	   resources.  These attacks are referred to as Cross-Device Session
+884	   Phishing (CDSP) attacks.
+
+886	4.1.  Cross-Device Authorization Flow Exploits
+
+888	   Attackers exploit cross-device authorization flows by initiating an
+889	   authorization flow on the Consumption Device and then use social
+890	   engineering techniques to change the context in which the request is
+891	   presented to the user in order to convince them to grant
+892	   authorization on the Authorization Device.  The attacker is able to
+893	   change the context of the authorization request because the channel
+894	   between the Consumption Device and the Authorization Device is
+895	   unauthenticated.  These attacks are also known as Cross-Device
+896	   Consent Phishing (CDCP) attacks.
+
+898	4.1.1.  User-Transferred Session Data Pattern Exploits
+
+900	   A common action in cross-device flows is to present the user with a
+901	   QR code or a user code on the Consumption Device (e.g., smart TV)
+902	   which is then scanned or entered on the Authorization Device (the
+903	   mobile phone).  When the user scans the code or copies the user code,
+904	   they do so without any proof that the QR code or user code is being
+905	   displayed in the place or context intended by the service provider.
+906	   It is up to the user to decide whether they should trust the QR code
+907	   or user code.  In effect the user is asked to compensate for the
+908	   absence of an authenticated channel between the Consumption Device
+909	   (e.g., smart TV) and the Authorization Device (e.g., the mobile
+910	   phone).
+
+912	   Attackers exploit this absence of an authenticated channel between
+913	   the two devices by obtaining QR codes or user codes (e.g., by
+914	   initiating the authorization flows).  They then use social
+915	   engineering techniques to change the context in which authorization
+916	   is requested to convince end-users to scan the QR code or enter it on
+917	   their Authorization Device (e.g., mobile phone).  Once the end-user
+918	   performs the authorization on the mobile device, the attacker who
+919	   initiated the authentication or authorization request obtains access
+920	   to the user's resources.  The figure below shows an example of such
+921	   an attack.
+
+923	                +--------------+                       +---------------+
+924	                |  Attacker's  |--(B) Request -------->|               |
+925	                |  Consumption |      QR/User Code     |               |
+926	                |    Device    |                       |               |
+927	                |              |<-(C) Return ----------|               |
+928	       +------->|              |      QR/User Code     |               |
+929	       |        |              |                       |               |
+930	       |        |              |--(D) Poll for ------->|               |
+931	       |        |              |      Authorization    |               |
+932	       |        |              |                       |               |
+933	       |        |              |<-(L) Grant -----------| Authorization |
+934	       |        |              |      Authorization    |     Server    |
+935	       |        +--------------+                       |               |
+936	       |              |                                |               |
+937	      (A) Attacker   (E) Attacker Copies               |               |
+938	       |  Starts      |  QR or User Code               |               |
+939	       |  Flow        |                                |               |
+940	   +--------------+   |                                |               |
+941	   |   Attacker   |<--+                                |               |
+942	   +--------------+                                    |               |
+943	          |                                            |               |
+944	          (F) Attacker Changes                         |               |
+945	          |   QR Code/User Code                        |               |
+946	          v   Context                                  |               |
+947	   +--------------+                                    |               |
+948	   |     User     |                                    |               |
+949	   +--------------+                                    |               |
+950	    |   |                                              |               |
+951	    |  (G) User is convinced by the                    |               |
+952	    |   |  attacker and scans QR code                  |               |
+953	    |   |  or enters User Code                         |               |
+954	    |   |       +--------------+                       |               |
+955	    |   +------>| Authorization|                       |               |
+956	    |           |    Device    |--(H) Send QR code --->|               |
+957	    |           |              |      or user code     |               |
+958	    |           |              |                       |               |
+959	    |           |              |<-(I) Request user ----|               |
+960	    |           |              |     Authentication and|               |
+961	    |           |              |     Authorization     |               |
+962	    +-(J) User->|              |                       |               |
+963	   Authenticates|              |                       |               |
+964	   and grants   |              |                       |               |
+965	   Authorization|              |                       |               |
+966	                |              |--(K) Authentication ->|               |
+967	                |              |      and Authorization|               |
+968	                |              |      Completes        |               |
+969	                +--------------+                       +---------------+
+
+971	   Figure: User-Transferred Session Data Pattern Exploits
+
+973	   *  (A) The attacker initiates the protocol on the Consumption Device
+974	      (or mimicks the Consumption Device) by starting a purchase, adding
+975	      a device to a network or connecting a service to the Consumption
+976	      Device.
+
+978	   *  (B) The Consumption Device requests a QR code or user code from an
+979	      Authorization Server.
+
+981	   *  (C) The Authorization Server returns a QR code or user code to the
+982	      Consumption Device, which displays it to the user with
+983	      instructions to scan the QR code or enter the user code using the
+984	      Authorization Device.
+
+986	   *  (D) The Consumption Device starts polling the Authorization Server
+987	      to find out if the user granted authorization.
+
+989	   *  (E) The attacker copies the QR code or user code.
+
+991	   *  (F) The attacker changes the context in which the QR code or user
+992	      code is displayed in such a way that the user is likely to scan
+993	      the QR code or use the user code when completing the
+994	      authorization.  For example, the attacker could craft an e-mail
+995	      that includes the user code or QR code and send it to the user.
+996	      The e-mail might encourage the user to scan the QR code or enter
+997	      the user code by suggesting that doing so would grant them a
+998	      reward through a loyalty program or prevent the loss of their
+999	      data.
+
+1001	   *  (G) The QR code or user code is displayed to the user in a context
+1002	      chosen by the attacker.  The user is convinced by the attacker's
+1003	      effort and scans the QR code or enters the user code on the
+1004	      Authorization Device.
+
+1006	   *  (H) The QR code or user code is sent to the Authorization Server
+
+1008	   *  (I) The Authorization Server validates the QR code or user code
+1009	      and prompts the user to authenticate and accept or decline the
+1010	      authorization request.
+
+1012	   *  (J) The user authenticates and grants authorization using the
+1013	      Authorization Device.
+
+1015	   *  (K) The user is authenticated with the Authorization Server and
+1016	      authorization is granted to access the user's resources (there may
+1017	      be several additional messages, depending on the authentication
+1018	      protocol, user interface and other implementation details).
+
+1020	   *  (L) The Authorization Server issues tokens or grants authorization
+1021	      to the Consumption Device, which is under the attacker's control,
+1022	      to access the user's resources.  The attacker gains access to the
+1023	      resources and any authorization artifacts like access and refresh
+1024	      tokens.
+
+1026	4.1.2.  Backchannel-Transferred Session Pattern Exploits
+
+1028	   In the backchannel-transferred session pattern, the client requests
+1029	   the authorization server to authenticate the user and obtain
+1030	   authorization for an action.  This may happen as a result of user
+1031	   interaction with the Consumption Device, but may also be triggered
+1032	   without the users direct interaction with the Consumption Device,
+1033	   resulting in an authorization request presented to the user without
+1034	   context of why or who triggered the request.
+
+1036	   Attackers exploit this lack of context by using social engineering
+1037	   techniques to prime the user for an authorization request and thereby
+1038	   convince them to granting authorization.  The social engineering
+1039	   techniques range in sophistication from messages misrepresenting the
+1040	   reason for receiving an authorization request, to triggering a large
+1041	   volume of requests at an inconvenient time for the user, in the hope
+1042	   that the user will grant authorization to make the requests stop.
+1043	   The figure below shows an example of such an attack.
+
+1045	   The ability to trigger authorization requests without user
+1046	   involvement can be exploited an attacker to overwhelm users with a
+1047	   high volume of requests in a short period, increasing the likelihood
+1048	   of inadvertent approval.
+
+1050	                +--------------+                       +---------------+
+1051	        +------>|  Attacker's  |--(C) Backchannel ---->|               |
+1052	        |       |  Consumption |      Authorization    |               |
+1053	        |       |  Device      |      Request          |               |
+1054	        |       |              |                       | Authorization |
+1055	        |       |              |<-(G) Grant------------|     Server    |
+1056	        |       +--------------+      Authorization    |               |
+1057	       (B) Attacker                                    |               |
+1058	        |  Start                                       |               |
+1059	        |  Flow                                        |               |
+1060	        |                                              |               |
+1061	   +----------+                                        |               |
+1062	   | Attacker |                                        |               |
+1063	   +----------+                                        |               |
+1064	        |                                              |               |
+1065	       (A) Attacker Sends                              |               |
+1066	        |  Social Engineering                          |               |
+1067	        v  Message to User (optional)                  |               |
+1068	   +----------+                                        |               |
+1069	   |   User   |                                        |               |
+1070	   +----------+                                        |               |
+1071	        |                                              |               |
+1072	       (E) User Authenticate                           |               |
+1073	        |  and Authorize Action                        |               |
+1074	        |                                              |               |
+1075	        |       +--------------+                       |               |
+1076	        |       | Authorization|                       |               |
+1077	        |       |    Device    |<-(D) Request User ----|               |
+1078	        +------>|              |      Authentication   |               |
+1079	                |              |      and Authorization|               |
+1080	                |              |                       |               |
+1081	                |              |--(F) Authentication ->|               |
+1082	                |              |      and Authorization|               |
+1083	                |              |      Completes        |               |
+1084	                +--------------+                       +---------------+
+
+1086	   Figure: Backchannel-Transferred Session Pattern Exploits
+
+1088	   *  (A) The attacker sends a social engineering message to prepare the
+1089	      user for the upcoming authorization (optional).
+
+1091	   *  (B) The attacker initiates the protocol on the Consumption Device
+1092	      (or mimics the Consumption Device) by starting a purchase, adding
+1093	      a device to a network or accessing a service on the Consumption
+1094	      Device.
+
+1096	   *  (C) The client on the Consumption Device requests user
+1097	      authorization on the backchannel from the Authorization Server and
+1098	      waits for a response from the Authorization Server.
+
+1100	   *  (D) The Authorization Server requests user authentication and
+1101	      authorization on the user's Authorization Device.
+
+1103	   *  (E) If the user is unauthenticated, they use their Authorization
+1104	      Device to authenticate and grant authorization to the
+1105	      Authorization Server.
+
+1107	   *  (F) The user is authenticated and authorization is granted to
+1108	      access the user's resources (there may be several additional
+1109	      messages, depending on the authentication protocol, user interface
+1110	      and other implementation details).
+
+1112	   *  (G) The Authorization Server issues tokens or grants authorization
+1113	      to the Consumption Device, which is under the attacker's control.
+1114	      The attacker gains access to the user's resources and possibly any
+1115	      authorization artifacts like access and refresh tokens.
+
+1117	4.1.3.  User-Transferred Authorization Data Pattern Exploits
+
+1119	   In cross-device flows that follow the user-transferred authorization
+1120	   data pattern, the client on the Consumption Device initiates the
+1121	   authorization request, but the user still has to transfer the
+1122	   authorization data to the Consumption Device.  The authorization data
+1123	   may take different forms, including a numerical value such as a 6
+1124	   digit authorization code.  The authorization request may happen as a
+1125	   result of user interaction with the Consumption Device, but may also
+1126	   be triggered without the user's direct interaction with the
+1127	   Consumption Device.
+
+1129	   Attackers exploit the user-transferred authorization data pattern by
+1130	   combining the social engineering techniques used to set context for
+1131	   users and convincing users to providing them with authorization data
+1132	   sent to their Authorization Devices (e.g., mobile phones).  These
+1133	   attacks are very similar to phishing attacks, except that the
+1134	   attacker also has the ability to trigger the authorization request to
+1135	   be sent to the user directly by the Authorization Server.
+
+1137	                +--------------+                       +---------------+
+1138	       +------->|  Consumption |--(C) Backchannel ---->| Authorization |
+1139	       |        |    Device    |      Authorization    |    Server     |
+1140	       |        |              |      Request          |               |
+1141	       |        |              |                       |               |
+1142	       |        |              |<-(H) Grant------------|               |
+1143	       |        +--------------+      Authorization    |               |
+1144	       |                    ^                          |               |
+1145	       |                    |                          |               |
+1146	      (B) Attacker         (G) Attacker Enters         |               |
+1147	       |  Start             |  Authorization           |               |
+1148	       |  Flow              |  Data                    |               |
+1149	       |                    |                          |               |
+1150	   +------------------------------------------+        |               |
+1151	   |                 Attacker                 |        |               |
+1152	   +------------------------------------------+        |               |
+1153	     |                   ^                             |               |
+1154	    (A) Attacker        (F) User                       |               |
+1155	     |  Sends            |  Sends                      |               |
+1156	     |  Social           |  Authorization              |               |
+1157	     |  Engineering      |  Data                       |               |
+1158	     v  Message          |                             |               |
+1159	   +------------------------------------------+        |               |
+1160	   |                   User                   |        |               |
+1161	   +------------------------------------------+        |               |
+1162	                     ^                                 |               |
+1163	                     |                                 |               |
+1164	                    (E) User Copies                    |               |
+1165	                     |  Authorization Data             |               |
+1166	                     |                                 |               |
+1167	                +--------------+                       |               |
+1168	                | Authorization|                       |               |
+1169	                |    Device    |<-(D) Send ------------|               |
+1170	                |              |      Authorization    |               |
+1171	                |              |      Data             |               |
+1172	                +--------------+                       +---------------+
+
+1174	   Figure: User-Transferred Authorization Data Pattern
+
+1176	   *  (A) The attacker sends a social engineering message to prime the
+1177	      user for the authorization request they are about to receive,
+1178	      including instructions on what to do with the authorization data
+1179	      once they receive it.
+
+1181	   *  (B) The attacker initiates the protocol on the Consumption Device
+1182	      (or by mimicking the Consumption Device) by starting a purchase,
+1183	      adding a device to a network or accessing a service on the
+1184	      Consumption Device.
+
+1186	   *  (C) The client on the Consumption Device requests user
+1187	      authorization on the backchannel from the Authorization Server.
+
+1189	   *  (D) The Authorization Server sends authorization data (e.g., a 6
+1190	      digit authorization code) to the Authorization Device.  Examples
+1191	      of mechanisms that may be used to distribute the authorization
+1192	      data include text messages, email or a mobile application.  The
+1193	      authorization data may be presented as text or a QR code.
+
+1195	   *  (E) The user is convinced by the social engineering message
+1196	      received from the attacker in step (A) and copies the
+1197	      authorization data received on the Authorization Device.
+
+1199	   *  (F) The user forwards the authorization data to the attacker.
+
+1201	   *  (G) The attacker enters the authorization data (e.g., a 6 digit
+1202	      authorization code) on the Consumption Device.
+
+1204	   *  (H) The Authorization Server grants authorization and issues
+1205	      access and refresh tokens to the Consumption Device, which is
+1206	      under the attacker's control.  On completion of the exploit, the
+1207	      attacker gains access to the user's resources.
+
+1209	   The unauthenticated channel may also be exploited in variations of
+1210	   the above scenario if there is no session maintained in the channel
+1211	   for steps C and G.  In that case a user (as opposed to the attacker)
+1212	   initiates the flow and is then convinced using social engineering
+1213	   techniques into sending the authorization data (e.g., a 6 digit
+1214	   authorization code) to the attacker, instead of using it themselves.
+1215	   The authorization data may be represented as a QR code or text string
+1216	   (e.g., 6 digit authorization code).  The attacker then starts the
+1217	   flow and uses the authorization data to obtain the privileges that
+1218	   would have been assigned to the user.
+
+1220	4.2.  Cross-Device Session Transfer Exploits
+
+1222	   Attackers exploit cross-device session transfer flows by using social
+1223	   engineering techniques typically used in phishing attacks to convince
+1224	   the user to authorize the transfer of a session and then send the
+1225	   session transfer code or QR code to the attacker.  The absence of an
+1226	   authenticated channel between these two devices enables the attacker
+1227	   to use the session transfer code on their own device to obtain access
+1228	   to the session and access the users data.  These attacks are referred
+1229	   to as Cross-Device Session Phishing (CDSP) attacks.
+
+1231	              +---------------+                       +---------------+
+1232	      +------>| Authorization |                       | Authorization |
+1233	      |       |    Device     |--(C) Session -------->|     Server    |
+1234	      |       |               |      Transfer Request |               |
+1235	      |       |               |                       |               |
+1236	      |       |               |<-(D) Session ---------|               |
+1237	      |       |               |      Transfer Code    |               |
+1238	      |       |               |                       |               |
+1239	      |       +---------------+                       |               |
+1240	     (B) User      |                                  |               |
+1241	      |  Start    (E) User Views                      |               |
+1242	      |  Flow      |  Session Transfer Code           |               |
+1243	      |            v  or QR Code                      |               |
+1244	  +--------------------------------+                  |               |
+1245	  |             User               |                  |               |
+1246	  +--------------------------------+                  |               |
+1247	    ^                |                                |               |
+1248	    |                |                                |               |
+1249	   (A) Attacker     (F) User sends Session            |               |
+1250	    |  Sends         |  Transfer or QR Code           |               |
+1251	    |  Social        |  to Attacker                   |               |
+1252	    |  Engineering   |                                |               |
+1253	    |  Message       v                                |               |
+1254	  +-------------------------------+                   |               |
+1255	  |            Attacker           |                   |               |
+1256	  +-------------------------------+                   |               |
+1257	                       |                              |               |
+1258	                      (G) Attacker Enter              |               |
+1259	                       |  Session Transfer Code       |               |
+1260	                       |  or Scan QR Code             |               |
+1261	                       v                              |               |
+1262	              +---------------+                       |               |
+1263	              |  Consumption  |                       |               |
+1264	              |     Device    |--(H) Present -------->|               |
+1265	              |               |      Session Transfer |               |
+1266	              |               |      Code             |               |
+1267	              |               |                       |               |
+1268	              |               |<-(I) Return Session --|               |
+1269	              |               |      Context           |               |
+1270	              +---------------+                       +---------------+
+
+1272	   Figure: Cross-Device Session Transfer Pattern
+
+1274	   *  (A) The attacker sends a social engineering message that convinces
+1275	      the user that they should authorize a session transfer including
+1276	      instructions on what to do with the QR code or session transfer
+1277	      code once they obtained it.
+
+1279	   *  (B) The user starts the flow and is authenticated on their
+1280	      Authorization Device before they authorize the transfer of the
+1281	      session to the Consumption Device.
+
+1283	   *  (C) The client on the Authorization Device requests a session
+1284	      transfer code from the Authorization Server.
+
+1286	   *  (D) The Authorization Server responds with a session transfer
+1287	      code, which may be rendered as a QR code on the Authorization
+1288	      Device.
+
+1290	   *  (E) The user views the session transfer code, which may be
+1291	      rendered as a QR code.
+
+1293	   *  (F) The user sends the QR code or session transfer code to the
+1294	      attacker, following the instructions they received in step (A).
+
+1296	   *  (G) Once the attacker receives the QR code, they scan it or enter
+1297	      it on their own Consumption Device.
+
+1299	   *  (H) The client on the Consumption Device presents the session
+1300	      transfer code to the Authorization Server.
+
+1302	   *  (I) The Authorization Server verifies the session transfer code
+1303	      and returns the session context information needed to resume the
+1304	      session on the Consumption Device.  The attacker resumes the
+1305	      session on their own Consumption Device and is able to access the
+1306	      information that the user authorized on their Authorization Device
+1307	      in step (B).
+
+1309	4.3.  Examples of Cross-Device Flow Exploits
+
+1311	   The following examples illustrate these attacks in practical settings
+1312	   applied to the use cases described in Section 3.3.  These examples
+1313	   show how the unauthenticated channel is exploited by attackers who
+1314	   can copy the QR codes and user codes, change the context in which
+1315	   they are presented using social engineering techniques and mislead
+1316	   end-users into granting consent to avail of services, access data and
+1317	   make payments.
+
+1319	4.3.1.  Example B1: Illicit Access to a Video Streaming Service (User-
+1320	        Transferred Session Data Pattern)
+
+1322	   This exploit applies to the use case described in Section 3.3.1.
+
+1324	   An attacker obtains a smart TV and attempts to access an online
+1325	   streaming service.  The smart TV obtains a QR code from the streaming
+1326	   service authorization server and displays it on screen.  The attacker
+1327	   copies the QR code and embeds it in an e-mail that is sent to a large
+1328	   number of recipients.  The e-mail contains a message stating that the
+1329	   streaming service wants to thank them for their loyal support and by
+1330	   scanning the QR code, they will be able to add a bonus device to
+1331	   their account for no charge.  One of the recipients open the e-mail
+1332	   and scan the QR code to claim the loyalty reward.  The user performs
+1333	   multi-factor authentication, and when asked if they want a new device
+1334	   to be added to their account, they authorize the action.  The
+1335	   attacker's device is now authorized to access the content and obtains
+1336	   an access and refresh token.  The access token allows the attacker to
+1337	   access content and the refresh token allows the attacker to obtain
+1338	   fresh tokens whenever the access token expires.
+
+1340	   The attacker scales up the attack by emulating a new smart TV,
+1341	   obtaining multiple QR codes and widening the audience it sends the QR
+1342	   code to.  Whenever a recipient scans the QR code and authorizes the
+1343	   addition of a new device, the attacker obtains an access and refresh
+1344	   token, which they sell for a profit.
+
+1346	4.3.2.  Example B2: Illicit Access to Productivity Services (User-
+1347	        Transferred Session Data Pattern)
+
+1349	   This exploit applies to the use case described in Section 3.3.2.
+
+1351	   An attacker emulates an enterprise application (e.g., an interactive
+1352	   whiteboard) and initiates a cross-device flow by requesting a user
+1353	   code and URL from the authorization server.  The attacker obtains a
+1354	   list of potential victims and sends an e-mail informing users that
+1355	   their files will be deleted within 24 hours if they don't follow the
+1356	   link, enter the user code and authenticate.  The e-mail reminds them
+1357	   that this is the third time that they have been notified and their
+1358	   last opportunity to prevent deletion of their work files.  One or
+1359	   more employees respond by following the URL, entering the code and
+1360	   performing multi-factor authentication.  Throughout the
+1361	   authentication experience, the user is interacting with a trusted
+1362	   user experience, re-enforcing the legitimacy of the request.  Once
+1363	   these employees authorized access, the attacker obtains access and
+1364	   refresh tokens from the authorization server and uses it to access
+1365	   the users' files, perform lateral attacks to obtain access to other
+1366	   information and continuously refresh the session by requesting new
+1367	   access tokens.  These tokens may be exfiltrated and sold to third
+1368	   parties.
+
+1370	4.3.3.  Example B3: Illicit Access to Physical Assets (User-Transferred
+1371	        Session Data Pattern)
+
+1373	   This exploit applies to the use case described in Section 3.3.3.
+
+1375	   An attacker copies a QR code from a bicycle locked in a bicycle rack
+1376	   in a city, prints it on a label and places the label on a bicycle at
+1377	   the other end of the bicycle rack.  A customer approaches the bicycle
+1378	   that contains the replicated QR code and scans the code and
+1379	   authenticates before authorizing payment for renting the bicycle.
+1380	   The bicycle rack unlocks the bicycle containing the original QR code
+1381	   and the attacker removes the bicycle before cycling down the street
+1382	   while the customer is left frustrated that the bicycle they were
+1383	   trying to use is not being unlocked [NYC.Bike].  The customer
+1384	   proceeds to unlock another bicycle and lodges a complaint with the
+1385	   bicycle renting company.
+
+1387	4.3.4.  Example B4: Illicit Transaction Authorization (Backchannel-
+1388	        Transferred Session Pattern)
+
+1390	   These exploits applies to the use case described in Section 3.3.4.
+
+1392	4.3.4.1.  Example B4.1: Bulk Authorization Request (Backchannel-
+1393	          Transferred Session Pattern)
+
+1395	   An attacker obtains a list of user identifiers for a financial
+1396	   institution and triggers a transaction request for each of the users
+1397	   on the list.  The financial institution's authorization server sends
+1398	   push notifications to each of the users, requesting authorization of
+1399	   a transaction.  The vast majority of users ignore the request to
+1400	   authorize the transaction, but a small percentage grants
+1401	   authorization by approving the transaction.
+
+1403	4.3.4.2.  Example B4.2: Fake Helpdesk (Backchannel-Transferred Session
+1404	          Pattern)
+
+1406	   An attacker obtains the contact information for a user and contacts
+1407	   them, pretending to be a representative of the user's financial
+1408	   institution.  The attacker informs the user that there were a number
+1409	   of fraudulent transactions against their account and asks them to
+1410	   review these transactions by approving or rejecting them.  The
+1411	   attacker then triggers a sequence of transactions.  The user receives
+1412	   an authorization request for each transaction and declines them as
+1413	   they do not recognize them.  The attacker then informs the user that
+1414	   they need to close the users account and transfer all the funds to a
+1415	   new account to prevent further fraudulent transactions.  The user
+1416	   receives another authorization request which they approve, or provide
+1417	   additional authorization information to the attacker which enables
+1418	   the attacker to complete their attack and defraud the user.
+
+1420	4.3.5.  Example B5: Illicit Network Join (Cross-Device Session Transfer
+1421	        Pattern)
+
+1423	   This exploit applies to the use case described in Section 3.3.5.
+
+1425	   An attacker creates a message to all employees of a company, claiming
+1426	   to be from a trusted technology provider investigating a suspected
+1427	   security breach.  They ask employees to send them the QR code
+1428	   typically used to join a new device to the network, along with
+1429	   detailed steps on how to obtain the QR code.  The employee, eager to
+1430	   assist, initiates the process to add a new mobile device to the
+1431	   network.  They authenticate to the network and obtain a QR code.
+1432	   They send the QR code to the attacker.  The attacker scans the QR
+1433	   code and adds their own device to the network.  They use this device
+1434	   access as an entry point and perform lateral moves to obtain
+1435	   additional privileges and access to restricted resources.
+
+1437	4.3.6.  Example B6: Illicit Onboarding (User-Transferred Session Data
+1438	        Pattern)
+
+1440	   This exploit applies to the use case described in Section 3.3.6.
+
+1442	   An attacker initiates an employee onboarding flow and obtains a QR
+1443	   code from the onboarding portal to invoke a digital wallet and
+1444	   present a verifiable credential attesting to a new employee's
+1445	   identity.  The attacker obtains a list of potential new employees and
+1446	   sends an e-mail informing them that it is time to present proof of
+1447	   their background check or government issued ID.  The new employee
+1448	   scans the QR code, invokes their digital wallet and presents their
+1449	   credentials.  Once the credentials are presented, the employee's
+1450	   account is activated.  The employee portal accessed by the attacker
+1451	   to obtain the QR code displays a message to the attacker with
+1452	   instructions on how to access their account.
+
+1454	4.3.7.  Example B7: Illicit Application Bootstrap (Cross-Device Session
+1455	        Transfer Pattern)
+
+1457	   This exploit applies to the use case described in Section 3.3.7.
+
+1459	   An attacker creates a message to all employees of a company, claiming
+1460	   to be from the company's IT service provider.  They claim that they
+1461	   are trying to resolve an application performance issue and ask
+1462	   employees to send them the QR code typically used to transfer a
+1463	   session.  The employee, eager to assist, initiates the process to
+1464	   transfer a session.  They authenticate and obtain a QR code and then
+1465	   send the QR code to the attacker.  The attacker scans the QR code
+1466	   with their mobile phone and access the users data and resources.
+
+1468	4.3.8.  Example B8: Account Takeover (User-Transferred Session Data
+1469	        Pattern)
+
+1471	   This exploit applies to the use case described in Section 3.3.8.
+
+1473	   An attacker wants to use some website which requires presentation of
+1474	   a verifiable credential for authentication.  The attacker creates a
+1475	   phishing website which will in real time capture log-in QR Codes from
+1476	   the original website and present these to the user.  The attacker
+1477	   tries to get the user to use the phishing website by sending messages
+1478	   by e-mail or other messaging technologies.  The user scans the QR
+1479	   code on the phishing website, invokes their digital wallet and
+1480	   presents their credentials.  Once the credentials are presented, the
+1481	   original session from the attackers device is authorized with the
+1482	   user's credentials.
+
+1484	4.3.9.  Example B9: Illicit Access to Administration Capabilities
+1485	        Through Consent Request Overload (Backchannel-Transferred
+1486	        Session Pattern)
+
+1488	   This exploit applies to the use case described in Section 3.3.9.
+
+1490	   An attacker attempts to access an adminstration portal repeatedly,
+1491	   generating a stream of authorization requests to the network
+1492	   administrator.  The attempts are timed to occur while the
+1493	   administrator is asleep.  The administrator is woken by the incoming
+1494	   requests on their phone, and, in an attempt to stop the
+1495	   notifications, they accidentally approve access and the attacker
+1496	   gains access to the portal.
+
+1498	4.3.10.  Out of Scope
+
+1500	   In all of the attack scenarios listed above, a user is misled or
+1501	   exploited.  For other attacks, where the user is willingly colluding
+1502	   with the attacker, the threat model, security implications and
+1503	   potential mitigations are very different.  For example, a cooperating
+1504	   user can bypass software mitigations on their device, share access to
+1505	   hardware tokens with the attacker, and install additional devices to
+1506	   forward radio signals to circumvent proximity checks.
+
+1508	   This document only considers scenarios where a user does not collude
+1509	   with an attacker.
+
+1511	5.  Cross-Device Protocols and Standards
+
+1513	   Cross-device flows that are subject to the attacks described earlier
+1514	   typically share the following characteristics:
+
+1516	   1.  The attacker can initiate the flow and manipulate the context of
+1517	       an authorization request.  E.g., the attacker can obtain a QR
+1518	       code or user code, or can request an authentication/authorization
+1519	       decision from the user.
+
+1521	   2.  The interaction between the Consumption Device and Authorization
+1522	       Device is unauthenticated.  I.e., it is left to the user to
+1523	       decide if the QR code, user code, or authentication request is
+1524	       being presented in a legitimate context.
+
+1526	   A number of protocols that have been standardized, or are in the
+1527	   process of being standardized that share these characteristics
+1528	   include:
+
+1530	   *  *IETF OAuth 2.0 Device Authorization Grant ([RFC8628]):* A
+1531	      standard to enable authorization on devices with constrained input
+1532	      capabilities (smart TVs, printers, kiosks).  In this protocol, the
+1533	      user code or QR code is displayed on the Consumption Device and
+1534	      entered on a second device (e.g., a mobile phone).
+
+1536	   *  *Open ID Foundation Client Initiated Back-Channel Authentication
+1537	      (CIBA) [CIBA]:* A standard developed in the OpenID Foundation that
+1538	      allows a device or service (e.g., a personal computer, smart TV,
+1539	      Kiosk) to request the OpenID Provider to initiate an
+1540	      authentication flow if it knows a valid identifier for the user.
+1541	      The user completes the authentication flow using a second device
+1542	      (e.g., a mobile phone).  In this flow the user does not scan a QR
+1543	      code or obtain a user code from the Consumption Device, but is
+1544	      instead contacted by the OpenID Provider to complete the
+1545	      authentication using a push notification, e-mail, text message or
+1546	      any other suitable mechanism.
+
+1548	   *  *OpenID for Verifiable Credential Protocol Suite (Issuance,
+1549	      Presentation):* The OpenID for Verifiable Credentials enables
+1550	      cross-device scenarios by allowing users to scan QR codes to
+1551	      retrieve credentials (Issuance - see [OpenID.VCI]) or present
+1552	      credentials (Presentation - see [OpenID.VP]).  The QR code is
+1553	      presented on a device that initiates the flow.
+
+1555	   *  *Self-Issued OpenID Provider v2 (SIOP V2):* A standard that allows
+1556	      end-user to present self-attested or third party attested
+1557	      attributes when used with OpenID for Verifiable Credential
+1558	      protocols.  The user scans a QR code presented by the relying
+1559	      party to initiate the flow.
+
+1561	   Cross-device protocols SHOULD NOT be used for same-device scenarios.
+1562	   If the Consumption Device and Authorization Device are the same
+1563	   device, protocols like OpenID Connect Core [OpenID.Core] and OAuth
+1564	   2.0 Authorization Code Grant as defined in [RFC6749] are more
+1565	   appropriate.  If a protocol supports both same-device and cross-
+1566	   device modes (e.g., [OpenID.SIOPV2]), the cross-device mode SHOULD
+1567	   NOT be used for same-device scenarios.  An authorization server MAY
+1568	   choose to block cross-device protocols used in same-device scenarios
+1569	   if it detects that the same device is used.  An authorization server
+1570	   may use techniques such as device fingerprinting, network address or
+1571	   other techniques to detect if a cross-device protocol is being used
+1572	   on the same device.  If an implementor decides to use a cross-device
+1573	   protocol or a protocol with a cross-device mode in a same-device
+1574	   scenario, the mitigations recommended in this document SHOULD be
+1575	   implemented to reduce the risks that the unauthenticated channel is
+1576	   exploited.
+
+1578	6.  Mitigating Against Cross-Device Flow Attacks
+
+1580	   The unauthenticated channel between the Consumption Device and the
+1581	   Authorization Device allows attackers to change the context in which
+1582	   the authorization request is presented to the user.  This shifts
+1583	   responsibility of authenticating the channel between the two devices
+1584	   to the end-user.  End-users have "expertise elsewhere", are typically
+1585	   not security experts, and don't understand the protocols and systems
+1586	   they interact with.  As a result, end-users are poorly equipped to
+1587	   authenticate the channel between the two devices.  Mitigations should
+1588	   focus on:
+
+1590	   1.  Minimizing reliance on the user to make decisions to authenticate
+1591	       the channel.
+
+1593	   2.  Providing better information with which to make decisions to
+1594	       authenticate the channel.
+
+1596	   3.  Recovering from incorrect channel authentication decisions by
+1597	       users.
+
+1599	   To achieve the above outcomes, mitigating against Cross-Device
+1600	   Consent Phishing attacks require a three-pronged approach:
+
+1602	   1.  Reduce risks of deployed protocols with practical mitigations.
+
+1604	   2.  Adopt or develop protocols that are less susceptible to these
+1605	       attacks where possible.
+
+1607	   3.  Provide analytical tools to assess vulnerabilities and
+1608	       effectiveness of mitigations.
+
+1610	6.1.  Practical Mitigations
+
+1612	   A number of protocols that enable cross-device flows that are
+1613	   susceptible to Cross-Device Consent Phishing attacks are already
+1614	   deployed.  The security profile of these protocols can be improved
+1615	   through practical mitigations that provide defense in depth that
+1616	   either:
+
+1618	   1.  Prevents the attack from being initiated.
+
+1620	   2.  Disrupts the attack once it is initiated.
+
+1622	   3.  Remediates or reduces the impact if the attack succeeds.
+
+1624	   It is RECOMMENDED that one or more of the mitigations be applied when
+1625	   implementing a cross-device flow.  Each mitigation, despite
+1626	   limitations in its effectiveness, provides an additional layer of
+1627	   security that may increase the difficulty of initiating an attack,
+1628	   disrupt attacks in progress, or reduce the impact of a successful
+1629	   attack.
+
+1631	6.1.1.  Establish Proximity
+
+1633	   The unauthenticated channel between the Consumption Device and
+1634	   Authorization Device allows attackers to obtain a QR code or user
+1635	   code in one location and display it in another location.
+1636	   Consequently, proximity-enforced cross-device flows are more
+1637	   resistant to Cross-Device Consent Phishing attacks than proximity-
+1638	   less cross-device flows.  Establishing proximity between the location
+1639	   of the Consumption Device and the Authorization Device limits an
+1640	   attacker's ability to launch attacks by sending the user or QR codes
+1641	   to large numbers of users that are geographically distributed.  Note
+1642	   that the authorization server typically cannot directly determine
+1643	   whether the Consumption Device and Authorization Device are
+1644	   physically close to each other.  Instead, it must rely on the
+1645	   surrounding systems, protocols in use, device capabilities, or
+1646	   information it obtains from other systems to establish or verify
+1647	   proximity.  The authorization server can validate information it
+1648	   receives, but it cannot independently measure or enforce proximity on
+1649	   its own.  There are a number of ways to establish proximity, each
+1650	   with its own implementation benefits and limitations:
+
+1652	   *  Physical connectivity: This is a good indicator of proximity, but
+1653	      requires specific ports, cables and hardware and may be
+1654	      challenging from a user experience perspective or may not be
+1655	      possible in certain settings (e.g., when USB ports are blocked or
+1656	      removed for security purposes).  Physical connectivity may be
+1657	      better suited to dedicated hardware like FIDO devices that can be
+1658	      used with protocols that are resistant to the exploits described
+1659	      in this document.
+
+1661	   *  Wireless proximity: Near Field Communications (NFC), Bluetooth Low
+1662	      Energy (BLE), and Ultra Wideband (UWB) services can be used to
+1663	      prove proximity between the two devices.  NFC technology is widely
+1664	      deployed in mobile phones as part of payment solutions, but NFC
+1665	      readers are less widely deployed.  BLE presents another
+1666	      alternative for establishing proximity, but may present user
+1667	      experience challenges when setting up.  UWB standards such as IEEE
+1668	      802.15.4 and the IEEE 802.15.4z-2020 Amendment 1 enable secure
+1669	      ranging between devices and allow devices to establish proximity
+1670	      relative to each other [IEEE802154].  FIDO and WebAuthn-based
+1671	      cross-device flows leverage wireless proximity using BLE and are
+1672	      the RECOMMENDED approach for performing secure cross-device flows
+1673	      (see Section 6.2.3).
+
+1675	   *  Shared network: Device proximity can be inferred by verifying that
+1676	      both devices are on the same network.  This check may be performed
+1677	      by the authorization server by comparing the network addresses of
+1678	      the device where the code is displayed (Consumption Device) with
+1679	      that of the Authorization Device.  Alternatively the check can be
+1680	      performed on the device, provided that the network address is
+1681	      available.  This could be achieved if the authorization server
+1682	      encodes the Consumption Device's network address in the QR code
+1683	      and uses a digital signature to prevent tampering with the code.
+1684	      This does require the wallet to be aware of the countermeasure and
+1685	      effectively enforce it.  Note that it is common for a Consumption
+1686	      Device (e.g., a TV) to use a Wi-Fi connection while the
+1687	      Authorization Device (e.g., a phone) uses a mobile network.
+1688	      Though physically in close proximity, they don't share a network,
+1689	      so other proximity checks are needed.
+
+1691	   *  Geolocation: Proximity can be established by comparing geo-
+1692	      location information derived from global navigation satellite-
+1693	      system (GNSS) co-ordinates or geolocation lookup of IP addresses
+1694	      and comparing proximity.  Geolocation based on GNSS may vary in
+1695	      accuracy depending on the user's location, and when mapped to
+1696	      national or regional boundaries may show a Consumption and
+1697	      Authorization Device in different locations if those devices are
+1698	      close to a border.  Since relative position is more important than
+1699	      absolute location, implementations should consider relative
+1700	      location to both devices rather than absolute location when
+1701	      determining proximity.  Geolocation based on IP addresses may be
+1702	      inaccurate along regional or national borders due to overlapping
+1703	      coverage by different network providers from the respective
+1704	      regions.  This may result in the Consumption Device being mapped
+1705	      to one region, while the Authorization Device may be on another
+1706	      network from another provider and mapped to another region.  These
+1707	      inaccuracies may require restrictions to be at a more granular
+1708	      level (e.g., same city, country, region or continent).  Similar to
+1709	      the shared network checks, these checks may be performed by the
+1710	      authorization server or on the users device, provided that the
+1711	      information encoded in a QR code is integrity protected using a
+1712	      digital signature.
+
+1714	   Depending on the risk profile and the threat model in which a system
+1715	   is operating, it MAY be necessary to use more than one mechanism to
+1716	   establish proximity to raise the bar for any potential attackers.
+
+1718	   Note: There are scenarios that require that authorization takes place
+1719	   in a different location than the one in which the transaction is
+1720	   initiated.  For example, there may be a primary and secondary credit
+1721	   card holder and both can initiate transactions, but only the primary
+1722	   holder can authorize it.  There is no guarantee that the primary and
+1723	   secondary holders are in the same location at the time of the
+1724	   authorization.  In such cases, proximity (or lack of proximity) may
+1725	   be an indicator of risk and the system may deploy additional controls
+1726	   (e.g., transaction value limits, transaction velocity limits) or use
+1727	   the proximity information as input to a risk management system.
+
+1729	   *Limitations:* Proximity mechanisms make it harder to perform Cross-
+1730	   Device Consent Phishing (CDCP) attacks.  However, depending on how
+1731	   the proximity check is performed, an attacker may be able to
+1732	   circumvent the protection: The attacker can use a VPN to simulate a
+1733	   shared network or spoof a GNSS position.  For example, the attacker
+1734	   can try to request the location of the end-user's Authorization
+1735	   Device through browser APIs and then simulate the same location on
+1736	   their Consumption Device using standard debugging features available
+1737	   on many platforms.  Relying on IP address mapping can degrade user
+1738	   experience when a VPN is used on the Consumption or Authorization
+1739	   Device.  In such cases, the devices may appear to be in different
+1740	   locations, requiring additional user guidance or alternative
+1741	   mechanisms to establish proximity.
+
+1743	6.1.2.  Short Lived/Timebound QR or User Codes
+
+1745	   The impact of an attack can be reduced by making QR or user codes
+1746	   short lived.  If an attacker obtains a short lived code, the duration
+1747	   during which the unauthenticated channel can be exploited is reduced,
+1748	   potentially increasing the cost of a successful attack.  This
+1749	   mitigation can be implemented on the authorization server without
+1750	   changes to other system components.
+
+1752	   *Limitations:* There is a practical limit to how short a user code
+1753	   can be valid due to network latency and user experience limitations
+1754	   (time taken to enter a code, time to complete authentication, or time
+1755	   needed to re-enter codes or re-authenticate due to an error).  More
+1756	   sophisticated Cross-Device Consent Phishing attacks counter the
+1757	   effectiveness of short lived codes by convincing a user to respond to
+1758	   a phishing e-mail and only request the QR or user code once the user
+1759	   clicks on the link in the phishing e-mail [SQPHISH].
+
+1761	6.1.3.  One-Time or Limited Use Codes
+
+1763	   By enforcing one-time use or limited use of user or QR codes, the
+1764	   authorization server can limit the impact of attacks where the same
+1765	   user code or QR code is sent to multiple victims.  One-time use may
+1766	   be achieved by including a nonce or date-stamp in the user code or QR
+1767	   code which is validated by the authorization server when the user
+1768	   scans the QR code against a list of previously issued codes.  This
+1769	   mitigation can be implemented on the authorization server without
+1770	   changes to other system components.
+
+1772	   *Limitations:* Enforcing one-time use may be difficult in large
+1773	   globally distributed systems with low latency requirements, in which
+1774	   case short lived tokens may be more practical.  One-time use codes
+1775	   may also have an impact on the user experience.  For example, a user
+1776	   may enter a code, but their session may be interrupted before the
+1777	   access request is completed.  If the code is a one-time use code,
+1778	   they would need to restart the session and obtain a new code since
+1779	   they won't be allowed to enter the same code a second time.  To avoid
+1780	   this, implementers MAY allow the same code to be presented a small
+1781	   number of times.
+
+1783	6.1.4.  Unique Codes
+
+1785	   By issuing unique user or QR codes, an authorization server can
+1786	   detect if the same codes are being repeatedly submitted.  This may be
+1787	   interpreted as anomalous behavior and the authorization server MAY
+1788	   choose to decline issuing access and refresh tokens if it detects the
+1789	   same codes being presented repeatedly.  This may be achieved by
+1790	   maintaining a deny list that contains QR codes or user codes that
+1791	   were previously used.  The authorization server MAY use a sliding
+1792	   window equal to the lifetime of a token if short lived/timebound
+1793	   tokens are used (see Section 6.1.2).  This will limit the size of the
+1794	   deny list.  This mitigation can be implemented on the authorization
+1795	   server without changes to other system components.
+
+1797	   *Limitations:* Maintaining a deny list of previously redeemed codes,
+1798	   even for a sliding window, may have an impact on the latency of
+1799	   globally distributed systems.  One alternative is to segment user
+1800	   codes by geography or region and maintain local deny lists.
+
+1802	6.1.5.  Content Filtering
+
+1804	   Attackers exploit the unauthenticated channel by changing the context
+1805	   of the user code or QR code and then sending a message to a user
+1806	   (e-mail, text messaging, instant messaging or other communication
+1807	   mechanisms).  By deploying content filtering (e.g., anti-spam
+1808	   filter), these messages can be blocked and prevented from reaching
+1809	   the end-users.  It may be possible to fine-tune content filtering
+1810	   solutions to detect artefacts like QR codes or user codes that are
+1811	   included in a message that is sent to multiple recipients in the
+1812	   expectation that at least one of the recipients will be convinced by
+1813	   the message and grant authorization to access restricted resources.
+
+1815	   *Limitations:* Some scenarios may require legitimate re-transmission
+1816	   of user, QR and authorization data (e.g., retries).  To prevent the
+1817	   disruption of legitimate scenarios, content filters may use a
+1818	   threshold and allow a limited number of messages with the same QR or
+1819	   user codes to be transmitted before interrupting the delivery of
+1820	   those messages.  Content filtering may also be fragmented across
+1821	   multiple communications systems and communication channels (e-mail,
+1822	   text messaging, instant messaging or other communication mechanisms),
+1823	   making it harder to detect or interrupt attacks that are executed
+1824	   over multiple channels, unless here is a high degree of integration
+1825	   between content filtering systems.
+
+1827	6.1.6.  Detect and Remediate
+
+1829	   The authorization server may be able to detect misuse of the codes
+1830	   due to repeated use as described in Section 6.1.4, as an input from a
+1831	   content filtering engine as described in Section 6.1.5, or through
+1832	   other mechanisms such as reports from end-users.  If an authorization
+1833	   server determines that a user code or QR code is being used in an
+1834	   attack it may choose to invalidate all tokens issued in response to
+1835	   these codes and make that information available through a token
+1836	   introspection endpoint (see [RFC7662]).  In addition it may notify
+1837	   resource servers to stop accepting these tokens or to terminate
+1838	   existing sessions associated with these tokens using Continuous
+1839	   Access Evaluation Protocol (CAEP) messages [CAEP] using the Shared
+1840	   Signals Framework (SSF) [SSF] framework or an equivalent notification
+1841	   system.
+
+1843	   *Limitations:* Detection and remediation requires that resource
+1844	   servers are integrated with security eventing systems or token
+1845	   introspection services.  This may not always be practical for
+1846	   existing systems and may need to be targeted to the most critical
+1847	   resource services in an environment.
+
+1849	6.1.7.  Trusted Devices
+
+1851	   If an attacker is unable to initiate the protocol, they are unable to
+1852	   obtain a QR code or user code that can be leveraged for the attacks
+1853	   described in this document.  By restricting the protocol to only be
+1854	   executed on devices trusted by the authorization server, it prevents
+1855	   attackers from using arbitrary devices, or by mimicking devices to
+1856	   initiate the protocol.
+
+1858	   Authorization Servers MAY use different mechanisms to establish which
+1859	   devices it trusts for cross-device flows.  This includes limiting
+1860	   cross-device flows to specific device types such as interactive
+1861	   whiteboards or smart TVs, pre-registering devices with the
+1862	   authorization server or only allow cross-device flows on devices
+1863	   managed through device management systems.  Device management systems
+1864	   may enforce policies that govern patching, version updates, on-device
+1865	   anti-malware deployment, revocation status and device location
+1866	   amongst others.  Trusted devices MAY have their identities rooted in
+1867	   hardware (e.g., a TPM or equivalent technology).
+
+1869	   By only allowing trusted devices to initiate cross-device flows, it
+1870	   requires the attacker to have access to such a device and maintain
+1871	   access in a way that does not result in the device's trust status
+1872	   from being revoked.
+
+1874	   *Limitations:* An attacker may still be able to obtain access to a
+1875	   trusted device and use it to initiate authorization requests, making
+1876	   it necessary to apply additional controls and integrating with other
+1877	   threat detection and management systems that can detect suspicious
+1878	   behaviour such as repeated requests to initiate authorization or high
+1879	   volume of service activation on the same device.  An attacker may
+1880	   also spoof device identities or device types that are not
+1881	   cryptographically established or verified through attestation
+1882	   mechanisms.
+
+1884	6.1.8.  Trusted Networks
+
+1886	   An attacker can be prevented from initiating a cross-device flow
+1887	   protocol by only allowing the protocol to be initiated on a trusted
+1888	   network or within a security perimeter (e.g., a corporate network).
+1889	   A trusted network may be defined as a set of IP addresses and joining
+1890	   the network is subject to security controls managed by the network
+1891	   operator, which may include only allowing trusted devices on the
+1892	   network, device management, user authentication and physical access
+1893	   policies and systems.  By limiting protocol initiation to a specific
+1894	   network, the attacker needs to have access to a device on the
+1895	   network.  This mitigation can be implemented on the authorization
+1896	   server without changes to other system components.
+
+1898	   *Limitations:* Network level controls may not always be feasible,
+1899	   especially when dealing with consumer scenarios where the network may
+1900	   not be under control of the service provider.  Even if it is possible
+1901	   to deploy network level controls, it SHOULD be used in conjunction
+1902	   with other controls outlined in this document to achieve defence in-
+1903	   depth.
+
+1905	6.1.9.  Limited Scopes
+
+1907	   Authorization servers MAY choose to limit the scopes they include in
+1908	   access tokens issued through cross-device flows where the
+1909	   unauthenticated channel between two devices are susceptible to being
+1910	   exploited.  Including limited scopes lessens the impact in case of a
+1911	   successful attack.  The decision about which scopes are included may
+1912	   be further refined based on whether the protocol is initiated on a
+1913	   trusted device or the user's location relative to the location of the
+1914	   Consumption Device.  This mitigation can be implemented on the
+1915	   authorization server without changes to other system components.
+
+1917	   *Limitations:* Limiting scopes reduces the impact of a compromise,
+1918	   but does not avoid it.  It SHOULD be used in conjunction with other
+1919	   mitigations described in this document.
+
+1921	6.1.10.  Short Lived Tokens
+
+1923	   Another mitigation strategy includes limiting the life of the access
+1924	   and refresh tokens.  The lifetime can be lengthened or shortened,
+1925	   depending on the user's location, the resources they are trying to
+1926	   access or whether they are using a trusted device.  Short lived
+1927	   tokens do not prevent or disrupt the attack, but serve as a remedial
+1928	   mechanism in case the attack succeeded.  This mitigation can be
+1929	   implemented on the authorization server without changes to other
+1930	   system components.
+
+1932	   *Limitations:* Short lived tokens reduces the time window during
+1933	   which an attacker can benefit from a successful attack.  This is most
+1934	   effective for access tokens.  However, once an attacker obtains a
+1935	   refresh token, they can continue to request new access tokens, as
+1936	   well as refresh tokens.  Forcing the expiry of refresh tokens may
+1937	   cause the user to re-authorize an action more frequently, which
+1938	   results in a negative user experience.
+
+1940	6.1.11.  Rate Limits
+
+1942	   An attacker that engages in a scaled attack may need to request a
+1943	   large number of user codes (see exploit described in Section 4.3.1)
+1944	   or initiate a large number of authorization requests (see exploits
+1945	   described in Section 4.3.4.1 and Section 4.3.9) in a short period of
+1946	   time.  An authorization server MAY apply rate limits to minimize the
+1947	   number of requests it would accept from a client or send to a user in
+1948	   a limited time period.
+
+1950	   *Limitations:* Rate limits are effective at slowing an attacker down
+1951	   and help to degrade scaled attacks, but do not prevent more targeted
+1952	   attacks that are executed with lower volumes and velocity.
+1953	   Therefore, it should be used along with other techniques to provide a
+1954	   defence-in-depth defence against cross-device attacks.
+
+1956	6.1.12.  Sender-Constrained Tokens
+
+1958	   Sender-constrained tokens limit the impact of a successful attack by
+1959	   preventing the tokens from being moved from the device on which the
+1960	   attack was successfully executed.  This makes attacks where an
+1961	   attacker gathers a large number of access and refresh tokens on a
+1962	   single device and then sells them for profit more difficult, since
+1963	   the attacker would also have to export the cryptographic keys used to
+1964	   sender-constrain the tokens or be able to access them and generate
+1965	   signatures for future use.  If the attack is being executed on a
+1966	   trusted device to a device with anti-malware, any attempts to
+1967	   exfiltrate tokens or keys may be detected and the device's trust
+1968	   status may be changed.  Using hardware keys for sender-constraining
+1969	   tokens will further reduce the ability of the attacker to move tokens
+1970	   to another device.
+
+1972	   *Limitations:* Sender-constrained tokens, especially sender-
+1973	   constrained tokens that require proof-of-possession, raise the bar
+1974	   for executing the attack and profiting from exfiltrating tokens.
+1975	   Although a software proof-of-possession key is better than no proof-
+1976	   of-possession key, an attacker may still exfiltrate the software key.
+1977	   Hardware keys are harder to exfiltrate, but come with additional
+1978	   implementation complexity.  An attacker that controls the Consumption
+1979	   Device may still be able to excercise the key, even if it is in
+1980	   hardware.  Consequently the main protection derived from sender-
+1981	   constrained tokens is preventing tokens from being moved from the
+1982	   Consumption Device to another device, thereby making it harder sell
+1983	   stolen tokens and profit from the attack.
+
+1985	6.1.13.  User Education
+
+1987	   Research shows that user education is effective in reducing the risk
+1988	   of phishing attacks [Baki2023].  The service provider MAY educate
+1989	   users on the risks of cross-device consent phishing and provide out-
+1990	   of-band reinforcement to the user on the context and conditions under
+1991	   which an authorization grant may be requested.  For example, if the
+1992	   service provider does not send e-mails with QR codes requesting users
+1993	   to grant authorization, this may be reinforced in marketing messages
+1994	   and anti-fraud awareness campaigns.  The service provider MAY also
+1995	   choose to reinforce these user education messages through in-app
+1996	   experiences.  In [PCRSM2023], it is proposed to advise users to
+1997	   verify the trustworthiness of the source of a QR code, for instance
+1998	   by checking that the connection is protected through TLS or by
+1999	   verifying that the URL really belongs to the Authorization Server.
+
+2001	   *Limitations:* Although user education helps to raise awareness and
+2002	   reduce the overall risk to users, it is insufficient on its own to
+2003	   mitigate cross-device consent phishing attacks.  In particular,
+2004	   carefully designed phishing attacks can be practically
+2005	   indistinguishable from benign authorization flows even for well-
+2006	   trained users.  User education SHOULD therefore be used in
+2007	   conjunction with other controls described in this document.
+
+2009	6.1.14.  User Experience
+
+2011	   The user experience SHOULD preserve the context within which the
+2012	   protocols were initiated and communicate this clearly to the user
+2013	   when they are asked to authorize, authenticate or present a
+2014	   credential.  In preserving the context, it should be clear to the
+2015	   user who invoked the flow, why it was invoked and what the
+2016	   consequence of completing the authorization, authentication or
+2017	   credential presentation is.  The user experience SHOULD reinforce the
+2018	   message that unless the user initiated the authorization request, or
+2019	   was expecting it, they should decline the request.
+
+2021	   This information MAY be communicated graphically or in a simple
+2022	   message (e.g., "It looks like you are trying to access your files on
+2023	   a digital whiteboard in your city center office.  Click here to grant
+2024	   access to your files.  If you are not trying to access your files,
+2025	   you should decline this request and notify the security department").
+
+2027	   It SHOULD be clear to the user how to decline the request.  To avoid
+2028	   accidental authorization grants, the "decline" option SHOULD be the
+2029	   default option or given similar prominence in the user experience as
+2030	   the "grant" option.
+
+2032	   If the user uses an application on a mobile device to scan a QR code,
+2033	   the application MAY display information advising the user under which
+2034	   conditions they should expect to be asked to scan a QR code and under
+2035	   which circumstances they should never scan a QR code (e.g., display a
+2036	   message that the QR code will only be displayed on kiosks within
+2037	   trusted locations or on trusted websites hosted on a specific domain,
+2038	   and never in e-mail or other media and locations).
+
+2040	   The user experience MAY include information to further educate the
+2041	   user on cross-device consent phishing attacks and reinforce the
+2042	   conditions under which authorization grants may be requested.
+
+2044	   *Limitations:* Improvements to user experience on their own is
+2045	   unlikely to be sufficient and SHOULD be used in conjunction with
+2046	   other controls described in this document.
+
+2048	6.1.15.  Authenticate-then-Initiate
+
+2050	   By requiring a user to authenticate on the Consumption Device with a
+2051	   phishing resistant authentication method before initiating a cross-
+2052	   device flow, the server can prevent an attacker from initiating a
+2053	   cross-device flow and obtaining QR codes or user codes.  For example,
+2054	   a banking application may initiate a cross-device authorization
+2055	   request using the Backchannel-Transferred Session pattern only after
+2056	   the user is already authenticated and attempts a high-value
+2057	   transaction.  This prevents the attacker from inititiating a cross-
+2058	   device authorization request, obtaining a QR code or a user code that
+2059	   they can use to mislead an unsuspecting user.  This requires that the
+2060	   Consumption Device has sufficient input capabilities to support a
+2061	   phishing resistant authentication mechanism, which may in itself
+2062	   negate the need for a cross-device flow.
+
+2064	   *Limitations:* This mitigation is limited to Consumption Devices
+2065	   capable of supporting phishing resistant authentication mechanisms.
+2066	   Authenticating on the Consumption Device before starting a cross-
+2067	   device flow does not prevent the attacks described in Section 4.3.5
+2068	   and Section 4.3.7 and it is RECOMMENDED that additional mitigations
+2069	   described in this document is used if the cross-device flows are used
+2070	   in scenarios such as Section 3.3.5 and Section 3.3.7.
+
+2072	6.1.16.  Request Initiation Verification
+
+2074	   The user MAY be asked to confirm if they initiated an authentication
+2075	   or authorization request by sending a one-time password (OTP) or PIN
+2076	   to the user's Authorization Device and asking them to enter it on the
+2077	   Consumption Device to confirm the request.  If the request was
+2078	   initiated without the users' consent, they would receive an OTP or
+2079	   PIN out of context which may raise suspicion for the user.  In
+2080	   addition, they would not have information on where to enter the OTP
+2081	   or PIN.  The user experience on the Authorization Device MAY
+2082	   reinforce the risk of receiving an out-of-context OTP or PIN and
+2083	   provide information to the user on how to report an unauthorized
+2084	   authentication or authorization request.
+
+2086	   *Limitations:* The additional verification step may reduce the
+2087	   overall usability of the system as it is one more thing users need to
+2088	   do right.  Attackers may combine traditional phishing attacks and
+2089	   target users who respond to those messages with an interactive attack
+2090	   that sets the expectation with the user that they will have to
+2091	   provide the OTP or PIN, in addition to granting authorization for the
+2092	   request.
+
+2094	6.1.17.  Request Binding with Out-of-Band Data
+
+2096	   In the User-Transferred Session Data Pattern, users MAY enter out-of-
+2097	   band information on the Consumption Device to start the authorization
+2098	   process.  The out-of-band data entered by the user MAY then be
+2099	   included in the QR code which is displayed on the Consumption Device.
+2100	   When the QR code is scanned by the Authorization Device, the out-of-
+2101	   band data is verified by the user or by the Authorization Device.
+2102	   The out-of-band data could be any attribute that the user or
+2103	   Authorization Device can retrieve during the authorization process.
+2104	   Examples include a serial number, one-time password or PIN, location
+2105	   or any other data that the user or the Authorization Device can
+2106	   recall or retrieve during the authorization process ([MPRCS2020],
+2107	   [PCRSM2023]).
+
+2109	   *Limitations:* A sophistacted attacker may include an additional step
+2110	   in their attack where they create a phishing attack that gathers the
+2111	   out-of-band data from the user before initiating the authorization
+2112	   request.  The additional step could also have a negative impact on
+2113	   the usability level of the solution.
+
+2115	6.1.18.  Practical Mitigation Summary
+
+2117	   The practical mitigations described in this section can prevent the
+2118	   attacks from being initiated, disrupt attacks once they start or
+2119	   reduce the impact or remediate an attack if it succeeds.  When
+2120	   combining one or more of these mitigations the overall security
+2121	   profile of a cross-device flow improves significantly.  The following
+2122	   table provides a summary view of these mitigations:
+
+2124	     +=================================+=========+=========+=========+
+2125	     | Mitigation                      | Prevent | Disrupt | Recover |
+2126	     +=================================+=========+=========+=========+
+2127	     | Establish Proximity             |    X    |    X    |         |
+2128	     +---------------------------------+---------+---------+---------+
+2129	     | Short Lived/Timebound Codes     |         |    X    |         |
+2130	     +---------------------------------+---------+---------+---------+
+2131	     | One-Time or Limited Use Codes   |         |    X    |         |
+2132	     +---------------------------------+---------+---------+---------+
+2133	     | Unique Codes                    |         |    X    |         |
+2134	     +---------------------------------+---------+---------+---------+
+2135	     | Content Filtering               |         |    X    |         |
+2136	     +---------------------------------+---------+---------+---------+
+2137	     | Detect and remediate            |         |         |    X    |
+2138	     +---------------------------------+---------+---------+---------+
+2139	     | Trusted Devices                 |    X    |         |         |
+2140	     +---------------------------------+---------+---------+---------+
+2141	     | Trusted Networks                |    X    |         |         |
+2142	     +---------------------------------+---------+---------+---------+
+2143	     | Limited Scopes                  |         |         |    X    |
+2144	     +---------------------------------+---------+---------+---------+
+2145	     | Short Lived Tokens              |         |         |    X    |
+2146	     +---------------------------------+---------+---------+---------+
+2147	     | Rate Limits                     |    X    |    X    |         |
+2148	     +---------------------------------+---------+---------+---------+
+2149	     | Sender-Constrained Tokens       |         |         |    X    |
+2150	     +---------------------------------+---------+---------+---------+
+2151	     | User Education                  |    X    |         |         |
+2152	     +---------------------------------+---------+---------+---------+
+2153	     | User Experience                 |    X    |         |         |
+2154	     +---------------------------------+---------+---------+---------+
+2155	     | Authenticate-then-Initiate      |    X    |         |         |
+2156	     +---------------------------------+---------+---------+---------+
+2157	     | Request Initiation Verification |         |    X    |         |
+2158	     +---------------------------------+---------+---------+---------+
+2159	     | Request Binding with Out-of-    |         |    X    |         |
+2160	     | Band Data                       |         |         |         |
+2161	     +---------------------------------+---------+---------+---------+
+
+2163	                                  Table 1
+
+2165	   Table: Practical Mitigation Summary
+
+2167	6.2.  Protocol Selection
+
+2169	   Some cross-device protocols are more susceptible to the exploits
+2170	   described in this document than others.  In this section we will
+2171	   compare three different cross-device protocols in terms of their
+2172	   susceptibility to exploits focused on the unauthenticated channel,
+2173	   the prerequisites to implement and deploy them, along with guidance
+2174	   on when it is appropriate to use them.
+
+2176	6.2.1.  IETF OAuth 2.0 Device Authorization Grant [RFC8628]:
+
+2178	6.2.1.1.  Description
+
+2180	   A standard to enable authorization on devices with constrained input
+2181	   capabilities (smart TVs, printers, kiosks).  In this protocol, the
+2182	   user code or QR code is displayed or made available on the
+2183	   Consumption Device (smart TV) and entered on a second device (e.g., a
+2184	   mobile phone).
+
+2186	6.2.1.2.  Susceptibility
+
+2188	   There are several reports in the public domain outlining how the
+2189	   unauthenticated channel may be exploited to execute a Cross-Device
+2190	   Consent Phishing attack ([ARTDCPHISH], [DCFLOWPHISH], [NEWDCPHISH],
+2191	   [DEFCON29], [DCATTACK], [SQPHISH]).
+
+2193	6.2.1.3.  Device Capabilities
+
+2195	   There are no assumptions in the protocol about underlying
+2196	   capabilities of the device, making it a "least common denominator"
+2197	   protocol that is expected to work on the broadest set of devices and
+2198	   environments.
+
+2200	6.2.1.4.  Mitigations
+
+2202	   In addition to the security considerations section in the standard,
+2203	   it is RECOMMENDED that one or more of the mitigations outlined in
+2204	   this document be considered, especially mitigations that can help
+2205	   establish proximity or prevent attackers from obtaining QR or user
+2206	   codes.
+
+2208	6.2.1.5.  When to use
+
+2210	   Only use this protocol if other cross-device protocols are not viable
+2211	   due to device or system constraints.  Avoid using if the protected
+2212	   resources are sensitive, high value, or business critical.  Always
+2213	   deploy additional mitigations like proximity or only allow with pre-
+2214	   registered devices.  Do not use for same-device scenarios (e.g., if
+2215	   the Consumption Device and Authorization Device is the same device).
+
+2217	6.2.2.  OpenID Foundation Client Initiated Back-Channel Authentication
+2218	        (CIBA):
+
+2220	6.2.2.1.  Description
+
+2222	   Client Initiated Back-Channel Authentication (CIBA) [CIBA]: A
+2223	   standard developed in the OpenID Foundation that allows a device or
+2224	   service (e.g., a personal computer, smart TV, Kiosk) to request the
+2225	   OpenID Provider to initiate an authentication flow if it knows a
+2226	   valid identifier for the user.  The user completes the authentication
+2227	   flow using a second device (e.g., a mobile phone).  In this flow the
+2228	   user does not scan a QR code or obtain a user code from the
+2229	   Consumption Device, but is instead contacted by the OpenID Provider
+2230	   to complete the authentication using a push notification, e-mail,
+2231	   text message or any other suitable mechanism.
+
+2233	6.2.2.2.  Susceptibility
+
+2235	   Less susceptible to unauthenticated channel attacks, but still
+2236	   vulnerable to attackers who know or can guess the user identifier and
+2237	   initiate an attack as described in Section 4.3.4.1.
+
+2239	6.2.2.3.  Device Capabilities
+
+2241	   There is no requirement on the Consumption Device to support specific
+2242	   hardware.  The Authorization Device must be registered/associated
+2243	   with the user and it must be possible for the Authorization Server to
+2244	   trigger an authorization on this device.
+
+2246	6.2.2.4.  Mitigations
+
+2248	   In addition to the security considerations section in the standard,
+2249	   it is RECOMMENDED that one or more of the mitigations outlined in
+2250	   this document be considered, especially mitigations that can help
+2251	   establish proximity or prevent attackers from initiating
+2252	   authorization requests.
+
+2254	6.2.2.5.  When to Use
+
+2256	   Use CIBA instead of Device Authorization Grant if it is possible for
+2257	   the Consumption Device to obtain a user identifier on the Consumption
+2258	   Device (e.g., through an input or selection mechanism) and if the
+2259	   Authorization Server can trigger an authorization on the
+2260	   Authorization Device.  Do not use for same-device scenarios (e.g., if
+2261	   the Consumption Device and Authorization Device is the same device).
+
+2263	6.2.3.  FIDO2/WebAuthn
+
+2265	6.2.3.1.  Description
+
+2267	   FIDO2/WebAuthn is a stack of standards developed in the FIDO Alliance
+2268	   and W3C respectively which allow for origin-bound, phishing-resistant
+2269	   user authentication using asymmetric cryptography that can be invoked
+2270	   from a web browser or native client.  Version 2.2 of the FIDO Client
+2271	   to Authenticator Protocol (CTAP) supports a new cross-device
+2272	   authentication protocol, called "hybrid transports", which enables an
+2273	   external device, such as a phone or tablet, to be used as a roaming
+2274	   authenticator for signing into the primary device, such as a personal
+2275	   computer.  This is commonly called FIDO Cross-Device Authentication
+2276	   (CDA).  CTAP 2.2 hybrid transports is implemented by the client and
+2277	   authenticator platforms.
+
+2279	   When a user wants to authenticate using their mobile device
+2280	   (authenticator) for the first time, they need to link their
+2281	   authenticator to their main device.  This is done using a scan of a
+2282	   QR code.  When the authenticator scans the QR code, the device sends
+2283	   an encrypted BLE advertisement containing keying material and a
+2284	   tunnel ID.  The main device (CTAP client) and authenticator both
+2285	   establish connections to the web service, and the normal CTAP
+2286	   protocol exchange occurs.
+
+2288	   If the user chooses to keep their authenticator linked with the main
+2289	   device, the QR code link step is not necessary for subsequent use.
+2290	   The user will receive a push notification on the authenticator.
+
+2292	6.2.3.2.  Susceptibility
+
+2294	   The Cross-Device Authentication flow proves proximity by leveraging
+2295	   BLE advertisements for service establishment, significantly reducing
+2296	   the susceptibility to any of the exploits described in Examples 1-6.
+
+2298	6.2.3.3.  Device Capabilities
+
+2300	   Both the Consumption Device and the authenticator require BLE support
+2301	   and access to the internet.  The Consumption Device must support both
+2302	   the WebAuthn API [W3CWebAuthn] (or a platform-specific WebAuthn
+2303	   abstraction for native apps) and the FIDO Client to Authenticator
+2304	   Protocol (CTAP), specifically version 2.2 with hybrid transports
+2305	   [FIDOCTAP22].  The device serving as the FIDO authenticator must also
+2306	   support CTAP 2.2 or later to be used as a cross-device authenticator.
+
+2308	6.2.3.4.  Mitigations
+
+2310	   FIDO Cross-Device Authentication (CDA) establishes proximity through
+2311	   the use of BLE, reducing the need for additional mitigations.  An
+2312	   implementer MAY still choose to implement additional mitigation as
+2313	   described in this document.
+
+2315	6.2.3.5.  When to Use
+
+2317	   FIDO2/WebAuthn SHOULD be used for cross-device authentication
+2318	   scenarios whenever the devices are capable of doing so and a suitable
+2319	   FIDO credential is not available on the Consumption Device.  It MAY
+2320	   be used as an authentication method with the Authorization Code Grant
+2321	   [RFC6749] and PKCE [RFC7636], to grant authorization to a Consumption
+2322	   Device (e.g., smart TV or interactive whiteboard) using a device
+2323	   serving as the FIDO authenticator (e.g. a mobile phone) for
+2324	   authentication.  This combination of FIDO2/WebAuthn and Authorization
+2325	   Code Flow with PKCE enables cross device authorization flows, without
+2326	   the risks posed by the Device Authorization Grant [RFC8628].
+
+2328	6.2.4.  Protocol Selection Summary
+
+2330	   The FIDO Cross-Device Authentication (CDA) flow provides the best
+2331	   protection against attacks on the unauthenticated channel for cross
+2332	   device flows.  It can be combined with OAuth 2.0 and OpenID Connect
+2333	   protocols for standards-based authorization and authentication flows.
+2334	   If FIDO2/WebAuthn support is not available, Client Initiated
+2335	   Backchannel Authentication (CIBA) provides an alternative, provided
+2336	   that there is a channel through which the authorization server can
+2337	   contact the end user.  Examples of such a channel include device push
+2338	   notifications, e-mail or text messages which the user can access from
+2339	   their device.  If CIBA is used, additional mitigations to enforce
+2340	   proximity and initiate transactions from trusted devices or trusted
+2341	   networks SHOULD be considered.  The OAuth 2.0 Device Authorization
+2342	   Grant provides the most flexibility and has the lowest requirements
+2343	   on devices used, but it is RECOMMENDED that it is only used when
+2344	   additional mitigations are deployed to prevent attacks that exploit
+2345	   the unauthenticated channel between devices.
+
+2347	6.3.  Foundational Pillars
+
+2349	   Experience with web authorization and authentication protocols such
+2350	   as OAuth and OpenID Connect has shown that securing these protocols
+2351	   can be hard.  The major reason for this is that the landscape in
+2352	   which they are operating - the web infrastructure with browsers,
+2353	   servers, and the underlying network - is complex, diverse, and ever-
+2354	   evolving.
+
+2356	   As is the case with other kinds of protocols, it can be easy to
+2357	   overlook vulnerabilities in this environment.  One way to reduce the
+2358	   chances of hidden security problems is to use mathematical-logical
+2359	   models to describe the protocols, their environments and their
+2360	   security goals, and then use these models to try to prove security.
+2361	   This approach is what is usually subsumed as "formal security
+2362	   analysis".
+
+2364	   There are two major strengths of formal analysis: First, finding new
+2365	   vulnerabilities does not require creativity - i.e., new classes of
+2366	   attacks can be uncovered even if no one thought of these attacks
+2367	   before.  In a faithful model, vulnerabilities become clear during the
+2368	   proof process or even earlier.  Second, formal analysis can exclude
+2369	   the existence of any attacks within the boundaries of the model
+2370	   (e.g., the protocol layers modeled, the level of detail and
+2371	   functionalities covered, the assumed attacker capabilities, and the
+2372	   formalized security goals).  As a downside, there is usually a gap
+2373	   between the model (which necessarily abstracts away from details) and
+2374	   implementations.  In other words, implementations can introduce flaws
+2375	   where the model does not have any.  Nonetheless, for protocol
+2376	   standards, formal analysis can help to ensure that the specification
+2377	   is secure when implemented correctly.
+
+2379	   There are various different approaches to formal security analysis
+2380	   and each brings its own strengths and weaknesses.  For example,
+2381	   models differ in the level of detail in which they can capture a
+2382	   protocol (granularity, expressiveness), in the kind of statements
+2383	   they can produce, and whether the proofs can be assisted by tools or
+2384	   have to be performed manually.
+
+2386	   The following works have been identified as relevant to the analysis
+2387	   of cross-device flows:
+
+2389	   *  In "Formal analysis of self-issued OpenID providers" [Bauer2022],
+2390	      the protocol of [OpenID.SIOPV2] was analyzed using the Web
+2391	      Infrastructure Model (WIM).  The WIM is specifically designed for
+2392	      the analysis of web authentication and authorization protocols.
+2393	      While it is a manual (pen-and-paper) model, it captures details of
+2394	      browsers and web interactions to a degree that is hard to match in
+2395	      automated models.  In previous works, previously unknown flaws in
+2396	      OAuth, OpenID Connect, and FAPI were discovered using the WIM.  In
+2397	      the analysis of a cross-device SIOP V2 flow in [Bauer2022], the
+2398	      request replay attack already described in Section 13.3 of
+2399	      [OpenID.SIOPV2] was confirmed in the model.  A mitigation was
+2400	      implemented based on a so-called Cross-Device Stub, essentially a
+2401	      component that serves to link the two devices before the protocol
+2402	      flow starts.  This can be seen as an implementation of a trusted
+2403	      device relationship as described in Section 6.1.7.  The mitigation
+2404	      was shown to be effective in the model.
+
+2406	   *  In "Security analysis of the Grant Negotiation and Authorization
+2407	      Protocol" [Helmschmidt2022], an analysis of a draft of the Grant
+2408	      Negotiation and Authorization Protocol (GNAP) [RFC9635] was
+2409	      performed using the Web Infrastructure Model.  The same attack as
+2410	      in [Bauer2022] was found to apply to GNAP as well.  In this case,
+2411	      a model of a "careful user" (see Section 6.1.13 was used to show
+2412	      that the attack can be prevented (at least in theory) by the user.
+
+2414	   *  In "The Good, the Bad and the (Not So) Ugly of Out-of-Band
+2415	      Authentication with eID Cards and Push Notifications: Design,
+2416	      Formal and Risk Analysis" [MPRCS2020], Pernpruner et al. formally
+2417	      analysed an authentication protocol relying on push notifications
+2418	      delivered to an out-of-band device to approve the authentication
+2419	      attempt on the primary device (Backchannel-Transferred Session
+2420	      Pattern, Section 3.1.2).  The analysis was performed using the
+2421	      specification language ASLan++ and the model checker SATMC.
+2422	      According to the results of the analysis, they identified and
+2423	      defined the category of _implicit attacks_, which manage to
+2424	      deceive users into approving a malicious authentication attempt
+2425	      through social engineering techniques, thus not compromising all
+2426	      the authentication factors involved; these attacks are aligned
+2427	      with the definition of Cross-Device Consent Phishing (CDCP)
+2428	      attacks.
+
+2430	   *  In "An Automated Multi-Layered Methodology to Assist the Secure
+2431	      and Risk-Aware Design of Multi-Factor Authentication Protocols"
+2432	      [PCRSM2023], Pernpruner et al. defined a multi-layered methodology
+2433	      to analyze multi-factor authentication protocols at different
+2434	      levels of granularity.  They leveraged their methodology to
+2435	      formally analyze a protocol relying on a QR code that has to be
+2436	      scanned on a secondary device to approve the authentication
+2437	      attempt on the primary device (User-Transferred Session Data
+2438	      Pattern, Section 3.1.1).  Given the results of the analysis, they
+2439	      proposed some practical mitigations either to prevent or reduce
+2440	      the risk of successful attacks, such as those described in
+2441	      Section 6.1.13, Section 6.1.16 and Section 6.1.17.
+
+2443	7.  Security Considerations
+
+2445	   Security considerations are described in Section 2 and Section 6.
+
+2447	8.  IANA Considerations
+
+2449	   This document has no IANA actions.
+
+2451	9.  Conclusion
+
+2453	   Cross-device flows enable authorization on devices with limited input
+2454	   capabilities, allow for secure authentication when using public or
+2455	   shared devices, provide a path towards multi-factor authentication
+2456	   and, provide the convenience of a single, portable credential store.
+
+2458	   The popularity of cross-device flows attracted the attention of
+2459	   attackers that exploit the unauthenticated channel between the
+2460	   Consumption Device and Authorization Device using techniques commonly
+2461	   used in phishing attacks.  These Cross-Device Consent Phishing (CDCP)
+2462	   attacks allow attackers to obtain access and refresh tokens, rather
+2463	   than authentication credentials, resulting in access to resources
+2464	   even if the user used multi-factor authentication.
+
+2466	   To address these attacks, we propose a three pronged approach that
+2467	   includes the deployment of practical mitigations to safeguard
+2468	   protocols that are already deployed, provide guidance on when to use
+2469	   different protocols, including protocols that are not susceptible to
+2470	   these attacks, and the introduction of formal methods to evaluate the
+2471	   impact of mitigations and find additional issues.
+
+2473	10.  Contributors
+
+2475	   The authors would like to thank Tim Cappalli, Nick Ludwig, Adrian
+2476	   Frei, Nikhil Reddy Boreddy, Bjorn Hjelm, Joseph Heenan, Brian
+2477	   Campbell, Damien Bowden, Kristina Yasuda, Tim Würtele, Karsten Meyer
+2478	   zu Selhausen, Maryam Mehrnezhad, Marco Pernpruner, Giada Sciarretta,
+2479	   Dean H.  Saxe, Roy Williams, Aaron Parecki, George Fletcher, Hannes
+2480	   Tschofenig, Dan Moore, Deb Cooley, Paul Kyzivat, David Mandelberg,
+2481	   Jim Fenton and Bing Liu and others (please let us know, if you've
+2482	   been mistakenly omitted) for their valuable input, feedback and
+2483	   general support of this work.
+
+2485	11.  References
+
+2487	11.1.  Normative References
+
+2489	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+2490	              Requirement Levels", BCP 14, RFC 2119,
+2491	              DOI 10.17487/RFC2119, March 1997,
+2492	              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+2494	   [RFC6749]  Hardt, D., Ed., "The OAuth 2.0 Authorization Framework",
+2495	              RFC 6749, DOI 10.17487/RFC6749, October 2012,
+2496	              <https://www.rfc-editor.org/rfc/rfc6749>.
+
+2498	   [RFC7636]  Sakimura, N., Ed., Bradley, J., and N. Agarwal, "Proof Key
+2499	              for Code Exchange by OAuth Public Clients", RFC 7636,
+2500	              DOI 10.17487/RFC7636, September 2015,
+2501	              <https://www.rfc-editor.org/rfc/rfc7636>.
+
+2503	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+2504	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+2505	              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+2507	   [RFC8628]  Denniss, W., Bradley, J., Jones, M., and H. Tschofenig,
+2508	              "OAuth 2.0 Device Authorization Grant", RFC 8628,
+2509	              DOI 10.17487/RFC8628, August 2019,
+2510	              <https://www.rfc-editor.org/rfc/rfc8628>.
+
+2512	   [RFC7662]  Richer, J., Ed., "OAuth 2.0 Token Introspection",
+2513	              RFC 7662, DOI 10.17487/RFC7662, October 2015,
+2514	              <https://www.rfc-editor.org/rfc/rfc7662>.
+
+2516	   [CIBA]     Rodriguez, G. F., Walter, F., Nennker, A., Tonge, D., and
+2517	              B. Campbell, "OpenID Connect Client-Initiated Backchannel
+2518	              Authentication Flow - Core 1.0", September 2021,
+2519	              <https://openid.net/specs/openid-client-initiated-
+2520	              backchannel-authentication-core-1_0.html>.
+
+2522	   [CAEP]     Tulshibagwale, A. and T. Cappalli, "OpenID Continuous
+2523	              Access Evaluation Profile 1.0", August 2025,
+2524	              <https://openid.net/specs/openid-caep-1_0-final.html>.
+
+2526	   [SSF]      Tulshibagwale, A., Cappalli, T., Scurtescu, M., Backman,
+2527	              A., Bradley, J., and S. Miel, "OpenID Shared Signals
+2528	              Framework Specification 1.0", August 2025,
+2529	              <https://openid.net/specs/openid-sharedsignals-framework-
+2530	              1_0-final.html>.
+
+2532	   [W3CWebAuthn]
+2533	              Cappalli, T., Jones, M.B., Kumar, A., Lundberg, E., and M.
+2534	              Miller, "Web Authentication: An API for accessing Public
+2535	              Key Credentials Level 3", January 2025,
+2536	              <https://www.w3.org/TR/2025/WD-webauthn-3-20250127/>.
+
+2538	   [FIDOCTAP22]
+2539	              Bradley, J., Jones, M.B., Kumar, A., Lindemann, R.,
+2540	              Verrept, S., and D. Waite, "Client to Authenticator
+2541	              Protocol (CTAP)", July 2025.
+
+2543	   [IEEE802154]
+2544	              Institute of Electrical and Electronics Engineers, "IEEE
+2545	              Std 802.15.4-2024: IEEE Standard for Low-Rate Wireless
+2546	              Networks", 2024,
+2547	              <https://standards.ieee.org/ieee/802.15.4/11041/>.
+
+2549	11.2.  Informative References
+
+2551	   [RFC9635]  Richer, J., Ed. and F. Imbault, "Grant Negotiation and
+2552	              Authorization Protocol (GNAP)", RFC 9635,
+2553	              DOI 10.17487/RFC9635, October 2024,
+2554	              <https://www.rfc-editor.org/rfc/rfc9635>.
+
+2556	   [ARTDCPHISH]
+2557	              Cooke, B., "The Art of the Device Code Phish", July 2021,
+2558	              <https://0xboku.com/2021/07/12/ArtOfDeviceCodePhish.html>.
+
+2560	   [DCFLOWPHISH]
+2561	              Min, D., "Microsoft 365 OAuth Device Code Flow and
+2562	              Phishing", August 2021, <https://www.optiv.com/insights/
+2563	              source-zero/blog/microsoft-365-oauth-device-code-flow-and-
+2564	              phishing>.
+
+2566	   [NEWDCPHISH]
+2567	              Syynimaa, N., "Introducing a new phishing technique for
+2568	              compromising Office 365 accounts", October 2020,
+2569	              <https://o365blog.com/post/phishing/#new-phishing-
+2570	              technique-device-code-authentication>.
+
+2572	   [DEFCON29] Hwong, J., "New Phishing Attacks Exploiting OAuth
+2573	              Authentication Flows (DEFCON 29)", August 2021,
+2574	              <https://www.youtube.com/watch?v=9slRYvpKHp4>.
+
+2576	   [DCATTACK] Secureworks Counter Threat Unit (CTU), "OAuth's Device
+2577	              Code Flow Abused in Phishing Attacks", August 2021,
+2578	              <https://www.secureworks.com/blog/oauths-device-code-flow-
+2579	              abused-in-phishing-attacks>.
+
+2581	   [SQPHISH]  Talebzadeh, K. and N. Romsdah, "SquarePhish: Advanced
+2582	              phishing tool combines QR codes and OAuth 2.0 device code
+2583	              flow", August 2022,
+2584	              <https://www.helpnetsecurity.com/2022/08/11/squarephish-
+2585	              video/>.
+
+2587	   [NYC.Bike] Byrne, K. J., "Citi Bikes being swiped by joyriding
+2588	              scammers who have cracked the QR code", August 2021,
+2589	              <https://nypost.com/2021/08/07/citi-bikes-being-swiped-by-
+2590	              joyriding-scammers-who-have-cracked-the-qr-code/>.
+
+2592	   [OpenID.SIOPV2]
+2593	              Yasuda, K., Jones, M. B., and T. Lodderstedt, "Self-Issued
+2594	              OpenID Provider v2", November 2022,
+2595	              <https://bitbucket.org/openid/connect/src/master/openid-
+2596	              connect-self-issued-v2/openid-connect-self-issued-
+2597	              v2-1_0.md>.
+
+2599	   [OpenID.VP]
+2600	              Terbu, O., Lodderstedt, T., Yasuda, K., and T. Looker,
+2601	              "OpenID for Verifiable Credential Presentations", November
+2602	              2023, <https://openid.net/specs/openid-4-verifiable-
+2603	              presentations-1_0.html>.
+
+2605	   [OpenID.VCI]
+2606	              Lodderstedt, T., Yasuda, K., and T. Looker, "OpenID for
+2607	              Verifiable Credential Issuance", October 2023,
+2608	              <https://openid.net/specs/openid-4-verifiable-credential-
+2609	              issuance-1_0.html>.
+
+2611	   [Bauer2022]
+2612	              Bauer, C., "Formal analysis of self-issued OpenID
+2613	              providers", 2022,
+2614	              <https://elib.uni-stuttgart.de/handle/11682/12417>.
+
+2616	   [OpenID.Core]
+2617	              Sakimura, N., Bradley, J., Jones, M. B., de Medeiros, B.,
+2618	              and C. Mortimore, "OpenID Connect Core 1.0", November
+2619	              2014,
+2620	              <https://openid.net/specs/openid-connect-core-1_0.html>.
+
+2622	   [PCRSM2023]
+2623	              Pernpruner, M., Carbone, R., Sciarretta, G., and S.
+2624	              Ranise, "An Automated Multi-Layered Methodology to Assist
+2625	              the Secure and Risk-Aware Design of Multi-Factor
+2626	              Authentication Protocols, IEEE Transactions on Dependable
+2627	              and Secure Computing (TDSC)", 2023,
+2628	              <https://doi.org/10.1109/TDSC.2023.3296210>.
+
+2630	   [MPRCS2020]
+2631	              Pernpruner, M., Carbone, R., Ranise, S., and G.
+2632	              Sciarretta, "The Good, the Bad and the (Not So) Ugly of
+2633	              Out-of-Band Authentication with eID Cards and Push
+2634	              Notifications: Design, Formal and Risk Analysis,
+2635	              Proceedings of the Tenth ACM Conference on Data and
+2636	              Application Security and Privacy, Pages 223–234,
+2637	              Association for Computing Machinery", 2020,
+2638	              <https://doi.org/10.1145/3374664.3375727>.
+
+2640	   [Helmschmidt2022]
+2641	              Helmschmidt, F., "Security analysis of the Grant
+2642	              Negotiation and Authorization Protocol", 2022,
+2643	              <https://elib.uni-stuttgart.de/handle/11682/12220>.
+
+2645	   [Baki2023] Baki, S. and R. M. Verma, "Sixteen Years of Phishing User
+2646	              Studies: What Have We Learned?, IEEE Transactions on
+2647	              Dependable and Secure Computing, Volume 20, Number 2,
+2648	              Pages 1200–1212", 2023,
+2649	              <https://doi.org/10.1109/TDSC.2022.3151103>.
+
+2651	   [NISTGlossary]
+2652	              "NIST Computer Security Resource Center Glossary", n.d.,
+2653	              <https://csrc.nist.gov/glossary>.
+
+2655	Appendix A.  Document History
+
+2657	   [[ To be removed from the final specification ]]
+
+2659	   *  latest
+
+2661	      -  Secdir Feedback: Additional information on allowing time to
+2662	         authenticate (https://github.com/oauth-wg/oauth-cross-device-
+2663	         security/issues/203)
+
+2665	      -  Secdir Feedback: Provide additional guidance on user impact of
+2666	         using a VPN (see https://github.com/oauth-wg/oauth-cross-
+2667	         device-security/issues/202)
+
+2669	      -  Secdir Feedback: Clarify section 4.1.3 (https://github.com/
+2670	         oauth-wg/oauth-cross-device-security/issues/201)
+
+2672	      -  Art Feedback: Add reference defining social engineering and
+2673	         phishing (https://github.com/oauth-wg/oauth-cross-device-
+2674	         security/issues/207)
+
+2676	      -  Art Feedback: Clarify diagrams (https://github.com/oauth-wg/
+2677	         oauth-cross-device-security/issues/208)
+
+2679	      -  ARTART Feedback: Cross-link to reference "consent fatigue"
+2680	         attacks (https://github.com/oauth-wg/oauth-cross-device-
+2681	         security/issues/211)
+
+2683	      -  ARTART Feedback: Editorial updates (https://github.com/oauth-
+2684	         wg/oauth-cross-device-security/issues/212, https://github.com/
+2685	         oauth-wg/oauth-cross-device-security/issues/218,
+2686	         https://github.com/oauth-wg/oauth-cross-device-security/
+2687	         issues/217, https://github.com/oauth-wg/oauth-cross-device-
+2688	         security/issues/213)
+
+2690	      -  ARTART Feedback: Clarify that 6 digit codes are examples only
+2691	         (https://github.com/oauth-wg/oauth-cross-device-security/
+2692	         issues/214)
+
+2694	      -  ARTART Feedback: Make limitations of proximity scehems clearer
+2695	         (https://github.com/oauth-wg/oauth-cross-device-security/
+2696	         issues/215)
+
+2698	      -  ARTART Feedback: Add note on risks of device type spoofing
+2699	         (https://github.com/oauth-wg/oauth-cross-device-security/
+2700	         issues/216)
+
+2702	      -  ARTART Feedback: Provide examples of authenticate-then-initiate
+2703	         mitigations and limitations (https://github.com/oauth-wg/oauth-
+2704	         cross-device-security/issues/219)
+
+2706	      -  OPSDIR Feedback: Editorial updates (https://github.com/oauth-
+2707	         wg/oauth-cross-device-security/issues/231)
+
+2709	      -  OPSDIR Feedback: Add example cross references to ease
+2710	         navvigation (https://github.com/oauth-wg/oauth-cross-device-
+2711	         security/issues/232)
+
+2713	      -  Added Aaron Parecki, George Fletcher, Hannes Tschofenig, Dan
+2714	         Moore, Deb Cooley, Paul Kyzivat, David Mandelberg, Jim Fenton
+2715	         and Bing Liu to the list of people who proivded input and made
+2716	         contributions.
+
+2718	      -13
+
+2720	      -  Fixed reference for protocol selection (see issue #189)
+
+2722	      -  Change affiliation
+
+2724	      -  AD Feedback: Add Security Consideration
+
+2726	      -  AD Feedback: Add IANA Consideration
+
+2728	      -  AD Feedback: Capitalise SHOULD not -> SHOULD NOT (issue #185)
+2729	      -  AD Feedback: AD Nits (see https://github.com/oauth-wg/oauth-
+2730	         cross-device-security/issues/195)
+
+2732	      -  AD Feedback: Clarify limitations on consumption device (see
+2733	         https://github.com/oauth-wg/oauth-cross-device-security/
+2734	         issues/194)
+
+2736	      -  AD Feedback: Remove repetitive text (see https://github.com/
+2737	         oauth-wg/oauth-cross-device-security/issues/193)
+
+2739	      -  AD Feedback: Clarify seperate use cases (see
+2740	         https://github.com/oauth-wg/oauth-cross-device-security/
+2741	         issues/192)
+
+2743	      -12
+
+2745	      -  Fixed FIDO CTAP V2.2 URL
+
+2747	      -  Update SSF Reference
+
+2749	      -  CAEP Reference Update
+
+2751	      -  Fix IEEE reference
+
+2753	      -  Update IEEE Reference
+
+2755	      -11
+
+2757	      -  Fixed malformed labels
+
+2759	      -  Clarified common use case for when phone and TVs do not use the
+2760	         same network.
+
+2762	      -  Clarified role of authorization server in establishing
+2763	         proximity.
+
+2765	      -  Clarified which mitigations can be implented by the
+2766	         authorization server only.
+
+2768	      -  Add Dan Moore to acknowledgements.
+
+2770	      -  Updated outdated references.
+
+2772	      -10
+
+2774	      -  Shepherd feedback: Describe unauthenticated channel.
+
+2776	      -  Shepherd feedback: Seperate normative and informative
+2777	         references.
+
+2779	      -  Shepherd feedback: Update FIDO/WebAuthn references
+
+2781	      -09
+
+2783	      -  Affiliation change to allow publication to Datatracker.
+
+2785	      -  No content changes - re-published to avoid expiry while waiting
+2786	         on shepherd review.
+
+2788	      -08
+
+2790	      -  Editorial updates.
+
+2792	      -07
+
+2794	      -  Clarification of FIDO\WebAuthn section.
+
+2796	      -  Updated langugage in section on FIDO to allow for use of FIDO
+2797	         keys on consumption devices.
+
+2799	      -  Clarified origin of QR Code.
+
+2801	      -  Editorial updates
+
+2803	      -  Updated examples to be consistent.
+
+2805	      -  Made diagram description clearer.
+
+2807	      -  Added CTAP 2.2 Draft.
+
+2809	      -  Added additional guidance on geolocation inaccuracies.
+
+2811	      -  Added Roy Williams to acknowledgements
+
+2813	      -  Clarified that authorization servers can detect
+
+2815	      -  Consistent use of "smart TV"
+
+2817	      -  Fixed references
+
+2819	      -06
+
+2821	      -  Corrected typos.
+
+2823	      -05
+2824	      -  Added section to provide actionable guidance to implementers on
+2825	         how to use this document.
+
+2827	      -  Expanded section on formal analysis to include completed
+2828	         research projects.
+
+2830	      -  Added reference to OpenID for Verifiable Presentations.
+
+2832	      -04
+
+2834	      -  Corrected formatting issue that prevented history from showing
+2835	         correctly.
+
+2837	      -03
+
+2839	      -  Introduced normative SHOULD, RECOMMENDED and MAY when applied
+2840	         to actions the Authorization Server, Resource Server or Client
+2841	         may implement.
+
+2843	      -  Added User Education as a standalone mitigation.
+
+2845	      -  Added Maryam Mehrnezhad, Marco Pernpruner and Giada Sciarretta
+2846	         to the contributors list.
+
+2848	      -  Added Request Binding with Out-of-Band Data as an additional
+2849	         mitigation.
+
+2851	      -  Adopted the OpenID Foundation terminology from [CIBA] and
+2852	         changed Initiating Device to Consumption Device
+
+2854	      -  Added Fake Helpdesk and Consent Request Overload examples
+
+2856	      -  Replaced "Authenticated Flow" mitigation name with
+2857	         "Authenticate-then-Intitiate"
+
+2859	      -  Added Cross-Device Session Transfer pattern
+
+2861	      -02
+
+2863	      -  Fixed typos and grammar edits
+
+2865	      -  Capitalised Initiating Device and Authorization Device
+
+2867	      -  Introduced Cross-Device Consent Phishing as a label for the
+2868	         types of attacks described in this document.
+
+2870	      -  Updated labels for different types of flows (User-Transferred
+2871	         Session Data Pattern, Backchannel-Transferred Session Pattern,
+2872	         User-Transferred Authorization Data Pattern)
+
+2874	      -  Adopted consistent use of hyphenation in using "cross-device"
+
+2876	      -  Consistent use of "Authorization Device"
+
+2878	      -  Update Reference to Secure Signals Framework to reflect name
+2879	         change from Secure Signals and Events
+
+2881	      -  Described difference between proximity enforced and proximity-
+2882	         less cross-device flows
+
+2884	      -  General editorial pass
+
+2886	      -01
+
+2888	      -  Added additional diagrams and descriptions to distinguish
+2889	         between different cross-device flow patterns.
+
+2891	      -  Added short description on limitations of each mitigation.
+
+2893	      -  Added acknowledgement of additional contributors.
+
+2895	      -  Fixed document history format.
+
+2897	      -00 (Working Group Draft)
+
+2899	      -  Initial WG revision (content unchanged from draft-kasselman-
+2900	         cross-device-security-03)
+
+2902	      -03 draft-kasselman-cross-device-security
+
+2904	      -  Minor edits and typos
+
+2906	      -02 draft-kasselman-cross-device-security
+
+2908	      -  Minor edits and typos
+
+2910	      -  Upload as draft-ietf-oauth-cross-device-security-best-
+2911	         practice-02
+
+2913	      -01 draft-kasselman-cross-device-security
+
+2915	      -  Updated draft based on feedback from version circulated to
+2916	         OAuth working group
+
+2918	      -  Upload as draft-ietf-oauth-cross-device-security-best-
+2919	         practice-01
+
+2921	      -00 draft-kasselman-cross-device-security
+
+2923	      -  Initial draft adopted from document circulated to the OAuth
+2924	         Security Workshop Slack Channel
+
+2926	      -  Upload as draft-ietf-oauth-cross-device-security-best-
+2927	         practice-00
+
+2929	Authors' Addresses
+
+2931	   Pieter Kasselman
+2932	   Defakto
+2933	   Email: prkasselman@gmail.com
+
+2935	   Daniel Fett
+2936	   Authlete
+2937	   Email: mail@danielfett.de
+
+2939	   Filip Skokan
+2940	   Okta
+2941	   Email: panva.ip@gmail.com
+
+
+
+
+
+
+
+
+
