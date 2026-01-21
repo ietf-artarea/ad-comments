@@ -1,0 +1,821 @@
+idnits 2.17.1 
+
+draft-ietf-dnsop-3901bis-10.txt:
+-(579): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+  == There are 4 instances of lines with non-ascii characters in the document.
+
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     Summary: 0 errors (**), 0 flaws (~~), 1 warning (==), 0 comments (--).
+
+--------------------------------------------------------------------------------
+
+
+2	dnsop                                                             Momoka
+3	Internet-Draft                                              WIDE Project
+4	Obsoletes: 3901 (if approved)                                  T. Fiebig
+5	Intended status: Best Current Practice                           MPI-INF
+6	Expires: 11 July 2026                                     7 January 2026
+
+8	               DNS IPv6 Transport Operational Guidelines
+9	                      draft-ietf-dnsop-3901bis-10
+
+11	Abstract
+
+13	   This document provides guidelines and documents Best Current Practice
+14	   for operating authoritative DNS servers, recursive resolvers and stub
+15	   resolvers in a mixed IPv4/IPv6 environment.  This document recommends
+16	   that both authoritative DNS servers and recursive resolvers support
+17	   IPv4 and IPv6.  It also provides guidance on how recursive DNS
+18	   resolvers should select upstream DNS servers when both native and
+19	   IPv4-embedded IPv6 addresses are available.
+
+21	   This document obsoletes RFC 3901.
+
+23	Discussion Venues
+
+25	   This note is to be removed before publishing as an RFC.
+
+27	   Source for this draft and an issue tracker can be found at
+28	   https://github.com/ietf-wg-dnsop/draft-ietf-dnsop-3901bis.
+
+30	Status of This Memo
+
+32	   This Internet-Draft is submitted in full conformance with the
+33	   provisions of BCP 78 and BCP 79.
+
+35	   Internet-Drafts are working documents of the Internet Engineering
+36	   Task Force (IETF).  Note that other groups may also distribute
+37	   working documents as Internet-Drafts.  The list of current Internet-
+38	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+40	   Internet-Drafts are draft documents valid for a maximum of six months
+41	   and may be updated, replaced, or obsoleted by other documents at any
+42	   time.  It is inappropriate to use Internet-Drafts as reference
+43	   material or to cite them other than as "work in progress."
+
+45	   This Internet-Draft will expire on 11 July 2026.
+
+47	Copyright Notice
+
+49	   Copyright (c) 2026 IETF Trust and the persons identified as the
+50	   document authors.  All rights reserved.
+
+52	   This document is subject to BCP 78 and the IETF Trust's Legal
+53	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+54	   license-info) in effect on the date of publication of this document.
+55	   Please review these documents carefully, as they describe your rights
+56	   and restrictions with respect to this document.  Code Components
+57	   extracted from this document must include Revised BSD License text as
+58	   described in Section 4.e of the Trust Legal Provisions and are
+59	   provided without warranty as described in the Revised BSD License.
+
+61	Table of Contents
+
+63	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+64	     1.1.  Requirements Language . . . . . . . . . . . . . . . . . .   3
+65	   2.  Terminology . . . . . . . . . . . . . . . . . . . . . . . . .   4
+66	   3.  Name Space Fragmentation  . . . . . . . . . . . . . . . . . .   4
+67	     3.1.  Misconfigurations Causing IP Address Family Related Name
+68	           Space Fragmentation . . . . . . . . . . . . . . . . . . .   5
+69	     3.2.  Network Conditions Causing IP Address Family Related Name
+70	           Space Fragmentation . . . . . . . . . . . . . . . . . . .   6
+71	     3.3.  Reasons for Intentional IP Address Family Related Name
+72	           Space Fragmentation . . . . . . . . . . . . . . . . . . .   8
+73	   4.  Policy Based Avoidance of Name Space Fragmentation  . . . . .   8
+74	     4.1.  Guidelines for Authoritative DNS Server Configuration . .   8
+75	     4.2.  Guidelines for Recursive DNS Resolvers  . . . . . . . . .  10
+76	     4.3.  Guidelines for DNS Stub Resolvers . . . . . . . . . . . .  10
+77	   5.  Security Considerations . . . . . . . . . . . . . . . . . . .  11
+78	   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  11
+79	   Acknowledgments . . . . . . . . . . . . . . . . . . . . . . . . .  11
+80	   References  . . . . . . . . . . . . . . . . . . . . . . . . . . .  12
+81	     Normative References  . . . . . . . . . . . . . . . . . . . . .  12
+82	     Informative References  . . . . . . . . . . . . . . . . . . . .  13
+83	   Appendix A.  Changes Since RFC3901  . . . . . . . . . . . . . . .  16
+84	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  17
+
+86	1.  Introduction
+
+88	   Despite IPv6 being first discussed since the mid-1990s [RFC2460],
+89	   consistent deployment throughout the whole Internet has not yet been
+90	   accomplished [RFC9386].  Hence, the Internet still consists of
+91	   IPv4-only, dual-stack (networks supporting both IP address families),
+92	   and IPv6-only networks.
+
+94	   This creates a complex landscape where authoritative DNS servers
+95	   might be accessible only via specific network protocols
+96	   [V6DNSRDY-23].  At the same time, DNS resolvers may only be able to
+97	   access the Internet via either IPv4 or IPv6 connectivity.  This poses
+98	   a challenge for such resolvers because they may receive queries for
+99	   names whose authoritative DNS servers do not support the same IP
+100	   address family as the resolver itself.
+
+102	   [RFC3901] was initially written at a time when IPv6 deployment was
+103	   not widespread, focusing primarily on maintaining name space
+104	   continuity within the IPv4 landscape.  Two decades later, not only is
+105	   IPv6 widely deployed, it is also becoming the de facto standard in
+106	   many areas, such as mobile and access networks and data center
+107	   underlays.  Furthermore, since 2012, IPv6 support being required for
+108	   all IP-capable nodes has been established as a best current practice
+109	   [RFC6540].  This document broadens the scope of [RFC3901]
+110	   recommending IPv6 connectivity for authoritative DNS servers,
+111	   recursive resolvers, and stub resolvers.
+
+113	   This document provides:
+
+115	   *  Guidance on IP address family-related name space fragmentation and
+116	      best practices for avoiding it.
+
+118	   *  Guidelines for configuring authoritative DNS servers for zones.
+
+120	   *  Guidelines for operating recursive DNS resolvers.
+
+122	   *  Guidelines for stub DNS resolvers.
+
+124	   While transition and coexistence setups may mitigate some of the DNS
+125	   resolution issues in a mixed IP address family Internet, making DNS
+126	   data accessible over both IPv4 and IPv6 is the most robust and
+127	   flexible approach.  This approach allows resolvers to retrieve the
+128	   information they need without requiring intermediary translation or
+129	   encapsulation services, which may introduce additional failure cases.
+
+131	   Refer to Appendix A for an overview of the main changes since
+132	   [RFC3901].
+
+134	1.1.  Requirements Language
+
+136	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+137	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+138	   "OPTIONAL" in this document are to be interpreted as described in BCP
+139	   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+140	   capitals, as shown here.
+
+142	2.  Terminology
+
+144	   This document uses DNS terminology as described in [RFC9499].
+145	   Furthermore, the following terms are used with a defined meaning:
+
+147	   Native IPv6 address:
+148	      A Globally Unique IPv6 address [RFC5375] that is not an
+149	      IPv4-embedded IPv6 address [RFC6052].
+
+151	   IPv4 name server:
+152	      A name server that provides either authoritative or recursive DNS
+153	      services and is reachable via IPv4.  This does not imply anything
+154	      about the DNS data served, but rather that the name server
+155	      receives and answers queries over IPv4.
+
+157	   IPv6 name server:
+158	      A name server that provides either authoritative or recursive DNS
+159	      services and is reachable via IPv6.  This does not imply anything
+160	      about the DNS data served, but rather that the name server
+161	      receives and answers queries over IPv6.
+
+163	   Dual-stack name server:
+164	      A name server that is both an "IPv4 name server" and an "IPv6 name
+165	      server".
+
+167	3.  Name Space Fragmentation
+
+169	   When a resolver looks up a name, it starts at the root and follows
+170	   referrals until it reaches a name server set that is authoritative
+171	   for the name.  However, if the referrals lead to a name server set
+172	   that only contains name servers reachable via an IP address family
+173	   not supported by the resolver, the resolver is unable to continue DNS
+174	   resolution.
+
+176	   If this occurs, the DNS has effectively fragmented due to mismatching
+177	   IP address family support between the recursive DNS resolver and the
+178	   authoritative DNS server.
+
+180	   With the deployment of both IPv4 and IPv6, name space fragmentation
+181	   can occur for different reasons.  One reason is that DNS zones are
+182	   consistently configured to support only either IPv4 or IPv6.  Another
+183	   reason is misconfigurations that make a zone unresolvable by either
+184	   IPv4-only or IPv6-only resolvers.  The latter is often hard to
+185	   identify because the impact of misconfigurations affecting one IP
+186	   address family (IPv4 or IPv6) may be hidden in a dual-stack setting.
+187	   In the worst case, where both IP address families must be fully
+188	   supported by a resolver, a specific name may only be resolvable via
+189	   dual-stack enabled resolvers.
+
+191	3.1.  Misconfigurations Causing IP Address Family Related Name Space
+192	      Fragmentation
+
+194	   Even when an administrator assumes that they have enabled support for
+195	   a specific IP address family on their authoritative DNS server,
+196	   various misconfigurations may break the DNS delegation chain of a
+197	   zone for that IP address family, preventing any of its records from
+198	   being resolved by clients that only support that IP address family.
+199	   Such misconfigurations may remain undetected if most clients can
+200	   successfully fall back to the other IP address family.
+
+202	   The following name-related misconfigurations can cause broken
+203	   delegation for one IP address family:
+
+205	   No A/AAAA records for NS names:
+206	      If all of the NS resource records (RR) for a zone in their parent
+207	      zone have either only A RRs or only AAAA RRs, then resolution via
+208	      the other IP address family is not possible.
+
+210	   Missing glue:
+211	      If the name from an NS record for a zone is in-domain (i.e., the
+212	      name is within the zone or below), a parent zone needs to contain
+213	      both IPv4 and IPv6 glue records.  A parent needs to serve the
+214	      corresponding A and AAAA RRs in the additional section when
+215	      returning the NS RRs as the referral response [RFC9471].
+
+217	   No A/AAAA RR for in-domain NS:
+218	      If the parent provides glue records for both IP address families
+219	      but the child zone itself lacks corresponding A or AAAA RRs for
+220	      its in-domain NS' names, resolution via the missing IP address
+221	      family will fail during delegation revalidation (see, e.g.,
+222	      [I-D.ietf-dnsop-ns-revalidation]).
+
+224	   Zone of sibling domain NSes not resolving:
+225	      If the name from an NS RR for a zone is in a sibling domain, the
+226	      corresponding zone needs to be resolvable via the IP address
+227	      family in question as well.  It is insufficient if the name
+228	      pointed to by the NS RR has an associated A or AAAA RR
+229	      correspondingly.
+
+231	   Parent zone not resolvable via one IP address family:
+232	      For a zone to be resolvable via an IP address family the parent
+233	      zones up to the root zone needs to be resolvable via that IP
+234	      address family as well.  Any zone not resolvable via the concerned
+235	      IP address family breaks the delegation chain for all its
+236	      children.
+
+238	   The above misconfigurations are not mutually exclusive.
+
+240	   Furthermore, any of the misconfigurations above may not only
+241	   materialize via a missing RR but also via an RR providing the IP
+242	   address of a name server that is not configured to answer queries via
+243	   that IP address family [V6DNSRDY-23].
+
+245	3.2.  Network Conditions Causing IP Address Family Related Name Space
+246	      Fragmentation
+
+248	   In addition to explicit misconfigurations in the served DNS zones,
+249	   network conditions may also influence a resolver's ability to resolve
+250	   names in a zone.  The most common issue are packets requiring
+251	   fragmentation given a reduced path MTU (PMTU) and MTU discards, i.e.,
+252	   packets being dropped on-path due to exceeding the MTU of the link to
+253	   the next-hop without the sender being notified.  This can manifest in
+254	   the following ways:
+
+256	   DNS-over-UDP packets requiring fragmentation
+257	      When using EDNS(0) to communicate support for DNS messages larger
+258	      than 512 octets [RFC6891] via conventional DNS-over-UDP transport
+259	      according to [RFC1035], an IP packet carrying a DNS response may
+260	      exceed the PMTU for the path to a resolver.  If an authoritative
+261	      DNS server does not follow [RFC9715], i.e., honors EDNS(0) sizes
+262	      larger than 1232 octets, it will try to fragment the packet
+263	      according to the discovered PMTU.  Such packets mostly occur for
+264	      DNSKEY responses with DNSSEC [RFC4034].
+
+266	      In general, DNS servers SHOULD follow [RFC9715], which provides
+267	      additional guidance on preventing fragmentation by ensuring that
+268	      the maximum DNS/UDP payload size does not exceed 1400 octets.
+269	      This can be accomplished by setting a corresponding EDNS(0) size,
+270	      with most implementations using a lower EDNS(0) size of 1232
+271	      octets as per the suggestions made by the [DNSFlagDay2020]
+272	      initiative, to ensure that generated packets always fit into lower
+273	      bound of the IPv6 MTU of 1280 octets, as defined in [RFC8200].
+274	      Hence, DNS servers MAY also opt to set an EDNS(0) size of 1232
+275	      octets as suggested by the [DNSFlagDay2020] initiative.
+
+277	      Additionally, DNS servers MAY opt to explicitly not rely on path
+278	      MTU discovery [RFC4821] or PLPMTUD [RFC8899].  It can do so, for
+279	      example, by setting IPV6_USE_MIN_MTU=1 from [RFC3542] to avoid the
+280	      need to perform PMTU discovery.
+
+282	   DNS-over-TCP packets requiring fragmentation
+283	      A resolver can for various reasons also initiate connections via
+284	      TCP for resolution to an authoritative server.  However, similar
+285	      to the case of DNS-over-UDP, DNS-over-TCP may encounter MTU
+286	      discards, especially on IPv6, if PMTUD does not work, if the MSS
+287	      honored by the authoritative DNS server leads to IP packets
+288	      exceeding the PMTU.  In that case, similar to the case of DNS-
+289	      over-UDP, DNS resolution will time out when the recursive DNS
+290	      resolver did not receive a response in time.
+
+292	      [RFC9715] does not provide explicit guidance on mitigating this
+293	      issue.  However, transferring the guidance from [RFC9715], setting
+294	      an MSS of 1388 octets would reduce the impact of this issue.
+295	      Hence, DNS servers MAY set an MSS of no more than 1388 octets for
+296	      TCP connections.  Similarly, aligned with the recommendations of
+297	      the [DNSFlagDay2020], DNS servers MAY ensure that a total packet
+298	      size of 1280 octets is not exceeded by setting an MSS of 1220
+299	      octets.  Additionally, DNS servers MAY opt to not rely on PMTU
+300	      discovery.  It can do so, for example, by setting
+301	      IPV6_USE_MIN_MTU=1 from [RFC3542].
+
+303	   Broken IP Connectivity at the Resolver
+304	      Similar to authoritative servers, (stub) recursive resolvers may
+305	      face broken IP connectivity for either IPv4 or IPv6:
+
+307	      IPv4 connectivity for a DNS resolver may experience issues, e.g.,
+308	      if the resolver is deployed behind a Carrier Grade NAT (CGN)
+309	      [RFC6888] that implements strict timeouts on active sessions, or
+310	      limits the number of available TCP and UDP ports numbers for
+311	      connections below the number required by the multiple connections
+312	      necessary during recursive DNS resolution.  Similarly, [RFC1918]
+313	      addressing may be in use on the resolver, while address
+314	      translation is not performed, or, similar to the case for IPv6,
+315	      when the DNS resolver has a global IPv4 address, but that address
+316	      is not forwarded on the resolver's network.
+
+318	      IPv6 connectivity for a DNS resolver may experience issues, if,
+319	      e.g., a client has been assigned a global unicast IPv6 address,
+320	      but IPv6 traffic is not forwarded on the resolver's network.
+321	      Similarly, IPv6 connectivity can experience issues when IPv4-IPv6
+322	      transition technologies like NAT64 [RFC6146] on IPv6-mostly
+323	      networks [RFC9313] are in use, where the use of NAT64 can be,
+324	      e.g., discovered through PREF64 in Router Advertisements (RAs)
+325	      [RFC8781] or DNS64 [RFC7050].  There, the synthesized IPv6
+326	      addresses used in, e.g., 464XLAT [RFC6877] encounter additional
+327	      PMTU fluctuation due to the difference in header size between IPv4
+328	      and IPv6, possibly impacting DNS resolution.
+
+330	   Note: This document only explicitly discusses DNS-over-TCP and DNS-
+331	   over-UDP.  However, several other transport methods between recursive
+332	   and authoritative DNS severs exist, including DNS over various
+333	   encrypted transports.  Some of these technologies provide additional
+334	   mechanisms for preventing the impact of a reduced PMTU or MTU
+335	   discards.  Guidance in this document focuses on IP address family
+336	   support, and questions of the underlying transport protocol (TCP or
+337	   UDP).  If DNS servers use an additional protocol layer, e.g., DNS-
+338	   over-TLS [RFC7858] or DNS-over-QUIC [RFC9250], for their
+339	   communication, and that protocol supports additional measures to
+340	   prevent fragmentation on the IP layer related issues, these measures
+341	   SHOULD be used for the connection.  Otherwise, if the protocol is not
+342	   resilient to IP layer fragmentation related issues by default, the
+343	   above guidance for TCP and UDP based connections SHOULD be applied
+344	   analogously.
+
+346	3.3.  Reasons for Intentional IP Address Family Related Name Space
+347	      Fragmentation
+
+349	   Intentional IP related name space fragmentation occurs if an operator
+350	   consciously decides not to deploy IPv4 or IPv6 for a part of the
+351	   resolution chain.  Most commonly, this is realized by intentionally
+352	   not listing A/AAAA RRs for NS names.  Based on a 2023 study, the
+353	   share of zones not resolvable via IPv4 is negligible, while a little
+354	   less than 40% of zones are not resolvable via IPv6 [V6DNSRDY-23].
+355	   However, as IPv4 address exhaustion progresses, IPv6 adoption is
+356	   expected to increase.
+
+358	4.  Policy Based Avoidance of Name Space Fragmentation
+
+360	   With the final exhaustion of IPv4 address pools in RIRs, e.g.,
+361	   [RIPEV4], and the progressing deployment of IPv6, IPv4 and IPv6 have
+362	   become comparably relevant.  Yet, while it is observed that the first
+363	   zones becoming exclusively IPv6 resolvable, there is still a major
+364	   portion of zones solely relying on IPv4 [V6DNSRDY-23].  Hence, dual-
+365	   stack connectivity is still instrumental to be able to resolve zones
+366	   and avoid name space fragmentation.
+
+368	   Having zones served only by name servers reachable via one IP address
+369	   family would fragment the DNS.  Hence, the need for a way to avoid
+370	   this fragmentation.
+
+372	   The recommended approach to maintain name space continuity is to use
+373	   administrative policies, as described in this section.
+
+375	4.1.  Guidelines for Authoritative DNS Server Configuration
+
+377	   It is usually recommended that DNS zones contain at least two name
+378	   servers (Section 4.1 of [RFC1034]).  Typically, these servers are
+379	   geographically diverse and operate under different routing policies
+380	   [RFC2182], as also mirrored by, e.g., the IANA requirements for TLD
+381	   authoritative name servers [IANANS].  To reduce the chance of DNS
+382	   name space fragmentation, it is RECOMMENDED that at least two
+383	   IPv4-reachable and two IPv6-reachable name servers are configured for
+384	   a zone.  A single name server that is reachable over both IPv4 and
+385	   IPv6 counts once per address family.  Specifically, this means that
+386	   the following minimal requirements SHOULD be implemented for a zone:
+
+388	   IPv4 adoption:
+389	      Every DNS zone SHOULD be served by at least two IPv4-reachable
+390	      authoritative DNS servers to maintain name space continuity.  The
+391	      delegation configuration (Resolution of the parent, resolution of
+392	      sibling domain names, glue) MUST NOT rely on IPv6 connectivity
+393	      being available.  Given the IPv4 address scarcity, operators MAY
+394	      opt not to provide DNS services via IPv4, if they can ensure that
+395	      all clients expected to resolve this zone do support DNS
+396	      resolution via IPv6.
+
+398	   IPv6 adoption:
+399	      Every DNS zone SHOULD be served by at least two IPv6-reachable
+400	      authoritative DNS servers to maintain name space continuity.  To
+401	      avoid reachability issues, authoritative DNS servers SHOULD use
+402	      native IPv6 addresses instead of IPv4-converted IPv6 addresses for
+403	      receiving queries.  The delegation configuration (Resolution of
+404	      the parent, resolution of sibling domain names, glue) MUST NOT
+405	      rely on IPv4 connectivity being available.
+
+407	   Consistency:
+408	      Both IPv4 and IPv6 transports SHOULD serve identical DNS data to
+409	      ensure a consistent resolution experience across different network
+410	      types.
+
+412	   Avoiding IP Fragmentation:
+413	      IP fragmentation has been reported to be fragile [RFC8900].
+414	      Furthermore, IPv6 transition technologies can introduce unexpected
+415	      MTU breaks (e.g., when NAT64 is used (Section 7 of [RFC7269])).
+416	      Therefore, IP fragmentation SHOULD be avoided by following
+417	      guidance on maximum DNS payload sizes [RFC9715] and providing TCP
+418	      fall back options [RFC7766].  Furthermore, similar to the guidance
+419	      in [RFC9715], authoritative DNS servers MAY set an MSS of either
+420	      1388 (analogous to [RFC9715]) or 1220 (analogous to the
+421	      [DNSFlagDay2020] suggestions) in TCP sessions carrying DNS
+422	      responses.
+
+424	   To prevent name space fragmentation, zone validation processes SHOULD
+425	   ensure that:
+
+427	   *  There is at least one IPv4 address record and one IPv6 address
+428	      record available for the name servers of any child delegation
+429	      within the zone.
+
+431	   *  The zone's authoritative servers follow [RFC9715] for avoiding
+432	      fragmentation on DNS-over-UDP.
+
+434	   *  The zone's authoritative servers support DNS-over-TCP [RFC9210].
+
+436	   *  The zone's authoritative servers can be reached via IPv4 and IPv6
+437	      when performing DNS resolution via IPv4-only and IPv6-only
+438	      networks respectively.
+
+440	4.2.  Guidelines for Recursive DNS Resolvers
+
+442	   Every recursive DNS resolver SHOULD be dual-stack.
+
+444	   While the zones that IPv6-only recursive DNS resolvers can resolve
+445	   are growing, they do not yet cover all zones.  Hence, a recursive DNS
+446	   resolver MAY be IPv6-only, if it uses a transition mechanism that
+447	   allows it to also query IPv4-only authoritative DNS servers, or uses
+448	   a configuration where it forwards queries failing IPv6-only DNS
+449	   resolution to a recursive DNS resolver that is able to perform DNS
+450	   resolution over IPv4.  If a recursive DNS resolver is aware of a
+451	   PREF64 to use for NAT64 [RFC6146], either through static
+452	   configuration or by discovering it (e.g., [RFC8781]), it MAY
+453	   synthesize IPv6 addresses for remote authoritative DNS servers.
+
+455	   Similarly, a recursive DNS resolver MAY be IPv4-only, if it uses a
+456	   configuration where such resolvers forward queries failing IPv4-only
+457	   DNS resolution to a recursive DNS resolver that is able to perform
+458	   DNS resolution over IPv6.
+
+460	   Finally, when responding to recursive queries sent by stub DNS
+461	   resolvers, a DNS resolver SHOULD follow the above guidance on
+462	   fragmentation avoidance (Section 4.1) for communication between
+463	   authoritative DNS servers and recursive DNS resolvers analogously.
+
+465	4.3.  Guidelines for DNS Stub Resolvers
+
+467	   Contrary to authoritative DNS servers and recursive DNS resolvers,
+468	   stub DNS resolvers are more likely to find themselves in either an
+469	   IPv6-mostly or IPv4-only environment, as they are usually run on end-
+470	   hosts / clients.  Furthermore, a stub DNS resolver has to rely on
+471	   recursive DNS servers discovered for the local network, e.g., using
+472	   DHCPv4 [RFC2131], DHCPv6 [RFC8415], and/or router advertisements
+473	   [RFC8106].  In that case, the stub resolver may obtain multiple
+474	   different IPv4 and IPv6 DNS resolver addresses to use.
+
+476	   To prioritize different IPv4 and IPv6 DNS resolver addresses, a stub
+477	   resolver SHOULD follow [RFC6724].  However, a stub DNS resolver
+478	   SHOULD NOT utilize IPv4-embedded IPv6 addresses if it is able to
+479	   identify them as such, e.g., by having discovered the PREF64 in use
+480	   for the network [RFC8781].
+
+482	   When providing multiple DNS servers to stub resolvers, network
+483	   operators SHOULD consider that various implementations can only
+484	   configure a small set of possible DNS resolvers, e.g., only up to
+485	   three for libc [MAN], and additional resolvers provided may be
+486	   ignored by clients.
+
+488	5.  Security Considerations
+
+490	   The guidelines described in this memo introduce no new security
+491	   considerations into the DNS protocol.
+
+493	   Recommendations for recursive and stub resolvers rely on a correctly
+494	   discovered PREF64.  Security issues may materialize if an incorrect
+495	   PREF64 is used.  Hence, guidance from [RFC9872] on securely
+496	   discovering PREF64 SHOULD be followed.
+
+498	6.  IANA Considerations
+
+500	   This document requests IANA consider updating its technical
+501	   requirements for authoritative DNS servers to require both IPv4 and
+502	   IPv6 addresses for each authoritative server [IANANS], in accordance
+503	   with its processes for reviewing and revising these procedures.
+
+505	Acknowledgments
+
+507	   Valuable input for this draft was provided by: Bob Harold, Andreas
+508	   Schulze, Tommy Jensen, Nick Buraglio, Jen Linkova, Tim Chown, Brian E
+509	   Carpenter, Tom Petch, Philipp S.  Tiesel, Mark Andrews, Stefan
+510	   Ubbink, Joe Abley, Gorry Fairhurst, Paul Vixie, Lorenzo Colitti,
+511	   David Farmer, Pieter Lexis, Ralf Weber, Philip Homburg, Marco Davids,
+512	   Mohamed Boucadair, Thomas Fossati, Aihua Guo, Bernie Volz, David Dong
+
+514	   Thank you for reading this draft.
+
+516	   The authors furthermore express their thanks towards the authors of
+517	   [RFC3901], Alain Durand and Johan Ihren, and provide their original
+518	   acknowledgements verbatim below:
+
+520	   This document is the result of many conversations that happened in
+521	   the DNS community at IETF and elsewhere since 2001.  During that
+522	   period of time, a number of Internet drafts have been published to
+523	   clarify various aspects of the issues at stake.  This document
+524	   focuses on the conclusion of those discussions.
+
+526	   The authors would like to acknowledge the role of Pekka Savola in his
+527	   thorough review of the document.
+
+529	References
+
+531	Normative References
+
+533	   [RFC1034]  Mockapetris, P., "Domain names - concepts and facilities",
+534	              STD 13, RFC 1034, DOI 10.17487/RFC1034, November 1987,
+535	              <https://www.rfc-editor.org/info/rfc1034>.
+
+537	   [RFC1035]  Mockapetris, P., "Domain names - implementation and
+538	              specification", STD 13, RFC 1035, DOI 10.17487/RFC1035,
+539	              November 1987, <https://www.rfc-editor.org/info/rfc1035>.
+
+541	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+542	              Requirement Levels", BCP 14, RFC 2119,
+543	              DOI 10.17487/RFC2119, March 1997,
+544	              <https://www.rfc-editor.org/info/rfc2119>.
+
+546	   [RFC4821]  Mathis, M. and J. Heffner, "Packetization Layer Path MTU
+547	              Discovery", RFC 4821, DOI 10.17487/RFC4821, March 2007,
+548	              <https://www.rfc-editor.org/info/rfc4821>.
+
+550	   [RFC6052]  Bao, C., Huitema, C., Bagnulo, M., Boucadair, M., and X.
+551	              Li, "IPv6 Addressing of IPv4/IPv6 Translators", RFC 6052,
+552	              DOI 10.17487/RFC6052, October 2010,
+553	              <https://www.rfc-editor.org/info/rfc6052>.
+
+555	   [RFC6724]  Thaler, D., Ed., Draves, R., Matsumoto, A., and T. Chown,
+556	              "Default Address Selection for Internet Protocol Version 6
+557	              (IPv6)", RFC 6724, DOI 10.17487/RFC6724, September 2012,
+558	              <https://www.rfc-editor.org/info/rfc6724>.
+
+560	   [RFC6891]  Damas, J., Graff, M., and P. Vixie, "Extension Mechanisms
+561	              for DNS (EDNS(0))", STD 75, RFC 6891,
+562	              DOI 10.17487/RFC6891, April 2013,
+563	              <https://www.rfc-editor.org/info/rfc6891>.
+
+565	   [RFC7766]  Dickinson, J., Dickinson, S., Bellis, R., Mankin, A., and
+566	              D. Wessels, "DNS Transport over TCP - Implementation
+567	              Requirements", RFC 7766, DOI 10.17487/RFC7766, March 2016,
+568	              <https://www.rfc-editor.org/info/rfc7766>.
+
+570	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+571	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+572	              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+574	   [RFC8200]  Deering, S. and R. Hinden, "Internet Protocol, Version 6
+575	              (IPv6) Specification", STD 86, RFC 8200,
+576	              DOI 10.17487/RFC8200, July 2017,
+577	              <https://www.rfc-editor.org/info/rfc8200>.
+
+579	   [RFC8899]  Fairhurst, G., Jones, T., Tüxen, M., Rüngeler, I., and T.
+580	              Völker, "Packetization Layer Path MTU Discovery for
+581	              Datagram Transports", RFC 8899, DOI 10.17487/RFC8899,
+582	              September 2020, <https://www.rfc-editor.org/info/rfc8899>.
+
+584	   [RFC9210]  Kristoff, J. and D. Wessels, "DNS Transport over TCP -
+585	              Operational Requirements", BCP 235, RFC 9210,
+586	              DOI 10.17487/RFC9210, March 2022,
+587	              <https://www.rfc-editor.org/info/rfc9210>.
+
+589	   [RFC9471]  Andrews, M., Huque, S., Wouters, P., and D. Wessels, "DNS
+590	              Glue Requirements in Referral Responses", RFC 9471,
+591	              DOI 10.17487/RFC9471, September 2023,
+592	              <https://www.rfc-editor.org/info/rfc9471>.
+
+594	Informative References
+
+596	   [DNSFlagDay2020]
+597	              "DNS flag day 2020", <https://dnsflagday.net/2020/>.
+
+599	   [I-D.ietf-dnsop-ns-revalidation]
+600	              Huque, S., Vixie, P. A., and W. Toorop, "Delegation
+601	              Revalidation by DNS Resolvers", Work in Progress,
+602	              Internet-Draft, draft-ietf-dnsop-ns-revalidation-11, 19
+603	              October 2025, <https://datatracker.ietf.org/doc/html/
+604	              draft-ietf-dnsop-ns-revalidation-11>.
+
+606	   [IANANS]   IANA, "Technical requirements for authoritative name
+607	              servers",
+608	              <https://www.iana.org/help/nameserver-requirements>.
+
+610	   [MAN]      Linux, "resolv.conf(5) — Linux manual page", 2025,
+611	              <https://man7.org/linux/man-pages/man5/
+612	              resolv.conf.5.html>.
+
+614	   [RFC1918]  Rekhter, Y., Moskowitz, B., Karrenberg, D., de Groot, G.
+615	              J., and E. Lear, "Address Allocation for Private
+616	              Internets", BCP 5, RFC 1918, DOI 10.17487/RFC1918,
+617	              February 1996, <https://www.rfc-editor.org/info/rfc1918>.
+
+619	   [RFC2131]  Droms, R., "Dynamic Host Configuration Protocol",
+620	              RFC 2131, DOI 10.17487/RFC2131, March 1997,
+621	              <https://www.rfc-editor.org/info/rfc2131>.
+
+623	   [RFC2182]  Elz, R., Bush, R., Bradner, S., and M. Patton, "Selection
+624	              and Operation of Secondary DNS Servers", BCP 16, RFC 2182,
+625	              DOI 10.17487/RFC2182, July 1997,
+626	              <https://www.rfc-editor.org/info/rfc2182>.
+
+628	   [RFC2460]  Deering, S. and R. Hinden, "Internet Protocol, Version 6
+629	              (IPv6) Specification", RFC 2460, DOI 10.17487/RFC2460,
+630	              December 1998, <https://www.rfc-editor.org/info/rfc2460>.
+
+632	   [RFC3542]  Stevens, W., Thomas, M., Nordmark, E., and T. Jinmei,
+633	              "Advanced Sockets Application Program Interface (API) for
+634	              IPv6", RFC 3542, DOI 10.17487/RFC3542, May 2003,
+635	              <https://www.rfc-editor.org/info/rfc3542>.
+
+637	   [RFC3901]  Durand, A. and J. Ihren, "DNS IPv6 Transport Operational
+638	              Guidelines", BCP 91, RFC 3901, DOI 10.17487/RFC3901,
+639	              September 2004, <https://www.rfc-editor.org/info/rfc3901>.
+
+641	   [RFC4034]  Arends, R., Austein, R., Larson, M., Massey, D., and S.
+642	              Rose, "Resource Records for the DNS Security Extensions",
+643	              RFC 4034, DOI 10.17487/RFC4034, March 2005,
+644	              <https://www.rfc-editor.org/info/rfc4034>.
+
+646	   [RFC5375]  Van de Velde, G., Popoviciu, C., Chown, T., Bonness, O.,
+647	              and C. Hahn, "IPv6 Unicast Address Assignment
+648	              Considerations", RFC 5375, DOI 10.17487/RFC5375, December
+649	              2008, <https://www.rfc-editor.org/info/rfc5375>.
+
+651	   [RFC6146]  Bagnulo, M., Matthews, P., and I. van Beijnum, "Stateful
+652	              NAT64: Network Address and Protocol Translation from IPv6
+653	              Clients to IPv4 Servers", RFC 6146, DOI 10.17487/RFC6146,
+654	              April 2011, <https://www.rfc-editor.org/info/rfc6146>.
+
+656	   [RFC6540]  George, W., Donley, C., Liljenstolpe, C., and L. Howard,
+657	              "IPv6 Support Required for All IP-Capable Nodes", BCP 177,
+658	              RFC 6540, DOI 10.17487/RFC6540, April 2012,
+659	              <https://www.rfc-editor.org/info/rfc6540>.
+
+661	   [RFC6877]  Mawatari, M., Kawashima, M., and C. Byrne, "464XLAT:
+662	              Combination of Stateful and Stateless Translation",
+663	              RFC 6877, DOI 10.17487/RFC6877, April 2013,
+664	              <https://www.rfc-editor.org/info/rfc6877>.
+
+666	   [RFC6888]  Perreault, S., Ed., Yamagata, I., Miyakawa, S., Nakagawa,
+667	              A., and H. Ashida, "Common Requirements for Carrier-Grade
+668	              NATs (CGNs)", BCP 127, RFC 6888, DOI 10.17487/RFC6888,
+669	              April 2013, <https://www.rfc-editor.org/info/rfc6888>.
+
+671	   [RFC7050]  Savolainen, T., Korhonen, J., and D. Wing, "Discovery of
+672	              the IPv6 Prefix Used for IPv6 Address Synthesis",
+673	              RFC 7050, DOI 10.17487/RFC7050, November 2013,
+674	              <https://www.rfc-editor.org/info/rfc7050>.
+
+676	   [RFC7269]  Chen, G., Cao, Z., Xie, C., and D. Binet, "NAT64
+677	              Deployment Options and Experience", RFC 7269,
+678	              DOI 10.17487/RFC7269, June 2014,
+679	              <https://www.rfc-editor.org/info/rfc7269>.
+
+681	   [RFC7858]  Hu, Z., Zhu, L., Heidemann, J., Mankin, A., Wessels, D.,
+682	              and P. Hoffman, "Specification for DNS over Transport
+683	              Layer Security (TLS)", RFC 7858, DOI 10.17487/RFC7858, May
+684	              2016, <https://www.rfc-editor.org/info/rfc7858>.
+
+686	   [RFC8106]  Jeong, J., Park, S., Beloeil, L., and S. Madanapalli,
+687	              "IPv6 Router Advertisement Options for DNS Configuration",
+688	              RFC 8106, DOI 10.17487/RFC8106, March 2017,
+689	              <https://www.rfc-editor.org/info/rfc8106>.
+
+691	   [RFC8415]  Mrugalski, T., Siodelski, M., Volz, B., Yourtchenko, A.,
+692	              Richardson, M., Jiang, S., Lemon, T., and T. Winters,
+693	              "Dynamic Host Configuration Protocol for IPv6 (DHCPv6)",
+694	              RFC 8415, DOI 10.17487/RFC8415, November 2018,
+695	              <https://www.rfc-editor.org/info/rfc8415>.
+
+697	   [RFC8781]  Colitti, L. and J. Linkova, "Discovering PREF64 in Router
+698	              Advertisements", RFC 8781, DOI 10.17487/RFC8781, April
+699	              2020, <https://www.rfc-editor.org/info/rfc8781>.
+
+701	   [RFC8900]  Bonica, R., Baker, F., Huston, G., Hinden, R., Troan, O.,
+702	              and F. Gont, "IP Fragmentation Considered Fragile",
+703	              BCP 230, RFC 8900, DOI 10.17487/RFC8900, September 2020,
+704	              <https://www.rfc-editor.org/info/rfc8900>.
+
+706	   [RFC9250]  Huitema, C., Dickinson, S., and A. Mankin, "DNS over
+707	              Dedicated QUIC Connections", RFC 9250,
+708	              DOI 10.17487/RFC9250, May 2022,
+709	              <https://www.rfc-editor.org/info/rfc9250>.
+
+711	   [RFC9313]  Lencse, G., Palet Martinez, J., Howard, L., Patterson, R.,
+712	              and I. Farrer, "Pros and Cons of IPv6 Transition
+713	              Technologies for IPv4-as-a-Service (IPv4aaS)", RFC 9313,
+714	              DOI 10.17487/RFC9313, October 2022,
+715	              <https://www.rfc-editor.org/info/rfc9313>.
+
+717	   [RFC9386]  Fioccola, G., Volpato, P., Palet Martinez, J., Mishra, G.,
+718	              and C. Xie, "IPv6 Deployment Status", RFC 9386,
+719	              DOI 10.17487/RFC9386, April 2023,
+720	              <https://www.rfc-editor.org/info/rfc9386>.
+
+722	   [RFC9499]  Hoffman, P. and K. Fujiwara, "DNS Terminology", BCP 219,
+723	              RFC 9499, DOI 10.17487/RFC9499, March 2024,
+724	              <https://www.rfc-editor.org/info/rfc9499>.
+
+726	   [RFC9715]  Fujiwara, K. and P. Vixie, "IP Fragmentation Avoidance in
+727	              DNS over UDP", RFC 9715, DOI 10.17487/RFC9715, January
+728	              2025, <https://www.rfc-editor.org/info/rfc9715>.
+
+730	   [RFC9872]  Buraglio, N., Jensen, T., and J. Linkova, "Recommendations
+731	              for Discovering IPv6 Prefix Used for IPv6 Address
+732	              Synthesis", RFC 9872, DOI 10.17487/RFC9872, September
+733	              2025, <https://www.rfc-editor.org/info/rfc9872>.
+
+735	   [RIPEV4]   RIPE NCC, "The RIPE NCC has run out of IPv4 Addresses",
+736	              November 2019, <https://www.ripe.net/publications/news/
+737	              about-ripe-ncc-and-ripe/the-ripe-ncc-has-run-out-of-
+738	              ipv4-addresses>.
+
+740	   [V6DNSRDY-23]
+741	              Streibelt, F., Sattler, P., Lichtblau, F., Hernandez-
+742	              Gañán, C., Gasser, O., and T. Fiebig, "How Ready is DNS
+743	              for an IPv6-Only World?", March 2023,
+744	              <https://link.springer.com/
+745	              chapter/10.1007/978-3-031-28486-1_22>.
+
+747	Appendix A.  Changes Since [RFC3901]
+
+749	   The following changes have been made to the guidance published in
+750	   [RFC3901]:
+
+752	   *  Expanded the terminology section, also taking considerations from
+753	      [RFC9499] into account.
+
+755	   *  Expanded namespace fragmentation, independently discussing IP
+756	      address family related namespace fragmentation, network condition
+757	      based namespace fragmentation, and intentional namespace
+758	      fragmentation.
+
+760	   *  Now recommends the use of IPv4 and IPv6 for authoritative DNS
+761	      servers, instead of leaving IPv6 optional.
+
+763	   *  Now recommends testing IPv4 and IPv6 resolvability when delegating
+764	      zones, instead of only testing IPv4 resolvability.
+
+766	   *  Added guidance on handling IP layer fragmentation.
+
+768	   *  Added guidance for IP address family handling for recursive and
+769	      stub resolvers.
+
+771	Authors' Addresses
+
+773	   Momoka Yamamoto
+774	   WIDE Project
+775	   Email: momoka.my6@gmail.com
+
+777	   Tobias Fiebig
+778	   Max-Planck-Institut fuer Informatik
+779	   Campus E14
+780	   66123 Saarbruecken
+781	   Germany
+782	   Phone: +49 681 9325 3527
+783	   Email: tfiebig@mpi-inf.mpg.de
+
+
+
+
+
+
+
+
+
