@@ -1,0 +1,1511 @@
+idnits 2.17.1 
+
+draft-ietf-cats-usecases-requirements-12.txt:
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+  == There is 1 instance of lines with non-ascii characters in the document.
+
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     Summary: 0 errors (**), 0 flaws (~~), 1 warning (==), 0 comments (--).
+
+--------------------------------------------------------------------------------
+
+
+2	cats                                                              K. Yao
+3	Internet-Draft                                              China Mobile
+4	Intended status: Informational                           L. M. Contreras
+5	Expires: 17 July 2026                                         Telefonica
+6	                                                                  H. Shi
+7	                                                     Huawei Technologies
+8	                                                                S. Zhang
+9	                                                            China Unicom
+10	                                                                   Q. An
+11	                                                           Alibaba Group
+12	                                                         13 January 2026
+
+14	 Computing-Aware Traffic Steering (CATS) Problem Statement, Use Cases,
+15	                            and Requirements
+16	                draft-ietf-cats-usecases-requirements-12
+
+18	Abstract
+
+20	   Distributed computing is a computing pattern that service providers
+21	   can follow and use to achieve better service response time and
+22	   optimized energy consumption.  In such a distributed computing
+23	   environment, compute intensive and delay sensitive services can be
+24	   improved by utilizing computing resources hosted in various computing
+25	   facilities.  Ideally, compute services are balanced across servers
+26	   and network resources to enable higher throughput and lower response
+27	   time.  To achieve this, the choice of server and network resources
+28	   should consider metrics that are oriented towards compute
+29	   capabilities and resources instead of simply dispatching the service
+30	   requests in a static way or optimizing solely on connectivity
+31	   metrics.  The process of selecting servers or service instance
+32	   locations, and of directing traffic to them on chosen network
+33	   resources is called "Computing-Aware Traffic Steering" (CATS).
+
+35	   This document provides the problem statement and the typical
+36	   scenarios for CATS, which shows the necessity of considering more
+37	   factors when steering traffic to the appropriate computing resource
+38	   to better meet the customer's expectations.
+
+40	Status of This Memo
+
+42	   This Internet-Draft is submitted in full conformance with the
+43	   provisions of BCP 78 and BCP 79.
+
+45	   Internet-Drafts are working documents of the Internet Engineering
+46	   Task Force (IETF).  Note that other groups may also distribute
+47	   working documents as Internet-Drafts.  The list of current Internet-
+48	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+50	   Internet-Drafts are draft documents valid for a maximum of six months
+51	   and may be updated, replaced, or obsoleted by other documents at any
+52	   time.  It is inappropriate to use Internet-Drafts as reference
+53	   material or to cite them other than as "work in progress."
+
+55	   This Internet-Draft will expire on 17 July 2026.
+
+57	Copyright Notice
+
+59	   Copyright (c) 2026 IETF Trust and the persons identified as the
+60	   document authors.  All rights reserved.
+
+62	   This document is subject to BCP 78 and the IETF Trust's Legal
+63	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+64	   license-info) in effect on the date of publication of this document.
+65	   Please review these documents carefully, as they describe your rights
+66	   and restrictions with respect to this document.  Code Components
+67	   extracted from this document must include Revised BSD License text as
+68	   described in Section 4.e of the Trust Legal Provisions and are
+69	   provided without warranty as described in the Revised BSD License.
+
+71	Table of Contents
+
+73	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
+74	   2.  Definition of Terms . . . . . . . . . . . . . . . . . . . . .   4
+75	   3.  Problem Statement . . . . . . . . . . . . . . . . . . . . . .   4
+76	     3.1.  Multi-deployment of Edge Service Sites and Service  . . .   4
+77	     3.2.  Traffic Steering among Edges Service Sites and Service
+78	           Instances . . . . . . . . . . . . . . . . . . . . . . . .   5
+79	   4.  Use Cases . . . . . . . . . . . . . . . . . . . . . . . . . .   8
+80	     4.1.  Example 1: Computing-aware AR or VR . . . . . . . . . . .   9
+81	     4.2.  Example 2: Computing-aware Intelligent Transportation . .  12
+82	     4.3.  Example 3: Computing-aware Digital Twin . . . . . . . . .  13
+83	     4.4.  Example 4: Computing-aware SD-WAN . . . . . . . . . . . .  14
+84	     4.5.  Example 5: Computing-aware Distributed AI Training and
+85	           Inference . . . . . . . . . . . . . . . . . . . . . . . .  15
+86	       4.5.1.  Distributed AI Inference  . . . . . . . . . . . . . .  16
+87	       4.5.2.  Distributed AI Training . . . . . . . . . . . . . . .  17
+88	     4.6.  Discussion  . . . . . . . . . . . . . . . . . . . . . . .  18
+89	   5.  Requirements  . . . . . . . . . . . . . . . . . . . . . . . .  18
+90	     5.1.  Support Dynamic and Effective Selection among Multiple
+91	           Service Instances . . . . . . . . . . . . . . . . . . . .  19
+92	     5.2.  Support Agreement on Metric Representation and
+93	           Definition  . . . . . . . . . . . . . . . . . . . . . . .  19
+94	     5.3.  Use of CATS Metrics . . . . . . . . . . . . . . . . . . .  21
+95	     5.4.  Support Instance Affinity . . . . . . . . . . . . . . . .  22
+96	     5.5.  Preserve Communication Confidentiality  . . . . . . . . .  24
+97	     5.6.  Correlation between Use Cases and Requirements  . . . . .  24
+
+99	   6.  Security Considerations . . . . . . . . . . . . . . . . . . .  26
+100	   7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  27
+101	   8.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  27
+102	     8.1.  Normative References  . . . . . . . . . . . . . . . . . .  27
+103	     8.2.  Informative References  . . . . . . . . . . . . . . . . .  27
+104	   Appendix A.  Appendix A . . . . . . . . . . . . . . . . . . . . .  28
+105	     A.1.  Integrated Sensing and Communications (ISAC)  . . . . . .  29
+106	       A.1.1.  Requirements  . . . . . . . . . . . . . . . . . . . .  31
+107	   Acknowledgements  . . . . . . . . . . . . . . . . . . . . . . . .  31
+108	   Contributors  . . . . . . . . . . . . . . . . . . . . . . . . . .  31
+109	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  33
+
+111	1.  Introduction
+
+113	   Network operators are increasingly deploying computing resources,
+114	   with a focus on enhancing edge capabilities to support services
+115	   requiring low latency, high reliability, and dynamic resource
+116	   scaling.
+
+118	   Diversified service demands have brought key challenges to service
+119	   deployment and traffic scheduling.  A single-site service instance
+120	   often lacks sufficient capacity to guarantee the required quality of
+121	   service, especially during peak hours when local computing resources
+122	   may fail to handle all incoming requests, leading to longer response
+123	   times or even request drops.  Regular capacity expansion of a single
+124	   site is neither practical nor economical.  Additionally, relying
+125	   solely on end-side computing enhancements cannot meet the computing
+126	   requirements of all applications.
+
+128	   It is necessary to deploy services across multiple sites (either edge
+129	   or central nodes) to improve availability and scalability.  To this
+130	   end, traffic should be steered to the "best" service instance based
+131	   on factors like current computing load, where "best" is largely
+132	   determined by application requirements.
+
+134	   However, existing routing schemes and traffic engineering methods
+135	   fall short of addressing these challenges.  The underlying networking
+136	   infrastructures that include computing resources usually provide
+137	   relatively static service dispatching or depend solely on
+138	   connectivity metrics for traffic steering, failing to account for
+139	   compute capabilities and resource status, which are critical for
+140	   meeting the quality requirements of modern services.
+
+142	   To tackle this issue, the choice of service instance and network
+143	   resources should further consider compute-oriented metrics beyond
+144	   connectivity metrics.  The process of selecting service instances and
+145	   locations based on metrics that are oriented towards compute
+146	   capabilities and resources, and of directing traffic to them on
+147	   chosen network resources is called "Computing-Aware Traffic Steering"
+148	   (CATS).  It should be noted that CATS is not limited to edge
+149	   computing scenarios, however, Section 3 of this document will focus
+150	   on edge computing scenarios for problem statement.
+
+152	   This document describes sample usage scenarios that drive CATS
+153	   requirements and will help to identify candidate solution
+154	   architectures and approaches.
+
+156	2.  Definition of Terms
+
+158	   This document uses the terms defined in [I-D.ietf-cats-framework],
+159	   including service site, service instance, CATS service identifier(CS-
+160	   ID).
+
+162	   Edge Computing:  Edge computing is a computing pattern that moves
+163	     computing infrastructures, i.e, servers, away from centralized data
+164	     centers and instead places it close to the end users for low
+165	     latency communication.
+
+167	   Even though this document is not a protocol specification, it makes
+168	   use of upper case key words to define requirements unambiguously.
+
+170	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+171	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+172	   "OPTIONAL" in this document are to be interpreted as described in BCP
+173	   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+174	   capitals, as shown here.
+
+176	3.  Problem Statement
+
+178	3.1.  Multi-deployment of Edge Service Sites and Service
+
+180	   In edge computing environments, service instances typically adopt a
+181	   multi-site deployment model.  It should be clarified that specific
+182	   service instance deployment strategies are not within the scope of
+183	   CATS.  However, it is undeniable that there is a close correlation
+184	   between service instance deployment and traffic scheduling,
+185	   especially in the definition and selection of core metrics such as
+186	   computing capabilities and resources.  This dual applicability allows
+187	   a common set of metrics to inform both traffic steering and higher-
+188	   level service management decisions, without requiring CATS to define
+189	   orchestration behavior.
+
+191	   Therefore, to present a clear and comprehensive problem statement, it
+192	   is necessary to first introduce the relevant considerations for
+193	   multi-edge service site deployment.  This premise can better support
+194	   the subsequent elaboration on CATS requirements and solutions.
+
+196	   The core goal of edge computing is to provide computing services
+197	   closer to users through shorter network paths.  Before deploying edge
+198	   service sites, the following factors need to be considered:
+
+200	   *  Geographic location: Including the number of users, differences in
+201	      service types, and the number of connection requests from users.
+202	      For edge service sites located in densely populated areas with a
+203	      large number of users and service requests, more service replicas
+204	      can be deployed compared to other areas.
+
+206	   *  The type, scale, and usage frequency of required computing
+207	      resources.  For example, distributed AI inference services require
+208	      the deployment of more GPU resources.
+
+210	   *  The status of network resources associated with computing
+211	      resources, such as network topology, network access methods,
+212	      connectivity, link bandwidth, and path protection or redundancy
+213	      information.
+
+215	   To improve the overall quality of service, during the service
+216	   deployment phase, it is necessary to analyze the approximate network
+217	   and computing resource requirements of the service, comprehensively
+218	   form a reasonable network and computing resource topology, and
+219	   clarify the location, overall distribution, and relative position of
+220	   computing resources in the network topology.  This process relies on
+221	   standardized consensus on computing and network resources related
+222	   metrics, which is also the point most closely related to the problem
+223	   space addressed by CATS traffic scheduling.
+
+225	3.2.  Traffic Steering among Edges Service Sites and Service Instances
+
+227	   This section describes how existing edge computing systems do not
+228	   provide all of the support needed for real-time or near-real-time
+229	   services, and how it is necessary to steer traffic to different sites
+230	   considering changes in client distribution, different time slots,
+231	   events, server loads, network capabilities, and some other factors
+232	   which might not be directly measured, i.e., properties of edge
+233	   service sites(e.g., geographical location), etc.
+
+235	   It's assumed that service instances are multi-site deployed, and they
+236	   are reachable through a network infrastructure.
+
+238	   When a client issues a service request for a required service, the
+239	   request is steered to one of the available service instances.  Each
+240	   service instance may act as a client towards another service, thereby
+241	   seeing its own outbound traffic steered to a suitable service
+242	   instance of the requested service and so on, achieving service
+243	   composition and chaining as a result.
+
+245	   The aforementioned selection of a service instance from the set of
+246	   candidates is performed using traffic steering methods.
+
+248	   In edge computing, traffic is steered to an edge service site that is
+249	   "closest" or to one of a few "close" sites using load-balancing.
+250	   Such traffic steering can be initiated either by the application
+251	   layer or by the network layer: the application layer may actively
+252	   query for the optimal node and guide traffic using mechanisms such as
+253	   the ALTO protocol[RFC7285], while the network layer may leverage
+254	   Anycast routing[RFC4786], where routering systems automatically
+255	   distribute traffic according to routing tables in an application-
+256	   transparent manner.  However, regardless of whether the steering is
+257	   performed by the application or the network, the core criteria for
+258	   selecting "closest" or "close" sites often rely solely on
+259	   communication metrics (such as physical distance, hop count, or
+260	   network latency).  This decision logic can easily lead to suboptimal
+261	   choices, meaning that the "closest" site is not always the "best"
+262	   one.  This is because the computing resources and states of edge
+263	   service sites can change in real time:
+
+265	   *  The closest site may not have sufficient resources.
+
+267	   *  The closest site may not have the specific computing resources
+268	      required.
+
+270	   To address these issues, enhancements to traffic steering mechanisms
+271	   are needed to direct traffic to sites that can adequately support the
+272	   requested services.  Steering decision may take into account more
+273	   complex and possibly dynamic metric information, such as load of
+274	   service instances, latency experienced or similar, for selection of a
+275	   more suitable service instance.
+
+277	   It is important to note that clients may move.  This means that the
+278	   service instance that was "best" at one moment might no longer be
+279	   best when a new service request is issued.  This creates a (physical)
+280	   dynamicity that will need to be catered for in addition to the
+281	   changes in server and network load.  From a routing perspective, CATS
+282	   is an application-transparent routing mechanism that can provide
+283	   scheduling for both stateful and stateless services.  However, in
+284	   scenarios where clients move and the service is stateful, CATS
+285	   requires the application to explicitly indicate whether it allows the
+286	   routing system to enable CATS functionality.  Otherwise, mid-session
+287	   scheduling triggered by CATS may cause application context
+288	   inconsistency among service sites or even service interruption.
+
+290	   Figure 1 shows a common way to deploy edge service sites in the
+291	   metro.  Edge service sites are connected with Provider Edges(PEs).
+292	   There is an edge data center for metro area which has high computing
+293	   resource and provides the service to more User Equipments(UEs) (UE1
+294	   to UEn) at the working time.  Because more office buildings are in
+295	   the metro area.  And there are also some remote edge service sites
+296	   which have limited computing resource and provide the service to the
+297	   UEs (UEa, UEb) close to them.
+
+299	   Applications to meet service demands could be deployed in both the
+300	   edge data center in metro area and the remote edge service sites.  In
+301	   this case, the service request and the resource are matched well.
+302	   Some potential traffic steering may be needed just for special
+303	   service request or some small scheduling demand.
+
+305	        +----------------+    +---+                  +------------+
+306	      +----------------+ |- - |UE1|                +------------+ |
+307	      | +-----------+  | |    +---+             +--|    Edge    | |
+308	      | |Edge server|  | |    +---+       +- - -|PE|            | |
+309	      | +-----------+  | |- - |UE2|       |     +--|   Site 1   |-+
+310	      | +-----------+  | |    +---+                +------------+
+311	      | |Edge server|  | |     ...        |            |
+312	      | +-----------+  | +--+         Potential      +---+ +---+
+313	      | +-----------+  | |PE|- - - - - - -+          |UEa| |UEb|
+314	      | |Edge server|  | +--+         Steering       +---+ +---+
+315	      | +-----------+  | |    +---+       |                  |
+316	      | +-----------+  | |- - |UE3|                  +------------+
+317	      | |  ... ...  |  | |    +---+       |        +------------+ |
+318	      | +-----------+  | |     ...              +--|    Edge    | |
+319	      |                | |    +---+       +- - -|PE|            | |
+320	      |Edge data center|-+- - |UEn|             +--|   Site 2   |-+
+321	      +----------------+      +---+                +------------+
+322	      High computing resource              Limited computing resource
+323	      and more UE at metro area            and less UE at remote area
+
+325	             Figure 1: Common Deployment of Edge Service Sites
+
+327	   Figure 2 shows that during non-working hours, for example at weekend
+328	   or daily night, more UEs move to the remote area that are close to
+329	   their house or for some weekend events.  So there will be more
+330	   service request at remote but with limited computing resource, while
+331	   the rich computing resource might not be used with less UE in the
+332	   metro area.  It is possible for many people to request services at
+333	   the remote area, but with the limited computing resource, moreover,
+334	   as the people move from the metro area to the remote area, the edge
+335	   service sites that serve common services will also change, so it may
+336	   be necessary to steer some traffic back to the metro data center.
+
+338	        +----------------+                           +------------+
+339	      +----------------+ |                         +------------+ |
+340	      | +-----------+  | |  Steering traffic    +--|    Edge    | |
+341	      | |Edge server|  | |          +-----------|PE|            | |
+342	      | +-----------+  | |          |           +--|   Site 1   |-+
+343	      | +-----------+  | |- - - - - - - -+         +-+----------+
+344	      | |Edge server|  | |          |    |           |          |
+345	      | +-----------+  | +--+       |  +---+ +---+ +---+ +---+ +---+
+346	      | +-----------+  | |PE|-------+  |UEa| |UEb| |UE1| |...| |UEn|
+347	      | |Edge server|  | +--+       |  +---+ +---+ +---+ +---+ +---+
+348	      | +-----------+  | |          |          |           |
+349	      | +-----------+  | |- - - - - - - - - - -+           +------+
+350	      | |  ... ...  |  | |          |              +------------+ |
+351	      | +-----------+  | |          |           +--|    Edge    | |
+352	      |                | |          +-----------|PE|            | |
+353	      |Edge data center|-+  Steering traffic    +--|   Site 2   |-+
+354	      +----------------+                           +------------+
+355	      High computing resource              Limited computing resource
+356	      and less UE at metro area            and more UE at remote area
+
+358	            Figure 2: Steering Traffic among Edge Service Sites
+
+360	   There will also be the common variable of network and computing
+361	   resources, for someone who is not moving but get a poor latency
+362	   sometime.  Because of other UEs moving, a large number of request for
+363	   temporary events such as vocal concert, shopping festival and so on,
+364	   and there will also be the normal change of the network and computing
+365	   resource status.  So for some fixed UEs, it is also expected to steer
+366	   the traffic to appropriate sites dynamically.
+
+368	   Those problems indicate that traffic needs to be steered among
+369	   different edge service sites, because of the mobility of the UE and
+370	   the common variable of network and computing resources.  Moreover,
+371	   some use cases in the following section require both low latency and
+372	   high computing resource usage or specific computing hardware
+373	   capabilities (such as local GPU); hence joint optimization of network
+374	   and computing resource is needed to guarantee the Quality of
+375	   Experience (QoE).
+
+377	4.  Use Cases
+
+379	   This section presents a non-exhaustive set of use cases which would
+380	   benefit from the dynamic selection of service instances and the
+381	   steering of traffic to those service instances.
+
+383	4.1.  Example 1: Computing-aware AR or VR
+
+385	   Cloud VR/AR introduces the concept of cloud computing to the
+386	   rendering of audiovisual assets in such applications.  Here, the edge
+387	   cloud helps encode/decode and render content.  The end device usually
+388	   only uploads posture or control information to the edge and then VR/
+389	   AR contents are rendered in the edge cloud.  The video and audio
+390	   outputs generated from the edge cloud are encoded, compressed, and
+391	   transmitted back to the end device or further transmitted to central
+392	   data center via high bandwidth networks.
+
+394	   A Cloud VR service is delay-sensitive and influenced by both network
+395	   and computing resources.  Therefore, the edge service site which
+396	   executes the service has to be carefully selected to make sure it has
+397	   sufficient computing resource and good network condition to guarantee
+398	   the end-to-end service delay.  For example, for an entry-level cloud
+399	   VR (panoramic 8K 2D video) with 110-degree Field of View (FOV)
+400	   transmission, the typical network requirements are bandwidth 40Mbps,
+401	   20ms for motion-to-photon latency, packet loss rate is 2.4E-5; the
+402	   typical computing requirements are 8K H.265 real-time decoding, 2K
+403	   H.264 real-time encoding.  Further, the 20ms latency can be
+404	   categoried as:
+
+406	   (i)    Sensor sampling delay(client), which is considered
+407	          imperceptible by users is less than 1.5ms including an extra
+408	          0.5ms for digitalization and end device processing.
+
+410	   (ii)   Display refresh delay(client), which take 7.9ms based on the
+411	          144Hz display refreshing rate and 1ms extra delay to light up.
+
+413	   (iii)  Image/frame rendering delay(server), which could be reduced to
+414	          5.5ms.
+
+416	   (iv)   Round-trip network delay: The remaining latency budget is 5.1
+417	          ms, calculated as 20-1.5-5.5-7.9 = 5.1ms.
+
+419	   So the budgets for server(computing) delay and network delay are
+420	   almost equivalent, which make sense to consider both of the delay for
+421	   computing and network.  And it could't meet the total delay
+422	   requirements or find the best choice by either optimizing the network
+423	   or computing resource.
+
+425	   Based on the analysis, here are some further assumption as Figure 3
+426	   shows, the client could request any service instance among 3 edge
+427	   service sites.  The delay of client could be same, and the
+428	   differences of edge service sites and corresponding network path have
+429	   different delays:
+
+431	   *  Edge service site 1: The computing delay=4ms based on a light
+432	      load, and the corresponding network delay=9ms based on a heavy
+433	      traffic.
+
+435	   *  Edge service site 2: The computing delay=10ms based on a heavy
+436	      load, and the corresponding network delay=4ms based on a light
+437	      traffic.
+
+439	   *  Edge service site 3: The edge service site 3's computing delay=5ms
+440	      based on a normal load, and the corresponding network delay=5ms
+441	      based on a normal traffic.
+
+443	   In this case, we can't get an optimal network and computing total
+444	   delay if choosing the resource only based on either of computing or
+445	   network status:
+
+447	   *  The edge service site based on the best computing delay it will be
+448	      the edge service site 1, the E2E delay=22.4ms.
+
+450	   *  The edge service site based on the best network delay it will be
+451	      the edge service site 2, the E2E delay=23.4ms.
+
+453	   *  The edge service site based on both of the status it will be the
+454	      edge site 3, the E2E delay=19.4ms.
+
+456	   So, the best choice to ensure the E2E delay is edge service site 3,
+457	   which is 19.4ms and is less than 20ms.  The differences of the E2E
+458	   delay is only 3~4ms among the three, but some of them will meet the
+459	   application demand while the others don't.
+
+461	   The conclusion is that E2E delay is a key factor for traffic
+462	   steering, and it is also necessary to consider whether an edge
+463	   service site has the required GPU resources.  Even if a site offers
+464	   good latency, it cannot provide the service if it lacks GPU support.
+465	   For AR/VR scenarios, traffic should only be steered at the start of a
+466	   service session, because mid-session steering involves significant
+467	   context migration, which is costly and requires explicit application
+468	   participation and approval.
+
+470	        Light Load          Heavy Load           Normal load
+471	      +------------+      +------------+       +------------+
+472	      |    Edge    |      |    Edge    |       |    Edge    |
+473	      |   Site 1   |      |   Site 2   |       |   Site 3   |
+474	      +-----+------+      +------+-----+       +------+-----+
+475	   computing|delay(4ms)          |           computing|delay(5ms)
+476	            |           computing|delay(10ms)         |
+477	       +----+-----+        +-----+----+         +-----+----+
+478	       |  Egress  |        |  Egress  |         |  Egress  |
+479	       | Router 1 |        | Router 2 |         | Router 3 |
+480	       +----+-----+        +-----+----+         +-----+----+
+481	     newtork|delay(9ms)   newtork|delay(4ms)   newtork|delay(5ms)
+482	            |                    |                    |
+483	            |           +--------+--------+           |
+484	            +-----------|  Infrastructure |-----------+
+485	                        +--------+--------+
+486	                                 |
+487	                            +----+----+
+488	                            | Ingress |
+489	            +---------------|  Router |--------------+
+490	            |               +----+----+              |
+491	            |                    |                   |
+492	         +--+--+              +--+---+           +---+--+
+493	       +------+|            +------+ |         +------+ |
+494	       |Client|+            |Client|-+         |Client|-+
+495	       +------+             +------+           +------+
+496	                      client delay=1.5+7.9=9.4ms
+
+498	                     Figure 3: Computing-Aware AR or VR
+
+500	   Furthermore, specific techniques may be employed to divide the
+501	   overall rendering into base assets that are common across a number of
+502	   clients participating in the service, while the client-specific input
+503	   data is being utilized to render additional assets.  When being
+504	   delivered to the client, those two assets are being combined into the
+505	   overall content being consumed by the client.  The requirements for
+506	   sending the client input data as well as the requests for the base
+507	   assets may be different in terms of which service instances may serve
+508	   the request, where base assets may be served from any nearby service
+509	   instance (since those base assets may be served without requiring
+510	   cross-request state being maintained), while the client-specific
+511	   input data is being processed by a stateful service instance that
+512	   changes, if at all, only slowly over time due to the stickiness of
+513	   the service that is being created by the client-specific data.  Other
+514	   splits of rendering and input tasks can be found in [TR22.874] for
+515	   further reading.
+
+517	   When it comes to the service instances themselves, those may be
+518	   instantiated on-demand, e.g., driven by network or client demand
+519	   metrics, while resources may also be released, e.g., after an idle
+520	   timeout, to free up resources for other services.  Depending on the
+521	   utilized node technologies, the lifetime of such "function as a
+522	   service" may range from many minutes down to millisecond scale.
+523	   Therefore, computing resources across participating edges exhibit a
+524	   distributed (in terms of locations) as well as dynamic (in terms of
+525	   resource availability) nature.  In order to achieve a satisfying
+526	   service quality to end users, a service request will need to be sent
+527	   to and served by an edge with sufficient computing resource and a
+528	   good network path.
+
+530	4.2.  Example 2: Computing-aware Intelligent Transportation
+
+532	   Urban intelligent transportation relies on a large number of high-
+533	   quality video capture devices, whose data needs to be processed at
+534	   edge service sites (e.g., pedestrian flow statistics, vehicle
+535	   tracking).  This imposes stringent requirements on the computing
+536	   capabilities of edge service sites (for video processing) and network
+537	   performance (bandwidth, latency).  CATS can address the issue by
+538	   coordinating network and computing resources.
+
+540	   In auxiliary driving scenarios (for example, "Extended Electronic
+541	   Horizon" [HORITA]), edge service sites collect road and traffic data
+542	   via V2X to address blind-spot and collision risks, and provide real-
+543	   time warnings and maneuver guidance.  Requests are typically sent
+544	   preferentially to the closest edge node.  However, if the closest
+545	   node becomes overloaded, it may lead to response delays and safety
+546	   risks, which requires CATS to perform traffic steering.
+
+548	   Specifically, delay-insensitive services (e.g., in-vehicle
+549	   entertainment) can be offloaded via CATS to edge service sites with
+550	   lighter loads (even if they are farther away), while delay-sensitive
+551	   assisted driving services are preferentially processed at local
+552	   service sites.  As mentioned in the problem statement section, CATS
+553	   is an application-transparent network-layer solution.  Unlike
+554	   ALTO[RFC7285], it enables coordinated scheduling of network and
+555	   computing resources without requiring application modifications.  For
+556	   moving vehicles, CATS supports smooth and proactive context migration
+557	   between edge nodes, provided that the application allows it, to
+558	   maintain service continuity.  In addition, vehicle speed is a key
+559	   factor: faster movement requires higher frequency of metric updates
+560	   (to be detailed in the requirements section) to ensure that CATS
+561	   steering decisions remain valid as vehicles switch services among
+562	   base stations or edge service sites.
+
+564	   In video recognition scenarios, traffic surges (e.g., during rush
+565	   hours or weekends) can easily overload the closest edge service
+566	   sites.  CATS addresses this scalability challenge by steering excess
+567	   service requests to other appropriate sites, ensuring that processing
+568	   capacity matches user demand.
+
+570	4.3.  Example 3: Computing-aware Digital Twin
+
+572	   A number of industry associations, such as the Industrial Digital
+573	   Twin Association or the Digital Twin Consortium
+574	   (https://www.digitaltwinconsortium.org/), have been founded to
+575	   promote the concept of the Digital Twin (DT) for a number of use case
+576	   areas, such as smart cities, transportation, industrial control,
+577	   among others.  The core concept of the DT is the "administrative
+578	   shell" [Industry4.0], which serves as a digital representation of the
+579	   information and technical functionality pertaining to the "assets"
+580	   (such as an industrial machinery, a transportation vehicle, an object
+581	   in a smart city or others) that is intended to be managed,
+582	   controlled, and actuated.
+
+584	   As an example for industrial control, the programmable logic
+585	   controller (PLC) may be virtualized and the functionality aggregated
+586	   across a number of physical assets into a single administrative shell
+587	   for the purpose of managing those assets.  PLCs may be virtualized in
+588	   order to move the PLC capabilities from the physical assets to the
+589	   edge cloud.  Several PLC instances may exist to enable load balancing
+590	   and fail-over capabilities, while also enabling physical mobility of
+591	   the asset and the connection to a suitable "nearby" PLC instance.
+592	   With this, traffic dynamicity may be similar to that observed in the
+593	   connected car scenario in the previous subsection.  Crucial here is
+594	   high availability and bounded latency since a failure of the
+595	   (overall) PLC functionality may lead to a production line stop, while
+596	   boundary violations of the latency may lead to loosing
+597	   synchronization with other processes and, ultimately, to production
+598	   faults, tool failures or similar.
+
+600	   Particular attention in Digital Twin scenarios is given to the
+601	   problem of data storage.  Here, decentralization, not only driven by
+602	   the scenario (such as outlined in the connected car scenario for
+603	   cases of localized reasoning over data originating from driving
+604	   vehicles) but also through proposed platform solutions, such as those
+605	   in [GAIA-X], plays an important role.  With decentralization,
+606	   endpoint relations between client and (storage) service instances may
+607	   frequently change as a result.
+
+609	   In this use case, CATS is required for selecting the optimal PLC
+610	   instance and storage node, ensuring low latency and reliability for
+611	   data processing in industrial scenarios, as well as low latency for
+612	   data reading/writing during twin control processes.
+
+614	4.4.  Example 4: Computing-aware SD-WAN
+
+616	   SD-WAN is an overlay connectivity service that optimizes the
+617	   transport of IP packets over one or more underlay connectivity
+618	   services by recognizing applications and determining forwarding
+619	   behavior through the application of policies [MEF70.2].  SD-WAN can
+620	   be deployed by both service providers and enterprises to support
+621	   connectivity across branch sites, data centers, and cloud
+622	   environments.  Applications or services may be deployed at multiple
+623	   locations to achieve performance, resiliency, or cost objectives.
+
+625	   In current SD-WAN deployments, forwarding decisions are primarily
+626	   based on network-related metrics such as available bandwidth,
+627	   latency, packet loss, or path availability.  However, these decisions
+628	   typically lack visibility into the computing resources available at
+629	   the destination sites, such as CPU or GPU utilization, memory
+630	   pressure, or other composite cost metrics.
+
+632	   CATS metrics can complement existing SD-WAN network metrics by
+633	   providing information about the availability and condition of
+634	   computing resources associated with service instances at edge or
+635	   cloud sites.  Such metrics may be consumed by a centralized SD-WAN
+636	   controller when deriving policies or computing preferred paths, and/
+637	   or by SD-WAN edge devices to make distributed, real-time traffic
+638	   steering decisions among already-deployed service instances.  In both
+639	   cases, the goal is to enable application traffic to be steered
+640	   towards service instances and sites that best satisfy application
+641	   requirements by jointly considering network and computing conditions.
+
+643	   For the scenario of enterprises deploying applications in the cloud,
+644	   SD-WAN provides enterprises with centralized control over Customer-
+645	   Premises Equipments(CPEs) in branch offices and the cloudified
+646	   CPEs(vCPEs) in the clouds.  The CPEs connect the clients in branch
+647	   offices and the application servers in clouds.  The same application
+648	   server in different clouds is called an application instance.
+649	   Different application instances have different computing resource.
+
+651	   SD-WAN is aware of the computing resource of applications deployed in
+652	   the clouds by vCPEs, and selects the application instance for the
+653	   client to visit according to computing power and the network state of
+654	   WAN.
+
+656	   Additionally, in order to provide cost-effective solutions, the SD-
+657	   WAN may also consider cost, e.g., in terms of energy prices incurred
+658	   or energy source used, when selecting a specific application instance
+659	   over another.  For this, suitable metric information would need to be
+660	   exposed, e.g., by the cloud provider, in terms of utilized energy or
+661	   incurred energy costs per computing resource.
+
+663	   Figure 4 below illustrates Computing-aware SD-WAN for Enterprise
+664	   Cloudification.
+
+666	                                                       +---------------+
+667	      +-------+                      +----------+      |    Cloud1     |
+668	      |Client1|            /---------|   WAN1   |------|  vCPE1  APP1  |
+669	      +-------+           /          +----------+      +---------------+
+670	        +-------+        +-------+
+671	        |Client2| ------ |  CPE  |
+672	        +-------+        +-------+                     +---------------+
+673	      +-------+           \          +----------+      |    Cloud2     |
+674	      |Client3|            \---------|   WAN2   |------|  vCPE2  APP1  |
+675	      +-------+                      +----------+      +---------------+
+
+677	      Figure 4: Illustration of Computing-aware SD-WAN for Enterprise
+678	                               Cloudification
+
+680	   The current computing load status of the application APP1 in cloud1
+681	   and cloud2 is as follows: each application uses 6 vCPUs.  The load of
+682	   application in cloud1 is 50%. The load of application in cloud2 is
+683	   20%. The computing resource of APP1 are collected by vCPE1 and vCPE2
+684	   respectively.  Client1 and Client2 are visiting APP1 in cloud1.  WAN1
+685	   and WAN2 have the same network states.  Considering lightly loaded
+686	   application SD-WAN selects APP1 in cloud2 for the client3 in branch
+687	   office.  The traffic of client3 follows the path: Client3 -> CPE ->
+688	   WAN2 -> Cloud2 vCPE1 -> Cloud2 APP1
+
+690	4.5.  Example 5: Computing-aware Distributed AI Training and Inference
+
+692	   Artificial Intelligence (AI) large model refers to models that are
+693	   characterized by their large size, high complexity, and high
+694	   computational requirements.  AI large models have become increasingly
+695	   important in various fields, such as natural language processing for
+696	   text classification, computer vision for image classification and
+697	   object detection, and speech recognition.
+
+699	   AI large model contains two key phases: training and inference.
+700	   Training refers to the process of developing an AI model by feeding
+701	   it with large amounts of data and optimizing it to learn and improve
+702	   its performance.  On the other hand, inference is the process of
+703	   using the trained AI model to make predictions or decisions based on
+704	   new input data.
+
+706	4.5.1.  Distributed AI Inference
+
+708	   With the fast development of AI large language models, more
+709	   lightweight models can be deployed at edge service sites.  Figure 5
+710	   shows the potential deployment of this case.
+
+712	   AI inference contains two major steps, prefilling and decoding.
+713	   Prefilling processes a user's prompt to generate the first token of
+714	   the response in one step.  Following it, decoding sequentially
+715	   generates subsequent tokens step-by-step until the termination token.
+716	   These stages consume much computing resource.  Important metrics for
+717	   AI inference are processor cores which transform prompts to tokens,
+718	   and memory resources which are used to store key-values and cache
+719	   tokens.  The generation and processing of tokens indicates the
+720	   service capability of an AI inference system.  Single site deployment
+721	   of the prefilling and decoding might not provide enough resources
+722	   when there are many clients sending requests (prompts) to access AI
+723	   inference service.
+
+725	   More generally, we also see the use of cost information, specifically
+726	   on the cost for energy expended on AI inferencing of the overall
+727	   provided AI-based service, as a possible criteria for steering
+728	   traffic.  Here, we envision (AI) service tiers being exposed to end
+729	   users, allowing to prioritize, e.g., 'greener energy costs' as a key
+730	   criteria for service fulfilment.  For this, the system would employ
+731	   metric information on, e.g., utilized energy mix at the AI inference
+732	   sites and costs for energy to prioritize a 'greener' site over
+733	   another, while providing similar response times.
+
+735	           +----------------------------------------------------------+
+736	           |  +--------------+  +--------------+   +--------------+   |
+737	           |  |     Edge     |  |     Edge     |   |     Edge     |   |
+738	           |  | +----------+ |  | +----------+ |   | +----------+ |   |
+739	           |  | |  Prefill | |  | |  Prefill | |   | |  Prefill | |   |
+740	           |  | +----------+ |  | +----------+ |   | +----------+ |   |
+741	           |  | +----------+ |  | +----------+ |   | +----------+ |   |
+742	           |  | |  Decode  | |  | |  Decode  | |   | |  Decode  | |   |
+743	           |  | +----------+ |  | +----------+ |   | +----------+ |   |
+744	           |  +--------------+  +--------------+   +--------------+   |
+745	           +----------+-----------------------------+-----------------+
+746	                      | Prompt                      | Prompt
+747	                      |                             |
+748	                 +----+-----+                     +-+--------+
+749	                 | Client_1 |           ...       | Client_2 |
+750	                 +----------+                     +----------+
+
+752	     Figure 5: Illustration of Computing-aware AI large model inference
+
+754	4.5.2.  Distributed AI Training
+
+756	   Although large language models are nowadays confined to be trained
+757	   with very large centers with computational, often GPU-based,
+758	   resources, platforms for federated or distributed training are being
+759	   positioned, specifically when employing edge computing resources.
+
+761	   While those approaches apply their own (collective) communication
+762	   approach to steer the training and gradient data towards the various
+763	   (often edge) computing sites, we also see a case for CATS traffic
+764	   steering here.  For this, the training clusters themselves may be
+765	   multi-site, i.e., combining resources from more than one site, but
+766	   acting as service instances in a CATS sense, i.e., providing the
+767	   respective training round as a service to the overall distributed/
+768	   federated learning platform.
+
+770	   One (cluster) site can be selected over another based on compute,
+771	   network but also cost metrics, or a combination thereof.  For
+772	   instance, training may be constrained based on the network resources
+773	   to ensure timely delivery of the required training and gradient
+774	   information to the cluster site, while also computational load may be
+775	   considered, particularly when the cluster sites are multi-homed, thus
+776	   hosting more than one application and therefore become (temporarily)
+777	   overloaded.  But equally to our inferencing use case in the previous
+778	   section, the overall training service may also be constrained by
+779	   cost, specifically energy aspects, e.g., when positioning the service
+780	   utilizing the trained model is advertising its 'green' credentials to
+781	   the end users.  For this, costs based on energy pricing (over time)
+782	   as well as the energy mix may be considered.  One could foresee, for
+783	   instance, the coupling of surplus energy in renewable energy
+784	   resources to a cost metric upon which traffic is steered preferably
+785	   to those cluster sites that are merely consuming surplus and not grid
+786	   energy.
+
+788	   Storage is also necessary for performing distributed/federated
+789	   learning due to several key reasons.  Firstly, it is needed to store
+790	   model checkpoints produced throughout the training process, allowing
+791	   for progress tracking and recovery in case of interruptions.
+792	   Additionally, storage is used to keep samples of the dataset used to
+793	   train the model, which often come from distributed sensors such as
+794	   cameras, microphones, etc.  Furthermore, storage is required to hold
+795	   the models themselves, which can be very large and complex.  Knowing
+796	   the storage performance metrics is also important.  For instance,
+797	   understanding the I/O transfer rate of the storage helps in
+798	   determining the latency of accessing data from disk.  Additionally,
+799	   knowing the size of the storage is relevant to understand how many
+800	   model checkpoints can be stored or the maximum size of the model that
+801	   can be locally stored.
+
+803	4.6.  Discussion
+
+805	   The five use cases mentioned in previous sections serve as examples
+806	   to show that CATS are needed for traffic steering.  Considering that
+807	   these use cases are enough to derive common requirements, this
+808	   document only includes the aforementioned five use cases in the main
+809	   body, although there have been more similar use cases proposed in
+810	   CATS working group[I-D.dcn-cats-req-service-segmentation].  CATS has
+811	   raised strong interests in many other standardization bodies, such as
+812	   ETSI, 3GPP.  The applicability of CATS may be further extended in
+813	   future use cases.  At the mean time, the CATS framework may also need
+814	   to be modified or enhanced according to new requirements raised by
+815	   potential new CATS use cases.  These potential use cases are not
+816	   included in the current document main body, but are attached in the
+817	   appendix A of this document.
+
+819	5.  Requirements
+
+821	   In the following, we outline the requirements for the CATS system to
+822	   overcome the observed problems in the realization of the use cases
+823	   above.
+
+825	5.1.  Support Dynamic and Effective Selection among Multiple Service
+826	      Instances
+
+828	   The basic requirement of CATS is to support the dynamic access to
+829	   different service instances residing in multiple computing sites and
+830	   then being aware of their status, which is also the fundamental model
+831	   to enable the traffic steering and to further optimize the network
+832	   and computing services.  A unique CATS service identifier (CS-ID) is
+833	   used by all the service instances for a specific service no matter
+834	   which edge service site an instance may attach to.  The mapping of
+835	   this CS-ID to a network locator is basic to steer traffic to any of
+836	   the service instances deployed in various edge service sites.
+
+838	   Moreover, according to CATS use cases, some applications require E2E
+839	   low latency, which warrants a quick mapping of the service identifier
+840	   to the network locator.  This leads to naturally the in-band methods,
+841	   involving the consideration of using metrics that are oriented
+842	   towards compute capabilities and resources, and their correlation
+843	   with services.  Therefore, a desirable system
+
+845	   R1: MUST provide a dynamic discovery and resolution method for
+846	   mapping CS-ID to one or more current service instance addresses,
+847	   based on up-to-date system state.
+
+849	   R2: MUST provide a method to dynamically assess the availability of
+850	   service instances, based on up-to-date status metrics (e.g., health,
+851	   load, reachability).
+
+853	   Note: The term "up-to-date" herein refers to the latest metric
+854	   information collected by the system in accordance with the preset
+855	   metric update cycle.  The principle for setting the cycle is
+856	   generally pre-determined by the network.  For example, based on
+857	   historical statistical data, a relatively appropriate update cycle
+858	   (either second-level or millisecond-level) is selected for a specific
+859	   type or certain types of services.
+
+861	5.2.  Support Agreement on Metric Representation and Definition
+
+863	   Computing metrics can have many different semantics, particularly for
+864	   being service-specific.  Even the notion of a "computing load" metric
+865	   could be represented in many different ways.  Such representation may
+866	   entail information on the semantics of the metric or it may be purely
+867	   one or more semantic-free numerals.  Agreement of the chosen
+868	   representation among all service and network elements participating
+869	   in the service instance selection decision is important.  Therefore,
+870	   a desirable system
+871	   R3: The implementations MUST agree on using metrics that are oriented
+872	   towards compute capabilities and resources and their representation
+873	   among service instances in the participating edges, at both design
+874	   time and runtime.
+
+876	   To better understand the meaning of different metrics and to better
+877	   support appropriate use of metrics,
+
+879	   R4: An information model of the compute and network resources MUST be
+880	   defined.  Such a model MUST characterize how metrics are abstracted
+881	   out from the compute and network resources.  We refer to this
+882	   information model as the Resource Model.
+
+884	   R5: The Resource Model MUST be implementable in an interoperable
+885	   manner.  That is, metrics generated by this resource model MUST be
+886	   understood and interoperable across independent CATS implementations.
+
+888	   R6: The Resource Model MUST be executable in a scalable manner.  That
+889	   is, the Resource Model MUST be capable of being executed at the
+890	   required time scale and at an affordable cost (e.g., memory
+891	   footprint, energy, etc.).
+
+893	   We recognize that different network nodes, e.g., routers, switches,
+894	   etc., may have diversified capabilities even in the same routing
+895	   domain, let alone in different administrative domains and from
+896	   different vendors.  Therefore, to work properly in a CATS system,
+
+898	   R7: CATS systems MUST support staleness handling for CATS metrics and
+899	   provide indications of when metrics should be refreshed, so that CATS
+900	   components can know if a metric value is valid or not.
+
+902	   R8: All metric information used in CATS MUST be produced and encoded
+903	   in a format that is understood by participating CATS components.  For
+904	   metrics that CATS components do not understand or support, CATS
+905	   components will ignore them.
+
+907	   R9: CATS MAY be applied in non-CATS network environments when needed,
+908	   considering that CATS is designed with extensibility and could work
+909	   compatibly with existing non-CATS network environments when the
+910	   network components in these environments could be upgraded to know
+911	   the meaning of CATS metrics.
+
+913	   R10: CATS components SHOULD support a mechanism to advertise or
+914	   negotiate supported metric types and encodings to ensure
+915	   compatibility across implementations.
+
+917	   R11: The computation and use of metrics in CATS MUST be designed to
+918	   avoid introducing routing loops or path oscillations when metrics are
+919	   distributed and used for path selection.
+
+921	   Compute metrics can change rapidly, which may lead to path
+922	   oscillation if metrics are updated too frequently or become stale if
+923	   updated too infrequently.  R10 ensures that CATS components can
+924	   negotiate metric types for consistent interpretation, while R11
+925	   requires that metrics be used in a way that avoids routing loops and
+926	   path instability.  Together, they balance responsiveness with
+927	   stability.
+
+929	5.3.  Use of CATS Metrics
+
+931	   Network path costs in the current routing system usually do not
+932	   change very frequently.  Network traffic engineering metrics (such as
+933	   available bandwidth) may change more frequently as traffic demands
+934	   fluctuate, but distribution of these changes is normally damped so
+935	   that only significant changes cause routing protocol messages.
+
+937	   However, metrics that are oriented towards compute capabilities and
+938	   resources in general can be highly dynamic, e.g., changing rapidly
+939	   with the number of sessions, the CPU/GPU utilization and the memory
+940	   consumption, etc.  Service providers must determine at what interval
+941	   or based on what events such information needs to be distributed.
+942	   Overly frequent distribution with more accurate synchronization may
+943	   result in unnecessary overhead in terms of signaling.
+
+945	   Moreover, depending on the service related decision logic, one or
+946	   more metrics need to be conveyed in a CATS domain.  The problem to be
+947	   addressed here may be the frequency of such conveyance, and which
+948	   CATS component is the decision maker for the service instance
+949	   selection should also be considered.  Thereby, choosing appropriate
+950	   protocols for conveying CATS metrics is important.  While existing
+951	   routing protocols may serve as a baseline for signaling metrics, for
+952	   example, BGP extensions[RFC4760] and GRASP[RFC8990].  These routing
+953	   protocols may be more suitable for distributed systems.  Considering
+954	   about some centralized approaches to select CATS service instances,
+955	   other means to convey the metrics can equally be chosen and even be
+956	   realized, for example, leveraging restful API for publication of CATS
+957	   metrics to a centralized decision maker.  Specifically, a desirable
+958	   system,
+
+960	   R12: MUST provide mechanisms for metric collection, including
+961	   specifying the responsible entity for collection.
+
+963	   Collecting metrics from all of the services instances may incur much
+964	   overhead for decision makers.  Hierarchical aggregation helps reduce
+965	   this burden by consolidating metrics at intermediate nodes, providing
+966	   a more scalable and efficient view of resource conditions.
+
+968	   CATS components do not need to be aware of how metrics are collected
+969	   behind the aggregator.  The decision point may not be directly
+970	   connected with service instances or metric collectors, therefore,
+
+972	   R13: MUST provide mechanisms to distribute the metrics.
+
+974	   There may be various update frequencies for different computing
+975	   metrics.  Some of the metrics may be more dynamic, while others are
+976	   relatively static.  Accordingly, different distribution methods may
+977	   need to be chosen with respect to different update frequencies of
+978	   different metrics.  Therefore a system,
+
+980	   For example, In highly mobile scenarios, such as fast-moving vehicles
+981	   mentioned in Section 4.2, compute metrics can quickly become outdated
+982	   as the UE moves across base stations and edge service sites,
+983	   potentially requiring more frequent updates.  However, updates should
+984	   remain stable and avoid excessive overhead.
+
+986	   R14: MUST NOT be sensitive to the update frequency of the metrics,
+987	   and MUST NOT be dependent on or vulnerable to the mechanisms used to
+988	   distribute the metrics.
+
+990	5.4.  Support Instance Affinity
+
+992	   In the CATS system, a service may be provided by one or more service
+993	   instances that would be deployed at different locations in the
+994	   network.  Each instance provides equivalent service functionality to
+995	   its respective clients.  The decision logic of the instance selection
+996	   is subject to the packet level communication and packets are
+997	   forwarded based on the operating status of both network and computing
+998	   resources.  This resource status will likely change over time,
+999	   leading to individual packets potentially being sent to different
+1000	   network locations, possibly segmenting individual service
+1001	   transactions and breaking service-level semantics.  Moreover, when a
+1002	   client moves, the access point might change and successively lead to
+1003	   the migration of service instances.  If execution changes from one
+1004	   (e.g., virtualized) service instance to another, state/context needs
+1005	   to be transferred to the new instance.  Such required transfer of
+1006	   state/context makes it desirable to have instance affinity as the
+1007	   default, removing the need for explicit context transfer, while also
+1008	   supporting an explicit state/context transfer (e.g., when metrics
+1009	   change significantly).
+
+1011	   The nature of this affinity is highly dependent on the nature of the
+1012	   service, which could be seen as an 'instance affinity' to represent
+1013	   the relationship.  The minimal affinity of a single request
+1014	   represents a stateless service, where each service request may be
+1015	   responded to without any state being held at the service instance for
+1016	   fulfilling the request.
+
+1018	   Providing any necessary information/state in the manner of in-band as
+1019	   part of the service request, e.g., in the form of a multi-form body
+1020	   in an HTTP request or through the URL provided as part of the
+1021	   request, is one way to achieve such stateless nature.
+
+1023	   Alternatively, the affinity to a particular service instance may span
+1024	   more than one request, as in the AR/VR use case, where the previous
+1025	   client input is needed to render subsequent frames.
+
+1027	   However, a client, e.g., a mobile UE, may have many applications
+1028	   running.  If all, or majority, of the applications request the CATS-
+1029	   based services, then the runtime states that need to be created and
+1030	   accordingly maintained would require high granularity.  In the
+1031	   extreme scenario, this granular requirement could reach the level of
+1032	   per-UE, per-APP, and per-(sub)flow with regard to a service instance.
+1033	   Evidently, these fine-granular runtime states can potentially place a
+1034	   heavy burden on network devices if they have to dynamically create
+1035	   and maintain them.  On the other hand, it is not appropriate either
+1036	   to place the state-keeping task on clients themselves.
+
+1038	   Besides, there might be the case that UE moves to a new (access)
+1039	   network or the service instance is migrated to another cloud, which
+1040	   cause the unreachable or inconvenient of the original service
+1041	   instance.  So the UE and service instance mobility also need to be
+1042	   considered.
+
+1044	   Therefore, a desirable system,
+
+1046	   R15: CATS systems MUST maintain instance affinity for stateful
+1047	   sessions and transactions on a per-flow basis.
+
+1049	   R16: MUST avoid maintaining per-flow states for specific applications
+1050	   in network nodes for providing instance affinity.
+
+1052	   R17: SHOULD support service continuity in the presence of UE or
+1053	   service instance mobility.
+
+1055	5.5.  Preserve Communication Confidentiality
+
+1057	   Exposing CATS metrics to the network may lead to the leakage of
+1058	   application privacy.  In order to prevent it, it is necessary to
+1059	   consider the methods to handle the sensitive information.  For
+1060	   instance, using general anonymization methods, including hiding the
+1061	   key information representing the identification of devices, or using
+1062	   an index to represent the service level of computing resources, or
+1063	   using customized information exposure strategies according to
+1064	   specific application requirements or network scheduling requirements.
+1065	   At the same time, when anonymity is achieved, it is important to
+1066	   ensure that the exposed computing information remains sufficient to
+1067	   enable effective traffic steering.  Therefore, a CATS system
+
+1069	   R18: MUST preserve the confidentiality of the communication relation
+1070	   between a user and a service provider by minimizing the exposure of
+1071	   user-relevant information according to user's demands.
+
+1073	5.6.  Correlation between Use Cases and Requirements
+
+1075	   A table is presented in this section to better illustrate the
+1076	   correlation between CATS use cases and requirements, 'X' is for
+1077	   marking that the requirement can be derived from the corresponding
+1078	   use case.
+
+1080	               +-------------------------------------------------+
+1081	               |                |           Use cases            |
+1082	               +--Requirements--+-----+-----+------+------+------+
+1083	               |                |AR/VR| ITS |  DT  |SD-WAN|  AI  |
+1084	               +-----------+----+-----+-----+------+------+------+
+1085	               | Instance  | R1 |  X  |  X  |  X   |  X   |  X   |
+1086	               | Selection +----+-----+-----+------+------+------+
+1087	               |           | R2 |  X  |  X  |  X   |  X   |  X   |
+1088	               +-----------+----+-----+-----+------+------+------+
+1089	               |           | R3 |  X  |  X  |  X   |  X   |  X   |
+1090	               |           +----+-----+-----+------+------+------+
+1091	               |           | R4 |  X  |  X  |  X   |  X   |  X   |
+1092	               |           +----+-----+-----+------+------+------+
+1093	               |  Metric   | R5 |  X  |  X  |  X   |  X   |  X   |
+1094	               |Definition +----+-----+-----+------+------+------+
+1095	               |           | R6 |  X  |  X  |  X   |  X   |  X   |
+1096	               |           +----+-----+-----+------+------+------+
+1097	               |           | R7 |  X  |  X  |  X   |  X   |  X   |
+1098	               |           +----+-----+-----+------+------+------+
+1099	               |           | R8 |  X  |  X  |  X   |  X   |  X   |
+1100	               |           +----+-----+-----+------+------+------+
+1101	               |           | R9 |  X  |  X  |  X   |  X   |  X   |
+1102	               |           +----+-----+-----+------+------+------+
+1103	               |           | R10|  X  |  X  |  X   |  X   |  X   |
+1104	               |           +----+-----+-----+------+------+------+
+1105	               |           | R11|  X  |  X  |  X   |  X   |  X   |
+1106	               +-----------+----+-----+-----+------+------+------+
+1107	               |           | R12|  X  |  X  |  X   |  X   |  X   |
+1108	               |           +----+-----+-----+------+------+------+
+1109	               |  Use of   | R13|  X  |  X  |  X   |  X   |  X   |
+1110	               |  Metrics  +----+-----+-----+------+------+------+
+1111	               |           | R14|  X  |  X  |  X   |  X   |  X   |
+1112	               +-----------+----+-----+-----+------+------+------+
+1113	               |           | R15|  X  |  X  |  X   |  X   |  X   |
+1114	               | Instance  +----+-----+-----+------+------+------+
+1115	               | Affinity  | R16|  X  |  X  |  X   |  X   |  X   |
+1116	               |           +----+-----+-----+------+------+------+
+1117	               |           | R17|  X  |  X  |      |      |  X   |
+1118	               +-----------+----+-----+-----+------+------+------+
+1119	               | Confiden- | R18|  X  |  X  |  X   |  X   |  X   |
+1120	               | -tiality  |    |     |     |      |      |      |
+1121	               +-----------+----+-----+-----+------+------+------+
+
+1123	         Figure 6: Mapping between CATS Use Cases and Requirements
+
+1125	6.  Security Considerations
+
+1127	   CATS decision-making relies on real-time computing and network status
+1128	   as well as service information, requiring robust security safeguards
+1129	   to mitigate risks associated with dynamic service and resource
+1130	   scheduling, and cross-node data transmission.
+
+1132	   Core Security Risks and Requirements include:
+
+1134	   * User Privacy Leakage Risk
+
+1136	   Description: CATS involves user-related data (e.g., access patterns,
+1137	   service requests) across edge service sites.  Unauthorized disclosure
+1138	   of user identifiers or per-user behavior tracking risks profiling or
+1139	   identity theft, especially in use cases with personal/context-rich
+1140	   data (e.g., AR/VR, vehicle trajectories, AI prompts), violating
+1141	   regulations and eroding trust.
+
+1143	   R19: User activity privacy MUST be preserved by anonymizing
+1144	   identifying information.  Per-user behavior pattern tracking is
+1145	   prohibited.
+
+1147	   * Service Instance Identity Spoofing and Traffic Hijacking
+
+1149	   Description: Attackers may spoof legitimate service instance
+1150	   identities or tamper with "CS-ID-instance address" mappings (per R1),
+1151	   diverting traffic to malicious nodes.  This undermines CATS' core
+1152	   scheduling logic, causing service disruptions, data leaks, and
+1153	   potential physical harm in safety-critical scenarios.
+
+1155	   R20: Service instances MUST be authenticated.  "CS-ID - instance
+1156	   address" mapping results MUST be encrypted.
+
+1158	   * Tampering and False Reporting of CATS Metrics
+
+1160	   Description: Attackers may tamper with core scheduling metrics or
+1161	   submit false data (per R3-R17), misleading traffic steering
+1162	   decisions.  This leads to node overload, link congestion, or
+1163	   "resource exhaustion attacks," directly degrading Quality of
+1164	   Experience (QoE).
+
+1166	   R21: Metric collection and distribution MUST employ encryption.
+1167	   Mechanisms for secondary validation and traceability of abnormal
+1168	   metrics MUST be supported, avoiding over-reliance on single-node
+1169	   reports.
+
+1171	   * Security of Cross-Node Context Migration Data
+1172	   Description: During user or terminal mobility, session states and
+1173	   computing context (e.g., AR rendering progress, vehicle status) may
+1174	   be intercepted or tampered with during cross-node migration (per
+1175	   R18-R22).  This impairs service continuity, leaks sensitive data, or
+1176	   causes state inconsistency.
+
+1178	   R22: Migration data MUST use end-to-end encryption, accessible only
+1179	   to authorized target instances.  Migration instructions MUST include
+1180	   integrity check codes.
+
+1182	7.  IANA Considerations
+
+1184	   This document makes no requests for IANA action.
+
+1186	8.  References
+
+1188	8.1.  Normative References
+
+1190	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+1191	              Requirement Levels", BCP 14, RFC 2119,
+1192	              DOI 10.17487/RFC2119, March 1997,
+1193	              <https://www.rfc-editor.org/info/rfc2119>.
+
+1195	   [RFC4760]  Bates, T., Chandra, R., Katz, D., and Y. Rekhter,
+1196	              "Multiprotocol Extensions for BGP-4", RFC 4760,
+1197	              DOI 10.17487/RFC4760, January 2007,
+1198	              <https://www.rfc-editor.org/info/rfc4760>.
+
+1200	   [RFC4786]  Abley, J. and K. Lindqvist, "Operation of Anycast
+1201	              Services", BCP 126, RFC 4786, DOI 10.17487/RFC4786,
+1202	              December 2006, <https://www.rfc-editor.org/info/rfc4786>.
+
+1204	   [RFC7285]  Alimi, R., Ed., Penno, R., Ed., Yang, Y., Ed., Kiesel, S.,
+1205	              Previdi, S., Roome, W., Shalunov, S., and R. Woundy,
+1206	              "Application-Layer Traffic Optimization (ALTO) Protocol",
+1207	              RFC 7285, DOI 10.17487/RFC7285, September 2014,
+1208	              <https://www.rfc-editor.org/info/rfc7285>.
+
+1210	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+1211	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+1212	              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+1214	   [RFC8990]  Bormann, C., Carpenter, B., Ed., and B. Liu, Ed., "GeneRic
+1215	              Autonomic Signaling Protocol (GRASP)", RFC 8990,
+1216	              DOI 10.17487/RFC8990, May 2021,
+1217	              <https://www.rfc-editor.org/info/rfc8990>.
+
+1219	8.2.  Informative References
+
+1221	   [GAIA-X]   Gaia-X, "GAIA-X: A Federated Data Infrastructure for
+1222	              Europe", 2021.
+
+1224	   [HORITA]   Horita, Y., "Extended electronic horizon for automated
+1225	              driving", Proceedings of 14th International Conference on
+1226	              ITS Telecommunications (ITST), 2015.
+
+1228	   [I-D.dcn-cats-req-service-segmentation]
+1229	              Ngọc, T. M. and Y. Kim, "Additional CATS requirements
+1230	              consideration for Service Segmentation-related use cases",
+1231	              Work in Progress, Internet-Draft, draft-dcn-cats-req-
+1232	              service-segmentation-02, 1 July 2025,
+1233	              <https://datatracker.ietf.org/doc/html/draft-dcn-cats-req-
+1234	              service-segmentation-02>.
+
+1236	   [I-D.ietf-cats-framework]
+1237	              Li, C., Du, Z., Boucadair, M., Contreras, L. M., and J.
+1238	              Drake, "A Framework for Computing-Aware Traffic Steering
+1239	              (CATS)", Work in Progress, Internet-Draft, draft-ietf-
+1240	              cats-framework-19, 20 November 2025,
+1241	              <https://datatracker.ietf.org/doc/html/draft-ietf-cats-
+1242	              framework-19>.
+
+1244	   [Industry4.0]
+1245	              Industry4.0, "Details of the Asset Administration Shell,
+1246	              Part 1 & Part 2", 2020.
+
+1248	   [MEF70.2]  MEF, Ed., "SD-WAN Service Attributes and Service
+1249	              Framework", 2023.
+
+1251	   [TR22.874] 3GPP, "Study on traffic characteristics and performance
+1252	              requirements for AI/ML model transfer in 5GS (Release
+1253	              18)", 2021.
+
+1255	Appendix A.  Appendix A
+
+1257	   This section presents an additional CATS use case, which is not
+1258	   included in the main body of this document.  Reasons are that the use
+1259	   case may bring new requirements that are not considered in the
+1260	   initail charter of CATS working group.  The requirements impact the
+1261	   design of CATS framework and may need further modificaition or
+1262	   enhancement on the initial CATS framework that serves all the
+1263	   existing use cases listed in the main body.  However, the ISAC use
+1264	   case is promising and has gained industry consensus.  Therefore, this
+1265	   use case may be considered in future work of CATS working group.
+
+1267	A.1.  Integrated Sensing and Communications (ISAC)
+
+1269	   Integrated Sensing and Communications (ISAC) enables wireless
+1270	   networks to perform simultaneous data transmission and environmental
+1271	   sensing.  In a distributed sensing scenario, multiple network nodes
+1272	   --such as base stations, access points, or edge devices-- collect raw
+1273	   sensing data from the environment.  This data can include radio
+1274	   frequency (RF) reflections, Doppler shifts, channel state information
+1275	   (CSI), or other physical-layer features that provide insights into
+1276	   object movement, material composition, or environmental conditions.
+1277	   To extract meaningful information, the collected raw data must be
+1278	   aggregated and processed by a designated computing node with
+1279	   sufficient computational resources.  This requires efficient
+1280	   coordination between sensing nodes and computing resources to ensure
+1281	   timely and accurate analysis, making it a relevant use case for
+1282	   Computing-Aware Traffic Steering (CATS) in IETF.
+
+1284	   This use case aligns with ongoing efforts in standardization bodies
+1285	   such as the ETSI ISAC Industry Specification Group (ISG),
+1286	   particularly Work Item #5 (WI#5), titled 'Integration of Computing
+1287	   with ISAC'.  WI#5 focuses on exploring different forms of computing
+1288	   integration within ISAC systems, including sensing combined with
+1289	   computing, communications combined with computing, and the holistic
+1290	   integration of ISAC with computing.  The considerations outlined in
+1291	   this document complement ETSI's work by examining how computing-aware
+1292	   networking solutions, as developed within CATS, can optimize the
+1293	   processing and routing of ISAC sensing data.
+
+1295	   As an example, we can consider a network domain with multiple sites
+1296	   capable of hosting the ISAC computing "service", each with
+1297	   potentially different connectivity and computing characteristics.
+1298	   Figure 7 shows an exemplary scenario.  Considering the connectivity
+1299	   and computing latencies (just as an example of metrics), the best
+1300	   service site is #n-1 in the example used in the Figure.  Note that in
+1301	   the figure we stilluse the old terminology in which by ICR we mean
+1302	   Ingress CATS-Forwarder [I-D.ietf-cats-framework], and by ECR we mean
+1303	   Egress CATS-Forwarder.
+
+1305	                               _______________
+1306	                              (     --------  )
+1307	                             (     |        |  )
+1308	                            (     --------  |   )
+1309	      ________________     (     |        | |   )     ________________
+1310	     (      --------  )    (    --------- | |   )    (      --------  )
+1311	    (      |        |  )   (   |service | |-    )   (      |        |  )
+1312	   (      --------  |   )  (   |contact | |     )  (      --------  |  )
+1313	   (     |        | |   )  (   |instance|-      )  (     |        | |  )
+1314	   (    --------  | |   )   (   ---------       )  (    --------  | |  )
+1315	   (   |service | |-    )    ( Serv. site #N-1 )   (   |service | |-   )
+1316	   (   |contact | |     )     -------+---------    (   |contact | |   )
+1317	   (   |instance|-     )   Computing  \             (  |instance|-    )
+1318	    (   --------      )    delay:4ms   \             (  --------      )
+1319	     ( Serv. site #1 )            ------+--           ( Serv. site #N )
+1320	      -------+-------        ----| ECR#N-1 |----       ---------+-----
+1321	              \  Computing --     ---------      --  Computing  /
+1322	               \ delay:10ms      Networking          delay:5ms /
+1323	              --+----            delay:7ms               -----+-
+1324	           ( | ECR#1 |            //                    | ECR#N | )
+1325	          (   -------            //                      -------   )
+1326	         ( Networking           //                       Networking )
+1327	        (  delay:5ms           //                         delay:15ms )
+1328	       (                      //                                      )
+1329	       (                     //                                       )
+1330	        (                   //                                       )
+1331	         (                 //                                       )
+1332	          (               //                                       )
+1333	           (        -------                       -------         )
+1334	            -------| ICR#1 |---------------------| ICR#2 |--------
+1335	                    -------            __         -------
+1336	                   (.)   (.)        / (  )          (.)
+1337	                  (.)    -----    -  (    )         (.)
+1338	                 (.)    | UE2 | /     (__) \        (.)
+1339	                (.)      -----     /         -    -----
+1340	               (.)               /  (sensing) \  | UE3 |
+1341	              -----    -----------                -----
+1342	             | UE1 | /
+1343	              -----
+
+1345	                     Figure 7: Exemplary ISAC Scenario
+
+1347	   In the distributed sensing use case, the sensed data collected by
+1348	   multiple nodes must be efficiently routed to a computing node capable
+1349	   of processing it.  The choice of the computing node depends on
+1350	   several factors, including computational load, network congestion,
+1351	   and latency constraints.  CATS mechanisms can optimize the selection
+1352	   of the processing node by dynamically steering the traffic based on
+1353	   computing resource availability and network conditions.
+1354	   Additionally, as sensing data is often time-sensitive, CATS can
+1355	   ensure low-latency paths while balancing computational demands across
+1356	   different processing entities.  This capability is essential for
+1357	   real-time applications such as cooperative perception for autonomous
+1358	   systems, industrial monitoring, and smart city infrastructure.
+
+1360	A.1.1.  Requirements
+
+1362	   In addition to some of the requirements already identified for CATS
+1363	   in the main body of this document, there are several additional
+1364	   challenges and requirements that need to be addressed for efficient
+1365	   distributed sensing in ISAC-enabled networks:
+
+1367	   CATS systems should be able to select an instance where multiple
+1368	   nodes can steer traffic to simultaneously, ensuring that packets
+1369	   arrive within a maximum time period.  This is required because there
+1370	   are distributed tasks in which there are multiple nodes acting as
+1371	   sensors that produce sensing data that has to be then processed by a
+1372	   sensing processing function, typically hosted at the edge.  This
+1373	   implies that there is a multi-point to point kind of direction of the
+1374	   traffic, with connectivity and computing requirements associated
+1375	   (which can be very strict for some types of sensing schema).
+
+1377	   CATS systems should provide mechanisms that implement per node/flow
+1378	   security and privacy policies to adapt to the nature of the sensitive
+1379	   information that might be exchanged in a sensing task.
+
+1381	Acknowledgements
+
+1383	   The authors would like to thank Adrian Farrel, Peng Liu, Joel
+1384	   Halpern, Jim Guichard, Cheng Li, Luigi Iannone, Christian Jacquenet,
+1385	   Yuexia Fu, Erum Welling, Ines Robles, Linda Dunbar, and Jim Reid for
+1386	   their valuable suggestions to this document.
+
+1388	   The authors would like to thank Yizhou Li for her early IETF work of
+1389	   Compute First Network (CFN) and Dynamic Anycast (Dyncast) which
+1390	   inspired the CATS work.
+
+1392	Contributors
+
+1394	   The following people have substantially contributed to this document:
+
+1396	   Yizhou Li
+1397	   Huawei Technologies
+1398	   Email: liyizhou@huawei.com
+1399	   Dirk Trossen
+1400	   Email: dirk@trossen.tech
+
+1402	   Mohamed Boucadair
+1403	   Orange
+1404	   Email: mohamed.boucadair@orange.com
+
+1406	   Carlos J. Bernardos
+1407	   UC3M
+1408	   Email: cjbc@it.uc3m.es
+
+1410	   Peter Willis
+1411	   Email: pjw7904@rit.edu
+
+1413	   Philip Eardley
+1414	   Email: ietf.philip.eardley@gmail.com
+
+1416	   Tianji Jiang
+1417	   China Mobile
+1418	   Email: tianjijiang@chinamobile.com
+
+1420	   Minh-Ngoc Tran
+1421	   ETRI
+1422	   Email: mipearlska@etri.re.kr
+
+1424	   Markus Amend
+1425	   Deutsche Telekom
+1426	   Email: Markus.Amend@telekom.de
+
+1428	   Guangping Huang
+1429	   ZTE
+1430	   Email: huang.guangping@zte.com.cn
+
+1432	   Dongyu Yuan
+1433	   ZTE
+1434	   Email: yuan.dongyu@zte.com.cn
+1435	   Xinxin Yi
+1436	   China Unicom
+1437	   Email: yixx3@chinaunicom.cn
+
+1439	   Tao Fu
+1440	   CAICT
+1441	   Email: futao@caict.ac.cn
+
+1443	   Jordi Ros-Giralt
+1444	   Qualcomm Europe, Inc.
+1445	   Email: jros@qti.qualcomm.com
+
+1447	   Jaehoon Paul Jeong
+1448	   Sungkyunkwan University
+1449	   Email: pauljeong@skku.edu
+
+1451	   Yan Wang
+1452	   Migu Culture Technology Co.,Ltd
+1453	   Email: wangyan_hy1@migu.chinamobile.com
+
+1455	Authors' Addresses
+
+1457	   Kehan Yao
+1458	   China Mobile
+1459	   Email: yaokehan@chinamobile.com
+
+1461	   Luis M. Contreras
+1462	   Telefonica
+1463	   Email: luismiguel.contrerasmurillo@telefonica.com
+
+1465	   Hang Shi
+1466	   Huawei Technologies
+1467	   Email: shihang9@huawei.com
+
+1469	   Shuai Zhang
+1470	   China Unicom
+1471	   Email: zhangs366@chinaunicom.cn
+1472	   Qing An
+1473	   Alibaba Group
+1474	   Email: anqing.aq@alibaba-inc.com
+
+
+
+
+
+
+
+
+
