@@ -13,9 +13,7 @@ CC @OR13
 
 I used AI for this section of my review, none the less, please consider the analysis carefully.
 
-I've reviewed each reference flagged by idnits. Below is a case-by-case analysis of whether references are correctly classified as normative vs informative, and the severity of issues when normative references are not freely available.
-
-**Overall Assessment**: All references appear to be correctly classified as normative based on their usage in the document. The issues are primarily about availability (non-freely-available standards) and downrefs (normative references to Informational RFCs), not misclassification.
+I've reviewed each reference flagged by idnits. Below is a case-by-case analysis of the severity of issues when normative references are not freely available.
 
 ### RFC Downrefs (Informational RFCs used normatively)
 
@@ -23,13 +21,13 @@ I've reviewed each reference flagged by idnits. Below is a case-by-case analysis
 - **Classification**: Currently normative
 - **Usage**: Referenced for VP8 codec mapping (line 908)
 - **Assessment**: This is a downref (normative reference to Informational RFC). The document MUST reference VP8 to define the codec mapping, so this appears correctly classified as normative from a functional perspective. However, this requires IESG approval per RFC 3967/BCP 97. 
-- **Severity: Medium** - Requires downref registry entry and IESG approval, but the reference itself is appropriate.
+- **Severity: Medium** - The working group should make a recommendation to the responsible AD regarding whether this reference shall be added to the downref registry. The reference itself is appropriate.
 
 **RFC 9043 (FFV1 Video Coding Format) - Informational RFC**
 - **Classification**: Currently normative  
 - **Usage**: Referenced for FFV1 codec mapping (lines 600, 605)
 - **Assessment**: Another downref. FFV1 is an important preservation codec, and the document MUST reference it to define the mapping. 
-- **Severity: Medium** - Requires downref registry entry and IESG approval, but the reference is functionally correct.
+- **Severity: Medium** - The working group should make a recommendation to the responsible AD regarding whether this reference shall be added to the downref registry. The reference is functionally correct.
 
 ### Non-RFC Normative References - Freely Available
 
@@ -133,7 +131,7 @@ The following are correctly classified as normative and are freely available (no
 1. For each non-freely-available normative reference, the document should explicitly state in the Security Considerations section that implementers must obtain these standards to fully understand security implications.
 2. Consider whether any of these could be moved to informative if the document only needs to reference them for context rather than requiring conformance.
 3. Document in the Security Considerations section that security analysis is incomplete without access to the referenced standards.
-4. The downrefs (RFC 6386, RFC 9043) need to be registered in the downref registry and approved by the IESG.
+4. For the downrefs (RFC 6386, RFC 9043), the working group should make a recommendation to the responsible AD regarding whether these references shall be added to the downref registry.
 
 
 ### First Come First Served
