@@ -1,0 +1,3719 @@
+idnits 2.17.1 
+
+draft-ietf-cellar-codec-16.txt:
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/checklist :
+  ----------------------------------------------------------------------------
+
+  == There are 1 instance of lines with non-RFC6890-compliant IPv4 addresses
+     in the document.  If these are example addresses, they should be changed.
+
+
+  Miscellaneous warnings:
+  ----------------------------------------------------------------------------
+
+  == The copyright year in the IETF Trust and authors Copyright Line does not
+     match the current year
+
+  -- The document date (9 November 2025) is 77 days in the past.  Is this
+     intentional?
+
+  -- Found something which looks like a code comment -- if you have code
+     sections in the document, please surround them with '<CODE BEGINS>' and
+     '<CODE ENDS>' lines.
+
+
+  Checking references for intended status: Proposed Standard
+  ----------------------------------------------------------------------------
+
+     (See RFCs 3967 and 4897 for information about using normative references
+     to lower-maturity documents in RFCs)
+
+  == Missing Reference: 'Events' is mentioned on line 2254, but not defined
+
+  -- Possible downref: Non-RFC (?) normative reference: ref. 'ALAC'
+
+  -- Possible downref: Non-RFC (?) normative reference: ref. 'AV1'
+
+  -- Possible downref: Non-RFC (?) normative reference: ref. 'AV1-ISOBMFF'
+
+  -- Possible downref: Non-RFC (?) normative reference: ref.
+     'BITMAPINFOHEADER'
+
+  -- Possible downref: Non-RFC (?) normative reference: ref. 'Dirac'
+
+  -- Possible downref: Non-RFC (?) normative reference: ref.
+     'DolbyVision-ISOBMFF'
+
+  -- Possible downref: Non-RFC (?) normative reference: ref. 'IEEE.1857-10'
+
+  -- Possible downref: Non-RFC (?) normative reference: ref. 'IEEE.1857-3'
+
+  -- Possible downref: Non-RFC (?) normative reference: ref. 'IEEE.1857-4'
+
+  -- Possible downref: Non-RFC (?) normative reference: ref. 'IEEE.754'
+
+  -- Possible downref: Non-RFC (?) normative reference: ref. 'JPEG'
+
+  -- Possible downref: Non-RFC (?) normative reference: ref. 'JPEG2000'
+
+  -- Possible downref: Non-RFC (?) normative reference: ref. 'OggKate'
+
+  -- Possible downref: Non-RFC (?) normative reference: ref. 'QTFF'
+
+  ** Downref: Normative reference to an Informational RFC: RFC 6386
+
+  ** Downref: Normative reference to an Informational RFC: RFC 9043
+
+  -- Possible downref: Non-RFC (?) normative reference: ref. 'SSA'
+
+  -- Possible downref: Non-RFC (?) normative reference: ref. 'Theora'
+
+  -- Possible downref: Non-RFC (?) normative reference: ref. 'TRUEHD'
+
+  -- Possible downref: Non-RFC (?) normative reference: ref. 'TTA'
+
+  -- Possible downref: Non-RFC (?) normative reference: ref. 'USF'
+
+  -- Possible downref: Non-RFC (?) normative reference: ref. 'VobSub'
+
+  -- Possible downref: Non-RFC (?) normative reference: ref. 'VORBIS'
+
+  -- Possible downref: Non-RFC (?) normative reference: ref. 'VP9'
+
+  -- Possible downref: Non-RFC (?) normative reference: ref. 'WAVEFORMATEX'
+
+  -- Possible downref: Non-RFC (?) normative reference: ref. 'WAVPACK'
+
+  -- Possible downref: Non-RFC (?) normative reference: ref. 'WebVTT'
+
+
+     Summary: 2 errors (**), 0 flaws (~~), 3 warnings (==), 27 comments (--).
+
+     Run idnits with the --verbose option for more detailed information about
+     the items above.
+
+--------------------------------------------------------------------------------
+
+
+2	cellar                                                         S. Lhomme
+3	Internet-Draft
+4	Intended status: Standards Track                               M. Bunkus
+5	Expires: 13 May 2026
+6	                                                                 D. Rice
+7	                                                         9 November 2025
+
+9	             Matroska Media Container Codec Specifications
+10	                       draft-ietf-cellar-codec-16
+
+12	Abstract
+
+14	   This document defines the Matroska multimedia container codec
+15	   mappings, including the codec ID, layout of data in a Block element
+16	   and in an optional CodecPrivate element.
+
+18	Status of This Memo
+
+20	   This Internet-Draft is submitted in full conformance with the
+21	   provisions of BCP 78 and BCP 79.
+
+23	   Internet-Drafts are working documents of the Internet Engineering
+24	   Task Force (IETF).  Note that other groups may also distribute
+25	   working documents as Internet-Drafts.  The list of current Internet-
+26	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+28	   Internet-Drafts are draft documents valid for a maximum of six months
+29	   and may be updated, replaced, or obsoleted by other documents at any
+30	   time.  It is inappropriate to use Internet-Drafts as reference
+31	   material or to cite them other than as "work in progress."
+
+33	   This Internet-Draft will expire on 13 May 2026.
+
+35	Copyright Notice
+
+37	   Copyright (c) 2025 IETF Trust and the persons identified as the
+38	   document authors.  All rights reserved.
+
+40	   This document is subject to BCP 78 and the IETF Trust's Legal
+41	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+42	   license-info) in effect on the date of publication of this document.
+43	   Please review these documents carefully, as they describe your rights
+44	   and restrictions with respect to this document.  Code Components
+45	   extracted from this document must include Revised BSD License text as
+46	   described in Section 4.e of the Trust Legal Provisions and are
+47	   provided without warranty as described in the Revised BSD License.
+
+49	Table of Contents
+
+51	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   5
+52	   2.  Notation and Conventions  . . . . . . . . . . . . . . . . . .   5
+53	   3.  Codec Mappings  . . . . . . . . . . . . . . . . . . . . . . .   5
+54	     3.1.  Defining Matroska Codec Support . . . . . . . . . . . . .   6
+55	       3.1.1.  Codec ID  . . . . . . . . . . . . . . . . . . . . . .   6
+56	       3.1.2.  Codec Name  . . . . . . . . . . . . . . . . . . . . .   8
+57	       3.1.3.  Description . . . . . . . . . . . . . . . . . . . . .   8
+58	       3.1.4.  Initialization  . . . . . . . . . . . . . . . . . . .   8
+59	       3.1.5.  Codec BlockAdditions  . . . . . . . . . . . . . . . .   8
+60	       3.1.6.  Citation  . . . . . . . . . . . . . . . . . . . . . .   9
+61	       3.1.7.  Superseded By . . . . . . . . . . . . . . . . . . . .   9
+62	     3.2.  Recommendations for the Creation of New Codec Mappings  .   9
+63	     3.3.  Video Codec Mappings  . . . . . . . . . . . . . . . . . .   9
+64	       3.3.1.  V_AV1 . . . . . . . . . . . . . . . . . . . . . . . .  10
+65	       3.3.2.  V_AVS2  . . . . . . . . . . . . . . . . . . . . . . .  10
+66	       3.3.3.  V_AVS3  . . . . . . . . . . . . . . . . . . . . . . .  11
+67	       3.3.4.  V_CAVS  . . . . . . . . . . . . . . . . . . . . . . .  11
+68	       3.3.5.  V_DIRAC . . . . . . . . . . . . . . . . . . . . . . .  11
+69	       3.3.6.  V_FFV1  . . . . . . . . . . . . . . . . . . . . . . .  11
+70	       3.3.7.  V_JPEG2000  . . . . . . . . . . . . . . . . . . . . .  12
+71	       3.3.8.  V_MJPEG . . . . . . . . . . . . . . . . . . . . . . .  12
+72	       3.3.9.  V_MPEGH/ISO/HEVC  . . . . . . . . . . . . . . . . . .  12
+73	       3.3.10. V_MPEGI/ISO/VVC . . . . . . . . . . . . . . . . . . .  13
+74	       3.3.11. V_MPEG1 . . . . . . . . . . . . . . . . . . . . . . .  13
+75	       3.3.12. V_MPEG2 . . . . . . . . . . . . . . . . . . . . . . .  13
+76	       3.3.13. V_MPEG4/ISO/AVC . . . . . . . . . . . . . . . . . . .  13
+77	       3.3.14. V_MPEG4/ISO/AP  . . . . . . . . . . . . . . . . . . .  14
+78	       3.3.15. V_MPEG4/ISO/ASP . . . . . . . . . . . . . . . . . . .  14
+79	       3.3.16. V_MPEG4/ISO/SP  . . . . . . . . . . . . . . . . . . .  14
+80	       3.3.17. V_MPEG4/MS/V3 . . . . . . . . . . . . . . . . . . . .  15
+81	       3.3.18. V_MS/VFW/FOURCC . . . . . . . . . . . . . . . . . . .  15
+82	       3.3.19. V_QUICKTIME . . . . . . . . . . . . . . . . . . . . .  15
+83	       3.3.20. V_PRORES  . . . . . . . . . . . . . . . . . . . . . .  16
+84	       3.3.21. V_REAL/RV10 . . . . . . . . . . . . . . . . . . . . .  16
+85	       3.3.22. V_REAL/RV20 . . . . . . . . . . . . . . . . . . . . .  16
+86	       3.3.23. V_REAL/RV30 . . . . . . . . . . . . . . . . . . . . .  17
+87	       3.3.24. V_REAL/RV40 . . . . . . . . . . . . . . . . . . . . .  17
+88	       3.3.25. V_THEORA  . . . . . . . . . . . . . . . . . . . . . .  17
+89	       3.3.26. V_UNCOMPRESSED  . . . . . . . . . . . . . . . . . . .  18
+90	       3.3.27. V_VP8 . . . . . . . . . . . . . . . . . . . . . . . .  18
+91	       3.3.28. V_VP9 . . . . . . . . . . . . . . . . . . . . . . . .  18
+92	     3.4.  Audio Codec Mappings  . . . . . . . . . . . . . . . . . .  19
+93	       3.4.1.  A_AAC . . . . . . . . . . . . . . . . . . . . . . . .  19
+94	       3.4.2.  A_AAC/MPEG2/LC  . . . . . . . . . . . . . . . . . . .  19
+95	       3.4.3.  A_AAC/MPEG2/LC/SBR  . . . . . . . . . . . . . . . . .  20
+96	       3.4.4.  A_AAC/MPEG2/MAIN  . . . . . . . . . . . . . . . . . .  20
+97	       3.4.5.  A_AAC/MPEG2/SSR . . . . . . . . . . . . . . . . . . .  20
+98	       3.4.6.  A_AAC/MPEG4/LC  . . . . . . . . . . . . . . . . . . .  20
+99	       3.4.7.  A_AAC/MPEG4/LC/SBR  . . . . . . . . . . . . . . . . .  21
+100	       3.4.8.  A_AAC/MPEG4/LTP . . . . . . . . . . . . . . . . . . .  21
+101	       3.4.9.  A_AAC/MPEG4/MAIN  . . . . . . . . . . . . . . . . . .  21
+102	       3.4.10. A_AAC/MPEG4/SSR . . . . . . . . . . . . . . . . . . .  22
+103	       3.4.11. A_AC3 . . . . . . . . . . . . . . . . . . . . . . . .  22
+104	       3.4.12. A_AC3/BSID9 . . . . . . . . . . . . . . . . . . . . .  22
+105	       3.4.13. A_AC3/BSID10  . . . . . . . . . . . . . . . . . . . .  23
+106	       3.4.14. A_ALAC  . . . . . . . . . . . . . . . . . . . . . . .  23
+107	       3.4.15. A_ATRAC/AT1 . . . . . . . . . . . . . . . . . . . . .  23
+108	       3.4.16. A_DTS . . . . . . . . . . . . . . . . . . . . . . . .  23
+109	       3.4.17. A_DTS/EXPRESS . . . . . . . . . . . . . . . . . . . .  24
+110	       3.4.18. A_DTS/LOSSLESS  . . . . . . . . . . . . . . . . . . .  24
+111	       3.4.19. A_EAC3  . . . . . . . . . . . . . . . . . . . . . . .  24
+112	       3.4.20. A_FLAC  . . . . . . . . . . . . . . . . . . . . . . .  25
+113	       3.4.21. A_MLP . . . . . . . . . . . . . . . . . . . . . . . .  25
+114	       3.4.22. A_MPEG/L1 . . . . . . . . . . . . . . . . . . . . . .  25
+115	       3.4.23. A_MPEG/L2 . . . . . . . . . . . . . . . . . . . . . .  25
+116	       3.4.24. A_MPEG/L3 . . . . . . . . . . . . . . . . . . . . . .  26
+117	       3.4.25. A_MS/ACM  . . . . . . . . . . . . . . . . . . . . . .  26
+118	       3.4.26. A_REAL/14_4 . . . . . . . . . . . . . . . . . . . . .  26
+119	       3.4.27. A_REAL/28_8 . . . . . . . . . . . . . . . . . . . . .  26
+120	       3.4.28. A_REAL/ATRC . . . . . . . . . . . . . . . . . . . . .  27
+121	       3.4.29. A_REAL/COOK . . . . . . . . . . . . . . . . . . . . .  27
+122	       3.4.30. A_REAL/RALF . . . . . . . . . . . . . . . . . . . . .  27
+123	       3.4.31. A_REAL/SIPR . . . . . . . . . . . . . . . . . . . . .  27
+124	       3.4.32. A_OPUS  . . . . . . . . . . . . . . . . . . . . . . .  27
+125	       3.4.33. A_PCM/FLOAT/IEEE  . . . . . . . . . . . . . . . . . .  28
+126	       3.4.34. A_PCM/INT/BIG . . . . . . . . . . . . . . . . . . . .  28
+127	       3.4.35. A_PCM/INT/LIT . . . . . . . . . . . . . . . . . . . .  29
+128	       3.4.36. A_QUICKTIME . . . . . . . . . . . . . . . . . . . . .  29
+129	       3.4.37. A_QUICKTIME/QDMC  . . . . . . . . . . . . . . . . . .  29
+130	       3.4.38. A_QUICKTIME/QDM2  . . . . . . . . . . . . . . . . . .  30
+131	       3.4.39. A_TRUEHD  . . . . . . . . . . . . . . . . . . . . . .  30
+132	       3.4.40. A_TTA1  . . . . . . . . . . . . . . . . . . . . . . .  30
+133	       3.4.41. A_VORBIS  . . . . . . . . . . . . . . . . . . . . . .  30
+134	       3.4.42. A_WAVPACK4  . . . . . . . . . . . . . . . . . . . . .  31
+135	     3.5.  Subtitle Codec Mappings . . . . . . . . . . . . . . . . .  31
+136	       3.5.1.  S_ARIBSUB . . . . . . . . . . . . . . . . . . . . . .  32
+137	       3.5.2.  S_DVBSUB  . . . . . . . . . . . . . . . . . . . . . .  32
+138	       3.5.3.  S_HDMV/PGS  . . . . . . . . . . . . . . . . . . . . .  32
+139	       3.5.4.  S_HDMV/TEXTST . . . . . . . . . . . . . . . . . . . .  32
+140	       3.5.5.  S_KATE  . . . . . . . . . . . . . . . . . . . . . . .  33
+141	       3.5.6.  S_IMAGE/BMP . . . . . . . . . . . . . . . . . . . . .  33
+142	       3.5.7.  S_TEXT/ASS  . . . . . . . . . . . . . . . . . . . . .  33
+143	       3.5.8.  S_TEXT/ASCII  . . . . . . . . . . . . . . . . . . . .  34
+144	       3.5.9.  S_TEXT/SSA  . . . . . . . . . . . . . . . . . . . . .  34
+145	       3.5.10. S_TEXT/USF  . . . . . . . . . . . . . . . . . . . . .  34
+146	       3.5.11. S_TEXT/UTF8 . . . . . . . . . . . . . . . . . . . . .  35
+147	       3.5.12. S_TEXT/WEBVTT . . . . . . . . . . . . . . . . . . . .  35
+148	       3.5.13. S_VOBSUB  . . . . . . . . . . . . . . . . . . . . . .  35
+149	     3.6.  Button Codec Mappings . . . . . . . . . . . . . . . . . .  36
+150	       3.6.1.  B_VOBBTN  . . . . . . . . . . . . . . . . . . . . . .  36
+151	   4.  Block Addition Mappings . . . . . . . . . . . . . . . . . . .  36
+152	     4.1.  Defining Block Addition Mappings  . . . . . . . . . . . .  36
+153	       4.1.1.  Block Type Identifier . . . . . . . . . . . . . . . .  37
+154	       4.1.2.  Block Type Name . . . . . . . . . . . . . . . . . . .  37
+155	       4.1.3.  Description . . . . . . . . . . . . . . . . . . . . .  37
+156	     4.2.  Initial Block Addition Mappings . . . . . . . . . . . . .  37
+157	       4.2.1.  Use BlockAddIDValue . . . . . . . . . . . . . . . . .  37
+158	       4.2.2.  Opaque Data . . . . . . . . . . . . . . . . . . . . .  37
+159	       4.2.3.  ITU T.35 Metadata . . . . . . . . . . . . . . . . . .  37
+160	       4.2.4.  SMPTE ST 12-1 Timecode  . . . . . . . . . . . . . . .  38
+161	       4.2.5.  avcE  . . . . . . . . . . . . . . . . . . . . . . . .  38
+162	       4.2.6.  hvcE  . . . . . . . . . . . . . . . . . . . . . . . .  38
+163	       4.2.7.  dvcC  . . . . . . . . . . . . . . . . . . . . . . . .  38
+164	       4.2.8.  dvvC  . . . . . . . . . . . . . . . . . . . . . . . .  39
+165	       4.2.9.  dvwC  . . . . . . . . . . . . . . . . . . . . . . . .  39
+166	       4.2.10. mvcC  . . . . . . . . . . . . . . . . . . . . . . . .  39
+167	   5.  Audio Codecs  . . . . . . . . . . . . . . . . . . . . . . . .  39
+168	     5.1.  WavPack . . . . . . . . . . . . . . . . . . . . . . . . .  39
+169	       5.1.1.  Lossless And Lossy Storage  . . . . . . . . . . . . .  40
+170	         5.1.1.1.  Mono/Stereo . . . . . . . . . . . . . . . . . . .  40
+171	         5.1.1.2.  Multichannel  . . . . . . . . . . . . . . . . . .  40
+172	       5.1.2.  Hybrid Storage  . . . . . . . . . . . . . . . . . . .  41
+173	         5.1.2.1.  Mono/Stereo . . . . . . . . . . . . . . . . . . .  42
+174	         5.1.2.2.  Multichannel  . . . . . . . . . . . . . . . . . .  42
+175	   6.  Subtitles . . . . . . . . . . . . . . . . . . . . . . . . . .  43
+176	     6.1.  Images Subtitles  . . . . . . . . . . . . . . . . . . . .  43
+177	     6.2.  SRT Subtitles . . . . . . . . . . . . . . . . . . . . . .  46
+178	     6.3.  SSA/ASS Subtitles . . . . . . . . . . . . . . . . . . . .  47
+179	     6.4.  WebVTT  . . . . . . . . . . . . . . . . . . . . . . . . .  50
+180	       6.4.1.  Track Parameters  . . . . . . . . . . . . . . . . . .  51
+181	       6.4.2.  Storage of non-global WebVTT blocks . . . . . . . . .  51
+182	       6.4.3.  Storage of Cues in Matroska blocks  . . . . . . . . .  51
+183	       6.4.4.  BlockAdditions  . . . . . . . . . . . . . . . . . . .  51
+184	       6.4.5.  Example of Matroska Muxing  . . . . . . . . . . . . .  52
+185	         6.4.5.1.  CodecPrivate  . . . . . . . . . . . . . . . . . .  53
+186	         6.4.5.2.  Cue Block 1 . . . . . . . . . . . . . . . . . . .  54
+187	         6.4.5.3.  Cue Block 2 . . . . . . . . . . . . . . . . . . .  55
+188	         6.4.5.4.  Cue Block 3 . . . . . . . . . . . . . . . . . . .  55
+189	         6.4.5.5.  Cue Block 4 . . . . . . . . . . . . . . . . . . .  56
+190	       6.4.6.  Storage of WebVTT in Matroska vs. WebM  . . . . . . .  56
+191	     6.5.  HDMV Presentation Graphics Subtitles  . . . . . . . . . .  57
+192	       6.5.1.  Track Parameters  . . . . . . . . . . . . . . . . . .  57
+193	       6.5.2.  Matroska Blocks . . . . . . . . . . . . . . . . . . .  57
+194	     6.6.  HDMV Text Subtitles . . . . . . . . . . . . . . . . . . .  57
+195	       6.6.1.  Track Parameters  . . . . . . . . . . . . . . . . . .  57
+196	       6.6.2.  Matroska Blocks . . . . . . . . . . . . . . . . . . .  58
+197	       6.6.3.  Character set . . . . . . . . . . . . . . . . . . . .  58
+198	     6.7.  Digital Video Broadcasting (DVB) subtitles  . . . . . . .  58
+199	       6.7.1.  Track Parameters  . . . . . . . . . . . . . . . . . .  58
+200	       6.7.2.  Matroska Blocks . . . . . . . . . . . . . . . . . . .  59
+201	     6.8.  ARIB (ISDB) subtitles . . . . . . . . . . . . . . . . . .  59
+202	       6.8.1.  Track Parameters  . . . . . . . . . . . . . . . . . .  59
+203	       6.8.2.  Matroska Blocks . . . . . . . . . . . . . . . . . . .  59
+204	   7.  Block Additional Mapping  . . . . . . . . . . . . . . . . . .  60
+205	     7.1.  SMPTE ST 12-1 Timecode Description  . . . . . . . . . . .  62
+206	   8.  Security Considerations . . . . . . . . . . . . . . . . . . .  63
+207	   9.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  64
+208	     9.1.  Matroska Codec IDs Registry . . . . . . . . . . . . . . .  64
+209	     9.2.  Matroska BlockAdditional Type IDs Registry  . . . . . . .  70
+210	   10. References  . . . . . . . . . . . . . . . . . . . . . . . . .  71
+211	     10.1.  Normative References . . . . . . . . . . . . . . . . . .  71
+212	     10.2.  Informative References . . . . . . . . . . . . . . . . .  77
+213	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  78
+
+215	1.  Introduction
+
+217	   Matroska is a multimedia container format defined in [RFC9559].  It
+218	   stores interleaved and timestamped audiovisual data using various
+219	   codecs.  To interpret the codec data, a mapping between the way the
+220	   data is stored in Matroska and how it is understood by such a codec
+221	   is necessary.
+
+223	   This document defines this mapping for many commonly used codecs in
+224	   Matroska.
+
+226	2.  Notation and Conventions
+
+228	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+229	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+230	   "OPTIONAL" in this document are to be interpreted as described in BCP
+231	   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+232	   capitals, as shown here.
+
+234	3.  Codec Mappings
+
+236	   A Codec Mapping is a set of attributes to identify, name, and
+237	   contextualize the format and characteristics of encoded data that can
+238	   be contained within Matroska Clusters.
+
+240	   Each TrackEntry used within Matroska MUST reference a defined Codec
+241	   Mapping using the CodecID to identify and describe the format of the
+242	   encoded data in its associated Clusters.  This CodecID is a unique
+243	   registered identifier that represents the encoding stored within the
+244	   Track.  Certain encodings MAY also require some form of codec
+245	   initialization to provide its decoder with context and technical
+246	   metadata.
+
+248	   The intention behind this list is not to list all existing audio and
+249	   video codecs, but rather to list those codecs that are currently
+250	   supported in Matroska and therefore need a well defined CodecID so
+251	   that all developers supporting Matroska will use the same CodecID.
+252	   If you feel we missed support for a very important codec, please tell
+253	   us on our development mailing list (cellar at ietf.org).
+
+255	3.1.  Defining Matroska Codec Support
+
+257	   Support for a codec is defined in Matroska with the following values.
+
+259	3.1.1.  Codec ID
+
+261	   Each codec supported for storage in Matroska MUST have a unique
+262	   CodecID.  Each CodecID MUST be prefixed with the string from the
+263	   following table according to the associated Track Type of the codec.
+264	   All characters of a Codec ID Prefix MUST be capital letters (A-Z)
+265	   except for the last character of a Codec ID Prefix which MUST be an
+266	   underscore ("_").
+
+268	                    +===============+=================+
+269	                    | Track Type    | Codec ID Prefix |
+270	                    +===============+=================+
+271	                    | Video (1)     | "V_"            |
+272	                    +---------------+-----------------+
+273	                    | Audio (2)     | "A_"            |
+274	                    +---------------+-----------------+
+275	                    | Complex (3)   | "O_"            |
+276	                    +---------------+-----------------+
+277	                    | Logo (16)     | "L_"            |
+278	                    +---------------+-----------------+
+279	                    | Subtitle (17) | "S_"            |
+280	                    +---------------+-----------------+
+281	                    | Button (18)   | "B_"            |
+282	                    +---------------+-----------------+
+283	                    | Control (32)  | "C_"            |
+284	                    +---------------+-----------------+
+285	                    | Metadata (33) | "M_"            |
+286	                    +---------------+-----------------+
+
+288	                        Table 1: Codec ID Prefix by
+289	                                 Track Type
+
+291	   Each CodecID MUST include a Major Codec ID immediately following the
+292	   Codec ID Prefix.  A Major Codec ID MAY be followed by an OPTIONAL
+293	   Codec ID Suffix to communicate a refinement of the Major Codec ID.
+294	   If a Codec ID Suffix is used, then the CodecID MUST include a forward
+295	   slash ("/") as a separator between the Major Codec ID and the Codec
+296	   ID Suffix.  The Major Codec ID MUST be composed of only capital
+297	   letters (A-Z) and numbers (0-9).  The Codec ID Suffix MUST be
+298	   composed of only capital letters (A-Z), numbers (0-9), underscore
+299	   ("_"), and forward slash ("/").
+
+301	   The following table provides examples of valid Codec IDs and their
+302	   components:
+
+304	     +==========+==========+===========+===========+=================+
+305	     | Codec ID | Major    | Separator | Codec ID  | Codec ID        |
+306	     | Prefix   | Codec ID |           | Suffix    |                 |
+307	     +==========+==========+===========+===========+=================+
+308	     | A_       | AAC      | /         | MPEG2/LC/ | A_AAC/MPEG2/LC/ |
+309	     |          |          |           | SBR       | SBR             |
+310	     +----------+----------+-----------+-----------+-----------------+
+311	     | V_       | MPEG4    | /         | ISO/ASP   | V_MPEG4/ISO/ASP |
+312	     +----------+----------+-----------+-----------+-----------------+
+313	     | V_       | MPEG1    |           |           | V_MPEG1         |
+314	     +----------+----------+-----------+-----------+-----------------+
+
+316	                        Table 2: Codec ID Components
+
+318	3.1.2.  Codec Name
+
+320	   Each encoding supported for storage in Matroska MUST have a Codec
+321	   Name.  The Codec Name provides a readable label for the encoding.
+
+323	3.1.3.  Description
+
+325	   An optional description for the encoding.  This value is only
+326	   intended for human consumption.
+
+328	3.1.4.  Initialization
+
+330	   Each encoding supported for storage in Matroska MUST have a defined
+331	   Initialization.  The Initialization MUST describe the storage of data
+332	   necessary to initialize the decoder, which MUST be stored within the
+333	   CodecPrivate element.  When the Initialization is updated within a
+334	   track, then that updated Initialization data MUST be written into the
+335	   CodecState element of the first Cluster to require it.  If the
+336	   encoding does not require any form of Initialization, then none MUST
+337	   be used to define the Initialization and the CodecPrivate element
+338	   SHOULD NOT be written and MUST be ignored.  If the TrackEntry
+339	   contains a CodecPrivate element, its data MUST be provided to the
+340	   decoder.
+
+342	3.1.5.  Codec BlockAdditions
+
+344	   Additional data that contextualizes or supplements a Block can be
+345	   stored within the BlockAdditional element of a BlockMore element
+346	   Section 5.1.3.5.2.1 of [RFC9559].  Each BlockAdditional is coupled
+347	   with a BlockAddID that identifies the kind of data it contains.
+
+349	   A BlockAddID of 1 means the data in the BlockAdditional element are
+350	   tied to the codec.  This BlockAdditional data with a BlockAddID of 1
+351	   MAY be passed to the associated decoder alongside the Block content .
+
+353	   A codec definition MUST contain a "Codec BlockAdditions" section if
+354	   the codec can use BlockAdditional data with a BlockAddID of 1.
+
+356	   The BlockAddID values are defined in Section 4.
+
+358	3.1.6.  Citation
+
+360	   Documentation of the associated normative and informative references
+361	   for the codec is RECOMMENDED.
+
+363	3.1.7.  Superseded By
+
+365	   When a Superseded By is set, the superseding CodecID value MUST be
+366	   used instead of the superseded CodecID.
+
+368	   Files MAY exist with the superseded CodecID and MAY be supported by
+369	   Matroska Players.
+
+371	3.2.  Recommendations for the Creation of New Codec Mappings
+
+373	   Creators of new Codec Mappings to be used in the context of Matroska:
+
+375	   *  MUST assume that all Codec Mappings they create might become
+376	      standardized, public, commonly deployed, or usable across multiple
+377	      implementations.
+
+379	   *  MUST employ meaningful values for CodecID and Codec Name that are
+380	      not already included in the Matroska Codec IDs Registry, and are
+381	      not otherwise known or suspected to be in use, even if they are
+382	      not already registered.
+
+384	   *  MUST NOT prefix their CodecID with "X_" or similar constructs.
+
+386	   These recommendations are based on Section 3 of [RFC6648].
+
+388	3.3.  Video Codec Mappings
+
+390	   All codecs described in this section MUST have a TrackType
+391	   (Section 5.1.4.1.3 of [RFC9559]) value of "1" for video.  The track
+392	   using these codecs MUST contain a Video element -- i.e., EBML Path
+393	   \Segment\Tracks\TrackEntry\Video.
+
+395	   Most video codec contain meta information about the data they
+396	   contain, like encoded width and height, chroma subsampling, etc.
+397	   Whenever possible these information inside the codec SHOULD be
+398	   extracted and repeated at the Matroska level with the appropriate
+399	   element(s) inside the \Segment\Tracks\TrackEntry\Video and
+400	   \Segment\Tracks\TrackEntry elements.  These values MUST be valid for
+401	   the whole Segment.
+
+403	3.3.1.  V_AV1
+
+405	   Codec ID: V_AV1
+
+407	   Codec Name: Alliance for Open Media AV1 Video codec
+
+409	   Description: Only one Sequence Header OBU, as defined in section 6.4
+410	   of [AV1], is supported per Matroska Segment.  Each Block contains one
+411	   Temporal Unit containing one or more OBUs.  Each OBU stored in the
+412	   Block MUST contain its header and its payload.  The OBUs in the Block
+413	   follow the Low Overhead Bitstream Format syntax.  They MUST have the
+414	   obu_has_size_field set to 1 except for the last OBU in the frame, for
+415	   which obu_has_size_field MAY be set to 0, in which case it is assumed
+416	   to fill the remainder of the frame.  A SimpleBlock MUST NOT be marked
+417	   as a Keyframe if it doesn't contain a Frame OBU.  A SimpleBlock MUST
+418	   NOT be marked as a Keyframe if the first Frame OBU doesn't have a
+419	   frame_type of KEY_FRAME.  A SimpleBlock MUST NOT be marked as a
+420	   Keyframe if it doesn't contains a Sequence Header OBU.  A Block
+421	   inside a BlockGroup MUST use ReferenceBlock elements if the first
+422	   Frame OBU in the Block has a frame_type other than KEY_FRAME.  A
+423	   Block inside a BlockGroup MUST use ReferenceBlock elements if the
+424	   Block doesn't contain a Sequence Header OBU.  A Block with
+425	   frame_header_obu where the frame_type is INTRA_ONLY_FRAME MUST use a
+426	   ReferenceBlock with a value of 0 to reference itself.
+
+428	   Initialization: The CodecPrivate consists of the
+429	   AV1CodecConfigurationRecord described in section 2.3 of
+430	   [AV1-ISOBMFF].
+
+432	   PixelWidth: MUST be max_frame_width_minus_1+1 of the Sequence Header
+433	   OBU.
+
+435	   PixelHeight: MUST be max_frame_height_minus_1+1 of the Sequence
+436	   Header OBU.
+
+438	3.3.2.  V_AVS2
+
+440	   Codec ID: V_AVS2
+
+442	   Codec Name: AVS2-P2/IEEE.1857.4
+443	   Description: Individual pictures of AVS2-P2 stored as described in
+444	   the second part of [IEEE.1857-4].
+
+446	   Initialization: none
+
+448	3.3.3.  V_AVS3
+
+450	   Codec ID: V_AVS3
+
+452	   Codec Name: AVS3-P2/IEEE.1857.10
+
+454	   Description: Individual pictures of AVS3-P2 stored as described in
+455	   the second part of [IEEE.1857-10].
+
+457	   Initialization: none
+
+459	3.3.4.  V_CAVS
+
+461	   Codec ID: V_CAVS
+
+463	   Codec Name: AVS1-P2, JiZhun profile
+
+465	   Description: Individual pictures of AVS1-P2 stored as described in
+466	   [IEEE.1857-3].
+
+468	   Initialization: none
+
+470	3.3.5.  V_DIRAC
+
+472	   Codec ID: V_DIRAC
+
+474	   Codec Name: BBC Dirac
+
+476	   Description: A video codec developed by the BBC [Dirac].  The Intra-
+477	   only version of Dirac, also known as Dirac Pro, resulted in SMPTE
+478	   VC-2 [SMPTE.ST2042-1].  Each Matroska frame corresponds to a Sequence
+479	   as defined in [Dirac].
+
+481	   Initialization: none
+
+483	3.3.6.  V_FFV1
+
+485	   Codec ID: V_FFV1
+
+487	   Codec Name: FF Video Codec 1
+488	   Description: FFV1 is a lossless intra-frame video encoding format
+489	   designed to efficiently compress video data in a variety of pixel
+490	   formats.  Compared to uncompressed video, FFV1 offers storage
+491	   compression, frame fixity, and self-description, which makes FFV1
+492	   useful as a preservation or intermediate video format.  [RFC9043]
+
+494	   Initialization: For FFV1 versions 0 or 1, CodecPrivate SHOULD NOT be
+495	   written.  For FFV1 version 3 or greater, the CodecPrivate MUST
+496	   contain the FFV1 Configuration Record structure, as defined in
+497	   Section 4.3 of [RFC9043], and no other data.
+
+499	3.3.7.  V_JPEG2000
+
+501	   Codec ID: V_JPEG2000
+
+503	   Codec Name: JPEG 2000
+
+505	   Description: Each Matroska frame corresponds to a JPEG 2000 image, as
+506	   defined in [JPEG2000].
+
+508	   Initialization: none
+
+510	3.3.8.  V_MJPEG
+
+512	   Codec ID: V_MJPEG
+
+514	   Codec Name: Motion JPEG
+
+516	   Description: Motion JPEG is a video compression format in which each
+517	   video frame or interlaced field is compressed separately as a [JPEG]
+518	   image.
+
+520	   Initialization: none
+
+522	3.3.9.  V_MPEGH/ISO/HEVC
+
+524	   Codec ID: V_MPEGH/ISO/HEVC
+
+526	   Codec Name: HEVC/H.265
+
+528	   Description: Individual pictures (which could be a frame, a field, or
+529	   2 fields having the same timestamp) of HEVC/H.265 stored as described
+530	   in [ISO.14496-15].
+
+532	   Initialization: The CodecPrivate contains a
+533	   HEVCDecoderConfigurationRecord structure, as defined in
+534	   [ISO.14496-15].
+
+536	3.3.10.  V_MPEGI/ISO/VVC
+
+538	   Codec ID: V_MPEGI/ISO/VVC
+
+540	   Codec Name: VVC/H.266
+
+542	   Description: Individual pictures (which could be a frame, a field, or
+543	   2 fields having the same timestamp) of VVC/H.266 stored as described
+544	   in [ISO.14496-15].
+
+546	   Initialization: The CodecPrivate contains a
+547	   VVCDecoderConfigurationRecord structure, as defined in
+548	   [ISO.14496-15].
+
+550	3.3.11.  V_MPEG1
+
+552	   Codec ID: V_MPEG1
+
+554	   Codec Name: MPEG 1
+
+556	   Description: Frames correspond to a Video Sequence as defined in
+557	   [ISO.11172-2].
+
+559	   Initialization: none
+
+561	3.3.12.  V_MPEG2
+
+563	   Codec ID: V_MPEG2
+
+565	   Codec Name: MPEG 2
+
+567	   Description: Frames correspond to a Video Sequence as defined in
+568	   [ISO.13818-2].
+
+570	   Initialization: none
+
+572	3.3.13.  V_MPEG4/ISO/AVC
+
+574	   Codec ID: V_MPEG4/ISO/AVC
+
+576	   Codec Name: AVC/H.264
+
+578	   Description: Individual pictures (which could be a frame, a field, or
+579	   2 fields having the same timestamp) of AVC/H.264 stored as described
+580	   in [ISO.14496-15].
+
+582	   Initialization: The CodecPrivate contains an
+583	   AVCDecoderConfigurationRecord structure, as defined in
+584	   [ISO.14496-15].  For legacy reasons, because Block Additional
+585	   Mappings are preferred; see Section 4, the
+586	   AVCDecoderConfigurationRecord structure MAY be followed by an
+587	   extension block beginning with a 4-byte extension block size field in
+588	   big-endian byte order which is the size of the extension block minus
+589	   4 (excluding the size of the extension block size field) and a 4-byte
+590	   field corresponding to a BlockAddIDType of "mvcC" followed by a
+591	   content corresponding to the content of BlockAddIDExtraData for mvcC;
+592	   see Section 4.2.10.
+
+594	3.3.14.  V_MPEG4/ISO/AP
+
+596	   Codec ID: V_MPEG4/ISO/AP
+
+598	   Codec Name: MPEG4 ISO Advanced Profile
+
+600	   Description: Frames correspond to frames defined in [ISO.14496-2].
+601	   Stream was created via improved codec API (UCI) or transmuxed from
+602	   MP4, not simply transmuxed from AVI.  Note there are differences how
+603	   b-frames are handled in these original streams, when being compared
+604	   to a VfW created stream, as here there are no dummy frames inserted.
+
+606	   Initialization: none
+
+608	3.3.15.  V_MPEG4/ISO/ASP
+
+610	   Codec ID: V_MPEG4/ISO/ASP
+
+612	   Codec Name: MPEG4 ISO Advanced Simple Profile (DivX5, XviD)
+
+614	   Description: Frames correspond to frames defined in [ISO.14496-2].
+615	   Stream was created via improved codec API (UCI) or transmuxed from
+616	   MP4, not simply transmuxed from AVI.  Note there are differences how
+617	   b-frames are handled in these original streams, when being compared
+618	   to a VfW created stream, as here there are no dummy frames inserted.
+
+620	   Initialization: none
+
+622	3.3.16.  V_MPEG4/ISO/SP
+
+624	   Codec ID: V_MPEG4/ISO/SP
+
+626	   Codec Name: MPEG4 ISO Simple Profile (DivX4)
+627	   Description: Frames correspond to frames defined in [ISO.14496-2].
+628	   Stream was created via improved codec API (UCI) or even transmuxed
+629	   from AVI (no b-frames in Simple Profile).
+
+631	   Initialization: none
+
+633	3.3.17.  V_MPEG4/MS/V3
+
+635	   Codec ID: V_MPEG4/MS/V3
+
+637	   Codec Name: Microsoft MPEG4 V3
+
+639	   Description: Microsoft MPEG4 V3 and derivatives, means DivX3,
+640	   Angelpotion, SMR, etc.; stream was created using VfW codec or
+641	   transmuxed from AVI; note that V1/V2 are covered by the "V_MS/VFW/
+642	   FOURCC" CodecID Section 3.3.18.
+
+644	   Initialization: none
+
+646	3.3.18.  V_MS/VFW/FOURCC
+
+648	   Codec ID: V_MS/VFW/FOURCC
+
+650	   Codec Name: Microsoft Video Codec Manager (VCM)
+
+652	   Description: Video frames originating from Video For Windows, using
+653	   the Microsoft Video Codec Manager codecs.  This is a codec designed
+654	   to be transmuxed back and forth from AVI sources.
+
+656	   Initialization: The CodecPrivate contains the VCM structure
+657	   BITMAPINFOHEADER including the extra private bytes, as defined in
+658	   [BITMAPINFOHEADER].  The data are stored in little-endian format
+659	   (like on IA32 machines).
+
+661	3.3.19.  V_QUICKTIME
+
+663	   Codec ID: V_QUICKTIME
+
+665	   Codec Name: Video taken from QuickTime files
+
+667	   Description: Several codecs as stored in QuickTime (e.g., Sorenson or
+668	   Cinepak).
+
+670	   Initialization: The CodecPrivate contains all additional data that is
+671	   stored in the 'stsd' (sample description) atom in the QuickTime file
+672	   *after* the mandatory video descriptor structure (starting with the
+673	   size and FourCC fields).  For an explanation of the QuickTime file
+674	   format read [QTFF].
+
+676	3.3.20.  V_PRORES
+
+678	   Codec ID: V_PRORES
+
+680	   Codec Name: Apple ProRes
+
+682	   Initialization: The CodecPrivate contains the FourCC as found in MP4
+683	   movies:
+
+685	   *  ap4x: ProRes 4444 XQ
+
+687	   *  ap4h: ProRes 4444
+
+689	   *  apch: ProRes 422 High Quality
+
+691	   *  apcn: ProRes 422 Standard Definition
+
+693	   *  apcs: ProRes 422 LT
+
+695	   *  apco: ProRes 422 Proxy
+
+697	   *  aprh: ProRes RAW High Quality
+
+699	   *  aprn: ProRes RAW Standard Definition
+
+701	   ProRes is defined as [SMPTE.RDD36].
+
+703	3.3.21.  V_REAL/RV10
+
+705	   Codec ID: V_REAL/RV10
+
+707	   Codec Name: RealVideo 1.0 aka RealVideo 5
+
+709	   Description: Individual slices from the Real container are combined
+710	   into a single frame.
+
+712	   Initialization: The CodecPrivate contains a real_video_props_t
+713	   structure in big-endian byte order as found in [librmff].
+
+715	3.3.22.  V_REAL/RV20
+
+717	   Codec ID: V_REAL/RV20
+
+719	   Codec Name: RealVideo G2 and RealVideo G2+SVT
+
+721	   Description: Individual slices from the Real container are combined
+722	   into a single frame.
+
+724	   Initialization: The CodecPrivate contains a real_video_props_t
+725	   structure in big-endian byte order as found in [librmff].
+
+727	3.3.23.  V_REAL/RV30
+
+729	   Codec ID: V_REAL/RV30
+
+731	   Codec Name: RealVideo 8
+
+733	   Description: Individual slices from the Real container are combined
+734	   into a single frame.
+
+736	   Initialization: The CodecPrivate contains a real_video_props_t
+737	   structure in big-endian byte order as found in [librmff].
+
+739	3.3.24.  V_REAL/RV40
+
+741	   Codec ID: V_REAL/RV40
+
+743	   Codec Name: rv40 : RealVideo 9
+
+745	   Description: Individual slices from the Real container are combined
+746	   into a single frame.
+
+748	   Initialization: The CodecPrivate contains a real_video_props_t
+749	   structure in big-endian byte order as found in [librmff].
+
+751	3.3.25.  V_THEORA
+
+753	   Codec ID: V_THEORA
+
+755	   Codec Name: Theora
+
+757	   Description: Frames correspond to a Theora Frame as defined in
+758	   [Theora].
+
+760	   Initialization: The CodecPrivate contains the first three Theora
+761	   packets in order.  The lengths of the packets precedes them.  The
+762	   actual layout is:
+
+764	   *  Byte 1: number of distinct packets #p minus one inside the
+765	      CodecPrivate block.  This MUST be "2" for current (as of
+766	      2016-07-08) Theora headers.
+
+768	   *  Bytes 2..n: lengths of the first #p packets, coded in Xiph-style
+769	      lacing.  The length of the last packet is the length of the
+770	      CodecPrivate block minus the lengths coded in these bytes minus
+771	      one.
+
+773	   *  Bytes n+1..: The Theora identification header, followed by the
+774	      commend header followed by the codec setup header.  Those are
+775	      described in the [Theora].
+
+777	3.3.26.  V_UNCOMPRESSED
+
+779	   Codec ID: V_UNCOMPRESSED
+
+781	   Codec Name: Video, raw uncompressed video frames
+
+783	   Description: The codec doesn't use any form of compression.  All the
+784	   relevant fields of the TrackEntry\Video element MUST be filled to
+785	   play this content correctly.  In addition the packing of RGB, YUV,
+786	   etc. pixels MUST be declared with a
+787	   TrackEntry\Video\UncompressedFourCC element with values defined in
+788	   Section 5.1.4.1.28.15 of [RFC9559].
+
+790	   Initialization: none
+
+792	3.3.27.  V_VP8
+
+794	   Codec ID: V_VP8
+
+796	   Codec Name: VP8 Codec format
+
+798	   Description: VP8 is an open and royalty free video compression format
+799	   developed by Google and created by On2 Technologies as a successor to
+800	   VP7.  [RFC6386]
+
+802	   Codec BlockAdditions: A single-channel encoding of an alpha channel
+803	   MAY be stored in BlockAdditions.  The BlockAddID of the BlockMore
+804	   containing these data MUST be 1.
+
+806	   Initialization: none
+
+808	3.3.28.  V_VP9
+
+810	   Codec ID: V_VP9
+
+812	   Codec Name: VP9 Codec format
+
+814	   Description: VP9 is an open and royalty free video compression format
+815	   developed by Google as a successor to VP8.  [VP9]
+
+817	   Codec BlockAdditions: A single-channel encoding of an alpha channel
+818	   MAY be stored in BlockAdditions.  The BlockAddID of the BlockMore
+819	   containing these data MUST be 1.
+
+821	   Initialization: Encoders are strongly encouraged to provide a
+822	   CodecPrivate that contains a list of specific VP9 codec features as
+823	   described in the "VP9 Codec Feature Metadata" section of
+824	   [WebMContainer].  This piece of data helps to select a decoder on
+825	   playback, but as many muxers don't provide the CodecPrivate for
+826	   "V_VP9" it is not a hard requirement.  It is possible for the decoder
+827	   to reconstruct the "VP9 Codec Feature Metadata" from the first frame
+828	   in case the CodecPrivate is not present.
+
+830	   Note that the format differs from the VPCodecConfigurationRecord
+831	   structure, as defined in [VP-ISOBMFF].
+
+833	3.4.  Audio Codec Mappings
+
+835	   All codecs described in this section MUST have a TrackType
+836	   (Section 5.1.4.1.3 of [RFC9559]) value of "2" for audio.  The track
+837	   using these codecs MUST contain an Audio element -- i.e., EBML Path
+838	   \Segment\Tracks\TrackEntry\Audio.
+
+840	   Most audio codec contain meta information about the data they
+841	   contain, like encoded sampling frequency, channel count, etc.
+842	   Whenever possible these information inside the codec SHOULD be
+843	   extracted and repeated at the Matroska level with the appropriate
+844	   element(s) inside the \Segment\Tracks\TrackEntry\Audio and
+845	   \Segment\Tracks\TrackEntry elements.  These values MUST be valid for
+846	   the whole Segment.
+
+848	3.4.1.  A_AAC
+
+850	   Codec ID: A_AAC
+
+852	   Codec Name: Advanced Audio Coding (AAC)
+
+854	   Description: Individual frames of AAC raw_data_block(), stored as
+855	   defined in subpart 4 of [ISO.14496-3].
+
+857	   Initialization: The CodecPrivate contains an AudioSpecificConfig
+858	   structure, as defined in [ISO.14496-3].
+
+860	3.4.2.  A_AAC/MPEG2/LC
+
+862	   Codec ID: A_AAC/MPEG2/LC
+
+864	   Codec Name: Low Complexity
+
+866	   Description: The audio stream is stripped from ADTS headers and
+867	   normal Matroska frame based muxing scheme is applied.
+
+869	   Initialization: none
+
+871	   Superseded By: A_AAC (Section 3.4.1)
+
+873	3.4.3.  A_AAC/MPEG2/LC/SBR
+
+875	   Codec ID: A_AAC/MPEG2/LC/SBR
+
+877	   Codec Name: Low Complexity with Spectral Band Replication
+
+879	   Description: The audio stream is stripped from ADTS headers and
+880	   normal Matroska frame based muxing scheme is applied.
+
+882	   Initialization: none
+
+884	   Superseded By: A_AAC (Section 3.4.1)
+
+886	3.4.4.  A_AAC/MPEG2/MAIN
+
+888	   Codec ID: A_AAC/MPEG2/MAIN
+
+890	   Codec Name: MPEG2 Main Profile
+
+892	   Description: The audio stream is stripped from ADTS headers and
+893	   normal Matroska frame based muxing scheme is applied.
+
+895	   Initialization: none
+
+897	   Superseded By: A_AAC (Section 3.4.1)
+
+899	3.4.5.  A_AAC/MPEG2/SSR
+
+901	   Codec ID: A_AAC/MPEG2/SSR
+
+903	   Codec Name: Scalable Sampling Rate
+
+905	   Description: The audio stream is stripped from ADTS headers and
+906	   normal Matroska frame based muxing scheme is applied.
+
+908	   Initialization: none
+
+910	   Superseded By: A_AAC (Section 3.4.1)
+
+912	3.4.6.  A_AAC/MPEG4/LC
+
+914	   Codec ID: A_AAC/MPEG4/LC
+
+916	   Codec Name: Low Complexity
+917	   Description: The audio stream is stripped from ADTS headers and
+918	   normal Matroska frame based muxing scheme is applied.
+
+920	   Initialization: none
+
+922	   Superseded By: A_AAC (Section 3.4.1)
+
+924	3.4.7.  A_AAC/MPEG4/LC/SBR
+
+926	   Codec ID: A_AAC/MPEG4/LC/SBR
+
+928	   Codec Name: Low Complexity with Spectral Band Replication
+
+930	   Description: The audio stream is stripped from ADTS headers and
+931	   normal Matroska frame based muxing scheme is applied.
+
+933	   Initialization: none
+
+935	   Superseded By: A_AAC (Section 3.4.1)
+
+937	3.4.8.  A_AAC/MPEG4/LTP
+
+939	   Codec ID: A_AAC/MPEG4/LTP
+
+941	   Codec Name: Long Term Prediction
+
+943	   Description: The audio stream is stripped from ADTS headers and
+944	   normal Matroska frame based muxing scheme is applied.
+
+946	   Initialization: none
+
+948	   Superseded By: A_AAC (Section 3.4.1)
+
+950	3.4.9.  A_AAC/MPEG4/MAIN
+
+952	   Codec ID: A_AAC/MPEG4/MAIN
+
+954	   Codec Name: MPEG4 Main Profile
+
+956	   Description: The audio stream is stripped from ADTS headers and
+957	   normal Matroska frame based muxing scheme is applied.
+
+959	   Initialization: none
+
+961	   Superseded By: A_AAC (Section 3.4.1)
+
+963	3.4.10.  A_AAC/MPEG4/SSR
+
+965	   Codec ID: A_AAC/MPEG4/SSR
+
+967	   Codec Name: Scalable Sampling Rate
+
+969	   Description: The audio stream is stripped from ADTS headers and
+970	   normal Matroska frame based muxing scheme is applied.
+
+972	   Initialization: none
+
+974	   Superseded By: A_AAC (Section 3.4.1)
+
+976	3.4.11.  A_AC3
+
+978	   Codec ID: A_AC3
+
+980	   Codec Name: Dolby Digital / AC-3
+
+982	   Description: Individual frames of AC-3 syncframe() stored as
+983	   described in [ATSC.A52] or [ETSI.TS102-366] when the value of the
+984	   bsid field defined in Section 5.4.2.1 of [ATSC.A52] or
+985	   Section 4.4.2.1 of [ETSI.TS102-366] is 10 or below.  Channel number
+986	   have to be read from the corresponding audio element
+
+988	   Initialization: none
+
+990	3.4.12.  A_AC3/BSID9
+
+992	   Codec ID: A_AC3/BSID9
+
+994	   Codec Name: Dolby Digital / AC-3
+
+996	   Description: Individual frames of AC-3 syncframe() stored as
+997	   described in [ATSC.A52] or [ETSI.TS102-366] when the value of the
+998	   bsid field defined in Section 5.4.2.1 of [ATSC.A52] or
+999	   Section 4.4.2.1 of [ETSI.TS102-366] is 9.  Note that the value 9 in
+1000	   the bsid field is not standard but it is defacto used for dividing
+1001	   the sampling rate defined in Section 5.4.1.3 of [ATSC.A52] or
+1002	   Section 4.4.2.1 of [ETSI.TS102-366] by 2.
+
+1004	   Using this Codec ID is NOT RECOMMENDED as many Matroska Players don't
+1005	   support it.  The generic A_AC3 Codec ID SHOULD be used instead as it
+1006	   supports a bsid of 9 as well.
+
+1008	   Initialization: none
+
+1010	3.4.13.  A_AC3/BSID10
+
+1012	   Codec ID: A_AC3/BSID10
+
+1014	   Codec Name: Dolby Digital / AC-3
+
+1016	   Description: Individual frames of AC-3 syncframe() stored as
+1017	   described in [ATSC.A52] or [ETSI.TS102-366] when the value of the
+1018	   bsid field defined in Section 5.4.2.1 of [ATSC.A52] or
+1019	   Section 4.4.2.1 of [ETSI.TS102-366] is 10.  Note that the value 10 in
+1020	   the bsid field is not standard but it is defacto used for dividing
+1021	   the sampling rate defined in Section 5.4.1.3 of [ATSC.A52] or
+1022	   Section 4.4.2.1 of [ETSI.TS102-366] by 4.
+
+1024	   Using this Codec ID is NOT RECOMMENDED as many Matroska Players don't
+1025	   support it.  The generic A_AC3 Codec ID SHOULD be used instead as it
+1026	   supports a bsid of 10 as well.
+
+1028	   Initialization: none
+
+1030	3.4.14.  A_ALAC
+
+1032	   Codec ID: A_ALAC
+
+1034	   Codec Name: ALAC (Apple Lossless Audio Codec)
+
+1036	   Initialization: The CodecPrivate contains ALAC's magic cookie (both
+1037	   the codec specific configuration as well as the optional channel
+1038	   layout information).  Its format is described in the "Magic Cookie"
+1039	   defined in [ALAC].
+
+1041	3.4.15.  A_ATRAC/AT1
+
+1043	   Codec ID: A_ATRAC/AT1
+
+1045	   Codec Name: Sony ATRAC1 Codec
+
+1047	   Description: The original ATRAC codec by Sony, mainly used in
+1048	   MiniDisc platforms.  The core technical details on ATRAC1 can be
+1049	   found in [AtracAES].  An example encoder/decoder can be found at
+1050	   [atracdenc].
+
+1052	   Initialization: None
+
+1054	3.4.16.  A_DTS
+
+1056	   Codec ID: A_DTS
+1057	   Codec Name: Digital Theatre System
+
+1059	   Description: Supports DTS, DTS-ES, DTS-96/26, DTS-HD High Resolution
+1060	   Audio and DTS-HD Master Audio.  It corresponds to the base codec
+1061	   defined in [ETSI.TS102-114].
+
+1063	   Initialization: none
+
+1065	3.4.17.  A_DTS/EXPRESS
+
+1067	   Codec ID: A_DTS/EXPRESS
+
+1069	   Codec Name: Digital Theatre System Express
+
+1071	   Description: DTS Express (a.k.a. LBR) audio streams.  It corresponds
+1072	   to the LBR extension of the DTS codec defined in section 9 of
+1073	   [ETSI.TS102-114].
+
+1075	   Initialization: none
+
+1077	3.4.18.  A_DTS/LOSSLESS
+
+1079	   Codec ID: A_DTS/LOSSLESS
+
+1081	   Codec Name: Digital Theatre System Lossless
+
+1083	   Description: DTS Lossless audio that does not have a core substream.
+1084	   It corresponds to the Lossless extension (XLL) of the DTS codec
+1085	   defined in section 8 of [ETSI.TS102-114].
+
+1087	   Initialization: none
+
+1089	3.4.19.  A_EAC3
+
+1091	   Codec ID: A_EAC3
+
+1093	   Codec Name: Dolby Digital Plus / E-AC-3
+
+1095	   Description: Individual frames of E-AC-3 syncframe() stored as
+1096	   described in [ATSC.A52] or [ETSI.TS102-366] when the value of the
+1097	   bsid field defined in Annex E Section 2.1 of [ATSC.A52] or
+1098	   Section E.1.3.1.6 of [ETSI.TS102-366] is 11, 12, 13, 14, 15 or 16.
+
+1100	   Initialization: none
+
+1102	3.4.20.  A_FLAC
+
+1104	   Codec ID: A_FLAC
+
+1106	   Codec Name: FLAC (Free Lossless Audio Codec)
+
+1108	   Description: The mapping of the FLAC framing and CodecPrivate is
+1109	   described in Section 10.2 of [RFC9639].
+
+1111	   Initialization: All FLAC data before the first audio frame; see
+1112	   Section 10.2 of [RFC9639].
+
+1114	3.4.21.  A_MLP
+
+1116	   Codec ID: A_MLP
+
+1118	   Codec Name: Meridian Lossless Packing / MLP
+
+1120	   Description: A lossless audio codec used in DVD-Audio discs.  The
+1121	   format is similar to Dolby TrueHD (Section 3.4.39) but with fewer
+1122	   channels.
+
+1124	   Initialization: none
+
+1126	3.4.22.  A_MPEG/L1
+
+1128	   Codec ID: A_MPEG/L1
+
+1130	   Codec Name: MPEG Audio 1, 2 Layer I
+
+1132	   Description: Frames correspond to Audio Frames of a Layer I bitstream
+1133	   as defined in [ISO.11172-3].
+
+1135	   Initialization: none
+
+1137	3.4.23.  A_MPEG/L2
+
+1139	   Codec ID: A_MPEG/L2
+
+1141	   Codec Name: MPEG Audio 1, 2 Layer II
+
+1143	   Description: Frames correspond to Audio Frames of a Layer II
+1144	   bitstream as defined in [ISO.11172-3].
+
+1146	   Initialization: none
+
+1148	3.4.24.  A_MPEG/L3
+
+1150	   Codec ID: A_MPEG/L3
+
+1152	   Codec Name: MPEG Audio 1, 2, 2.5 Layer III
+
+1154	   Description: Frames correspond to Audio Frames of a Layer III
+1155	   bitstream as defined in [ISO.11172-3].
+
+1157	   Initialization: none
+
+1159	3.4.25.  A_MS/ACM
+
+1161	   Codec ID: A_MS/ACM
+
+1163	   Codec Name: Microsoft Audio Codec Manager (ACM)
+
+1165	   Description: The data are stored in little-endian format (like on
+1166	   IA32 machines).
+
+1168	   Initialization: The CodecPrivate contains the [WAVEFORMATEX]
+1169	   structure including the extra format information bytes.  The
+1170	   structure is stored without packing or padding bytes.  A WORD
+1171	   corresponds to a signed 2 octets integer, DWORD corresponds to a
+1172	   signed 4 octets integer.  The extra format information are appended
+1173	   after the WAVEFORMATEX octets.
+
+1175	3.4.26.  A_REAL/14_4
+
+1177	   Codec ID: A_REAL/14_4
+
+1179	   Codec Name: Real Audio 1
+
+1181	   Initialization: The CodecPrivate contains either the
+1182	   "real_audio_v4_props_t" or the "real_audio_v5_props_t" structure
+1183	   (differentiated by their "version" field; big-endian byte order) as
+1184	   found in [librmff].
+
+1186	3.4.27.  A_REAL/28_8
+
+1188	   Codec ID: A_REAL/28_8
+
+1190	   Codec Name: Real Audio 2
+
+1192	   Initialization: The CodecPrivate contains either the
+1193	   "real_audio_v4_props_t" or the "real_audio_v5_props_t" structure
+1194	   (differentiated by their "version" field; big-endian byte order) as
+1195	   found in [librmff].
+
+1197	3.4.28.  A_REAL/ATRC
+
+1199	   Codec ID: A_REAL/ATRC
+
+1201	   Codec Name: Sony Atrac3 Codec
+
+1203	   Initialization: The CodecPrivate contains either the
+1204	   "real_audio_v4_props_t" or the "real_audio_v5_props_t" structure
+1205	   (differentiated by their "version" field; big-endian byte order) as
+1206	   found in [librmff].
+
+1208	3.4.29.  A_REAL/COOK
+
+1210	   Codec ID: A_REAL/COOK
+
+1212	   Codec Name: Real Audio Cook Codec (codename: Gecko)
+
+1214	   Initialization: The CodecPrivate contains either the
+1215	   "real_audio_v4_props_t" or the "real_audio_v5_props_t" structure
+1216	   (differentiated by their "version" field; big-endian byte order) as
+1217	   found in [librmff].
+
+1219	3.4.30.  A_REAL/RALF
+
+1221	   Codec ID: A_REAL/RALF
+
+1223	   Codec Name: Real Audio Lossless Format
+
+1225	   Initialization: The CodecPrivate contains either the
+1226	   "real_audio_v4_props_t" or the "real_audio_v5_props_t" structure
+1227	   (differentiated by their "version" field; big-endian byte order) as
+1228	   found in [librmff].
+
+1230	3.4.31.  A_REAL/SIPR
+
+1232	   Codec ID: A_REAL/SIPR
+
+1234	   Codec Name: Sipro Voice Codec
+
+1236	   Initialization: The CodecPrivate contains either the
+1237	   "real_audio_v4_props_t" or the "real_audio_v5_props_t" structure
+1238	   (differentiated by their "version" field; big-endian byte order) as
+1239	   found in [librmff].
+
+1241	3.4.32.  A_OPUS
+
+1243	   Codec ID: A_OPUS
+1244	   Codec Name: Opus interactive speech and audio codec
+
+1246	   Description: The OPUS audio codec defined by [RFC6716] using a
+1247	   similar encapsulation as the Ogg Encapsulation [RFC7845].
+
+1249	   Initialization: The track CodecPrivate MUST be present and contain
+1250	   the Identification Header defined in Section 5.1 of [RFC7845].
+
+1252	   Channels: The track Channels element value MUST be the "Output
+1253	   Channel Count" value of the Identification Header.
+
+1255	   SamplingFrequency: The track SamplingFrequency element value MUST be
+1256	   the "Input Sample Rate" value of the Identification Header.
+
+1258	   CodecDelay: The track CodecDelay element MUST be present and set to
+1259	   the "Pre-skip" value of the Identification Header translated to
+1260	   Matroska Ticks.  The "Pre-skip" value is in samples at 48,000 Hz.
+1261	   The formula to get the CodecDelay is:
+
+1263	   CodecDelay = pre-skip * 1,000,000,000 / 48,000.
+
+1265	   SeekPreRoll: The track SeekPreRoll element SHOULD be present and set
+1266	   to 80,000,000 -- 80 ms in Matroska Ticks -- in order to ensure that
+1267	   the output audio is correct by the time it reaches the seek target.
+
+1269	3.4.33.  A_PCM/FLOAT/IEEE
+
+1271	   Codec ID: A_PCM/FLOAT/IEEE
+
+1273	   Codec Name: Floating-Point, IEEE compatible
+
+1275	   Description: The audio bit depth MUST be read and set from the
+1276	   BitDepth element (32 bits in most cases).  The floats are stored as
+1277	   defined in [IEEE.754] and in little-endian order.
+
+1279	   Initialization: none
+
+1281	3.4.34.  A_PCM/INT/BIG
+
+1283	   Codec ID: A_PCM/INT/BIG
+
+1285	   Codec Name: PCM Integer Big Endian
+
+1287	   Description: The audio bit depth MUST be read and set from the
+1288	   BitDepth element.  Audio samples MUST be considered as signed values,
+1289	   unless the audio bit depth is 8 which MUST be interpreted as unsigned
+1290	   values.
+
+1292	   Initialization: none
+
+1294	3.4.35.  A_PCM/INT/LIT
+
+1296	   Codec ID: A_PCM/INT/LIT
+
+1298	   Codec Name: PCM Integer Little Endian
+
+1300	   Description: The audio bit depth MUST be read and set from the
+1301	   BitDepth element.  Audio samples MUST be considered as signed values,
+1302	   unless the audio bit depth is 8 which MUST be interpreted as unsigned
+1303	   values.
+
+1305	   Initialization: none
+
+1307	3.4.36.  A_QUICKTIME
+
+1309	   Codec ID: A_QUICKTIME
+
+1311	   Codec Name: Audio taken from QuickTime files
+
+1313	   Description: Several codecs as stored in QuickTime (e.g., QDesign
+1314	   Music v1 or v2).
+
+1316	   Initialization: The CodecPrivate contains all additional data that is
+1317	   stored in the 'stsd' (sample description) atom in the QuickTime file
+1318	   *after* the mandatory sound descriptor structure (starting with the
+1319	   size and FourCC fields).  For an explanation of the QuickTime file
+1320	   format read [QTFF].
+
+1322	3.4.37.  A_QUICKTIME/QDMC
+
+1324	   Codec ID: A_QUICKTIME/QDMC
+
+1326	   Codec Name: QDesign Music
+
+1328	   Description:
+
+1330	   Initialization: The CodecPrivate contains all additional data that is
+1331	   stored in the 'stsd' (sample description) atom in the QuickTime file
+1332	   *after* the mandatory sound descriptor structure (starting with the
+1333	   size and FourCC fields).  For an explanation of the QuickTime file
+1334	   format read [QTFF].
+
+1336	   Superseded By: A_QUICKTIME (Section 3.4.36)
+
+1338	3.4.38.  A_QUICKTIME/QDM2
+
+1340	   Codec ID: A_QUICKTIME/QDM2
+
+1342	   Codec Name: QDesign Music v2
+
+1344	   Description:
+
+1346	   Initialization: The CodecPrivate contains all additional data that is
+1347	   stored in the 'stsd' (sample description) atom in the QuickTime file
+1348	   *after* the mandatory sound descriptor structure (starting with the
+1349	   size and FourCC fields).  For an explanation of the QuickTime file
+1350	   format read [QTFF].
+
+1352	   Superseded By: A_QUICKTIME (Section 3.4.36)
+
+1354	3.4.39.  A_TRUEHD
+
+1356	   Codec ID: A_TRUEHD
+
+1358	   Codec Name: Dolby TrueHD
+
+1360	   Description: Lossless audio codec from Dolby.  Each Matroska frame
+1361	   corresponds to a single Access Unit as defined in [TRUEHD].
+
+1363	   Initialization: none
+
+1365	3.4.40.  A_TTA1
+
+1367	   Codec ID: A_TTA1
+
+1369	   Codec Name: The True Audio lossless audio compressor
+
+1371	   Description: The format is described in [TTA].  Each frame is kept
+1372	   intact, including the CRC32.  The header and seektable are dropped.
+1373	   SamplingFrequency, Channels and BitDepth are used in the TrackEntry.
+
+1375	   Initialization: The CodecPrivate contains the TTA Header Structure,
+1376	   as defined in [TTA].
+
+1378	3.4.41.  A_VORBIS
+
+1380	   Codec ID: A_VORBIS
+
+1382	   Codec Name: Vorbis
+1383	   Initialization: The CodecPrivate contains the first three Vorbis
+1384	   packet in order.  The lengths of the packets precedes them.  The
+1385	   actual layout is:
+
+1387	   *  Byte 1: number of distinct packets #p minus one inside the
+1388	      CodecPrivate block.  This MUST be "2" for current (as of
+1389	      2016-07-08) Vorbis headers.
+
+1391	   *  Bytes 2..n: lengths of the first #p packets, coded in Xiph-style
+1392	      lacing.  The length of the last packet is the length of the
+1393	      CodecPrivate block minus the lengths coded in these bytes minus
+1394	      one.
+
+1396	   *  Bytes n+1..: The "Identification Header" as defined in
+1397	      Section 4.2.2 of [VORBIS], followed by the "Comment Header" as
+1398	      defined in Section 5 of [VORBIS], followed by the "Setup Header"
+1399	      as defined in Section 4.2.4 of [VORBIS].
+
+1401	3.4.42.  A_WAVPACK4
+
+1403	   Codec ID: A_WAVPACK4
+
+1405	   Codec Name: WavPack lossless audio compressor
+
+1407	   Description: The WavPack packets consist of a block defined in
+1408	   [WAVPACK] with a WavpackHeader header.  For multichannel (> 2
+1409	   channels) a frame consists of many packets.  For more details, check
+1410	   the WavPack muxing description Section 5.1.
+
+1412	   Codec BlockAdditions: For hybrid A_WAVPACK4 encodings (that include a
+1413	   lossy encoding with a supplemental correction to produce a lossless
+1414	   encoding), the correction part is stored in BlockAdditional.  The
+1415	   BlockAddID of the BlockMore containing these data MUST be 1.
+
+1417	   Initialization: The CodecPrivate contains the version 16-bit integer
+1418	   from the WavpackHeader of [WAVPACK] stored in little-endian.
+
+1420	3.5.  Subtitle Codec Mappings
+
+1422	   All codecs described in this section MUST have a TrackType
+1423	   (Section 5.1.4.1.3 of [RFC9559]) value of "17" for subtitles.
+
+1425	   Subtitle codec often contain meta information about the data they
+1426	   contain, like expected output dimension, language, etc.  Whenever
+1427	   possible these information inside the codec SHOULD be extracted and
+1428	   repeated at the Matroska level with the appropriate element(s) inside
+1429	   the \Segment\Tracks\TrackEntry\Video and \Segment\Tracks\TrackEntry
+1430	   elements.  These values MUST be valid for the whole Segment.
+
+1432	3.5.1.  S_ARIBSUB
+
+1434	   Codec ID: S_ARIBSUB
+
+1436	   Codec Name: ARIB STD-B24 subtitles
+
+1438	   Description: This is the textual subtitle format used in the ISDB/
+1439	   ARIB broadcasting standard.  For more information see Section 6.8 on
+1440	   ARIB (ISDB) subtitles.
+
+1442	   Initialization: The CodecPrivate data are defined in Section 6.8.1.
+
+1444	3.5.2.  S_DVBSUB
+
+1446	   Codec ID: S_DVBSUB
+
+1448	   Codec Name: Digital Video Broadcasting (DVB) subtitles
+
+1450	   Description: This is the graphical subtitle format used in the
+1451	   Digital Video Broadcasting standard.  For more information see
+1452	   Section 6.7 on Digital Video Broadcasting (DVB).
+
+1454	   Initialization: The CodecPrivate data are defined in Section 6.7.1.
+
+1456	3.5.3.  S_HDMV/PGS
+
+1458	   Codec ID: S_HDMV/PGS
+
+1460	   Codec Name: HDMV presentation graphics subtitles (PGS)
+
+1462	   Description: This is the graphical subtitle format used on Blu-rays.
+1463	   For more information, see Section 6.6 on HDMV text presentation.
+
+1465	   Initialization: none
+
+1467	3.5.4.  S_HDMV/TEXTST
+
+1469	   Codec ID: S_HDMV/TEXTST
+
+1471	   Codec Name: HDMV text subtitles
+
+1473	   Description: This is the textual subtitle format used on Blu-rays.
+1474	   For more information, see Section 6.5 on HDMV graphics presentation.
+
+1476	   Initialization: The CodecPrivate data are defined in Section 6.6.1.
+
+1478	3.5.5.  S_KATE
+
+1480	   Codec ID: S_KATE
+
+1482	   Codec Name: Karaoke And Text Encapsulation
+
+1484	   Description: A subtitle format developed for ogg.  The mapping for
+1485	   Matroska is described on the "Matroska mapping" section of [OggKate].
+
+1487	   The codec MAY use embedded fonts from attachments, as defined in
+1488	   Section 21.2 of [RFC9559], in that case the TrackEntry MUST contain
+1489	   an AttachmentLink element.
+
+1491	   Initialization: Kate headers are stored in the CodecPrivate as xiph-
+1492	   laced packets.  The length of the last packet isn't encoded, it is
+1493	   deduced from the sizes of the other packets and the total size of the
+1494	   CodecPrivate.
+
+1496	3.5.6.  S_IMAGE/BMP
+
+1498	   Codec ID: S_IMAGE/BMP
+
+1500	   Codec Name: Bitmap
+
+1502	   Description: Basic image based subtitle format; The subtitles are
+1503	   stored as images, like in the DVD [DVD-Video].  The timestamp in the
+1504	   block header of Matroska indicates the start display time, the
+1505	   duration is set with the BlockDuration element.  The full data for
+1506	   the subtitle bitmap is stored in the Block's data section.
+
+1508	   Initialization: none
+
+1510	3.5.7.  S_TEXT/ASS
+
+1512	   Codec ID: S_TEXT/ASS
+
+1514	   Codec Name: Advanced SubStation Alpha Format
+
+1516	   Description: Each event is stored in its own Block.  For more
+1517	   information see Section 6.3 on SSA/ASS.
+
+1519	   This codec ID MUST be used when "ScriptType: v4.00+" or "[V4+
+1520	   Styles]" sections are found in the original SSA script.
+
+1522	   The codec MAY use embedded fonts from attachments, as defined in
+1523	   Section 21.2 of [RFC9559], in that case the TrackEntry MUST contain
+1524	   an AttachmentLink element.
+
+1526	   The codec MAY also be found with the Codec ID S_ASS in legacy media
+1527	   containers, but using that value is NOT RECOMMENDED.
+
+1529	   Initialization: The "[Script Info]" and "[V4 Styles]" sections are
+1530	   stored in the CodecPrivate.
+
+1532	3.5.8.  S_TEXT/ASCII
+
+1534	   Codec ID: S_TEXT/ASCII
+
+1536	   Codec Name: ASCII Plain Text
+
+1538	   Description: Basic text subtitles with only ASCII characters allowed.
+
+1540	   Initialization: none
+
+1542	3.5.9.  S_TEXT/SSA
+
+1544	   Codec ID: S_TEXT/SSA
+
+1546	   Codec Name: SubStation Alpha Format
+
+1548	   Description: Each event is stored in its own Block.  For more
+1549	   information see Section 6.3 on SSA/ASS.
+
+1551	   This codec ID MUST NOT be used when "ScriptType: v4.00+" or "[V4+
+1552	   Styles]" sections are found in the original SSA script.
+
+1554	   The codec MAY use embedded fonts from attachments, as defined in
+1555	   Section 21.2 of [RFC9559], in that case the TrackEntry MUST contain
+1556	   an AttachmentLink element.
+
+1558	   The codec MAY also be found with the Codec ID S_SSA, but using that
+1559	   value is NOT RECOMMENDED.
+
+1561	   Initialization: The "[Script Info]" and "[V4+ Styles]" sections are
+1562	   stored in the CodecPrivate.
+
+1564	3.5.10.  S_TEXT/USF
+
+1566	   Codec ID: S_TEXT/USF
+
+1568	   Codec Name: Universal Subtitle Format
+
+1570	   Description: An XML based subtitle format.  Each BlockGroup contains
+1571	   XML data from a "subtitle" XML element as defined in section 3.4 of
+1572	   [USF], without the "subtitle" element itself and with the start, stop
+1573	   duration mapped to the BlockGroup timestamp and BlockDuration
+1574	   element.  The "image" XML elements are turned into Matroska
+1575	   attachments and replaced in the stream with their attachment
+1576	   filename.
+
+1578	   The codec MAY use embedded fonts from attachments, as defined in
+1579	   Section 21.2 of [RFC9559], in that case the TrackEntry MUST contain
+1580	   an AttachmentLink element.
+
+1582	   Initialization: The CodecPrivate element MAY be present.  If present
+1583	   it MAY contain "metadata", "styles" and "effects" XML elements usable
+1584	   in the whole stream inside a parent "USFSubtitles" XML parent
+1585	   element, similar to the "USFSubtitles" element of a standalone USF
+1586	   file but without the "subtitles" XML element.
+
+1588	3.5.11.  S_TEXT/UTF8
+
+1590	   Codec ID: S_TEXT/UTF8
+
+1592	   Codec Name: UTF-8 Plain Text
+
+1594	   Description: Basic text subtitles.  For more information see
+1595	   Section 6 on Subtitles.
+
+1597	   Initialization: none
+
+1599	3.5.12.  S_TEXT/WEBVTT
+
+1601	   Codec ID: S_TEXT/WEBVTT
+
+1603	   Codec Name: Web Video Text Tracks Format (WebVTT)
+
+1605	   Description: Advanced text subtitles defined by [WebVTT].  For more
+1606	   information see Section 6.4.
+
+1608	   Initialization: The CodecPrivate contains the WebVTT file body up to
+1609	   the first WebVTT cue block.
+
+1611	   Codec BlockAdditions: Intermediate non-Cue Blocks SHOULD be stored in
+1612	   BlockAdditions.  The BlockAddID of the BlockMore containing these
+1613	   data MUST be 1.
+
+1615	3.5.13.  S_VOBSUB
+
+1617	   Codec ID: S_VOBSUB
+
+1619	   Codec Name: VobSub subtitles
+1620	   Description: Uses data from [VobSub] files.  The data represent
+1621	   subtitle data used on DVDs [DVD-Video].  VobSubs consist of two
+1622	   files, the .idx containing information, and the .sub, containing the
+1623	   actual data.  Only version 7 and newer of VobSubs files are
+1624	   supported.
+
+1626	   The line of the .idx file beginning with "id:" MUST be transformed
+1627	   into the appropriate Matroska track language element.
+
+1629	   For each line of the .idx file containing a "timestamp:" and
+1630	   "filepos:" data is read from the appropriate position in the .sub
+1631	   file.  This data consists of a MPEG program stream which in turn
+1632	   contains SPU packets.  The MPEG program stream data is discarded, and
+1633	   each SPU packet is put into one Matroska frame.
+
+1635	   Initialization: The CodecPrivate contains the "palette:" and "size:"
+1636	   lines from the .idx file.  Other lines from the .idx file not
+1637	   containing empty lines, comments, or starting with "alt:";
+1638	   "langidx:", "id:", or "timestamp:" MAY be added in the CodecPrivate
+1639	   data for preservation.
+
+1641	3.6.  Button Codec Mappings
+
+1643	   All codecs described in this section MUST have a TrackType
+1644	   (Section 5.1.4.1.3 of [RFC9559]) value of "18" for buttons.
+
+1646	3.6.1.  B_VOBBTN
+
+1648	   Codec ID: B_VOBBTN
+
+1650	   Codec Name: VobBtn Buttons
+
+1652	   Description: Based on MPEG/VOB PCI packets.  The frame contains a
+1653	   header consisting of the string "butonDVD" followed by the width and
+1654	   height in pixels (16-bit unsigned integer each) and 4 reserved bytes.
+1655	   The rest is a full PCI packet described in [DVD-Info.PCI].
+
+1657	4.  Block Addition Mappings
+
+1659	   This section describes the various types of BlockAdditionMapping that
+1660	   can be stored in Matroska.  These help the player interpret the
+1661	   multiple BlockAdditions that can be added to each Matroska
+1662	   BlockGroup.  More details can be found in section Section 7.
+
+1664	4.1.  Defining Block Addition Mappings
+
+1666	   Support for a Block Addition mapping is defined in Matroska with the
+1667	   following values.
+
+1669	4.1.1.  Block Type Identifier
+
+1671	   Each BlockAdditionMapping supported in Matroska MUST have a unique
+1672	   BlockAddIDType.  It MUST be defined for each Block Addition Mapping.
+
+1674	4.1.2.  Block Type Name
+
+1676	   Each BlockAdditionMapping supported in Matroska MAY have a
+1677	   BlockAddIDName.  The BlockAddIDName provides a readable label for the
+1678	   encoding.
+
+1680	4.1.3.  Description
+
+1682	   An optional description for the encoding.  This value is only
+1683	   intended for human consumption.
+
+1685	4.2.  Initial Block Addition Mappings
+
+1687	4.2.1.  Use BlockAddIDValue
+
+1689	   Block type identifier: 0
+
+1691	   Block type name: "Use BlockAddIDValue"
+
+1693	   Description: This value indicates that the actual type is stored in
+1694	   BlockAddIDValue instead.  This value is used when it is important to
+1695	   have a strong compatibility with players or derived formats not
+1696	   supporting BlockAdditionMapping but using BlockAdditions with an
+1697	   unknown BlockAddIDValue, and SHOULD NOT be used if it is possible to
+1698	   use another value.
+
+1700	4.2.2.  Opaque Data
+
+1702	   Block type identifier: 1
+
+1704	   Block type name: "Opaque data"
+
+1706	   Description: the BlockAdditional data is interpreted as opaque
+1707	   additional data passed to the codec with the Block data.  The usage
+1708	   of these BlockAdditional data is defined in the "Codec
+1709	   BlockAdditions" section of the codec; see Section 3.1.5.
+
+1711	4.2.3.  ITU T.35 Metadata
+
+1713	   Block type identifier: 4
+
+1715	   Block type name: "ITU T.35 metadata"
+1716	   Description: the BlockAdditional data is interpreted as ITU T.35
+1717	   metadata, as defined by [ITU-T.35] terminal codes.  BlockAddIDValue
+1718	   MUST be 4.
+
+1720	   HDR10+ dynamic metadata can be stored as ITU T.35 terminal codes as
+1721	   defined in Table 8 of [CTA.861-4].
+
+1723	4.2.4.  SMPTE ST 12-1 Timecode
+
+1725	   Block type identifier: 121
+
+1727	   Block type name: "SMPTE ST 12-1 timecode"
+
+1729	   Description: the BlockAdditional data is defined in Section 7.1.
+
+1731	4.2.5.  avcE
+
+1733	   Block type identifier: 0x61766345
+
+1735	   Block type name: Dolby Vision enhancement-layer AVC configuration
+
+1737	   Description: the BlockAddIDExtraData data is interpreted as the Dolby
+1738	   Vision enhancement-layer AVC configuration box as described in
+1739	   [DolbyVision-ISOBMFF].  This extension MUST NOT be used if CodecID is
+1740	   not V_MPEG4/ISO/AVC.
+
+1742	4.2.6.  hvcE
+
+1744	   Block type identifier: 0x68766345
+
+1746	   Block type name: "Dolby Vision enhancement-layer HEVC configuration"
+
+1748	   Description: the BlockAddIDExtraData data is interpreted as the Dolby
+1749	   Vision enhancement-layer HEVC configuration as described in
+1750	   [DolbyVision-ISOBMFF].  This extension MUST NOT be used if CodecID is
+1751	   not V_MPEGH/ISO/HEVC.
+
+1753	4.2.7.  dvcC
+
+1755	   Block type identifier: 0x64766343
+
+1757	   Block type name: "Dolby Vision configuration dvcC"
+
+1759	   Description: the BlockAddIDExtraData data is interpreted as
+1760	   DOVIDecoderConfigurationRecord structure, as defined in
+1761	   [DolbyVision-ISOBMFF], for Dolby Vision profiles 0 to 7 inclusive.
+
+1763	4.2.8.  dvvC
+
+1765	   Block type identifier: 0x64767643
+
+1767	   Block type name: "Dolby Vision configuration dvvC"
+
+1769	   Description: the BlockAddIDExtraData data is interpreted as
+1770	   DOVIDecoderConfigurationRecord structure, as defined in
+1771	   [DolbyVision-ISOBMFF], for Dolby Vision profiles 8 to 10 inclusive
+1772	   and 20.
+
+1774	4.2.9.  dvwC
+
+1776	   Block type identifier: 0x64767743
+
+1778	   Block type name: "Dolby Vision configuration dvwC"
+
+1780	   Description: the BlockAddIDExtraData data is interpreted as
+1781	   DOVIDecoderConfigurationRecord structure, as defined in
+1782	   [DolbyVision-ISOBMFF], for Dolby Vision profiles 11 to 19 inclusive.
+
+1784	4.2.10.  mvcC
+
+1786	   Block type identifier: 0x6D766343
+
+1788	   Block type name: "MVC configuration"
+
+1790	   Description: the BlockAddIDExtraData data is interpreted as
+1791	   MVCDecoderConfigurationRecord structure, as defined in
+1792	   [ISO.14496-15].  This extension MUST NOT be used if CodecID is not
+1793	   V_MPEG4/ISO/AVC.
+
+1795	5.  Audio Codecs
+
+1797	5.1.  WavPack
+
+1799	   WavPack is an audio codec primarily designed for lossless audio, but
+1800	   it can also be used as a lossy codec.
+
+1802	   [WAVPACK] stores each data in variable length frames.  That means
+1803	   each frame can have a different number of samples.
+
+1805	   Each WavPack block starts with a WavpackHeader header as defined in
+1806	   [WAVPACK], stored in little-endian.
+
+1808	   To save space and avoid redundant information in Matroska some data
+1809	   from the WavpackHeader header are removed, when saved in Matroska.
+1810	   All the data from the WavpackHeader are kept in little-endian.
+
+1812	   The CodecPrivate contains the version 16-bit integer from the
+1813	   WavpackHeader of [WAVPACK] stored in little-endian.
+
+1815	   Depending on the number of audio channels and whether the hybrid mode
+1816	   is kept or not, the storage of WavPack blocks in Matroska differ.
+
+1818	5.1.1.  Lossless And Lossy Storage
+
+1820	   For multichannel files (more than 2 channels, like for 5.1), a frame
+1821	   consists of multiple WavPack blocks.  The first one having the
+1822	   INITIAL_BLOCK (bit 11) flag set and the last one the FINAL_BLOCK (bit
+1823	   12) flag set.  For a mono or stereo file, both flags are set in each
+1824	   WavPack block.
+
+1826	5.1.1.1.  Mono/Stereo
+
+1828	   A Block or SimpleBlock frame contains the following header with the
+1829	   some fields taken from the WavpackHeader of a single WavPack block
+1830	   followed by the data of that WavPack block.
+
+1832	   {
+1833	     uint32_t block_samples; // # samples in this block
+1834	     uint32_t flags;         // various flags for id and decoding
+1835	     uint32_t crc;           // crc for actual decoded data
+1836	   }
+1837	   [ block data ]
+
+1839	5.1.1.2.  Multichannel
+
+1841	   For multichannel files, a WavPack file uses multiple WavPack block to
+1842	   store all channels of a frame.  The WavPack blocks for each channels
+1843	   of a frame are stored consecutively into a Matroska Block or
+1844	   SimpleBlock.
+
+1846	   Each WavPack block is preceded by a header.  The header for the first
+1847	   WavPack block is similar to the mono/stereo one (Section 5.1.1.1)
+1848	   with the addition of a "blocksize" field, which is the size of the
+1849	   first WavPack block minus the WavpackHeader size.  The header for the
+1850	   following WavPack blocks use the "flags" and "crc" of the
+1851	   WavpackHeader of each respective WavPack block, followed with the
+1852	   size of each respective WavPack block minus the WavpackHeader size.
+
+1854	   {
+1855	     uint32_t block_samples; // # samples in this block
+1856	     uint32_t flags;         // various flags for id and decoding
+1857	     uint32_t crc;           // crc for actual decoded data
+1858	     uint32_t blocksize;     // size of the data to follow
+1859	   }
+1860	   [ block data # 1 ]
+1861	   {
+1862	     uint32_t flags;         // various flags for id and decoding
+1863	     uint32_t crc;           // crc for actual decoded data
+1864	     uint32_t blocksize;     // size of the data to follow
+1865	   }
+1866	   [ block data # 2 ]
+1867	   {
+1868	     uint32_t flags;         // various flags for id and decoding
+1869	     uint32_t crc;           // crc for actual decoded data
+1870	     uint32_t blocksize;     // size of the data to follow
+1871	   }
+1872	   [ block data # 3 ]
+1873	   ...
+
+1875	5.1.2.  Hybrid Storage
+
+1877	   WavPack has a hybrid mode that splits the audio frames between lossy
+1878	   and correction packets.  Adding both gives a lossless version of the
+1879	   original audio.  It is possible to only store the lossy part in
+1880	   Matroska or both together.  Storing only the lossy part is equivalent
+1881	   to the format described in Section 5.1.1.  This section explains how
+1882	   to store all hybrid data in Matroska.
+
+1884	   Hybrid WavPack is encoded in 2 files.  The first one has a lossy part
+1885	   and the second file has the correction part to reconstruct the
+1886	   original audio losslessly.
+
+1888	   Each WavPack block in the correction file corresponds to a WavPack
+1889	   block in the lossy file with the same number of samples, that's also
+1890	   true for a multichannel file.  This means that if a frame is made of
+1891	   4 WavPack blocks, the correction file will have 4 WavPack blocks in
+1892	   the corresponding frame.  The header of the correction WavPack block
+1893	   is exactly the same as in the lossy WavPack block, except for the
+1894	   CRC.
+
+1896	   In Matroska, the correction part is stored as an additional data
+1897	   available to the Block (see Section 7).  This way a file could be
+1898	   remuxed and not keep the Block Additional data and still be usable as
+1899	   a lossy WavPack file.  The Block data of the lossy file are stored
+1900	   exactly the same as for lossy storage defined in Section 5.1.1.
+
+1902	   A BlockAdditionMapping MUST be used for hybrid WavPack TrackEntry'.
+
+1904	   The BlockAddIDType of that BlockAdditionMapping MUST be set to 1 for
+1905	   hybrid WavPack, corresponding to Opaque data; see Section 4.2.2.
+
+1907	   Each WavPack frame is stored in a BlockGroup that MUST have at least
+1908	   a BlockMore to hold the correction data.
+
+1910	   The BlockAddID of that BlockMore MUST be 1, i.e., the default value.
+
+1912	5.1.2.1.  Mono/Stereo
+
+1914	   The BlockAdditional element of the correction data BlockMore contains
+1915	   the following header with the "crc" field from the WavpackHeader of
+1916	   the WavPack block of the correction file matching the WavPack block
+1917	   of the lossy frame used to fill the Block data, followed by the data
+1918	   of that correction file WavPack block.
+
+1920	   {
+1921	     uint32_t crc;           // crc for actual decoded data
+1922	   }
+1923	   [ correction block data ]
+
+1925	5.1.2.2.  Multichannel
+
+1927	   The BlockAdditional element of the correction data BlockMore contains
+1928	   the following header with the data from the each WavpackHeader of the
+1929	   WavPack block of the correction file matching the WavPack block in
+1930	   the lossy file used to fill the Block data, followed by the data of
+1931	   the correction file WavPack block.
+
+1933	   {
+1934	     uint32_t crc;           // crc for actual decoded data
+1935	     uint32_t blocksize;     // size of the data to follow
+1936	   }
+1937	   [ correction block data # 1 ]
+1938	   {
+1939	     uint32_t crc;           // crc for actual decoded data
+1940	     uint32_t blocksize;     // size of the data to follow
+1941	   }
+1942	   [ correction block data # 2 ]
+1943	   {
+1944	     uint32_t crc;           // crc for actual decoded data
+1945	     uint32_t blocksize;     // size of the data to follow
+1946	   }
+1947	   [ correction block data # 3 ]
+1948	   ...
+
+1950	6.  Subtitles
+
+1952	   Here is a list of guidelines for storing subtitles in Matroska:
+
+1954	   *  As a general rule of thumb for all codecs, information that is
+1955	      global to an entire stream SHOULD be stored in the CodecPrivate
+1956	      element, although not all codec mappings are designed this way.
+
+1958	   *  As subtitles usually come with a start and stop timestamps or a
+1959	      start timestamp and a duration, SimpleBlock is usually not used as
+1960	      it doesn't allow storing the BlockDuration.  One exception would
+1961	      be if the subtitle track has a DefaultDuration which doesn't
+1962	      require a BlockDuration.
+
+1964	   *  Start and stop timestamps that are used in a timestamps original
+1965	      storage format SHOULD be removed when being placed in Matroska as
+1966	      they could interfere if the file is edited afterwards.  Instead,
+1967	      the Block's timestamp and BlockDuration SHOULD be used to say when
+1968	      the timestamp is displayed.
+
+1970	   *  Because a "subtitle" stream is actually just an overlay stream,
+1971	      anything with a transparency layer could be used, including video.
+
+1973	6.1.  Images Subtitles
+
+1975	   A common image format imported into Matroska is the VobSub subtitle
+1976	   format.  This subtitle type is generated by exporting the subtitles
+1977	   from a DVD [DVD-Video].
+
+1979	   If the subtitle version in the .IDX file is less than v7, the content
+1980	   has to be remuxed as the S_VOBSUB CodecID only supports version 7 and
+1981	   newer of VobSubs files; see Section 3.5.13.  One way to remux the
+1982	   subtitles is to use the SubResync utility from VobSub 2.23 (or MPC)
+1983	   into v7 format.  Generally any newly created subs will be in v7
+1984	   format.
+
+1986	   The .IFO file will not be used at all.
+
+1988	   If there is more than one subtitle stream in the VobSub set, each
+1989	   stream is separated into separate tracks for storage in Matroska.
+1990	   E.g. the VobSub file contains streams for both English and German
+1991	   subtitles.  Then the resulting Matroska file will contain multiple
+1992	   tracks, and language information can be mapped to Matroska's language
+1993	   tags and dropped from the streams.
+
+1995	   The .IDX file is reformatted (see below) and placed in the
+1996	   CodecPrivate.
+
+1998	   Each .BMP will be stored in its own Block.  The Timestamp will be
+1999	   stored in the Block timestamp and the duration will be stored in the
+2000	   Default Duration.
+
+2002	   Here is an example .IDX file:
+
+2004	    # VobSub index file, v7 (do not modify this line!)
+2005	    #
+2006	    # To repair desynchronization, you can insert gaps this way:
+2007	    # (it usually happens after vob id changes)
+2008	    #
+2009	    # delay: [sign]hh:mm:ss:ms
+2010	    #
+2011	    # Where:
+2012	    # [sign]: +, - (optional)
+2013	    # hh: hours (0 <= hh)
+2014	    # mm/ss: minutes/seconds (0 <= mm/ss <= 59)
+2015	    # ms: milliseconds (0 <= ms <= 999)
+2016	    #
+2017	    # You can also modify timestamps or delete a few subs you don't
+2018	    # like. Just make sure they stay in increasing order.
+
+2020	    # Settings
+
+2022	    # Original frame size
+2023	    size: 720x480
+
+2025	    # Origin, relative to the upper-left corner, can be overloaded by
+2026	    # alignment
+2027	    org: 0, 0
+
+2029	    # Image scaling (hor,ver), origin is at the upper-left corner or at
+2030	    # the alignment coord (x, y)
+2031	    scale: 100%, 100%
+
+2033	    # Alpha blending
+2034	    alpha: 100%
+
+2036	    # Smoothing for very blocky images (use OLD for no filtering)
+2037	    smooth: OFF
+
+2039	    # In millisecs
+2040	    fadein/out: 50, 50
+
+2042	    # Force subtitle placement relative to (org.x, org.y)
+2043	    align: OFF at LEFT TOP
+
+2045	    # For correcting non-progressive desync. (in millisecs or
+2046	    # hh:mm:ss:ms)
+2047	    # Note: Not effective in DirectVobSub, use "delay: ... " instead.
+2048	    time offset: 0
+
+2050	    # ON: displays only forced subtitles, OFF: shows everything
+2051	    forced subs: OFF
+
+2053	    # The original palette of the DVD
+2054	    palette: 000000, 7e7e7e, fbff8b, cb86f1, 7f74b8, e23f06, 0a48ea, \
+2055	    b3d65a, 6b92f1, 87f087, c02081, f8d0f4, e3c411, 382201, e8840b, \
+2056	    fdfdfd
+
+2058	    # Custom colors (transp idxs and the four colors)
+2059	    custom colors: OFF, tridx: 0000, colors: 000000, 000000, 000000, \
+2060	    000000
+
+2062	    # Language index in use
+2063	    langidx: 0
+
+2065	    # English
+2066	    id: en, index: 0
+2067	    # Uncomment next line to activate alternative name in DirectVobSub /
+2068	    # Windows Media Player 6.x
+2069	    # alt: English
+2070	    # Vob/Cell ID: 1, 1 (PTS: 0)
+2071	    timestamp: 00:00:01:101, filepos: 000000000
+2072	    timestamp: 00:00:08:708, filepos: 000001000
+
+2074	   First, lines beginning with "#" are removed.  These are comments to
+2075	   make text file editing easier, and as this is not a text file, they
+2076	   aren't needed.
+
+2078	   Next remove the "langidx" and "id" lines.  These are used to
+2079	   differentiate the subtitle streams and define the language.  As the
+2080	   streams will be stored separately anyway, there is no need to
+2081	   differentiate them here.  Also, the language setting will be stored
+2082	   in the Matroska tags, so there is no need to store it here.
+
+2084	   Finally, the "timestamp" will be used to set the Block's timestamp.
+2085	   Once it is set there, there is no need for it to be stored here.
+2086	   Also, as it may interfere if the file is edited, it SHOULD NOT be
+2087	   stored here and it MUST NOT be used by the decoder.
+
+2089	   Once all of these items are removed, the data to store in the
+2090	   CodecPrivate SHOULD look like this:
+
+2092	    size: 720x480
+2093	    org: 0, 0
+2094	    scale: 100%, 100%
+2095	    alpha: 100%
+2096	    smooth: OFF
+2097	    fadein/out: 50, 50
+2098	    align: OFF at LEFT TOP
+2099	    time offset: 0
+2100	    forced subs: OFF
+2101	    palette: 000000, 7e7e7e, fbff8b, cb86f1, 7f74b8, e23f06, 0a48ea, \
+2102	    b3d65a, 6b92f1, 87f087, c02081, f8d0f4, e3c411, 382201, e8840b, \
+2103	    fdfdfd
+2104	    custom colors: OFF, tridx: 0000, colors: 000000, 000000, 000000, \
+2105	    000000
+
+2107	   There SHOULD also be two Blocks containing one image each with the
+2108	   timestamps "00:00:01:101" and "00:00:08:708".
+
+2110	6.2.  SRT Subtitles
+
+2112	   SRT is perhaps the most basic of all subtitle formats.
+
+2114	   It consists of four parts, all in text:
+
+2116	   1.  A number indicating which subtitle it is in the sequence.
+
+2118	   2.  The time that the subtitle appears on the screen, and then
+2119	       disappears.
+
+2121	   3.  The subtitle itself.
+
+2123	   4.  A blank line indicating the start of a new subtitle.
+
+2125	   When placing SRT in Matroska, part 3 is converted to UTF-8 (S_TEXT/
+2126	   UTF8) and placed in the data portion of the Block.  Part 2 is used to
+2127	   set the timestamp of the Block, and BlockDuration element.  Nothing
+2128	   else is used.
+
+2130	   Here is an example SRT file:
+
+2132	   1
+2133	   00:02:17,440 --> 00:02:20,375
+2134	   Senator, we're making
+2135	   our final approach into Coruscant.
+
+2137	   2
+2138	   00:02:20,476 --> 00:02:22,501
+2139	   Very good, Lieutenant.
+
+2141	   In this example, the text "Senator, we're making our final approach
+2142	   into Coruscant." would be converted into UTF-8 and placed in the
+2143	   Block.  The timestamp of the block would be set to "00:02:17,440".
+2144	   And the BlockDuration element would be set to "00:00:02,935".
+
+2146	   The same is repeated for the next subtitle.
+
+2148	   Because there are no general settings for SRT, the CodecPrivate is
+2149	   left blank.
+
+2151	6.3.  SSA/ASS Subtitles
+
+2153	   SSA stands for Sub Station Alpha.  It's the file format used by the
+2154	   popular subtitle editor SubStation Alpha.  It allows you to do some
+2155	   advanced display features, like positioning, karaoke, or style
+2156	   managements...
+
+2158	   For detailed information on SSA/ASS, see the SSA specs [SSA].  It
+2159	   includes an SSA specs description and the advanced features added by
+2160	   ASS format (standing for Advanced SSA).  Because SSA and ASS are so
+2161	   similar, they are treated the same here.
+
+2163	   Like SRT, this format is text based with a particular syntax.
+
+2165	   A file consists of 4 or 5 parts, declared similar to an INI file.
+
+2167	   The first, "[Script Info]" contains some information about the
+2168	   subtitle file, such as its title, who created it, type of script and
+2169	   "PlayResY", which is very important, because everything in your
+2170	   script (font size, positioning) is scaled by it.  Sub Station Alpha
+2171	   uses your desktops Y resolution to write this value, so if a friend
+2172	   with a large monitor and a high screen resolution gives you an edited
+2173	   script, you can mess everything up by saving the script in SSA with
+2174	   your low-resolution monitor.
+
+2176	   The second, "[V4 Styles]" or "[V4+ Styles]", is a list of style
+2177	   definitions.  A style describes how a text will look on the screen.
+2178	   It defines font, font size, primary/.../outline color, position,
+2179	   alignment, etc.
+
+2181	   For example, this:
+
+2183	   Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, \
+2184	   TertiaryColour, BackColour, Bold, Italic, BorderStyle, Outline, \
+2185	   Shadow, Alignment, MarginL, MarginR, MarginV, AlphaLevel, Encoding
+2186	   Style: Wolf main,Wolf_Rain,56,15724527,15724527,15724527,4144959,0,\
+2187	   0,1,1,2,2,5,5,30,0,0
+2188	   The third, "[Events]", is the list of text you want to display at the
+2189	   right timing.  You can specify some attributes here, such as the
+2190	   style to use for this event (MUST be defined in the list), the
+2191	   position of the text (Left, Right, Vertical Margin), or some effect.
+2192	   The Name is used by the translator to know who said this sentence.
+2193	   Timing is in h:mm:ss.cc (centisec).
+
+2195	   Format: Marked, Start, End, Style, Name, MarginL, MarginR, MarginV, \
+2196	   Effect, Text
+2197	   Dialogue: Marked=0,0:02:40.65,0:02:41.79,Wolf main,Cher,0000,0000,\
+2198	   0000,,Et les enregistrements de ses ondes delta ?
+2199	   Dialogue: Marked=0,0:02:42.42,0:02:44.15,Wolf main,autre,0000,0000,\
+2200	   0000,,Toujours rien.
+
+2202	   "[Pictures]" or "[Fonts]" part can be found in some SSA files.  These
+2203	   parts contain UUE-encoded pictures/font.  These features are only
+2204	   used by Sub Station Alpha -- i.e., no filter (Vobsub/Avery Lee
+2205	   Subtiler filter) uses them.
+
+2207	   Now, how are they stored in Matroska?
+
+2209	   *  All text is converted to UTF-8
+
+2211	   *  All the headers, "[Script Info]" and the "[V4 Styles]"/"[V4+
+2212	      Styles]" list, are stored in CodecPrivate.
+
+2214	   *  Start & End field are used to set TimeStamp and the BlockDuration
+2215	      element. the data stored is:
+
+2217	   *  Events are stored in the Block in this order: ReadOrder, Layer,
+2218	      Style, Name, MarginL, MarginR, MarginV, Effect, Text (Layer comes
+2219	      from ASS specs ... it's empty for SSA.)  "ReadOrder field is
+2220	      needed for the decoder to be able to reorder the streamed samples
+2221	      as they were placed originally in the file."
+
+2223	   Here is an example of an SSA file.
+
+2225	   [Script Info]
+2226	   ; This is a Sub Station Alpha v4 script.
+2227	   Title: Wolf's rain 2
+2228	   Original Script: Anime-spirit Ishin-francais
+2229	   Original Translation: Coolman
+2230	   Original Editing: Spikewolfwood
+2231	   Original Timing: Lord_alucard
+2232	   Original Script Checking: Spikewolfwood
+2233	   ScriptType: v4.00
+2234	   Collisions: Normal
+2235	   PlayResY: 1024
+2236	   PlayDepth: 0
+2237	   Wav: 0, 128697,D:\Alex\Anime\- Fansub -\- TAFF -\WR_-_02_Wav.wav
+2238	   Wav: 0, 120692,H:\team truc\WR_-_02.wav
+2239	   Wav: 0, 116504,E:\sub\wolf's_rain\WOLF'S RAIN 02.wav
+2240	   LastWav: 3
+2241	   Timer: 100,0000
+
+2243	   [V4 Styles]
+2244	   Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, \
+2245	   TertiaryColour, BackColour, Bold, Italic, BorderStyle, Outline, \
+2246	   Shadow, Alignment, MarginL, MarginR, MarginV, AlphaLevel, Encoding
+2247	   Style: Default,Arial,20,65535,65535,65535,-2147483640,-1,0,1,3,0,2,\
+2248	   30,30,30,0,0
+2249	   Style: Titre_episode,Akbar,140,15724527,65535,65535,986895,-1,0,1,1,\
+2250	   0,3,30,30,30,0,0
+2251	   Style: Wolf main,Wolf_Rain,56,15724527,15724527,15724527,4144959,0,\
+2252	   0,1,1,2,2,5,5,30,0,0
+
+2254	   [Events]
+2255	   Format: Marked, Start, End, Style, Name, MarginL, MarginR, MarginV, \
+2256	   Effect, Text
+2257	   Dialogue: Marked=0,0:02:40.65,0:02:41.79,Wolf main,Cher,0000,0000,\
+2258	   0000,,Et les enregistrements de ses ondes delta ?
+2259	   Dialogue: Marked=0,0:02:42.42,0:02:44.15,Wolf main,autre,0000,0000,\
+2260	   0000,,Toujours rien.
+
+2262	   Here is what would be placed into the CodecPrivate element.
+
+2264	   [Script Info]
+2265	   ; This is a Sub Station Alpha v4 script.
+2266	   Title: Wolf's rain 2
+2267	   Original Script: Anime-spirit Ishin-francais
+2268	   Original Translation: Coolman
+2269	   Original Editing: Spikewolfwood
+2270	   Original Timing: Lord_alucard
+2271	   Original Script Checking: Spikewolfwood
+2272	   ScriptType: v4.00
+2273	   Collisions: Normal
+2274	   PlayResY: 1024
+2275	   PlayDepth: 0
+2276	   Wav: 0, 128697,D:\Alex\Anime\- Fansub -\- TAFF -\WR_-_02_Wav.wav
+2277	   Wav: 0, 120692,H:\team truc\WR_-_02.wav
+2278	   Wav: 0, 116504,E:\sub\wolf's_rain\WOLF'S RAIN 02.wav
+2279	   LastWav: 3
+2280	   Timer: 100,0000
+
+2282	   [V4 Styles]
+2283	   Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, \
+2284	   TertiaryColour, BackColour, Bold, Italic, BorderStyle, Outline, \
+2285	   Shadow, Alignment, MarginL, MarginR, MarginV, AlphaLevel, Encoding
+2286	   Style: Default,Arial,20,65535,65535,65535,-2147483640,-1,0,1,3,0,2,\
+2287	   30,30,30,0,0
+2288	   Style: Titre_episode,Akbar,140,15724527,65535,65535,986895,-1,0,1,1,\
+2289	   0,3,30,30,30,0,0
+2290	   Style: Wolf main,Wolf_Rain,56,15724527,15724527,15724527,4144959,0,\
+2291	   0,1,1,2,2,5,5,30,0,0
+
+2293	   And here are the two blocks that would be generated.
+
+2295	   Block's timestamp: 00:02:40.650 BlockDuration: 00:00:01.140
+
+2297	   1,,Wolf main,Cher,0000,0000,0000,,Et les enregistrements de ses \
+2298	   ondes delta ?
+
+2300	   Block's timestamp: 00:02:42.420 BlockDuration: 00:00:01.730
+
+2302	   2,,Wolf main,autre,0000,0000,0000,,Toujours rien.
+
+2304	6.4.  WebVTT
+
+2306	   The "Web Video Text Tracks Format" (short: WebVTT) is developed by
+2307	   the World Wide Web Consortium (W3C).  Its specifications are freely
+2308	   available at [WebVTT].
+
+2310	   The guiding principles for the storage of WebVTT in Matroska are:
+
+2312	   *  Consistency: store data in a similar way to other subtitle codecs
+
+2314	   *  Simplicity: making decoding and remuxing as easy as possible for
+2315	      existing infrastructures
+
+2317	   *  Completeness: keeping as much data as possible from the original
+2318	      WebVTT file
+
+2320	6.4.1.  Track Parameters
+
+2322	   The CodecID to use is S_TEXT/WEBVTT.
+
+2324	   This CodecPrivate contains all global blocks before the first
+2325	   subtitle entry.  This starts at the "WEBVTT" file identification
+2326	   marker but excludes the optional byte order mark.
+
+2328	6.4.2.  Storage of non-global WebVTT blocks
+
+2330	   Non-global WebVTT blocks (e.g., "NOTE") before a WebVTT caption or
+2331	   subtitle cue text are stored in Matroska's BlockAddition element
+2332	   together with the Matroska Block containing the WebVTT caption or
+2333	   subtitle cue text these blocks precede (see below for the actual
+2334	   format).
+
+2336	6.4.3.  Storage of Cues in Matroska blocks
+
+2338	   Each WebVTT caption or subtitle cue text is stored directly in the
+2339	   Matroska Block.
+
+2341	   A muxer MUST change all WebVTT cue timestamp(s) present within the
+2342	   WebVTT caption or subtitle cue text to be relative to the Matroska
+2343	   Block's timestamp.
+
+2345	   The Cue's start timestamp is used as the Matroska Block's timestamp.
+
+2347	   The difference between the Cue's end timestamp and its start
+2348	   timestamp is used as the Matroska BlockDuration.
+
+2350	6.4.4.  BlockAdditions
+
+2352	   Each Matroska Block may be accompanied by one BlockAdditions element.
+2353	   Its format is as follows:
+
+2355	   1.  The first line contains the WebVTT caption or subtitle cue text's
+2356	       optional WebVTT cue settings list followed by one line feed
+2357	       character (U+0x000a).  The WebVTT cue settings list may be empty,
+2358	       in which case the line consists of the line feed character only.
+
+2360	   2.  The second line contains the WebVTT caption or subtitle cue
+2361	       text's optional WebVTT cue identifier followed by one line feed
+2362	       character (U+0x000a).  The line may be empty indicating that
+2363	       there was no WebVTT cue identifier in the source file, in which
+2364	       case the line consists of the line feed character only.
+
+2366	   3.  The third and all following lines contain all WebVTT comment
+2367	       block(s) that precede the current WebVTT cue block.  These may be
+2368	       absent.  Each WebVTT comment block includes its WebVTT line
+2369	       terminator and is followed by one line feed character (U+0x000a).
+2370	       The last WebVTT comment block MAY omit the WebVTT line terminator
+2371	       and the line feed character.
+
+2373	   If there is no Matroska BlockAddition element stored together with
+2374	   the Matroska Block, then WebVTT cue settings list, WebVTT cue
+2375	   identifier, and WebVTT comment block(s) MUST be assumed to be absent.
+
+2377	6.4.5.  Example of Matroska Muxing
+
+2379	   Here's an example how a WebVTT is transformed.
+
+2381	   Consider the following example WebVTT file:
+
+2383	   WEBVTT with text after the signature
+
+2385	   STYLE
+2386	   ::cue {
+2387	     background-image: linear-gradient(to bottom, dimgray, lightgray);
+2388	     color: papayawhip;
+2389	   }
+2390	   /* Style blocks cannot use blank lines nor "dash dash greater \
+2391	   than" */
+
+2393	   NOTE comment blocks can be used between style blocks.
+
+2395	   STYLE
+2396	   ::cue(b) {
+2397	     color: peachpuff;
+2398	   }
+
+2400	   REGION
+2401	   id:bill
+2402	   width:40%
+2403	   lines:3
+2404	   regionanchor:0%,100%
+2405	   viewportanchor:10%,90%
+2406	   scroll:up
+2407	   NOTE
+2408	   Notes always span a whole block and can cover multiple
+2409	   lines. Like this one.
+2410	   An empty line ends the block.
+
+2412	   hello
+2413	   00:00:00.000 --> 00:00:10.000
+2414	   Example entry 1: Hello <b>world</b>.
+
+2416	   NOTE style blocks can't appear after the first cue.
+
+2418	   00:00:25.000 --> 00:00:35.000
+2419	   Example entry 2: Another entry.
+2420	   This one has multiple lines.
+
+2422	   00:01:03.000 --> 00:01:06.500 position:90% align:right size:35%
+2423	   Entry 3: That stuff to the right of the \
+2424	   timestamps are cue settings.
+
+2426	   00:03:10.000 --> 00:03:20.000
+2427	   Entry 4: Entries can even include timestamps.
+2428	   For example:<00:03:15.000>This becomes visible five seconds
+2429	   after the first part.
+
+2431	6.4.5.1.  CodecPrivate
+
+2433	   The following XML depicts the CodecPrivate element contains the UTF-8
+2434	   text of all global WebVTT blocks before the first subtitle entry:
+
+2436	   <TrackEntry>
+2437	     <CodecPrivate>WEBVTT with text after the signature
+
+2439	   STYLE
+2440	   ::cue {
+2441	     background-image: linear-gradient(to bottom, dimgray, lightgray);
+2442	     color: papayawhip;
+2443	   }
+2444	   /* Style blocks cannot use blank lines nor "dash dash greater \
+2445	   than" */
+
+2447	   NOTE comment blocks can be used between style blocks.
+
+2449	   STYLE
+2450	   ::cue(b) {
+2451	     color: peachpuff;
+2452	   }
+
+2454	   REGION
+2455	   id:bill
+2456	   width:40%
+2457	   lines:3
+2458	   regionanchor:0%,100%
+2459	   viewportanchor:10%,90%
+2460	   scroll:up
+
+2462	   NOTE
+2463	   Notes always span a whole block and can cover multiple
+2464	   lines. Like this one.
+2465	   An empty line ends the block.</CodecPrivate>
+2466	   </TrackEntry>
+
+2468	6.4.5.2.  Cue Block 1
+
+2470	   The following XML depicts the nested elements of a BlockGroup element
+2471	   with of the first WebVTT cue block.  The cue block timings are turned
+2472	   into Matroska timestamps.  The last line feed character (U+0x000a) is
+2473	   stripped.
+
+2475	   The BlockAddition content starts with one empty line as there's no
+2476	   WebVTT cue settings list:
+
+2478	   <BlockGroup>
+2479	     <Block timestamp="0">Example entry 1: Hello <b>world</b>.</Block>
+2480	     <BlockDuration>10000</BlockDuration> <!-- 10000 Ticks of 1 ms -->
+2481	     <BlockAdditions>
+2482	       <BlockMore>
+2483	         <BlockAddID>1</BlockAddID>
+2484	         <BlockAdditional>
+
+2486	   hello</BlockAdditional>
+2487	       </BlockMore>
+2488	     </BlockAdditions>
+2489	   </BlockGroup>
+
+2491	6.4.5.3.  Cue Block 2
+
+2493	   The following XML depicts the nested elements of a BlockGroup element
+2494	   with of the second WebVTT cue block.  The last line feed character
+2495	   (U+0x000a) is stripped.
+
+2497	   The BlockAddition content starts with two empty lines as there's
+2498	   neither a WebVTT cue settings list nor a WebVTT cue identifier, Then
+2499	   follows the content of the WebVTT comment block(s).  The last line
+2500	   feed character (U+0x000a) is stripped.
+
+2502	   <BlockGroup>
+2503	     <Block timestamp="25000">Example entry 2: Another entry.
+2504	   This one has multiple lines.</Block>
+2505	     <BlockDuration>10000</BlockDuration>
+2506	     <BlockAdditions>
+2507	       <BlockMore>
+2508	         <BlockAddID>1</BlockAddID>
+2509	         <BlockAdditional>
+
+2511	   NOTE style blocks can't appear after the first cue.</BlockAdditional>
+2512	       </BlockMore>
+2513	     </BlockAdditions>
+2514	   </BlockGroup>
+
+2516	6.4.5.4.  Cue Block 3
+
+2518	   The following XML depicts the nested elements of a BlockGroup element
+2519	   with of the third WebVTT cue block.  The last line feed character
+2520	   (U+0x000a) is stripped.
+
+2522	   The BlockAddition content ends with an empty line as there is no
+2523	   WebVTT cue identifier and there were no WebVTT comment block.
+
+2525	   <BlockGroup>
+2526	     <Block timestamp="63000">Entry 3: That stuff to the right of the \
+2527	   timestamps are cue settings.</Block>
+2528	     <BlockDuration>3500</BlockDuration>
+2529	     <BlockAdditions>
+2530	       <BlockMore>
+2531	         <BlockAddID>1</BlockAddID>
+2532	         <BlockAdditional>
+2533	   position:90% align:right size:35%
+
+2535	   </BlockAdditional>
+2536	       </BlockMore>
+2537	     </BlockAdditions>
+2538	   </BlockGroup>
+
+2540	6.4.5.5.  Cue Block 4
+
+2542	   The following XML depicts the nested elements of a BlockGroup element
+2543	   with of the fourth WebVTT cue block.  The last line feed character
+2544	   (U+0x000a) is stripped.
+
+2546	   No BlockAddition is used.
+
+2548	   <BlockGroup>
+2549	     <Block timestamp="190000">Entry 4: Entries can even include
+2550	     timestamps.
+2551	   For example:<00:03:15.000>This becomes visible five seconds
+2552	   after the first part.</Block>
+2553	     <BlockDuration>10000</BlockDuration>
+2554	   </BlockGroup>
+
+2556	6.4.6.  Storage of WebVTT in Matroska vs. WebM
+
+2558	   Note: the storage of WebVTT in Matroska is not the same as the design
+2559	   document for storage of WebVTT in WebM [WebM-WebVTT].  There are
+2560	   several reasons for this including but not limited to: the WebM
+2561	   document is old (from February 2012) and was based on an earlier
+2562	   draft of WebVTT and ignores several parts that were added to WebVTT
+2563	   later; WebM does still not support subtitles at all [WebMContainer];
+2564	   the proposal suggests splitting the information across multiple
+2565	   tracks making demuxer's and remuxer's life very difficult.
+
+2567	   WebM uses the "D_WEBVTT/SUBTITLES", "D_WEBVTT/CAPTIONS", "D_WEBVTT/
+2568	   DESCRIPTIONS", and "D_WEBVTT/METADATA" CodecID with different tracks
+2569	   depending on the data type and without a CodecPrivate.
+
+2571	6.5.  HDMV Presentation Graphics Subtitles
+
+2573	   The specifications for the HDMV Presentation Graphics Subtitle format
+2574	   (short: HDMV PGS) can be found in in section 9.14 "HDMV graphics
+2575	   streams" of the Blu-ray specifications [Blu-ray.Part3].
+
+2577	6.5.1.  Track Parameters
+
+2579	   The CodecID to use is S_HDMV/PGS.  A CodecPrivate element is not
+2580	   used.
+
+2582	6.5.2.  Matroska Blocks
+
+2584	   Each HDMV PGS Segment (short: Segment) will be stored in a Matroska
+2585	   Block.  A Segment is the data structure described in section 9.14.2.1
+2586	   "Segment coding structure and parameters" of the Blu-ray
+2587	   specifications [Blu-ray.Part3].
+
+2589	   Each Segment contains a presentation timestamp.  This timestamp will
+2590	   be used as the timestamp for the Matroska Block.
+
+2592	   A Segment is normally shown until a subsequent Segment is
+2593	   encountered.  Therefore, the Matroska Block MAY have no Duration.  In
+2594	   that case, a player MUST display a Segment within a Matroska Block
+2595	   until the next Segment is encountered.
+
+2597	   A muxer MAY use a Duration, e.g., by calculating the distance between
+2598	   two subsequent Segments.  If a Matroska Block has a Duration, a
+2599	   player MUST display that Segment only for the duration of the
+2600	   BlockDuration.
+
+2602	6.6.  HDMV Text Subtitles
+
+2604	   The specifications for the HDMV Text Subtitle format (short: HDMV
+2605	   TextST) can be found in section 9.15 "HDMV text subtitle streams" of
+2606	   the Blu-ray specifications [Blu-ray.Part3].
+
+2608	6.6.1.  Track Parameters
+
+2610	   The CodecID to use is S_HDMV/TEXTST.
+
+2612	   A CodecPrivate element is required.  It MUST contain the stream's
+2613	   Dialog Style Segment as described in section 9.15.4.2 "Dialog Style
+2614	   Segment" of the Blu-ray specifications [Blu-ray.Part3].
+
+2616	6.6.2.  Matroska Blocks
+
+2618	   Each HDMV Dialog Presentation Segment (short: Segment) will be stored
+2619	   in a Matroska Block.  A Segment is the data structure described in
+2620	   section 9.15.4.3 "Dialog presentation segment" of the Blu-ray
+2621	   specifications [Blu-ray.Part3].
+
+2623	   Each Segment contains a start and an end presentation timestamp
+2624	   (short: start PTS & end PTS).  The start PTS will be used as the
+2625	   timestamp for the Matroska Block.  The Matroska Block MUST have a
+2626	   Duration, and that Duration is the difference between the end PTS and
+2627	   the start PTS.
+
+2629	   A player MUST use the Matroska Block's timestamp and BlockDuration
+2630	   instead of the Segment's start and end PTS for determining when and
+2631	   how long to show the Segment.
+
+2633	6.6.3.  Character set
+
+2635	   When TextST subtitles are stored inside Matroska, the only allowed
+2636	   character set is UTF-8.
+
+2638	   Each HDMV text subtitle stream in a Blu-ray can use one of a handful
+2639	   of character sets.  This information is not stored in the MPEG2
+2640	   Transport Stream itself but in the accompanying Clip Information
+2641	   file.
+
+2643	   Therefore, a muxer MUST parse the accompanying Clip Information file.
+2644	   If the information indicates a character set other than UTF-8, it
+2645	   MUST re-encode all text Dialog Presentation Segments from the
+2646	   indicated character set to UTF-8 prior to storing them in Matroska.
+
+2648	6.7.  Digital Video Broadcasting (DVB) subtitles
+
+2650	   The specifications for the Digital Video Broadcasting subtitle
+2651	   bitstream format (short: DVB subtitles) can be found in the
+2652	   [ETSI.EN300-743] document.  The storage of DVB subtitles in MPEG
+2653	   transport streams is specified in the [ETSI.EN300-468] document.
+
+2655	6.7.1.  Track Parameters
+
+2657	   The CodecID to use is S_DVBSUB.
+
+2659	   The CodecPrivate element is five bytes long and has the following
+2660	   structure:
+
+2662	   *  2 bytes: composition page ID (bit string, left bit first)
+2663	   *  2 bytes: ancillary page ID (bit string, left bit first)
+
+2665	   *  1 byte: subtitling type (bit string, left bit first)
+
+2667	   The semantics of these bytes are the same as the ones described in
+2668	   section 6.2.41 "Subtitling descriptor" of [ETSI.EN300-468].
+
+2670	6.7.2.  Matroska Blocks
+
+2672	   Each Matroska Block consists of one or more DVB Subtitle Segments as
+2673	   described in section 7.2 "Syntax and semantics of the subtitling
+2674	   segment" of [ETSI.EN300-743].
+
+2676	   Each Matroska Block SHOULD have a Duration indicating how long the
+2677	   DVB Subtitle Segments in that Block SHOULD be displayed.
+
+2679	6.8.  ARIB (ISDB) subtitles
+
+2681	   The specifications for the ARIB B-24 subtitle bitstream format
+2682	   (short: ARIB subtitles) and its storage in MPEG transport streams can
+2683	   be found in the documents [ARIB.STD-B24], [ARIB.STD-B10], and
+2684	   [ARIB.TR-B14].
+
+2686	6.8.1.  Track Parameters
+
+2688	   The CodecID to use is S_ARIBSUB.
+
+2690	   The CodecPrivate element is three bytes long and has the following
+2691	   structure:
+
+2693	   *  1 byte: component tag (bit string, left bit first)
+
+2695	   *  2 bytes: data component ID (bit string, left bit first)
+
+2697	   The semantics of the component tag are the same as those described in
+2698	   [ARIB.STD-B10], part 2, Annex J.  The semantics of the data component
+2699	   ID are the same as those described in [ARIB.TR-B14], fascicle 2, Vol.
+2700	   3, Section 2, 4.2.8.1.
+
+2702	6.8.2.  Matroska Blocks
+
+2704	   Each Matroska Block consists of a single synchronized PES data
+2705	   structure as described in chapter 5 "Independent PES transmission
+2706	   protocol" of [ARIB.STD-B24], volume 3, with a
+2707	   Synchronized_PES_data_byte block containing one or more ISDB Caption
+2708	   Data Groups as described in chapter 9 "Transmission of caption and
+2709	   superimpose" of [ARIB.STD-B24], volume 1, part 3.  All of the Caption
+2710	   Statement Data Groups in a given Matroska Track MUST use the same
+2711	   language index.
+
+2713	   A Data Group is normally shown until a subsequent Group provides
+2714	   instructions to clear it.  Therefore, the Matroska Block SHOULD NOT
+2715	   have a Duration.  A player SHOULD display a Data Group within a
+2716	   Matroska Block until its internal duration elapses, or until a
+2717	   subsequent Data Group removes it.
+
+2719	7.  Block Additional Mapping
+
+2721	   Extra data or metadata can be added to each Block using
+2722	   BlockAdditional data.  Each BlockAdditional contains a BlockAddID
+2723	   that identifies the kind of data it contains.  When the BlockAddID is
+2724	   set to "1" the contents of the BlockAdditional element are defined by
+2725	   the "Codec BlockAdditions" section of the codec; see Section 3.1.5.
+
+2727	   The following XML depicts the nested elements of a BlockGroup element
+2728	   with an example of BlockAdditions with a BlockAddID of "1":
+
+2730	   <BlockGroup>
+2731	     <Block>{Binary data of a VP9 video frame in YUV}</Block>
+2732	     <BlockAdditions>
+2733	       <BlockMore>
+2734	         <BlockAddID>1</BlockAddID>
+2735	         <BlockAdditional>
+2736	           {alpha channel encoding to supplement the VP9 frame}
+2737	         </BlockAdditional>
+2738	       </BlockMore>
+2739	     </BlockAdditions>
+2740	   </BlockGroup>
+
+2742	   When the BlockAddID is set a value greater than "1", then the
+2743	   contents of the BlockAdditional element are defined by the
+2744	   BlockAdditionMapping element, within the associated TrackEntry
+2745	   element, where the BlockAddID element of BlockAdditional element
+2746	   equals the BlockAddIDValue of the associated TrackEntry's
+2747	   BlockAdditionMapping element.  That BlockAdditionMapping element
+2748	   identifies a particular Block Additional Mapping by the
+2749	   BlockAddIDType.
+
+2751	   The values of BlockAddID that are 2 or greater have no semantic
+2752	   meaning, but simply associate the BlockMore element with a
+2753	   BlockAdditionMapping of the associated Track.  See Section 7 on Block
+2754	   Additional Mappings for more information.
+
+2756	   It is RECOMMENDED to not use a value of 4 for BlockAddID and
+2757	   BlockAddIDValue when BlockAddIDType is not 4 -- i.e., ITU T.35
+2758	   metadata Section 4.2.3, as some WebM-oriented demuxers consider a
+2759	   block with BlockAddID of 4 as ITU T.35 metadata without checking the
+2760	   BlockAddIDType element.
+
+2762	   The following XML depicts a use of a Block Additional Mapping to
+2763	   associate a timecode value with a Block:
+
+2765	   <Segment>
+2766	     <!--Mandatory elements omitted for readability-->
+2767	     <Tracks>
+2768	       <TrackEntry>
+2769	         <TrackNumber>1</TrackNumber>
+2770	         <TrackUID>568001708</TrackUID>
+2771	         <TrackType>1</TrackType>
+2772	         <BlockAdditionMapping>
+2773	           <BlockAddIDValue>2</BlockAddIDValue><!--arbitrary value
+2774	             used in BlockAddID-->
+2775	           <BlockAddIDName>timecode</BlockAddIDName>
+2776	           <BlockAddIDType>121</BlockAddIDType>
+2777	         </BlockAdditionMapping>
+2778	         <CodecID>V_FFV1</CodecID>
+2779	         <Video>
+2780	           <PixelWidth>1920</PixelWidth>
+2781	           <PixelHeight>1080</PixelHeight>
+2782	         </Video>
+2783	       </TrackEntry>
+2784	     </Tracks>
+2785	     <Cluster>
+2786	       <Timestamp>3000</Timestamp>
+2787	       <BlockGroup>
+2788	         <Block>{binary video frame}</Block>
+2789	         <BlockAdditions>
+2790	           <BlockMore>
+2791	             <BlockAddID>2</BlockAddID><!--arbitrary value from
+2792	               BlockAdditionMapping-->
+2793	             <BlockAdditional>01:00:00:00</BlockAdditional><!--presented
+2794	              as a string for readability but should use binary encoding
+2795	              defined in the associated mapping -->
+2796	           </BlockMore>
+2797	         </BlockAdditions>
+2798	       </BlockGroup>
+2799	     </Cluster>
+2800	   </Segment>
+2801	   Block Additional Mappings detail how additional data is stored in the
+2802	   BlockMore element with a BlockAdditionMapping element, within the
+2803	   Track element, which identifies the BlockAdditional content.  Block
+2804	   Additional Mappings define the BlockAddIDType value reserved to
+2805	   identify that type of data as well as providing an optional label
+2806	   stored within the BlockAddIDName element.  When the Block Additional
+2807	   Mapping is dependent on additional contextual information, then the
+2808	   Mapping SHOULD describe how such additional contextual information is
+2809	   stored within the BlockAddIDExtraData element.
+
+2811	7.1.  SMPTE ST 12-1 Timecode Description
+
+2813	   SMPTE ST 12-1 timecode values can be stored in the BlockMore element
+2814	   to associate the content of a Matroska Block with a particular
+2815	   timecode value.  If the Block uses Lacing, the timecode value is
+2816	   associated with the first frame of the Lace.
+
+2818	   The Block Additional Mapping contains a full binary representation of
+2819	   a 64-bit SMPTE timecode value stored in big-endian format and
+2820	   expressed exactly as defined in Section 8 and 9 of SMPTE 12M
+2821	   [SMPTE.ST12-1], without the 16-bit synchronization word.  For
+2822	   convenience, here are the time address bit assignments as described
+2823	   in Section 6.2 of [RFC5484]:
+
+2825	                   +===============+==================+
+2826	                   | Bit Positions | Label            |
+2827	                   +===============+==================+
+2828	                   |      0--3     | Units of frames  |
+2829	                   +---------------+------------------+
+2830	                   |      8--9     | Tens of frames   |
+2831	                   +---------------+------------------+
+2832	                   |     16--19    | Units of seconds |
+2833	                   +---------------+------------------+
+2834	                   |     24--26    | Tens of seconds  |
+2835	                   +---------------+------------------+
+2836	                   |     32--35    | Units of minutes |
+2837	                   +---------------+------------------+
+2838	                   |     40--42    | Tens of minutes  |
+2839	                   +---------------+------------------+
+2840	                   |     48--51    | Units of hours   |
+2841	                   +---------------+------------------+
+2842	                   |     56--57    | Tens of hours    |
+2843	                   +---------------+------------------+
+
+2845	                       Table 3: SMPTE ST 12-1 Time
+2846	                          Address Bit Positions
+
+2848	   For example, a timecode value of "07:12:26;18" can be expressed as a
+2849	   64-bit SMPTE 12M value as:
+
+2851	   10000000 01100000 01100000 01010000
+2852	   00100000 00110000 01110000 00000000
+
+2854	   Or with the irrelevant bits marked with an "x" which gives 26 usable
+2855	   bits:
+
+2857	   1000xxxx 01xxxxxx 0110xxxx 010xxxxx
+2858	   0010xxxx 001xxxxx 0111xxxx 00xxxxxx
+
+2860	   This is interpreted in hexadecimal:
+
+2862	   *  0x8 units of frames
+2863	   *  0x1 tens of frames
+2864	   *  0x6 units of seconds
+2865	   *  0x2 tens of seconds
+2866	   *  0x2 units of minutes
+2867	   *  0x1 tens of minutes
+2868	   *  0x7 units of hours
+2869	   *  0x0 tens of hours
+
+2871	   Given no value is above 9, the BCD coding correspond to the actual
+2872	   values:
+
+2874	   *  8 units of frames
+2875	   *  1 tens of frames
+2876	   *  6 units of seconds
+2877	   *  2 tens of seconds
+2878	   *  2 units of minutes
+2879	   *  1 tens of minutes
+2880	   *  7 units of hours
+2881	   *  0 tens of hours
+
+2883	   Or:
+
+2885	   *  18 frames
+2886	   *  26 seconds
+2887	   *  12 minutes
+2888	   *  07 hours
+
+2890	8.  Security Considerations
+
+2892	   This document inherits security considerations from the EBML
+2893	   [RFC8794] and Matroska [RFC9559] documents.
+
+2895	   Codec handling may be one of the more error-prone aspect of using
+2896	   Matroska.  The parsing and interpretation of binary data can lead to
+2897	   many types of security issues.  Although these issues don't come from
+2898	   Matroska itself, it's worth noting some issues that need to be
+2899	   considered.
+
+2901	   The CodecPrivate may be missing from the TrackEntry description.  The
+2902	   TrackEntry MAY be discarded in that case.
+
+2904	   An existing CodecPrivate data may be corrupted or incomplete or too
+2905	   big.  The TrackEntry MAY be discarded in that case.
+
+2907	   A lot of codec have internal fields to hold values that are already
+2908	   found in the TrackEntry like the video dimensions or the audio
+2909	   sampling frequency.  If these values differ that can lead to playback
+2910	   issues and even crashes.
+
+2912	9.  IANA Considerations
+
+2914	9.1.  Matroska Codec IDs Registry
+
+2916	   This document defines registries for Codec IDs stored in the CodecID
+2917	   element.  A CodecID is a case-sensitive ASCII string with a prefix
+2918	   defined in Table 1.  The details of the string format are found in
+2919	   Section 3.1.1.
+
+2921	   To register a new Codec ID in this registry, one needs a Codec ID
+2922	   string, a TrackType value, a description, a Change Controller, and an
+2923	   optional Reference to a document describing the Codec ID.
+
+2925	   Some Codec IDs values are deprecated.  Such Codec IDs are marked as
+2926	   "Reclaimed" in the "Matroska Codec IDs" registry.
+
+2928	   "Matroska Codec IDs" are to be allocated according to the "First Come
+2929	   First Served" policy [RFC8126].
+
+2931	   Table 4 shows the initial contents of the "Matroska Codec IDs"
+2932	   registry.  The Change Controller for the initial entries is the IETF.
+
+2934	     +=================+=======+====================+================+
+2935	     |        Codec ID | Track | Description        | Reference      |
+2936	     |                 |  Type |                    |                |
+2937	     +=================+=======+====================+================+
+2938	     |           V_AV1 |   1   | Alliance for Open  | This document, |
+2939	     |                 |       | Media AV1          | Section 3.3.1  |
+2940	     +-----------------+-------+--------------------+----------------+
+2941	     |          V_AVS2 |   1   | AVS2-P2/           | This document, |
+2942	     |                 |       | IEEE.1857.4        | Section 3.3.2  |
+2943	     +-----------------+-------+--------------------+----------------+
+2944	     |          V_AVS3 |   1   | AVS3-P2/           | This document, |
+2945	     |                 |       | IEEE.1857.10       | Section 3.3.3  |
+2946	     +-----------------+-------+--------------------+----------------+
+2947	     |          V_CAVS |   1   | AVS1-P2/           | This document, |
+2948	     |                 |       | IEEE.1857.3        | Section 3.3.4  |
+2949	     +-----------------+-------+--------------------+----------------+
+2950	     |         V_DIRAC |   1   | Dirac / VC-2       | This document, |
+2951	     |                 |       |                    | Section 3.3.5  |
+2952	     +-----------------+-------+--------------------+----------------+
+2953	     |          V_FFV1 |   1   | FFV1               | This document, |
+2954	     |                 |       |                    | Section 3.3.6  |
+2955	     +-----------------+-------+--------------------+----------------+
+2956	     |      V_JPEG2000 |   1   | JPEG 2000          | This document, |
+2957	     |                 |       |                    | Section 3.3.7  |
+2958	     +-----------------+-------+--------------------+----------------+
+2959	     |         V_MJPEG |   1   | Motion JPEG        | This document, |
+2960	     |                 |       |                    | Section 3.3.8  |
+2961	     +-----------------+-------+--------------------+----------------+
+2962	     |    V_MPEGH/ISO/ |   1   | HEVC/H.265         | This document, |
+2963	     |            HEVC |       |                    | Section 3.3.9  |
+2964	     +-----------------+-------+--------------------+----------------+
+2965	     | V_MPEGI/ISO/VVC |   1   | VVC/H.266          | This document, |
+2966	     |                 |       |                    | Section 3.3.10 |
+2967	     +-----------------+-------+--------------------+----------------+
+2968	     |         V_MPEG1 |   1   | MPEG 1             | This document, |
+2969	     |                 |       |                    | Section 3.3.11 |
+2970	     +-----------------+-------+--------------------+----------------+
+2971	     |         V_MPEG2 |   1   | MPEG 2             | This document, |
+2972	     |                 |       |                    | Section 3.3.12 |
+2973	     +-----------------+-------+--------------------+----------------+
+2974	     | V_MPEG4/ISO/AVC |   1   | AVC/H.264          | This document, |
+2975	     |                 |       |                    | Section 3.3.13 |
+2976	     +-----------------+-------+--------------------+----------------+
+2977	     |  V_MPEG4/ISO/AP |   1   | MPEG4 ISO advanced | This document, |
+2978	     |                 |       | profile            | Section 3.3.14 |
+2979	     +-----------------+-------+--------------------+----------------+
+2980	     | V_MPEG4/ISO/ASP |   1   | MPEG4 ISO advanced | This document, |
+2981	     |                 |       | simple profile     | Section 3.3.15 |
+2982	     +-----------------+-------+--------------------+----------------+
+2983	     |  V_MPEG4/ISO/SP |   1   | MPEG4 ISO simple   | This document, |
+2984	     |                 |       | profile            | Section 3.3.16 |
+2985	     +-----------------+-------+--------------------+----------------+
+2986	     |   V_MPEG4/MS/V3 |   1   | Microsoft MPEG4 V3 | This document, |
+2987	     |                 |       |                    | Section 3.3.17 |
+2988	     +-----------------+-------+--------------------+----------------+
+2989	     | V_MS/VFW/FOURCC |   1   | Microsoft Video    | This document, |
+2990	     |                 |       | Codec Manager      | Section 3.3.18 |
+2991	     +-----------------+-------+--------------------+----------------+
+2992	     |     V_QUICKTIME |   1   | Video taken from   | This document, |
+2993	     |                 |       | QuickTime files    | Section 3.3.19 |
+2994	     +-----------------+-------+--------------------+----------------+
+2995	     |        V_PRORES |   1   | Apple ProRes       | This document, |
+2996	     |                 |       |                    | Section 3.3.20 |
+2997	     +-----------------+-------+--------------------+----------------+
+2998	     |     V_REAL/RV10 |   1   | RealVideo 1.0 aka  | This document, |
+2999	     |                 |       | RealVideo 5        | Section 3.3.21 |
+3000	     +-----------------+-------+--------------------+----------------+
+3001	     |     V_REAL/RV20 |   1   | RealVideo G2 and   | This document, |
+3002	     |                 |       | RealVideo G2+SVT   | Section 3.3.22 |
+3003	     +-----------------+-------+--------------------+----------------+
+3004	     |     V_REAL/RV30 |   1   | RealVideo 8        | This document, |
+3005	     |                 |       |                    | Section 3.3.23 |
+3006	     +-----------------+-------+--------------------+----------------+
+3007	     |     V_REAL/RV40 |   1   | rv40 : RealVideo 9 | This document, |
+3008	     |                 |       |                    | Section 3.3.24 |
+3009	     +-----------------+-------+--------------------+----------------+
+3010	     |        V_THEORA |   1   | Theora             | This document, |
+3011	     |                 |       |                    | Section 3.3.25 |
+3012	     +-----------------+-------+--------------------+----------------+
+3013	     |  V_UNCOMPRESSED |   1   | Raw uncompressed   | This document, |
+3014	     |                 |       | video frames       | Section 3.3.26 |
+3015	     +-----------------+-------+--------------------+----------------+
+3016	     |           V_VP8 |   1   | VP8 Codec format   | This document, |
+3017	     |                 |       |                    | Section 3.3.27 |
+3018	     +-----------------+-------+--------------------+----------------+
+3019	     |           V_VP9 |   1   | VP9 Codec format   | This document, |
+3020	     |                 |       |                    | Section 3.3.28 |
+3021	     +-----------------+-------+--------------------+----------------+
+3022	     |           A_AAC |   2   | Advanced Audio     | This document, |
+3023	     |                 |       | Coding             | Section 3.4.1  |
+3024	     +-----------------+-------+--------------------+----------------+
+3025	     |  A_AAC/MPEG2/LC |   2   | Low Complexity     | This document, |
+3026	     |                 |       |                    | Section 3.4.2  |
+3027	     +-----------------+-------+--------------------+----------------+
+3028	     | A_AAC/MPEG2/LC/ |   2   | Low Complexity     | This document, |
+3029	     |             SBR |       | with Spectral Band | Section 3.4.3  |
+3030	     |                 |       | Replication        |                |
+3031	     +-----------------+-------+--------------------+----------------+
+3032	     |    A_AAC/MPEG2/ |   2   | MPEG2 Main Profile | This document, |
+3033	     |            MAIN |       |                    | Section 3.4.4  |
+3034	     +-----------------+-------+--------------------+----------------+
+3035	     | A_AAC/MPEG2/SSR |   2   | Scalable Sampling  | This document, |
+3036	     |                 |       | Rate               | Section 3.4.5  |
+3037	     +-----------------+-------+--------------------+----------------+
+3038	     |  A_AAC/MPEG4/LC |   2   | Low Complexity     | This document, |
+3039	     |                 |       |                    | Section 3.4.6  |
+3040	     +-----------------+-------+--------------------+----------------+
+3041	     | A_AAC/MPEG4/LC/ |   2   | Low Complexity     | This document, |
+3042	     |             SBR |       | with Spectral Band | Section 3.4.7  |
+3043	     |                 |       | Replication        |                |
+3044	     +-----------------+-------+--------------------+----------------+
+3045	     | A_AAC/MPEG4/LTP |   2   | Long Term          | This document, |
+3046	     |                 |       | Prediction         | Section 3.4.8  |
+3047	     +-----------------+-------+--------------------+----------------+
+3048	     |    A_AAC/MPEG4/ |   2   | MPEG4 Main Profile | This document, |
+3049	     |            MAIN |       |                    | Section 3.4.9  |
+3050	     +-----------------+-------+--------------------+----------------+
+3051	     | A_AAC/MPEG4/SSR |   2   | Scalable Sampling  | This document, |
+3052	     |                 |       | Rate               | Section 3.4.10 |
+3053	     +-----------------+-------+--------------------+----------------+
+3054	     |           A_AC3 |   2   | Dolby Digital /    | This document, |
+3055	     |                 |       | AC-3               | Section 3.4.11 |
+3056	     +-----------------+-------+--------------------+----------------+
+3057	     |     A_AC3/BSID9 |   2   | Dolby Digital /    | This document, |
+3058	     |                 |       | AC-3               | Section 3.4.12 |
+3059	     +-----------------+-------+--------------------+----------------+
+3060	     |    A_AC3/BSID10 |   2   | Dolby Digital /    | This document, |
+3061	     |                 |       | AC-3               | Section 3.4.13 |
+3062	     +-----------------+-------+--------------------+----------------+
+3063	     |          A_ALAC |   2   | ALAC (Apple        | This document, |
+3064	     |                 |       | Lossless Audio     | Section 3.4.14 |
+3065	     |                 |       | Codec)             |                |
+3066	     +-----------------+-------+--------------------+----------------+
+3067	     |     A_ATRAC/AT1 |   2   | Sony ATRAC1 Codec  | This document, |
+3068	     |                 |       |                    | Section 3.4.15 |
+3069	     +-----------------+-------+--------------------+----------------+
+3070	     |           A_DTS |   2   | Digital Theatre    | This document, |
+3071	     |                 |       | System             | Section 3.4.16 |
+3072	     +-----------------+-------+--------------------+----------------+
+3073	     |   A_DTS/EXPRESS |   2   | Digital Theatre    | This document, |
+3074	     |                 |       | System Express     | Section 3.4.17 |
+3075	     +-----------------+-------+--------------------+----------------+
+3076	     |  A_DTS/LOSSLESS |   2   | Digital Theatre    | This document, |
+3077	     |                 |       | System Lossless    | Section 3.4.18 |
+3078	     +-----------------+-------+--------------------+----------------+
+3079	     |          A_EAC3 |   2   | Dolby Digital Plus | This document, |
+3080	     |                 |       | / E-AC-3           | Section 3.4.19 |
+3081	     +-----------------+-------+--------------------+----------------+
+3082	     |          A_FLAC |   2   | FLAC               | This document, |
+3083	     |                 |       |                    | Section 3.4.20 |
+3084	     +-----------------+-------+--------------------+----------------+
+3085	     |           A_MLP |   2   | Meridian Lossless  | This document, |
+3086	     |                 |       | Packing / MLP      | Section 3.4.21 |
+3087	     +-----------------+-------+--------------------+----------------+
+3088	     |       A_MPEG/L1 |   2   | MPEG Audio 1, 2    | This document, |
+3089	     |                 |       | Layer I            | Section 3.4.22 |
+3090	     +-----------------+-------+--------------------+----------------+
+3091	     |       A_MPEG/L2 |   2   | MPEG Audio 1, 2    | This document, |
+3092	     |                 |       | Layer II           | Section 3.4.23 |
+3093	     +-----------------+-------+--------------------+----------------+
+3094	     |       A_MPEG/L3 |   2   | MPEG Audio 1, 2,   | This document, |
+3095	     |                 |       | 2.5 Layer III      | Section 3.4.24 |
+3096	     +-----------------+-------+--------------------+----------------+
+3097	     |        A_MS/ACM |   2   | Microsoft Audio    | This document, |
+3098	     |                 |       | Codec Manager      | Section 3.4.25 |
+3099	     |                 |       | (ACM)              |                |
+3100	     +-----------------+-------+--------------------+----------------+
+3101	     |     A_REAL/14_4 |   2   | Real Audio 1       | This document, |
+3102	     |                 |       |                    | Section 3.4.26 |
+3103	     +-----------------+-------+--------------------+----------------+
+3104	     |     A_REAL/28_8 |   2   | Real Audio 2       | This document, |
+3105	     |                 |       |                    | Section 3.4.27 |
+3106	     +-----------------+-------+--------------------+----------------+
+3107	     |     A_REAL/ATRC |   2   | Sony Atrac3 Codec  | This document, |
+3108	     |                 |       |                    | Section 3.4.28 |
+3109	     +-----------------+-------+--------------------+----------------+
+3110	     |     A_REAL/COOK |   2   | Real Audio Cook    | This document, |
+3111	     |                 |       | Codec              | Section 3.4.29 |
+3112	     +-----------------+-------+--------------------+----------------+
+3113	     |     A_REAL/RALF |   2   | Real Audio         | This document, |
+3114	     |                 |       | Lossless Format    | Section 3.4.30 |
+3115	     +-----------------+-------+--------------------+----------------+
+3116	     |     A_REAL/SIPR |   2   | Sipro Voice Codec  | This document, |
+3117	     |                 |       |                    | Section 3.4.31 |
+3118	     +-----------------+-------+--------------------+----------------+
+3119	     |          A_OPUS |   2   | Opus interactive   | This document, |
+3120	     |                 |       | speech and audio   | Section 3.4.32 |
+3121	     |                 |       | codec              |                |
+3122	     +-----------------+-------+--------------------+----------------+
+3123	     |    A_PCM/FLOAT/ |   2   | Floating-Point,    | This document, |
+3124	     |            IEEE |       | IEEE compatible    | Section 3.4.33 |
+3125	     +-----------------+-------+--------------------+----------------+
+3126	     |   A_PCM/INT/BIG |   2   | PCM Integer Big    | This document, |
+3127	     |                 |       | Endian             | Section 3.4.34 |
+3128	     +-----------------+-------+--------------------+----------------+
+3129	     |   A_PCM/INT/LIT |   2   | PCM Integer Little | This document, |
+3130	     |                 |       | Endian             | Section 3.4.35 |
+3131	     +-----------------+-------+--------------------+----------------+
+3132	     |     A_QUICKTIME |   2   | Audio taken from   | This document, |
+3133	     |                 |       | QuickTime files    | Section 3.4.36 |
+3134	     +-----------------+-------+--------------------+----------------+
+3135	     |    A_QUICKTIME/ |   2   | QDesign Music      | This document, |
+3136	     |            QDMC |       |                    | Section 3.4.37 |
+3137	     +-----------------+-------+--------------------+----------------+
+3138	     |    A_QUICKTIME/ |   2   | QDesign Music v2   | This document, |
+3139	     |            QDM2 |       |                    | Section 3.4.38 |
+3140	     +-----------------+-------+--------------------+----------------+
+3141	     |        A_TRUEHD |   2   | Dolby TrueHD       | This document, |
+3142	     |                 |       |                    | Section 3.4.39 |
+3143	     +-----------------+-------+--------------------+----------------+
+3144	     |          A_TTA1 |   2   | The True Audio     | This document, |
+3145	     |                 |       |                    | Section 3.4.40 |
+3146	     +-----------------+-------+--------------------+----------------+
+3147	     |        A_VORBIS |   2   | Vorbis             | This document, |
+3148	     |                 |       |                    | Section 3.4.41 |
+3149	     +-----------------+-------+--------------------+----------------+
+3150	     |      A_WAVPACK4 |   2   | WavPack            | This document, |
+3151	     |                 |       |                    | Section 3.4.42 |
+3152	     +-----------------+-------+--------------------+----------------+
+3153	     |       S_ARIBSUB |   17  | ARIB STD-B24       | This document, |
+3154	     |                 |       | subtitles          | Section 3.5.1  |
+3155	     +-----------------+-------+--------------------+----------------+
+3156	     |        S_DVBSUB |   17  | Digital Video      | This document, |
+3157	     |                 |       | Broadcasting       | Section 3.5.2  |
+3158	     |                 |       | subtitles          |                |
+3159	     +-----------------+-------+--------------------+----------------+
+3160	     |      S_HDMV/PGS |   17  | HDMV presentation  | This document, |
+3161	     |                 |       | graphics subtitles | Section 3.5.3  |
+3162	     +-----------------+-------+--------------------+----------------+
+3163	     |   S_HDMV/TEXTST |   17  | HDMV text          | This document, |
+3164	     |                 |       | subtitles          | Section 3.5.4  |
+3165	     +-----------------+-------+--------------------+----------------+
+3166	     |          S_KATE |   17  | Karaoke And Text   | This document, |
+3167	     |                 |       | Encapsulation      | Section 3.5.5  |
+3168	     +-----------------+-------+--------------------+----------------+
+3169	     |     S_IMAGE/BMP |   17  | Bitmap             | This document, |
+3170	     |                 |       |                    | Section 3.5.6  |
+3171	     +-----------------+-------+--------------------+----------------+
+3172	     |           S_ASS |   17  | Advanced           | Reclaimed,     |
+3173	     |                 |       | SubStation Alpha   | Section 3.5.7  |
+3174	     |                 |       | Format             |                |
+3175	     +-----------------+-------+--------------------+----------------+
+3176	     |      S_TEXT/ASS |   17  | Advanced           | This document, |
+3177	     |                 |       | SubStation Alpha   | Section 3.5.7  |
+3178	     |                 |       | Format             |                |
+3179	     +-----------------+-------+--------------------+----------------+
+3180	     |    S_TEXT/ASCII |   17  | ASCII Plain Text   | This document, |
+3181	     |                 |       |                    | Section 3.5.8  |
+3182	     +-----------------+-------+--------------------+----------------+
+3183	     |      S_TEXT/SSA |   17  | SubStation Alpha   | This document, |
+3184	     |                 |       | Format             | Section 3.5.9  |
+3185	     +-----------------+-------+--------------------+----------------+
+3186	     |      S_TEXT/USF |   17  | Universal Subtitle | This document, |
+3187	     |                 |       | Format             | Section 3.5.10 |
+3188	     +-----------------+-------+--------------------+----------------+
+3189	     |     S_TEXT/UTF8 |   17  | UTF-8 Plain Text   | This document, |
+3190	     |                 |       |                    | Section 3.5.11 |
+3191	     +-----------------+-------+--------------------+----------------+
+3192	     |   S_TEXT/WEBVTT |   17  | Web Video Text     | This document, |
+3193	     |                 |       | Tracks (WebVTT)    | Section 3.5.12 |
+3194	     +-----------------+-------+--------------------+----------------+
+3195	     |           S_SSA |   17  | SubStation Alpha   | Reclaimed,     |
+3196	     |                 |       | Format             | Section 3.5.7  |
+3197	     +-----------------+-------+--------------------+----------------+
+3198	     |        S_VOBSUB |   17  | VobSub subtitles   | This document, |
+3199	     |                 |       |                    | Section 3.5.13 |
+3200	     +-----------------+-------+--------------------+----------------+
+3201	     |        B_VOBBTN |   18  | VobBtn Buttons     | This document, |
+3202	     |                 |       |                    | Section 3.6.1  |
+3203	     +-----------------+-------+--------------------+----------------+
+
+3205	         Table 4: Initial Contents of "Matroska Codec IDs" Registry
+
+3207	9.2.  Matroska BlockAdditional Type IDs Registry
+
+3209	   This document defines registries for BlockAdditional Type IDs stored
+3210	   in the BlockAddIDType element.  The values correspond to the unsigned
+3211	   integer BlockAddIDType value described in Section 5.1.4.1.17.3 of
+3212	   [RFC9559].
+
+3214	   To register a new BlockAdditional Type ID in this registry, one needs
+3215	   a BlockAddIDType unsigned integer, a BlockAddIDName string value, a
+3216	   Change Controller, and an optional Reference to a document describing
+3217	   the BlockAdditional Type ID.
+
+3219	   "Matroska BlockAdditional Type IDs" are to be allocated according to
+3220	   the "First Come First Served" policy [RFC8126].
+
+3222	   Table 5 shows the initial contents of the "Matroska BlockAdditional
+3223	   Type IDs" registry.  The Change Controller for the initial entries is
+3224	   the IETF.
+
+3226	      +================+===========================+================+
+3227	      | BlockAddIDType | BlockAddIDName            | Reference      |
+3228	      +================+===========================+================+
+3229	      |              0 | Use BlockAddIDValue       | This document, |
+3230	      |                |                           | Section 4.2.1  |
+3231	      +----------------+---------------------------+----------------+
+3232	      |              1 | Opaque data               | This document, |
+3233	      |                |                           | Section 4.2.2  |
+3234	      +----------------+---------------------------+----------------+
+3235	      |              4 | ITU T.35 metadata         | This document, |
+3236	      |                |                           | Section 4.2.3  |
+3237	      +----------------+---------------------------+----------------+
+3238	      |            121 | SMPTE ST 12-1 timecode    | This document, |
+3239	      |                |                           | Section 4.2.4  |
+3240	      +----------------+---------------------------+----------------+
+3241	      |     0x61766345 | Dolby Vision enhancement- | This document, |
+3242	      |                | layer AVC configuration   | Section 4.2.5  |
+3243	      +----------------+---------------------------+----------------+
+3244	      |     0x68766345 | Dolby Vision enhancement- | This document, |
+3245	      |                | layer HEVC configuration  | Section 4.2.6  |
+3246	      +----------------+---------------------------+----------------+
+3247	      |     0x64766343 | Dolby Vision              | This document, |
+3248	      |                | configuration dvcC        | Section 4.2.7  |
+3249	      +----------------+---------------------------+----------------+
+3250	      |     0x64767643 | Dolby Vision              | This document, |
+3251	      |                | configuration dvvC        | Section 4.2.8  |
+3252	      +----------------+---------------------------+----------------+
+3253	      |     0x64767743 | Dolby Vision              | This document, |
+3254	      |                | configuration dvwC        | Section 4.2.9  |
+3255	      +----------------+---------------------------+----------------+
+3256	      |     0x6D766343 | MVC configuration         | This document, |
+3257	      |                |                           | Section 4.2.10 |
+3258	      +----------------+---------------------------+----------------+
+
+3260	        Table 5: Initial Contents of "Matroska BlockAdditional Type
+3261	                               IDs" Registry
+
+3263	10.  References
+
+3265	10.1.  Normative References
+
+3267	   [ALAC]     Apple Inc., "Apple Lossless Format "Magic Cookie"
+3268	              Description", 12 December 2012,
+3269	              <https://github.com/macosforge/alac/blob/master/
+3270	              ALACMagicCookieDescription.txt>.
+
+3272	   [ARIB.STD-B10]
+3273	              ARIB, "Service Information for Digital Broadcasting
+3274	              System", 5 December 2019,
+3275	              <https://www.arib.or.jp/english/std_tr/broadcasting/desc/
+3276	              std-b10.html>.
+
+3278	   [ARIB.STD-B24]
+3279	              ARIB, "Data Coding and Transmission Specification for
+3280	              Digital Broadcasting", 6 October 2022,
+3281	              <https://www.arib.or.jp/english/std_tr/broadcasting/desc/
+3282	              std-b24.html>.
+
+3284	   [ARIB.TR-B14]
+3285	              ARIB, "Operational Guidelines for Digital Terrestrial
+3286	              Television Broadcasting", 6 October 2022,
+3287	              <https://www.arib.or.jp/english/std_tr/broadcasting/desc/
+3288	              tr-b14.html>.
+
+3290	   [ATSC.A52] Advanced Television Systems Committee, "ATSC Standard:
+3291	              Digital Audio Compression (AC-3, E-AC-3)", 25 January
+3292	              2018, <https://www.atsc.org/wp-content/uploads/2021/04/
+3293	              A52-2018.pdf>.
+
+3295	   [AV1]      Alliance for Open Media, "AV1 Bitstream & Decoding Process
+3296	              Specification", 8 January 2019,
+3297	              <https://aomediacodec.github.io/av1-spec/av1-spec.pdf>.
+
+3299	   [AV1-ISOBMFF]
+3300	              Alliance for Open Media, "AV1 Codec ISO Media File Format
+3301	              Binding", 3 April 2024,
+3302	              <https://aomediacodec.github.io/av1-isobmff/>.
+
+3304	   [BITMAPINFOHEADER]
+3305	              Microsoft Corporation, "BITMAPINFOHEADER structure", 26
+3306	              January 2024, <https://learn.microsoft.com/en-
+3307	              us/windows/win32/api/wingdi/ns-wingdi-bitmapinfoheader>.
+
+3309	   [Blu-ray.Part3]
+3310	              Blu-ray Disc Association, "System Description Blu-ray Disc
+3311	              Read-Only Format - Part 3: Audio Visual Basic
+3312	              Specifications Ver 2.01", January 2007,
+3313	              <https://blu-raydisc.info/format-spec/re2-spec.php>.
+
+3315	   [Dirac]    British Broadcasting Corporation, "Dirac Specification",
+3316	              23 September 2008, <https://web.archive.org/web/2015050301
+3317	              5104/http://diracvideo.org/download/specification/dirac-
+3318	              spec-latest.pdf>.
+
+3320	   [DolbyVision-ISOBMFF]
+3321	              Dolby, "Dolby Vision Streams Within the ISO Base MediaFile
+3322	              Format", 7 November 2023,
+3323	              <https://dolby.my.salesforce.com/sfc/p/700000009YuG/a/4u00
+3324	              0000l6FB/076wHYEmyEfz09m0V1bo85_25hlUJjaiWTbzorNmYY4>.
+
+3326	   [DVD-Info.PCI]
+3327	              "Presentation Control Information (PCI) Packet Layout",
+3328	              <http://dvd.sourceforge.net/dvdinfo/pci_pkt.html>.
+
+3330	   [ETSI.EN300-468]
+3331	              European Telecommunications Standards Institute, "Digital
+3332	              Video Broadcasting (DVB); Specification for Service
+3333	              Information (SI) in DVB systems", ETSI EN 300 468,
+3334	              December 2023, <https://www.etsi.org/deliver/
+3335	              etsi_en/300400_300499/300468/01.18.01_60/
+3336	              en_300468v011801p.pdf>.
+
+3338	   [ETSI.EN300-743]
+3339	              European Telecommunications Standards Institute, "Digital
+3340	              Video Broadcasting (DVB); Subtitling systems", ETSI EN 300
+3341	              743, October 2018, <https://www.etsi.org/deliver/
+3342	              etsi_en/300700_300799/300743/01.06.01_60/
+3343	              en_300743v010601p.pdf>.
+
+3345	   [ETSI.TS102-114]
+3346	              European Telecommunications Standards Institute, "DTS
+3347	              Coherent Acoustics; Core and Extensions with Additional
+3348	              Profiles", ETSI TS 102 114, August 2019,
+3349	              <https://www.etsi.org/deliver/
+3350	              etsi_ts/102100_102199/102114/01.06.01_60/
+3351	              ts_102114v010601p.pdf>.
+
+3353	   [ETSI.TS102-366]
+3354	              European Telecommunications Standards Institute, "Digital
+3355	              Audio Compression (AC-3, Enhanced AC-3) Standard", ETSI TS
+3356	              102 366, September 2017, <https://www.etsi.org/deliver/
+3357	              etsi_ts/102300_102399/102366/01.04.01_60/
+3358	              ts_102366v010401p.pdf>.
+
+3360	   [IEEE.1857-10]
+3361	              IEEE, "IEEE Standard for Third Generation Video Coding", 9
+3362	              November 2021,
+3363	              <https://standards.ieee.org/ieee/1857.10/7722/>.
+
+3365	   [IEEE.1857-3]
+3366	              IEEE, "IEEE Standard for a System of Advanced Audio and
+3367	              Video Coding", 8 November 2023,
+3368	              <https://standards.ieee.org/ieee/1857.3/10645/>.
+
+3370	   [IEEE.1857-4]
+3371	              IEEE, "IEEE Standard for Second-Generation IEEE 1857 Video
+3372	              Coding", 23 October 2018,
+3373	              <https://standards.ieee.org/ieee/1857.4/5817/>.
+
+3375	   [IEEE.754] IEEE, "IEEE Standard for Binary Floating-Point
+3376	              Arithmetic", 13 June 2019,
+3377	              <https://standards.ieee.org/standard/754-2019.html>.
+
+3379	   [ISO.11172-2]
+3380	              International Organization for Standardization,
+3381	              "Information technology - Coding of moving pictures and
+3382	              associated audio for digital storage median at up to about
+3383	              1,5 Mbit/s - Part 2: Video", ISO 11172-2:1993, August
+3384	              1993.
+
+3386	   [ISO.11172-3]
+3387	              International Organization for Standardization,
+3388	              "Information technology - Coding of moving pictures and
+3389	              associated audio for digital storage median at up to about
+3390	              1,5 Mbit/s - Part 3: Audio", ISO 11172-2:1993, August
+3391	              1993.
+
+3393	   [ISO.13818-2]
+3394	              International Organization for Standardization,
+3395	              "Information technology - Generic coding of moving
+3396	              pictures and associated audio information - Part 2:
+3397	              Video", ISO 13818-2:2013, October 2013.
+
+3399	   [ISO.14496-15]
+3400	              International Organization for Standardization,
+3401	              "Information technology - Coding of audio-visual objects -
+3402	              Part 15: Carriage of network abstraction layer (NAL) unit
+3403	              structured video in ISO base media file format",
+3404	              ISO 14496-15:2024, October 2024.
+
+3406	   [ISO.14496-2]
+3407	              International Organization for Standardization,
+3408	              "Information technology - Coding of audio-visual objects -
+3409	              Part 2: Visual", ISO 14496-2:2004, June 2004.
+
+3411	   [ISO.14496-3]
+3412	              International Organization for Standardization,
+3413	              "Information technology - Coding of audio-visual objects -
+3414	              Part 3: Audio", ISO 14496-3:2019, December 2019.
+
+3416	   [JPEG]     ITU-T, "INFORMATION TECHNOLOGY - DIGITAL COMPRESSION AND
+3417	              CODING OF CONTINUOUS-TONE STILL IMAGES - REQUIREMENTS AND
+3418	              GUIDELINES", ITU-T Recommendation T.81, September 1992,
+3419	              <https://www.w3.org/Graphics/JPEG/itu-t81.pdf>.
+
+3421	   [JPEG2000] ITU-T, "Information technology - JPEG 2000 image coding
+3422	              system: Core coding system", ITU-T Recommendation T.800,
+3423	              July 2024,
+3424	              <https://www.itu.int/rec/T-REC-T.800-202407-I/en>.
+
+3426	   [librmff]  Bunkus, M., "RealMedia file format access library", 20
+3427	              February 2021, <https://gitlab.com/mbunkus/mkvtoolnix/-
+3428	              /blob/main/lib/librmff/librmff.h>.
+
+3430	   [OggKate]  Xiph.Org Foundation, "OggKate", 21 February 2023,
+3431	              <http://wiki.xiph.org/index.php/OggKate>.
+
+3433	   [QTFF]     Apple Inc., "QuickTime File Format", 26 January 2024,
+3434	              <https://developer.apple.com/documentation/quicktime-file-
+3435	              format>.
+
+3437	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+3438	              Requirement Levels", BCP 14, RFC 2119,
+3439	              DOI 10.17487/RFC2119, March 1997,
+3440	              <https://www.rfc-editor.org/info/rfc2119>.
+
+3442	   [RFC6386]  Bankoski, J., Koleszar, J., Quillio, L., Salonen, J.,
+3443	              Wilkins, P., and Y. Xu, "VP8 Data Format and Decoding
+3444	              Guide", RFC 6386, DOI 10.17487/RFC6386, November 2011,
+3445	              <https://www.rfc-editor.org/info/rfc6386>.
+
+3447	   [RFC6648]  Saint-Andre, P., Crocker, D., and M. Nottingham,
+3448	              "Deprecating the "X-" Prefix and Similar Constructs in
+3449	              Application Protocols", BCP 178, RFC 6648,
+3450	              DOI 10.17487/RFC6648, June 2012,
+3451	              <https://www.rfc-editor.org/info/rfc6648>.
+
+3453	   [RFC6716]  Valin, JM., Vos, K., and T. Terriberry, "Definition of the
+3454	              Opus Audio Codec", RFC 6716, DOI 10.17487/RFC6716,
+3455	              September 2012, <https://www.rfc-editor.org/info/rfc6716>.
+
+3457	   [RFC7845]  Terriberry, T., Lee, R., and R. Giles, "Ogg Encapsulation
+3458	              for the Opus Audio Codec", RFC 7845, DOI 10.17487/RFC7845,
+3459	              April 2016, <https://www.rfc-editor.org/info/rfc7845>.
+
+3461	   [RFC8126]  Cotton, M., Leiba, B., and T. Narten, "Guidelines for
+3462	              Writing an IANA Considerations Section in RFCs", BCP 26,
+3463	              RFC 8126, DOI 10.17487/RFC8126, June 2017,
+3464	              <https://www.rfc-editor.org/info/rfc8126>.
+
+3466	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+3467	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+3468	              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+3470	   [RFC8794]  Lhomme, S., Rice, D., and M. Bunkus, "Extensible Binary
+3471	              Meta Language", RFC 8794, DOI 10.17487/RFC8794, July 2020,
+3472	              <https://www.rfc-editor.org/info/rfc8794>.
+
+3474	   [RFC9043]  Niedermayer, M., Rice, D., and J. Martinez, "FFV1 Video
+3475	              Coding Format Versions 0, 1, and 3", RFC 9043,
+3476	              DOI 10.17487/RFC9043, August 2021,
+3477	              <https://www.rfc-editor.org/info/rfc9043>.
+
+3479	   [RFC9559]  Lhomme, S., Bunkus, M., and D. Rice, "Matroska Media
+3480	              Container Format Specification", RFC 9559,
+3481	              DOI 10.17487/RFC9559, October 2024,
+3482	              <https://www.rfc-editor.org/info/rfc9559>.
+
+3484	   [RFC9639]  van Beurden, M.Q.C. and A. Weaver, "Free Lossless Audio
+3485	              Codec (FLAC)", RFC 9639, DOI 10.17487/RFC9639, December
+3486	              2024, <https://www.rfc-editor.org/info/rfc9639>.
+
+3488	   [SMPTE.RDD36]
+3489	              SMPTE, "Apple ProRes Bitstream Syntax and Decoding
+3490	              Process", 9 September 2022,
+3491	              <https://pub.smpte.org/doc/rdd36/20220909-pub/>.
+
+3493	   [SMPTE.ST12-1]
+3494	              SMPTE, "Time and Control Code", ST 12-1:2014, DOI
+3495	              10.5594/SMPTE.ST12-1.2014, 20 February 2014,
+3496	              <https://pub.smpte.org/doc/st12-1/20140220-pub/>.
+
+3498	   [SSA]      "Sub Station Alpha v4.00+ Script Format",
+3499	              <http://www.tcax.org/docs/ass-specs.htm>.
+
+3501	   [Theora]   Xiph.Org Foundation, "Theora Specification", 3 June 2017,
+3502	              <https://www.theora.org/doc/Theora.pdf>.
+
+3504	   [TRUEHD]   Dolby, "Dolby TrueHD (MLP) high-level bitstream
+3505	              description", February 2018, <https://web.archive.org/web/
+3506	              20250810135349/https://developer.dolby.com/globalassets/
+3507	              technology/dolby-truehd/
+3508	              dolbytruehdhighlevelbitstreamdescription.pdf>.
+
+3510	   [TTA]      Tau Software, "TTA", <https://tausoft.org/en/tta-
+3511	              %d0%be%d0%bf%d0%b8%d1%81%d0%b0%d0%bd%d0%b8%d0%b5-
+3512	              %d1%84%d0%be%d1%80%d0%bc%d0%b0%d1%82%d0%b0/>.
+
+3514	   [USF]      PARIS, C., Vialle, L., and U. Hammer, "Universal Subtitle
+3515	              Format", 28 November 2010,
+3516	              <https://subtitld.org/en/development/usf>.
+
+3518	   [VobSub]   MultimediaWiki, "VOBSub", 21 March 2007,
+3519	              <https://wiki.multimedia.cx/index.php?title=VOBsub>.
+
+3521	   [VORBIS]   Xiph.Org Foundation, "Vorbis I specification", 4 July
+3522	              2020, <https://xiph.org/vorbis/doc/Vorbis_I_spec.pdf>.
+
+3524	   [VP9]      Grange, A., de Rivaz, P., and J. Hunt, "VP9 Bitstream &
+3525	              Decoding Process Specification - version 0.7", 22 February
+3526	              2017,
+3527	              <https://storage.googleapis.com/downloads.webmproject.org/
+3528	              docs/vp9/vp9-bitstream-specification-
+3529	              v0.7-20170222-draft.pdf>.
+
+3531	   [WAVEFORMATEX]
+3532	              Microsoft Corporation, "WAVEFORMATEX structure", 4 April
+3533	              2021, <https://docs.microsoft.com/en-
+3534	              us/windows/win32/api/mmeapi/ns-mmeapi-waveformatex>.
+
+3536	   [WAVPACK]  Bryant, D., "WavPack 4 & 5 Binary File / Block Format", 12
+3537	              April 2020,
+3538	              <https://www.wavpack.com/WavPack5FileFormat.pdf>.
+
+3540	   [WebVTT]   Pieters, S., Pfeiffer, S., Ed., Jaegenstedt, P., and I.
+3541	              Hickson, "WebVTT: The Web Video Text Tracks Format", W3C
+3542	              Candidate Recommendation, April 2019,
+3543	              <https://www.w3.org/TR/2019/CR-webvtt1-20190404/>.
+
+3545	10.2.  Informative References
+
+3547	   [AtracAES] Sony Corporate Research Laboratories, "ATRAC: Adaptive
+3548	              Transform Acoustic Coding for MiniDisc", 1 October 1992,
+3549	              <https://www.minidisc.wiki/technology/atrac/aes>.
+
+3551	   [atracdenc]
+3552	              Cherednik, D., "atracdenc - ATRAC1 and ATRAC3 Decoder/
+3553	              Encoder", 12 October 2022,
+3554	              <https://github.com/dcherednik/atracdenc>.
+
+3556	   [CTA.861-4]
+3557	              Consumer Technology Association, "Updates to Dynamic HDR
+3558	              Metadata Signaling", CTA 861-4, March 2019,
+3559	              <https://shop.cta.tech/products/updates-to-dynamic-hdr-
+3560	              metadata-signaling>.
+
+3562	   [DVD-Video]
+3563	              DVD Forum, "DVD-Books: Part 3 DVD-Video Book", November
+3564	              1995, <http://www.dvdforum.org/>.
+
+3566	   [ITU-T.35] ITU-T, "Procedure for the allocation of ITU-T defined
+3567	              codes for non-standard facilities", ITU-T
+3568	              Recommendation T.35, February 2000,
+3569	              <https://www.itu.int/rec/T-REC-T.35/en>.
+
+3571	   [RFC5484]  Singer, D., "Associating Time-Codes with RTP Streams",
+3572	              RFC 5484, DOI 10.17487/RFC5484, March 2009,
+3573	              <https://www.rfc-editor.org/info/rfc5484>.
+
+3575	   [SMPTE.ST2042-1]
+3576	              SMPTE, "VC-2 Video Compression", ST 2042-1:2022, DOI
+3577	              10.5594/SMPTE.ST2042-1.2022, 8 December 2022,
+3578	              <https://pub.smpte.org/pub/st2042-1/st2042-1-2022.pdf>.
+
+3580	   [VP-ISOBMFF]
+3581	              Galligan, F., Hughes, K., Inskip, T., and D. Ronca, "VP
+3582	              Codec ISO Media File Format Binding", 31 March 2017,
+3583	              <https://www.webmproject.org/vp9/mp4/>.
+
+3585	   [WebM-WebVTT]
+3586	              Heaney, M. and F. Galligan, "WebVTT in WebM", 1 February
+3587	              2012, <https://wiki.webmproject.org/webm-metadata/
+3588	              temporal-metadata/webvtt-in-webm>.
+
+3590	   [WebMContainer]
+3591	              The WebM Project, "WebM Container Guidelines", 16 October
+3592	              2023, <https://www.webmproject.org/docs/container/>.
+
+3594	Authors' Addresses
+
+3596	   Steve Lhomme
+3597	   Email: slhomme@matroska.org
+3598	   Moritz Bunkus
+3599	   Email: moritz@bunkus.org
+
+3601	   Dave Rice
+3602	   Email: dave@dericed.com
+
+
+
+
+
+
+
+
+
