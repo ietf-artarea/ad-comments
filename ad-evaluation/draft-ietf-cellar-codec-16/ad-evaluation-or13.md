@@ -9,6 +9,133 @@ CC @OR13
 
 ## Discuss
 
+## Reference Classification Analysis
+
+I used AI for this section of my review, none the less, please consider the analysis carefully.
+
+I've reviewed each reference flagged by idnits. Below is a case-by-case analysis of whether references are correctly classified as normative vs informative, and the severity of issues when normative references are not freely available.
+
+**Overall Assessment**: All references appear to be correctly classified as normative based on their usage in the document. The issues are primarily about availability (non-freely-available standards) and downrefs (normative references to Informational RFCs), not misclassification.
+
+### RFC Downrefs (Informational RFCs used normatively)
+
+**RFC 6386 (VP8 Data Format and Decoding Guide) - Informational RFC**
+- **Classification**: Currently normative
+- **Usage**: Referenced for VP8 codec mapping (line 908)
+- **Assessment**: This is a downref (normative reference to Informational RFC). The document MUST reference VP8 to define the codec mapping, so this appears correctly classified as normative from a functional perspective. However, this requires IESG approval per RFC 3967/BCP 97. 
+- **Severity: Medium** - Requires downref registry entry and IESG approval, but the reference itself is appropriate.
+
+**RFC 9043 (FFV1 Video Coding Format) - Informational RFC**
+- **Classification**: Currently normative  
+- **Usage**: Referenced for FFV1 codec mapping (lines 600, 605)
+- **Assessment**: Another downref. FFV1 is an important preservation codec, and the document MUST reference it to define the mapping. 
+- **Severity: Medium** - Requires downref registry entry and IESG approval, but the reference is functionally correct.
+
+### Non-RFC Normative References - Freely Available
+
+The following are correctly classified as normative and are freely available (no issue):
+
+- **ALAC** - Freely available, used normatively for codec mapping (line 1147)
+- **AV1** - Freely available, used normatively for codec mapping (line 518)
+- **AV1-ISOBMFF** - Freely available, used for AV1 container binding
+- **BITMAPINFOHEADER** - Freely available Microsoft documentation
+- **Dirac** - Freely available, used for Dirac codec mapping
+- **DolbyVision-ISOBMFF** - Freely available (though requires registration)
+- **JPEG** - Freely available via ITU-T/W3C, used normatively (line 625)
+- **OggKate** - Freely available
+- **QTFF** - Freely available Apple documentation
+- **SSA** - Freely available subtitle format spec
+- **Theora** - Freely available
+- **TRUEHD** - Freely available
+- **TTA** - Freely available
+- **USF** - Freely available
+- **VobSub** - Freely available
+- **VORBIS** - Freely available
+- **VP9** - Freely available
+- **WAVEFORMATEX** - Freely available Microsoft documentation
+- **WAVPACK** - Freely available
+- **WebVTT** - Freely available W3C spec
+
+**Assessment**: All correctly classified as normative. No issues.
+
+### Non-RFC Normative References - NOT Freely Available
+
+**IEEE Standards (4 references):**
+
+1. **IEEE.1857-10** - "IEEE Standard for Third Generation Video Coding"
+   - **Availability**: Available for purchase from IEEE
+   - **Usage**: Referenced for AVS3 codec mapping (line 563)
+   - **Severity: HIGH** - This is a normative reference required to implement AVS3 support. Implementers cannot comply without purchasing the standard. This significantly impacts implementability and reviewability.
+
+2. **IEEE.1857-3** - "IEEE Standard for a System of Advanced Audio and Video Coding"
+   - **Availability**: Available for purchase from IEEE
+   - **Usage**: Referenced for AVS2 codec mapping (line 574)
+   - **Severity: HIGH** - Same issue as above. Required for AVS2 implementation.
+
+3. **IEEE.1857-4** - "IEEE Standard for Second-Generation IEEE 1857 Video Coding"
+   - **Availability**: Available for purchase from IEEE
+   - **Usage**: Referenced for CAVS codec mapping (line 552)
+   - **Severity: HIGH** - Required for CAVS implementation.
+
+4. **IEEE.754** - "IEEE Standard for Binary Floating-Point Arithmetic"
+   - **Availability**: Available for purchase from IEEE
+   - **Usage**: Referenced for floating-point data representation (line 1385)
+   - **Severity: MEDIUM** - IEEE 754 is widely implemented and understood, but still requires purchase. However, the core concepts are well-documented elsewhere. This could potentially be moved to informative if the document doesn't mandate specific IEEE 754 conformance requirements.
+
+**ISO Standards (6 references):**
+
+1. **ISO.11172-2** - MPEG-1 Video
+   - **Availability**: Available for purchase from ISO
+   - **Usage**: Referenced for MPEG-1 video codec mapping
+   - **Severity: HIGH** - Required for MPEG-1 implementation.
+
+2. **ISO.11172-3** - MPEG-1 Audio
+   - **Availability**: Available for purchase from ISO
+   - **Usage**: Referenced for MPEG-1 audio codec mapping
+   - **Severity: HIGH** - Required for MPEG-1 audio implementation.
+
+3. **ISO.13818-2** - MPEG-2 Video
+   - **Availability**: Available for purchase from ISO
+   - **Usage**: Referenced for MPEG-2 video codec mapping
+   - **Severity: HIGH** - Required for MPEG-2 implementation.
+
+4. **ISO.14496-15** - Carriage of NAL unit structured video in ISO base media file format
+   - **Availability**: Available for purchase from ISO
+   - **Usage**: Referenced for H.264/AVC and HEVC mappings
+   - **Severity: HIGH** - Critical for AVC/HEVC implementation.
+
+5. **ISO.14496-2** - MPEG-4 Visual
+   - **Availability**: Available for purchase from ISO
+   - **Usage**: Referenced for MPEG-4 video codec mapping
+   - **Severity: HIGH** - Required for MPEG-4 implementation.
+
+6. **ISO.14496-3** - MPEG-4 Audio
+   - **Availability**: Available for purchase from ISO
+   - **Usage**: Referenced for MPEG-4 audio codec mapping
+   - **Severity: HIGH** - Required for MPEG-4 audio implementation.
+
+**ITU-T Standards (1 reference):**
+
+1. **JPEG2000** (ITU-T T.800)
+   - **Availability**: Available for purchase from ITU-T
+   - **Usage**: Referenced for JPEG2000 codec mapping (line 614)
+   - **Severity: HIGH** - Required for JPEG2000 implementation.
+
+### Summary and Recommendations
+
+**Critical Issues (HIGH severity):**
+- 10 normative references require purchase (4 IEEE, 6 ISO, 1 ITU-T)
+- These are essential for implementing the codec mappings defined in this document
+- This creates a significant barrier to implementation and review
+- The IESG Statement on Normative and Informative References (https://www.ietf.org/about/groups/iesg/statements/normative-informative-references/) states: "Normative references to documents that are not freely available can create serious problems for the community"
+
+**Recommendations:**
+1. For each non-freely-available normative reference, the document should explicitly state in the Security Considerations section that implementers must obtain these standards to fully understand security implications.
+2. Consider whether any of these could be moved to informative if the document only needs to reference them for context rather than requiring conformance.
+3. Document in the Security Considerations section that security analysis is incomplete without access to the referenced standards.
+4. The downrefs (RFC 6386, RFC 9043) need to be registered in the downref registry and approved by the IESG.
+
+
 ### First Come First Served
 
 I wonder if this policy is correct here.
@@ -86,6 +213,7 @@ I assume this spelling is intentional.
 ```
 
 Is the "Use" here correct?
+
 
 ## Nits
 
