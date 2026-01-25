@@ -215,6 +215,21 @@ Is the "Use" here correct?
 
 ## Nits
 
+### Shepherd Writeup Discrepancy
+
+The shepherd writeup (question 21) states:
+
+```
+This document creates a new registry called the "Matroska Tag Names" registry.
+The new registry uses the "Specification Required" policy [RFC8126].
+```
+
+However, the actual document creates two registries, both using "First Come First Served" policy:
+1. "Matroska Codec IDs Registry" (Section 9.1, line 2936-2937)
+2. "Matroska BlockAdditional Type IDs Registry" (Section 9.2, line 3327-3328)
+
+There is no "Matroska Tag Names" registry in the document. The shepherd writeup appears to describe a different document or an outdated version. This discrepancy should be resolved.
+
 ### ID Nits
 
 ```
