@@ -1,0 +1,244 @@
+# Document Shepherd Write-Up for Group Documents
+
+*This version is dated 4 July 2022.*
+
+Thank you for your service as a document shepherd. Among the responsibilities is
+answering the questions in this write-up to give helpful context to Last Call
+and Internet Engineering Steering Group ([IESG][1]) reviewers, and your
+diligence in completing it is appreciated. The full role of the shepherd is
+further described in [<a href="/doc/rfc4858/">RFC 4858</a>][2]. You will need the cooperation of the authors
+and editors to complete these checks.
+
+Note that some numbered items contain multiple related questions; please be sure
+to answer all of them.
+
+## Document History
+
+1. Does the working group (WG) consensus represent the strong concurrence of a
+few individuals, with others being silent, or did it reach broad agreement?
+
+Yes
+
+2. Was there controversy about particular points, or were there decisions where
+the consensus was particularly rough?
+
+No
+
+3. Has anyone threatened an appeal or otherwise indicated extreme discontent? If
+so, please summarize the areas of conflict in separate email messages to the
+responsible Area Director. (It should be in a separate email because this
+questionnaire is publicly available.)
+
+No
+
+4. For protocol documents, are there existing implementations of the contents of
+the document? Have a significant number of potential implementers indicated
+plans to implement? Are any existing implementations reported somewhere,
+either in the document itself (as [<a href="/doc/rfc7942/">RFC 7942</a>][3] recommends) or elsewhere
+(where)?
+
+Yes. Fastmail is implementing it, but there are other partial implementations.
+
+## Additional Reviews
+
+5. Do the contents of this document closely interact with technologies in other
+IETF working groups or external organizations, and would it therefore benefit
+from their review? Have those reviews occurred? If yes, describe which
+reviews took place.
+
+This is a bis document, which means that people are using JSCalendar and wanted
+to improve it. The comments and reviews are coming from implementers, and
+interoperabilities. A lot of discussions are also happening outside the IETF in
+the Calconnect forum.
+
+6. Describe how the document meets any required formal expert review criteria,
+such as the MIB Doctor, YANG Doctor, media type, and URI type reviews.
+
+It is evident that experts are present in the working group. I do not believe
+that further expert reviews are necessary. Furthermore, since this is a bis
+document, many of the reviews conducted on the initial version are also
+relevant here.
+
+7. If the document contains a YANG module, has the final version of the module
+been checked with any of the [recommended validation tools][4] for syntax and
+formatting validation? If there are any resulting errors or warnings, what is
+the justification for not fixing them at this time? Does the YANG module
+comply with the Network Management Datastore Architecture (NMDA) as specified
+in [<a href="/doc/rfc8342/">RFC 8342</a>][5]?
+
+No YANG.
+
+8. Describe reviews and automated checks performed to validate sections of the
+final version of the document written in a formal language, such as XML code,
+BNF rules, MIB definitions, CBOR&#x27;s CDDL, etc.
+
+None of these. Only JSON is used.
+
+## Document Shepherd Checks
+
+9. Based on the shepherd&#x27;s review of the document, is it their opinion that this
+document is needed, clearly written, complete, correctly designed, and ready
+to be handed off to the responsible Area Director?
+
+The document is in my opinion very clear. Much clearer than the previous
+versions !
+
+10. Several IETF Areas have assembled [lists of common issues that their
+reviewers encounter][6]. For which areas have such issues been identified
+and addressed? For which does this still need to happen in subsequent
+reviews?
+
+Base 64
+
+section 1.4.1 Id
+Where Id is given as a data type, it means a String of at least 1 and
+a maximum of 255 octets in size, and it MUST only contain characters
+from the &quot;URL and Filename Safe&quot; base64url alphabet, as defined in
+Section 5 of [<a href="/doc/rfc4648/">RFC4648</a>], excluding the pad character (=). This means
+the allowed characters are the ASCII alphanumeric characters (A-Za-
+z0-9), hyphen (-), and underscore (_).
+
+Date and time: The document details the synthax:
+
+section 1.4.4. UTCDateTime
+This is a string in the date-time [<a href="/doc/rfc3339/">RFC3339</a>] format, with the further
+restrictions that any letters MUST be in uppercase, and the time
+offset MUST be the character Z. Fractional second values MUST NOT be
+included.¶
+For example, 2010-10-10T10:10:10Z is conformant, but
+2010-10-10T10:10:10.0Z or 2010-10-10T10:10:10.123Z are invalid.¶
+
+11. What type of RFC publication is being requested on the IETF stream ([Best
+Current Practice][12], [Proposed Standard, Internet Standard][13],
+[Informational, Experimental or Historic][14])? Why is this the proper type
+of RFC? Do all Datatracker state attributes correctly reflect this intent?
+
+Standard track is appropriated as itis required for interoperability.
+
+12. Have reasonable efforts been made to remind all authors of the intellectual
+property rights (IPR) disclosure obligations described in [<a href="/doc/bcp79/">BCP 79</a>][7]? To
+the best of your knowledge, have all required disclosures been filed? If
+not, explain why. If yes, summarize any relevant discussion, including links
+to publicly-available messages when applicable.
+
+Yes. Both authors responded to question 12 and 13.
+<a href="https://mailarchive.ietf.org/arch/msg/calsify/FTKjcVMvdGXnqHxi93WUxErUVHc/">https://mailarchive.ietf.org/arch/msg/calsify/FTKjcVMvdGXnqHxi93WUxErUVHc/</a>
+<a href="https://mailarchive.ietf.org/arch/msg/calsify/1JcSy7PJIwSNm9Gspz50Azqzf7E/">https://mailarchive.ietf.org/arch/msg/calsify/1JcSy7PJIwSNm9Gspz50Azqzf7E/</a>
+
+13. Has each author, editor, and contributor shown their willingness to be
+listed as such? If the total number of authors and editors on the front page
+is greater than five, please provide a justification.
+
+see above.
+
+14. Document any remaining I-D nits in this document. Simply running the [idnits
+tool][8] is not enough; please review the [&quot;Content Guidelines&quot; on
+<a href="http://authors.ietf.org">authors.ietf.org</a>][15]. (Also note that the current idnits tool generates
+some incorrect warnings; a rewrite is underway.)
+
+-- Possible downref: Non-RFC (?) normative reference: ref. &#x27;CLDR&#x27;
+
+-- Possible downref: Non-RFC (?) normative reference: ref. &#x27;CSS3&#x27;
+
+I beleive these are essential references for implementers, so having them as
+normative reference seems fine to me.
+
+** Obsolete normative reference: <a href="/doc/rfc2445/">RFC 2445</a> (Obsoleted by <a href="/doc/rfc5545/">RFC 5545</a>)
+
+Both references have been cited, thus the present one is being referred to. It
+is anticipated that both documents will be reviewed by the implementers.
+
+-- Possible downref: Non-RFC (?) normative reference: ref. &#x27;TZDB&#x27;
+This serves as an essential reference for the implementation; therefore, I
+believe it is appropriate to include it in the normative reference section to
+guarantee that everyone utilizes the same distinct source.
+
+15. Should any informative references be normative or vice-versa? See the [IESG
+Statement on Normative and Informative References][16].
+
+No
+
+16. List any normative references that are not freely available to anyone. Did
+the community have sufficient access to review any such normative
+references?
+
+None.
+
+17. Are there any normative downward references (see [<a href="/doc/rfc3967/">RFC 3967</a>][9] and [<a href="/doc/bcp97/">BCP
+97</a>][10]) that are not already listed in the [DOWNREF registry][17]? If so,
+list them.
+
+see nits.
+
+18. Are there normative references to documents that are not ready to be
+submitted to the IESG for publication or are otherwise in an unclear state?
+If so, what is the plan for their completion?
+
+no.
+
+19. Will publication of this document change the status of any existing RFCs? If
+so, does the Datatracker metadata correctly reflect this and are those RFCs
+listed on the title page, in the abstract, and discussed in the
+introduction? If not, explain why and point to the part of the document
+where the relationship of this document to these other RFCs is discussed.
+
+This is mentionned in the title page, abnstract and intro.
+
+20. Describe the document shepherd&#x27;s review of the IANA considerations section,
+especially with regard to its consistency with the body of the document.
+Confirm that all aspects of the document requiring IANA assignments are
+associated with the appropriate reservations in IANA registries. Confirm
+that any referenced IANA registries have been clearly identified. Confirm
+that each newly created IANA registry specifies its initial contents,
+allocations procedures, and a reasonable name (see [<a href="/doc/rfc8126/">RFC 8126</a>][11]).
+
+The IANA section is based on the initial version of JSCal and has undergone
+review by the IANA. We also consulted with IANA, which confirmed that the IANA
+section meets their standards. They provided one comment, which has since been
+addressed. The summarized comment and the author&#x27;s response can be found in the
+following email.
+
+Hi,
+
+On Wed, Jan 14, 2026, at 3:37 PM, Daniel Migault wrote:
+&gt; On Tue, Jan 13, 2026 at 5:10 PM Sabrina Tanamal via RT &lt;<a href="mailto:iana-issues@iana.org">iana-issues@iana.org</a>&gt;
+wrote: &gt;&gt; I just have one clarification question regarding Section 8.2.3.3,
+Removed Properties. Should this entry instead have its “Intended Usage” field
+updated rather than being removed entirely? Section 8.2.1.4 states: “JSCalendar
+property registrations may not be deleted; properties that are no longer
+believed appropriate for use can be declared obsolete by a change to their
+‘intended usage’ field; such properties will be clearly marked in the IANA
+registry.”
+
+Yes, please obsolete rather than remove. I have updated the document to version
+14, which removes section 8.2.3.3 and asks to obsolete the &quot;start&quot; property
+with property context &quot;TimeZoneRule&quot; in section 8.2.3.1.
+
+Thanks,
+Robert
+
+21. List any new IANA registries that require Designated Expert Review for
+future allocations. Are the instructions to the Designated Expert clear?
+Please include suggestions of designated experts, if appropriate.
+
+Yes. These instructions are clear.
+
+[1]: <a href="https://www.ietf.org/about/groups/iesg/">https://www.ietf.org/about/groups/iesg/</a>
+[2]: <a href="https://www.rfc-editor.org/rfc/rfc4858.html">https://www.rfc-editor.org/rfc/rfc4858.html</a>
+[3]: <a href="https://www.rfc-editor.org/rfc/rfc7942.html">https://www.rfc-editor.org/rfc/rfc7942.html</a>
+[4]: <a href="https://wiki.ietf.org/group/ops/yang-review-tools">https://wiki.ietf.org/group/ops/yang-review-tools</a>
+[5]: <a href="https://www.rfc-editor.org/rfc/rfc8342.html">https://www.rfc-editor.org/rfc/rfc8342.html</a>
+[6]: <a href="https://wiki.ietf.org/group/iesg/ExpertTopics">https://wiki.ietf.org/group/iesg/ExpertTopics</a>
+[7]: <a href="https://www.rfc-editor.org/info/bcp79">https://www.rfc-editor.org/info/bcp79</a>
+[8]: <a href="https://www.ietf.org/tools/idnits/">https://www.ietf.org/tools/idnits/</a>
+[9]: <a href="https://www.rfc-editor.org/rfc/rfc3967.html">https://www.rfc-editor.org/rfc/rfc3967.html</a>
+[10]: <a href="https://www.rfc-editor.org/info/bcp97">https://www.rfc-editor.org/info/bcp97</a>
+[11]: <a href="https://www.rfc-editor.org/rfc/rfc8126.html">https://www.rfc-editor.org/rfc/rfc8126.html</a>
+[12]: <a href="https://www.rfc-editor.org/rfc/rfc2026.html#section-5">https://www.rfc-editor.org/rfc/rfc2026.html#section-5</a>
+[13]: <a href="https://www.rfc-editor.org/rfc/rfc2026.html#section-4.1">https://www.rfc-editor.org/rfc/rfc2026.html#section-4.1</a>
+[14]: <a href="https://www.rfc-editor.org/rfc/rfc2026.html#section-4.2">https://www.rfc-editor.org/rfc/rfc2026.html#section-4.2</a>
+[15]: <a href="https://authors.ietf.org/en/content-guidelines-overview">https://authors.ietf.org/en/content-guidelines-overview</a>
+[16]:
+<a href="https://www.ietf.org/about/groups/iesg/statements/normative-informative-references/">https://www.ietf.org/about/groups/iesg/statements/normative-informative-references/</a>
+[17]: <a href="https://datatracker.ietf.org/doc/downref/">https://datatracker.ietf.org/doc/downref/</a>
+

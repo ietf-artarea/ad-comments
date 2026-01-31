@@ -1,0 +1,4319 @@
+idnits 2.17.1 
+
+draft-ietf-calext-jscalendarbis-14.txt:
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+  == There are 3 instances of lines with non-ascii characters in the document.
+
+
+  Checking nits according to https://www.ietf.org/id-info/checklist :
+  ----------------------------------------------------------------------------
+
+  ** There are 106 instances of weird spacing in the document.  Is it really
+     formatted ragged-right, rather than justified?
+
+
+  Miscellaneous warnings:
+  ----------------------------------------------------------------------------
+
+  == Line 2892 has weird spacing: '...ty Name  ackno...'
+
+  == Line 2895 has weird spacing: '...ty Name  actio...'
+
+  == Line 2898 has weird spacing: '...ty Name  alert...'
+
+  == Line 2901 has weird spacing: '...ty Name  byDay...'
+
+  == Line 2904 has weird spacing: '...ty Name  byHou...'
+
+  == (101 more instances...)
+
+  -- The document date (14 January 2026) is 17 days in the past.  Is this
+     intentional?
+
+  -- Found something which looks like a code comment -- if you have code
+     sections in the document, please surround them with '<CODE BEGINS>' and
+     '<CODE ENDS>' lines.
+
+
+  Checking references for intended status: Proposed Standard
+  ----------------------------------------------------------------------------
+
+     (See RFCs 3967 and 4897 for information about using normative references
+     to lower-maturity documents in RFCs)
+
+  == Missing Reference: 'B' is mentioned on line 308, but not defined
+
+  == Missing Reference: 'Boolean' is mentioned on line 1805, but not defined
+
+  == Missing Reference: 'Relation' is mentioned on line 1922, but not defined
+
+  == Missing Reference: 'Location' is mentioned on line 916, but not defined
+
+  == Missing Reference: 'Link' is mentioned on line 1815, but not defined
+
+  == Missing Reference: 'VirtualLocation' is mentioned on line 962, but not
+     defined
+
+  == Missing Reference: 'PatchObject' is mentioned on line 1496, but not
+     defined
+
+  == Missing Reference: 'Participant' is mentioned on line 1657, but not
+     defined
+
+  == Missing Reference: 'Alert' is mentioned on line 1849, but not defined
+
+  -- Possible downref: Non-RFC (?) normative reference: ref. 'CLDR'
+
+  -- Possible downref: Non-RFC (?) normative reference: ref. 'CSS3'
+
+  ** Obsolete normative reference: RFC 2445 (Obsoleted by RFC 5545)
+
+  -- Possible downref: Non-RFC (?) normative reference: ref. 'TZDB'
+
+
+     Summary: 2 errors (**), 0 flaws (~~), 16 warnings (==), 5 comments (--).
+
+     Run idnits with the --verbose option for more detailed information about
+     the items above.
+
+--------------------------------------------------------------------------------
+
+
+2	Calendaring extensions                                        N. Jenkins
+3	Internet-Draft                                               R. Stepanek
+4	Obsoletes: 8984 (if approved)                                   Fastmail
+5	Intended status: Standards Track                         14 January 2026
+6	Expires: 18 July 2026
+
+8	           JSCalendar: A JSON Representation of Calendar Data
+9	                   draft-ietf-calext-jscalendarbis-14
+
+11	Abstract
+
+13	   This specification defines a data model and JSON representation of
+14	   calendar data that can be used for storage and data exchange in a
+15	   calendaring and scheduling environment.  It aims to be an alternative
+16	   and, over time, successor to the widely deployed iCalendar data
+17	   format.  It also aims to be unambiguous, extendable, and simple to
+18	   process.  In contrast to the jCal format, which is also based on
+19	   JSON, JSCalendar is not a direct mapping from iCalendar but defines
+20	   the data model independently and expands semantics where appropriate.
+21	   This document obsoletes RFC 8984.
+
+23	Note
+
+25	   This note is to be removed before publishing as an RFC.
+
+27	   Differences from RFC 8984 are documented in Appendix A.
+
+29	Status of This Memo
+
+31	   This Internet-Draft is submitted in full conformance with the
+32	   provisions of BCP 78 and BCP 79.
+
+34	   Internet-Drafts are working documents of the Internet Engineering
+35	   Task Force (IETF).  Note that other groups may also distribute
+36	   working documents as Internet-Drafts.  The list of current Internet-
+37	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+39	   Internet-Drafts are draft documents valid for a maximum of six months
+40	   and may be updated, replaced, or obsoleted by other documents at any
+41	   time.  It is inappropriate to use Internet-Drafts as reference
+42	   material or to cite them other than as "work in progress."
+
+44	   This Internet-Draft will expire on 18 July 2026.
+
+46	Copyright Notice
+
+48	   Copyright (c) 2026 IETF Trust and the persons identified as the
+49	   document authors.  All rights reserved.
+
+51	   This document is subject to BCP 78 and the IETF Trust's Legal
+52	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+53	   license-info) in effect on the date of publication of this document.
+54	   Please review these documents carefully, as they describe your rights
+55	   and restrictions with respect to this document.  Code Components
+56	   extracted from this document must include Revised BSD License text as
+57	   described in Section 4.e of the Trust Legal Provisions and are
+58	   provided without warranty as described in the Revised BSD License.
+
+60	Table of Contents
+
+62	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   5
+63	     1.1.  Motivation and Relation to iCalendar and jCal . . . . . .   5
+64	     1.2.  Notational Conventions  . . . . . . . . . . . . . . . . .   6
+65	     1.3.  Type and Property Notation  . . . . . . . . . . . . . . .   7
+66	       1.3.1.  Type Signatures . . . . . . . . . . . . . . . . . . .   7
+67	       1.3.2.  Property Attributes . . . . . . . . . . . . . . . . .   7
+68	       1.3.3.  The @type Property  . . . . . . . . . . . . . . . . .   8
+69	     1.4.  Data Types  . . . . . . . . . . . . . . . . . . . . . . .   8
+70	       1.4.1.  Id  . . . . . . . . . . . . . . . . . . . . . . . . .   9
+71	       1.4.2.  Int . . . . . . . . . . . . . . . . . . . . . . . . .   9
+72	       1.4.3.  UnsignedInt . . . . . . . . . . . . . . . . . . . . .   9
+73	       1.4.4.  UTCDateTime . . . . . . . . . . . . . . . . . . . . .   9
+74	       1.4.5.  LocalDateTime . . . . . . . . . . . . . . . . . . . .  10
+75	       1.4.6.  Duration  . . . . . . . . . . . . . . . . . . . . . .  10
+76	       1.4.7.  SignedDuration  . . . . . . . . . . . . . . . . . . .  12
+77	       1.4.8.  TimeZoneId  . . . . . . . . . . . . . . . . . . . . .  12
+78	       1.4.9.  PatchObject . . . . . . . . . . . . . . . . . . . . .  12
+79	       1.4.10. Relation  . . . . . . . . . . . . . . . . . . . . . .  13
+80	       1.4.11. Link  . . . . . . . . . . . . . . . . . . . . . . . .  14
+81	   2.  JSCalendar Objects  . . . . . . . . . . . . . . . . . . . . .  15
+82	     2.1.  Event . . . . . . . . . . . . . . . . . . . . . . . . . .  15
+83	     2.2.  Task  . . . . . . . . . . . . . . . . . . . . . . . . . .  15
+84	     2.3.  Group . . . . . . . . . . . . . . . . . . . . . . . . . .  15
+85	   3.  Structure of JSCalendar Objects . . . . . . . . . . . . . . .  16
+86	     3.1.  Object Type . . . . . . . . . . . . . . . . . . . . . . .  16
+87	     3.2.  Normalization and Equivalence . . . . . . . . . . . . . .  16
+88	     3.3.  Vendor-Specific Property Extensions, Values, and Types  .  17
+89	   4.  Common JSCalendar Properties  . . . . . . . . . . . . . . . .  17
+90	     4.1.  Metadata Properties . . . . . . . . . . . . . . . . . . .  17
+91	       4.1.1.  uid . . . . . . . . . . . . . . . . . . . . . . . . .  17
+92	       4.1.2.  relatedTo . . . . . . . . . . . . . . . . . . . . . .  18
+93	       4.1.3.  prodId  . . . . . . . . . . . . . . . . . . . . . . .  18
+94	       4.1.4.  created . . . . . . . . . . . . . . . . . . . . . . .  18
+95	       4.1.5.  updated . . . . . . . . . . . . . . . . . . . . . . .  19
+96	       4.1.6.  sequence  . . . . . . . . . . . . . . . . . . . . . .  19
+97	       4.1.7.  method  . . . . . . . . . . . . . . . . . . . . . . .  19
+98	     4.2.  What and Where Properties . . . . . . . . . . . . . . . .  19
+99	       4.2.1.  title . . . . . . . . . . . . . . . . . . . . . . . .  19
+100	       4.2.2.  description . . . . . . . . . . . . . . . . . . . . .  19
+101	       4.2.3.  descriptionContentType  . . . . . . . . . . . . . . .  19
+102	       4.2.4.  showWithoutTime . . . . . . . . . . . . . . . . . . .  20
+103	       4.2.5.  locations . . . . . . . . . . . . . . . . . . . . . .  20
+104	       4.2.6.  mainLocationId  . . . . . . . . . . . . . . . . . . .  21
+105	       4.2.7.  virtualLocations  . . . . . . . . . . . . . . . . . .  21
+106	       4.2.8.  links . . . . . . . . . . . . . . . . . . . . . . . .  22
+107	       4.2.9.  locale  . . . . . . . . . . . . . . . . . . . . . . .  22
+108	       4.2.10. keywords  . . . . . . . . . . . . . . . . . . . . . .  22
+109	       4.2.11. categories  . . . . . . . . . . . . . . . . . . . . .  23
+110	       4.2.12. color . . . . . . . . . . . . . . . . . . . . . . . .  23
+111	     4.3.  Recurrence Properties . . . . . . . . . . . . . . . . . .  23
+112	       4.3.1.  recurrenceId  . . . . . . . . . . . . . . . . . . . .  23
+113	       4.3.2.  recurrenceIdTimeZone  . . . . . . . . . . . . . . . .  24
+114	       4.3.3.  recurrenceRule  . . . . . . . . . . . . . . . . . . .  24
+115	       4.3.4.  recurrenceOverrides . . . . . . . . . . . . . . . . .  32
+116	     4.4.  Sharing and Scheduling Properties . . . . . . . . . . . .  33
+117	       4.4.1.  priority  . . . . . . . . . . . . . . . . . . . . . .  33
+118	       4.4.2.  freeBusyStatus  . . . . . . . . . . . . . . . . . . .  34
+119	       4.4.3.  privacy . . . . . . . . . . . . . . . . . . . . . . .  34
+120	       4.4.4.  organizerCalendarAddress  . . . . . . . . . . . . . .  35
+121	       4.4.5.  participants  . . . . . . . . . . . . . . . . . . . .  36
+122	     4.5.  Alerts Properties . . . . . . . . . . . . . . . . . . . .  40
+123	       4.5.1.  alerts  . . . . . . . . . . . . . . . . . . . . . . .  40
+124	     4.6.  Time Zone Properties  . . . . . . . . . . . . . . . . . .  42
+125	       4.6.1.  timeZone  . . . . . . . . . . . . . . . . . . . . . .  42
+126	   5.  Type-Specific JSCalendar Properties . . . . . . . . . . . . .  42
+127	     5.1.  Event Properties  . . . . . . . . . . . . . . . . . . . .  42
+128	       5.1.1.  start . . . . . . . . . . . . . . . . . . . . . . . .  42
+129	       5.1.2.  duration  . . . . . . . . . . . . . . . . . . . . . .  42
+130	       5.1.3.  endTimeZone . . . . . . . . . . . . . . . . . . . . .  43
+131	       5.1.4.  status  . . . . . . . . . . . . . . . . . . . . . . .  43
+132	     5.2.  Task Properties . . . . . . . . . . . . . . . . . . . . .  43
+133	       5.2.1.  due . . . . . . . . . . . . . . . . . . . . . . . . .  43
+134	       5.2.2.  start . . . . . . . . . . . . . . . . . . . . . . . .  43
+135	       5.2.3.  estimatedDuration . . . . . . . . . . . . . . . . . .  44
+136	       5.2.4.  percentComplete . . . . . . . . . . . . . . . . . . .  44
+137	       5.2.5.  progress  . . . . . . . . . . . . . . . . . . . . . .  44
+138	     5.3.  Group Properties  . . . . . . . . . . . . . . . . . . . .  45
+139	       5.3.1.  entries . . . . . . . . . . . . . . . . . . . . . . .  45
+140	       5.3.2.  source  . . . . . . . . . . . . . . . . . . . . . . .  45
+141	   6.  Examples  . . . . . . . . . . . . . . . . . . . . . . . . . .  46
+142	     6.1.  Simple Event  . . . . . . . . . . . . . . . . . . . . . .  46
+143	     6.2.  Simple Task . . . . . . . . . . . . . . . . . . . . . . .  46
+144	     6.3.  Simple Group  . . . . . . . . . . . . . . . . . . . . . .  46
+145	     6.4.  All-Day Event . . . . . . . . . . . . . . . . . . . . . .  47
+146	     6.5.  Task with a Due Date  . . . . . . . . . . . . . . . . . .  47
+147	     6.6.  Event with End Time Zone  . . . . . . . . . . . . . . . .  48
+148	     6.7.  Floating-Time Event (with Recurrence) . . . . . . . . . .  48
+149	     6.8.  Event with Physical and Virtual Location  . . . . . . . .  49
+150	     6.9.  Recurring Event with Overrides  . . . . . . . . . . . . .  50
+151	     6.10. Making a "This and Future" Change . . . . . . . . . . . .  51
+152	     6.11. Recurring Event with Participants . . . . . . . . . . . .  54
+153	   7.  Security Considerations . . . . . . . . . . . . . . . . . . .  56
+154	     7.1.  Expanding Recurrences . . . . . . . . . . . . . . . . . .  56
+155	     7.2.  JSON Parsing  . . . . . . . . . . . . . . . . . . . . . .  57
+156	     7.3.  URI Values  . . . . . . . . . . . . . . . . . . . . . . .  57
+157	     7.4.  Spam  . . . . . . . . . . . . . . . . . . . . . . . . . .  58
+158	     7.5.  Duplication . . . . . . . . . . . . . . . . . . . . . . .  58
+159	     7.6.  Time Zones  . . . . . . . . . . . . . . . . . . . . . . .  58
+160	   8.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  58
+161	     8.1.  Media Type Registration . . . . . . . . . . . . . . . . .  59
+162	     8.2.  "JSCalendar Properties" Registry  . . . . . . . . . . . .  60
+163	       8.2.1.  Registry Policy and Change Procedures . . . . . . . .  60
+164	       8.2.2.  "JSCalendar Properties" Registry Template . . . . . .  62
+165	       8.2.3.  Changes to the JSCalendar Properties Registry
+166	               contents  . . . . . . . . . . . . . . . . . . . . . .  63
+167	     8.3.  "JSCalendar Types" Registry . . . . . . . . . . . . . . .  71
+168	       8.3.1.  "JSCalendar Types" Registry Template  . . . . . . . .  71
+169	       8.3.2.  Changes to the JSCalendar Types Registry contents . .  72
+170	     8.4.  "JSCalendar Enum Values" Registry . . . . . . . . . . . .  74
+171	       8.4.1.  "JSCalendar Enum Values" Registry Property
+172	               Template  . . . . . . . . . . . . . . . . . . . . . .  74
+173	       8.4.2.  "JSCalendar Enum Values" Registry Value Template  . .  75
+174	       8.4.3.  Changes to the JSCalendar Enum Values Registry
+175	               contents  . . . . . . . . . . . . . . . . . . . . . .  75
+176	   9.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  78
+177	     9.1.  Normative References  . . . . . . . . . . . . . . . . . .  78
+178	     9.2.  Informative References  . . . . . . . . . . . . . . . . .  80
+179	   Appendix A.  Differences from RFC 8984  . . . . . . . . . . . . .  82
+180	     A.1.  Applied Errata  . . . . . . . . . . . . . . . . . . . . .  82
+181	     A.2.  Obsolete Properties . . . . . . . . . . . . . . . . . . .  82
+182	     A.3.  Reserved Properties . . . . . . . . . . . . . . . . . . .  85
+183	     A.4.  Updated Properties  . . . . . . . . . . . . . . . . . . .  87
+184	     A.5.  New Properties  . . . . . . . . . . . . . . . . . . . . .  91
+185	     A.6.  Obsolete Types  . . . . . . . . . . . . . . . . . . . . .  92
+186	     A.7.  Updated Types . . . . . . . . . . . . . . . . . . . . . .  92
+187	   Acknowledgments . . . . . . . . . . . . . . . . . . . . . . . . .  92
+188	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  92
+
+190	1.  Introduction
+
+192	   This document defines a data model for calendar event and task
+193	   objects, or groups of such objects, in electronic calendar
+194	   applications and systems.  The format aims to be unambiguous,
+195	   extendable, and simple to process.  It obsoletes the data model
+196	   originally defined in [RFC8984] to improve interoperability with
+197	   systems that also make use of iCalendar [RFC5545].  Differences from
+198	   [RFC8984] are documented in Appendix A.
+
+200	   The key design considerations for this data model are as follows:
+
+202	   *  The attributes of the calendar entry represented must be described
+203	      as simple key-value pairs.  Simple events are simple to represent;
+204	      complex events can be modeled accurately.
+
+206	   *  Wherever possible, there should be only one way to express the
+207	      desired semantics, reducing complexity.
+
+209	   *  The data model should avoid ambiguities, which often lead to
+210	      interoperability issues between implementations.
+
+212	   *  The data model should be generally compatible with the iCalendar
+213	      data format [RFC5545] [RFC7986] and extensions, but the
+214	      specification should add new attributes where the iCalendar format
+215	      currently lacks expressivity, and drop seldom-used, obsolete, or
+216	      redundant properties.  This means translation with no loss of
+217	      semantics should be easy with most common iCalendar files.
+
+219	   *  Extensions, such as new properties and components, should not
+220	      require updates to this document.
+
+222	   The representation of this data model is defined in the Internet JSON
+223	   (I-JSON) format [RFC7493], which is a strict subset of the JSON data
+224	   interchange format [RFC8259].  Using JSON is mostly a pragmatic
+225	   choice: its widespread use makes JSCalendar easier to adopt and the
+226	   ready availability of production-ready JSON implementations
+227	   eliminates a whole category of parser-related interoperability
+228	   issues, which iCalendar has often suffered from.
+
+230	1.1.  Motivation and Relation to iCalendar and jCal
+
+232	   The iCalendar data format [RFC5545], a widely deployed interchange
+233	   format for calendaring and scheduling data, has served calendaring
+234	   vendors for a long time but contains some ambiguities and pitfalls
+235	   that cannot be overcome without backward-incompatible changes.
+
+237	   Sources of implementation errors include the following:
+
+239	   *  iCalendar defines various formats for local times, UTC, and dates.
+
+241	   *  iCalendar requires custom time zone definitions within a single
+242	      calendar component.
+
+244	   *  iCalendar's definition of recurrence rules is ambiguous and has
+245	      resulted in differing interpretations, even between experienced
+246	      calendar developers.
+
+248	   *  The iCalendar format itself causes interoperability issues due to
+249	      misuse of CRLF-terminated strings, line continuations, and subtle
+250	      differences among iCalendar parsers.
+
+252	   In recent years, many new products and services have appeared that
+253	   wish to use a JSON representation of calendar data within their APIs.
+254	   The JSON format for iCalendar data, jCal [RFC7265], is a direct
+255	   mapping between iCalendar and JSON.  In its effort to represent full
+256	   iCalendar semantics, it inherits all the same pitfalls and uses a
+257	   complicated JSON structure.
+
+259	   As a consequence, since the standardization of jCal, the majority of
+260	   implementations and service providers either kept using iCalendar or
+261	   came up with their own proprietary JSON representations, which are
+262	   incompatible with each other and often suffer from common pitfalls,
+263	   such as storing event start times in UTC (which become incorrect if
+264	   the time zone's rules change in the future).  JSCalendar meets the
+265	   demand for JSON-formatted calendar data that is free of such known
+266	   problems and provides a standard representation as an alternative to
+267	   the proprietary formats.
+
+269	1.2.  Notational Conventions
+
+271	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+272	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+273	   "OPTIONAL" in this document are to be interpreted as described in
+274	   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+275	   capitals, as shown here.
+
+277	   The underlying format used for this specification is JSON.
+278	   Consequently, the terms "object" and "array" as well as the four
+279	   primitive types (strings, numbers, booleans, and null) are to be
+280	   interpreted as described in Section 1 of [RFC8259].
+
+282	   Some examples in this document contain "partial" JSON documents used
+283	   for illustrative purposes.  In these examples, an ellipsis "..." is
+284	   used to indicate a portion of the document that has been removed for
+285	   compactness.
+
+287	1.3.  Type and Property Notation
+
+289	   This section defines the notation for JSCalendar properties and
+290	   types.
+
+292	1.3.1.  Type Signatures
+
+294	   Type signatures are given for all JSON values in this document.  The
+295	   following conventions are used:
+
+297	   *:  The type is undefined (the value could be any type, although
+298	      permitted values may be constrained by the context of this value).
+
+300	   String:  This is the JSON string type.
+
+302	   Number:  This is the JSON number type.
+
+304	   Boolean:  This is the JSON boolean type.
+
+306	   A:  The value is of type A.
+
+308	   A[B]:  The keys are all of type A and the values are all of type B
+309	      for a JSON object.
+
+311	   A[]:  There is an array of values of type A
+
+313	   A|B:  The value is either of type A or of type B.
+
+315	   Other types may also be given; their representations are defined
+316	   elsewhere in this document.
+
+318	1.3.2.  Property Attributes
+
+320	   Object properties may also have a set of attributes defined along
+321	   with the type signature.  These have the following meanings:
+
+323	   mandatory:  The property MUST be set for an instance of this object
+324	      to be valid.
+
+326	   optional:  The property can, but need not, be set for an instance of
+327	      this object to be valid.
+
+329	   default:  This is followed by a JSON value.  That value will be used
+330	      for this property if it is omitted.
+
+332	   defaultType:  This is followed by the name of a JSCalendar object
+333	      type.  A property value of JSCalendar object type is expected to
+334	      be of this named type, in case it omits the @type property.
+
+336	1.3.3.  The @type Property
+
+338	   Every JSCalendar object has the following JSON object member:
+
+340	   *@type: String*  This is the JSCalendar type of a JSON object.  It
+341	      MUST match the type name of the JSCalendar object of which the
+342	      JSON object is an instance of.
+
+344	   The purpose of the @type property is to help implementations identify
+345	   which JSCalendar object type a given JSON object represents.
+346	   Implementations MUST validate that JSON objects with this property
+347	   conform to the specification of the JSCalendar object type of that
+348	   name.
+
+350	   In many cases, the @type property value is implied by where the
+351	   object occurs in JSCalendar data.  Assuming that both A and B are
+352	   JSCalendar object types:
+
+354	   *  An object that is set as the value for a property with type
+355	      signature A MAY have the @type property set.  If the @type
+356	      property is not set, then its value is implied to be A.
+
+358	   *  An object that is set as the value for a property with type
+359	      signature A|B (defaultType: A) MAY have the @type property set if
+360	      it is an instance of A.  It MUST have the @type property set if it
+361	      is an instance of B.  If instead the defaultType attribute is not
+362	      defined, then the @type property MUST also be set for A.
+
+364	   *  An object that is not the value of a property, such as the topmost
+365	      object in JSON data (directly or as a member of an array), MUST
+366	      have the @type property set.
+
+368	   An object definition MAY require the @type property to be set
+369	   regardless of the above definitions, e.g. this document requires the
+370	   @type property to be set for the Event, Task and Group object types.
+
+372	1.4.  Data Types
+
+374	   In addition to the standard JSON data types, the following data types
+375	   are used in this specification:
+
+377	1.4.1.  Id
+
+379	   Where Id is given as a data type, it means a String of at least 1 and
+380	   a maximum of 255 octets in size, and it MUST only contain characters
+381	   from the "URL and Filename Safe" base64url alphabet, as defined in
+382	   Section 5 of [RFC4648], excluding the pad character (=).  This means
+383	   the allowed characters are the ASCII alphanumeric characters (A-Za-
+384	   z0-9), hyphen (-), and underscore (_).
+
+386	   In many places in JSCalendar, a JSON map is used where the map keys
+387	   are of type Id and the map values are all the same type of object.
+388	   This construction represents an unordered set of objects, with the
+389	   added advantage that each entry has a name (the corresponding map
+390	   key).  This allows for more concise patching of objects, and, when
+391	   applicable, for the objects in question to be referenced from other
+392	   objects within the JSCalendar object.
+
+394	   Unless otherwise specified for a particular property, there are no
+395	   uniqueness constraints on an Id value (other than, of course, the
+396	   requirement that you cannot have two values with the same key within
+397	   a single JSON map).  For example, two Event objects might use the
+398	   same Ids in their respective links properties or, within the same
+399	   Event object, the same Id could appear in the participants and alerts
+400	   properties.  These situations do not imply any semantic connections
+401	   among the objects.
+
+403	1.4.2.  Int
+
+405	   Where Int is given as a data type, it means an integer in the range
+406	   -2^53+1 <= value <= 2^53-1, the safe range for integers stored in a
+407	   floating-point double, represented as a JSON Number.
+
+409	1.4.3.  UnsignedInt
+
+411	   Where UnsignedInt is given as a data type, it means an integer in the
+412	   range 0 <= value <= 2^53-1, represented as a JSON Number.
+
+414	1.4.4.  UTCDateTime
+
+416	   This is a string in the date-time [RFC3339] format, with the further
+417	   restrictions that any letters MUST be in uppercase, and the time
+418	   offset MUST be the character Z.  Fractional second values MUST NOT be
+419	   included.
+
+421	   For example, 2010-10-10T10:10:10Z is conformant, but
+422	   2010-10-10T10:10:10.0Z or 2010-10-10T10:10:10.123Z are invalid.
+
+424	1.4.5.  LocalDateTime
+
+426	   This is a date-time string with no time zone/offset information.  It
+427	   is otherwise in the same format as UTCDateTime.  For example,
+428	   2006-01-02T15:04:05 is valid.  The time zone to associate with the
+429	   LocalDateTime comes from the timeZone property of the JSCalendar
+430	   object (see Section 4.6.1).  If no time zone is specified, the
+431	   LocalDateTime is "floating".  Floating date-times are not tied to any
+432	   specific time zone.  Instead, they occur in each time zone at the
+433	   given wall-clock time (as opposed to the same instant point in time).
+
+435	   A time zone may have a period of discontinuity, for example, a change
+436	   from standard time to daylight savings time.  When converting local
+437	   date-times that fall in the discontinuity to UTC, the offset before
+438	   the transition MUST be used.
+
+440	   For example, in the America/Los_Angeles time zone, the date-time
+441	   2020-11-01T01:30:00 occurs twice: before the daylight savings time
+442	   (DST) transition with a UTC offset of -07:00 and again after the
+443	   transition with an offset of -08:00.  When converting to UTC, we
+444	   therefore use the offset before the transition (-07:00), so it
+445	   becomes 2020-11-01T08:30:00Z.
+
+447	   Similarly, in the Australia/Melbourne time zone, the date-time
+448	   2020-10-04T02:30:00 does not exist; the clocks are moved forward one
+449	   hour for DST on that day at 02:00.  However, such a value may appear
+450	   during calculations (see duration semantics in Section 1.4.6) or due
+451	   to a change in time zone rules (so it was valid when the event was
+452	   first created).  Again, it is interpreted as though the offset before
+453	   the transition is in effect (+10:00); therefore, when converted to
+454	   UTC, we get 2020-10-03T16:30:00Z.
+
+456	1.4.6.  Duration
+
+458	   Where Duration is given as a type, it means a length of time
+459	   represented by a subset of the ISO 8601 duration format, as specified
+460	   by the following ABNF [RFC5234]:
+
+462	       dur-second  = 1*DIGIT "S"
+463	       dur-minute  = 1*DIGIT "M" [dur-second]
+464	       dur-hour    = 1*DIGIT "H" [dur-minute]
+465	       dur-time    = "T" (dur-hour / dur-minute / dur-second)
+466	       dur-day     = 1*DIGIT "D"
+467	       dur-week    = 1*DIGIT "W"
+468	       dur-cal     = (dur-week [dur-day] / dur-day)
+
+470	       duration    = "P" (dur-cal [dur-time] / dur-time)
+
+472	   A duration specifies an abstract number of weeks, days, hours,
+473	   minutes, and/or seconds.  A duration specified using weeks or days
+474	   does not always correspond to an exact multiple of 24 hours.  The
+475	   number of hours/minutes/seconds may vary if it overlaps a period of
+476	   discontinuity in the event's time zone, for example, a change from
+477	   standard time to daylight savings time.  Leap seconds MUST NOT be
+478	   considered when adding or subtracting a duration to/from a
+479	   LocalDateTime.
+
+481	   To add a duration to a LocalDateTime:
+
+483	   1.  Add any week or day components of the duration to the date.  A
+484	       week is always the same as seven days.
+
+486	   2.  If a time zone applies to the LocalDateTime, convert it to a
+487	       UTCDateTime following the semantics in Section 1.4.5.
+
+489	   3.  Add any hour, minute, or second components of the duration (in
+490	       absolute time).
+
+492	   4.  Convert the resulting UTCDateTime back to a LocalDateTime in the
+493	       time zone that applies.
+
+495	   To subtract a duration from a LocalDateTime, the steps apply in
+496	   reverse:
+
+498	   1.  If a time zone applies to the LocalDateTime, convert it to UTC
+499	       following the semantics in Section 1.4.5.
+
+501	   2.  Subtract any hour, minute, or second components of the duration
+502	       (in absolute time).
+
+504	   3.  Convert the resulting UTCDateTime back to LocalDateTime in the
+505	       time zone that applies.
+
+507	   4.  Subtract any week or day components of the duration from the
+508	       date.
+
+510	   5.  If the resulting time does not exist on the date due to a
+511	       discontinuity in the time zone, use the semantics in
+512	       Section 1.4.5 to convert to UTC and back to get a valid
+513	       LocalDateTime.
+
+515	   These semantics match the iCalendar DURATION value type ([RFC5545],
+516	   Section 3.3.6).
+
+518	1.4.7.  SignedDuration
+
+520	   A SignedDuration represents a length of time that may be positive or
+521	   negative and is typically used to express the offset of a point in
+522	   time relative to an associated time.  It is represented as a
+523	   Duration, optionally preceded by a sign character.  It is specified
+524	   by the following ABNF:
+
+526	   signed-duration = ["+" / "-"] duration
+
+528	   A negative sign indicates a point in time at or before the associated
+529	   time; a positive or no sign indicates a time at or after the
+530	   associated time.
+
+532	1.4.8.  TimeZoneId
+
+534	   Where TimeZoneId is given as a data type, it means a String that is a
+535	   time zone name in the IANA Time Zone Database [TZDB].  The zone rules
+536	   of the respective IANA time zone records apply.
+
+538	1.4.9.  PatchObject
+
+540	   A PatchObject is of type String[*] and represents an unordered set of
+541	   patches on a JSON object.  Each key is a path represented in a subset
+542	   of the JSON Pointer format [RFC6901].  The paths have an implicit
+543	   leading /, so each key is prefixed with / before applying the JSON
+544	   Pointer evaluation algorithm.
+
+546	   A patch within a PatchObject is only valid if all of the following
+547	   conditions apply:
+
+549	   1.  The pointer MUST NOT reference inside an array (i.e., you MUST
+550	       NOT insert/delete from an array; the array MUST be replaced in
+551	       its entirety instead).
+
+553	   2.  All parts prior to the last (i.e., the value after the final
+554	       slash) MUST already exist on the object being patched.
+
+556	   3.  There MUST NOT be two patches in the PatchObject where the
+557	       pointer of one is the prefix of the pointer of the other, e.g.,
+558	       alerts/1/offset and alerts.
+
+560	   4.  The value for the patch MUST be valid for the property being set
+561	       (of the correct type and obeying any other applicable
+562	       restrictions), or, if null, the property MUST be optional.
+
+564	   The value associated with each pointer determines how to apply that
+565	   patch:
+
+567	   *  If null, remove the property from the patched object.  If the key
+568	      is not present in the parent, this a no-op.
+
+570	   *  If non-null, set the value given as the value for this property
+571	      (this may be a replacement or addition to the object being
+572	      patched).
+
+574	   A PatchObject does not define its own @type property (see
+575	   Section 1.3.3).  An @type property in a patch MUST be handled as any
+576	   other patched property value.
+
+578	   Implementations MUST reject a PatchObject in its entirety if any of
+579	   its patches are invalid.  Implementations MUST NOT apply partial
+580	   patches.
+
+582	   The PatchObject format is used to significantly reduce file size and
+583	   duplicated content when specifying variations to a common object,
+584	   such as with recurring events or when translating the data into
+585	   multiple languages.  It can also better preserve semantic intent if
+586	   only the properties that should differ between the two objects are
+587	   patched.  For example, if one person is not going to a particular
+588	   instance of a regularly scheduled event, in iCalendar, you would have
+589	   to duplicate the entire event in the override.  In JSCalendar, this
+590	   is a small patch to show the difference.  As only this property is
+591	   patched, if the location of the event is changed, the occurrence will
+592	   automatically still inherit this.
+
+594	1.4.10.  Relation
+
+596	   A Relation object defines the relation to other objects, using a
+597	   possibly empty set of relation types.  The object that defines this
+598	   relation is the linking object, while the other object is the linked
+599	   object.  A Relation object has the following properties:
+
+601	   @type: String
+602	      This specifies the type of this object.  This MUST be Relation, if
+603	      set.
+
+605	   relation: String[Boolean] (optional, default: empty Object)
+606	      This describes how the linked object is related to the linking
+607	      object.  The relation is defined as a set of relation types.  Keys
+608	      in the set MUST be one of the following values, specified in the
+609	      property definition where the Relation object is used, a value
+610	      registered in the IANA "JSCalendar Enum Values" registry, or a
+611	      vendor-specific value (see Section 3.3):
+
+613	      first:  The linked object is the first in a series the linking
+614	         object is part of.
+
+616	      next:  The linked object is next in a series the linking object is
+617	         part of.
+
+619	      child:  The linked object is a subpart of the linking object.
+
+621	      parent:  The linking object is a subpart of the linked object.
+
+623	      The value for each key in the map MUST be true.  The empty Object
+624	      value represents a "parent" relation, unless defined differently
+625	      for a specific property.
+
+627	1.4.11.  Link
+
+629	   A Link object represents an external resource associated with the
+630	   linking object.  It has the following properties:
+
+632	   @type: String
+633	      This specifies the type of this object.  This MUST be Link, if
+634	      set.
+
+636	   href: String (mandatory)
+637	      This is a URI[RFC3986] from which the resource may be fetched.
+
+639	      This MAY be a data: URL [RFC2397], but it is recommended that the
+640	      file be hosted on a server to avoid embedding arbitrarily large
+641	      data in JSCalendar object instances.
+
+643	   contentType: String (optional)
+644	      This is the media type [RFC6838] of the resource, if known.
+
+646	   size: UnsignedInt (optional)
+647	      This is the size, in octets, of the resource when fully decoded
+648	      (i.e., the number of octets in the file the user would download),
+649	      if known.  Note that this is an informational estimate, and
+650	      implementations must be prepared to handle the actual size being
+651	      quite different when the resource is fetched.
+
+653	   rel: String (optional)
+654	      This identifies the relation of the linked resource to the object.
+655	      If set, the value MUST be a link relation type as defined in
+656	      Section 2.1 of [RFC8288] .
+
+658	   display: String[Boolean] (optional)
+659	      This is a set of intended purposes of a link to an image.  The
+660	      keys MUST be one of the following values, another value registered
+661	      in the IANA "JSCalendar Enum Values" registry, or a vendor-
+662	      specific value (see Section 3.3):
+
+664	      badge:  an image meant to be displayed alongside the title of the
+665	         object
+
+667	      graphic:  a full image replacement for the object itself
+
+669	      fullsize:  an image that is used to enhance the object
+
+671	      thumbnail:  a smaller variant of fullsize to be used when space
+672	         for the image is constrained
+
+674	      The value for each key in the map MUST be true.
+
+676	   title: String (optional)
+677	      This is a human-readable, plain-text description of the resource.
+
+679	2.  JSCalendar Objects
+
+681	   This section describes the calendar object types specified by
+682	   JSCalendar.
+
+684	2.1.  Event
+
+686	   Media type: application/jscalendar+json;type=event
+
+688	   An Event represents a scheduled amount of time on a calendar,
+689	   typically a meeting, appointment, reminder, or anniversary.  It is
+690	   required to start at a certain point in time and typically has a non-
+691	   zero duration.  Multiple participants may partake in the event.
+
+693	   The @type (Section 1.3.3) property is mandatory, it MUST be set to
+694	   value Event.
+
+696	2.2.  Task
+
+698	   Media type: application/jscalendar+json;type=task
+
+700	   A Task represents an action item, assignment, to-do item, or work
+701	   item.  It may start and be due at certain points in time, take some
+702	   estimated time to complete, and recur, none of which is required.
+
+704	   The @type (Section 1.3.3) property is mandatory, it MUST be set to
+705	   value Task.
+
+707	2.3.  Group
+
+709	   Media type: application/jscalendar+json;type=group
+710	   A Group is a collection of Event (Section 2.1) and/or Task
+711	   (Section 2.2) objects.  Typically, objects are grouped by topic
+712	   (e.g., by keywords) or calendar membership.
+
+714	   The @type (Section 1.3.3) property is mandatory, it MUST be set to
+715	   value Group.
+
+717	3.  Structure of JSCalendar Objects
+
+719	   A JSCalendar object is a JSON object [RFC8259], which MUST be valid
+720	   I-JSON (a stricter subset of JSON) [RFC7493].  Property names and
+721	   values are case sensitive.
+
+723	   The object has a collection of properties, as specified in the
+724	   following sections.  Properties are specified as being either
+725	   mandatory or optional.  Optional properties may have a default value
+726	   if explicitly specified in the property definition.
+
+728	3.1.  Object Type
+
+730	   JSCalendar objects MUST name their type in the @type property if not
+731	   explicitly specified otherwise for the respective object type.  A
+732	   notable exception to this rule is the PatchObject (Section 1.4.9).
+
+734	3.2.  Normalization and Equivalence
+
+736	   JSCalendar aims to provide unambiguous definitions for value types
+737	   and properties but does not define a general normalization or
+738	   equivalence method for JSCalendar objects and types.  This is because
+739	   the notion of equivalence might range from byte-level equivalence to
+740	   semantic equivalence, depending on the respective use case.
+741	   Normalization of JSCalendar objects is hindered because of the
+742	   following reasons:
+
+744	   *  Custom JSCalendar properties may contain arbitrary JSON values,
+745	      including arrays.  However, equivalence of arrays might or might
+746	      not depend on the order of elements, depending on the respective
+747	      property definition.
+
+749	   *  Several JSCalendar property values are defined as URIs and media
+750	      types, but normalization of these types is inherently protocol and
+751	      scheme specific, depending on the use case of the equivalence
+752	      definition (see Section 6 of [RFC3986]).
+
+754	   Considering this, the definition of equivalence and normalization is
+755	   left to client and server implementations and to be negotiated by a
+756	   calendar exchange protocol or defined elsewhere.
+
+758	3.3.  Vendor-Specific Property Extensions, Values, and Types
+
+760	   Vendors MAY add additional properties to the calendar object to
+761	   support their custom features.  To avoid conflict, the names of these
+762	   properties MUST be prefixed by a domain name controlled by the vendor
+763	   followed by a colon, e.g., example.com:customprop.  If the value is a
+764	   new JSCalendar object, it either MUST include an @type property, or
+765	   it MUST explicitly be specified to not require a type designator.
+766	   The type name MUST be prefixed with a domain name controlled by the
+767	   vendor.
+
+769	   Some JSCalendar properties allow vendor-specific value extensions.
+770	   Such vendor-specific values MUST be prefixed by a domain name
+771	   controlled by the vendor followed by a colon, e.g.,
+772	   example.com:customrel.
+
+774	   Vendors are strongly encouraged to register any new property values
+775	   or extensions that are useful to other systems as well, rather than
+776	   use a vendor-specific prefix.
+
+778	4.  Common JSCalendar Properties
+
+780	   This section describes the properties that are common to the various
+781	   JSCalendar object types.  Specific JSCalendar object types may only
+782	   support a subset of these properties.  The object type definitions in
+783	   Section 5 describe the set of supported properties per type.
+
+785	4.1.  Metadata Properties
+
+787	4.1.1.  uid
+
+789	   Type: String (mandatory)
+
+791	   This is a globally unique identifier used to associate objects
+792	   representing the same event, task, group, or other object across
+793	   different systems, calendars, and views.  For recurring events and
+794	   tasks, the UID is associated with the base object and therefore is
+795	   the same for all occurrences; the combination of the UID with a
+796	   recurrenceId identifies a particular instance.
+
+798	   The generator of the identifier MUST guarantee that the identifier is
+799	   unique.  [RFC9562] describes a range of established algorithms to
+800	   generate universally unique identifiers (UUIDs).  UUID version 4,
+801	   described in Section 4.4 of [RFC9562], is RECOMMENDED.
+
+803	   For compatibility with UIDs [RFC5545], implementations MUST be able
+804	   to receive and persist values of at least 255 octets for this
+805	   property, but they MUST NOT truncate values in the middle of a UTF-8
+806	   multi-octet sequence.
+
+808	4.1.2.  relatedTo
+
+810	   Type: String[Relation] (optional)
+
+812	   This relates the object to other JSCalendar objects.  Each key in the
+813	   map is the uid property value of a related object.  The value defines
+814	   the type of the relation.
+
+816	   If an object is split to make a "this and future" change to a
+817	   recurrence, the original object MUST be truncated to end at the
+818	   previous occurrence before this split, and a new object is created to
+819	   represent all the occurrences after the split.  A next relation MUST
+820	   be set on the original object's relatedTo property, keyed by the uid
+821	   of the new object.  A first relation MUST be set on the new object,
+822	   keyed by the uid of the first object in the series.  Clients can then
+823	   follow these uid keys to get the complete set of objects if the user
+824	   wishes to modify them all at once.
+
+826	4.1.3.  prodId
+
+828	   Type: String (optional)
+
+830	   This is the identifier for the product that last updated the
+831	   JSCalendar object.  This should be set whenever the data in the
+832	   object is modified (i.e., whenever the updated property is set).
+
+834	   The vendor of the implementation MUST ensure that this is a globally
+835	   unique identifier, using some technique such as a Formal Public
+836	   Identifier (FPI) value, as defined in [ISO.9070.1991].
+
+838	   This property SHOULD NOT be used to alter the interpretation of a
+839	   JSCalendar object beyond the semantics specified in this document.
+840	   For example, it is not to be used to further the understanding of
+841	   nonstandard properties, a practice that is known to cause long-term
+842	   interoperability problems.
+
+844	4.1.4.  created
+
+846	   Type: UTCDateTime (optional)
+
+848	   This is the date and time this object was initially created.
+
+850	4.1.5.  updated
+
+852	   Type: UTCDateTime (mandatory)
+
+854	   This is the date and time the data in this object was last modified
+855	   (or its creation date/time if not modified since).
+
+857	4.1.6.  sequence
+
+859	   Type: UnsignedInt (optional, default: 0)
+
+861	   This property indicates the revision of the calendar object.  For
+862	   scheduled calendar objects, its value must be incremented according
+863	   to the rules of the scheduling protocol, e.g. [jmap-calendars] or
+864	   [RFC5546].
+
+866	4.1.7.  method
+
+868	   Type: String (optional)
+
+870	   This is the iTIP [RFC5546] method, in lowercase.  This MUST only be
+871	   present if the JSCalendar object represents an iTIP scheduling
+872	   message.
+
+874	4.2.  What and Where Properties
+
+876	4.2.1.  title
+
+878	   Type: String (optional, default: empty String)
+
+880	   This is a short summary of the object.
+
+882	4.2.2.  description
+
+884	   Type: String (optional, default: empty String)
+
+886	   This is a longer-form text description of the object.  The content is
+887	   formatted according to the descriptionContentType property.
+
+889	4.2.3.  descriptionContentType
+
+891	   Type: String (optional, default: text/plain)
+
+893	   This describes the media type [RFC6838] of the contents of the
+894	   description property.  Media types MUST be subtypes of type text and
+895	   SHOULD be text/plain or text/html [MEDIATYPES].  They MAY include
+896	   parameters, and the charset parameter value MUST be utf-8, if
+897	   specified.
+
+899	4.2.4.  showWithoutTime
+
+901	   Type: Boolean (optional, default: false)
+
+903	   This indicates that the time is not important to display to the user
+904	   when rendering this calendar object.  An example of this is an event
+905	   that conceptually occurs all day or across multiple days, such as
+906	   "New Year's Day" or "Italy Vacation".  While the time component is
+907	   important for free-busy calculations and checking for scheduling
+908	   clashes, calendars may choose to omit displaying it and/or display
+909	   the object separately to other objects to enhance the user's view of
+910	   their schedule.
+
+912	   Such events are also commonly known as "all-day" events.
+
+914	4.2.5.  locations
+
+916	   Type: Id[Location] (optional)
+
+918	   This is a map of location ids to Location objects, representing
+919	   locations associated with the object.
+
+921	   A Location object has the following properties.  It MUST have at
+922	   least one property other than the @type property.
+
+924	   @type: String
+925	      This specifies the type of this object.  This MUST be Location, if
+926	      set.
+
+928	   name: String (optional)
+929	      This is the human-readable name or short description of the
+930	      location, such as an address.
+
+932	   locationTypes: String[Boolean] (optional)
+933	      This is a set of one or more location types that describe this
+934	      location.  All types MUST be from the "Location Types Registry"
+935	      [LOCATIONTYPES], as defined in [RFC4589] . The set is represented
+936	      as a map, with the keys being the location types.  The value for
+937	      each key in the map MUST be true.
+
+939	   coordinates: String (optional)
+940	      This is a geo: URI [RFC5870] for the location.
+
+942	   links: Id[Link] (optional)
+943	      This is a map of link ids to Link objects, representing external
+944	      resources associated with this location, for example, a vCard or
+945	      image.  If there are no links, this MUST be omitted (rather than
+946	      specified as an empty set).
+
+948	4.2.6.  mainLocationId
+
+950	   Type: String (optional)
+
+952	   This indicates which of the multiple entries in the locations
+953	   property can be considered the main location for the event or task.
+954	   A client implementation MAY choose to display this location more
+955	   prominently.  The main location is undefined if this property is not
+956	   set.  If this property is set, then its value MUST match a key in the
+957	   locations property and the name property of that main Location object
+958	   MUST be set.
+
+960	4.2.7.  virtualLocations
+
+962	   Type: Id[VirtualLocation] (optional)
+
+964	   This is a map of virtual location ids to VirtualLocation objects,
+965	   representing virtual locations, such as video conferences or chat
+966	   rooms, associated with the object.
+
+968	   A VirtualLocation object has the following properties.
+
+970	   @type: String
+971	      This specifies the type of this object.  This MUST be
+972	      VirtualLocation, if set.
+
+974	   name: String (optional, default: empty String)
+975	      This is the human-readable name or short description of the
+976	      virtual location, such as an access code.
+
+978	   uri: String (mandatory)
+979	      This is a URI[RFC3986] that represents how to connect to this
+980	      virtual location.
+
+982	      This may be a telephone number (represented using the tel: scheme,
+983	      e.g., tel:+1-555-555-5555) for a teleconference, a web address for
+984	      online chat, or any custom URI.
+
+986	   features: String[Boolean] (optional)
+987	      A set of features supported by this virtual location.  The set is
+988	      represented as a map, with the keys being the feature.  The value
+989	      for each key in the map MUST be true.
+
+991	      The feature MUST be one of the following values, another value
+992	      registered in the IANA "JSCalendar Enum Values" registry, or a
+993	      vendor-specific value (see Section 3.3).  Any value the client or
+994	      server doesn't understand should be treated the same as if this
+995	      feature is omitted.
+
+997	      audio:  Audio conferencing
+
+999	      chat:  Chat or instant messaging
+
+1001	      feed:  Blog or atom feed
+
+1003	      moderator:  Provides moderator-specific features
+
+1005	      phone:  Phone conferencing
+
+1007	      screen:  Screen sharing
+
+1009	      video:  Video conferencing
+
+1011	4.2.8.  links
+
+1013	   Type: Id[Link] (optional)
+
+1015	   This is a map of link ids to Link objects, representing external
+1016	   resources associated with the object.
+
+1018	   Links with a rel of enclosure MUST be considered by the client to be
+1019	   attachments for download.
+
+1021	   Links with a rel of describedby MUST be considered by the client to
+1022	   be alternative representations of the description.
+
+1024	   Links with a rel of icon MUST be considered by the client to be
+1025	   images that it may use when presenting the calendar data to a user.
+1026	   The display property may be set to indicate the purpose of this
+1027	   image.
+
+1029	4.2.9.  locale
+
+1031	   Type: String (optional)
+
+1033	   This is the language tag, as defined in [RFC5646], that best
+1034	   describes the locale used for the text in the calendar object, if
+1035	   known.
+
+1037	4.2.10.  keywords
+
+1039	   Type: String[Boolean] (optional)
+
+1041	   This is a set of keywords or tags that relate to the object.  The set
+1042	   is represented as a map, with the keys being the keywords.  The value
+1043	   for each key in the map MUST be true.
+
+1045	4.2.11.  categories
+
+1047	   Type: String[Boolean] (optional)
+
+1049	   This is a set of categories that relate to the calendar object.  The
+1050	   set is represented as a map, with the keys being the categories
+1051	   specified as URIs.  The value for each key in the map MUST be true.
+
+1053	   In contrast to keywords, categories are typically structured.  For
+1054	   example, a vendor owning the domain example.com might define the
+1055	   categories http://example.com/categories/sports/american-football and
+1056	   http://example.com/categories/music/r-b.
+
+1058	4.2.12.  color
+
+1060	   Type: String (optional)
+
+1062	   This is a color clients MAY use when displaying this calendar object.
+1063	   The value is a color name taken from the set of names defined in
+1064	   Section 4.3 of [CSS3] or an RGB value in six-digit hexadecimal
+1065	   notation, as defined in Section 4.2.1 of [CSS3].  Values are case-
+1066	   insensitive.
+
+1068	4.3.  Recurrence Properties
+
+1070	   Some events and tasks occur at regular or irregular intervals.
+1071	   Rather than having to copy the data for every occurrence, there can
+1072	   be a base event with a rule to generate recurrences and/or overrides
+1073	   that add extra dates or exceptions to the rule.
+
+1075	   The recurrence set is the complete set of instances for an object.
+1076	   It is generated by considering the following properties in order, all
+1077	   of which are optional:
+
+1079	   1.  The recurrenceRule property (Section 4.3.3) generates a set of
+1080	       extra date-times on which the object occurs.
+
+1082	   2.  The recurrenceOverrides property (Section 4.3.4) defines date-
+1083	       times that are added or excluded to form the final set.  (This
+1084	       property may also contain changes to the object to apply to
+1085	       particular instances.)
+
+1087	4.3.1.  recurrenceId
+
+1089	   Type: LocalDateTime (optional)
+1090	   If present, this JSCalendar object represents one occurrence of a
+1091	   recurring JSCalendar object.  If present, the recurrenceRule and
+1092	   recurrenceOverrides properties MUST NOT be present.
+
+1094	   The value is a date-time either produced by the recurrenceRule of the
+1095	   base event or added as a key to the recurrenceOverrides property of
+1096	   the base event.
+
+1098	4.3.2.  recurrenceIdTimeZone
+
+1100	   Type: TimeZoneId|null (optional, default: null)
+
+1102	   Identifies the time zone of the main JSCalendar object, of which this
+1103	   JSCalendar object is a recurrence instance.  It MUST NOT be set if
+1104	   the recurrenceId property is not set.
+
+1106	4.3.3.  recurrenceRule
+
+1108	   Type: RecurrenceRule (optional)
+
+1110	   This a recurrence rule (a repeating pattern) for recurring calendar
+1111	   objects.
+
+1113	   An Event recurs by applying the recurrence rule to the start date-
+1114	   time.
+
+1116	   A Task recurs by applying the recurrence rule to the start date-time,
+1117	   if defined; otherwise, it recurs by the due date-time, if defined.
+1118	   If the task defines neither a start nor due date-time, it MUST NOT
+1119	   define a recurrenceRule property.
+
+1121	   A RecurrenceRule object is a JSON object mapping of a RECUR value
+1122	   type in iCalendar [RFC5545] [RFC7529] and has the same semantics.  It
+1123	   has the following properties:
+
+1125	   @type: String
+1126	      This specifies the type of this object.  This MUST be
+1127	      RecurrenceRule, if set.
+
+1129	   frequency: String (mandatory)
+1130	      This is the time span covered by each iteration of this recurrence
+1131	      rule (see Section 4.3.3.1 for full semantics).  This MUST be one
+1132	      of the following values:
+
+1134	      *  yearly
+
+1136	      *  monthly
+1137	      *  weekly
+
+1139	      *  daily
+
+1141	      *  hourly
+
+1143	      *  minutely
+
+1145	      *  secondly
+
+1147	      This is the FREQ part from iCalendar, converted to lowercase.
+
+1149	   interval: UnsignedInt (optional, default: 1)
+1150	      This is the interval of iteration periods at which the recurrence
+1151	      repeats.  If included, it MUST be an integer >= 1.
+
+1153	      This is the INTERVAL part from iCalendar.
+
+1155	   rscale: String (optional, default: "gregorian")
+1156	      This is the calendar system in which this recurrence rule
+1157	      operates, in lowercase.  This MUST be either a CLDR-registered
+1158	      calendar system name [CLDR] or a vendor-specific value (see
+1159	      Section 3.3).
+
+1161	      This is the RSCALE part from iCalendar RSCALE [RFC7529], converted
+1162	      to lowercase.
+
+1164	   skip: String (optional, default: "omit")
+1165	      This is the behavior to use when the expansion of the recurrence
+1166	      produces invalid dates.  This property only has an effect if the
+1167	      frequency is "yearly" or "monthly".  It MUST be one of the
+1168	      following values:
+
+1170	      *  omit
+
+1172	      *  backward
+
+1174	      *  forward
+
+1176	      This is the SKIP part from iCalendar RSCALE [RFC7529], converted
+1177	      to lowercase.
+
+1179	   firstDayOfWeek: String (optional, default: "mo")
+1180	      This is the day on which the week is considered to start,
+1181	      represented as a lowercase, abbreviated, and two-letter English
+1182	      day of the week.  If included, it MUST be one of the following
+1183	      values:
+
+1185	      *  mo
+
+1187	      *  tu
+
+1189	      *  we
+
+1191	      *  th
+
+1193	      *  fr
+
+1195	      *  sa
+
+1197	      *  su
+
+1199	      This is the WKST part from iCalendar.
+
+1201	   byDay: NDay[] (optional)
+1202	      These are days of the week on which to repeat.  An NDay object has
+1203	      the following properties:
+
+1205	      @type: String
+1206	         This specifies the type of this object.  This MUST be NDay, if
+1207	         set.
+
+1209	      day: String (mandatory)
+1210	         This is a day of the week on which to repeat; the allowed
+1211	         values are the same as for the firstDayOfWeek recurrenceRule
+1212	         property.
+
+1214	         This is the day of the week of the BYDAY part in iCalendar,
+1215	         converted to lowercase.
+
+1217	      nthOfPeriod: Int (optional)
+1218	         If present, rather than representing every occurrence of the
+1219	         weekday defined in the day property, it represents only a
+1220	         specific instance within the recurrence period.  The value can
+1221	         be positive or negative but MUST NOT be zero.  A negative
+1222	         integer means the nth-last occurrence within that period (i.e.,
+1223	         -1 is the last occurrence, -2 the one before that, etc.).
+
+1225	         This is the ordinal part of the BYDAY value in iCalendar (e.g.,
+1226	         1 or -3).
+
+1228	   byMonthDay: Int[] (optional)
+1229	      These are the days of the month on which to repeat.  Valid values
+1230	      are between 1 and the maximum number of days any month may have in
+1231	      the calendar given by the rscale property and the negative values
+1232	      of these numbers.  For example, in the Gregorian calendar, valid
+1233	      values are 1 to 31 and -31 to -1.  Negative values offset from the
+1234	      end of the month.  The array MUST have at least one entry if
+1235	      included.
+
+1237	      This is the BYMONTHDAY part in iCalendar.
+
+1239	   byMonth: String[] (optional)
+1240	      These are the months in which to repeat.  Each entry is a string
+1241	      representation of a number, starting from "1" for the first month
+1242	      in the calendar (e.g., "1" means January with the Gregorian
+1243	      calendar), with an optional "L" suffix (see [RFC7529]) for leap
+1244	      months (this MUST be uppercase, e.g., "3L").  The array MUST have
+1245	      at least one entry if included.
+
+1247	      This is the BYMONTH part from iCalendar.
+
+1249	   byYearDay: Int[] (optional)
+1250	      These are the days of the year on which to repeat.  Valid values
+1251	      are between 1 and the maximum number of days any year may have in
+1252	      the calendar given by the rscale property and the negative values
+1253	      of these numbers.  For example, in the Gregorian calendar, valid
+1254	      values are 1 to 366 and -366 to -1.  Negative values offset from
+1255	      the end of the year.  The array MUST have at least one entry if
+1256	      included.
+
+1258	      This is the BYYEARDAY part from iCalendar.
+
+1260	   byWeekNo: Int[] (optional)
+1261	      These are the weeks of the year in which to repeat.  Valid values
+1262	      are between 1 and the maximum number of weeks any year may have in
+1263	      the calendar given by the rscale property and the negative values
+1264	      of these numbers.  For example, in the Gregorian calendar, valid
+1265	      values are 1 to 53 and -53 to -1.  The array MUST have at least
+1266	      one entry if included.
+
+1268	      This is the BYWEEKNO part from iCalendar.
+
+1270	   byHour: UnsignedInt[] (optional)
+1271	      These are the hours of the day in which to repeat.  Valid values
+1272	      are 0 to 23.  The array MUST have at least one entry if included.
+1273	      This is the BYHOUR part from iCalendar.
+
+1275	   byMinute: UnsignedInt[] (optional)
+1276	      These are the minutes of the hour in which to repeat.  Valid
+1277	      values are 0 to 59.  The array MUST have at least one entry if
+1278	      included.
+
+1280	      This is the BYMINUTE part from iCalendar.
+
+1282	   bySecond: UnsignedInt[] (optional)
+1283	      These are the seconds of the minute in which to repeat.  Valid
+1284	      values are 0 to 60.  The array MUST have at least one entry if
+1285	      included.
+
+1287	      This is the BYSECOND part from iCalendar.
+
+1289	   bySetPosition: Int[] (optional)
+1290	      These are the occurrences within the recurrence interval to
+1291	      include in the final results.  Negative values offset from the end
+1292	      of the list of occurrences.  The array MUST have at least one
+1293	      entry if included.  This is the BYSETPOS part from iCalendar.
+
+1295	   count: UnsignedInt (optional)
+1296	      These are the number of occurrences at which to range-bound the
+1297	      recurrence.  This MUST NOT be included if an until property is
+1298	      specified.
+
+1300	      This is the COUNT part from iCalendar.
+
+1302	   until: LocalDateTime (optional)
+1303	      These are the date-time at which to finish recurring.  The last
+1304	      occurrence is on or before this date-time.  This MUST NOT be
+1305	      included if a count property is specified.  Note that if not
+1306	      specified otherwise for a specific JSCalendar object, this date is
+1307	      to be interpreted in the time zone specified in the JSCalendar
+1308	      object's timeZone property.
+
+1310	      This is the UNTIL part from iCalendar.
+
+1312	4.3.3.1.  Interpreting Recurrence Rules
+
+1314	   A recurrence rule specifies a set of date-times for recurring
+1315	   calendar objects.  A recurrence rule has the following semantics.
+1316	   Note that wherever "year", "month", or "day of month" is used, this
+1317	   is within the calendar system given by the rscale property, which
+1318	   defaults to "gregorian" if omitted.
+
+1320	   1.  A set of candidates is generated.  This is every second within a
+1321	       period defined by the frequency property value:
+
+1323	       yearly:  every second from midnight on the first day of a year
+1324	          (inclusive) to midnight the first day of the following year
+1325	          (exclusive).
+
+1327	          If skip is not "omit", the calendar system has leap months,
+1328	          and there is a byMonth property, generate candidates for the
+1329	          leap months, even if they don't occur in this year.
+
+1331	          If skip is not "omit" and there is a byMonthDay property,
+1332	          presume each month has the maximum number of days any month
+1333	          may have in this calendar system when generating candidates,
+1334	          even if it's more than this month actually has.
+
+1336	       monthly:  every second from midnight on the first day of a month
+1337	          (inclusive) to midnight on the first of the following month
+1338	          (exclusive).
+
+1340	          If skip is not "omit" and there is a byMonthDay property,
+1341	          presume the month has the maximum number of days any month may
+1342	          have in this calendar system when generating candidates, even
+1343	          if it's more than this month actually has.
+
+1345	       weekly:  every second from midnight (inclusive) on the first day
+1346	          of the week (as defined by the firstDayOfWeek property or
+1347	          Monday if omitted) to midnight seven days later (exclusive).
+
+1349	       daily:  every second from midnight at the start of the day
+1350	          (inclusive) to midnight at the end of the day (exclusive).
+
+1352	       hourly:  every second from the beginning of the hour (inclusive)
+1353	          to the beginning of the next hour (exclusive).
+
+1355	       minutely:  every second from the beginning of the minute
+1356	          (inclusive) to the beginning of the next minute (exclusive).
+
+1358	       secondly:  only the second itself.
+
+1360	   2.  Each date-time candidate is compared against all of the byX
+1361	       properties of the rule except bySetPosition.  If any property in
+1362	       the rule does not match the date-time, the date-time is
+1363	       eliminated.  Each byX property is an array; the date-time matches
+1364	       the property if it matches any of the values in the array.  The
+1365	       properties have the following semantics:
+
+1367	       byMonth:  The date-time is in the given month.
+
+1369	       byWeekNo:  The date-time is in the nth week of the year.
+1370	          Negative numbers mean the nth last week of the year.  This
+1371	          corresponds to weeks according to week numbering, as defined
+1372	          in ISO.8601.2004, with a week defined as a seven-day period,
+1373	          starting on the firstDayOfWeek property value or Monday if
+1374	          omitted.  Week number one of the calendar year is the first
+1375	          week that contains at least four days in that calendar year.
+
+1377	          If the date-time is not valid (this may happen when generating
+1378	          candidates with a skip property in effect), it is always
+1379	          eliminated by this property.
+
+1381	       byYearDay:  The date-time is on the nth day of year.  Negative
+1382	          numbers mean the nth last day of the year.
+
+1384	          If the date-time is not valid (this may happen when generating
+1385	          candidates with a skip property in effect), it is always
+1386	          eliminated by this property.
+
+1388	       byMonthDay:  The date-time is on the given day of the month.
+1389	          Negative numbers mean the nth last day of the month.
+
+1391	       byDay:  The date-time is on the given day of the week.  If the
+1392	          day is prefixed by a number, it is the nth occurrence of that
+1393	          day of the week within the month (if frequency is monthly) or
+1394	          year (if frequency is yearly).  Negative numbers mean the nth
+1395	          last occurrence within that period.
+
+1397	       byHour:  The date-time has the given hour value.
+
+1399	       byMinute:  The date-time has the given minute value.
+
+1401	       bySecond:  The date-time has the given second value.
+
+1403	       If a skip property is defined and is not "omit", there may be
+1404	       candidates that do not correspond to valid dates (e.g., February
+1405	       31st in the Gregorian calendar).  In this case, the properties
+1406	       MUST be considered in the order above, and:
+
+1408	       1.  After applying the byMonth filter, if the candidate's month
+1409	           is invalid for the given year, increment it (if skip is
+1410	           "forward") or decrement it (if skip is "backward") until a
+1411	           valid month is found, incrementing/decrementing the year as
+1412	           well if passing through the beginning/end of the year.  This
+1413	           only applies to calendar systems with leap months.
+
+1415	       2.  After applying the byMonthDay filter, if the day of the month
+1416	           is invalid for the given month and year, change the date to
+1417	           the first day of the next month (if skip is "forward") or the
+1418	           last day of the current month (if skip is "backward").
+
+1420	       3.  If any valid date produced after applying the skip is already
+1421	           a candidate, eliminate the duplicate.  (For example, after
+1422	           adjusting, February 30th and February 31st would both become
+1423	           the same "real" date, so one is eliminated as a duplicate.)
+
+1425	   3.  If a bySetPosition property is included, this is now applied to
+1426	       the ordered list of remaining dates.  This property specifies the
+1427	       indexes of date-times to keep; all others should be eliminated.
+1428	       Negative numbers are indexed from the end of the list, with -1
+1429	       being the last item, -2 the second from last, etc.
+
+1431	   4.  Any date-times before the start date of the event are eliminated
+1432	       (see below for why this might be needed).
+
+1434	   5.  If a skip property is included and is not "omit", eliminate any
+1435	       date-times that have already been produced by previous iterations
+1436	       of the algorithm.  (This is not possible if skip is "omit".)
+
+1438	   6.  If further dates are required (we have not reached the until date
+1439	       or count limit), skip the next (interval - 1) sets of candidates,
+1440	       then continue from step 1.
+
+1442	   When determining the set of occurrence dates for an event or task,
+1443	   the following extra rules must be applied:
+
+1445	   1.  The initial date-time to which the rule is applied (the start
+1446	       date-time for events or the start or due date-time for tasks) is
+1447	       always the first occurrence in the expansion (and is counted if
+1448	       the recurrence is limited by a count property), even if it would
+1449	       normally not match the rule.
+
+1451	   2.  The first set of candidates to consider is that which would
+1452	       contain the initial date-time.  This means the first set may
+1453	       include candidates before the initial date-time; such candidates
+1454	       are eliminated from the results in step 4 of the list above.
+
+1456	   3.  The following properties MUST be implicitly added to the rule
+1457	       under the given conditions:
+
+1459	       *  If frequency is not secondly and there is no bySecond
+1460	          property, add a bySecond property with the sole value being
+1461	          the seconds value of the initial date-time.
+
+1463	       *  If frequency is not secondly or minutely and there is no
+1464	          byMinute property, add a byMinute property with the sole value
+1465	          being the minutes value of the initial date-time.
+
+1467	       *  If frequency is not secondly, minutely, or hourly and there is
+1468	          no byHour property, add a byHour property with the sole value
+1469	          being the hours value of the initial date-time.
+
+1471	       *  If frequency is weekly and there is no byDay property, add a
+1472	          byDay property with the sole value being the day of the week
+1473	          of the initial date-time.
+
+1475	       *  If frequency is monthly and there is no byDay property and no
+1476	          byMonthDay property, add a byMonthDay property with the sole
+1477	          value being the day of the month of the initial date-time.
+
+1479	       *  If frequency is yearly and there is no byYearDay property:
+
+1481	          -  If there are no byMonth or byWeekNo properties, and either
+1482	             there is a byMonthDay property or there is no byDay
+1483	             property, add a byMonth property with the sole value being
+1484	             the month of the initial date-time.
+
+1486	          -  If there are no byMonthDay, byWeekNo, or byDay properties,
+1487	             add a byMonthDay property with the sole value being the day
+1488	             of the month of the initial date-time.
+
+1490	          -  If there is a byWeekNo property and no byMonthDay or byDay
+1491	             properties, add a byDay property with the sole value being
+1492	             the day of the week of the initial date-time.
+
+1494	4.3.4.  recurrenceOverrides
+
+1496	   Type: LocalDateTime[PatchObject] (optional)
+
+1498	   Maps recurrence ids (the date-time produced by the recurrence rule)
+1499	   to the overridden properties of the recurrence instance.
+
+1501	   If the recurrence id does not match a date-time from the recurrence
+1502	   rule (or no rule is specified), it is to be treated as an additional
+1503	   occurrence (like an RDATE from iCalendar).  The patch object may
+1504	   often be empty in this case.
+
+1506	   If the occurrence generated by the recurrence id shall be omitted
+1507	   from the final set of recurrences (like an EXDATE from iCalendar),
+1508	   then the patch object MUST be a JSON object with a single member.
+1509	   The member name MUST be "excluded", the member value MUST be true.
+1510	   The JSON object MUST NOT contain any other members.
+
+1512	   By default, an occurrence inherits all properties from the main
+1513	   object except the start (or due) date-time, which is shifted to match
+1514	   the recurrence id LocalDateTime.  However, individual properties of
+1515	   the occurrence can be modified by a patch or multiple patches.  It is
+1516	   valid to patch the start property value, and this patch takes
+1517	   precedence over the value generated from the recurrence id.  Both the
+1518	   recurrence id as well as the patched start date-time may occur before
+1519	   the original JSCalendar object's start or due date.
+
+1521	   A pointer in the PatchObject MUST be ignored if it starts with one of
+1522	   the following prefixes:
+
+1524	   *  @type
+
+1526	   *  method
+
+1528	   *  organizerCalendarAddress
+
+1530	   *  participants/*/calendarAddress
+
+1532	   *  privacy
+
+1534	   *  prodId
+
+1536	   *  recurrenceId
+
+1538	   *  recurrenceIdTimeZone
+
+1540	   *  recurrenceOverrides
+
+1542	   *  recurrenceRule
+
+1544	   *  relatedTo
+
+1546	   *  uid
+
+1548	4.4.  Sharing and Scheduling Properties
+
+1550	4.4.1.  priority
+
+1552	   Type: Int (optional, default: 0)
+
+1554	   This specifies a priority for the calendar object.  This may be used
+1555	   as part of scheduling systems to help resolve conflicts for a time
+1556	   period.
+
+1558	   The priority is specified as an integer in the range 0 to 9.  A value
+1559	   of 0 specifies an undefined priority, for which the treatment will
+1560	   vary by situation.  A value of 1 is the highest priority.  A value of
+1561	   2 is the second highest priority.  Subsequent numbers specify a
+1562	   decreasing ordinal priority.  A value of 9 is the lowest priority.
+1563	   Other integer values are reserved for future use.
+
+1565	4.4.2.  freeBusyStatus
+
+1567	   Type: String (optional, default: busy)
+
+1569	   This specifies how this calendar object should be treated when
+1570	   calculating free-busy state.  This MUST be one of the following
+1571	   values, another value registered in the IANA "JSCalendar Enum Values"
+1572	   registry, or a vendor-specific value (see Section 3.3):
+
+1574	   free:  The object should be ignored when calculating whether the user
+1575	      is busy.
+
+1577	   busy:  The object should be included when calculating whether the
+1578	      user is busy.
+
+1580	4.4.3.  privacy
+
+1582	   Type: String (optional, default: public)
+
+1584	   Calendar objects are normally collected together and may be shared
+1585	   with other users.  The privacy property allows the object owner to
+1586	   indicate that it should not be shared or should only have the time
+1587	   information shared but the details withheld.  Enforcement of the
+1588	   restrictions indicated by this property is up to the API via which
+1589	   this object is accessed.
+
+1591	   This property MUST NOT affect the information sent to scheduled
+1592	   participants; it is only interpreted by protocols that share the
+1593	   calendar objects belonging to one user with other users.
+
+1595	   The value MUST be one of the following values, another value
+1596	   registered in the IANA "JSCalendar Enum Values" registry, or a
+1597	   vendor-specific value (see Section 3.3).  Any value the client or
+1598	   server doesn't understand should be preserved but treated as
+1599	   equivalent to private.
+
+1601	   public:  The full details of the object are visible to those whom the
+1602	      object's calendar is shared with.
+
+1604	   private:  The details of the object are hidden; only the basic time
+1605	      and metadata are shared.  The following properties MAY be shared;
+1606	      any other properties MUST NOT be shared:
+
+1608	      *  @type
+
+1610	      *  created
+
+1612	      *  due
+
+1614	      *  duration
+
+1616	      *  estimatedDuration
+
+1618	      *  freeBusyStatus
+
+1620	      *  privacy
+
+1622	      *  recurrenceId
+
+1624	      *  recurrenceIdTimeZone
+
+1626	      *  recurrenceOverrides (Only patches that apply to another
+1627	         permissible property are allowed to be shared.)
+
+1629	      *  recurrenceRule
+
+1631	      *  sequence
+
+1633	      *  showWithoutTime
+
+1635	      *  start
+
+1637	      *  timeZone
+
+1639	      *  uid
+
+1641	      *  updated
+
+1643	   secret:  The object is hidden completely (as though it did not exist)
+1644	      when the calendar this object is in is shared.
+
+1646	4.4.4.  organizerCalendarAddress
+
+1648	   Type: String (optional)
+1649	   This is a URI as defined by [RFC3986] or any other IANA-registered
+1650	   form for a URI.  It is the same as the CAL-ADDRESS value of an
+1651	   iCalendar ORGANIZER property [RFC5545] (Section 3.8.4.3) — it
+1652	   globally identifies a particular organizer, even across different
+1653	   calendaring objects.
+
+1655	4.4.5.  participants
+
+1657	   Type: Id[Participant] (optional)
+
+1659	   This is a map of participant ids to participants, describing their
+1660	   participation in the calendar object.
+
+1662	   If this property is set and any participant has a calendarAddress
+1663	   property set, then the organizerCalendarAddress property of this
+1664	   calendar object MUST be set.
+
+1666	   A Participant object has the following properties:
+
+1668	   @type: String
+1669	      This specifies the type of this object.  This MUST be Participant,
+1670	      if set.
+
+1672	   name: String (optional)
+1673	      This is the display name of the participant (e.g., "Joe Bloggs").
+
+1675	   email: String (optional)
+1676	      This is the email address to use to contact the participant or,
+1677	      for example, match with an address book entry.  If set, the value
+1678	      MUST be a valid addr-spec value as defined in Section 3.4.1 of
+1679	      [RFC5322] .
+
+1681	   description: String (optional)
+1682	      This is a description of this participant.  For example, this may
+1683	      include more information about their role in the event or how best
+1684	      to contact them.
+
+1686	   descriptionContentType: String (optional)
+1687	      This describes the media type of the contents of the description
+1688	      property.  Its requirements are specified in Section 4.2.3.  If
+1689	      this property is set, then the description property MUST be set.
+
+1691	   calendarAddress: String (optional)
+1692	      This is a URI as defined by [RFC3986] or any other IANA-registered
+1693	      form for a URI.  It is the same as the CAL-ADDRESS value of an
+1694	      iCalendar ATTENDEE property [RFC5545] (Section 3.8.4.1) or
+1695	      ORGANIZER property [RFC5545] (Section 3.8.4.3) — it globally
+1696	      identifies a particular participant, even across different
+1697	      calendaring objects.
+
+1699	   kind: String (optional)
+1700	      This is what kind of entity this participant is, if known.  If
+1701	      this property is set, then the calendarAddress property MUST be
+1702	      set.  The value MUST be one of the following values, another value
+1703	      registered in the IANA "JSCalendar Enum Values" registry, or a
+1704	      vendor-specific value (see Section 3.3).  Any value the client or
+1705	      server doesn't understand should be treated the same as if this
+1706	      property is omitted.
+
+1708	      individual:  a single person
+
+1710	      group:  a collection of people invited as a whole
+
+1712	      location:  a physical location that needs to be scheduled, e.g., a
+1713	         conference room
+
+1715	      resource:  a non-human resource other than a location, such as a
+1716	         projector
+
+1718	   roles: String[Boolean] (optional)
+1719	      This is a set of roles that this participant fulfills.  If this
+1720	      property is set, then the calendarAddress property MUST be set and
+1721	      at least one role MUST be specified for the participant.  The keys
+1722	      in the set MUST be one of the following values, another value
+1723	      registered in the IANA "JSCalendar Enum Values" registry, or a
+1724	      vendor-specific value (see Section 3.3):
+
+1726	      owner:  The participant is an owner of the calendar object.  This
+1727	         signifies they can make changes that affect all participants
+1728	         (for example, rescheduling the calendar object, adding and
+1729	         removing participants and roles).  The presence of this role
+1730	         only is indicative, its semantics are subject to the
+1731	         calendaring exchange protocol being used.  See [jmap-calendars]
+1732	         for an example for making use of this role.
+
+1734	      optional:  The participant's involvement with the event is
+1735	         optional.
+
+1737	      informational:  The participant is copied for informational
+1738	         reasons and is not expected to attend.
+
+1740	      chair:  The participant is in charge of the event/task when it
+1741	         occurs.
+
+1743	      required:  The participant is required to be present at the event.
+
+1745	      The value for each key in the map MUST be true.  It is expected
+1746	      that no more than one of the roles "required", "optional",
+1747	      "informational" and "chair" be present; if more than one are
+1748	      given, they take precedence as follows: "chair" over "required",
+1749	      either of them over "optional", all of them over "informational".
+1750	      Roles that are unknown to the implementation MUST be preserved.
+
+1752	   participationStatus: String (optional, default: needs-action )
+1753	      This is the participation status, if any, of this participant.  If
+1754	      this property is set, then the calendarAddress property MUST be
+1755	      set.
+
+1757	      The value MUST be one of the following values, another value
+1758	      registered in the IANA "JSCalendar Enum Values" registry, or a
+1759	      vendor-specific value (see Section 3.3):
+
+1761	      needs-action:  No status has yet been set by the participant.
+
+1763	      accepted:  The invited participant will participate.
+
+1765	      declined:  The invited participant will not participate.
+
+1767	      tentative:  The invited participant may participate.
+
+1769	      delegated:  The invited participant has delegated their attendance
+1770	         to another participant, as specified in the delegatedTo
+1771	         property.
+
+1773	   expectReply: Boolean (optional, default: false)
+1774	      If true, the organizer is expecting the participant to notify them
+1775	      of their participation status.  If this property is set, then the
+1776	      calendarAddress property MUST be set.
+
+1778	   sentBy: String (optional)
+1779	      This is the email address in the "From" header of the email that
+1780	      last updated this participant via iMIP.  If this property is set,
+1781	      then the calendarAddress property MUST be set.  This SHOULD only
+1782	      be set if the email address is different to that in the mailto URI
+1783	      of this participant's calendarAddress property (i.e., the response
+1784	      was received from a different address to that which the invitation
+1785	      was sent to).  If set, the value MUST be a valid addr-spec value
+1786	      as defined in Section 3.4.1 of [RFC5322] .
+
+1788	   delegatedTo: String[Boolean] (optional)
+1789	      This is the set of participants that this participant has
+1790	      delegated their participation to.  If this property is set, then
+1791	      the calendarAddress property MUST be set.  Each key in the set
+1792	      MUST be a URI according to the definition of the calendarAddress
+1793	      property.  The value for each key in the map MUST be true.  If
+1794	      there are no delegates, this MUST be omitted (rather than
+1795	      specified as an empty set).
+
+1797	   delegatedFrom: String[Boolean] (optional)
+1798	      This is a set of participants that this participant is acting as a
+1799	      delegate for.  If this property is set, then the calendarAddress
+1800	      property MUST be set.  Each key in the set MUST be a URI according
+1801	      to the definition of the calendarAddress property.  The value for
+1802	      each key in the map MUST be true.  If there are no delegators,
+1803	      this MUST be omitted (rather than specified as an empty set).
+
+1805	   memberOf: Id[Boolean] (optional)
+1806	      This is a set of group participants that were invited to this
+1807	      calendar object, which caused this participant to be invited due
+1808	      to their membership in the group(s).  If this property is set,
+1809	      then the calendarAddress property MUST be set.  Each key in the
+1810	      set MUST be a URI according to the definition of the
+1811	      calendarAddress property.  The value for each key in the map MUST
+1812	      be true.  If there are no groups, this MUST be omitted (rather
+1813	      than specified as an empty set).
+
+1815	   links: Id[Link] (optional)
+1816	      This is a map of link ids to Link objects, representing external
+1817	      resources associated with this participant, for example, a vCard
+1818	      or image.  If there are no links, this MUST be omitted (rather
+1819	      than specified as an empty set).
+
+1821	   progress: String (optional; only allowed for participants of a
+1822	   Task)
+1823	      This represents the progress of the participant for this task.  If
+1824	      this property is set, then the calendarAddress property MUST be
+1825	      set and the participationStatus of this participant MUST be
+1826	      accepted.  The property value MUST be one of the following values,
+1827	      another value registered in the IANA "JSCalendar Enum Values"
+1828	      registry, or a vendor-specific value (see Section 3.3):
+
+1830	      in-process:  The participant is in process of contributing to the
+1831	         task.
+
+1833	      completed:  The participant successfully completed contributing to
+1834	         the task.
+
+1836	      failed:  The participant could not complete their contribution to
+1837	         the task.
+
+1839	   percentComplete: UnsignedInt (optional; only allowed for
+1840	   participants of a Task)
+1841	      This represents the percent completion of the participant for this
+1842	      task.  The property value MUST be a positive integer between 0 and
+1843	      100.
+
+1845	4.5.  Alerts Properties
+
+1847	4.5.1.  alerts
+
+1849	   Type: Id[Alert] (optional)
+
+1851	   This is a map of alert ids to Alert objects, representing alerts/
+1852	   reminders to display or send to the user for this calendar object.
+
+1854	   An Alert object has the following properties:
+
+1856	   @type: String
+1857	      This specifies the type of this object.  This MUST be Alert, if
+1858	      set.
+
+1860	   trigger: OffsetTrigger|AbsoluteTrigger|UnknownTrigger (mandatory,
+1861	   defaultType: OffsetTrigger)
+1862	      This defines when to trigger the alert.  New types may be defined
+1863	      in future documents.
+
+1865	      An OffsetTrigger object has the following properties:
+
+1867	      @type: String
+1868	         This specifies the type of this object.  This MUST be
+1869	         OffsetTrigger, if set.
+
+1871	      offset: SignedDuration (mandatory)
+1872	         This defines the offset at which to trigger the alert relative
+1873	         to the time property defined in the relativeTo property of the
+1874	         alert.  Negative durations signify alerts before the time
+1875	         property; positive durations signify alerts after the time
+1876	         property.
+
+1878	      relativeTo: String (optional, default: start )
+1879	         This specifies the time property that the alert offset is
+1880	         relative to.  The value MUST be one of the following:
+
+1882	         start:  triggers the alert relative to the start of the
+1883	            calendar object
+
+1885	         end:  triggers the alert relative to the end/due time of the
+1886	            calendar object
+
+1888	      An AbsoluteTrigger object has the following properties:
+
+1890	      @type: String
+1891	         This specifies the type of this object.  This MUST be
+1892	         AbsoluteTrigger.
+
+1894	      when: UTCDateTime (mandatory)
+1895	         This defines a specific UTC date-time when the alert is
+1896	         triggered.
+
+1898	      An UnknownTrigger object is an object that contains an @type
+1899	      property whose value is not recognized (i.e., not OffsetTrigger or
+1900	      AbsoluteTrigger ) plus zero or more other properties.  This is for
+1901	      compatibility with client extensions and future specifications.
+1902	      Implementations SHOULD NOT trigger for trigger types they do not
+1903	      understand but MUST preserve them.
+
+1905	   acknowledged: UTCDateTime (optional)
+1906	      This records when an alert was last acknowledged.  This is set
+1907	      when the user has dismissed the alert; other clients that sync
+1908	      this property SHOULD automatically dismiss or suppress duplicate
+1909	      alerts (alerts with the same alert id that triggered on or before
+1910	      this date-time).
+
+1912	      For a recurring calendar object, setting the acknowledged property
+1913	      MUST NOT add a new override to the recurrenceOverrides property.
+1914	      If the alert is not already overridden, the acknowledged property
+1915	      MUST be set on the alert in the base event/task.
+
+1917	      Certain kinds of alert action may not provide feedback as to when
+1918	      the user sees them, for example, email-based alerts.  For those
+1919	      kinds of alerts, this property MUST be set immediately when the
+1920	      alert is triggered and the action is successfully carried out.
+
+1922	   relatedTo: String[Relation] (optional)
+1923	      This relates this alert to other alerts in the same JSCalendar
+1924	      object.  Each key in the map is the key of an Alert object in the
+1925	      alerts property.  The value defines the type of the relation.  In
+1926	      addition to the relation values defined in Section 1.4.10, the
+1927	      following key is allowed:
+
+1929	      snooze:  The linked alert is snoozed by this alert.
+
+1931	      If the user wishes to snooze an alert, the application MUST create
+1932	      an alert to trigger after snoozing.  This new snooze alert MUST
+1933	      set a "snooze" relation to the identifier of the original alert.
+
+1935	   action: String (optional, default: display )
+1936	      This describes how to alert the user.
+
+1938	      The value MUST be at most one of the following values, a value
+1939	      registered in the IANA "JSCalendar Enum Values" registry, or a
+1940	      vendor-specific value (see Section 3.3):
+
+1942	      display:  The alert should be displayed as appropriate for the
+1943	         current device and user context.
+
+1945	      email:  The alert should trigger an email sent out to the user,
+1946	         notifying them of the alert.  This action is typically only
+1947	         appropriate for server implementations.
+
+1949	4.6.  Time Zone Properties
+
+1951	4.6.1.  timeZone
+
+1953	   Type: TimeZoneId|null (optional, default: null)
+
+1955	   This identifies the time zone the object is scheduled in or is null
+1956	   for floating time.  If omitted, this MUST be presumed to be null
+1957	   (i.e., floating time).
+
+1959	5.  Type-Specific JSCalendar Properties
+
+1961	5.1.  Event Properties
+
+1963	   In addition to the common JSCalendar object properties (Section 4),
+1964	   an Event has the following properties:
+
+1966	5.1.1.  start
+
+1968	   Type: LocalDateTime (mandatory)
+
+1970	   This is the date/time the event starts in the event's time zone (as
+1971	   specified in the timeZone property, see Section 4.6.1).
+
+1973	5.1.2.  duration
+
+1975	   Type: Duration (optional, default: PT0S)
+1976	   This is the zero or positive duration of the event in the event's
+1977	   start time zone.  The end time of an event can be found by adding the
+1978	   duration to the event's start time.
+
+1980	5.1.3.  endTimeZone
+
+1982	   Type: TimeZoneId (optional)
+
+1984	   This identifies the time zone in which this event ends, for cases
+1985	   where the start and time zones of the event differ (e.g., a
+1986	   transcontinental flight).  If this property is not set, then the
+1987	   event starts and ends in the same time zone.  This property MUST NOT
+1988	   be set if the timeZone property value is null or not set.
+
+1990	5.1.4.  status
+
+1992	   Type: String (optional, default: confirmed)
+
+1994	   This is the scheduling status ( Section 4.4) of an Event.  If set, it
+1995	   MUST be one of the following values, another value registered in the
+1996	   IANA "JSCalendar Enum Values" registry, or a vendor-specific value
+1997	   (see Section 3.3):
+
+1999	   confirmed:  indicates the event is definitely happening
+
+2001	   cancelled:  indicates the event has been cancelled
+
+2003	   tentative:  indicates the event may happen
+
+2005	5.2.  Task Properties
+
+2007	   In addition to the common JSCalendar object properties (Section 4), a
+2008	   Task has the following properties.
+
+2010	   If the timeZone property value is not null or the showWithoutTime
+2011	   property value is "true", then at least one of the due and start
+2012	   properties MUST be set.
+
+2014	5.2.1.  due
+
+2016	   Type: LocalDateTime (optional)
+
+2018	   This is the date/time the task is due in the task's time zone.
+
+2020	5.2.2.  start
+
+2022	   Type: LocalDateTime (optional)
+2023	   This the date/time the task should start in the task's time zone.
+2024	   This MUST be set if the recurrenceRule or recurrenceId properties are
+2025	   set.
+
+2027	5.2.3.  estimatedDuration
+
+2029	   Type: Duration (optional)
+
+2031	   This specifies the estimated positive duration of time the task takes
+2032	   to complete.
+
+2034	5.2.4.  percentComplete
+
+2036	   Type: UnsignedInt (optional)
+
+2038	   This represents the percent completion of the task overall.  The
+2039	   property value MUST be a positive integer between 0 and 100.
+
+2041	5.2.5.  progress
+
+2043	   Type: String (optional)
+
+2045	   This defines the progress of this task.  If omitted, the default
+2046	   progress ( Section 4.4) of a Task is defined as follows (in order of
+2047	   evaluation):
+
+2049	   completed:  if the progress property value of all participants is
+2050	      completed
+
+2052	   failed:  if at least one progress property value of a participant is
+2053	      failed
+
+2055	   in-process:  if at least one progress property value of a participant
+2056	      is in-process
+
+2058	   needs-action:  if none of the other criteria match
+
+2060	   If set, it MUST be one of the following values, another value
+2061	   registered in the IANA "JSCalendar Enum Values" registry, or a
+2062	   vendor-specific value (see Section 3.3):
+
+2064	   needs-action:  indicates the task needs action
+
+2066	   in-process:  indicates the task is in process
+
+2068	   completed:  indicates the task is completed
+
+2070	   failed:  indicates the task failed
+2071	   cancelled:  indicates the task was cancelled
+
+2073	5.3.  Group Properties
+
+2075	   Group supports the following common JSCalendar properties (Section 4)
+2076	   :
+
+2078	   *  @type
+
+2080	   *  uid
+
+2082	   *  prodId
+
+2084	   *  created
+
+2086	   *  updated
+
+2088	   *  title
+
+2090	   *  description
+
+2092	   *  descriptionContentType
+
+2094	   *  links
+
+2096	   *  locale
+
+2098	   *  keywords
+
+2100	   *  categories
+
+2102	   *  color
+
+2104	   In addition, the following Group-specific properties are supported:
+
+2106	5.3.1.  entries
+
+2108	   Type: (Task|Event)[] (mandatory)
+
+2110	   This is a collection of group members.  Implementations MUST ignore
+2111	   entries of unknown type.
+
+2113	5.3.2.  source
+
+2115	   Type: String (optional)
+
+2117	   This is the source from which updated versions of this group may be
+2118	   retrieved.  The value MUST be a URI.
+
+2120	6.  Examples
+
+2122	   The following examples illustrate several aspects of the JSCalendar
+2123	   data model and format.  The examples may omit mandatory or additional
+2124	   properties, which is indicated by a placeholder property with key
+2125	   .... While most of the examples use calendar event objects, they are
+2126	   also illustrative for tasks.
+
+2128	6.1.  Simple Event
+
+2130	   This example illustrates a simple one-time event.  It specifies a
+2131	   one-time event that begins on January 15, 2020 at 1 pm New York local
+2132	   time and ends after 1 hour.
+
+2134	   {
+2135	     "@type": "Event",
+2136	     "uid": "a8df6573-0474-496d-8496-033ad45d7fea",
+2137	     "updated": "2020-01-02T18:23:04Z",
+2138	     "title": "Some event",
+2139	     "start": "2020-01-15T13:00:00",
+2140	     "timeZone": "America/New_York",
+2141	     "duration": "PT1H"
+2142	   }
+
+2144	6.2.  Simple Task
+
+2146	   This example illustrates a simple task for a plain to-do item.
+
+2148	   {
+2149	     "@type": "Task",
+2150	     "uid": "2a358cee-6489-4f14-a57f-c104db4dc2f2",
+2151	     "updated": "2020-01-09T14:32:01Z",
+2152	     "title": "Do something"
+2153	   }
+
+2155	6.3.  Simple Group
+
+2157	   This example illustrates a simple calendar object group that contains
+2158	   an event and a task.
+
+2160	   {
+2161	     "@type": "Group",
+2162	     "uid": "bf0ac22b-4989-4caf-9ebd-54301b4ee51a",
+2163	     "updated": "2020-01-15T18:00:00Z",
+2164	     "title": "A simple group",
+2165	     "entries": [{
+2166	       "@type": "Event",
+2167	       "uid": "a8df6573-0474-496d-8496-033ad45d7fea",
+2168	       "updated": "2020-01-02T18:23:04Z",
+2169	       "title": "Some event",
+2170	       "start": "2020-01-15T13:00:00",
+2171	       "timeZone": "America/New_York",
+2172	       "duration": "PT1H"
+2173	     },
+2174	     {
+2175	       "@type": "Task",
+2176	       "uid": "2a358cee-6489-4f14-a57f-c104db4dc2f2",
+2177	       "updated": "2020-01-09T14:32:01Z",
+2178	       "title": "Do something"
+2179	     }]
+2180	   }
+
+2182	6.4.  All-Day Event
+
+2184	   This example illustrates an event for an international holiday.  It
+2185	   specifies an all-day event on April 1 that occurs every year since
+2186	   the year 1900.
+
+2188	   {
+2189	     "...": "",
+2190	     "title": "April Fool's Day",
+2191	     "showWithoutTime": true,
+2192	     "start": "1900-04-01T00:00:00",
+2193	     "duration": "P1D",
+2194	     "recurrenceRule": {
+2195	       "frequency": "yearly"
+2196	     }
+2197	   }
+
+2199	6.5.  Task with a Due Date
+
+2201	   This example illustrates a task with a due date.  It is a reminder to
+2202	   buy groceries before 6 pm Vienna local time on January 19, 2020.  The
+2203	   calendar user expects to need 1 hour for shopping.
+
+2205	   {
+2206	     "...": "",
+2207	     "title": "Buy groceries",
+2208	     "due": "2020-01-19T18:00:00",
+2209	     "timeZone": "Europe/Vienna",
+2210	     "estimatedDuration": "PT1H"
+2211	   }
+
+2213	6.6.  Event with End Time Zone
+
+2215	   This example illustrates the use of end time zones by use of an
+2216	   international flight.  The flight starts on April 1, 2020 at 9 am in
+2217	   Berlin local time.  The duration of the flight is scheduled at 10
+2218	   hours 30 minutes.  The time at the flight's destination is in the
+2219	   same time zone as Tokyo.  Calendar clients could use the end time
+2220	   zone to display the arrival time in Tokyo local time and highlight
+2221	   the time zone difference of the flight.  The location names can serve
+2222	   as input for navigation systems.  The mainLocationId property
+2223	   indicates the start location.
+
+2225	   {
+2226	     "...": "",
+2227	     "title": "Flight XY51 to Tokyo",
+2228	     "start": "2020-04-01T09:00:00",
+2229	     "timeZone": "Europe/Berlin",
+2230	     "endTimeZone": "Asia/Tokyo",
+2231	     "duration": "PT10H30M",
+2232	     "mainLocationId": "1",
+2233	     "locations": {
+2234	       "1": {
+2235	         "name": "Frankfurt Airport (FRA)"
+2236	       },
+2237	       "2": {
+2238	         "name": "Narita International Airport (NRT)"
+2239	       }
+2240	     }
+2241	   }
+
+2243	6.7.  Floating-Time Event (with Recurrence)
+
+2245	   This example illustrates the use of floating time.  Since January 1,
+2246	   2020, a calendar user blocks 30 minutes every day to practice yoga at
+2247	   7 am local time in whatever time zone the user is located on that
+2248	   date.
+
+2250	   {
+2251	     "...": "",
+2252	     "title": "Yoga",
+2253	     "start": "2020-01-01T07:00:00",
+2254	     "duration": "PT30M",
+2255	     "recurrenceRule": {
+2256	       "frequency": "daily"
+2257	     }
+2258	   }
+
+2260	6.8.  Event with Physical and Virtual Location
+
+2262	   This example illustrates an event that happens at both a physical and
+2263	   a virtual location.  Fans can see a live concert on premises or
+2264	   online.  In addition to the main event location, the event contains
+2265	   an additional location for a nearby parking garage.
+
+2267	   {
+2268	     "...": "",
+2269	     "title": "Live from Music Bowl: The Band",
+2270	     "description": "Go see the biggest music event ever!",
+2271	     "locale": "en",
+2272	     "start": "2020-07-04T17:00:00",
+2273	     "timeZone": "America/New_York",
+2274	     "duration": "PT3H",
+2275	     "mainLocationId": "c0503d30-8c50-4372-87b5-7657e8e0fedd",
+2276	     "locations": {
+2277	       "c0503d30-8c50-4372-87b5-7657e8e0fedd": {
+2278	         "name": "The Music Bowl",
+2279	         "description": "Music Bowl, Central Park, New York",
+2280	         "coordinates": "geo:40.7829,-73.9654"
+2281	       },
+2282	       "ee42e41e-1046-4489-9760-c0b85f0dc176": {
+2283	         "name": "BAZ Parking, 9 West 57th Street, New York",
+2284	         "coordinates": "geo:40.7637,-73.9748",
+2285	         "locationTypes": {
+2286	           "parking": true
+2287	         }
+2288	       }
+2289	     },
+2290	     "virtualLocations": {
+2291	       "vloc1": {
+2292	         "name": "Free live Stream from Music Bowl",
+2293	         "uri": "https://stream.example.com/the_band_2020"
+2294	       }
+2295	     }
+2296	   }
+
+2298	6.9.  Recurring Event with Overrides
+
+2300	   This example illustrates the use of recurrence overrides.  A math
+2301	   course at a university is held for the first time on January 8, 2020
+2302	   at 9 am London time and occurs every week until June 24, 2020.  Each
+2303	   lecture lasts for one hour and 30 minutes and is located at the
+2304	   Mathematics department.  This event has exceptional occurrences: at
+2305	   the last occurrence of the course is an exam, which lasts for 2 hours
+2306	   and starts at 10 am.  Also, the location of the exam differs from the
+2307	   usual location.  On April 1, no course is held.  On January 7 at 2
+2308	   pm, there is an optional introduction course, which occurs before the
+2309	   first regular lecture.
+
+2311	   {
+2312	     "...": "",
+2313	     "title": "Calculus I",
+2314	     "start": "2020-01-08T09:00:00",
+2315	     "timeZone": "Europe/London",
+2316	     "duration": "PT1H30M",
+2317	     "locations": {
+2318	       "mlab": {
+2319	         "name": "Math lab room 1",
+2320	         "description": "Math Lab I, Department of Mathematics"
+2321	       }
+2322	     },
+2323	     "recurrenceRule": {
+2324	       "frequency": "weekly",
+2325	       "until": "2020-06-24T09:00:00"
+2326	     },
+2327	     "recurrenceOverrides": {
+2328	       "2020-01-07T14:00:00": {
+2329	         "title": "Introduction to Calculus I (optional)"
+2330	       },
+2331	       "2020-04-01T09:00:00": {
+2332	         "excluded": true
+2333	       },
+2334	       "2020-06-25T09:00:00": {
+2335	         "title": "Calculus I Exam",
+2336	         "start": "2020-06-25T10:00:00",
+2337	         "duration": "PT2H",
+2338	         "locations": {
+2339	           "auditorium": {
+2340	             "name": "Big Auditorium",
+2341	             "description": "Big Auditorium, Other Road"
+2342	           }
+2343	         }
+2344	       }
+2345	     }
+2346	   }
+
+2348	6.10.  Making a "This and Future" Change
+
+2350	   Sometimes, you may want to make a change to a recurring event that
+2351	   applies from a specific instance onwards.  This cannot be represented
+2352	   as a single JSCalendar object.  Instead, you must duplicate the
+2353	   event, modifying the recurrence rule of the original so it finishes
+2354	   before the split point, and the duplicate so it starts at the split
+2355	   point.  A "next" and "first" relation must be set on the new objects
+2356	   respectively, as per Section 4.1.2.
+
+2358	   This example shows two JSCalendar objects, representing an event that
+2359	   used to happen at 2pm on a Tuesday in Room 101, but moved in March to
+2360	   3pm on a Wednesday in Room 202.
+
+2362	   {
+2363	     "...": "",
+2364	     "uid": "715ed4c5-3cf5-427f-927c-db40cdd63894",
+2365	     "relatedTo": {
+2366	       "32859916-af7a-4599-82ed-32a4315b4fe7": {
+2367	         "relation": {
+2368	           "next": true
+2369	         }
+2370	       }
+2371	     },
+2372	     "title": "Departmental meeting",
+2373	     "start": "2025-01-07T14:00:00",
+2374	     "timeZone": "Australia/Melbourne",
+2375	     "duration": "PT1H",
+2376	     "locations": {
+2377	       "room": {
+2378	         "name": "Room 101"
+2379	       }
+2380	     },
+2381	     "recurrenceRule": {
+2382	       "frequency": "weekly",
+2383	       "until": "2025-02-25T14:00:00"
+2384	     }
+2385	   }
+2386	   {
+2387	     "...": "",
+2388	     "uid": "32859916-af7a-4599-82ed-32a4315b4fe7",
+2389	     "relatedTo": {
+2390	       "715ed4c5-3cf5-427f-927c-db40cdd63894": : {
+2391	         "relation": {
+2392	           "first": true
+2393	         }
+2394	       }
+2395	     },
+2396	     "title": "Departmental meeting",
+2397	     "start": "2025-03-05T15:00:00",
+2398	     "timeZone": "Australia/Melbourne",
+2399	     "duration": "PT1H",
+2400	     "locations": {
+2401	       "room": {
+2402	         "name": "Room 202"
+2403	       }
+2404	     },
+2405	     "recurrenceRule": {
+2406	       "frequency": "weekly"
+2407	     }
+2408	   }
+
+2410	6.11.  Recurring Event with Participants
+
+2412	   This example illustrates scheduled events.  A team meeting occurs
+2413	   every week since January 8, 2020 at 9 am Johannesburg time.  The
+2414	   event owner also chairs the event.  Participants meet in a virtual
+2415	   meeting room.  A participant has accepted the invitation, but, on
+2416	   March 4, 2020, they are unavailable and declined participation for
+2417	   this occurrence.
+
+2419	   {
+2420	     "...": "",
+2421	     "title": "FooBar team meeting",
+2422	     "start": "2020-01-08T09:00:00",
+2423	     "timeZone": "Africa/Johannesburg",
+2424	     "duration": "PT1H",
+2425	     "virtualLocations": {
+2426	       "0": {
+2427	         "name": "ChatMe meeting room",
+2428	         "uri": "https://chatme.example.com?id=1234567&pw=a8a24627b63d"
+2429	       }
+2430	     },
+2431	     "recurrenceRule": {
+2432	       "frequency": "weekly"
+2433	     },
+2434	     "organizerCalendarAddress":
+2435	       "mailto:f245f875-7f63-4a5e-a2c8@schedule.example.com",
+2436	     "participants": {
+2437	       "dG9tQGZvb2Jhci5xlLmNvbQ": {
+2438	         "name": "Tom Tool",
+2439	         "email": "tom@foobar.example.com",
+2440	         "calendarAddress": "mailto:tom@calendar.example.com",
+2441	         "participationStatus": "accepted",
+2442	       },
+2443	       "em9lQGZvb2GFtcGxlLmNvbQ": {
+2444	         "name": "Zoe Zelda",
+2445	         "calendarAddress": "mailto:zoe@foobar.example.com",
+2446	         "participationStatus": "accepted",
+2447	         "roles": {
+2448	           "owner": true,
+2449	           "chair": true
+2450	         }
+2451	       }
+2452	     },
+2453	     "recurrenceOverrides": {
+2454	       "2020-03-04T09:00:00": {
+2455	         "participants/dG9tQGZvb2Jhci5xlLmNvbQ/participationStatus":
+2456	                                                             "declined"
+2457	       }
+2458	     }
+2459	   }
+
+2461	7.  Security Considerations
+
+2463	   Calendaring and scheduling information is very privacy sensitive.  It
+2464	   can reveal the social network of a user, location information of this
+2465	   user and those in their social network, identity and credentials
+2466	   information, and patterns of behavior of the user in both the
+2467	   physical and cyber realm.  Additionally, calendar events and tasks
+2468	   can influence the physical location of a user or their cyber behavior
+2469	   within a known time window.  Its transmission and storage must be
+2470	   done carefully to protect it from possible threats, such as
+2471	   eavesdropping, replay, message insertion, deletion, modification, and
+2472	   on-path attacks.
+
+2474	   The data being stored and transmitted may be used in systems with
+2475	   real-world consequences.  For example, a home automation system may
+2476	   turn an alarm on and off or a coworking space may charge money to the
+2477	   organizer of an event that books one of their meeting rooms.  Such
+2478	   systems must be careful to authenticate all data they receive to
+2479	   prevent them from being subverted and ensure the change comes from an
+2480	   authorized entity.
+
+2482	   This document only defines the data format; such considerations are
+2483	   primarily the concern of the API or method of storage and
+2484	   transmission of such files.
+
+2486	7.1.  Expanding Recurrences
+
+2488	   A recurrence rule may produce infinite occurrences of an event.
+2489	   Implementations MUST handle expansions carefully to prevent
+2490	   accidental or deliberate resource exhaustion.
+
+2492	   Conversely, a recurrence rule may be specified that does not expand
+2493	   to anything.  It is not always possible to tell this through static
+2494	   analysis of the rule, so implementations MUST be careful to avoid
+2495	   getting stuck in infinite loops or otherwise exhausting resources
+2496	   while searching for the next occurrence.
+
+2498	   Events recur in the event's time zone.  If the user is in a different
+2499	   time zone, daylight saving transitions may cause an event that
+2500	   normally occurs at, for example, 9 am to suddenly shift an hour
+2501	   earlier.  This may be used in an attempt to cause a participant to
+2502	   miss an important meeting.  User agents must be careful to translate
+2503	   date-times correctly between time zones and may wish to call out
+2504	   unexpected changes in the time of a recurring event.
+
+2506	7.2.  JSON Parsing
+
+2508	   The security considerations of [RFC8259] apply to the use of JSON as
+2509	   the data interchange format.
+
+2511	   As for any serialization format, parsers need to thoroughly check the
+2512	   syntax of the supplied data.  JSON uses opening and closing tags for
+2513	   several types and structures, and it is possible that the end of the
+2514	   supplied data will be reached when scanning for a matching closing
+2515	   tag; this is an error condition, and implementations need to stop
+2516	   scanning at the end of the supplied data.
+
+2518	   JSON also uses a string encoding with some escape sequences to encode
+2519	   special characters within a string.  Care is needed when processing
+2520	   these escape sequences to ensure that they are fully formed before
+2521	   the special processing is triggered, with special care taken when the
+2522	   escape sequences appear adjacent to other (non-escaped) special
+2523	   characters or adjacent to the end of data (as in the previous
+2524	   paragraph).
+
+2526	   If parsing JSON into a non-textual structured data format,
+2527	   implementations may need to allocate storage to hold JSON string
+2528	   elements.  Since JSON does not use explicit string lengths, the risk
+2529	   of denial of service due to resource exhaustion is small, but
+2530	   implementations may still wish to place limits on the size of
+2531	   allocations they are willing to make in any given context, to avoid
+2532	   untrusted data causing excessive memory allocation.
+
+2534	7.3.  URI Values
+
+2536	   Several JSCalendar properties contain URIs as values, and processing
+2537	   these properties requires extra care.  Section 7 of [RFC3986]
+2538	   discusses security risks related to URIs.
+
+2540	   Fetching remote resources carries inherent risks.  Connections must
+2541	   only be allowed on well-known ports, using allowed protocols
+2542	   (generally, just HTTP/HTTPS on their default ports).  The URL must be
+2543	   resolved externally and not allowed to access internal resources.
+2544	   Connecting to an external source reveals IP (and therefore often
+2545	   location) information.
+
+2547	   A maliciously constructed JSCalendar object may contain a very large
+2548	   number of URIs.  In the case of published calendars with a large
+2549	   number of subscribers, such objects could be widely distributed.
+2550	   Implementations should be careful to limit the automatic fetching of
+2551	   linked resources to reduce the risk of this being an amplification
+2552	   vector for a denial-of-service attack.
+
+2554	7.4.  Spam
+
+2556	   Calendar systems may receive JSCalendar files from untrusted sources,
+2557	   in particular, as attachments to emails.  This can be a vector for an
+2558	   attacker to inject spam into a user's calendar.  This may confuse,
+2559	   annoy, and mislead users or overwhelm their calendar with bogus
+2560	   events, preventing them from seeing legitimate ones.
+
+2562	   Heuristic, statistical, or machine-learning-based filters can be
+2563	   effective in filtering out spam.  Authentication mechanisms, such as
+2564	   DomainKeys Identified Mail (DKIM) [RFC6376], can help establish the
+2565	   source of messages and associate the data with existing relationships
+2566	   (such as an address book contact).  However, misclassifications are
+2567	   always possible and providing a mechanism for users to quickly
+2568	   correct this is advised.
+
+2570	   Confusable unicode characters may be used to trick a user into
+2571	   trusting a JSCalendar file that appears to come from a known contact
+2572	   but is actually from a similar-looking source controlled by an
+2573	   attacker.
+
+2575	7.5.  Duplication
+
+2577	   It is important for calendar systems to maintain the UID of an event
+2578	   when updating it to avoid an unexpected duplication of events.
+2579	   Consumers of the data may not remove the previous version of the
+2580	   event if it has a different UID.  This can lead to a confusing
+2581	   situation for the user, with many variations of the event and no
+2582	   indication of which one is correct.  Care must be taken by consumers
+2583	   of the data to remove old events where possible to avoid an
+2584	   accidental denial-of-service attack due to the volume of data.
+
+2586	7.6.  Time Zones
+
+2588	   Events recur in a particular time zone.  When this differs from the
+2589	   user's current time zone, it may unexpectedly cause an occurrence to
+2590	   shift in time for that user due to a daylight savings change in the
+2591	   event's time zone.  A maliciously crafted event could attempt to
+2592	   confuse users with such an event to ensure a meeting is missed.
+
+2594	8.  IANA Considerations
+
+2596	   IANA has created the "JSCalendar Properties", "JSCalendar Types" and
+2597	   "JSCalendar Enum Values" registries, originally defined in [RFC8984].
+2598	   This document updates some of the registry definitions and registry
+2599	   contents.  The following sections redefine all IANA considerations,
+2600	   even if they are unchanged.
+
+2602	8.1.  Media Type Registration
+
+2604	   [RFC8984] defined a media type for use with JSCalendar data formatted
+2605	   in JSON.  This section restates the original definition unchanged.
+
+2607	   Type name:  application
+
+2609	   Subtype name:  jscalendar+json
+
+2611	   Required parameters:  type
+
+2613	      The type parameter conveys the type of the JSCalendar data in the
+2614	      body part.  The allowed parameter values correspond to the @type
+2615	      property of the JSON-formatted JSCalendar object in the body:
+
+2617	      event:  The @type property value MUST be Event.
+
+2619	      task:  The @type property value MUST be Task.
+
+2621	      group:  The @type property value MUST be Group.
+
+2623	      No other parameter values are allowed.  The parameter MUST NOT
+2624	      occur more than once.
+
+2626	   Optional parameters:  none
+
+2628	   Encoding considerations:  This is the same as the encoding
+2629	      considerations of application/json, as specified in Section 11 of
+2630	      [RFC8259].
+
+2632	   Security considerations:  See Section 7 of this document.
+
+2634	   Interoperability considerations:  While JSCalendar is designed to
+2635	      avoid ambiguities as much as possible, when converting objects
+2636	      from other calendar formats to/from JSCalendar, it is possible
+2637	      that differing representations for the same logical data or
+2638	      ambiguities in interpretation might arise.  The semantic
+2639	      equivalence of two JSCalendar objects may be determined
+2640	      differently by different applications, for example, where URL
+2641	      values differ in case between the two objects.
+
+2643	   Published specification:  draft-ietf-calext-jscalendarbis
+
+2645	   Applications that use this media type:  Applications that currently
+2646	      make use of the text/calendar and application/calendar+json media
+2647	      types can use this as an alternative.  Similarly, applications
+2648	      that use the application/json media type to transfer calendaring
+2649	      data can use this to further specify the content.
+
+2651	   Fragment identifier considerations:  A JSON Pointer fragment
+2652	      identifier may be used, as defined in [RFC6901], Section 6.
+
+2654	   Additional information:  Magic number(s):  N/A
+
+2656	                            File extensions(s):  N/A
+
+2658	                            Macintosh file type code(s):  N/A
+
+2660	   Person & email address to contact for further information:
+2661	      calsify@ietf.org
+
+2663	   Intended usage:  COMMON
+
+2665	   Restrictions on usage:  N/A
+
+2667	   Author:  See the "Author's Address" section of this document.
+
+2669	   Change controller:  IETF
+
+2671	8.2.  "JSCalendar Properties" Registry
+
+2673	   IANA has created the "JSCalendar Properties" registry to allow
+2674	   interoperability of extensions to JSCalendar objects.  IANA will set
+2675	   the Reference of the registry to this document, rather than obsoleted
+2676	   [RFC8984].
+
+2678	8.2.1.  Registry Policy and Change Procedures
+
+2680	   _Note for IANA_: This section leaves the original definition of
+2681	   [RFC8984] unchanged.
+
+2683	   This registry follows the Expert Review process ([RFC8126],
+2684	   Section 4.5).  If the "Intended Usage" field is common, sufficient
+2685	   documentation is required to enable interoperability.  Preliminary
+2686	   community review for this registry is optional but strongly
+2687	   encouraged.
+
+2689	   A registration can have an intended usage of common, reserved, or
+2690	   obsolete.  IANA will list registrations with a common usage
+2691	   designation prominently and separately from those with other intended
+2692	   usage values.
+
+2694	   A reserved registration reserves a property name without assigning
+2695	   semantics to avoid name collisions with future extensions or protocol
+2696	   use.
+
+2698	   An obsolete registration denotes a property that is no longer
+2699	   expected to be added by up-to-date systems.  A new property has
+2700	   probably been defined covering the obsolete property's semantics.
+
+2702	   The JSCalendar property registration procedure is not a formal
+2703	   standards process but rather an administrative procedure intended to
+2704	   allow community comment and check it is coherent without excessive
+2705	   time delay.  It is designed to encourage vendors to document and
+2706	   register new properties they add for use cases not covered by the
+2707	   original specification, leading to increased interoperability.
+
+2709	8.2.1.1.  Preliminary Community Review
+
+2711	   Notice of a potential new registration SHOULD be sent to the Calext
+2712	   mailing list <calsify@ietf.org> for review.  This mailing list is
+2713	   appropriate to solicit community feedback on a proposed new property.
+
+2715	   Property registrations must be marked with their intended use:
+2716	   "common", "reserved", or "obsolete".
+
+2718	   The intent of the public posting to this list is to solicit comments
+2719	   and feedback on the choice of the property name, the unambiguity of
+2720	   the specification document, and a review of any interoperability or
+2721	   security considerations.  The submitter may submit a revised
+2722	   registration proposal or abandon the registration completely at any
+2723	   time.
+
+2725	8.2.1.2.  Submit Request to IANA
+
+2727	   Registration requests can be sent to <iana@iana.org>.
+
+2729	8.2.1.3.  Designated Expert Review
+
+2731	   The primary concern of the designated expert (DE) is preventing name
+2732	   collisions and encouraging the submitter to document security and
+2733	   privacy considerations.  For a common-use registration, the DE is
+2734	   expected to confirm that suitable documentation, as described in
+2735	   Section 4.6 of [RFC8126], is available to ensure interoperability.
+2736	   That documentation will usually be in an RFC, but simple definitions
+2737	   are likely to use a web/wiki page, and if a sentence or two is deemed
+2738	   sufficient, it could be described in the registry itself.  The DE
+2739	   should also verify that the property name does not conflict with work
+2740	   that is active or already published within the IETF.  A published
+2741	   specification is not required for reserved or obsolete registrations.
+
+2743	   The DE will either approve or deny the registration request and
+2744	   publish a notice of the decision to the Calext WG mailing list or its
+2745	   successor, as well as inform IANA.  A denial notice must be justified
+2746	   by an explanation, and, in the cases where it is possible, concrete
+2747	   suggestions on how the request can be modified so as to become
+2748	   acceptable should be provided.
+
+2750	8.2.1.4.  Change Procedures
+
+2752	   Once a JSCalendar property has been published by IANA, the change
+2753	   controller may request a change to its definition.  The same
+2754	   procedure that would be appropriate for the original registration
+2755	   request is used to process a change request.
+
+2757	   JSCalendar property registrations may not be deleted; properties that
+2758	   are no longer believed appropriate for use can be declared obsolete
+2759	   by a change to their "intended usage" field; such properties will be
+2760	   clearly marked in the IANA registry.
+
+2762	   Significant changes to a JSCalendar property's definition should be
+2763	   requested only when there are serious omissions or errors in the
+2764	   published specification, as such changes may cause interoperability
+2765	   issues.  When review is required, a change request may be denied if
+2766	   it renders entities that were valid under the previous definition
+2767	   invalid under the new definition.
+
+2769	   The owner of a JSCalendar property may pass responsibility to another
+2770	   person or agency by informing IANA; this can be done without
+2771	   discussion or review.
+
+2773	8.2.2.  "JSCalendar Properties" Registry Template
+
+2775	   _Note for IANA_: This section leaves the original definition of
+2776	   [RFC8984] unchanged.
+
+2778	   Property Name:  This is the name of the property.  The property name
+2779	      MUST NOT already be registered for any of the object types listed
+2780	      in the "Property Context" field of this registration.  Other
+2781	      object types MAY already have registered a different property with
+2782	      the same name; however, the same name SHOULD only be used when the
+2783	      semantics are analogous.
+
+2785	   Property Type:  This is the type of this property, using type
+2786	      signatures, as specified in Section 1.3.1.  The property type MUST
+2787	      be registered in the "JSCalendar Types" registry.
+
+2789	   Property Context:  This is a comma-separated list of JSCalendar
+2790	      object types this property is allowed on.
+
+2792	   Reference or Description:  This is a brief description or RFC number
+2793	      and section reference where the property is specified (omitted for
+2794	      "reserved" property names).
+
+2796	   Intended Usage:  This may be "common", "reserved", or "obsolete".
+
+2798	   Change Controller:  This is who may request a change to this entry's
+2799	      definition (IETF for RFCs from the IETF stream).
+
+2801	8.2.3.  Changes to the JSCalendar Properties Registry contents
+
+2803	8.2.3.1.  Obsoleted Properties
+
+2805	   IANA will change the Intended Status from "common" to "obsolete" for
+2806	   the following entries in the JSCalendar Properties Registry.  For
+2807	   each entry, the Reference/Description column will refer to
+2808	   Appendix A.2 of this document.
+
+2810	   *  aliases
+
+2812	   *  cid
+
+2814	   *  comments
+
+2816	   *  daylight
+
+2818	   *  excludedRecurrenceRules
+
+2820	   *  language
+
+2822	   *  locationId
+
+2824	   *  names
+
+2826	   *  offsetFrom
+
+2828	   *  offsetTo
+
+2830	   *  progressUpdated
+
+2832	   *  recurrenceRules
+
+2834	   *  standard
+
+2836	   *  start (where Property Context is "TimeZoneRule")
+
+2838	   *  timeZones
+
+2840	   *  tzId
+2841	   *  url
+
+2843	   *  validUntil
+
+2845	8.2.3.2.  Reserved Properties
+
+2847	   IANA will change the Intended Status from "common" to "reserved" for
+2848	   the following entries in the JSCalendar Properties Registry.  For
+2849	   each entry, the Reference/Description column will refer to
+2850	   Appendix A.3 of this document.
+
+2852	   *  excluded
+
+2854	   *  invitedBy
+
+2856	   *  localizations
+
+2858	   *  participationComment
+
+2860	   *  replyTo
+
+2862	   *  requestStatus
+
+2864	   *  scheduleAgent
+
+2866	   *  scheduleForceSend
+
+2868	   *  scheduleSequence
+
+2870	   *  scheduleStatus
+
+2872	   *  scheduleUpdated
+
+2874	   *  sendTo
+
+2876	   *  useDefaultAlerts
+
+2878	8.2.3.3.  Updated Properties
+
+2880	   IANA will update the following entries in the JSCalendar Properties
+2881	   Registry.  For each entry, the Property Name and its changed fields
+2882	   are listed.  Unchanged fields are omitted.  Referenced section
+2883	   numbers refer to this document, unless otherwise noted.
+
+2885	   Property Name  @type
+2886	   Property Context  Event, Task, Group, AbsoluteTrigger, Alert, Link,
+2887	      Location, NDay, OffsetTrigger, Participant, RecurrenceRule,
+2888	      Relation, VirtualLocation
+
+2890	   Reference/Description  Section 1.3.3
+
+2892	   Property Name  acknowledged
+2893	   Reference/Description  Section 4.5.1
+
+2895	   Property Name  action
+2896	   Reference/Description  Section 4.5.1
+
+2898	   Property Name  alerts
+2899	   Reference/Description  Section 4.5.1
+
+2901	   Property Name  byDay
+2902	   Reference/Description  Section 4.3.3
+
+2904	   Property Name  byHour
+2905	   Reference/Description  Section 4.3.3
+
+2907	   Property Name  byMinute
+2908	   Reference/Description  Section 4.3.3
+
+2910	   Property Name  byMonth
+2911	   Reference/Description  Section 4.3.3
+
+2913	   Property Name  byMonthDay
+2914	   Reference/Description  Section 4.3.3
+
+2916	   Property Name  bySecond
+2917	   Reference/Description  Section 4.3.3
+
+2919	   Property Name  bySetPosition
+2920	   Reference/Description  Section 4.3.3
+
+2922	   Property Name  byWeekNo
+2923	   Reference/Description  Section 4.3.3
+
+2925	   Property Name  byYearDay
+2926	   Reference/Description  Section 4.3.3
+
+2928	   Property Name  calendarAddress
+2929	   Reference/Description  Section 4.4.5
+
+2931	   Property Name  categories
+2932	   Reference/Description  Section 4.2.11
+
+2934	   Property Name  color
+2935	   Reference/Description  Section 4.2.12
+
+2937	   Property Name  contentType
+2938	   Reference/Description  Section 1.4.11
+
+2940	   Property Name  coordinates
+2941	   Reference/Description  Section 4.2.5
+
+2943	   Property Name  count
+2944	   Reference/Description  Section 4.3.3
+
+2946	   Property Name  created
+2947	   Reference/Description  Section 4.1.4
+
+2949	   Property Name  day
+2950	   Reference/Description  Section 4.3.3
+
+2952	   Property Name  delegatedFrom
+2953	   Reference/Description  Section 4.4.5
+
+2955	   Property Name  delegatedTo
+2956	   Reference/Description  Section 4.4.5
+
+2958	   Property Name  description
+2959	   Property Context  Event, Task, Participant
+2960	   Reference/Description  Section 4.2.2, Section 4.4.5
+
+2962	   Property Name  descriptionContentType
+2963	   Property Context  Event, Task, Participant
+2964	   Reference/Description  Section 4.2.2, Section 4.4.5
+
+2966	   Property Name  display
+2967	   Reference/Description  Section 1.4.11
+
+2969	   Property Name  due
+2970	   Reference/Description  Section 5.2.1
+
+2972	   Property Name  duration
+2973	   Reference/Description  Section 5.1.2
+
+2975	   Property Name  email
+2976	   Reference/Description  Section 4.4.5
+
+2978	   Property Name  entries
+2979	   Reference/Description  Section 5.3.1
+
+2981	   Property Name  estimatedDuration
+2982	   Reference/Description  Section 5.2.3
+
+2984	   Property Name  expectReply
+2985	   Reference/Description  Section 4.4.5
+2986	   Property Name  features
+2987	   Reference/Description  Section 4.2.7
+
+2989	   Property Name  firstDayOfWeek
+2990	   Reference/Description  Section 4.3.3
+
+2992	   Property Name  freeBusyStatus
+2993	   Reference/Description  Section 4.4.2
+
+2995	   Property Name  frequency
+2996	   Reference/Description  Section 4.3.3
+
+2998	   Property Name  href
+2999	   Reference/Description  Section 1.4.11
+
+3001	   Property Name  interval
+3002	   Reference/Description  Section 4.3.3
+
+3004	   Property Name  keywords
+3005	   Reference/Description  Section 4.2.10
+
+3007	   Property Name  kind
+3008	   Reference/Description  Section 4.4.5
+
+3010	   Property Name  links
+3011	   Reference/Description  Section 4.2.8, Section 4.2.5, Section 4.4.5
+
+3013	   Property Name  locale
+3014	   Reference/Description  Section 4.2.9
+
+3016	   Property Name  locationTypes
+3017	   Reference/Description  Section 4.2.5
+
+3019	   Property Name  locations
+3020	   Reference/Description  Section 4.2.5
+
+3022	   Property Name  memberOf
+3023	   Reference/Description  Section 4.4.5
+
+3025	   Property Name  method
+3026	   Reference/Description  Section 4.1.7
+
+3028	   Property Name  name
+3029	   Reference/Description  Section 4.2.5, Section 4.2.7, Section 4.4.5
+
+3031	   Property Name  nthOfPeriod
+3032	   Reference/Description  Section 4.3.3
+3033	   Property Name  offset
+3034	   Reference/Description  Section 4.5.1
+
+3036	   Property Name  participants
+3037	   Reference/Description  Section 4.4.5
+
+3039	   Property Name  participationStatus
+3040	   Reference/Description  Section 4.4.5
+
+3042	   Property Name  percentComplete
+3043	   Reference/Description  Section 5.2.4, Section 4.4.5
+
+3045	   Property Name  priority
+3046	   Reference/Description  Section 4.4.1
+
+3048	   Property Name  privacy
+3049	   Reference/Description  Section 4.4.3
+
+3051	   Property Name  prodId
+3052	   Reference/Description  Section 4.1.3
+
+3054	   Property Name  progress
+3055	   Reference/Description  Section 5.2.5, Section 4.4.5
+
+3057	   Property Name  recurrenceId
+3058	   Reference/Description  Section 4.3.1
+
+3060	   Property Name  recurrenceIdTimeZone
+3061	   Reference/Description  Section 4.3.2
+
+3063	   Property Name  recurrenceOverrides
+3064	   Property Content  Event, Task
+3065	   Reference/Description  Section 4.3.4
+
+3067	   Property Name  rel
+3068	   Reference/Description  Section 1.4.11
+
+3070	   Property Name  relatedTo
+3071	   Reference/Description  Section 4.1.2, Section 4.5.1
+
+3073	   Property Name  relation
+3074	   Reference/Description  Section 1.4.10
+
+3076	   Property Name  relativeTo
+3077	   Property Context  OffsetTrigger
+3078	   Reference/Description  Section 4.5.1
+
+3080	   Property Name  roles
+3081	   Reference/Description  Section 4.4.5
+
+3083	   Property Name  rscale
+3084	   Reference/Description  Section 4.3.3
+
+3086	   Property Name  sentBy
+3087	   Property Context  Participant
+3088	   Reference/Description  Section 4.4.5
+
+3090	   Property Name  sequence
+3091	   Reference/Description  Section 4.1.6
+
+3093	   Property Name  showWithoutTime
+3094	   Reference/Description  Section 4.2.4
+
+3096	   Property Name  size
+3097	   Reference/Description  Section 1.4.11
+
+3099	   Property Name  skip
+3100	   Reference/Description  Section 4.3.3
+
+3102	   Property Name  source
+3103	   Reference/Description  Section 5.3.2
+
+3105	   Property Name  start
+3106	   Reference/Description  Section 5.1.1, Section 5.2.2
+
+3108	   Property Name  status
+3109	   Reference/Description  Section 5.1.4
+
+3111	   Property Name  timeZone
+3112	   Property Context  Event, Task
+3113	   Reference/Description  Section 4.6.1
+
+3115	   Property Name  title
+3116	   Reference/Description  Section 4.2.1
+
+3118	   Property Name  trigger
+3119	   Reference/Description  Section 4.5.1
+
+3121	   Property Name  uid
+3122	   Reference/Description  Section 4.1.1
+
+3124	   Property Name  until
+3125	   Reference/Description  Section 4.3.3
+
+3127	   Property Name  updated
+3128	   Reference/Description  Section 4.1.5
+3129	   Property Name  uri
+3130	   Reference/Description  Section 4.2.7
+
+3132	   Property Name  virtualLocations
+3133	   Reference/Description  Section 4.2.7
+
+3135	   Property Name  when
+3136	   Reference/Description  Section 4.5.1
+
+3138	8.2.3.4.  Added Properties
+
+3140	   IANA will add the following entries in the JSCalendar Properties
+3141	   Registry.  Referenced section numbers refer to this document, unless
+3142	   otherwise noted.
+
+3144	   Property Name  calendarAddress
+3145	   Property Type  String
+3146	   Property Context  Participant
+3147	   Reference/Description  Section 4.4.5
+3148	   Intended Usage  common
+3149	   Is Per-User  No
+
+3151	   Property Name  description
+3152	   Property Type  Not applicable
+3153	   Property Context  Location, VirtualLocation
+3154	   Reference/Description  Appendix A.3
+3155	   Intended Usage  reserved
+3156	   Is Per-User  No
+
+3158	   Property Name  endTimeZone
+3159	   Property Type  String
+3160	   Property Context  Event
+3161	   Reference/Description  Section 5.1.3
+3162	   Intended Usage  common
+3163	   Is Per-User  No
+
+3165	   Property Name  mainLocationId
+3166	   Property Type  String
+3167	   Property Context  Event, Task
+3168	   Reference/Description  Section 4.2.6
+3169	   Intended Usage  common
+3170	   Is Per-User  No
+
+3172	   Property Name  organizerCalendarAddress
+3173	   Property Type  String
+3174	   Property Context  Event, Task
+3175	   Reference/Description  Section 4.4.4
+3176	   Intended Usage  common
+3177	   Is Per-User  No
+
+3179	   Property Name  recurrenceRule
+3180	   Property Type  RecurrenceRule
+3181	   Property Context  Event, Task
+3182	   Reference/Description  Section 4.3.3
+3183	   Intended Usage  common
+3184	   Is Per-User  No
+
+3186	   Property Name  relativeTo
+3187	   Property Context  Location
+3188	   Reference/Description  Appendix A.2
+3189	   Intended Usage  obsolete
+3190	   Is Per-User  No
+
+3192	   Property Name  sentBy
+3193	   Property Type  Not applicable
+3194	   Property Context  Event, Task
+3195	   Reference/Description  Appendix A.3
+3196	   Intended Usage  reserved
+3197	   Is Per-User  No
+
+3199	   Property Name  timeZone
+3200	   Property Context  Location
+3201	   Reference/Description  Appendix A.2
+3202	   Intended Usage  obsolete
+3203	   Is Per-User  No
+
+3205	8.3.  "JSCalendar Types" Registry
+
+3207	   IANA has created the "JSCalendar Types" registry to avoid name
+3208	   collisions and provide a complete reference for all data types used
+3209	   for JSCalendar property values.  IANA will set the Reference of the
+3210	   registry to this document, rather than obsoleted [RFC8984].
+
+3212	   The registration process is the same as for the "JSCalendar
+3213	   Properties" registry, as defined in Section 8.2.1.
+
+3215	8.3.1.  "JSCalendar Types" Registry Template
+
+3217	   _Note for IANA_: This section leaves the original definition of
+3218	   [RFC8984] unchanged.
+
+3220	   Type Name:  This is the name of the type.
+
+3222	   Reference or Description:  This is a brief description or RFC number
+3223	      and section reference where the Type is specified (may be omitted
+3224	      for "reserved" type names).
+
+3226	   Intended Use:  This may be "common", "reserved", or "obsolete".
+
+3228	   Change Controller:  This is who may request a change to this entry's
+3229	      definition (IETF for RFCs from the IETF stream)
+
+3231	8.3.2.  Changes to the JSCalendar Types Registry contents
+
+3233	8.3.2.1.  Obsoleted Types
+
+3235	   IANA will change the Intended Status from "common" to "obsolete" for
+3236	   the following entries in the JSCalendar Types Registry.  For each
+3237	   entry, the Reference/Description column will refer to Appendix A.6 of
+3238	   this document.
+
+3240	   *  TimeZone
+
+3242	   *  TimeZoneRule
+
+3244	8.3.2.2.  Updated Types
+
+3246	   IANA will update the following entries in the JSCalendar Types
+3247	   Registry.  For each entry, the Type Name and its changed fields are
+3248	   listed.  Unchanged fields are omitted.  Referenced section numbers
+3249	   refer to this document, unless otherwise noted.
+
+3251	   Type Name  Alert
+3252	   Reference/Description  Section 4.5.1
+
+3254	   Type Name  Boolean
+3255	   Reference/Description  Section 1.3.1
+
+3257	   Type Name  Duration
+3258	   Reference/Description  Section 1.4.6
+
+3260	   Type Name  Id
+3261	   Reference/Description  Section 1.4.1
+
+3263	   Type Name  Int
+3264	   Reference/Description  Section 1.4.2
+
+3266	   Type Name  LocalDateTime
+3267	   Reference/Description  Section 1.4.5
+
+3269	   Type Name  Link
+3270	   Reference/Description  Section 1.4.11
+
+3272	   Type Name  Location
+3273	   Reference/Description  Section 4.2.5
+3274	   Type Name  NDay
+3275	   Reference/Description  Section 4.3.3
+
+3277	   Type Name  Number
+3278	   Reference/Description  Section 1.3.1
+
+3280	   Type Name  Participant
+3281	   Reference/Description  Section 4.4.5
+
+3283	   Type Name  PatchObject
+3284	   Reference/Description  Section 1.4.9
+
+3286	   Type Name  RecurrenceRule
+3287	   Reference/Description  Section 4.3.3
+
+3289	   Type Name  Relation
+3290	   Reference/Description  Section 1.4.10
+
+3292	   Type Name  SignedDuration
+3293	   Reference/Description  Section 1.4.7
+
+3295	   Type Name  String
+3296	   Reference/Description  Section 1.3.1
+
+3298	   Type Name  TimeZoneId
+3299	   Reference/Description  Section 1.4.8
+
+3301	   Type Name  UnsignedInt
+3302	   Reference/Description  Section 1.4.3
+
+3304	   Type Name  UTCDateTime
+3305	   Reference/Description  Section 1.4.4
+
+3307	8.3.2.3.  Added Types
+
+3309	   IANA will add the following entries in the JSCalendar Types Registry.
+3310	   Referenced section numbers refer to this document, unless otherwise
+3311	   noted.
+
+3313	   Type Name  Event
+3314	   Reference/Description  Section 2.1
+3315	   Intended Usage  common
+3316	   Change Controller  IETF
+
+3318	   Type Name  Group
+3319	   Reference/Description  Section 2.3
+3320	   Intended Usage  common
+3321	   Change Controller  IETF
+3322	   Type Name  Task
+3323	   Reference/Description  Section 2.2
+3324	   Intended Usage  common
+3325	   Change Controller  IETF
+
+3327	   Type Name  OffsetTrigger
+3328	   Reference/Description  Section 4.5.1
+3329	   Intended Usage  common
+3330	   Change Controller  IETF
+
+3332	   Type Name  AbsoluteTrigger
+3333	   Reference/Description  Section 4.5.1
+3334	   Intended Usage  common
+3335	   Change Controller  IETF
+
+3337	   Type Name  UnknownTrigger
+3338	   Reference/Description  Section 4.5.1
+3339	   Intended Usage  common
+3340	   Change Controller  IETF
+
+3342	8.4.  "JSCalendar Enum Values" Registry
+
+3344	   IANA has created the "JSCalendar Enum Values" registry to allow
+3345	   interoperable extension of semantics for properties with enumerable
+3346	   values.  Each such property has a subregistry of allowed values.
+3347	   IANA will set the Reference of the registry to this document, rather
+3348	   than obsoleted [RFC8984].
+
+3350	   The registration process for a new enum value or adding a new
+3351	   enumerable property is the same as for the "JSCalendar Properties"
+3352	   registry, as defined in Section 8.2.1.
+
+3354	8.4.1.  "JSCalendar Enum Values" Registry Property Template
+
+3356	   _Note for IANA_: This section leaves the original definition of
+3357	   [RFC8984] unchanged.
+
+3359	   This template is for adding a subregistry for a new enumerable
+3360	   property to the "JSCalendar Enum" registry.
+
+3362	   Property Name:  These are the name(s) of the property or properties
+3363	      where these values may be used.  This MUST be registered in the
+3364	      "JSCalendar Properties" registry.
+
+3366	   Context:  This is the list of allowed object types where the property
+3367	      or properties may appear, as registered in the "JSCalendar
+3368	      Properties" registry.  This disambiguates where there may be two
+3369	      distinct properties with the same name in different contexts.
+
+3371	   Change Controller:  (IETF for properties defined in RFCs from the
+3372	      IETF stream).
+
+3374	   Initial Contents:  This is the initial list of defined values for
+3375	      this enum, using the template defined in Section 8.4.2.  A
+3376	      subregistry will be created with these values for this property
+3377	      name/context tuple.
+
+3379	8.4.2.  "JSCalendar Enum Values" Registry Value Template
+
+3381	   _Note for IANA_: This section adds the "Intended Use" column to the
+3382	   template.
+
+3384	   This template is for adding a new enum value to a subregistry in the
+3385	   JSCalendar Enum registry.
+
+3387	   Enum Value:  This is the verbatim value of the enum.
+
+3389	   Reference or Description:  This is a brief description or RFC number
+3390	      and section reference for the semantics of this value.
+
+3392	   Intended Use:  This may be "common", "reserved", or "obsolete".
+
+3394	8.4.3.  Changes to the JSCalendar Enum Values Registry contents
+
+3396	8.4.3.1.  Updated References
+
+3398	   This document adds the "Intended Use" column to the registry template
+3399	   (Section 8.4.2).  IANA will set the value for each existing entry to
+3400	   "common", except for the special case of the "attendee" roles enum
+3401	   described in Section 8.4.3.3.4.
+
+3403	   IANA will set the Reference of the registry and its sub-registries to
+3404	   a reference to this document.  It will set the Reference column of
+3405	   the property names to a reference to this document.
+
+3407	   IANA will set the Reference columns of the Enum Values sub-registries
+3408	   as follows:
+
+3410	    +====================================================+===========+
+3411	    | Registry Name                                      | Reference |
+3412	    +====================================================+===========+
+3413	    | JSCalendar Enum Values for action (Context: Alert) | Section   |
+3414	    |                                                    | 4.5.1     |
+3415	    +----------------------------------------------------+-----------+
+3416	    | JSCalendar Enum Values for display (Context: Link) | Section   |
+3417	    |                                                    | 1.4.11    |
+3418	    +----------------------------------------------------+-----------+
+3419	    | JSCalendar Enum Values for features (Context:      | Section   |
+3420	    | VirtualLocation)                                   | 4.2.7     |
+3421	    +----------------------------------------------------+-----------+
+3422	    | JSCalendar Enum Values for freeBusyStatus          | Section   |
+3423	    | (Context: Event, Task)                             | 4.4.2     |
+3424	    +----------------------------------------------------+-----------+
+3425	    | JSCalendar Enum Values for kind (Context:          | Section   |
+3426	    | Participant)                                       | 4.4.5     |
+3427	    +----------------------------------------------------+-----------+
+3428	    | JSCalendar Enum Values for participationStatus     | Section   |
+3429	    | (Context: Participant)                             | 4.4.5     |
+3430	    +----------------------------------------------------+-----------+
+3431	    | JSCalendar Enum Values for privacy (Context:       | Section   |
+3432	    | Event, Task)                                       | 4.4.3     |
+3433	    +----------------------------------------------------+-----------+
+3434	    | JSCalendar Enum Values for roles (Context:         | Section   |
+3435	    | Participant)                                       | 4.4.5     |
+3436	    +----------------------------------------------------+-----------+
+3437	    | JSCalendar Enum Values for status (Context: Event) | Section   |
+3438	    |                                                    | 5.1.4     |
+3439	    +----------------------------------------------------+-----------+
+
+3441	       Table 1: Updates references of the "JSCalendar Enum Values"
+3442	                                registry"
+
+3444	8.4.3.2.  Removed Registries
+
+3446	   IANA will remove the sub-registry "JSCalendar Enum Values for
+3447	   scheduleAgent (Context: Participant)".
+
+3449	8.4.3.3.  Updated Registries
+
+3451	8.4.3.3.1.  JSCalendar Enum Values for progress (Context: Task,
+3452	            Participant)
+
+3454	   IANA will rename the sub-registry to "JSCalendar Enum Values for
+3455	   progress (Context: Task)".  It will set the Reference column of the
+3456	   enum values to a reference to Section 5.2.5 of this document.
+
+3458	8.4.3.3.2.  JSCalendar Enum Values for relativeTo (Context:
+3459	            OffsetTrigger, Location)
+
+3461	   IANA will rename the sub-registry to "JSCalendar Enum Values for
+3462	   relativeTo (Context: OffsetTrigger)".  It will set the Reference
+3463	   column of the enum values to a reference to Section 4.5.1 of this
+3464	   document.
+
+3466	8.4.3.3.3.  JSCalendar Enum Values for relation (Context: Relation)
+
+3468	   IANA will set the Reference column of the enum values to a reference
+3469	   to Section 1.4.10 of this document.
+
+3471	   It will add the following Enum Value entry:
+
+3473	   Enum Value  snooze
+3474	   Reference/Description  Section 4.5.1
+3475	   Change Controller  IETF
+
+3477	8.4.3.3.4.  JSCalendar Enum Values for roles (Context: Context:
+3478	            Participant)
+
+3480	   IANA will set "Intended Use" column of the "attendee" value to
+3481	   "obsolete".
+
+3483	8.4.3.4.  Added Registries
+
+3485	   IANA will add the following sub-registries to the "JSCalendar Enum
+3486	   Values" registry.
+
+3488	8.4.3.4.1.  JSCalendar Enum Values for progress (Context: Participant)
+
+3490	   Property Name:      progress
+3491	   Context:            Participant
+3492	   Change Controller:  IETF
+3493	   Initial Contents:
+3494	                       +============+==========================+
+3495	                       | Enum Value | Reference or Description |
+3496	                       +============+==========================+
+3497	                       | in-process | Section 4.4.5            |
+3498	                       +------------+--------------------------+
+3499	                       | completed  | Section 4.4.5            |
+3500	                       +------------+--------------------------+
+3501	                       | failed     | Section 4.4.5            |
+3502	                       +------------+--------------------------+
+
+3504	                          Table 2: JSCalendar Enum Values for
+3505	                            progress (Context: Participant)
+
+3507	9.  References
+
+3509	9.1.  Normative References
+
+3511	   [CLDR]     "Unicode Common Locale Data Repository",
+3512	              <http://cldr.unicode.org/>.
+
+3514	   [CSS3]     Çelik, T., Lilley, C., and L. Baron, "CSS Color Module
+3515	              Level 3", W3C Recommendation, January 2022,
+3516	              <https://www.w3.org/TR/css-color-3/>.
+
+3518	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+3519	              Requirement Levels", BCP 14, RFC 2119,
+3520	              DOI 10.17487/RFC2119, March 1997,
+3521	              <https://www.rfc-editor.org/info/rfc2119>.
+
+3523	   [RFC2397]  Masinter, L., "The "data" URL scheme", RFC 2397,
+3524	              DOI 10.17487/RFC2397, August 1998,
+3525	              <https://www.rfc-editor.org/info/rfc2397>.
+
+3527	   [RFC2445]  Dawson, F. and D. Stenerson, "Internet Calendaring and
+3528	              Scheduling Core Object Specification (iCalendar)",
+3529	              RFC 2445, DOI 10.17487/RFC2445, November 1998,
+3530	              <https://www.rfc-editor.org/info/rfc2445>.
+
+3532	   [RFC3339]  Klyne, G. and C. Newman, "Date and Time on the Internet:
+3533	              Timestamps", RFC 3339, DOI 10.17487/RFC3339, July 2002,
+3534	              <https://www.rfc-editor.org/info/rfc3339>.
+
+3536	   [RFC3986]  Berners-Lee, T., Fielding, R., and L. Masinter, "Uniform
+3537	              Resource Identifier (URI): Generic Syntax", STD 66,
+3538	              RFC 3986, DOI 10.17487/RFC3986, January 2005,
+3539	              <https://www.rfc-editor.org/info/rfc3986>.
+
+3541	   [RFC4589]  Schulzrinne, H. and H. Tschofenig, "Location Types
+3542	              Registry", RFC 4589, DOI 10.17487/RFC4589, July 2006,
+3543	              <https://www.rfc-editor.org/info/rfc4589>.
+
+3545	   [RFC4648]  Josefsson, S., "The Base16, Base32, and Base64 Data
+3546	              Encodings", RFC 4648, DOI 10.17487/RFC4648, October 2006,
+3547	              <https://www.rfc-editor.org/info/rfc4648>.
+
+3549	   [RFC5234]  Crocker, D., Ed. and P. Overell, "Augmented BNF for Syntax
+3550	              Specifications: ABNF", STD 68, RFC 5234,
+3551	              DOI 10.17487/RFC5234, January 2008,
+3552	              <https://www.rfc-editor.org/info/rfc5234>.
+
+3554	   [RFC5322]  Resnick, P., Ed., "Internet Message Format", RFC 5322,
+3555	              DOI 10.17487/RFC5322, October 2008,
+3556	              <https://www.rfc-editor.org/info/rfc5322>.
+
+3558	   [RFC5545]  Desruisseaux, B., Ed., "Internet Calendaring and
+3559	              Scheduling Core Object Specification (iCalendar)",
+3560	              RFC 5545, DOI 10.17487/RFC5545, September 2009,
+3561	              <https://www.rfc-editor.org/info/rfc5545>.
+
+3563	   [RFC5546]  Daboo, C., Ed., "iCalendar Transport-Independent
+3564	              Interoperability Protocol (iTIP)", RFC 5546,
+3565	              DOI 10.17487/RFC5546, December 2009,
+3566	              <https://www.rfc-editor.org/info/rfc5546>.
+
+3568	   [RFC5646]  Phillips, A., Ed. and M. Davis, Ed., "Tags for Identifying
+3569	              Languages", BCP 47, RFC 5646, DOI 10.17487/RFC5646,
+3570	              September 2009, <https://www.rfc-editor.org/info/rfc5646>.
+
+3572	   [RFC5870]  Mayrhofer, A. and C. Spanring, "A Uniform Resource
+3573	              Identifier for Geographic Locations ('geo' URI)",
+3574	              RFC 5870, DOI 10.17487/RFC5870, June 2010,
+3575	              <https://www.rfc-editor.org/info/rfc5870>.
+
+3577	   [RFC6638]  Daboo, C. and B. Desruisseaux, "Scheduling Extensions to
+3578	              CalDAV", RFC 6638, DOI 10.17487/RFC6638, June 2012,
+3579	              <https://www.rfc-editor.org/info/rfc6638>.
+
+3581	   [RFC6838]  Freed, N., Klensin, J., and T. Hansen, "Media Type
+3582	              Specifications and Registration Procedures", BCP 13,
+3583	              RFC 6838, DOI 10.17487/RFC6838, January 2013,
+3584	              <https://www.rfc-editor.org/info/rfc6838>.
+
+3586	   [RFC6901]  Bryan, P., Ed., Zyp, K., and M. Nottingham, Ed.,
+3587	              "JavaScript Object Notation (JSON) Pointer", RFC 6901,
+3588	              DOI 10.17487/RFC6901, April 2013,
+3589	              <https://www.rfc-editor.org/info/rfc6901>.
+
+3591	   [RFC7493]  Bray, T., Ed., "The I-JSON Message Format", RFC 7493,
+3592	              DOI 10.17487/RFC7493, March 2015,
+3593	              <https://www.rfc-editor.org/info/rfc7493>.
+
+3595	   [RFC7529]  Daboo, C. and G. Yakushev, "Non-Gregorian Recurrence Rules
+3596	              in the Internet Calendaring and Scheduling Core Object
+3597	              Specification (iCalendar)", RFC 7529,
+3598	              DOI 10.17487/RFC7529, May 2015,
+3599	              <https://www.rfc-editor.org/info/rfc7529>.
+
+3601	   [RFC7809]  Daboo, C., "Calendaring Extensions to WebDAV (CalDAV):
+3602	              Time Zones by Reference", RFC 7809, DOI 10.17487/RFC7809,
+3603	              March 2016, <https://www.rfc-editor.org/info/rfc7809>.
+
+3605	   [RFC8126]  Cotton, M., Leiba, B., and T. Narten, "Guidelines for
+3606	              Writing an IANA Considerations Section in RFCs", BCP 26,
+3607	              RFC 8126, DOI 10.17487/RFC8126, June 2017,
+3608	              <https://www.rfc-editor.org/info/rfc8126>.
+
+3610	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+3611	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+3612	              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+3614	   [RFC8259]  Bray, T., Ed., "The JavaScript Object Notation (JSON) Data
+3615	              Interchange Format", STD 90, RFC 8259,
+3616	              DOI 10.17487/RFC8259, December 2017,
+3617	              <https://www.rfc-editor.org/info/rfc8259>.
+
+3619	   [RFC8288]  Nottingham, M., "Web Linking", RFC 8288,
+3620	              DOI 10.17487/RFC8288, October 2017,
+3621	              <https://www.rfc-editor.org/info/rfc8288>.
+
+3623	   [RFC8984]  Jenkins, N. and R. Stepanek, "JSCalendar: A JSON
+3624	              Representation of Calendar Data", RFC 8984,
+3625	              DOI 10.17487/RFC8984, July 2021,
+3626	              <https://www.rfc-editor.org/info/rfc8984>.
+
+3628	   [RFC9073]  Douglass, M., "Event Publishing Extensions to iCalendar",
+3629	              RFC 9073, DOI 10.17487/RFC9073, August 2021,
+3630	              <https://www.rfc-editor.org/info/rfc9073>.
+
+3632	   [RFC9074]  Daboo, C. and K. Murchison, Ed., ""VALARM" Extensions for
+3633	              iCalendar", RFC 9074, DOI 10.17487/RFC9074, August 2021,
+3634	              <https://www.rfc-editor.org/info/rfc9074>.
+
+3636	   [RFC9253]  Douglass, M., "Support for iCalendar Relationships",
+3637	              RFC 9253, DOI 10.17487/RFC9253, August 2022,
+3638	              <https://www.rfc-editor.org/info/rfc9253>.
+
+3640	   [RFC9562]  Davis, K., Peabody, B., and P. Leach, "Universally Unique
+3641	              IDentifiers (UUIDs)", RFC 9562, DOI 10.17487/RFC9562, May
+3642	              2024, <https://www.rfc-editor.org/info/rfc9562>.
+
+3644	   [TZDB]     IANA, "Time Zone Database",
+3645	              <https://www.iana.org/time-zones>.
+
+3647	9.2.  Informative References
+
+3649	   [ical-tasks]
+3650	              Douglass, M. and A. Apthorp, "Task Extensions to
+3651	              iCalendar", Work in Progress, Internet-Draft, draft-ietf-
+3652	              calext-ical-tasks, 7 July 2025,
+3653	              <https://datatracker.ietf.org/doc/draft-ietf-calext-ical-
+3654	              tasks>.
+
+3656	   [ISO.9070.1991]
+3657	              ISO/IEC, "Information technology -- SGML support
+3658	              facilities -- Registration procedures for public text
+3659	              owner identifiers", Edition 2, ISO/IEC 9070:1991, April
+3660	              1991, <https://www.iso.org/standard/16645.html>.
+
+3662	   [jmap-calendars]
+3663	              Jenkins, N.M. and M. Douglass, "JMAP for Calendars", Work
+3664	              in Progress, Internet-Draft, draft-ietf-jmap-calendars, 8
+3665	              October 2025, <https://datatracker.ietf.org/doc/draft-
+3666	              ietf-jmap-calendars/>.
+
+3668	   [LOCATIONTYPES]
+3669	              IANA, "Location Types Registry",
+3670	              <https://www.iana.org/assignments/location-type-registry>.
+
+3672	   [MEDIATYPES]
+3673	              IANA, "Media Types",
+3674	              <https://www.iana.org/assignments/media-types>.
+
+3676	   [RFC6376]  Crocker, D., Ed., Hansen, T., Ed., and M. Kucherawy, Ed.,
+3677	              "DomainKeys Identified Mail (DKIM) Signatures", STD 76,
+3678	              RFC 6376, DOI 10.17487/RFC6376, September 2011,
+3679	              <https://www.rfc-editor.org/info/rfc6376>.
+
+3681	   [RFC7265]  Kewisch, P., Daboo, C., and M. Douglass, "jCal: The JSON
+3682	              Format for iCalendar", RFC 7265, DOI 10.17487/RFC7265, May
+3683	              2014, <https://www.rfc-editor.org/info/rfc7265>.
+
+3685	   [RFC7986]  Daboo, C., "New Properties for iCalendar", RFC 7986,
+3686	              DOI 10.17487/RFC7986, October 2016,
+3687	              <https://www.rfc-editor.org/info/rfc7986>.
+
+3689	   [RFC8607]  Daboo, C., Quillaud, A., and K. Murchison, Ed.,
+3690	              "Calendaring Extensions to WebDAV (CalDAV): Managed
+3691	              Attachments", RFC 8607, DOI 10.17487/RFC8607, June 2019,
+3692	              <https://www.rfc-editor.org/info/rfc8607>.
+
+3694	Appendix A.  Differences from RFC 8984
+
+3696	   This section documents all significant differences from RFC 8984.
+3697	   Insignificant differences, such as formatting, grammar or typos are
+3698	   not documented.
+
+3700	A.1.  Applied Errata
+
+3702	   All verified errata of RFC 8984 was applied to this document:
+
+3704	   *  Errata 6872 (https://www.rfc-editor.org/errata/eid6872)
+
+3706	   *  Errata 6873 (https://www.rfc-editor.org/errata/eid6873)
+
+3708	   *  Errata 8028 (https://www.rfc-editor.org/errata/eid8028)
+
+3710	A.2.  Obsolete Properties
+
+3712	   The following properties became obsolete:
+
+3714	   *excludedRecurrenceRules*:
+3715	      This is incompatible with iCalendar, which deprecated the EXRULE
+3716	      property [RFC2445] (Section 4.8.5.2) in [RFC5545].
+
+3718	      See Section 4.3.4 of [RFC8984].
+
+3720	   *recurrenceRules*:
+3721	      This is incompatible with the following definitions of the
+3722	      iCalendar RRULE property [RFC5545] (Section 3.8.5.3):
+
+3724	      *  The RRULE property SHOULD NOT be specified more than once.
+
+3726	      *  The recurrence set generated with multiple RRULE properties is
+3727	         undefined.
+
+3729	      The newly defined single-valued recurrenceRule property
+3730	      (Section 4.3.3) replaces it.
+
+3732	      See Section 4.3.3 of [RFC8984].
+
+3734	   *timeZones*:
+3735	      This property was obsoleted for the following reasons:
+
+3737	      *  Custom time zones in calendaring data increase implementation
+3738	         complexity, introduce inefficiencies and are error-prone, as
+3739	         described for CalDAV and iCalendar in [RFC7809].
+
+3741	      *  In practice, the only non-IANA time zone identifiers are
+3742	         Microsoft time zone names.  These can be converted to IANA time
+3743	         zones, e.g. using the International Components for Unicode
+3744	         (https://icu.unicode.org/) software library.
+
+3746	      *  The property contradicts the stated goal of JSCalendar to avoid
+3747	         ambiguities and pitfalls of iCalendar, defined in Section 1.1
+3748	         of [RFC8984].
+
+3750	      See Section 4.7.2 of [RFC8984].
+
+3752	   *Link.cid*:
+3753	      This property was obsoleted for the following reasons:
+
+3755	      *  It only is relevant for rich-text descriptions, but the related
+3756	         iCalendar STYLED-DESCRIPTION property [RFC9073] (Section 6.5)
+3757	         does not support referring to attached media.
+
+3759	      *  It only is applicable for Link objects having a "data:" URI as
+3760	         href property value.  But even the definition of the Link
+3761	         object recommends not to use "data:" URIs as values in the href
+3762	         property.
+
+3764	      *  A Link with "data:" URI converts to an iCalendar BINARY value
+3765	         [RFC5545] (Section 3.3.1).  But these are marginally supported
+3766	         by CalDAV clients, which tend to prefer using WebDAV managed
+3767	         attachments [RFC8607].
+
+3769	      See Section 1.4.11 of [RFC8984].
+
+3771	   *Location.{relativeTo|timeZone}*:
+3772	      These got replaced with the newly defined Event.endTimeZone
+3773	      property (Section 5.1.3):
+
+3775	      *  They were meant to be equivalent to the iCalendar DTEND
+3776	         property [RFC5545] (Section 3.8.2.2).  But the semantics were
+3777	         undefined if multiple Location objects had "relativeTo=end" and
+3778	         the "timeZone" property set.
+
+3780	      *  Their semantics were undefined for Task objects.
+
+3782	      *  They were incompatible with the iCalendar VLOCATION component
+3783	         [RFC9073] (Section 7.2), which neither defines how to set a
+3784	         time zone identifier or how the VLOCATION relates to start and
+3785	         end.
+
+3787	      See Section 4.2.5 of [RFC8984].
+
+3789	   *Participant.locationId*:
+3790	      This is incompatible with the iCalendar PARTICIPANT component
+3791	      [RFC9073] (Section 7.1):
+
+3793	      *  The PARTICIPANT component may contain multiple VLOCATION
+3794	         components and LOCATION properties.
+
+3796	      *  The PARTICIPANT component does not support referring to other
+3797	         VLOCATION components or LOCATION properties
+
+3799	      The description of the Event object type in Section 2.1 reflects
+3800	      this:
+
+3802	      *  It stated: "Multiple participants may partake in the event at
+3803	         multiple locations."
+
+3805	      *  It now states: "Multiple participants may partake in the
+3806	         event."
+
+3808	      See Section 4.4.6 of [RFC8984].
+
+3810	   *Participant.language*:
+3811	      No equivalent element exists in iCalendar and its current single-
+3812	      valued definition is likely to conflict with any related future
+3813	      extension of the PARTICIPANT component [RFC9073] (Section 7.1).
+
+3815	      See Section 4.4.6 of [RFC8984].
+
+3817	   *{Participant|Task}.progressUpdated*:
+3818	      This became obsolete for the following reasons:
+
+3820	      *  It is incompatible with the newly introduced iCalendar VSTATUS
+3821	         component [ical-tasks] (Section 12.1), which may occur multiple
+3822	         times in the PARTICIPANT and VTODO components.
+
+3824	      *  The VSTATUS component introduces new semantics to a task's
+3825	         progress and status, which better be defined by a future
+3826	         JSCalendar extension for tasks.
+
+3828	      See Section 4.4.6 of [RFC8984] and Section 5.2.6 of [RFC8984].
+
+3830	   *{TimeZone|TimeZoneRule}.**:
+3831	      All properties defined solely for the TimeZone and TimeZoneRule
+3832	      object types became obsolete, because the "timeZones" property
+3833	      became obsolete.
+
+3835	      See Section 4.7.2 of [RFC8984].
+
+3837	A.3.  Reserved Properties
+
+3839	A.3.1.  JMAP for Calendars
+
+3841	   The following common use properties became reserved for JMAP for
+3842	   Calendars [jmap-calendars]:
+
+3844	   *useDefaultAlerts*:
+3845	      No equivalent element exists in iCalendar and no consensus for
+3846	      default alarms in CalDAV and iCalendar was found at IETF as part
+3847	      of [RFC9074].
+
+3849	      See Section 4.4.1 of [RFC8984].
+
+3851	   *Participant.scheduleSequence*:
+3852	      This requires further work by IETF to update iTIP [RFC5546] with
+3853	      the PARTICIPANT component and JSCalendar.  This property may later
+3854	      be redefined for common use.
+
+3856	      See Section 4.4.6 of [RFC8984].
+
+3858	   *Participant.scheduleUpdated*:
+3859	      This requires further work by IETF to update iTIP [RFC5546] with
+3860	      the PARTICIPANT component and JSCalendar.  This property may later
+3861	      be redefined for common use.
+
+3863	      See Section 4.4.6 of [RFC8984].
+
+3865	A.3.2.  Scheduling Extensions for CalDAV and iTIP
+
+3867	   The following common use properties became reserved for future
+3868	   JSCalendar extensions of Scheduling Extensions for CalDAV [RFC6638]
+3869	   and iTIP [RFC5546]:
+
+3871	   *replyTo*:
+3872	      This requires further work by IETF.  For compatibility with
+3873	      iCalendar, the newly introduced organizerCalendarAddress property
+3874	      (Section 4.4.4) replaces it.
+
+3876	      See Section 4.4.4 of [RFC8984].
+
+3878	   *requestStatus*:
+3879	      This mainly is applicable in scheduling over CalDAV.
+
+3881	      See Section 4.4.7 of [RFC8984].
+
+3883	   *{Event|Task}.sentBy*:
+
+3885	      No equivalent element exists in iCalendar and this property mainly
+3886	      is relevant in context of a combined calendaring and mail service.
+3887	      Note that the Participant.sentBy property does _not_ become
+3888	      reserved: it is equivalent to the iCalendar SENT-BY [RFC5545]
+3889	      (Section 3.2.18) parameter.
+
+3891	      See Section 4.4.5 of [RFC8984].
+
+3893	   *Participant.invitedBy*:
+3894	      This requires further work by IETF.  Specifically, the iTIP
+3895	      definitions of the REPLY method [RFC5546] (Section 3.2.3) and how
+3896	      to forward invitation requests (Section 4.2.8 of [RFC5546]) must
+3897	      be updated.
+
+3899	      See Section 4.4.6 of [RFC8984].
+
+3901	   *Participant.participationComment*:
+3902	      This requires further work by IETF to update iTIP [RFC5546] with
+3903	      the PARTICIPANT component or JSCalendar.  This property may later
+3904	      be redefined for common use.
+
+3906	      See Section 4.4.6 of [RFC8984].
+
+3908	   *Participant.scheduleAgent*:
+3909	      This only is applicable in scheduling over CalDAV.
+
+3911	      See Section 4.4.6 of [RFC8984].
+
+3913	   *Participant.scheduleForceSend*:
+3914	      This only is applicable in scheduling over CalDAV.
+
+3916	      See Section 4.4.6 of [RFC8984].
+
+3918	   *Participant.scheduleStatus*:
+3919	      This only is applicable in scheduling over CalDAV.
+
+3921	      See Section 4.4.6 of [RFC8984].
+
+3923	   *Participant.sendTo*:
+3924	      This requires further work by IETF.  For compatibility with
+3925	      iCalendar, the newly introduced Participant.calendarAddress
+3926	      property (Section 4.4.5) replaces it.
+
+3928	      See Section 4.4.6 of [RFC8984].
+
+3930	A.3.3.  Localization Extensions for iCalendar and JSCalendar
+
+3932	   The following properties became reserved for future JSCalendar and
+3933	   iCalendar extensions for multi-lingual calendar data:
+
+3935	   *localizations*:
+3936	      This requires further work by IETF.  The "localizations" property
+3937	      primarily was introduced in JSCalendar for event publishing, but
+3938	      neither the Event Publishing extensions for iCalendar [RFC9073]
+3939	      nor other iCalendar extensions define how to localize iCalendar
+3940	      data.  This property may later be redefined for common use.
+
+3942	      See Section 4.6.1 of [RFC8984].
+
+3944	A.3.4.  Reserved for Future RFCs
+
+3946	   The following properties became reserved for some future JSCalendar
+3947	   extension RFCs:
+
+3949	   *Location.description, VirtualLocation.description*:
+3950	      This requires further work by IETF.  The VirtualLocation
+3951	      "description" property does not convert to any parameter of the
+3952	      CONFERENCE property.  It would require to define a new parameter
+3953	      or to introduce a new component to augment the CONFERENCE property
+3954	      with a DESCRIPTION or STYLED-DESCRIPTION property.  For
+3955	      consistency, the Location "description" property became reserved,
+3956	      too.
+
+3958	      See Section 4.2.5 of [RFC8984] and Section 4.2.6 of [RFC8984].
+
+3960	A.3.5.  Reserved for Internal Use
+
+3962	   The following properties became reserved for internal use by
+3963	   JSCalendar:
+
+3965	   *excluded*:
+3966	      This property name already was defined for internal use only in
+3967	      the recurrenceOverrides property, but registering it for common
+3968	      use had made it appear as being a regular property.  Making this a
+3969	      reserved property is to help clarify its purpose.  Section 4.3.4
+3970	      has been updated accordingly.
+
+3972	      See Section 4.3.4 of [RFC8984].
+
+3974	A.4.  Updated Properties
+
+3976	   The following property definitions were updated:
+
+3978	   *@type*:
+3979	      The original definition required this property be set on every
+3980	      object type.  The type and property notation in Section 1.3 now
+3981	      matches the one in JSContact, and the @type property is optional
+3982	      in the majority of cases.
+
+3984	   *Alert.relatedTo*:
+3985	      The original definition instructed to set the "parent" relation on
+3986	      a snooze alert.  It now instructs to set the newly defined
+3987	      "snooze" relation, for compatibility with the VALARM "SNOOZE"
+3988	      relationship type (Section 7 of [RFC9074].
+
+3990	      The original definition did not define that the map keys represent
+3991	      keys of Alert objects in the "alerts" property.
+
+3993	      See Section 4.5.1.
+
+3995	   *Alert.trigger*:
+3996	      JSCalendar now supports default types for properties of type A|B.
+3997	      The default type of this property now is OffsetTrigger.
+
+3999	      See Section 4.5.1.
+
+4001	   *{Event|Task|Group}.color*:
+4002	      The original definition allowed hexadecimal RGB values, which CSS3
+4003	      specifies to be either in three-digit or six-digit form.  The
+4004	      updated definition only allows them in six-digit form to match the
+4005	      proposed update of the iCalendar COLOR property.  It also
+4006	      explicitly defines that values are case-insensitive.
+
+4008	      See Section 4.2.12.
+
+4010	   *Link.display*:
+4011	      The original definition only allowed one purpose to be set, which
+4012	      is incompatible with the multi-valued iCalendar DISPLAY parameter
+4013	      [RFC7986] (Section 6.1).  It now supports setting multiple
+4014	      purposes.
+
+4016	      Setting this property does not anymore require the "rel" property
+4017	      of the Link object be set to "icon".
+
+4019	      See Section 1.4.11.
+
+4021	   *Link.rel*:
+4022	      The original definition restricted the value of this property to
+4023	      registered link types.  It now also allows extension relation
+4024	      types for compatibility with the LINKREL parameter [RFC9253]
+4025	      (Section 6.1).
+
+4027	      See Section 1.4.11.
+
+4029	   *Participant.delegatedFrom*, *Participant.delegatedTo*,
+4030	   *Participant.memberOf*,
+4031	      The original definitions required their values to identify
+4032	      Participant objects.  This was incompatible with iCalendar when
+4033	      the DELEGATED-TO, DELEGATED-FROM or MEMBER parameters contained a
+4034	      calendar address but no ATTENDEE property with that same calendar
+4035	      address.  The new definition now requires the property values to
+4036	      be calendar addresses.
+
+4038	      Also, they now require the calendarAddress property to be set.
+
+4040	      See Section 4.4.5.
+
+4042	   *Participant.expectReply*, *Participant.invitedBy*,
+4043	   *Participant.kind*, *Participant.participationStatus*,
+4044	   *Participant.progress*, *Participant.sentBy*:
+4045	      The original definitions were incompatible with iCalendar: they
+4046	      did not require the (now reserved) sendTo property to be set, but
+4047	      their equivalent iCalendar parameters require an ATTENDEE
+4048	      property.  They now require the calendarAddress property to be
+4049	      set.
+
+4051	      See Section 4.4.5.
+
+4053	   *Participant.progress*:
+4054	      The original definition was incompatible with iCalendar.  It
+4055	      allowed the progress value to be "cancelled", but this is not a
+4056	      supported PARTSTAT parameter value of an ATTENDEE property in a
+4057	      VTODO component.  The new definition only supports the progress
+4058	      property values "in-process", "completed" and "failed".
+
+4060	      See Section 4.4.5.
+
+4062	   *Participant.roles*:
+4063	      The original definition was incompatible with iCalendar:
+
+4065	      *  It did not cover the "REQ-PARTICIPANT" value of the ROLE
+4066	         parameter [RFC5545] (Section 3.2.16).  It now defines the new
+4067	         "required" role.
+
+4069	      *  The "roles" property is multi-valued but the ROLE parameter is
+4070	         single-valued and only allowed to be set once on an ATTENDEE.
+4071	         For compatibility, a precendence of Participant roles got
+4072	         defined for converting roles to iCalendar.
+
+4074	      *  It was mandatory for a Participant, but the (now reserved)
+4075	         sendTo property was not.  This was incompatible with iCalendar,
+4076	         which required an ATTENDEE property to set the ROLE parameter.
+4077	         It now is optional, but requires the calendarAddress property
+4078	         to be set.
+
+4080	      *  It defined a "contact" role, but this role later got redefined
+4081	         as an enumerated value of the PARTICIPANT-TYPE property
+4082	         [RFC9073] (Section 6.2).  It now removed this role and leaves
+4083	         defining participant types to a future JSCalendar extension.
+
+4085	      *  The "attendee" role got removed.  There is no equivalent ROLE
+4086	         value in iCalendar and any Participant with a calendarAddress
+4087	         by definition is an ATTENDEE in iCalendar.
+
+4089	      *  The "owner" role got redefined.  It now makes clear that the
+4090	         semantics of the role depend on the calendaring exchange
+4091	         protocol.
+
+4093	      See Section 4.4.5.
+
+4095	   *Relation.relation*:
+4096	      The original definition specified the empty relation to represent
+4097	      an unspecified relationship.  It now defines the empty relation to
+4098	      default to "parent", unless overridden, for compatibility with the
+4099	      RELATED-TO property [RFC5545] (Section 3.8.4.5).
+
+4101	      See Section 1.4.10.
+
+4103	   *Task.{due|start}*:
+4104	      The original definition defined these as optional, but this is
+4105	      incompatible with iCalendar: if the Task object's timeZone
+4106	      property is set, then it requires the DUE property [RFC5545]
+4107	      (Section 3.8.2.3) or DTSTART property [RFC5545] (Section 3.8.2.4)
+4108	      be set in the VTODO component.  It now requires at least one of
+4109	      the "due" or "start" properties be set, if the "timeZone" property
+4110	      is set.
+
+4112	      The original definition did not require the "start" property be
+4113	      set if the "recurrenceRule" property is set.  But this is
+4114	      incompatible with the RRULE property [RFC5545] (Section 3.8.5.3),
+4115	      which requires the DTSTART property be set in the VTODO component.
+4116	      The "start" property now is required if the "recurrenceRule" or
+4117	      "recurrenceId" properties are set.
+
+4119	      The "showWithoutTime" property having value "true" now requires at
+4120	      least one of the "due" or "start" properties be set.
+
+4122	      See Section 5.2.
+
+4124	A.5.  New Properties
+
+4126	   The following new properties were defined:
+
+4128	   *mainLocationId*:
+4129	      This got introduced for better interoperatibility with iCalendar,
+4130	      where the VEVENT and VTODO components allow at most one LOCATION
+4131	      property to be present.  While VLOCATION components [RFC9073]
+4132	      (Section 7.2) may occur multiple times, implementations need to
+4133	      know which Location to choose for the LOCATION property.
+
+4135	      See Section 4.2.6.
+
+4137	   *organizerCalendarAddress*:
+4138	      This replaces the reserved replyTo property.
+
+4140	      See Section 4.4.4.
+
+4142	   *recurrenceRule*:
+4143	      This replaces the obsoleted recurrenceRules property.
+
+4145	      See Section 4.3.3.
+
+4147	   *Event.endTimeZone*:
+4148	      This replaces the obsoleted Location.relativeTo and
+4149	      Location.timeZone properties.
+
+4151	      See Section 5.1.3.
+
+4153	   *Location.descriptionContentType*:
+4154	      This is for compatibility with the iCalendar STYLED-DESCRIPTION
+4155	      property [RFC9073] (Section 6.5) of the VLOCATION component.
+
+4157	      See Section 4.2.5.
+
+4159	   *Participant.calendarAddress*:
+4160	      This replaces the reserved Participant.sendTo property.
+
+4162	      See Section 4.4.5.
+
+4164	   *Participant.descriptionContentType*:
+4165	      This is for compatibility with the iCalendar STYLED-DESCRIPTION
+4166	      property [RFC9073] (Section 6.5) of the PARTICIPANT component.
+
+4168	      See Section 4.2.5.
+
+4170	   *VirtualLocation.descriptionContentType*:
+4171	      This is for consistency with the definition of the Location object
+4172	      type.  The newly defined VCONFERENCE component will be allowed to
+4173	      contain the STYLED-DESCRIPTION property [RFC9073] (Section 6.5).
+
+4175	      See Section 4.2.7.
+
+4177	A.6.  Obsolete Types
+
+4179	   The following type definitions became obsolete:
+
+4181	   *TimeZone, TimeZoneRule*:
+4182	      The "timeZones" property became obsolete.
+
+4184	      See Section 4.7.2 of [RFC8984].
+
+4186	A.7.  Updated Types
+
+4188	   The following type definitions were updated:
+
+4190	   *Duration, LocalDateTime, UTCDateTime*:
+4191	      The original definitions supported fractional seconds.  This is
+4192	      incompatible with the iCalendar DATE-TIME and DURATION types
+4193	      defined in Section 3.3.5 of [RFC5545] and Section 3.3.6 of
+4194	      [RFC5545].
+
+4196	Acknowledgments
+
+4198	   The authors would like to thank the members of CalConnect for their
+4199	   valuable contributions.  This specification originated from the work
+4200	   of the API technical committee of CalConnect: The Calendaring and
+4201	   Scheduling Consortium.
+
+4203	Authors' Addresses
+
+4205	   Neil Jenkins
+4206	   Fastmail
+4207	   Collins St. West
+4208	   P.O. Box 234
+4209	   Melbourne  VIC 8007
+4210	   Australia
+4211	   Email: neilj@fastmailteam.com
+4212	   URI:   https://www.fastmail.com
+
+4214	   Robert Stepanek
+4215	   Fastmail
+4216	   Collins St. West
+4217	   P.O. Box 234
+4218	   Melbourne  VIC 8007
+4219	   Australia
+4220	   Email: rsto@fastmailteam.com
+4221	   URI:   https://www.fastmail.com
+
+
+
+
+
+
+
+
+
