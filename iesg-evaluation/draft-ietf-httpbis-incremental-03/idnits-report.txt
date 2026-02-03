@@ -1,0 +1,390 @@
+idnits 2.17.1 
+
+draft-ietf-httpbis-incremental-03.txt:
+-(2): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+  == There are 2 instances of lines with non-ascii characters in the document.
+
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     Summary: 0 errors (**), 0 flaws (~~), 1 warning (==), 0 comments (--).
+
+--------------------------------------------------------------------------------
+
+
+2	httpbis                                                 奥 一穂 (K. Oku)
+3	Internet-Draft                                                    Fastly
+4	Intended status: Standards Track                                T. Pauly
+5	Expires: 16 May 2026                                               Apple
+6	                                                              M. Thomson
+7	                                                                 Mozilla
+8	                                                        12 November 2025
+
+10	                Incremental Forwarding of HTTP Messages
+11	                   draft-ietf-httpbis-incremental-03
+
+13	Abstract
+
+15	   This document specifies the "Incremental" HTTP header field, which
+16	   instructs HTTP intermediaries to forward the HTTP message
+17	   incrementally.
+
+19	Status of This Memo
+
+21	   This Internet-Draft is submitted in full conformance with the
+22	   provisions of BCP 78 and BCP 79.
+
+24	   Internet-Drafts are working documents of the Internet Engineering
+25	   Task Force (IETF).  Note that other groups may also distribute
+26	   working documents as Internet-Drafts.  The list of current Internet-
+27	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+29	   Internet-Drafts are draft documents valid for a maximum of six months
+30	   and may be updated, replaced, or obsoleted by other documents at any
+31	   time.  It is inappropriate to use Internet-Drafts as reference
+32	   material or to cite them other than as "work in progress."
+
+34	   This Internet-Draft will expire on 16 May 2026.
+
+36	Copyright Notice
+
+38	   Copyright (c) 2025 IETF Trust and the persons identified as the
+39	   document authors.  All rights reserved.
+
+41	   This document is subject to BCP 78 and the IETF Trust's Legal
+42	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+43	   license-info) in effect on the date of publication of this document.
+44	   Please review these documents carefully, as they describe your rights
+45	   and restrictions with respect to this document.  Code Components
+46	   extracted from this document must include Revised BSD License text as
+47	   described in Section 4.e of the Trust Legal Provisions and are
+48	   provided without warranty as described in the Revised BSD License.
+
+50	Table of Contents
+
+52	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+53	   2.  Conventions and Definitions . . . . . . . . . . . . . . . . .   3
+54	   3.  The Incremental Header Field  . . . . . . . . . . . . . . . .   3
+55	   4.  Security Considerations . . . . . . . . . . . . . . . . . . .   5
+56	     4.1.  Permanent Rejection . . . . . . . . . . . . . . . . . . .   5
+57	     4.2.  Temporary Rejection . . . . . . . . . . . . . . . . . . .   5
+58	     4.3.  Handling of Small Packets . . . . . . . . . . . . . . . .   5
+59	   5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   6
+60	   6.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   6
+61	     6.1.  Normative References  . . . . . . . . . . . . . . . . . .   6
+62	     6.2.  Informative References  . . . . . . . . . . . . . . . . .   7
+63	   Acknowledgments . . . . . . . . . . . . . . . . . . . . . . . . .   7
+64	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .   8
+
+66	1.  Introduction
+
+68	   HTTP [HTTP] permits receivers to begin processing portions of HTTP
+69	   messages as they arrive, rather than requiring them to wait for the
+70	   entire HTTP message to be received before acting.
+
+72	   Some applications are specifically designed to take advantage of this
+73	   capability.
+
+75	   For example, Server-Sent Events [SSE] uses a long-running HTTP
+76	   response, where the server continually sends notifications as they
+77	   become available.
+
+79	   In the case of Chunked Oblivious HTTP Messages [CHUNKED-OHTTP], the
+80	   client opens an HTTP request and incrementally sends application
+81	   data, while the server can start responding even before the HTTP
+82	   request is fully complete.  In this way, the HTTP request-response
+83	   pair could create what is, in effect, a bi-directional communication
+84	   channel.
+
+86	   Applications that rely on incremental delivery of data are fragile
+87	   when HTTP intermediaries are involved.  This is because HTTP
+88	   intermediaries are not only permitted but are frequently deployed to
+89	   buffer complete HTTP messages before forwarding them downstream
+90	   (Section 7.6 of [HTTP]).
+
+92	   If such a buffering HTTP intermediary exists between the client and
+93	   the server, these applications may fail to function as intended.
+
+95	   In the case of Server-Sent Events, an intermediary that tries to
+96	   buffer the HTTP response completely before forwarding it could be
+97	   left waiting indefinitely.  A client might never receive any portion
+98	   of the response.
+
+100	   In the case of requests that involve any bi-directional exchange, an
+101	   intermediary that tries to buffer entire messages -- either request
+102	   or response -- prevents any data from being delivered.
+
+104	   To help avoid such behavior, this document specifies the
+105	   "Incremental" HTTP header field, which instructs HTTP intermediaries
+106	   to begin forwarding the HTTP message downstream before receiving the
+107	   complete message.
+
+109	2.  Conventions and Definitions
+
+111	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+112	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+113	   "OPTIONAL" in this document are to be interpreted as described in
+114	   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+115	   capitals, as shown here.
+
+117	   This document relies on structured field definitions of Item and
+118	   Boolean [STRUCTURED-FIELDS].
+
+120	3.  The Incremental Header Field
+
+122	   The Incremental HTTP header field expresses the sender's intent for
+123	   HTTP intermediaries to start forwarding the message downstream before
+124	   the entire message is received.
+
+126	   The Incremental header field is defined as a structured field
+127	   [STRUCTURED-FIELDS] of type Item.  Only Boolean values (Section 3.3.6
+128	   of [STRUCTURED-FIELDS]) are valid; a recipient ignores the field if
+129	   it contains any other type.
+
+131	   Incremental: ?1
+
+133	   A true value ("?1") indicates that the sender requests intermediaries
+134	   to forward the message incrementally, as described below.
+
+136	   Incremental: ?0
+
+138	   A false value ("?0") indicates the default behavior defined in
+139	   [HTTP], where intermediaries might buffer the entire message before
+140	   forwarding it.  However, this explicit signal might increase
+141	   intermediaries' confidence in doing so.
+
+143	   The Incremental HTTP header field applies to each HTTP message.
+144	   Therefore, if both the HTTP request and response need to be forwarded
+145	   incrementally, the Incremental HTTP header field MUST be set for both
+146	   the HTTP request and the response.
+
+148	   Upon receiving a header section that includes an Incremental header
+149	   field with a true value, HTTP intermediaries SHOULD NOT buffer the
+150	   entire message before forwarding it.  Instead, intermediaries SHOULD
+151	   transmit the header section downstream and continuously forward the
+152	   bytes of the message content as they arrive.  As the Incremental
+153	   header field indicates only how the message content is to be
+154	   forwarded, intermediaries can still buffer the entire header and
+155	   trailer sections of the message before forwarding them downstream.
+
+157	   If an intermediary decides outright to refuse forwarding the message
+158	   body incrementally, the intermediary MUST generate an error response
+159	   rather than buffering an entire message before forwarding.  Typical
+160	   scenarios under which an intermediary might refuse are discussed in
+161	   Section 4.
+
+163	   The request to use incremental forwarding also applies to HTTP
+164	   implementations.  Though most HTTP APIs provide the ability to
+165	   incrementally transfer message content, those that do not for any
+166	   reason, SHOULD use the presence of the Incremental header field to
+167	   reduce or disable buffering.
+
+169	   The Incremental field is advisory, as intermediaries that are unaware
+170	   of the field or that do not support the field might buffer messages,
+171	   even when explicitly requested otherwise.  Clients and servers
+172	   therefore cannot expect all intermediaries to understand and respect
+173	   a request to deliver messages incrementally.  Clients can rely on
+174	   prior knowledge or probe for support on individual resources.
+
+176	   The Incremental header field facilitates the establishment of a
+177	   bidirectional byte channel over HTTP, as its presence in both
+178	   requests and responses instructs intermediaries to forward early
+179	   responses (Section 7.5 of [HTTP]) and to transmit message contents
+180	   incrementally in both directions.  However, when developing
+181	   bidirectional protocols over HTTP, Extended CONNECT
+182	   [RFC8441][RFC9220] is generally more consistent with HTTP's
+183	   architecture.
+
+185	   This document does not define any parameters for the Incremental
+186	   header field value, but future documents might define parameters.
+187	   Receivers MUST ignore unknown parameters.
+
+189	4.  Security Considerations
+
+191	   When receiving a request or response that asks for incremental
+192	   forwarding, intermediaries might reject the request due to security
+193	   concerns.  The following subsections explore typical scenarios under
+194	   which the intermediaries might reject requests.
+
+196	4.1.  Permanent Rejection
+
+198	   Some intermediaries inspect the content of HTTP messages and forward
+199	   them only if their content is deemed safe.  Any feature that depends
+200	   on seeing the entirety of the message in this way is incompatible
+201	   with incremental delivery.
+
+203	   When an intermediary is asked to incrementally forward message and
+204	   cannot -- whether that message is a request or a response -- due to
+205	   security concerns about the message content, the intermediary SHOULD
+206	   respond with a 501 (Not Implemented) error with an
+207	   incremental_refused Proxy-Status response header field (Section 5).
+
+209	4.2.  Temporary Rejection
+
+211	   To conserve resources required to handle HTTP requests or
+212	   connections, it is common for intermediaries to impose limits on the
+213	   maximum number of concurrent HTTP requests that they forward, while
+214	   buffering requests that exceed this limit.
+
+216	   Such intermediaries could apply a more restrictive concurrency limit
+217	   to requests marked as incremental to ensure that capacity remains
+218	   available for non-incremental requests, even when the maximum number
+219	   of incremental requests is reached.  This approach helps balance the
+220	   processing of different types of requests and maintains service
+221	   availability across all requests.
+
+223	   When rejecting incremental requests due to reaching the concurrency
+224	   limit, intermediaries SHOULD respond with a 429 (Too Many Requests)
+225	   error (Section 4 of [EXTRA-STATUS]), accompanied by a
+226	   connection_limit_reached Proxy-Status response header field
+227	   (Section 2.3.12 of [PROXY-STATUS]).
+
+229	4.3.  Handling of Small Packets
+
+231	   For performance and efficiency reasons, a small amount of buffering
+232	   might be used by intermediaries, even for incremental messages.
+233	   Immediate forwarding might be exploited to cause an intermediary to
+234	   waste effort on many small packets.  Enabling incremental delivery
+235	   might instead set limits on the number bytes that are buffered or the
+236	   time that buffers are held before forwarding.  Any buffering could
+237	   adversely affect application latency, even if it improves efficiency.
+238	   In all cases, intermediaries cannot hold data in buffers
+239	   indefinitely, so data needs to be forwarded when either the time
+240	   limit or the byte limit is reached.
+
+242	5.  IANA Considerations
+
+244	   An HTTP field named Incremental is registered in the Hypertext
+245	   Transfer Protocol (HTTP) Field Name Registry, following the
+246	   procedures in Section 18.4 of [HTTP].  The following values are
+247	   registered:
+
+249	   Field Name:  Incremental
+250	   Status:  permanent
+251	   Structured Type:  Item
+252	   Reference:  This document
+253	   Comments:  None
+
+255	   An HTTP Proxy Error Type is registered in the HTTP Proxy Error Types
+256	   registry as shown below:
+
+258	   Name:  incremental_refused
+
+260	   Description:  The HTTP message contained the Incremental HTTP header
+261	      field, but the intermediary refused to forward the message
+262	      incrementally.
+
+264	   Extra Parameters:  none
+
+266	   Recommended HTTP Status Code:  501
+
+268	   Response Only Generated By Intermediaries:  true
+
+270	   Reference:  This document
+
+272	6.  References
+
+274	6.1.  Normative References
+
+276	   [EXTRA-STATUS]
+277	              Nottingham, M. and R. Fielding, "Additional HTTP Status
+278	              Codes", RFC 6585, DOI 10.17487/RFC6585, April 2012,
+279	              <https://www.rfc-editor.org/rfc/rfc6585>.
+
+281	   [HTTP]     Fielding, R., Ed., Nottingham, M., Ed., and J. Reschke,
+282	              Ed., "HTTP Semantics", STD 97, RFC 9110,
+283	              DOI 10.17487/RFC9110, June 2022,
+284	              <https://www.rfc-editor.org/rfc/rfc9110>.
+
+286	   [PROXY-STATUS]
+287	              Nottingham, M. and P. Sikora, "The Proxy-Status HTTP
+288	              Response Header Field", RFC 9209, DOI 10.17487/RFC9209,
+289	              June 2022, <https://www.rfc-editor.org/rfc/rfc9209>.
+
+291	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+292	              Requirement Levels", BCP 14, RFC 2119,
+293	              DOI 10.17487/RFC2119, March 1997,
+294	              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+296	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+297	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+298	              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+300	   [STRUCTURED-FIELDS]
+301	              Nottingham, M. and P. Kamp, "Structured Field Values for
+302	              HTTP", RFC 9651, DOI 10.17487/RFC9651, September 2024,
+303	              <https://www.rfc-editor.org/rfc/rfc9651>.
+
+305	6.2.  Informative References
+
+307	   [CHUNKED-OHTTP]
+308	              Pauly, T. and M. Thomson, "Chunked Oblivious HTTP
+309	              Messages", Work in Progress, Internet-Draft, draft-ietf-
+310	              ohai-chunked-ohttp-06, 13 September 2025,
+311	              <https://datatracker.ietf.org/doc/html/draft-ietf-ohai-
+312	              chunked-ohttp-06>.
+
+314	   [RFC8441]  McManus, P., "Bootstrapping WebSockets with HTTP/2",
+315	              RFC 8441, DOI 10.17487/RFC8441, September 2018,
+316	              <https://www.rfc-editor.org/rfc/rfc8441>.
+
+318	   [RFC9220]  Hamilton, R., "Bootstrapping WebSockets with HTTP/3",
+319	              RFC 9220, DOI 10.17487/RFC9220, June 2022,
+320	              <https://www.rfc-editor.org/rfc/rfc9220>.
+
+322	   [SSE]      WHATWG, "Server-Sent Events", n.d.,
+323	              <https://html.spec.whatwg.org/multipage/server-sent-
+324	              events.html>.
+
+326	Acknowledgments
+
+328	   The authors would like to thank many members of the IETF HTTP working
+329	   group for their discussions and feedback on this specification.  In
+330	   particular, the authors would like to thank Mark Thomas, Piotr
+331	   Sikora, Thibault Meunier, Marius Kleidl, Ben Schwartz, Willy Tarreau,
+332	   Will Hawkins, Mark Nottingham, and Lucas Pardue for close review and
+333	   sugggested changes.
+
+335	Authors' Addresses
+
+337	   Kazuho Oku
+338	   Fastly
+339	   Email: kazuhooku@gmail.com
+
+341	   Additional contact information:
+
+343	      奥 一穂
+344	      Fastly
+
+346	   Tommy Pauly
+347	   Apple
+348	   Email: tpauly@apple.com
+
+350	   Martin Thomson
+351	   Mozilla
+352	   Email: mt@lowentropy.net
+
+
+
+
+
+
+
+
+
