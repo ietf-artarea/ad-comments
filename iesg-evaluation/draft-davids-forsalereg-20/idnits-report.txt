@@ -1,0 +1,994 @@
+idnits 2.17.1 
+
+draft-davids-forsalereg-20.txt:
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     No nits found.
+--------------------------------------------------------------------------------
+
+
+2	Network Working Group                                          M. Davids
+3	Internet-Draft                                                 SIDN Labs
+4	Intended status: Informational                           3 February 2026
+5	Expires: 7 August 2026
+
+7	     The "_for-sale" Underscored and Globally Scoped DNS Node Name
+8	                       draft-davids-forsalereg-20
+
+10	Abstract
+
+12	   This document defines an operational convention that uses the
+13	   reserved underscored DNS leaf node name "_for-sale" to indicate the
+14	   parent domain name is available for purchase.
+
+16	   The convention can be deployed without disrupting existing
+17	   operations, and it may be applied even when the domain name is still
+18	   actively in use.
+
+20	About This Document
+
+22	   This note is to be removed before publishing as an RFC.
+
+24	   This document contains a "Note to the RFC Editor" requesting removal
+25	   of Section 6 prior to publication.  Please also review the Status of
+26	   This Memo section and other relevant parts before publication,
+27	   particularly Section 7.
+
+29	Status of This Memo
+
+31	   This Internet-Draft is submitted in full conformance with the
+32	   provisions of BCP 78 and BCP 79.
+
+34	   Internet-Drafts are working documents of the Internet Engineering
+35	   Task Force (IETF).  Note that other groups may also distribute
+36	   working documents as Internet-Drafts.  The list of current Internet-
+37	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+39	   Internet-Drafts are draft documents valid for a maximum of six months
+40	   and may be updated, replaced, or obsoleted by other documents at any
+41	   time.  It is inappropriate to use Internet-Drafts as reference
+42	   material or to cite them other than as "work in progress."
+
+44	   This Internet-Draft will expire on 7 August 2026.
+
+46	Copyright Notice
+
+48	   Copyright (c) 2026 IETF Trust and the persons identified as the
+49	   document authors.  All rights reserved.
+
+51	   This document is subject to BCP 78 and the IETF Trust's Legal
+52	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+53	   license-info) in effect on the date of publication of this document.
+54	   Please review these documents carefully, as they describe your rights
+55	   and restrictions with respect to this document.  Code Components
+56	   extracted from this document must include Revised BSD License text as
+57	   described in Section 4.e of the Trust Legal Provisions and are
+58	   provided without warranty as described in the Revised BSD License.
+
+60	Table of Contents
+
+62	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
+63	     1.1.  Terminology . . . . . . . . . . . . . . . . . . . . . . .   4
+64	   2.  Conventions . . . . . . . . . . . . . . . . . . . . . . . . .   4
+65	     2.1.  General Record Format . . . . . . . . . . . . . . . . . .   4
+66	     2.2.  Content Tag Type Definitions  . . . . . . . . . . . . . .   6
+67	       2.2.1.  fcod  . . . . . . . . . . . . . . . . . . . . . . . .   6
+68	       2.2.2.  ftxt  . . . . . . . . . . . . . . . . . . . . . . . .   7
+69	       2.2.3.  furi  . . . . . . . . . . . . . . . . . . . . . . . .   8
+70	       2.2.4.  fval  . . . . . . . . . . . . . . . . . . . . . . . .   8
+71	       2.2.5.  Future Tags . . . . . . . . . . . . . . . . . . . . .   9
+72	     2.3.  Content Limitations . . . . . . . . . . . . . . . . . . .   9
+73	     2.4.  RRset Limitations . . . . . . . . . . . . . . . . . . . .  10
+74	     2.5.  Wildcard Limitation . . . . . . . . . . . . . . . . . . .  10
+75	     2.6.  Placement of the Leaf Node Name . . . . . . . . . . . . .  10
+76	   3.  Operational Considerations  . . . . . . . . . . . . . . . . .  11
+77	     3.1.  DNS Wildcards . . . . . . . . . . . . . . . . . . . . . .  12
+78	     3.2.  Handling of RDATA . . . . . . . . . . . . . . . . . . . .  12
+79	     3.3.  Currency  . . . . . . . . . . . . . . . . . . . . . . . .  13
+80	     3.4.  TTLs  . . . . . . . . . . . . . . . . . . . . . . . . . .  13
+81	     3.5.  Ambiguous Constructs  . . . . . . . . . . . . . . . . . .  13
+82	     3.6.  Robustness  . . . . . . . . . . . . . . . . . . . . . . .  13
+83	     3.7.  Scope of Application  . . . . . . . . . . . . . . . . . .  14
+84	   4.  Security Considerations . . . . . . . . . . . . . . . . . . .  14
+85	   5.  Privacy Considerations  . . . . . . . . . . . . . . . . . . .  15
+86	   6.  Implementation Status . . . . . . . . . . . . . . . . . . . .  15
+87	   7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  15
+88	   8.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  16
+89	     8.1.  Normative References  . . . . . . . . . . . . . . . . . .  16
+90	     8.2.  Informative References  . . . . . . . . . . . . . . . . .  17
+91	   Appendix A.  Additional Examples  . . . . . . . . . . . . . . . .  19
+92	     A.1.  Example 1: Code Format  . . . . . . . . . . . . . . . . .  19
+93	     A.2.  Example 2: Free Text Format . . . . . . . . . . . . . . .  19
+94	     A.3.  Example 3: URI Format . . . . . . . . . . . . . . . . . .  19
+95	     A.4.  Example 4: Asking Price Format  . . . . . . . . . . . . .  20
+96	     A.5.  Example 5: Combinations . . . . . . . . . . . . . . . . .  20
+97	   Acknowledgements  . . . . . . . . . . . . . . . . . . . . . . . .  21
+98	   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  21
+
+100	1.  Introduction
+
+102	   Well-established services [RFC3912][RFC9083] exist for determining
+103	   whether a DNS domain name is registered.  However, the existence of a
+104	   domain name does not necessarily imply that it cannot be obtained; it
+105	   may still be available for sale.
+
+107	   Some registrars and other parties offer brokerage services between
+108	   domain name holders and interested buyers.  Such services are of
+109	   limited value when the domain name is not available for purchase, but
+110	   they may be beneficial for domain names that are explicitly marked as
+111	   for sale.
+
+113	   This document defines a simple method to explicitly signal that a
+114	   domain name, although registered, is available for purchase.  It
+115	   enables a domain name holder to add a reserved underscored leaf node
+116	   name [RFC8552] in the zone, indicating that the domain name is for
+117	   sale.  The indicator can be turned on and off at will and, moreover,
+118	   it is immediately deployable and does not require significant changes
+119	   in existing services, allowing for a smooth introduction of the
+120	   concept.
+
+122	   The TXT RR type [RFC1035] created for this purpose must follow the
+123	   formal definition of Section 2.  Its content may contain a pointer,
+124	   such as a Uniform Resource Identifier (URI) [RFC3986], an
+125	   Internationalized Resource Identifier (IRI) [RFC3987] or another
+126	   string, allowing interested parties to obtain information or contact
+127	   the domain name holder for further negotiations.  Details about
+128	   whether and how such negotiations occur are out of scope.
+
+130	   With due caution, such information can also be incorporated into
+131	   automated availability services.  When checking a domain name for
+132	   purchasability, the service may indicate whether it is for sale and
+133	   provide a pointer to the seller's information.
+
+135	   The TXT content defined by this document is intended primarily for
+136	   human-readable informational display, rather than for algorithmic
+137	   string comparison or automated processing.
+
+139	   The operational convention described in this document does not
+140	   require any protocol change.
+
+142	   Examples are provided in Appendix A.
+
+144	1.1.  Terminology
+
+146	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+147	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+148	   "OPTIONAL" in this document are to be interpreted as described in BCP
+149	   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+150	   capitals, as shown here.
+
+152	   Although the document defines an operational convention rather than a
+153	   protocol extension, normative language is used to promote consistent
+154	   and unambiguous behaviours among entities that adopt the convention.
+
+156	   The term "processor" refers to an entity (person, system, or service)
+157	   that reads, interprets, and takes appropriate actions based on "_for-
+158	   sale" DNS labels, whether manually or automatically.
+
+160	   The term "for sale" is used in a broad sense and may also refer to
+161	   cases where the domain name is available for lease, or where the
+162	   contractual right to use the domain name is offered to another party.
+
+164	   DNS terminology in this document follows [RFC9499].
+
+166	2.  Conventions
+
+168	2.1.  General Record Format
+
+170	   Each "_for-sale" TXT record MUST begin with a version tag, optionally
+171	   followed by a string containing content that follows a simple
+172	   "tag=value" syntax.
+
+174	   The formal definition of the record format, using ABNF
+175	   [RFC5234][RFC7405], is as follows:
+
+177	   forsale-record  = forsale-version [forsale-content]
+178	                     ; referred to as 'content' or RDATA
+179	                     ; in a single character-string
+
+181	   forsale-version = %s"v=FORSALE1;"
+182	                     ; %x76.3D.46.4F.52.53.41.4C.45.31.3B
+183	                     ; version tag, case-sensitive, no spaces
+
+185	   forsale-content = fcod-pair / ftxt-pair / furi-pair / fval-pair
+186	                     ; referred to as 'tag-value pairs'
+187	                     ; only one tag-value pair per record
+
+189	   fcod-pair       = fcod-tag fcod-value
+190	   ftxt-pair       = ftxt-tag ftxt-value
+191	   furi-pair       = furi-tag furi-value
+192	   fval-pair       = fval-tag fval-value
+193	                     ; the tags are referred to as 'content tags'
+194	                     ; the values are referred to as 'content values'
+
+196	   fcod-tag        = %s"fcod="
+197	   ftxt-tag        = %s"ftxt="
+198	   furi-tag        = %s"furi="
+199	   fval-tag        = %s"fval="
+200	                     ; all content tags case-sensitive lowercase
+
+202	   fcod-value      = 1*239OCTET
+
+204	   ftxt-value      = 1*239OCTET
+
+206	   furi-value      = URI / IRI
+207	                     ; http, https, mailto and tel URI schemes
+208	                     ; exactly one URI or IRI
+
+210	   URI             = <as defined in RFC3986, Appendix A>
+211	   IRI             = <as defined in RFC3987, Section 2.2>
+
+213	   fval-value      = fval-currency fval-amount
+214	                     ; total length: 2 to 239 characters
+215	   fval-currency   = 1*%x41-5A
+216	                     ; one or more uppercase letters (A-Z)
+217	                     ; indicating (crypto)currency
+218	                     ; e.g., USD, EUR, BTC, ETH
+219	                     ; standard three-letter fiat currencies recommended
+220	   fval-amount     = int-part [ %x2E frac-part ]
+221	                     ; integer part with optional fractional part
+222	                     ; e.g., 0.00010
+223	   int-part        = 1*DIGIT
+224	   frac-part       = 1*DIGIT
+
+226	   See Section 2.2 for more detailed format definitions per content tag
+227	   type.
+
+229	   Each "_for-sale" TXT record MUST NOT contain more than one tag-value
+230	   pair, but multiple TXT records MAY be present in a single RRset.
+
+232	   Every tag-value pair in the RRset MUST be unique, but multiple
+233	   instances of the same content tag MAY occur within a single RRset
+234	   (e.g., two "fcod=" content tags, each with a different content
+235	   value).
+
+237	   See Section 2.4 for additional RRset limitations.
+
+239	   The OPTIONAL forsale-content provides information to interested
+240	   parties as explained in Section 1.
+
+242	   If the forsale-content is absent or invalid, but a valid version tag
+243	   is present, processors SHOULD assume that the domain is for sale
+244	   unless a local policy indicates otherwise.  For example:
+
+246	   _for-sale.example.com. IN TXT "v=FORSALE1;"
+247	   _for-sale.example.com. IN TXT "v=FORSALE1;fcod="
+248	   _for-sale.example.com. IN TXT "v=FORSALE1;foo=bar"
+
+250	   In such cases, processors determine how to proceed.  An approach
+251	   might be to signal that the domain is for sale and to rely on
+252	   conventional mechanisms (e.g., WHOIS or Registration Data Access
+253	   Protocol (RDAP)) to retrieve and present contact information.
+
+255	   TXT records in the same RRset that lack a version tag MUST NOT be
+256	   interpreted as a valid "_for-sale" indicator.  However, they may
+257	   still offer some additional information for humans when considered
+258	   alongside a valid record.  For example:
+
+260	   _for-sale.example.com. IN TXT "I am for sale"
+261	   _for-sale.example.com. IN TXT "v=FORSALE1;fcod=XX-NGYyYjEyZWY"
+
+263	   If no TXT records at a "_for-sale" leaf node name contain a valid
+264	   version tag, processors MUST consider the node name invalid and MUST
+265	   ignore it.
+
+267	   See Section 2.3 for additional content limitations.
+
+269	2.2.  Content Tag Type Definitions
+
+271	   The following content tags are defined as valid content tags.
+
+273	   Content tags are optional.  Providing at least one to give interested
+274	   parties a pointer for engagement is RECOMMENDED.
+
+276	2.2.1.  fcod
+
+278	   This content tag is intended to contain a code that is meaningful
+279	   only to processors that understand its semantics.  The content value
+280	   MUST consist of at least one octet.
+
+282	   The manner in which the "fcod=" content tag is used is determined by
+283	   agreement between cooperating parties.
+
+285	   For example, a domain name registry may allow registrars to enter a
+286	   "for sale" URL into their back-end system.  From that URL, a unique
+287	   code is generated.  This code is inserted as the value of the "fcod="
+288	   content tag of the "_for-sale" TXT record of a domain name, as shown
+289	   in the example below.
+
+291	   When a user checks the availability of the domain name using a
+292	   registry-provided tool (e.g., a web interface), the domain name
+293	   registry may use the code to redirect the user to the appropriate
+294	   "for sale" URL, which may include a query component containing the
+295	   domain name, for example:
+
+297	   https://forsale-url.example.com/exco?d=example.org
+
+299	   The rationale for this approach is that controlling parties retain
+300	   authority over redirection URLs and any other information derived
+301	   from the content tag, thereby preventing users from being sent to
+302	   unintended or malicious destinations or from being presented with
+303	   unintended content.  This approach also allows the interpretation of
+304	   "fcod=" content values to be adjusted centrally in back-end systems,
+305	   such as determining which "for sale" URL to redirect to, without
+306	   modifying the "_for-sale" TXT records.
+
+308	   The following example shows a string encoded using Base64 [RFC4648]
+309	   preceded by the prefix "EXCO-" as the value of the content tag:
+
+311	   _for-sale IN TXT "v=FORSALE1;fcod=EXCO-S2lscm95IHdhcyBoZXJl"
+
+313	   See the Additional Examples section for other possible uses of this
+314	   content tag.
+
+316	   Note: As an implementation consideration, when multiple parties are
+317	   involved in the domain sale process and use the same mechanism, it
+318	   may be difficult to identify the relevant content in an RRset.
+319	   Adding a recognisable prefix to the content (e.g., "EXCO-") is one
+320	   possible approach.  However, this is left to the implementor, as it
+321	   is not enforced in this document.  In this case, Example Corporation
+322	   (ExCo) would recognise its content tag and interpret it as intended.
+323	   This example uses Base64 encoding to avoid escaping and ensure
+324	   printable characters, though this is OPTIONAL and not required.
+
+326	2.2.2.  ftxt
+
+328	   This content tag is intended to contain concise, human-readable text
+329	   that conveys additional information to interested parties.  For
+330	   example:
+
+332	   _for-sale IN TXT "v=FORSALE1;ftxt=Call for info."
+333	   While a single octet is the minimum, it is RECOMMENDED to provide
+334	   more context.
+
+336	   While a URI in this field is not syntactically prohibited, its
+337	   interpretation as a URI is not guaranteed.  Use of URIs in this field
+338	   SHOULD be avoided in favour of the "furi=" content tag.
+
+340	   See Section 2.2.4 for a way to explicitly indicate an asking price
+341	   for easier machine parsing.
+
+343	   See Section 3.2 for considerations regarding the representation of
+344	   non-ASCII data in the content value.
+
+346	2.2.3.  furi
+
+348	   This content tag is intended to contain a human-readable and machine-
+349	   parsable URI that can be used by interested parties to retrieve
+350	   further information.
+
+352	   While the syntax allows any URI scheme, only the following schemes
+353	   are RECOMMENDED for use: http and https [RFC9110], mailto
+354	   [RFC6068][RFC6530] (Section 11.1), and tel [RFC3966].
+
+356	   The content value MUST contain exactly one URI.  For example:
+
+358	   _for-sale IN TXT "v=FORSALE1;furi=https://example.com/foo%20bar"
+
+360	   URIs MUST conform to the syntax and encoding requirements specified
+361	   in Section 2.1 of [RFC3986], including the percent-encoding of
+362	   characters not allowed unencoded (e.g., spaces must be encoded as %20
+363	   in a URI).
+
+365	   Section 3.2 provides additional guidelines on character encoding.
+
+367	   See the Security Considerations section for possible risks.
+
+369	   Note: References to a URI in this document also encompass IRIs
+370	   [RFC3987].
+
+372	2.2.4.  fval
+
+374	   This content tag is intended to contain human-readable and machine-
+375	   parsable text that explicitly indicates an asking price in a certain
+376	   currency.
+
+378	   Price information is commonly published by domain sellers.  The
+379	   "fval=" content tag provides a structured format for this purpose,
+380	   enabling reliable machine parsing and reducing ambiguity compared to
+381	   embedding prices in free-form "ftxt=" content tags.  For example:
+
+383	   _for-sale IN TXT "v=FORSALE1;fval=EUR999"
+
+385	   The information provided in "fval=" is not binding and is intended
+386	   for indicative purposes only.  Current and reliable information can
+387	   be obtained by engaging directly via "furi=" or other available
+388	   communication mechanisms.
+
+390	   See Section 3.3 for additional operational guidelines and the
+391	   Security Considerations section for possible risks.
+
+393	2.2.5.  Future Tags
+
+395	   Future tags may be defined to accommodate operational needs.  Future
+396	   content tags MUST NOT alter the semantics of existing content tags.
+
+398	   A tag name length of 4 characters is RECOMMENDED for consistency with
+399	   the initial tag set and to maintain compact record formats.
+
+401	2.3.  Content Limitations
+
+403	   The "_for-sale" TXT record [RFC8553] (Section 2.1) MUST contain
+404	   content deemed valid under the operational convention defined in this
+405	   document.
+
+407	   The "_for-sale" indicator is only to be used for domain names that
+408	   are available for purchase.  Any text suggesting that a domain is not
+409	   for sale is invalid content.  When a domain name is no longer for
+410	   sale, the "_for-sale" indicator is to be removed.
+
+412	   The existence of a "_for-sale" leaf node name does not obligate the
+413	   holder to sell the domain name; it may have been published in error,
+414	   or withdrawn later for other reasons.
+
+416	   This document does not dictate the exact use of any content values in
+417	   the "_for-sale" TXT record.  Parties may use it in their tools,
+418	   perhaps even by defining specific requirements that the content value
+419	   must meet.  Content values can also be represented in a human-
+420	   readable format for individuals to interpret.  See the Additional
+421	   Examples section for clarification.
+
+423	   See Section 3 for additional guidelines.
+
+425	2.4.  RRset Limitations
+
+427	   This document does not impose a limit on the number of TXT records in
+428	   the RRset of "_for-sale" TXT records.
+
+430	   When multiple "_for-sale" TXT records are present in an RRset, the
+431	   processor MAY select one or more of them.
+
+433	   For example, a domain name registry might extract content from an
+434	   RRset that includes a recognisable "fcod=" content tag and use it to
+435	   direct visitors to a sales page as part of its services.  An
+436	   individual, on the other hand, might extract a phone number (if
+437	   present) from a "furi=" tag in the same RRset and use it to contact a
+438	   potential seller.
+
+440	   An example of such a combined record is provided in Appendix A.5.
+
+442	   The RDATA [RFC9499] of each "_for-sale" TXT record MUST consist of a
+443	   single character-string [RFC1035] with a maximum length of 255
+444	   octets, to avoid the need to concatenate multiple character-strings
+445	   during processing.
+
+447	   The following example illustrates an invalid "_for-sale" TXT record
+448	   due to the presence of multiple character-strings:
+
+450	   _for-sale IN TXT "v=FORSALE1;" "ftxt=foo" "bar" "invalid"
+
+452	2.5.  Wildcard Limitation
+
+454	   Wildcards are only interpreted as leaf names, so "_for-
+455	   sale.*.example." is not a valid wildcard [RFC4592] and is non-
+456	   conformant.  Hence, it is not possible to put all domains under a TLD
+457	   for sale with just one "_for-sale" TXT record.
+
+459	   The example below, however, shows a common use case where a "_for-
+460	   sale" leaf node name exists alongside a wildcard:
+
+462	   *         IN A    198.51.100.80
+463	             IN AAAA 2001:db8::80
+464	   _for-sale IN TXT  "v=FORSALE1;ftxt=Only $99 at ExCo"
+
+466	2.6.  Placement of the Leaf Node Name
+
+468	   The "_for-sale" leaf node name can be placed at any level of the DNS
+469	   except in the .arpa infrastructure TLD.
+
+471	   Table 1 illustrates this:
+
+473	   +================================+================+================+
+474	   | Name                           | Situation      | Verdict        |
+475	   +================================+================+================+
+476	   | _for-sale.example.             | root zone      | For sale       |
+477	   +--------------------------------+----------------+----------------+
+478	   | _for-sale.aaa.example.         | second level   | For sale       |
+479	   +--------------------------------+----------------+----------------+
+480	   | _for-sale.exco.bbb.example.    | third level    | For sale       |
+481	   |                                | with public    |                |
+482	   |                                | registry       |                |
+483	   +--------------------------------+----------------+----------------+
+484	   | _for-sale.www.ccc.example.     | third level    | See note 1     |
+485	   |                                | without public |                |
+486	   |                                | registry       |                |
+487	   +--------------------------------+----------------+----------------+
+488	   | _for-sale.51.198.in-addr.arpa. | infrastructure | See note 2     |
+489	   |                                | TLD            |                |
+490	   +--------------------------------+----------------+----------------+
+491	   | xyz._for-sale.example.         | Invalid        | Non-conformant |
+492	   |                                | placement, not |                |
+493	   |                                | a leaf         |                |
+494	   +--------------------------------+----------------+----------------+
+
+496	                    Table 1: Placements of TXT record
+
+498	   Note 1: When the "_for-sale" leaf node name is applied to a label
+499	   under a subdomain, there may not be a public domain name registry
+500	   [RFC9499] capable of properly recording the rights associated with
+501	   that label.  Nevertheless, this does not constitute a violation of
+502	   this document.  One possible approach is for the involved parties to
+503	   establish a mutual agreement to formalise these rights.
+
+505	   Note 2: If a "_for-sale" leaf node name were to appear under the
+506	   .arpa infrastructure top-level domain, it might be interpreted as an
+507	   offer to sell IP address space, E.164 numbers or the like.  However,
+508	   such use is explicitly out of scope for this document, and processors
+509	   MUST ignore any such records.
+
+511	   The operational convention in this document is designed for the
+512	   global DNS.  Application to Special-Use Domain Names [RFC6761] (e.g.,
+513	   .onion, .alt) is out of scope.
+
+515	3.  Operational Considerations
+516	3.1.  DNS Wildcards
+
+518	   DNS wildcards interact poorly with underscored names [RFC8552]
+519	   (Section 1.4), but they may still be encountered in practice,
+520	   especially with operators who are not implementing this mechanism.
+521	   This is why the version tag is a mandatory element: it allows
+522	   processors to distinguish valid "_for-sale" records from unrelated
+523	   TXT records.
+
+525	   Nonetheless, any assumptions about the content of "_for-sale" TXT
+526	   records should be made with caution, particularly in edge cases where
+527	   wildcard expansion - possibly combined with DNS aliases (e.g.,
+528	   CNAMEs) or redirections (e.g., DNAMEs [RFC6672]) - might result in
+529	   misleading listings or unintended references to third-party domains.
+
+531	3.2.  Handling of RDATA
+
+533	   Since this method relies on DNS TXT records, standard content rules
+534	   apply as defined in [RFC1035] (Section 3.3.14).  This includes the
+535	   possibility of including non-ASCII data in the content value.
+
+537	   When non-ASCII data is used, interpretation may become ambiguous.
+538	   For this reason, it is RECOMMENDED that text in content values be
+539	   encoded in UTF-8 [RFC3629], conform to the Network Unicode format
+540	   [RFC5198], and use a subset of Unicode code points consistent with
+541	   [RFC9839] (Section 4.3), with the exception of %x09, %x0A, and %x0D,
+542	   which are best avoided.
+
+544	   Processors are RECOMMENDED to handle such encodings to ensure that
+545	   non-ASCII content values are correctly interpreted and represented.
+
+547	   Internationalized Domain Names (IDN) (e.g., in the "furi=" content
+548	   tag) MAY appear as A-labels as well as U-labels [RFC5890], with
+549	   U-labels encoded as described above.
+
+551	   Implementation Note: Some DNS query tools return DNS records in
+552	   presentation format, rather than the underlying RDATA content.
+553	   Parsers of the ABNF in this document MUST ensure they operate on the
+554	   raw TXT RDATA content, not its escaped presentation format [RFC1035]
+555	   (Section 5.1).  If the TXT RDATA consists of multiple character-
+556	   strings, they SHOULD be concatenated into a single contiguous string
+557	   prior to being interpreted as a UTF-8 encoded value matching the
+558	   ABNF.
+
+560	   See Section 3.6 for additional guidelines and the Security
+561	   Considerations section for possible risks.
+
+563	3.3.  Currency
+
+565	   The ABNF in Section 2.1 allows currency codes consisting of one or
+566	   more uppercase letters, providing flexibility to accommodate both
+567	   standard fiat currencies and other widely recognised abbreviations,
+568	   such as cryptocurrencies.
+
+570	   The use of standard fiat currencies is RECOMMENDED.  When used, they
+571	   MUST be represented by three-letter uppercase currency codes as
+572	   specified in [ISO4217] (e.g., USD, EUR, GBP and JPY).
+
+574	   The amount component consists of an integer part, optionally followed
+575	   by a fractional part separated by a decimal point (%x2E, ".").
+
+577	3.4.  TTLs
+
+579	   Long TTLs [RFC1035] (Section 3.2.1) increase the risk of outdated
+580	   data misleading buyers into thinking the domain is still available or
+581	   that advertised prices remain current.
+
+583	   A TTL of 3600 seconds (1 hour) or less is RECOMMENDED and the TTL
+584	   values of all records in an RRset have to be the same [RFC2181]
+585	   (Section 5.2).
+
+587	3.5.  Ambiguous Constructs
+
+589	   Ambiguous constructs in content values SHOULD be avoided, as
+590	   illustrated by the following example:
+
+592	   _for-sale IN TXT "v=FORSALE1;fcod=TRIP-confusing;ftxt=dont_do_this"
+
+594	   The above example is a valid "fcod=" content tag that includes the
+595	   string ";ftxt=" in the content value, which may be confusing, as it
+596	   does not actually represent an "ftxt=" content tag.
+
+598	3.6.  Robustness
+
+600	   Because the format of the content part is not strictly defined in
+601	   this document, processors MAY apply the robustness principle of being
+602	   liberal in what they accept.  This also applies to space characters
+603	   (%x20) immediately following the version tag.
+
+605	   Alternatively, parties may agree on a more strictly defined
+606	   proprietary format for the content value to reduce ambiguity.
+607	   However, it is out of scope to discuss which mechanisms are put in
+608	   place for such agreements.
+
+610	   When encountering unexpected, or prohibited control characters in
+611	   "ftxt=" content (e.g., %x09, %x0A, %x0B, %x0D, see Section 3.2),
+612	   processors MAY sanitise them by replacing them with spaces (%x20) to
+613	   ensure correct representation, or replacing them with the Unicode
+614	   REPLACEMENT CHARACTER U+FFFD (%xEF.BF.BD) to signal the presence of
+615	   problematic content.
+
+617	3.7.  Scope of Application
+
+619	   The "_for-sale" mechanism relies upon the domain name being
+620	   resolvable in the DNS.  This is not guaranteed, for example, during a
+621	   redemption period, in pendingDelete status [STD69], or when the
+622	   domain is DNSSEC-signed but fails validation (i.e., has a bogus
+623	   state).
+
+625	4.  Security Considerations
+
+627	   One use of the TXT record type defined in this document is to parse
+628	   the content it contains and to publish certain information from it on
+629	   a website or elsewhere.  However, there is a risk if the domain name
+630	   holder publishes a malicious URI or one that points to improper
+631	   content.  This may result in reputational damage to the party parsing
+632	   the record.
+
+634	   An even more serious scenario arises when the content of the TXT
+635	   record is not properly validated and sanitised, potentially enabling
+636	   attacks such as XSS or SQL injection, as well as spoofing techniques
+637	   based on Unicode manipulation, including bidirectional text attacks
+638	   and homograph attacks.
+
+640	   Therefore, parsing and publishing this information requires careful
+641	   validation to ensure that only valid characters and formats are
+642	   processed.  Possible mitigation strategies include output
+643	   sanitisation, maintaining a curated and validated list of URIs, or
+644	   applying other validation methods, such as URI reputation checks
+645	   before display.
+
+647	   Automatically following URIs from "_for-sale" records without user
+648	   consent creates security risks, including exposure to malware,
+649	   phishing pages, and scripted attacks.  Processors MUST NOT
+650	   automatically redirect users when encountering "furi=" content tags
+651	   without requiring explicit confirmation before navigation.  This
+652	   allows users to inspect the destination before proceeding.
+
+654	   There is also a risk that this method will be abused as a marketing
+655	   tool, or to lure individuals into visiting certain sites or making
+656	   contact by other means, without there being any intention to actually
+657	   sell the domain name.
+
+659	   Domain name holders may advertise artificially low prices and
+660	   processors that present "fval=" data to users SHOULD display
+661	   appropriate disclaimers (e.g., "Price indicative only - verify with
+662	   seller").  Automated systems SHOULD NOT make purchase commitments
+663	   based solely on advertised prices without human verification.
+
+665	5.  Privacy Considerations
+
+667	   The use of the "_for-sale" leaf node name publicly indicates the
+668	   intent to sell a domain name.  Domain name holders should be aware
+669	   that this information is accessible to anyone querying the DNS and
+670	   may have privacy implications.
+
+672	   There is a risk of data scraping, such as email addresses and phone
+673	   numbers.
+
+675	   Publishing contact information may expose domain name holders to
+676	   spam, or unwanted contact.
+
+678	6.  Implementation Status
+
+680	   The concept described in this document has been in use at the .nl
+681	   ccTLD registry since 2022, when it initially started as a pilot.
+682	   Since then, hundreds of thousands of domain names have been marked
+683	   with the "_for-sale" indicator.  See for example:
+
+685	   https://www.sidn.nl/en/whois?q=example.nl
+
+687	   The Dutch domain name registry SIDN offers registrars the option to
+688	   register a sales landing page via its registrar dashboard following
+689	   the "fcod=" method.  When this option is used, a unique code is
+690	   generated, which can be included in the "_for-sale" record.  If such
+691	   a domain name is entered on the domain finder page of SIDN, a "for
+692	   sale" button is displayed accordingly.
+
+694	   A simple demonstration of a validator is present at:
+
+696	   https://forsalereg.sidnlabs.nl/demo
+
+698	   <NOTE TO RFC EDITOR: Please remove this section before publication as
+699	   per RFC7942.>
+
+701	7.  IANA Considerations
+
+703	   IANA is requested to add the following entry to the "Underscored and
+704	   Globally Scoped DNS Node Names" registry [RFC8552] :
+
+706	                  +=========+============+=============+
+707	                  | RR Type | _NODE NAME | Reference   |
+708	                  +=========+============+=============+
+709	                  | TXT     | _for-sale  | <this memo> |
+710	                  +---------+------------+-------------+
+
+712	                          Table 2: Entry for the
+713	                     "Underscored and Globally Scoped
+714	                         DNS Node Names" registry
+
+716	8.  References
+
+718	8.1.  Normative References
+
+720	   [ISO4217]  SIX Group, "ISO 4217 Currency Codes",
+721	              <https://www.iso.org/iso-4217-currency-codes.html>.
+
+723	   [RFC1035]  Mockapetris, P., "Domain names - implementation and
+724	              specification", STD 13, RFC 1035, DOI 10.17487/RFC1035,
+725	              November 1987, <https://www.rfc-editor.org/info/rfc1035>.
+
+727	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+728	              Requirement Levels", BCP 14, RFC 2119,
+729	              DOI 10.17487/RFC2119, March 1997,
+730	              <https://www.rfc-editor.org/info/rfc2119>.
+
+732	   [RFC2181]  Elz, R. and R. Bush, "Clarifications to the DNS
+733	              Specification", RFC 2181, DOI 10.17487/RFC2181, July 1997,
+734	              <https://www.rfc-editor.org/info/rfc2181>.
+
+736	   [RFC3629]  Yergeau, F., "UTF-8, a transformation format of ISO
+737	              10646", STD 63, RFC 3629, DOI 10.17487/RFC3629, November
+738	              2003, <https://www.rfc-editor.org/info/rfc3629>.
+
+740	   [RFC3986]  Berners-Lee, T., Fielding, R., and L. Masinter, "Uniform
+741	              Resource Identifier (URI): Generic Syntax", STD 66,
+742	              RFC 3986, DOI 10.17487/RFC3986, January 2005,
+743	              <https://www.rfc-editor.org/info/rfc3986>.
+
+745	   [RFC3987]  Duerst, M. and M. Suignard, "Internationalized Resource
+746	              Identifiers (IRIs)", RFC 3987, DOI 10.17487/RFC3987,
+747	              January 2005, <https://www.rfc-editor.org/info/rfc3987>.
+
+749	   [RFC5198]  Klensin, J. and M. Padlipsky, "Unicode Format for Network
+750	              Interchange", RFC 5198, DOI 10.17487/RFC5198, March 2008,
+751	              <https://www.rfc-editor.org/info/rfc5198>.
+
+753	   [RFC5234]  Crocker, D., Ed. and P. Overell, "Augmented BNF for Syntax
+754	              Specifications: ABNF", STD 68, RFC 5234,
+755	              DOI 10.17487/RFC5234, January 2008,
+756	              <https://www.rfc-editor.org/info/rfc5234>.
+
+758	   [RFC5890]  Klensin, J., "Internationalized Domain Names for
+759	              Applications (IDNA): Definitions and Document Framework",
+760	              RFC 5890, DOI 10.17487/RFC5890, August 2010,
+761	              <https://www.rfc-editor.org/info/rfc5890>.
+
+763	   [RFC7405]  Kyzivat, P., "Case-Sensitive String Support in ABNF",
+764	              RFC 7405, DOI 10.17487/RFC7405, December 2014,
+765	              <https://www.rfc-editor.org/info/rfc7405>.
+
+767	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+768	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+769	              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+771	   [RFC9839]  Bray, T. and P. Hoffman, "Unicode Character Repertoire
+772	              Subsets", RFC 9839, DOI 10.17487/RFC9839, August 2025,
+773	              <https://www.rfc-editor.org/info/rfc9839>.
+
+775	8.2.  Informative References
+
+777	   [RFC3912]  Daigle, L., "WHOIS Protocol Specification", RFC 3912,
+778	              DOI 10.17487/RFC3912, September 2004,
+779	              <https://www.rfc-editor.org/info/rfc3912>.
+
+781	   [RFC3966]  Schulzrinne, H., "The tel URI for Telephone Numbers",
+782	              RFC 3966, DOI 10.17487/RFC3966, December 2004,
+783	              <https://www.rfc-editor.org/info/rfc3966>.
+
+785	   [RFC4592]  Lewis, E., "The Role of Wildcards in the Domain Name
+786	              System", RFC 4592, DOI 10.17487/RFC4592, July 2006,
+787	              <https://www.rfc-editor.org/info/rfc4592>.
+
+789	   [RFC4648]  Josefsson, S., "The Base16, Base32, and Base64 Data
+790	              Encodings", RFC 4648, DOI 10.17487/RFC4648, October 2006,
+791	              <https://www.rfc-editor.org/info/rfc4648>.
+
+793	   [RFC6068]  Duerst, M., Masinter, L., and J. Zawinski, "The 'mailto'
+794	              URI Scheme", RFC 6068, DOI 10.17487/RFC6068, October 2010,
+795	              <https://www.rfc-editor.org/info/rfc6068>.
+
+797	   [RFC6530]  Klensin, J. and Y. Ko, "Overview and Framework for
+798	              Internationalized Email", RFC 6530, DOI 10.17487/RFC6530,
+799	              February 2012, <https://www.rfc-editor.org/info/rfc6530>.
+
+801	   [RFC6672]  Rose, S. and W. Wijngaards, "DNAME Redirection in the
+802	              DNS", RFC 6672, DOI 10.17487/RFC6672, June 2012,
+803	              <https://www.rfc-editor.org/info/rfc6672>.
+
+805	   [RFC6761]  Cheshire, S. and M. Krochmal, "Special-Use Domain Names",
+806	              RFC 6761, DOI 10.17487/RFC6761, February 2013,
+807	              <https://www.rfc-editor.org/info/rfc6761>.
+
+809	   [RFC8552]  Crocker, D., "Scoped Interpretation of DNS Resource
+810	              Records through "Underscored" Naming of Attribute Leaves",
+811	              BCP 222, RFC 8552, DOI 10.17487/RFC8552, March 2019,
+812	              <https://www.rfc-editor.org/info/rfc8552>.
+
+814	   [RFC8553]  Crocker, D., "DNS Attrleaf Changes: Fixing Specifications
+815	              That Use Underscored Node Names", BCP 222, RFC 8553,
+816	              DOI 10.17487/RFC8553, March 2019,
+817	              <https://www.rfc-editor.org/info/rfc8553>.
+
+819	   [RFC9083]  Hollenbeck, S. and A. Newton, "JSON Responses for the
+820	              Registration Data Access Protocol (RDAP)", STD 95,
+821	              RFC 9083, DOI 10.17487/RFC9083, June 2021,
+822	              <https://www.rfc-editor.org/info/rfc9083>.
+
+824	   [RFC9110]  Fielding, R., Ed., Nottingham, M., Ed., and J. Reschke,
+825	              Ed., "HTTP Semantics", STD 97, RFC 9110,
+826	              DOI 10.17487/RFC9110, June 2022,
+827	              <https://www.rfc-editor.org/info/rfc9110>.
+
+829	   [RFC9499]  Hoffman, P. and K. Fujiwara, "DNS Terminology", BCP 219,
+830	              RFC 9499, DOI 10.17487/RFC9499, March 2024,
+831	              <https://www.rfc-editor.org/info/rfc9499>.
+
+833	   [STD69]    Internet Standard 69,
+834	              <https://www.rfc-editor.org/info/std69>.
+835	              At the time of writing, this STD comprises the following:
+
+837	              Hollenbeck, S., "Extensible Provisioning Protocol (EPP)",
+838	              STD 69, RFC 5730, DOI 10.17487/RFC5730, August 2009,
+839	              <https://www.rfc-editor.org/info/rfc5730>.
+
+841	              Hollenbeck, S., "Extensible Provisioning Protocol (EPP)
+842	              Domain Name Mapping", STD 69, RFC 5731,
+843	              DOI 10.17487/RFC5731, August 2009,
+844	              <https://www.rfc-editor.org/info/rfc5731>.
+
+846	              Hollenbeck, S., "Extensible Provisioning Protocol (EPP)
+847	              Host Mapping", STD 69, RFC 5732, DOI 10.17487/RFC5732,
+848	              August 2009, <https://www.rfc-editor.org/info/rfc5732>.
+
+850	              Hollenbeck, S., "Extensible Provisioning Protocol (EPP)
+851	              Contact Mapping", STD 69, RFC 5733, DOI 10.17487/RFC5733,
+852	              August 2009, <https://www.rfc-editor.org/info/rfc5733>.
+
+854	              Hollenbeck, S., "Extensible Provisioning Protocol (EPP)
+855	              Transport over TCP", STD 69, RFC 5734,
+856	              DOI 10.17487/RFC5734, August 2009,
+857	              <https://www.rfc-editor.org/info/rfc5734>.
+
+859	Appendix A.  Additional Examples
+
+861	A.1.  Example 1: Code Format
+
+863	   A proprietary format, defined and used by agreement between parties -
+864	   for example, a domain name registry and its registrars - without a
+865	   clearly specified meaning for third parties.  For example, it may be
+866	   used to automatically redirect visitors to a web page, as described
+867	   in Section 2.2.1:
+
+869	   _for-sale IN TXT "v=FORSALE1;fcod=XX-aHR0cHM...wbGUuY29t"
+
+871	   Note: the content value in the above example is truncated for
+872	   readability.
+
+874	   The use of the "fcod=" content tag is, in principle, unrestricted,
+875	   allowing implementers to define additional uses as needed.  For
+876	   example, it may convey arbitrary formatting or conditional display
+877	   instructions, such as adding an extra banner (e.g., "eligibility
+878	   criteria apply") or specifying a style, including color, font,
+879	   emojis, or logos.
+
+881	A.2.  Example 2: Free Text Format
+
+883	   Free format text, with some additional unstructured information,
+884	   aimed at being human-readable:
+
+886	   _for-sale IN TXT "v=FORSALE1;ftxt=Eligibility criteria apply."
+
+888	   The content in the following example could be malicious, but it is
+889	   not in violation of the convention in this document (see the Security
+890	   Considerations):
+
+892	   _for-sale IN TXT "v=FORSALE1;ftxt=<script>...</script>"
+
+894	A.3.  Example 3: URI Format
+
+896	   The holder of "example.com" wishes to signal that the domain is for
+897	   sale and adds this record to the "example.com" zone:
+
+899	   _for-sale IN TXT "v=FORSALE1;furi=https://example.com/fs?d=eHl6"
+
+901	   An interested party notices this signal and can visit the URI
+902	   mentioned for further information.  The TXT record may also be
+903	   processed by automated tools, but see the Security Considerations
+904	   section for possible risks.
+
+906	   As an alternative, a mailto: URI could also be used:
+
+908	   _for-sale IN TXT "v=FORSALE1;furi=mailto:hq@example.com?subject=foo"
+
+910	   Or a telephone URI:
+
+912	   _for-sale IN TXT "v=FORSALE1;furi=tel:+1-201-555-0123"
+
+914	   There can be a use case for these URIs, especially since WHOIS (or
+915	   RDAP) often has privacy restrictions.  But see the Privacy
+916	   Considerations section for possible downsides.
+
+918	A.4.  Example 4: Asking Price Format
+
+920	   Consists of an uppercase currency code (e.g., USD, EUR), followed by
+921	   a numeric amount.  See Section 3.3 for additional guidelines.
+
+923	   In Bitcoins:
+
+925	   _for-sale IN TXT "v=FORSALE1;fval=BTC0.000010"
+
+927	   In US dollars:
+
+929	   _for-sale IN TXT "v=FORSALE1;fval=USD750"
+
+931	A.5.  Example 5: Combinations
+
+933	   An example of multiple valid TXT records from which a processor can
+934	   choose:
+
+936	   _for-sale IN TXT "v=FORSALE1;furi=https://fs.example.com/"
+937	             IN TXT "v=FORSALE1;ftxt=This domain name is for sale"
+938	             IN TXT "v=FORSALE1;fval=EUR500"
+939	             IN TXT "v=FORSALE1;fcod=EXCO-ZGVhZGJlZWYx"
+940	             IN TXT "v=FORSALE1;fcod=XYZ1-MTExLTIyMi0zMzMtNDQ0"
+
+942	Acknowledgements
+
+944	   The author would like to thank Thijs van den Hout, Caspar Schutijser,
+945	   Melvin Elderman, Ben van Hartingsveldt, Jesse Davids, Juan Stelling,
+946	   John R. Levine, Dave Lawrence, Andrew Sullivan, Paul Hoffman, Eliot
+947	   Lear (ISE), Viktor Dukhovni, James Gannon, Watson Ladd, Tim Wicinski,
+948	   Russ Housley, Takahiro Nemoto, Chongfeng Xie, Joe Abley and Mohamed
+949	   'Med' Boucadair for their valuable feedback.
+
+951	Author's Address
+
+953	   Marco Davids
+954	   SIDN Labs
+955	   Meander 501
+956	   6825 MD Arnhem
+957	   Netherlands
+958	   Phone: +31 26 352 5500
+959	   Email: marco.davids@sidn.nl
+
+
+
+
+
+
+
+
+
