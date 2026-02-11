@@ -1,0 +1,907 @@
+idnits 2.17.1 
+
+draft-ietf-rats-eat-measured-component-11.txt:
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+  == There is 1 instance of lines with non-ascii characters in the document.
+
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     Summary: 0 errors (**), 0 flaws (~~), 1 warning (==), 0 comments (--).
+
+--------------------------------------------------------------------------------
+
+
+2	Remote ATtestation ProcedureS                                   S. Frost
+3	Internet-Draft                                                       Arm
+4	Intended status: Standards Track                              T. Fossati
+5	Expires: 8 August 2026                                            Linaro
+6	                                                           H. Tschofenig
+7	                                                                   H-BRS
+8	                                                             H. Birkholz
+9	                                                          Fraunhofer SIT
+10	                                                         4 February 2026
+
+12	                         EAT Measured Component
+13	               draft-ietf-rats-eat-measured-component-11
+
+15	Abstract
+
+17	   The term "measured component" refers to an object within the
+18	   attester's target environment whose state can be sampled and
+19	   typically digested using a cryptographic hash function.  Examples of
+20	   measured components include firmware stored in flash memory, software
+21	   loaded into memory at start time, data stored in a file system, or
+22	   values in a CPU register.  This document provides the information
+23	   model for the "measured component" and two associated data models.
+24	   This separation is intentional: the JSON and CBOR serializations,
+25	   coupled with the media types and associated Constrained Application
+26	   Protocol (CoAP) Content-Formats, enable the immediate use of the
+27	   semantics within the Entity Attestation Token (EAT) framework.
+28	   Meanwhile, the information model can be reused in future
+29	   specifications to provide additional serializations, for example
+30	   using ASN.1.
+
+32	Discussion Venues
+
+34	   This note is to be removed before publishing as an RFC.
+
+36	   Discussion of this document takes place on the Remote ATtestation
+37	   ProcedureS Working Group mailing list (rats@ietf.org), which is
+38	   archived at https://mailarchive.ietf.org/arch/browse/rats/.
+
+40	   Source for this draft and an issue tracker can be found at
+41	   https://github.com/thomas-fossati/draft-fft-rats-eat-measured-
+42	   component.
+
+44	Status of This Memo
+
+46	   This Internet-Draft is submitted in full conformance with the
+47	   provisions of BCP 78 and BCP 79.
+
+49	   Internet-Drafts are working documents of the Internet Engineering
+50	   Task Force (IETF).  Note that other groups may also distribute
+51	   working documents as Internet-Drafts.  The list of current Internet-
+52	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+54	   Internet-Drafts are draft documents valid for a maximum of six months
+55	   and may be updated, replaced, or obsoleted by other documents at any
+56	   time.  It is inappropriate to use Internet-Drafts as reference
+57	   material or to cite them other than as "work in progress."
+
+59	   This Internet-Draft will expire on 8 August 2026.
+
+61	Copyright Notice
+
+63	   Copyright (c) 2026 IETF Trust and the persons identified as the
+64	   document authors.  All rights reserved.
+
+66	   This document is subject to BCP 78 and the IETF Trust's Legal
+67	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+68	   license-info) in effect on the date of publication of this document.
+69	   Please review these documents carefully, as they describe your rights
+70	   and restrictions with respect to this document.  Code Components
+71	   extracted from this document must include Revised BSD License text as
+72	   described in Section 4.e of the Trust Legal Provisions and are
+73	   provided without warranty as described in the Revised BSD License.
+
+75	Table of Contents
+
+77	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
+78	   2.  Conventions and Definitions . . . . . . . . . . . . . . . . .   4
+79	   3.  Information Model . . . . . . . . . . . . . . . . . . . . . .   4
+80	   4.  Data Model  . . . . . . . . . . . . . . . . . . . . . . . . .   5
+81	     4.1.   Common Types . . . . . . . . . . . . . . . . . . . . . .   6
+82	     4.2.  The digest Type . . . . . . . . . . . . . . . . . . . . .   6
+83	     4.3.  The measured-component Data Item  . . . . . . . . . . . .   6
+84	       4.3.1.  Component Identifier  . . . . . . . . . . . . . . . .   7
+85	       4.3.2.  Authority Identifier  . . . . . . . . . . . . . . . .   8
+86	       4.3.3.  Profile-specific Flags  . . . . . . . . . . . . . . .   9
+87	     4.4.  EAT measurements-format Extensions  . . . . . . . . . . .   9
+88	     4.5.  measurements-format for CBOR EAT  . . . . . . . . . . . .  10
+89	     4.6.  measurements-format for JSON EAT  . . . . . . . . . . . .  10
+90	     4.7.  EAT Profiles and Measured Components  . . . . . . . . . .  10
+91	     4.8.  Examples  . . . . . . . . . . . . . . . . . . . . . . . .  10
+92	   5.  Security Considerations . . . . . . . . . . . . . . . . . . .  14
+93	   6.  Privacy Considerations  . . . . . . . . . . . . . . . . . . .  14
+94	   7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  14
+95	     7.1.  Media Types Registrations . . . . . . . . . . . . . . . .  14
+96	       7.1.1.  application/measured-component+cbor . . . . . . . . .  15
+97	       7.1.2.  application/measured-component+json . . . . . . . . .  15
+98	     7.2.  Measured Component Content-Format Registrations . . . . .  16
+99	   8.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  16
+100	     8.1.  Normative References  . . . . . . . . . . . . . . . . . .  16
+101	     8.2.  Informative References  . . . . . . . . . . . . . . . . .  17
+102	   Appendix A.  Collected CDDL . . . . . . . . . . . . . . . . . . .  18
+103	   Appendix B.  Open Issues  . . . . . . . . . . . . . . . . . . . .  19
+104	   Acknowledgments . . . . . . . . . . . . . . . . . . . . . . . . .  20
+105	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  20
+
+107	1.  Introduction
+
+109	   Section 4.2.16 of [RFC9711] defines a Measurements claim that:
+
+111	      "[c]ontains descriptions, lists, evidence or measurements of the
+112	      software that exists on the entity or any other measurable
+113	      subsystem of the entity."
+
+115	   This claim allows for different measurement formats, each identified
+116	   by a different CoAP Content-Format (Section 12.3 of [RFC7252]).
+117	   Currently, the only specified format is Concise Software
+118	   Identification (CoSWID) Tags of type "evidence", as per Section 2.9.4
+119	   of [RFC9393].  However, CoSWID is not suitable for measurements that
+120	   cannot be anchored to a file system, such as those in early boot
+121	   environments.  To address this gap, this document introduces a
+122	   "measured component" format that can be used with the EAT
+123	   Measurements claim alongside or instead of CoSWID.
+
+125	   The term "measured component" refers to an object within the
+126	   attester's target environment whose state can be sampled and
+127	   typically digested using a cryptographic hash function.  This
+128	   includes, for example: the invariant part of a firmware component
+129	   that is loaded in memory at startup time, a run-time integrity check
+130	   (RTIC), a file system object, or a CPU register.
+
+132	   This document provides the information model for the "measured
+133	   component" and two associated data models [RFC3444].  This separation
+134	   is intentional: the JSON and CBOR serializations, coupled with the
+135	   media types and associated CoAP Content-Formats, enable the immediate
+136	   use of the semantics within the EAT framework.  Meanwhile, the
+137	   information model can be reused in future specifications to provide
+138	   additional serializations, for example using ASN.1.
+
+140	2.  Conventions and Definitions
+
+142	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+143	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+144	   "OPTIONAL" in this document are to be interpreted as described in
+145	   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+146	   capitals, as shown here.
+
+148	   In this document, CDDL [RFC8610] [RFC9165] [RFC9741] is used to
+149	   describe the data formats.  This specification uses the following
+150	   CDDL control operators: .b64u defined in Section 2.1 of [RFC9741],
+151	   .json defined in Section 2.4 of [RFC9741] and .cbor defined in
+152	   Section 3.8.4 of [RFC8610].
+
+154	3.  Information Model
+
+156	   This section presents the information model of a "measured
+157	   component".
+
+159	   A "measured component" information element includes the component's
+160	   sampled state (in digested or raw form) along with metadata that
+161	   helps in identifying the component.  Optionally, any entities
+162	   responsible for signing the installed component can also be
+163	   specified.
+
+165	   The information elements (IE) that constitute a "measured component"
+166	   are described in Table 1.
+
+168	   +=============+======================================+=============+
+169	   | IE          | Description                          | Requirement |
+170	   |             |                                      | Level       |
+171	   +=============+======================================+=============+
+172	   | Component   | The name given to the measured       | REQUIRED    |
+173	   | Name        | component.  It is important that     |             |
+174	   |             | this name remains consistent across  |             |
+175	   |             | different releases to allow for      |             |
+176	   |             | better tracking of the same measured |             |
+177	   |             | item across updates.  When combined  |             |
+178	   |             | with a consistent versioning scheme, |             |
+179	   |             | it enables better signalling from    |             |
+180	   |             | the appraisal procedure to the       |             |
+181	   |             | relying parties.                     |             |
+182	   +-------------+--------------------------------------+-------------+
+183	   | Component   | A value representing the specific    | OPTIONAL    |
+184	   | Version     | release or development version of    |             |
+185	   |             | the measured component.  Using       |             |
+186	   |             | Semantic Versioning [SEMVER] is      |             |
+187	   |             | RECOMMENDED.                         |             |
+188	   +-------------+--------------------------------------+-------------+
+189	   | Digested or | Either the raw value or the digested | REQUIRED    |
+190	   | Raw Value   | value of the measured component.     |             |
+191	   +-------------+--------------------------------------+-------------+
+192	   | Digest      | Hash algorithm used to compute the   | REQUIRED    |
+193	   | Algorithm   | Digest Value.                        | only if the |
+194	   |             |                                      | value is in |
+195	   |             |                                      | the         |
+196	   |             |                                      | digested    |
+197	   |             |                                      | form        |
+198	   +-------------+--------------------------------------+-------------+
+199	   | Authorities | One or more entities that can        | OPTIONAL    |
+200	   |             | authoritatively identify the         |             |
+201	   |             | component being measured.            |             |
+202	   +-------------+--------------------------------------+-------------+
+
+204	             Table 1: Measured Component Information Elements
+
+206	   A data model implementing this information model SHOULD also allow a
+207	   limited amount of extensibility to accommodate profile-specific
+208	   semantics.
+
+210	4.  Data Model
+
+212	   This section presents coordinated JSON and CBOR data models that each
+213	   implement the information model outlined in Section 3.
+
+215	   The data model is inspired by the "PSA software component" claim
+216	   (Section 4.4.1 of [RFC9783]), which has been refactored to take into
+217	   account the recommendations about the design of new EAT claims
+218	   described in Appendix E of [RFC9711].
+
+220	   CDDL is used to express rules and constraints of the data model for
+221	   both JSON and CBOR.  These rules must be strictly followed when
+222	   creating or validating "measured component" data items.  When there
+223	   is variation between CBOR and JSON, the CDDL generic JC<>, defined in
+224	   Appendix D of [RFC9711], is used.
+
+226	4.1.   Common Types
+
+228	   The following three basic types are used at various places within the
+229	   measured component data model:
+
+231	   bytes-b64u = text .b64u bytes
+232	   bytes8 = bytes .size 8
+233	   bytes8-b64u = text .b64u bytes8
+
+235	4.2.  The digest Type
+
+237	   A digest represents the result of a hashing operation together with
+238	   the hash algorithm used.  The type of the digest algorithm identifier
+239	   can be either int or text and is interpreted according to the
+240	   [IANA.named-information] registry.  Specifically, int values are
+241	   matched against "ID" entries and text values are matched against
+242	   "Hash Name String" entries.  Whenever possible, using the int
+243	   encoding is RECOMMENDED.
+
+245	   digest = [
+246	     alg: (int / text)
+247	     val: digest-value-type
+248	   ]
+
+250	   digest-value-type = eat.JC<bytes-b64u, bytes>
+
+252	4.3.  The measured-component Data Item
+
+254	   The measured-component data item is as follows:
+
+256	   measured-component = {
+257	     component-id-label => component-id
+258	     measurement
+259	     ? authorities-label => [ + authority-id-type ]
+260	     ? flags-label => flags-type
+261	   }
+
+263	   measurement //= ( digested-measurement-label => digest )
+264	   measurement //= ( raw-measurement-label => bytes )
+
+266	   authority-id-type = eat.JC<bytes-b64u, bytes>
+267	   flags-type = eat.JC<bytes8-b64u, bytes8>
+
+269	   component-id-label = eat.JC<"id", 1>
+270	   digested-measurement-label = eat.JC<"digested-measurement", 2>
+271	   raw-measurement-label = eat.JC<"raw-measurement", 5>
+272	   authorities-label = eat.JC<"authorities", 3>
+273	   flags-label = eat.JC<"flags", 4>
+
+275	   The members of the measured-component CBOR map / JSON object are:
+
+277	   "id" (index 1):
+278	      The measured component identifier encoded according to the format
+279	      described in Section 4.3.1.
+
+281	   "measurement":
+282	      Either a digest value and digest algorithm (index 2), encoded
+283	      using the digest format (Section 4.2), or the "raw" measurement
+284	      (index 5), encoded as a byte string.  Note that, while the size of
+285	      the digested form is constrained by the digest function, the size
+286	      of the raw form can vary greatly depending on what is being
+287	      measured (it could be a CPU register or an entire configuration
+288	      blob, for example).  Therefore, a decoder implementation may
+289	      decide to limit the amount of memory it allocates to this specific
+290	      field.
+
+292	   "authorities" (index 3):
+293	      One or more authorities, see Section 4.3.2.
+
+295	   "flags" (index 4):
+296	      a 64-bit field with profile-defined semantics, see Section 4.3.3.
+
+298	4.3.1.  Component Identifier
+
+300	   The component-id data item is as follows:
+
+302	   component-id = [
+303	     name:      text
+304	     ? version: version
+305	   ]
+
+307	   ;# import coswid.$version-scheme from rfc9393 as coswid
+
+309	   version = [
+310	     val:      text
+311	     ? scheme: coswid.$version-scheme
+312	   ]
+
+314	   name  A string that provides a human readable identifier for the
+315	      component in question.  Format and adopted conventions depend on
+316	      the component type.
+
+318	   version  A compound version data item that reuses the encoding and
+319	      semantics of [RFC9711] sw-version-type, extending it to non-
+320	      software components.
+
+322	4.3.2.  Authority Identifier
+
+324	   An authority is an entity that can authoritatively identify a given
+325	   component by digitally signing it.  This signature is typically
+326	   verified during installation (Section 7 of [RFC9019]), or when the
+327	   measured component is executed by the boot firmware, operating
+328	   system, or application launcher, as in the case of Unified Extensible
+329	   Firmware Interface (UEFI) Secure Boot [UEFI2] and Arm Trusted Board
+330	   Boot [TBBR-CLIENT].  Another example may be the controlling entity in
+331	   an app store.  Note that this signature is in no way related to the
+332	   attester's signature on the EAT-formatted evidence.
+
+334	   An authority is identified by its signing public key.  It could be an
+335	   X.509 certificate, a raw public key, a public key thumbprint, or some
+336	   other identifier that can be uniquely associated with the signing
+337	   entity.  In some cases, multiple parties may need to sign a component
+338	   to indicate their endorsement or approval.  This could include roles
+339	   such as a firmware update system, fleet owner, or third-party
+340	   auditor.  The specific purpose of each signature may depend on the
+341	   deployment, and the order of authorities within the array could
+342	   indicate meaning.
+
+344	   If an EAT profile (Section 6 of [RFC9711]) uses measured components,
+345	   it MUST specify whether the authorities field is used.  If it is
+346	   used, the profile MUST also specify what each of the entries in the
+347	   authorities array represents, and how to interpret the corresponding
+348	   authority-id-type.
+
+350	   The authority-id-type is defined as follows:
+
+352	   authority-id-type = eat.JC<bytes-b64u, bytes>
+
+354	4.3.3.  Profile-specific Flags
+
+356	   This optional field can contain up to 64 bits of profile-defined
+357	   semantics, enabling a profile of this specification to encode
+358	   additional information and extend the base type.  It can be used to
+359	   carry information in fixed-size chunks, such as a bit mask or a
+360	   single value within a predetermined set of codepoints.  Regardless of
+361	   its internal structure, the size of this field is exactly 8 bytes.
+
+363	   The flags-type is defined as follows:
+
+365	   flags-type = eat.JC<bytes8-b64u, bytes8>
+
+367	   If an EAT profile (Section 6 of [RFC9711]) uses measured components,
+368	   it MUST specify whether the flags field is used.  If it is used, the
+369	   profile MUST also specify how to interpret the 64 bits.
+
+371	4.4.  EAT measurements-format Extensions
+
+373	   The CDDL in Figure 1 extends the $measurements-body-cbor and
+374	   $measurements-body-json EAT sockets to add support for measured-
+375	   components to the Measurements claim.
+
+377	   mc-cbor = bytes .cbor measured-component
+378	   mc-json = text .json measured-component
+
+380	   ; EAT CBOR (`.feature "cbor"`)
+381	   $measurements-body-cbor /= mc-cbor ; native
+382	   $measurements-body-cbor /= mc-json ; tunnel
+
+384	   ; EAT JSON (`.feature "json"`)
+385	   $measurements-body-json /= mc-json            ; native
+386	   $measurements-body-json /= text .b64u mc-cbor ; tunnel
+
+388	                Figure 1: EAT measurements-format Extensions
+
+390	   Each socket is extended with two new types: a "native" representation
+391	   that is used when measured-component and the EAT have the same
+392	   serialization (e.g., they are both CBOR), and a "tunnel"
+393	   representation that is used when the serializations differ.
+
+395	4.5.  measurements-format for CBOR EAT
+
+397	   The entries in Table 2 are the allowed content-type / content-format
+398	   pairs when the measured-component is carried in a CBOR EAT.
+
+400	   Note the use of the "native" and "tunnel" formats from Figure 1, and
+401	   how the associated CoAP Content-Format is used to describe the
+402	   original serialization.
+
+404	         +=====================================+================+
+405	         | content-type (CoAP C-F equivalent)  | content-format |
+406	         +=====================================+================+
+407	         | application/measured-component+cbor | mc-cbor        |
+408	         +-------------------------------------+----------------+
+409	         | application/measured-component+json | mc-json        |
+410	         +-------------------------------------+----------------+
+
+412	                 Table 2: measurement-format for EAT CWT
+
+414	4.6.  measurements-format for JSON EAT
+
+416	   Table 3 is the equivalent of Table 2 for JSON-serialized EAT.
+
+418	       +=====================================+====================+
+419	       | content-type (CoAP C-F equivalent)  | content-format     |
+420	       +=====================================+====================+
+421	       | application/measured-component+json | mc-json            |
+422	       +-------------------------------------+--------------------+
+423	       | application/measured-component+cbor | tstr .b64u mc-cbor |
+424	       +-------------------------------------+--------------------+
+
+426	                 Table 3: measurement-format for EAT JWT
+
+428	4.7.  EAT Profiles and Measured Components
+
+430	   The semantics of the authorities and profile flags fields are defined
+431	   by the applicable EAT profile, i.e., the profile of the wrapping EAT.
+
+433	   If the profile of the EAT is not known to the consumer and one or
+434	   more Measured Components within that EAT include authorities and/or
+435	   profile flags, the consumer MUST reject the EAT.
+
+437	4.8.  Examples
+
+439	   The example in Figure 2 is a digested measured component with all the
+440	   fields populated.
+
+442	   {
+443	     / id / 1: [
+444	       / name / "boot loader X",
+445	       / version / [
+446	         "1.2.3rc2",
+447	         16384 / semver /
+448	       ]
+449	     ],
+450	     / measurement / 2: [
+451	       / alg / "sha-256",
+452	       / val / h'3996003d486fb91ffb056f7d03f2b2992b215b31dbe7af4b37
+453	                 3431fc7d319da3'
+454	     ],
+455	     / authorities / 3: [
+456	       h'492e9b676c21f6012b1ceeb9032feb4141a880797355f6675015ec59c5
+457	         1ca1ec',
+458	       h'4277bb97ba7b51577a0d38151d3e08b40bdf946753f5b5bdeb814d6ff5
+459	         7a8a5e'
+460	     ],
+461	     / flags / 4: h'0000000000000101'
+462	   }
+
+464	                   Figure 2: Complete Measured Component
+
+466	   The example in Figure 3 is the same measured component as above but
+467	   used as the format of a measurements claim in a EAT claims-set.
+
+469	   This example uses TBD1 as the content-type value of the measurements-
+470	   format entry.  (This will change to the value assigned by IANA to the
+471	   measured-component+cbor Content-Format.)
+
+473	   Note that the array contains only one measured component, but
+474	   additional entries could be added if the measured TCB is made of
+475	   multiple, individually measured components.
+
+477	   {
+478	     273: [
+479	       [
+480	         TBD1, / measured-component+cbor /
+481	         <<
+482	           {
+483	             / id / 1: [
+484	               / name / "boot loader X",
+485	               / version / [
+486	                 "1.2.3rc2",
+487	                 16384 / semver /
+488	               ]
+489	             ],
+490	             / measurement / 2: [
+491	               / alg / "sha-256",
+492	               / val / h'3996003d486fb91ffb056f7d03f2b2992b215b31db
+493	                         e7af4b373431fc7d319da3'
+494	             ],
+495	             / authorities / 3: [
+496	               h'492e9b676c21f6012b1ceeb9032feb4141a880797355f66750
+497	                 15ec59c51ca1ec',
+498	               h'4277bb97ba7b51577a0d38151d3e08b40bdf946753f5b5bdeb
+499	                 814d6ff57a8a5e'
+500	             ]
+501	           }
+502	         >>
+503	       ]
+504	     ]
+505	   }
+
+507	     Figure 3: EAT Measurements Claim using a Measured Component (CBOR)
+
+509	   The example in Figure 4 illustrates the inclusion of a JSON measured
+510	   component inside a JSON EAT.
+
+512	   This example uses TBD2 as the content-type value of the measurements-
+513	   format entry.  (This will change to the value assigned by IANA to the
+514	   measured-component+json Content-Format.)
+515	   =============== NOTE: '\' line wrapping per RFC 8792 ================
+
+517	   {
+518	     "measurements": [
+519	       [
+520	         TBD2, / measured-component+json /
+521	         "{ \"id\": [ \"boot loader X\", [ \"1.2.3rc2\", 16384 ] ], \"\
+522	   digested-measurement\": [ \"sha-256\", \"\
+523	   OZYAPUhvuR_7BW99A_KymSshWzHb569LNzQx_H0xnaM\" ], \"authorities\": [ \
+524	   \"SS6bZ2wh9gErHO65Ay_rQUGogHlzVfZnUBXsWcUcoew\", \"\
+525	                      Qne7l7p7UVd6DTgVHT4ItAvflGdT9bW964FNb_V6il4\" ] }"
+526	       ]
+527	     ]
+528	   }
+
+530	     Figure 4: EAT Measurements Claim using a Measured Component (JSON)
+
+532	   The example in Figure 5 is a measured component representing a boot
+533	   loader identified by its path name:
+
+535	   {
+536	     / id / 1: [
+537	       / name / "/boot/loader.bin"
+538	     ],
+539	     / measurement / 2: [
+540	       / alg / "sha-384",
+541	       / val / h'66ec2fb4e02d8c8b3eee320e750d9389d66c52c51db11cc6
+542	                 9cc5e410816283ed60ba573795f5fcc85e513af57b3f6def'
+543	     ],
+544	     / flags / 4: h'0000000000000101'
+545	   }
+
+547	    Figure 5: Digested Measured Component using File Path as Identifier
+
+549	   The example in Figure 6 is a raw measured component.
+
+551	   {
+552	     / id / 1: [
+553	       / name / "hardware-config"
+554	     ],
+555	     / measurement / 5: h'4f6d616861'
+556	   }
+
+558	                      Figure 6: Raw Measured Component
+
+560	5.  Security Considerations
+
+562	   Please review Sections 9.1 (Claim Trustworthiness), 9.4 (Multiple EAT
+563	   Consumers) and 9.5 (Detached EAT Bundle Digest Security
+564	   Considerations) of [RFC9711]; these considerations apply to this
+565	   document as well.  Note that similar security considerations may
+566	   apply when the Measured Component information model is serialized
+567	   using different data models than the ones specified in this document.
+
+569	   The Component Name and Component Version can give an attacker
+570	   detailed information about the software running on a device and its
+571	   configuration settings.  This information could offer an attacker
+572	   valuable insights.
+
+574	   Any textual fields (e.g., Component Name and Component Version) that
+575	   are stored in a file, inserted into a database, or displayed to
+576	   humans must be properly sanitized to prevent attacks and undesirable
+577	   behavior.  Further discussion and references on this topic can be
+578	   found in Section 7 of [RFC9839].
+
+580	   If the component measurement is digested, the digest must be computed
+581	   using a strong cryptographic hash function.
+
+583	6.  Privacy Considerations
+
+585	   Please review Section 9.1 (Multiple EAT Consumers) of [RFC9711]; the
+586	   differential encryption considerations discussed there also apply to
+587	   this document.
+
+589	   The Component Name and Component Version could reveal private
+590	   information about a device and its owner.
+
+592	   Additionally, the stability requirement of the Component Name could
+593	   enable tracking.
+
+595	7.  IANA Considerations
+
+597	   // RFC Editor: replace "RFCthis" with the RFC number assigned to this
+598	   document.
+
+600	7.1.  Media Types Registrations
+
+602	   IANA is requested to add the following media types to the "Media
+603	   Types" registry [IANA.media-types].
+
+605	     +=========================+=========================+===========+
+606	     | Name                    | Template                | Reference |
+607	     +=========================+=========================+===========+
+608	     | measured-component+cbor | application/measured-   | RFCthis   |
+609	     |                         | component+cbor          |           |
+610	     +-------------------------+-------------------------+-----------+
+611	     | measured-component+json | application/measured-   | RFCthis   |
+612	     |                         | component+json          |           |
+613	     +-------------------------+-------------------------+-----------+
+
+615	                  Table 4: Measured Component Media Types
+
+617	7.1.1.  application/measured-component+cbor
+
+619	   Type name:  application
+620	   Subtype name:  measured-component+cbor
+621	   Required parameters:  n/a
+622	   Optional parameters:  n/a
+623	   Encoding considerations:  binary (CBOR)
+624	   Security considerations:  Section 5 of RFCthis
+625	   Interoperability considerations:  n/a
+626	   Published specification:  RFCthis
+627	   Applications that use this media type:  Attesters, Verifiers and
+628	      Relying Parties
+629	   Fragment identifier considerations:  The syntax and semantics of
+630	      fragment identifiers are as specified for "application/cbor".  (No
+631	      fragment identification syntax is currently defined for
+632	      "application/cbor".)
+633	   Person & email address to contact for further information:  RATS WG
+634	      mailing list (rats@ietf.org)
+635	   Intended usage:  COMMON
+636	   Restrictions on usage:  none
+637	   Author/Change controller:  IETF
+638	   Provisional registration:  no
+
+640	7.1.2.  application/measured-component+json
+
+642	   Type name:  application
+643	   Subtype name:  measured-component+json
+644	   Required parameters:  n/a
+645	   Optional parameters:  n/a
+646	   Encoding considerations:  binary (JSON is UTF-8-encoded text)
+647	   Security considerations:  Section 5 of RFCthis
+648	   Interoperability considerations:  n/a
+649	   Published specification:  RFCthis
+650	   Applications that use this media type:  Attesters, Verifiers and
+651	      Relying Parties
+652	   Fragment identifier considerations:  The syntax and semantics of
+653	      fragment identifiers are as specified for "application/json".  (No
+654	      fragment identification syntax is currently defined for
+655	      "application/json".)
+656	   Person & email address to contact for further information:  RATS WG
+657	      mailing list (rats@ietf.org)
+658	   Intended usage:  COMMON
+659	   Restrictions on usage:  none
+660	   Author/Change controller:  IETF
+661	   Provisional registration:  no
+
+663	7.2.  Measured Component Content-Format Registrations
+
+665	   IANA is requested to register two Content-Format numbers in the "CoAP
+666	   Content-Formats" sub-registry, within the "Constrained RESTful
+667	   Environments (CoRE) Parameters" Registry [IANA.core-parameters], as
+668	   follows:
+
+670	      +=========================+================+======+===========+
+671	      | Content-Type            | Content Coding | ID   | Reference |
+672	      +=========================+================+======+===========+
+673	      | application/measured-   | -              | TBD1 | RFCthis   |
+674	      | component+cbor          |                |      |           |
+675	      +-------------------------+----------------+------+-----------+
+676	      | application/measured-   | -              | TBD2 | RFCthis   |
+677	      | component+json          |                |      |           |
+678	      +-------------------------+----------------+------+-----------+
+
+680	                                  Table 5
+
+682	   If possible, TBD1 and TBD2 should be assigned in the 256..9999 range.
+
+684	8.  References
+
+686	8.1.  Normative References
+
+688	   [IANA.named-information]
+689	              IANA, "Named Information",
+690	              <https://www.iana.org/assignments/named-information>.
+
+692	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+693	              Requirement Levels", BCP 14, RFC 2119,
+694	              DOI 10.17487/RFC2119, March 1997,
+695	              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+697	   [RFC7252]  Shelby, Z., Hartke, K., and C. Bormann, "The Constrained
+698	              Application Protocol (CoAP)", RFC 7252,
+699	              DOI 10.17487/RFC7252, June 2014,
+700	              <https://www.rfc-editor.org/rfc/rfc7252>.
+
+702	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+703	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+704	              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+706	   [RFC8610]  Birkholz, H., Vigano, C., and C. Bormann, "Concise Data
+707	              Definition Language (CDDL): A Notational Convention to
+708	              Express Concise Binary Object Representation (CBOR) and
+709	              JSON Data Structures", RFC 8610, DOI 10.17487/RFC8610,
+710	              June 2019, <https://www.rfc-editor.org/rfc/rfc8610>.
+
+712	   [RFC8792]  Watsen, K., Auerswald, E., Farrel, A., and Q. Wu,
+713	              "Handling Long Lines in Content of Internet-Drafts and
+714	              RFCs", RFC 8792, DOI 10.17487/RFC8792, June 2020,
+715	              <https://www.rfc-editor.org/rfc/rfc8792>.
+
+717	   [RFC9165]  Bormann, C., "Additional Control Operators for the Concise
+718	              Data Definition Language (CDDL)", RFC 9165,
+719	              DOI 10.17487/RFC9165, December 2021,
+720	              <https://www.rfc-editor.org/rfc/rfc9165>.
+
+722	   [RFC9711]  Lundblade, L., Mandyam, G., O'Donoghue, J., and C.
+723	              Wallace, "The Entity Attestation Token (EAT)", RFC 9711,
+724	              DOI 10.17487/RFC9711, April 2025,
+725	              <https://www.rfc-editor.org/rfc/rfc9711>.
+
+727	   [RFC9741]  Bormann, C., "Concise Data Definition Language (CDDL):
+728	              Additional Control Operators for the Conversion and
+729	              Processing of Text", RFC 9741, DOI 10.17487/RFC9741, March
+730	              2025, <https://www.rfc-editor.org/rfc/rfc9741>.
+
+732	   [SEMVER]   "Semantic Versioning 2.0.0", 2013,
+733	              <https://semver.org/spec/v2.0.0.html>.
+
+735	8.2.  Informative References
+
+737	   [IANA.core-parameters]
+738	              IANA, "Constrained RESTful Environments (CoRE)
+739	              Parameters",
+740	              <https://www.iana.org/assignments/core-parameters>.
+
+742	   [IANA.media-types]
+743	              IANA, "Media Types",
+744	              <https://www.iana.org/assignments/media-types>.
+
+746	   [RFC3444]  Pras, A. and J. Schoenwaelder, "On the Difference between
+747	              Information Models and Data Models", RFC 3444,
+748	              DOI 10.17487/RFC3444, January 2003,
+749	              <https://www.rfc-editor.org/rfc/rfc3444>.
+
+751	   [RFC9019]  Moran, B., Tschofenig, H., Brown, D., and M. Meriac, "A
+752	              Firmware Update Architecture for Internet of Things",
+753	              RFC 9019, DOI 10.17487/RFC9019, April 2021,
+754	              <https://www.rfc-editor.org/rfc/rfc9019>.
+
+756	   [RFC9393]  Birkholz, H., Fitzgerald-McKay, J., Schmidt, C., and D.
+757	              Waltermire, "Concise Software Identification Tags",
+758	              RFC 9393, DOI 10.17487/RFC9393, June 2023,
+759	              <https://www.rfc-editor.org/rfc/rfc9393>.
+
+761	   [RFC9783]  Tschofenig, H., Frost, S., Brossard, M., Shaw, A., and T.
+762	              Fossati, "Arm's Platform Security Architecture (PSA)
+763	              Attestation Token", RFC 9783, DOI 10.17487/RFC9783, June
+764	              2025, <https://www.rfc-editor.org/rfc/rfc9783>.
+
+766	   [RFC9839]  Bray, T. and P. Hoffman, "Unicode Character Repertoire
+767	              Subsets", RFC 9839, DOI 10.17487/RFC9839, August 2025,
+768	              <https://www.rfc-editor.org/rfc/rfc9839>.
+
+770	   [TBBR-CLIENT]
+771	              Arm Ltd, "Trusted Board Boot Requirements Client (TBBR-
+772	              CLIENT) Armv8-A", ARM DEN0006D, September 2018,
+773	              <https://developer.arm.com/documentation/den0006>.
+
+775	   [UEFI2]    UEFI Forum, Inc., "Unified Extensible Firmware Interface
+776	              (UEFI) Specification", August 2022,
+777	              <https://uefi.org/sites/default/files/resources/
+778	              UEFI_Spec_2_10_Aug29.pdf>.
+
+780	Appendix A.  Collected CDDL
+
+782	   This appendix contains all the CDDL definitions included in this
+783	   specification.
+
+785	   =============== NOTE: '\' line wrapping per RFC 8792 ================
+
+787	   measured-component = {
+788	     component-id-label => component-id,
+789	     measurement,
+790	     ? authorities-label => [+ authority-id-type],
+791	     ? flags-label => flags-type,
+792	   }
+793	   measurement //= (digested-measurement-label => digest // raw-\
+794	                                             measurement-label => bytes)
+795	   authority-id-type = eat.JC<bytes-b64u, bytes>
+796	   flags-type = eat.JC<bytes8-b64u, bytes8>
+797	   component-id = [
+798	     name: text,
+799	     ? version: version,
+800	   ]
+801	   version = [
+802	     val: text,
+803	     ? scheme: coswid.$version-scheme,
+804	   ]
+805	   digest = [
+806	     alg: int / text,
+807	     val: digest-value-type,
+808	   ]
+809	   digest-value-type = eat.JC<bytes-b64u, bytes>
+810	   bytes-b64u = text .b64u bytes
+811	   bytes8 = bytes .size 8
+812	   bytes8-b64u = text .b64u bytes8
+813	   component-id-label = eat.JC<"id", 1>
+814	   digested-measurement-label = eat.JC<"digested-measurement", 2>
+815	   raw-measurement-label = eat.JC<"raw-measurement", 5>
+816	   authorities-label = eat.JC<"authorities", 3>
+817	   flags-label = eat.JC<"flags", 4>
+818	   mc-cbor = bytes .cbor measured-component
+819	   mc-json = text .json measured-component
+820	   $measurements-body-cbor /= mc-cbor / mc-json
+821	   $measurements-body-json /= mc-json / text .b64u mc-cbor
+822	   eat.JSON-ONLY<J> = J .feature "json"
+823	   eat.CBOR-ONLY<C> = C .feature "cbor"
+824	   eat.JC<J, C> = eat.JSON-ONLY<J> / eat.CBOR-ONLY<C>
+825	   coswid.$version-scheme /= coswid.multipartnumeric / coswid.\
+826	   multipartnumeric-suffix / coswid.alphanumeric / coswid.decimal / \
+827	                                              coswid.semver / int / text
+828	   coswid.multipartnumeric = 1
+829	   coswid.multipartnumeric-suffix = 2
+830	   coswid.alphanumeric = 3
+831	   coswid.decimal = 4
+832	   coswid.semver = 16384
+
+834	Appendix B.  Open Issues
+
+836	   The list of currently open issues for this documents can be found at
+837	   https://github.com/ietf-rats-wg/draft-ietf-rats-eat-measured-
+838	   component/issues.
+
+840	   // Note to RFC Editor: please remove before publication.
+
+842	Acknowledgments
+
+844	   The authors would like to thank Carl Wallace, Carsten Bormann, Deb
+845	   Cooley, Dionna Glaze, Esko Dijk, Giridhar Mandyam, Henry Thompson,
+846	   Houda Labiod, Ionuț Mihalcea, Joe Salowey, Jun Zhang, Laurence
+847	   Lundblade, Michael Richardson, Muhammad Usama Sardar and Yogesh
+848	   Deshpande for providing comments, reviews and suggestions that
+849	   greatly improved this document.
+
+851	   The authors would also like to thank Ken Takayama for providing an
+852	   implementation of this specification in the veraison/eat package.
+
+854	Authors' Addresses
+
+856	   Simon Frost
+857	   Arm
+858	   Email: Simon.Frost@arm.com
+
+860	   Thomas Fossati
+861	   Linaro
+862	   Email: Thomas.Fossati@linaro.org
+
+864	   Hannes Tschofenig
+865	   University of Applied Sciences Bonn-Rhein-Sieg
+866	   Email: Hannes.Tschofenig@gmx.net
+
+868	   Henk Birkholz
+869	   Fraunhofer SIT
+870	   Email: henk.birkholz@ietf.contact
+
+
+
+
+
+
+
+
+

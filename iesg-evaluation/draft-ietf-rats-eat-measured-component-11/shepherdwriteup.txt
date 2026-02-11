@@ -1,0 +1,249 @@
+# Document History
+
+1. Does the working group (WG) consensus represent the strong concurrence of a
+few individuals, with others being silent, or did it reach broad agreement?
+
+The document has received reviews and feedback from at least 10 people involved
+in the RATS WG, across multiple channels (IETF meetings, mailing list, Github
+issues). The reviewer group spans a wide range of backgrounds (academic,
+confidential computing, networking infrastructure, IoT). All sections of the
+document have been refined through the review process.
+
+There is a strong consensus among interested participants.
+
+2. Was there controversy about particular points, or were there decisions where
+the consensus was particularly rough?
+
+The only lengthy discussion which didn't lead to a single unanimous decision
+was the naming of "authorities" (formerly "signers") in the information model
+[signers-renaming] [signer-section]. Renaming was needed because most (if not
+all) reviewers displayed some level of confusion as to the semantics of the
+field. The original term - "signers" - seemed to bias readers towards assuming
+the field indicated entities who had signed the Measured Component, not those
+who signed the component itself to authorize its installation or use.
+
+No other discussions caused controversy, or needed rough consensus for progress
+to be made.
+
+[signers-renaming]
+<a href="https://mailarchive.ietf.org/arch/msg/rats/T1P7oKPIb3-IWCFAnQS7eC-T2FE/">https://mailarchive.ietf.org/arch/msg/rats/T1P7oKPIb3-IWCFAnQS7eC-T2FE/</a>
+[signer-section]
+<a href="https://datatracker.ietf.org/doc/html/draft-ietf-rats-eat-measured-component-08#name-signer">https://datatracker.ietf.org/doc/html/draft-ietf-rats-eat-measured-component-08#name-signer</a>
+
+3. Has anyone threatened an appeal or otherwise indicated extreme discontent? If
+so, please summarize the areas of conflict in separate email messages to the
+responsible Area Director. (It should be in a separate email because this
+questionnaire is publicly available.)
+
+I am not aware of such instances.
+
+4. For protocol documents, are there existing implementations of the contents of
+the document? Have a significant number of potential implementers indicated
+plans to implement? Are any existing implementations reported somewhere,
+either in the document itself (as <a href="/doc/rfc7942/">RFC 7942</a> recommends) or elsewhere
+(where)?
+
+A Go language implementation exists [Go-EAT], and is integrated into a library
+providing support for Entity Attestation Tokens.
+
+[Go-EAT] <a href="https://github.com/veraison/eat/blob/main/measured_component.go">https://github.com/veraison/eat/blob/main/measured_component.go</a>
+
+# Additional Reviews
+
+5. Do the contents of this document closely interact with technologies in other
+IETF working groups or external organizations, and would it therefore benefit
+from their review? Have those reviews occurred? If yes, describe which
+reviews took place.
+
+The scope of the document can be broken up into a generic information model,
+and an EAT-specific data model.
+
+The data model has limited scope outside the RATS WG.
+
+The information model could in theory be used more broadly, both in other IETF
+WGs or in other SDOs, to convey the components of a system. For example, the
+issue of compatibility with the TCG-defined Canonical Event Log has been
+brought up by a member of the RATS WG. Direct engagement with the TCG on this
+topic showed limited interest on their side in use of the info model. This
+position has also been summarised on the mailing list [tcg-summary].
+
+Other external reviews of the information model (with a goal of inclusion in
+another data format) have not been forthcoming.
+
+[tcg-summary]
+<a href="https://mailarchive.ietf.org/arch/msg/rats/pdKk9IlqnyjF0scP9QtP391qlOs/">https://mailarchive.ietf.org/arch/msg/rats/pdKk9IlqnyjF0scP9QtP391qlOs/</a>
+
+6. Describe how the document meets any required formal expert review criteria,
+such as the MIB Doctor, YANG Doctor, media type, and URI type reviews.
+
+The document defines registrations for two new media types, as well as
+associated CoAP Content Formats. An early review of the media type registration
+requests has been performed [early-iana-review].
+
+CoAP Content Format expert review has taken place, and feedback incorporated
+[coap-cf-review].
+
+[early-iana-review]
+<a href="https://mailarchive.ietf.org/arch/msg/media-types/E4lFQMwcoMh_kwZyMGvXWUWXvgw/">https://mailarchive.ietf.org/arch/msg/media-types/E4lFQMwcoMh_kwZyMGvXWUWXvgw/</a>
+[coap-cf-review]
+<a href="https://mailarchive.ietf.org/arch/msg/rats/TNUcx4-uIwMKEpn4ZbVlcHSL2Gk/">https://mailarchive.ietf.org/arch/msg/rats/TNUcx4-uIwMKEpn4ZbVlcHSL2Gk/</a>
+
+7. If the document contains a YANG module, has the final version of the module
+been checked with any of the recommended validation tools for syntax and
+formatting validation? If there are any resulting errors or warnings, what is
+the justification for not fixing them at this time? Does the YANG module
+comply with the Network Management Datastore Architecture (NMDA) as specified
+in <a href="/doc/rfc8342/">RFC 8342</a>?
+
+Document does not contain YANG modules.
+
+8. Describe reviews and automated checks performed to validate sections of the
+final version of the document written in a formal language, such as XML code,
+BNF rules, MIB definitions, CBOR's CDDL, etc.
+
+The document contains CDDL, as well as CBOR and JSON examples. These have been
+improved repeatedly through reviews from multiple WG members, including experts
+(e.g., [fix-flags-size]).
+
+CI on the draft repo automatically checks for the validity of the combined
+CDDL, as well as correctness of examples against this CDDL (see `Build Drafts`
+step in [CDDL-CI] jobs). Since the data model offered in the draft is meant for
+inclusion in Entity Attestation Tokens, the CI also checks that this
+integration is possible.
+
+[fix-flags-size]
+<a href="https://github.com/ietf-rats-wg/draft-ietf-rats-eat-measured-component/pull/26/files#diff-91d27af79b4c5cb8ba2c6eab1e2df673eec17d6a2c96f9d041d125d6abb7b218">https://github.com/ietf-rats-wg/draft-ietf-rats-eat-measured-component/pull/26/files#diff-91d27af79b4c5cb8ba2c6eab1e2df673eec17d6a2c96f9d041d125d6abb7b218</a>
+[CDDL-CI]
+<a href="https://github.com/ietf-rats-wg/draft-ietf-rats-eat-measured-component/actions/workflows/ghpages.yml">https://github.com/ietf-rats-wg/draft-ietf-rats-eat-measured-component/actions/workflows/ghpages.yml</a>
+
+# Document Shepherd Checks
+
+9. Based on the shepherd's review of the document, is it their opinion that this
+document is needed, clearly written, complete, correctly designed, and ready
+to be handed off to the responsible Area Director?
+
+The document is ready for AD evaluation. It was created to address a clear
+need. Ample feedback has confirmed the utility, and helped refine the content
+and its presentation.
+
+NOTE: Deb's AD review (and reply from document editors) can be found here
+[ad-review].
+
+[ad-review]
+<a href="https://mailarchive.ietf.org/arch/msg/rats/GrBxoBZbt4WSNhfMjTXtJDaCYIM/">https://mailarchive.ietf.org/arch/msg/rats/GrBxoBZbt4WSNhfMjTXtJDaCYIM/</a>
+
+10. Several IETF Areas have assembled lists of common issues that their
+reviewers encounter. For which areas have such issues been identified
+and addressed? For which does this still need to happen in subsequent
+reviews?
+
+No early expert reviews from any IETF areas / directorates have been performed.
+Reviews from the following areas would be beneficial:
+
+* IoTDir: IoT devices would be prime territory for use of this draft. (Update:
+no IoT review requested)
+
+* ART ART: for review of the data model. Review available at [artart-review].
+
+* SecDir: for review of both the security and privacy implications of the
+draft. Review available at [sec-review].
+
+* Gen-ART: review will be available at [genart-review].
+
+[genart-review]
+<a href="https://datatracker.ietf.org/doc/draft-ietf-rats-eat-measured-component/reviewrequest/23473/">https://datatracker.ietf.org/doc/draft-ietf-rats-eat-measured-component/reviewrequest/23473/</a>
+[artart-review]
+<a href="https://datatracker.ietf.org/doc/review-ietf-rats-eat-measured-component-10-artart-lc-thompson-2026-02-03/">https://datatracker.ietf.org/doc/review-ietf-rats-eat-measured-component-10-artart-lc-thompson-2026-02-03/</a>
+[sec-review]
+<a href="https://datatracker.ietf.org/doc/review-ietf-rats-eat-measured-component-10-secdir-lc-salowey-2026-01-25/">https://datatracker.ietf.org/doc/review-ietf-rats-eat-measured-component-10-secdir-lc-salowey-2026-01-25/</a>
+
+11. What type of RFC publication is being requested on the IETF stream (Best
+Current Practice, Proposed Standard, Internet Standard,
+Informational, Experimental or Historic)? Why is this the proper type
+of RFC? Do all Datatracker state attributes correctly reflect this intent?
+
+Proposed Standard is being requested, which is appropriate given that the
+document defines a protocol-level data structure intended for use as an
+extension to EAT, which is also a Proposed Standard RFC. Datatracker metadata
+reflects this intent.
+
+12. Have reasonable efforts been made to remind all authors of the intellectual
+property rights (IPR) disclosure obligations described in <a href="/doc/bcp79/">BCP 79</a>? To
+the best of your knowledge, have all required disclosures been filed? If
+not, explain why. If yes, summarize any relevant discussion, including links
+to publicly-available messages when applicable.
+
+IPR disclosure reminder has been sent [IPR-Q]. All authors have confirmed the
+lack of applicable patents. No disclosures have been filed yet, as far as I
+know.
+
+[IPR-Q] <a href="https://mailarchive.ietf.org/arch/msg/rats/htTABpfbrr2dZe-TzakF08oTYvg/">https://mailarchive.ietf.org/arch/msg/rats/htTABpfbrr2dZe-TzakF08oTYvg/</a>
+
+13. Has each author, editor, and contributor shown their willingness to be
+listed as such? If the total number of authors and editors on the front page
+is greater than five, please provide a justification.
+
+Question was sent on mailing list [authorship-Q]. All authors have confirmed.
+
+[authorship-Q]
+<a href="https://mailarchive.ietf.org/arch/msg/rats/ewgYIwMBojRpKCcER3_ZXFRk8qs/">https://mailarchive.ietf.org/arch/msg/rats/ewgYIwMBojRpKCcER3_ZXFRk8qs/</a>
+
+14. Document any remaining I-D nits in this document. Simply running the idnits
+tool is not enough; please review the "Content Guidelines" on
+<a href="http://authors.ietf.org">authors.ietf.org</a>. (Also note that the current idnits tool generates
+some incorrect warnings; a rewrite is underway.)
+
+I-D nits checking reveals no errors, no flaws, and one warning (a non-ASCII
+character in a name in the acknowledgements list, "Ionuț").
+
+All other content guidelines seemed to be fulfilled.
+
+15. Should any informative references be normative or vice-versa? See the IESG
+Statement on Normative and Informative References.
+
+No.
+
+16. List any normative references that are not freely available to anyone. Did
+the community have sufficient access to review any such normative
+references?
+
+All normative references are freely available.
+
+17. Are there any normative downward references (see <a href="/doc/rfc3967/">RFC 3967</a> and <a href="/doc/bcp97/">BCP
+97</a>) that are not already listed in the DOWNREF registry? If so,
+list them.
+
+No normative downward references are present.
+
+18. Are there normative references to documents that are not ready to be
+submitted to the IESG for publication or are otherwise in an unclear state?
+If so, what is the plan for their completion?
+
+No such references exist in this document.
+
+19. Will publication of this document change the status of any existing RFCs? If
+so, does the Datatracker metadata correctly reflect this and are those RFCs
+listed on the title page, in the abstract, and discussed in the
+introduction? If not, explain why and point to the part of the document
+where the relationship of this document to these other RFCs is discussed.
+
+No changes to the status of existing RFCs are being made.
+
+20. Describe the document shepherd's review of the IANA considerations section,
+especially with regard to its consistency with the body of the document.
+Confirm that all aspects of the document requiring IANA assignments are
+associated with the appropriate reservations in IANA registries. Confirm
+that any referenced IANA registries have been clearly identified. Confirm
+that each newly created IANA registry specifies its initial contents,
+allocations procedures, and a reasonable name (see <a href="/doc/rfc8126/">RFC 8126</a>).
+
+The IANA section is consistent with the body of the document, and describes
+correctly (as far as I can tell) registration requests for two media types (one
+for a CBOR measured component, one for a JSON one), along with two new
+associated CoAP Content Format IDs. The registration requests label the correct
+registries clearly, and provide all the required metadata.
+
+21. List any new IANA registries that require Designated Expert Review for
+future allocations. Are the instructions to the Designated Expert clear?
+Please include suggestions of designated experts, if appropriate.
+
