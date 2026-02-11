@@ -1,0 +1,566 @@
+idnits 2.17.1 
+
+draft-ietf-dnssd-multi-qtypes-12.txt:
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     No nits found.
+--------------------------------------------------------------------------------
+
+
+2	DNSSD                                                          R. Bellis
+3	Internet-Draft                                                       ISC
+4	Intended status: Standards Track                         30 January 2026
+5	Expires: 3 August 2026
+
+7	                          DNS Multiple QTYPEs
+8	                    draft-ietf-dnssd-multi-qtypes-12
+
+10	Abstract
+
+12	   This document specifies a method for a DNS client to request
+13	   additional DNS record types to be delivered alongside the primary
+14	   record type specified in the question section of a DNS QUERY
+15	   (OpCode=0).
+
+17	About This Document
+
+19	   This note is to be removed before publishing as an RFC.
+
+21	   The latest revision of this draft can be found at https://dnssd-
+22	   wg.github.io/draft-ietf-dnssd-multi-qtypes/draft-ietf-dnssd-multi-
+23	   qtypes.html.  Status information for this document may be found at
+24	   https://datatracker.ietf.org/doc/draft-ietf-dnssd-multi-qtypes/.
+
+26	   Discussion of this document takes place on the DNSSD Working Group
+27	   mailing list (mailto:dnssd@ietf.org), which is archived at
+28	   https://mailarchive.ietf.org/arch/browse/dnssd/.  Subscribe at
+29	   https://www.ietf.org/mailman/listinfo/dnssd/.
+
+31	   Source for this draft and an issue tracker can be found at
+32	   https://github.com/dnssd-wg/draft-ietf-dnssd-multi-qtypes.
+
+34	Status of This Memo
+
+36	   This Internet-Draft is submitted in full conformance with the
+37	   provisions of BCP 78 and BCP 79.
+
+39	   Internet-Drafts are working documents of the Internet Engineering
+40	   Task Force (IETF).  Note that other groups may also distribute
+41	   working documents as Internet-Drafts.  The list of current Internet-
+42	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+44	   Internet-Drafts are draft documents valid for a maximum of six months
+45	   and may be updated, replaced, or obsoleted by other documents at any
+46	   time.  It is inappropriate to use Internet-Drafts as reference
+47	   material or to cite them other than as "work in progress."
+48	   This Internet-Draft will expire on 3 August 2026.
+
+50	Copyright Notice
+
+52	   Copyright (c) 2026 IETF Trust and the persons identified as the
+53	   document authors.  All rights reserved.
+
+55	   This document is subject to BCP 78 and the IETF Trust's Legal
+56	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+57	   license-info) in effect on the date of publication of this document.
+58	   Please review these documents carefully, as they describe your rights
+59	   and restrictions with respect to this document.  Code Components
+60	   extracted from this document must include Revised BSD License text as
+61	   described in Section 4.e of the Trust Legal Provisions and are
+62	   provided without warranty as described in the Revised BSD License.
+
+64	Table of Contents
+
+66	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+67	   2.  Terminology used in this document . . . . . . . . . . . . . .   3
+68	   3.  Specification . . . . . . . . . . . . . . . . . . . . . . . .   3
+69	     3.1.  Multiple QTYPE EDNS Options Format  . . . . . . . . . . .   3
+70	     3.2.  Client Request Generation . . . . . . . . . . . . . . . .   4
+71	     3.3.  Server Request Parsing  . . . . . . . . . . . . . . . . .   4
+72	     3.4.  Server Response Generation  . . . . . . . . . . . . . . .   5
+73	     3.5.  Client Response Processing  . . . . . . . . . . . . . . .   6
+74	   4.  Security Considerations . . . . . . . . . . . . . . . . . . .   7
+75	   5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   8
+76	   Acknowledgements  . . . . . . . . . . . . . . . . . . . . . . . .   8
+77	   References  . . . . . . . . . . . . . . . . . . . . . . . . . . .   8
+78	     Normative References  . . . . . . . . . . . . . . . . . . . . .   8
+79	     Informative References  . . . . . . . . . . . . . . . . . . . .   9
+80	   Appendix A.   Examples  . . . . . . . . . . . . . . . . . . . . .   9
+81	     A.1.  Stub query for A with MQType-Query for AAAA + HTTPS . . .  10
+82	     A.2.  Stub query for DS with MQType-Query for DNSKEY  . . . . .  10
+83	     A.3.  Recursive query for DS with MQType-Query for NS . . . . .  11
+84	   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  12
+
+86	1.  Introduction
+
+88	   A commonly requested DNS [STD13] feature is the ability to receive
+89	   multiple related resource records (RRs) in a single DNS response.
+
+91	   For example, it may be desirable to receive the A, AAAA and HTTPS
+92	   records for a domain name together, rather than having to issue
+93	   multiple queries.
+
+95	   The DNS wire protocol in theory supported having multiple questions
+96	   in a single packet, but in practice this does not work.  In
+97	   [RFC9619], RFC1035 is updated to only permit a single question in a
+98	   QUERY (OpCode=0) request.
+
+100	   Sending QTYPE=ANY does not guarantee that all RRsets will be
+101	   returned.  [RFC8482] specifies that responders may return a single
+102	   RRset of their choosing.
+
+104	   This document provides a solution for those cases where only the
+105	   QTYPE varies by specifying a new option for the Extension Mechanisms
+106	   for DNS (EDNS [RFC6891]) that contains an additional list of QTYPE
+107	   values that the client wishes to receive in addition to the single
+108	   QTYPE appearing in the question section.  A different EDNS option is
+109	   used in response packets as protection against DNS middleboxes that
+110	   echo EDNS options verbatim.
+
+112	   The specification described herein is applicable both for queries
+113	   from a stub resolver to recursive servers, and from recursive
+114	   resolvers to authoritative servers.  It does not apply to Multicast
+115	   DNS queries [RFC6762], which are already designed to allow requesting
+116	   multiple records in a single query, but is applicable to DNS-Based
+117	   Service Discovery (DNS-SD) [RFC6763].
+
+119	2.  Terminology used in this document
+
+121	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+122	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+123	   "OPTIONAL" in this document are to be interpreted as described in
+124	   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+125	   capitals, as shown here.
+
+127	3.  Specification
+
+129	3.1.  Multiple QTYPE EDNS Options Format
+
+131	   The overall format of an EDNS option is shown for reference below,
+132	   per [RFC6891], followed by the option specific data:
+
+134	       +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+135	    0: |                          OPTION-CODE                          |
+136	       +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+137	    2: |                         OPTION-LENGTH                         |
+138	       +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+139	    4: |                                                               |
+140	       :                          OPTION-DATA                          :
+141	       |                                                               |
+142	       +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+
+144	   OPTION-CODE: MQTYPE-Query (20) in queries and MQTYPE-Response (21) in
+145	   responses.
+
+147	   OPTION-LENGTH: Size (in octets) of OPTION-DATA.
+
+149	   OPTION-DATA: Option specific, as below:
+
+151	       +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+152	    0: |                              QT1                              |
+153	       +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+154	    2: |                                                               |
+155	       :                              ...                              :
+156	       |                                                               |
+157	       +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+158	       |                              QTn                              |
+159	       +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+
+161	   A list of 2-octet fields in network order (MSB first) each specifying
+162	   a DNS RRTYPE that must be for a data RRTYPE as described in
+163	   Section 3.1 of [RFC6895].
+
+165	3.2.  Client Request Generation
+
+167	   DNS clients implementing this specification MUST generate packets
+168	   that conform to the server request parsing rules described
+169	   immediately below.
+
+171	   The choice of when a client implementation should attempt to coalesce
+172	   queries for multiple QTYPEs using this method is implementation
+173	   specific and not discussed further herein.
+
+175	3.3.  Server Request Parsing
+
+177	   If an MQTYPE-Query option is received in any inbound DNS message with
+178	   an OpCode other than QUERY (0) the server MUST return a FORMERR
+179	   response.
+
+181	   A server that receives an MQTYPE-Response option in any inbound DNS
+182	   message MUST return a FORMERR response.
+
+184	   A server that receives more than one MQTYPE-Query option in a query
+185	   MUST return a FORMERR response.
+
+187	   If an MQTYPE-Query option is received in a query that contains no
+188	   primary question (i.e. QDCOUNT=0) the server MUST return a FORMERR
+189	   response.
+
+191	   If an MQTYPE-Query option is received in a query where the primary
+192	   question is a non-data RRTYPE (e.g. ANY, AXFR, etc.) the server MUST
+193	   return a FORMERR response.
+
+195	   If the QT list in an MQTYPE-Query option is empty the server MUST
+196	   return a FORMERR response.
+
+198	   If any invalid QTx is received in the query (e.g. one corresponding
+199	   to a Meta RRTYPE) the server MUST return a FORMERR response.
+
+201	   If any duplicate QTx (or one duplicating the primary QTYPE field) is
+202	   contained in a query the server MUST return a FORMERR response.
+
+204	3.4.  Server Response Generation
+
+206	   A conforming server that receives an MQTYPE-Query option in a query
+207	   MUST return an MQTYPE-Response option in its response, even if that
+208	   response is truncated (TC=1).  This is necessary to indicate that the
+209	   server does support this extension.
+
+211	   The server MUST first start constructing a response for the primary
+212	   (QNAME, QCLASS, QTYPE) tuple specified in the Question section per
+213	   the existing DNS sections.  The RCODE and all other flags (e.g. AA,
+214	   AD, etc) MUST be determined at this time.
+
+216	   If this initial response results in truncation (TC=1) then the
+217	   additional queries specified in the MQTYPE-Query option MUST NOT be
+218	   processed.
+
+220	   After the initial response is prepared, the server MUST attempt to
+221	   combine the responses for individual (QNAME, QCLASS, QTx)
+222	   combinations into the response for the first query.  If a recursive
+223	   server does not yet have those responses available it MAY first make
+224	   appropriate outbound queries to populate its caches.
+
+226	   For each individual combination the server MUST evaluate the
+227	   resulting RCODE and other flags and check that they all match the
+228	   values generated from the primary query.
+
+230	   If any mismatch is detected the mismatching additional response MUST
+231	   NOT be included in the final combined response and its QTx value MUST
+232	   NOT be included in the MQTYPE-Response option's list.  This might
+233	   happen, for example, if the primary query resulted in a NOERROR
+234	   response but a QTx query resulted in a SERVFAIL, or if the primary
+235	   response has AA=0 but a QTx response has AA=1, such as might happen
+236	   if the NS and DS records were both requested at the parent side of a
+237	   zone cut.
+
+239	   The server MUST attempt to combine the remaining individual RRs into
+240	   the same sections in which they would have appeared in a standalone
+241	   query, i.e.  as if each combination had been "the question" per
+242	   section 4.1 of RFC1035.
+
+244	   The server MUST detect duplicate RRs and keep only a single copy of
+245	   each RR in its respective section.  Duplicates can occur e.g. in the
+246	   Answer section if a CNAME chain is involved, or in the Authority
+247	   section if multiple QTYPEs don't exist, etc.  Note that RRs can be
+248	   legitimately duplicated in different sections, e.g. for the (SOA,
+249	   TYPE12345) combination on apex where TYPE12345 is not present.
+
+251	   Handling of an MQTYPE-Query option MUST NOT itself trigger a
+252	   truncated response.  If response size (or other) limits do not allow
+253	   all of the data obtained by querying for an additional QTx to be
+254	   included in the final response in their entirety (i.e. as complete
+255	   RRsets) then the server MUST NOT include the respective QTx in the
+256	   MQTYPE-Response option's list and MAY stop processing further QTx
+257	   combinations.
+
+259	   If all RRs for a single QTx combination fit into the message then the
+260	   server MUST then include the respective QTx in the MQTYPE-Response
+261	   option's list to indicate that the given query type was completely
+262	   processed.
+
+264	   Note that it is possible for the resulting MQTYPE-Response option to
+265	   contain an empty list, but as described above the option MUST still
+266	   be returned.
+
+268	3.5.  Client Response Processing
+
+270	   If the response to a query containing an MQTYPE-Query option does not
+271	   contain an MQTYPE-Response option, or if it erroneously contains an
+272	   MQTYPE-Query option, the client MUST treat the response as if this
+273	   option is unsupported by the server and MUST process the primary
+274	   response as if the MQTYPE-Query option had not been used.
+
+276	   In the above case, or if the server generates a FORMERR response, the
+277	   client MUST issue additional standalone queries (e.g. without using
+278	   the MQTYPE-Query option) for all QTYPEs for which an answer is still
+279	   required.
+
+281	   If the MQTYPE-Response option is present more than once or if a QTx
+282	   value is duplicated (or duplicates the primary QTYPE field) the
+283	   client MUST treat the answer as invalid (equivalent to FORMERR).
+
+285	   The Question section and the list of types present in the MQTYPE-
+286	   Response option indicates the list of (QNAME, QCLASS, qtypes)
+287	   combinations which are completely answered and contained within the
+288	   received response.  The answers to all query combinations share the
+289	   same RCODE and all other flags.
+
+291	   All RRs required by existing DNS specifications are expected to be
+292	   present in the respective sections of the DNS message, including
+293	   proofs of nonexistence where required.  The client MUST NOT rely on
+294	   any particular order of RRs in the message sections.
+
+296	   For the purposes of Section 5.4.1 of [RFC2181] any authoritative
+297	   answers received MUST be ranked the same as the answer for the
+298	   primary question.
+
+300	   Clients MUST take into account that individual RRs might originate
+301	   from different DNS zones and that proofs of non-existence might have
+302	   been produced by different signers.
+
+304	   Absence of QTx values which were requested by client but are not
+305	   present in the MQTYPE-Response option indicates that:
+
+307	   *  (for responses from recursive servers) that the server does not
+308	      have any records for that QTx value in cache, and/or
+
+310	   *  the individual responses could not be combined into one message
+311	      because of RCODE or other flag mismatches, and/or
+
+313	   *  the server was unwilling to process the request (e.g. because a
+314	      limit was exceeded), and/or
+
+316	   *  the response size limit would be exceeded
+
+318	   The client MUST subsequently initiate separate standalone queries for
+319	   all QTx values for which an answer is still required.
+
+321	4.  Security Considerations
+
+323	   The method documented here does not change any of the security
+324	   properties of the DNS protocol itself.
+
+326	   It should however be noted that this method does increase the
+327	   potential amplification factor when the DNS protocol is used as a
+328	   vector for a denial of service attack.  A further risk is being able
+329	   to maliciously cause recursive servers to perform large amounts of
+330	   additional work.
+
+332	   Implementors SHOULD therefore allow operators to configure limits on
+333	   the number of QTx values specified and/or the resulting response
+334	   size.  The recommended values of those limits will depend on the
+335	   environment in which this specification is used.  In public DNS it is
+336	   expected that a limit of four QTx values would be appropriate, but
+337	   when used with DNS-SD or within private networks higher limits would
+338	   be acceptable.
+
+340	5.  IANA Considerations
+
+342	   IANA has assigned the following in the "DNS EDNS0 Option Codes (OPT)"
+343	   registry:
+
+345	            +=======+=================+==========+===========+
+346	            | Value | Name            | Status   | Reference |
+347	            +=======+=================+==========+===========+
+348	            | 20    | MQTYPE-Query    | Optional | RFC TBD   |
+349	            +-------+-----------------+----------+-----------+
+350	            | 21    | MQTYPE-Response | Optional | RFC TBD   |
+351	            +-------+-----------------+----------+-----------+
+
+353	                       Table 1: EDNS Option Numbers
+
+355	Acknowledgements
+
+357	   The author wishes to thank the following for their feedback and
+358	   reviews during the initial development of this document: Michael
+359	   Graff, Olafur Gudmundsson, Matthijs Mekking, and Paul Vixie.
+
+361	   In addition the author wishes to thank the following for subsequent
+362	   review during discussion in the DNSSD Working Group: Chris Box,
+363	   Stuart Cheshire, Esko Dijk, Ted Lemon, David Schinazi and Petr
+364	   Spacek.
+
+366	References
+
+368	Normative References
+
+370	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+371	              Requirement Levels", BCP 14, RFC 2119,
+372	              DOI 10.17487/RFC2119, March 1997,
+373	              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+375	   [RFC2181]  Elz, R. and R. Bush, "Clarifications to the DNS
+376	              Specification", RFC 2181, DOI 10.17487/RFC2181, July 1997,
+377	              <https://www.rfc-editor.org/rfc/rfc2181>.
+
+379	   [RFC6891]  Damas, J., Graff, M., and P. Vixie, "Extension Mechanisms
+380	              for DNS (EDNS(0))", STD 75, RFC 6891,
+381	              DOI 10.17487/RFC6891, April 2013,
+382	              <https://www.rfc-editor.org/rfc/rfc6891>.
+
+384	   [RFC6895]  Eastlake 3rd, D., "Domain Name System (DNS) IANA
+385	              Considerations", BCP 42, RFC 6895, DOI 10.17487/RFC6895,
+386	              April 2013, <https://www.rfc-editor.org/rfc/rfc6895>.
+
+388	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+389	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+390	              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+392	   [RFC9619]  Bellis, R. and J. Abley, "In the DNS, QDCOUNT Is (Usually)
+393	              One", RFC 9619, DOI 10.17487/RFC9619, July 2024,
+394	              <https://www.rfc-editor.org/rfc/rfc9619>.
+
+396	   [STD13]    Internet Standard 13,
+397	              <https://www.rfc-editor.org/info/std13>.
+398	              At the time of writing, this STD comprises the following:
+
+400	              Mockapetris, P., "Domain names - concepts and facilities",
+401	              STD 13, RFC 1034, DOI 10.17487/RFC1034, November 1987,
+402	              <https://www.rfc-editor.org/info/rfc1034>.
+
+404	              Mockapetris, P., "Domain names - implementation and
+405	              specification", STD 13, RFC 1035, DOI 10.17487/RFC1035,
+406	              November 1987, <https://www.rfc-editor.org/info/rfc1035>.
+
+408	Informative References
+
+410	   [RFC6762]  Cheshire, S. and M. Krochmal, "Multicast DNS", RFC 6762,
+411	              DOI 10.17487/RFC6762, February 2013,
+412	              <https://www.rfc-editor.org/rfc/rfc6762>.
+
+414	   [RFC6763]  Cheshire, S. and M. Krochmal, "DNS-Based Service
+415	              Discovery", RFC 6763, DOI 10.17487/RFC6763, February 2013,
+416	              <https://www.rfc-editor.org/rfc/rfc6763>.
+
+418	   [RFC8482]  Abley, J., Gudmundsson, O., Majkowski, M., and E. Hunt,
+419	              "Providing Minimal-Sized Responses to DNS Queries That
+420	              Have QTYPE=ANY", RFC 8482, DOI 10.17487/RFC8482, January
+421	              2019, <https://www.rfc-editor.org/rfc/rfc8482>.
+
+423	Appendix A.   Examples
+
+425	   The examples below are shown as might be reported by the ISC Dig
+426	   utility.  For the purposes of brevity irrelevant content is omitted.
+
+428	A.1.  Stub query for A with MQType-Query for AAAA + HTTPS
+
+430	   In this example a stub resolver has requested the A record for
+431	   www.example.com, along with an MQTYPE-Query option requesting AAAA
+432	   and HTTPS records.  The stub resolver has also set the DO bit,
+433	   indicating DNSSEC support.
+
+435	   The presence of the HTTPS QTYPE in the MQTYPE-Response option of the
+436	   response coupled with its absence from the answer section indicates
+437	   that the recursive server currently holds no data for this QTYPE.
+438	   The corresponding type fields in the NSEC3 record further provide a
+439	   cryptographic proof of non-existence for the HTTPS QTYPE and the SOA
+440	   record also indicates a "negative answer".
+
+442	   ;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 11111
+443	   ;; flags: qr rd ra ad
+444	   ;; QUERY: 1, ANSWER: 4, AUTHORITY: 4, ADDITIONAL: 1
+
+446	   ;; OPT PSEUDOSECTION:
+447	   ; EDNS: version: 0, flags: do; udp: 1232
+448	   ; MQTYPE-Response: AAAA HTTPS
+
+450	   ;; QUESTION SECTION:
+451	   ;www.example.com.         IN  A
+
+453	   ;; ANSWER SECTION:
+454	   www.example.com.    2849  IN  A       192.0.2.1
+455	   www.example.com.    2849  IN  RRSIG   A [...]
+456	   www.example.com.    3552  IN  AAAA    3fff::1234
+457	   www.example.com.    3552  IN  RRSIG   AAAA [...]
+
+459	   ;; AUTHORITY SECTION:
+460	   example.com.        2830  IN  SOA     ns.example.com. [...]
+461	   example.com.        2830  IN  RRSIG   SOA 13 2 [...]
+462	   [...].example.com.  2830  IN  NSEC3   [...] A TXT AAAA RRSIG
+463	   [...].example.com.  2830  IN  RRSIG   NSEC3 [...]
+
+465	                         Figure 1: A + AAAA + HTTPS
+
+467	A.2.  Stub query for DS with MQType-Query for DNSKEY
+
+469	   In this similar example, the primary QTYPE is for DS and the MQTYPE-
+470	   Query field only contains DNSKEY.
+
+472	   Both the DS and DNSKEY records are returned, along with their
+473	   corresponding RRSIG records.
+
+475	   ;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 33333
+476	   ;; flags: qr rd ra ad
+477	   ;; QUERY: 1, ANSWER: 5, AUTHORITY: 0, ADDITIONAL: 1
+
+479	   ;; OPT PSEUDOSECTION:
+480	   ; EDNS: version: 0, flags: do; udp: 1232
+481	   ; MQTYPE-Response: DNSKEY
+
+483	   ;; QUESTION SECTION:
+484	   ;example.com.                 IN      DS
+
+486	   ;; ANSWER SECTION:
+487	   example.com.        625   IN  DNSKEY  256 3 13 [...]
+488	   example.com.        625   IN  DNSKEY  257 3 13 [...]
+489	   example.com.        625   IN  RRSIG   DNSKEY [...] example.com. [...]
+490	   example.com.      86185   IN  DS      370 13 2 [...]
+491	   example.com.      86185   IN  RRSIG   DS [...] com. [...]
+
+493	                         Figure 2: Stub DS + DNSKEY
+
+495	A.3.  Recursive query for DS with MQType-Query for NS
+
+497	   In this instance, a recursive resolver is sending a DS record query
+498	   to the parent zone's authoritative server and simultaneously
+499	   requesting the NS records for the zone.
+
+501	   Since the DS record response is marked as authoritative (AA = 1) but
+502	   the NS record data on the parent side of a zone cut is not
+503	   authoritative (AA = 0) the server is unable to merge the responses,
+504	   and the NS QTYPE is omitted from the MQTYPE-Response field.
+
+506	   ;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 33333
+507	   ;; flags: qr aa
+508	   ;; QUERY: 1, ANSWER: 5, AUTHORITY: 0, ADDITIONAL: 1
+
+510	   ;; OPT PSEUDOSECTION:
+511	   ; EDNS: version: 0, flags: do; udp: 1232
+512	   ; MQTYPE-Response: [empty]
+
+514	   ;; QUESTION SECTION:
+515	   ;example.com.             IN  DS
+
+517	   ;; ANSWER SECTION:
+518	   example.com.      86185   IN  DS      370 13 2 [...]
+519	   example.com.      86185   IN  RRSIG   DS [...] com. [...]
+
+521	                        Figure 3: Recursive DS + NS
+
+523	Author's Address
+
+525	   Ray Bellis
+526	   Internet Systems Consortium, Inc.
+527	   PO Box 360
+528	   Newmarket,  NH 03857
+529	   United States of America
+530	   Phone: +1 650 423 1300
+531	   Email: ray@isc.org
+
+
+
+
+
+
+
+
+
