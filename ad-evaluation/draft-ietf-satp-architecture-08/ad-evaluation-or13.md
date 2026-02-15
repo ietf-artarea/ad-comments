@@ -15,7 +15,7 @@ See ID Nits for details.
 
 There are lots of unused references in this document, and some that are broken.
 
-This must be fixed before the document is progressed.
+This must be fixed before the document is progressed. Please run idnits and address each reported unused or broken reference.
 
 For example, this reference is broken:
 
@@ -30,8 +30,7 @@ For example, this reference is broken:
 939	   must utilize a TLS1.2 (TLS1.3) secure channel that must be
 ```
 
-Why not must use TLS1.3 or later?
-If TLS1.2 is required, I suggest explaining that in a dedicated section.
+Why not require TLS 1.3 or later? If TLS 1.2 is required for a specific reason (e.g., compatibility), I suggest explaining that rationale in a dedicated subsection.
 
 
 
@@ -81,7 +80,7 @@ Later:
 
 Again a requirement on stage 0, in the architecture document.
 
-I'd like to explore what a minimal charter change to allow Stage 0 to be in scope would mean for this document.
+I'd like to explore what a minimal charter change to allow Stage 0 to be in scope would mean for this document. Alternatively, rephrasing to avoid normative requirements on Stage 0 (e.g., "In jurisdictions where Travel Rule policies apply [FATF], gateway owners would need to consider compliance.") would resolve the tension.
 
 
 
@@ -90,7 +89,7 @@ I'd like to explore what a minimal charter change to allow Stage 0 to be in scop
 
 ### Reading order
 
-You might consider recommending the reader start with use cases, then architecture, then core protocol.
+You might consider recommending the reader start with use cases, then architecture, then core protocol (e.g., a short "How to read this document" or "Document roadmap" at the start of the Architecture draft).
 
 ### Repeated Terminology Section
 
@@ -112,7 +111,7 @@ The Architecture and Use Cases drafts both define a Terminology section but use 
   - Use Cases: "The network to which a digital asset is to be transferred."  
   - Architecture: "The asset network to which a digital asset is to be transferred."
 
-Please consider aligning the Architecture terminology with the Use Cases document (or vice versa) so the same terms are used consistently.
+Please consider aligning the Architecture terminology with the Use Cases document (or vice versa) so the same terms are used consistently. Picking one document as the source of truth for each term will simplify maintenance.
 
 
 ### commitment
@@ -131,6 +130,8 @@ or:
 In blockchain technology, commitment refers to a cryptographic mechanism that allows a party to lock in a specific value (such as a transaction, a vote, or data) and publish it, while keeping the actual value hidden from others until a later reveal phase
 ```
 
+Consider adding a sentence in the Terminology section clarifying which sense is intended in this document.
+
 ### should not must
 
 Even though not capitalized I wonder why these are not must.
@@ -147,7 +148,7 @@ Even though not capitalized I wonder why these are not must.
 473	   accessible to other authorized gateways within the same network.
 ```
 
-... There are lots of these... Consider each case, and assume the reader chooses to interpret the should as "MUST NOT"... what happens to the architecture?
+... There are lots of these. Consider each case, and assume the reader chooses to interpret "should" as "MUST NOT"—what happens to the architecture?
 
 ### Standardized
 
@@ -166,7 +167,7 @@ Later:
 919	   given transactional commitment protocol) to eliminate any ambiguity.
 ```
 
-Is this a setup for a future document? Its not clear if this is possible, and if its not, what is the value of SATP in absence of this?
+Is this a setup for a future document? It's not clear if this is possible, and if it's not, what is the value of SATP in its absence? If the semantics/syntax are not yet standardized, consider wording such as "must be standardized (e.g., in the core protocol or a companion spec)" and indicating where that would be defined.
 
 
 ### Asset ID
@@ -177,10 +178,7 @@ Is this a setup for a future document? Its not clear if this is possible, and if
 593	      cryptographic hash of the ledger data representing the asset.
 ```
 
-This seems like its assuming a lot about the ledger, which is supposed to be opaque.
-Shouldn't this just be phrased in terms of some uniqueness properties?
-
-Consider deleting this may, sentence.
+This seems like it's assuming a lot about the ledger, which is supposed to be opaque. Shouldn't this be phrased in terms of uniqueness properties only? Consider deleting or rephrasing this sentence.
 
 ### 2PC vs 3PC
 
@@ -201,9 +199,7 @@ This is answered later:
 902	   disputable commitments to the asset transfer.
 ```
 
-The real requirement appears to be at least one "transactional commitment sub-protocols" must be implemented.
-
-I would recommend leaving interoperability related details to the core protocol document, and just describe the requirement in the informational architecture document.
+The real requirement appears to be that at least one transactional commitment sub-protocol must be implemented. I would recommend leaving interoperability-related details to the core protocol document, and in this architecture document simply stating the requirement (e.g., "Gateways must implement a transactional commitment sub-protocol (e.g., 2PC or 3PC).").
 
 
 ### networks (ledgers)
@@ -213,7 +209,7 @@ I would recommend leaving interoperability related details to the core protocol 
 811	   (ledgers).  The previous signed receipt message (2.4) from gateway G2
 ```
 
-There are several cases where the word "ledger" is used, and I don't know that it helps improve clarity... I would suggest just using the term network, and disambiguate once, so you don't need to keep using the term ledger.
+There are several cases where the word "ledger" is used, and I'm not sure it improves clarity. I would suggest using the term "network" consistently, and disambiguating once (e.g., "network (including its ledger where applicable)") so you don't need to keep repeating "ledger."
 
 ### should .... hashes
 
@@ -224,7 +220,7 @@ There are several cases where the word "ledger" is used, and I don't know that i
 
 I assume its ok to ignore this?
 
-What perhaps it would be better to describe the security property that needs to be achieved here, instead of the mechanism?... I am assuming this will be covered in thre core protocol document if its important.
+It might be better to describe the security property that needs to be achieved here (e.g., binding to prior messages) rather than the mechanism. I assume the core protocol document will specify the mechanism if it's important.
 
 
 ### G1 was NOT able?
@@ -235,7 +231,7 @@ What perhaps it would be better to describe the security property that needs to 
 1003	   owner (i.e. originator) through one or more mechanisms supported by
 ```
 
-G1 needs the lock to be able to burn right?
+G1 needs the lock to be able to burn, right? If so, consider making that causal link explicit so readers don't wonder whether "was able" is incorrect.
 
 
 
@@ -244,7 +240,7 @@ G1 needs the lock to be able to burn right?
 
 ### Indentation
 
-Weird indentation starts around line 100 in the document.
+Inconsistent indentation starts around line 100 in the document.
 
 
 ### Extra the
@@ -255,12 +251,16 @@ Weird indentation starts around line 100 in the document.
 222	      application to its corresponding gateway, permitting each gateway
 ```
 
+Suggested fix: "by the each" → "by each".
+
 ### Missing are
 
 ```
 400	   The desirable features of asset transfers between two gateways
 401	   include, but not limited, to the following:
 ```
+
+Suggested fix: "include, but not limited, to" → "include, but are not limited to,".
 
 
 ### Reached
@@ -269,3 +269,5 @@ Weird indentation starts around line 100 in the document.
 983	   message is lost and will assume that the transaction has reach
 984	   completion in network NW2.  The sender gateway G1 has retained the
 ```
+
+Suggested fix: "has reach" → "has reached".
