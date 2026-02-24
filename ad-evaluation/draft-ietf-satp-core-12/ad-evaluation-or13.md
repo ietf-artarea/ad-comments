@@ -13,6 +13,16 @@ CC @OR13
 
 There are lots of broken or unused references in this document.
 
+### TSL 1.2
+
+```
+215	   All messages exchanged between gateways are assumed to run over
+216	   TLS1.2 or higher, and the endpoints at the respective gateways are
+```
+
+Why is TLS 1.2 mandatory? Why not TLS 1.3? 
+Some elaboration on this seems warranted.
+
 ## Comments
 
 ### 2PC vs 3PC
@@ -25,15 +35,6 @@ There are lots of broken or unused references in this document.
 ```
 
 IMO, if core never describes 3PC, the architecture should either say that, or not introduce 3PC.
-
-### TSL 1.2
-
-```
-215	   All messages exchanged between gateways are assumed to run over
-216	   TLS1.2 or higher, and the endpoints at the respective gateways are
-```
-
-Why not TLS 1.3 ? 
 
 ### Legal Owner in Cert
 
@@ -72,7 +73,7 @@ However, "Claim Type" is not defined in RFC 7519.
 ```
 
 The implication here is that all SHOULD be supported.
-Its good that you have a MTI, I don't think you need to encourage the use of all algorithms and key types.
+Its good enough that you have a MTI, I don't think you need to encourage the use of all algorithms and key types.
 
 ### Base64 JSON
 
@@ -139,10 +140,6 @@ Perhaps keep this one, and us a forward reference for the first statement on MTI
 Are there any networks that implement these lock types?
 Perhaps provide at least one reference for each lock type.
 
-
-### TLS 1.2
-
-Why is TLS 1.2 mandatory? Why not TLS 1.3?
 
 
 ### Nonces are not shown
