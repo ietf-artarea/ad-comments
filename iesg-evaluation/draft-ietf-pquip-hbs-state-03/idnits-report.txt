@@ -1,0 +1,1116 @@
+idnits 2.17.1 
+
+draft-ietf-pquip-hbs-state-03.txt:
+-(6): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(378): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+  == There are 9 instances of lines with non-ascii characters in the document.
+
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     Summary: 0 errors (**), 0 flaws (~~), 1 warning (==), 0 comments (--).
+
+--------------------------------------------------------------------------------
+
+
+2	Post-Quantum Use In Protocols                                 T. Wiggers
+3	Internet-Draft                                                  PQShield
+4	Intended status: Informational                                K. Bashiri
+5	Expires: 11 August 2026                                              BSI
+6	                                                                S. Kölbl
+7	                                                                  Google
+8	                                                              J. Goodman
+9	                                                   Crypto4A Technologies
+10	                                                             S. Kousidis
+11	                                                                     BSI
+12	                                                         7 February 2026
+
+14	           Hash-based Signatures: State and Backup Management
+15	                     draft-ietf-pquip-hbs-state-03
+
+17	Abstract
+
+19	   Stateful Hash-Based Signature Schemes (Stateful HBS) such as LMS,
+20	   HSS, XMSS and XMSS^MT combine Merkle trees with One-Time Signatures
+21	   (OTS) to provide signatures that are resistant against attacks using
+22	   large-scale quantum computers.  Unlike conventional stateless digital
+23	   signature schemes, Stateful HBS have a state to keep track of which
+24	   OTS keys have been used, as double-signing with the same OTS key
+25	   allows forgeries.
+
+27	   This document provides guidance and catalogs security considerations
+28	   for the operational and technical aspects of deploying systems that
+29	   rely on Stateful HBS.  Management of the state of the Stateful HBS,
+30	   including any handling of redundant key material, is a sensitive
+31	   topic.  This document describes some approaches to handle the
+32	   associated challenges.  It also describes the challenges that need to
+33	   be resolved before certain approaches should be considered.
+
+35	About This Document
+
+37	   This note is to be removed before publishing as an RFC.
+
+39	   The latest revision of this draft can be found at https://hbs-
+40	   guidance.github.io/draft-hbs-state/draft-ietf-pquip-hbs-state.html.
+41	   Status information for this document may be found at
+42	   https://datatracker.ietf.org/doc/draft-ietf-pquip-hbs-state/.
+
+44	   Discussion of this document takes place on the Post-Quantum Use In
+45	   Protocols Working Group mailing list (mailto:pqc@ietf.org), which is
+46	   archived at https://mailarchive.ietf.org/arch/browse/pqc/.  Subscribe
+47	   at https://www.ietf.org/mailman/listinfo/pqc/.
+
+49	   Source for this draft and an issue tracker can be found at
+50	   https://github.com/hbs-guidance/draft-hbs-state.
+
+52	Status of This Memo
+
+54	   This Internet-Draft is submitted in full conformance with the
+55	   provisions of BCP 78 and BCP 79.
+
+57	   Internet-Drafts are working documents of the Internet Engineering
+58	   Task Force (IETF).  Note that other groups may also distribute
+59	   working documents as Internet-Drafts.  The list of current Internet-
+60	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+62	   Internet-Drafts are draft documents valid for a maximum of six months
+63	   and may be updated, replaced, or obsoleted by other documents at any
+64	   time.  It is inappropriate to use Internet-Drafts as reference
+65	   material or to cite them other than as "work in progress."
+
+67	   This Internet-Draft will expire on 11 August 2026.
+
+69	Copyright Notice
+
+71	   Copyright (c) 2026 IETF Trust and the persons identified as the
+72	   document authors.  All rights reserved.
+
+74	   This document is subject to BCP 78 and the IETF Trust's Legal
+75	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+76	   license-info) in effect on the date of publication of this document.
+77	   Please review these documents carefully, as they describe your rights
+78	   and restrictions with respect to this document.  Code Components
+79	   extracted from this document must include Revised BSD License text as
+80	   described in Section 4.e of the Trust Legal Provisions and are
+81	   provided without warranty as described in the Revised BSD License.
+
+83	Table of Contents
+
+85	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
+86	     1.1.  When are Stateful HBS Appropriate?  . . . . . . . . . . .   4
+87	   2.  Specific Terminology in the Context of Stateful HBS . . . . .   5
+88	     2.1.  Private Key Components  . . . . . . . . . . . . . . . . .   5
+89	     2.2.  State Management  . . . . . . . . . . . . . . . . . . . .   6
+90	     2.3.  Backup Management . . . . . . . . . . . . . . . . . . . .   6
+91	     2.4.  Key Export, Key Import and Key Transfer . . . . . . . . .   7
+92	   3.  Operational Considerations  . . . . . . . . . . . . . . . . .   7
+93	   4.  Requirements for Secure State Management  . . . . . . . . . .   9
+94	   5.  Potential Solutions . . . . . . . . . . . . . . . . . . . . .  11
+95	     5.1.  Multiple Public Keys (SP-800-208) . . . . . . . . . . . .  11
+96	     5.2.  Distributed Multi-trees (SP-800-208)  . . . . . . . . . .  12
+97	     5.3.  Sectorization . . . . . . . . . . . . . . . . . . . . . .  13
+98	     5.4.  Key/State Transfer  . . . . . . . . . . . . . . . . . . .  14
+99	     5.5.  Key Rotation  . . . . . . . . . . . . . . . . . . . . . .  14
+100	     5.6.  Variable-length Signature Chains  . . . . . . . . . . . .  15
+101	     5.7.  Pre-assigning States  . . . . . . . . . . . . . . . . . .  15
+102	     5.8.  Time-based State Management . . . . . . . . . . . . . . .  16
+103	     5.9.  Interval-based Approaches . . . . . . . . . . . . . . . .  18
+104	   6.  Backup Management Beyond NIST SP-800-208  . . . . . . . . . .  18
+105	   7.  Security Considerations . . . . . . . . . . . . . . . . . . .  21
+106	   8.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  21
+107	   9.  Informative References  . . . . . . . . . . . . . . . . . . .  21
+108	   Acknowledgments . . . . . . . . . . . . . . . . . . . . . . . . .  23
+109	   Contributors  . . . . . . . . . . . . . . . . . . . . . . . . . .  23
+110	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  23
+
+112	1.  Introduction
+
+114	   Stateful Hash-Based Signature Schemes (Stateful HBS) such as LMS,
+115	   HSS, XMSS and XMSS^MT combine Merkle trees with One-Time Signatures
+116	   (OTS) in order to provide digital signature schemes that remain
+117	   secure even when large-scale quantum computers become available.  The
+118	   theoretic security of Stateful HBS is well understood and depends
+119	   only on the security of the underlying hash function.  As such,
+120	   Stateful HBS can serve as an important building block for quantum-
+121	   resistant information and communication technology.  Stateful HBS are
+122	   specified in [RFC8391], [RFC8554], and NIST [SP-800-208].
+
+124	   The private key of a Stateful HBS is a finite collection of OTS keys
+125	   (typically generated on-demand from a seed) and an associated data
+126	   structure which keeps track of which OTS keys have been used.  This
+127	   data structure is typically a simple counter and often called an
+128	   index; we refer to it as the *state* of the private key.  Each
+129	   Stateful HBS private key can be used to sign a finite number of
+130	   messages, and the state must be updated with each generated
+131	   signature.
+
+133	   One must not reuse any OTS key that is part of a Stateful HBS private
+134	   key.  If an attacker is able to obtain signatures for two different
+135	   messages created using the same OTS key, it is computationally
+136	   feasible for that attacker to create forgeries [BH16] [Fluhrer23].
+137	   As noted in [MCGREW] and [ETSI-TR-103-692], extreme care should be
+138	   taken in order to avoid the risk that an OTS key will be reused
+139	   accidentally.  Whereas [MCGREW] identifies the fundamental failure
+140	   modes of Stateful HBS and proposes architectural strategies such as a
+141	   reservation approach, and [ETSI-TR-103-692] provides a broad analysis
+142	   of state management challenges and risks, this document complements
+143	   both by cataloging concrete operational patterns in Section 5 and by
+144	   addressing backup and recovery considerations Section 6 not covered
+145	   in prior work.
+
+147	   In particular, the challenges below highlight why careful state and
+148	   backup management are essential in Stateful HBS:
+
+150	   *  Implementers must ensure that each creation of a signature updates
+151	      the state correctly.
+
+153	   *  If the Stateful HBS private key is distributed to multiple signers
+154	      at the same time, implementers must ensure that they never use the
+155	      same OTS key.  This may require synchronization between all
+156	      signers.
+
+158	   *  Additional operational complexity arises when part of the
+159	      available OTS signatures are allocated to different devices
+160	      (partial state transfer), or when state from different devices
+161	      needs merging; these introduce risks of overlap, failure, and
+162	      require careful coordination.
+
+164	   *  If key backups are required, implementers must ensure that any
+165	      backup mechanism can not lead to re-using a previously used OTS
+166	      key.
+
+168	   The following sections present, recall, and discuss various
+169	   strategies for a correct state and backup management for Stateful
+170	   HBS.
+
+172	1.1.  When are Stateful HBS Appropriate?
+
+174	   The issues with state management described above, as well as (for
+175	   most parameter sets) the limited number of signatures, lead to new
+176	   requirements that most developers will not be familiar with and that
+177	   require careful handling in practice: Stateful HBS are not general-
+178	   purpose signature schemes.  Most applications, especially those that
+179	   may produce unrestricted numbers of signatures, should use
+180	   _stateless_ hash-based signature schemes like SLH-DSA [FIPS205],
+181	   which use the same security assumptions, or schemes based on other
+182	   assumptions, such as ML-DSA [FIPS204], instead.  However, if run
+183	   time, implementation size, or signature or key sizes of stateless
+184	   alternatives are prohibitive, and the specific use case allows a very
+185	   tight control of the signing environment, using Stateful HBS may be
+186	   an appropriate solution.  It seems likely that in many scenarios, it
+187	   is only possible to meet the requirements set out in Section 4 when
+188	   using purpose-designed hardware, such as hardware-security modules.
+
+190	   Stateful HBS are already profiled or discussed in several deployment-
+191	   focused specifications and guidance documents.  For example,
+192	   [RFC9802] discusses suitable use cases for stateful HBS in X.509
+193	   (including firmware/software signing and CA certificates).  The SUIT
+194	   Mandatory-to-Implement algorithms specification
+195	   [I-D.draft-ietf-suit-mti] defines an asymmetric profile that uses
+196	   HSS-LMS, providing an interoperability target for software/firmware
+197	   update IoT ecosystems.  Additionally, the NSA [CNSA2.0] allows LMS
+198	   (and XMSS) in specific application scenarios such as firmware/
+199	   software signing.
+
+201	2.  Specific Terminology in the Context of Stateful HBS
+
+203	   In this section we specify certain notions which are important in the
+204	   context of Stateful HBS.
+
+206	2.1.  Private Key Components
+
+208	   This section describes the two conceptual components that make up the
+209	   private key material used in Stateful HBS.
+
+211	   private key  the static, long-lived secret(s) from which OTS private
+212	      keys are derived.  This material is stateless: given the scheme
+213	      parameters, it deterministically defines the set of OTS private
+214	      keys but does not change over time.
+
+216	   state  the dynamically updated data structure that records which OTS
+217	      key indices have been consumed (often a monotone counter).  This
+218	      material is mutable and must change on every successful signature.
+
+220	   Conceptually, the private key and the state are distinct and should
+221	   be handled accordingly: the private key is a static secret, while the
+222	   state is mutable, evolves with each signature, and must be maintained
+223	   with integrity and correctness.  In some implementations, these two
+224	   components may be packaged together and not directly separable; in
+225	   such cases, this document’s guidance applies to the combined
+226	   artifact.
+
+228	2.2.  State Management
+
+230	   In this document, _state management_ refers to the handling and
+231	   implementation of the state of the private key.
+
+233	   This includes mechanisms, which aim:
+
+235	   *  to securely update the state before the signature is released,
+
+237	   *  to set up Stateful HBS where the state is separated in distinct,
+238	      non-overlapping parts, so that signatures can be generated from
+239	      either part without risk of state reuse,
+
+241	   *  to enable partial transfer of unused signature capacity between
+242	      devices, and optionally merging state fragments without overlap,
+
+244	   *  to enable effective but secure handling of private key and state
+245	      backup material,
+
+247	   *  to guarantee the availability of both the private key and its
+248	      state across the lifetime of the key.
+
+250	   Note that in particular implementations of Stateful HBS, or in
+251	   alternative signature mechanisms, the state and private key might be
+252	   inseparable.  For example, puncturable schemes [BSW16] represent such
+253	   an alternative; they are research-level constructions and are not
+254	   currently standardized or deployed in practice.  However, even in
+255	   these scenarios, this document's guidance should still apply.
+
+257	2.3.  Backup Management
+
+259	   In order to mitigate failure of, e.g., devices storing key material
+260	   and to facilitate other types of disaster recovery, backups of
+261	   private keys and their associated states should be considered as part
+262	   of a security architecture.
+
+264	   In this document, _backup management_ refers to all mechanisms
+265	   surrounding the goal to guarantee the availability of the private key
+266	   and state, but with special care to avoid state reuse by rolling back
+267	   to a state in which already-used OTS keys are still available.
+
+269	   These mechanisms include procedures and protocols, which aim:
+
+271	   *  to securely store this private key and state material outside the
+272	      in-use signing device,
+
+274	   *  to import an externally stored private key and state to a newly
+275	      initiated signing device,
+
+277	   *  allow practicing with backup recovery and to ensure backups are
+278	      valid.
+
+280	   Backup management can be viewed as a more specific type of state
+281	   management; we make this distinction to clarify the aims of our
+282	   recommendations.
+
+284	2.4.  Key Export, Key Import and Key Transfer
+
+286	   As part of state and backup management, we will discuss mechanisms to
+287	   export, import or transfer private key and state material.  In order
+288	   to avoid misunderstandings we now specify these notions more
+289	   precisely.
+
+291	   key export  mechanism of exporting secret data, which yields
+292	      (partial) private key and state material, from the signing device
+293	      to external storage.  This external storage may be given in
+294	      digital or non-digital form.
+
+296	   key import  mechanism of importing secret data, which loads (partial)
+297	      private key and state material, from external storage to the
+298	      signing device.
+
+300	   key transfer  a cryptographically protected transfer of ownership of
+301	      private key and state material from one signing device to another.
+
+303	   Systems and architectures relying on key transfer are generally
+304	   expected to require fewer operational and manually-executed steps and
+305	   checks to avoid state reuse.
+
+307	   Note that, at times, secure variants of the aforementioned primitives
+308	   may be required (e.g., securely importing/exporting the key).  In
+309	   these situations cryptographic mechanisms should be utilized to
+310	   provide assurances related to the confidentiality (e.g., utilizing
+311	   symmetric/asymmetric encryption mechanisms) and/or integrity/
+312	   authenticity (e.g., utilizing digital signatures, hash functions, and
+313	   keyed message authentication codes) of the associated operations.
+
+315	3.  Operational Considerations
+
+317	   An important aspect of the evaluation of various HBS state and backup
+318	   management options is to consider the operational costs associated
+319	   with the option(s) being evaluated.  In the past, a traditional trust
+320	   infrastructure solution could utilize straightforward archival
+321	   procedures to make copies of the keys, which could then be
+322	   distributed geographically to ensure their availability and deliver a
+323	   sufficiently resilient solution, all the while enforcing whatever
+324	   security protocols and procedures were required.  Unfortunately,
+325	   Stateful HBS introduce an additional constraint in that they need to
+326	   ensure the state is never re-used.  Hence, archival procedures used
+327	   for traditional trust infrastructures have to be amended/redesigned
+328	   to be used as viable options.
+
+330	   One of the most problematic aspects of providing a long-lived
+331	   resilient solution is simply managing the physical media on which the
+332	   keys/state are stored externally (i.e., outside of the signing
+333	   device) throughout the course of their lifetime.  Physical media/
+334	   devices degrade over time, and the more complex the media/device, the
+335	   more likely it is to fail at some point in time (e.g., data stored on
+336	   a CD vs. data stored on a USB drive vs. data stored in a Hardware
+337	   Security Module).  Combine that fact with the long lifetimes
+338	   associated with Stateful HBS keys (e.g., 10-20+ years) and the
+339	   difficulties associated with transferring keys between devices, and
+340	   one finds them self with a perplexing set of challenges that needs to
+341	   be accounted for in any state selection process of a proper state and
+342	   backup management solution.  Compounding these complexities is the
+343	   fact any resilient state management system should also provide some
+344	   means to verify the integrity of these long-lived backups to ensure
+345	   they will be valid when they are required, and to ensure the
+346	   operators know how to execute the necessary recovery procedure(s).
+
+348	   Similarly, many of the prescribed state management options require a
+349	   high degree of operator involvement which means one should consider
+350	   the costs associated with training the operator element to ensure
+351	   processes and procedures are adhered to and failures caught early and
+352	   corrected before a catastrophic loss of security can occur (e.g.,
+353	   accidentally instantiating multiple instances of a Stateful HBS key/
+354	   state).  Note that training is not a fixed one-time cost either as
+355	   long lifetimes will necessitate succession planning amongst the
+356	   operator element, and training of each successive generation of
+357	   participants.  Mechanisms also should be put in place to mitigate the
+358	   ever-present insider threat via mechanisms such as M-of-N controls,
+359	   ensuring least-privileges amongst participants, and enforcing a
+360	   segregation of duties to ensure multiple parties are required to
+361	   collude to undermine a solution's security.  Note that the
+362	   segregation of duties must persist across successive generations to
+363	   ensure participants do not acquire multiple roles over time, thereby
+364	   undermining the intended segregation.
+
+366	   In addition to the state management, implementers may consider
+367	   implementing mechanisms to prevent abrupt signature exhaustion.
+368	   Implementations may consider providing a configurable warning
+369	   threshold, M, which is triggered when M signatures remain.  When the
+370	   number of available signatures reaches this threshold, the system
+371	   should return a 'signatures nearing exhaustion' warning.  This
+372	   warning condition should require explicit acknowledgment from the
+373	   user through a mechanism that cannot be trivially skipped.
+
+375	   Another important consideration in deploying Stateful HBS is the
+376	   selection of an appropriate parameter set.  Given the flexibility of
+377	   these schemes — such as adjustable tree heights or Winternitz
+378	   parameters — there exists a large variety of possible configurations.
+379	   The availability of these different configurations offers many trade-
+380	   offs between signature generation/verification time, signature size,
+381	   and key generation time.  Hence, careful attention during the design
+382	   phase is essential to ensure that the chosen parameter set aligns
+383	   optimally with the specific requirements of the intended use case.
+
+385	   Lastly, costs associated with any external dependencies required by a
+386	   particular solution (e.g., access to a public ledger or transparency
+387	   log, providing accurate time references and synchronization
+388	   mechanisms, access to attestation facilities, etc.) must be accounted
+389	   for as well, particularly if a system is operating in an offline mode
+390	   that makes delivering these additional capabilities all the more
+391	   complicated and expensive.
+
+393	4.  Requirements for Secure State Management
+
+395	   A system deploying Stateful HBS should fulfill certain requirements
+396	   to allow securely handling the state.  The system must ensure that no
+397	   two signing operations can ever be issued from the same state.  In
+398	   addition, the generation of a signature and update of the state
+399	   should appear to be an _atomic transaction_. This means that the
+400	   system must not release a signature without irrevocably and correctly
+401	   updating the state.
+
+403	   State management systems should satisfy all _ACID_ properties:
+
+405	   *  _Atomicity_: each operation on the state must be indivisible —
+406	      such that it either commits completely or leaves the state
+407	      unchanged.
+
+409	   *  _Consistency_: the state before and after each update must reflect
+410	      a valid progression of available OTS indices, and no invalid or
+411	      conflicting state is ever observable.
+
+413	   *  _Isolation_: concurrent or overlapping operations (e.g., from
+414	      separate processes or devices) must not interfere in ways that
+415	      could lead to state reuse.
+
+417	   *  _Durability_: once a state transition (e.g., before issuing a
+418	      signature) is committed, that transition must survive crashes,
+419	      power loss, or device failure.
+
+421	   These requirements impose significant restrictions on the underlying
+422	   technical approach and a careful implementation of how the state will
+423	   be updated or synchronized.  The abstraction layers of modern systems
+424	   can make it particularly difficult to guarantee that no two versions
+425	   of the same state are present.  The main concerns here are
+
+427	   *  how the actual storage for the state is implemented,
+
+429	   *  how it is modified,
+
+431	   *  how an accidental/intentional failure/glitch might affect the
+432	      state security.
+
+434	   A system may have a version of the private key stored in non-volatile
+435	   memory (e.g. a disk) and will load it into volatile memory (e.g. RAM)
+436	   while processing.  Here, an implementer must ensure that these are
+437	   always perfectly synchronized [MCGREW], meaning that no parts of the
+438	   system are allowed to read any version of the key during procedures
+439	   which load, write or modify keys.  This can be particularly
+440	   challenging if there are additional abstraction layers present in the
+441	   system, like additional caches which may affect reading/writing the
+442	   state and its potential existence in multiple locations.
+
+444	   Cloning is another concern, as it can easily lead to re-using the
+445	   same state.  This can happen for instance if a process which issues a
+446	   signing operation is forked, and no proper synchronization is
+447	   enforced in the implementation to guarantee correct state update.
+448	   Virtual machine (VM) cloning is another potential security risk here,
+449	   as both backing up a VM into non-volatile memory or live cloning of a
+450	   VM can easily lead to a state re-use [MCGREW].  With users shifting
+451	   workloads to cloud service providers, the issue of VM cloning may
+452	   become more prevalent.
+
+454	   Using dedicated cryptographic hardware is recommended to enforce
+455	   these requirements, ensure correct behavior and handle the complexity
+456	   of state management.  In particular, this enables implementing
+457	   rollback resistant counters which can be difficult to achieve in a
+458	   software-only fashion.
+
+460	   On the verifier side, no state management is required.  However, the
+461	   verifier needs to trust the signer to not have re-used the state.  A
+462	   verifier may want to check that no state re-use happened in the past
+463	   by a signer, before accepting a signature.
+
+465	   In practice, this can be done if the verifier has access to all
+466	   signatures issued by the signer.  As the signatures contain the index
+467	   of the OTS key used, detecting if an index was used more than once
+468	   becomes trivial.  In practice, such a (public) data structure which
+469	   contains all signatures may already be present in some use cases
+470	   (e.g. certificate transparency [RFC9162]) or could be built.  It is
+471	   worth noting that while trusting the signer to not re-use the state
+472	   is a strong assumption, other signature schemes like ECDSA introduce
+473	   similar assumptions for the verifier, by requiring the signer to
+474	   never re-use the nonce.
+
+476	5.  Potential Solutions
+
+478	   A variety of potential solutions have been proposed both within the
+479	   [SP-800-208] specification, as well as from external sources.  This
+480	   section describes a number of approaches and their potential
+481	   advantages/disadvantages.
+
+483	5.1.  Multiple Public Keys (SP-800-208)
+
+485	   [SP-800-208] proposes generating multiple Stateful HBS keypairs and
+486	   configuring devices and clients to accept signatures created by any
+487	   of these keys.  Secondary Stateful HBS keys can be kept in storage
+488	   until the first keypair is exhausted or lost.
+
+490	   Accepting multiple public keys negatively impacts one of the
+491	   advantages of using Stateful HBS by increasing the public key
+492	   footprint within the client, which can be problematic if it has
+493	   limited public key storage capacity.  (Though public keys are
+494	   typically equivalently sized to ECDSA rather than larger classical
+495	   RSA keys often currently found.)  [SP-800-208] addresses storage
+496	   capacity concerns by suggesting using a mechanism such as that
+497	   proposed in [RFC8649] to update the stored public key by having the
+498	   current key endorse the next key that is to be installed.
+499	   Unfortunately, for many constrained devices the public key is
+500	   embedded in immutable ROM or fuses due to security reasons, so it
+501	   cannot be updated in this manner.
+
+503	   The proposal of using multiple Stateful HBS keypairs for a single
+504	   instance also generates questions as to how to establish that
+505	   approach in existing public key infrastructures.  For example,
+506	   issuing multiple certificates adds the storage needs of the
+507	   certificate material to the public key footprint.  In order to
+508	   alternatively issue multiple public keys encoded inside a single
+509	   certificate one would need a standardized format if interoperability
+510	   is a concern.
+
+512	5.2.  Distributed Multi-trees (SP-800-208)
+
+514	   [SP-800-208] also proposes creating multiple Stateful HBS keys across
+515	   multiple cryptographic modules using a distributed multi-tree
+516	   approach that is a variant of the standard hyper-tree based Stateful
+517	   HBS schemes HSS and XMSS^MT.  In this approach, trees are
+518	   instantiated on a root device (HSM_root), as well as one or more
+519	   subordinate devices (HSM_(sub{{i}})), and the root tree is used to
+520	   sign the root nodes of the subordinate trees to synthesize a multi-
+521	   level Stateful HBS key.  The root device is only ever used to sign
+522	   subordinate device root nodes, while the subordinate device(s)
+523	   is(are) used to sign messages.  This is relatively straightforward to
+524	   do using HSS, and [SP-800-208] describes the necessary algorithmic
+525	   modifications when using XMSS^MT.
+
+527	   One drawback of this approach is the increased signature size as an
+528	   additional OTS needs to be generated, effectively doubling the
+529	   overall signature size.  Another concern is the single point of
+530	   failure nature of relying on the root tree module to sign all of the
+531	   subordinate trees; if the root tree device fails then no new
+532	   subordinate trees can be signed.  [SP-800-208] suggested that as many
+533	   subordinate trees as possible be generated during the initial root
+534	   key generation and subordinate-signing procedure.  Unfortunately,
+535	   this can incur a large capital expenditure to procure all of the
+536	   necessary devices, many of which may not be used for a long period of
+537	   time, if at all.  The subordinate tree root node signing process must
+538	   also be carefully managed to ensure top level trees are only ever
+539	   used to sign the root nodes of trusted/approved subordinate trees to
+540	   ensure that no malicious signing request is accepted, which would
+541	   effectively give a rogue entity the ability to generate valid
+542	   signatures, thereby undermining the security of the entire system.
+
+544	   [SP-800-208] also suggests combining distributed multi-trees with
+545	   multiple root public keys as a means to mitigate some of the concerns
+546	   regarding having a single point of failure in the root tree.
+547	   However, even if a system operator does everything right, use cases
+548	   with exceptionally long lifetimes of 10-20+ years (e.g., automotive
+549	   and aerospace/satellite applications) will require system operators
+550	   to rely on devices well beyond their expected lifetimes of 5-10
+551	   years, which may constitute an unacceptable business risk.
+
+553	5.3.  Sectorization
+
+555	   Distributed multi-trees attempt to partition a Stateful HBS signing
+556	   space amongst multiple cryptographic modules by breaking up the
+557	   signing space along the boundaries of the subordinate trees generated
+558	   during the multi-tree key generation process.  An alternative
+559	   approach would be to use only a single tree, and partition its
+560	   signature space along some power-of-2 less than the total number of
+561	   leaves in the tree (e.g., 2^s for a tree of height h > s), creating N
+562	   = 2^(h-s) partitions or sectors, which are instantiated as N height-s
+563	   Merkle trees whose root nodes are considered interior nodes of the
+564	   overall height-h Merkle tree.  Hence, there is no additional OTS
+565	   required to sign their root nodes; their values are used as-is in the
+566	   tree ascent mechanism of the underlying Stateful HBS scheme, yielding
+567	   a common public key (i.e., root node) for all sectors.  Care must be
+568	   taken to ensure that each sector uses the same root tree identifier
+569	   (i.e., the "I" value for HSS/LMS and "root" value for XMSS/XMSS^MT).
+
+571	   Each of the N sectors' OTS private key values can be generated
+572	   pseudo-randomly from a unique seed value generated from an
+573	   appropriate source of randomness.  The private keys from different
+574	   sectors are independent when generated by this process.  This
+575	   requires that the path information for the root node of each sector
+576	   (i.e., all off-path nodes between the sector root node and the top
+577	   level node value) be stored with each sector's private key at key
+578	   generation time since a sector will not know the seed information
+579	   required to compute any of the other sectors' root nodes during the
+580	   tree ascent phase of a signature generation operation.  During
+581	   signature generation the signer appends the stored path information
+582	   to the path information it computes to ascend from the leaf OTS to
+583	   the sector's root node (which it can compute given that it knows its
+584	   own seed value).
+
+586	   Hence, sectorized key generation results in a single public key value
+587	   and 2^(h-s) private key values, each capable of generating 2^s
+588	   signatures, after which the sectorized key is exhausted.
+
+590	   In addition to avoiding an increased signature size; when unique
+591	   seeds are utilized sectorization breaks a given Stateful HBS key/
+592	   state into multiple independent fragments that can be managed as
+593	   independent objects.  As a result, system operators may distribute
+594	   sectors to multiple cryptographic devices, providing scalability
+595	   through parallelization and improved resiliency/availability.  This
+596	   approach offers isolation between sectors, ensuring that a compromise
+597	   in one does not extend to others, thereby supporting damage
+598	   containment.  At the same time, it simplifies operational robustness
+599	   by removing the need for cross-device state coordination, since each
+600	   sector is restricted to its own signature space.
+
+602	5.4.  Key/State Transfer
+
+604	   Stateful HBS key/state transfer between cryptographic modules entails
+605	   having a means to migrate one instance of a Stateful HBS key/state on
+606	   a source device to a separate destination device, while ensuring that
+607	   any copy of the key/state is deleted from the source device.
+
+609	   This capability may help alleviate the aforementioned concern
+610	   regarding operating devices beyond their expected lifetimes by
+611	   allowing operators to migrate Stateful HBS key/state to a newer
+612	   device when the original device begins to approach its end-of-life.
+613	   However, it still leaves the operator vulnerable to having the source
+614	   device fail before the key/state can be transferred, effectively
+615	   causing the loss of the key/state.  Hence, it will not be of much
+616	   help addressing the single point of failure issue identified for root
+617	   trees, but may be useful for managing subordinate trees.
+
+619	   In addition to complete key/state transfer, a device holding part of
+620	   the total available OTS signatures may transfer some unused capacity
+621	   to another device (partial state transfer).  In more advanced
+622	   deployments, state fragments from two devices may be merged to
+623	   reconstruct or continue signature operations.  These operations carry
+624	   risk: ensuring no overlap in used indices, ensuring atomicity of
+625	   transfer/merge operations, managing consistency, possible conflicts,
+626	   and durability of state across devices.  Such approaches require
+627	   robust synchronization, auditability, and appropriate backup
+628	   mechanisms to avoid double-signing or loss of capacity.
+
+630	   A more elaborate variant of key transfer, going beyond what
+631	   [SP-800-208] allows, can be found described in Section 6 where key
+632	   transfer is accomplished using a two-step export and import process
+633	   with hash-based transfer validation to yield a more robust transfer
+634	   mechanism.
+
+636	5.5.  Key Rotation
+
+638	   Key rotation, such as that defined in [RFC8649], would generate new
+639	   Stateful HBS keys on an as-needed basis, and provide a means to
+640	   transition the system on to using this new Stateful HBS key, while
+641	   generating the next key in the chain in preparation of a future
+642	   rotation/update.  However, this just shifts the problem to the PKI
+643	   and certificate handling.
+
+645	   Key rotation is not foolproof since in most use cases it will require
+646	   redundancy to ensure there is at least one Stateful HBS signing key
+647	   available to attest to newly generated keys.  In addition, for many
+648	   applications the device keys cannot be updated due to engineering
+649	   constraints or security reasons.
+
+651	5.6.  Variable-length Signature Chains
+
+653	   A variant of the key rotation approach is to have an available
+654	   signing tree endorse a new subordinate tree when it is about to
+655	   become exhausted (e.g., use its final OTS to sign the root node of a
+656	   new subordinate tree, creating a {n+1}-layer multi-tree from an {n}-
+657	   layer multi-tree).  This process can in theory be repeated as many
+658	   times as necessary.  However, this entails having a multi-tree scheme
+659	   with a variable number of levels, and hence, variable length
+660	   signatures.  Such dynamically extensible constructions are research-
+661	   class and are not currently standardized or deployed.
+
+663	   In addition to departing quite significantly from the current
+664	   Stateful HBS specifications and [SP-800-208], this approach has a
+665	   number of significant challenges on both the engineering and
+666	   operational fronts.  Firstly, the variable length nature of the
+667	   signature can lead to variable length verification of signatures,
+668	   which may cause significant issues for use cases with strict time
+669	   constraints (e.g., secure booting of a semiconductor device).  From
+670	   an operational perspective, the ability of a subordinate tree to sign
+671	   either messages or new subordinate trees leads to severe security
+672	   implications as the rigor around authorizing those two types of
+673	   operations will vary dramatically, leading to either a much more
+674	   onerous message signing operation, or a much more risky subordinate
+675	   tree signing operation.  This may put the system operator in an
+676	   untenable situation where no users are satisfied with the resulting
+677	   solution, and hence, should not be considered as a viable solution.
+
+679	5.7.  Pre-assigning States
+
+681	   In some applications, individual one-time signatures (or states) can
+682	   be pre-assigned to the to-be-signed objects.  This may for example be
+683	   possible if the signed objects are monotonically increasingly
+684	   numbered.  One example of such a use case may be software signing.
+685	   This solution basically externalizes the state management to the to-
+686	   be signed messages.
+
+688	   Expanding on the given example, for software that is released with
+689	   strictly increasing, simple single-position version numbers (i.e.,
+690	   versions 1, 2, 3...), this can be trivially implemented.  As versions
+691	   have a one-to-one correspondence to a Stateful HBS signing state,
+692	   operators must ensure that versions can only be minted a single time.
+693	   This may require skipping version numbers if a release process
+694	   failed, to avoid double-signing.
+
+696	   This scheme can be adapted to more complicated release schemes: for
+697	   example, minor update-releases 1.0 to 1.99 can be accommodated by
+698	   assigning signatures 1-100 for these version numbers, while release
+699	   2.0-2.99 would get signatures 101-200.  The assignments must be fixed
+700	   as the scheme is set up, and operators should take into account that
+701	   they are strictly limiting the number of update releases.  In the
+702	   described solution to state management, one must move up a major
+703	   release number after 99 minor releases, even if this would break,
+704	   e.g., semantic versioning conventions.
+
+706	   A variant of pre-assigning signatures is doing this on the basis of
+707	   time, which we describe in the next section.
+
+709	5.8.  Time-based State Management
+
+711	   As a variant of pre-assigning one-time signatures based on external
+712	   counters, it is in theory possible to base the selection of one-time
+713	   signature indexes on the current date and time.  For example, if a
+714	   given Stateful HBS instance offers 1024 total signatures, they could
+715	   be broken up into 8 groups of 128 OTS instances each, with the first
+716	   128 allowed to be used in the first time window, the second 128 in
+717	   the second time window, and so on, until the signature space is
+718	   effectively exhausted after 8 time windows.  Note that a time-based
+719	   approach to state management will "waste" any OTS keys that are
+720	   unused in past time windows.  One must not attempt to use these keys
+721	   after the time window has gone by.
+
+723	   Any time-based approach has a very strict reliance on accurate time-
+724	   keeping and synchronization of clocks.  In particular, we identify
+725	   that at least the following engineering-related challenges need to be
+726	   considered:
+
+728	   *  Signing devices must have accurate timekeeping (which is a very
+729	      challenging engineering problem [TIMEFALSEHOODS]).
+
+731	   *  Time on signing devices must not be allowed to ever move
+732	      backwards, as this can cause double-signing.
+
+734	   *  Within time windows, signers must track the number of signatures
+735	      produced to ensure it does not exceed the number allowed within
+736	      the window.
+
+738	   *  Signing devices must still operate consistently with the
+739	      requirements of state keeping for Stateful HBS: the signature
+740	      index within a time window should still appear to be updated
+741	      atomically, and signatures must not be released before state
+742	      changes have been recorded.
+
+744	   *  A system should be robust against exhaustion of the number of
+745	      signatures available in a time window, as in this case it is
+746	      required to wait until the next time window starts before new
+747	      messages can be signed.
+
+749	   *  Time on signing devices should not be allowed to be moved forward
+750	      maliciously or accidentally, which would allow for a simple
+751	      denial-of-service attack by skipping over portions of the
+752	      signature space.
+
+754	   *  If a signing device needs to be replaced, the replacement device
+755	      must be set up with its time in sync with or ahead of the device
+756	      it is to replace.  This implies the current time on signing
+757	      devices should be continuously recorded.
+
+759	   *  Rate limiting may need to be considered, as exhausting the
+760	      available signatures in a given time window may otherwise be easy.
+
+762	   *  It may be necessary for signers to keep a separate clock for time-
+763	      based state management, and one for not necessarily monotonically
+764	      increasing "wall-time", e.g., if signed artifacts are expected to
+765	      be time-stamped with real-world time.
+
+767	   If these concerns can not be sufficiently addressed, time-based state
+768	   management as described in this paragraph should not be used.  Note
+769	   that this list of concerns is not exhaustive, and other, unmentioned,
+770	   concerns may also be relevant to the security of a time-based
+771	   solution.
+
+773	   Time-based systems can be backed up by simply recording the private
+774	   keys and the configuration of the time windows.  In case of loss of a
+775	   signing device, a time-based state management system can be recovered
+776	   by using this information to bring online a new device in the next
+777	   time window.  This approach may also be used as a recovery mechanism
+778	   in the case of (suspected) state consistency problems during a time
+779	   window.  However, the operator must not allow new signatures to be
+780	   produced before the new time window starts, unless they know the
+781	   exact state at which the previous device became unavailable and are
+782	   able to set up the new device accordingly.  Waiting until the start
+783	   of the next time window avoids double signing, as the OTS keys
+784	   assigned to future time windows are guaranteed to have not yet been
+785	   used.  However, this might incur significant downtime of the signing
+786	   systems.  Downtime may be avoided by forcibly moving the signing
+787	   device to the next time window by incrementing its clock; however,
+788	   this induced clock drift will then need to be accounted for in the
+789	   future.  If clock drift is to be avoided, this approach should
+790	   account for availability considerations.
+
+792	5.9.  Interval-based Approaches
+
+794	   The State Reservation Strategy described in section 5 of [MCGREW]
+795	   provides another means of managing the state by allowing users to
+796	   reserve intervals of the signing space, marking the interval's
+797	   associated OTS keys as being used in the overall HBS state, which is
+798	   then written back to non-volatile memory prior to their usage.  The
+799	   OTS keys within the reservation interval are then consumed as-needed,
+800	   without having to update the state again until they have all been
+801	   consumed and additional OTS keys are required.  Note that the
+802	   reserved OTS keys are kept in dynamic memory so they will be lost if
+803	   the signing device loses power or is reset, resulting in a reduction
+804	   in the number of usable signatures for a given HBS instantiation.
+
+806	   Over provisioning can be used to ensure a sufficient number of
+807	   signatures can be provided in the presence of unexpected losses due
+808	   to power loss or resets.  Over provisioning will cause a minor
+809	   increase between 2% and 12% on signature length as the MTS validation
+810	   paths increase to accommodate the increased Merkle tree height.
+811	   However, reservation eliminates the need to update the state after
+812	   each OTS key is used, minimizing the likelihood of state reuse due to
+813	   state update failures and coherency issues.
+
+815	   Multiple signing devices can in theory utilize reservation intervals
+816	   to carve out portions of signing space so that a single S-HBS key can
+817	   be shared amongst multiple devices, leading to potential performance
+818	   and disaster-recovery benefits.  However, great care must be taken to
+819	   manage the reservations to ensure there is no overlap or repeated
+820	   reservation of a given interval, either in part or in whole.
+
+822	6.  Backup Management Beyond NIST SP-800-208
+
+824	   In this section, an alternative backup mechanism for Stateful HBS is
+825	   presented in a generic form, which makes the strategy applicable for
+826	   both multi-tree instances XMSS^MT and HSS.  However, following the
+827	   same arguments as in Section 5.3, with minor modifications, the
+828	   presented strategy is also applicable for single-tree instances such
+829	   as XMSS and LMS.
+
+831	   The strategy presented in this section builds upon the multi-tree
+832	   variant approach from [SP-800-208], and aims to mitigate its
+833	   limitations described in Section 5.2.  Thus, it is assumed that
+834	   already a top-level Merkle tree (for signing the root-nodes of sub-
+835	   trees) and several bottom-level Merkle trees (for signing messages)
+836	   are initiated.  These bottom-level trees may be implemented on
+837	   different hardware modules in order to obtain redundancy and improve
+838	   availability.  Let R be the number of these already initiated bottom-
+839	   level trees.  Let h_0 be the height of the top-level-tree.  It is
+840	   assumed that R + 1 is strictly smaller than 2^(h_0), the number of
+841	   leaves of the top-level tree.
+
+843	   In this new strategy, after the completed key generation procedure
+844	   from the multi-tree variant approach from [SP-800-208], further
+845	   bottom-level trees are generated, one by one, in one of the hardware
+846	   modules.  These new bottom-level trees are each generated from a
+847	   different seed, which is chosen uniformly at random.  For the sake of
+848	   clarity, let us introduce some notation:
+
+850	   *  S denotes the number of these newly generated bottom-level trees.
+851	      Note that at most 2^(h_0) - R new bottom-level trees can be
+852	      generated, i.e. S is lower or equal to 2^(h_0) - R.  In the
+853	      following we suppose that S is _strictly smaller_ than 2^(h_0) -
+854	      R.
+
+856	   *  I_new denotes the set of indices that belong to these newly
+857	      generated bottom-level trees, i.e. I_new = {R, R+1, ..., R+S-1}.
+858	      I_new is zero-indexed here.
+
+860	   For each new bottom-level tree, after it has been generated, the
+861	   following steps must be performed:
+
+863	   *  sign the corresponding root node with an unused OTS key from the
+864	      top-level tree,
+
+866	   *  securely _key export_ (as described in Section 2.4) the seed,
+867	      which was used to generate the bottom-level tree,
+
+869	   *  export the signature of the root node, the corresponding OTS key
+870	      index and finally the hash of the seed, using appropriate domain
+871	      separation (i.e. ensuring there is no domain overlap with the
+872	      hashes in the Stateful HBS scheme, and the hash of the seed
+873	      includes the public key and leaf index to mitigate multi-target
+874	      attacks),
+
+876	   *  irreversibly delete the seed and the bottom-level tree from the
+877	      hardware module.
+
+879	   The newly generated bottom-level trees (i.e. those bottom-level
+880	   trees, whose indices belong to I_new) are only used in order to
+881	   guarantee availability in the _worst-case scenario_, where at the
+882	   same time both
+
+884	   *  none of the R bottom-level Merkle trees (which were generated
+885	      according to the multi-tree variant approach from [SP-800-208])
+886	      are available for signing messages and
+
+888	   *  the top-level Merkle tree (which is used for signing the root-
+889	      nodes of sub-trees) is also not available anymore.
+
+891	   This scenario may, for example, happen if all hardware modules are
+892	   broken at the same time.
+
+894	   As soon as this worst-case scenario occurs, the newly generated
+895	   bottom-level trees (i.e. those bottom-level trees, whose indices
+896	   belong to I_new) need to be initiated in order to ensure
+897	   availability.  In order to do this the following steps must be
+898	   performed:
+
+900	   *  initiate a new hardware module
+
+902	   *  securely _key import_ (as decribed in Section 2.4) the first
+903	      unused seed into this hardware module
+
+905	   *  generate the bottom-level tree corresponding to the seed
+
+907	   *  irreversibly delete the seed from the backup medium
+
+909	   *  perform a correctness check by letting the hardware module output
+910	      the hash of the seed
+
+912	   Now this bottom-level tree can be used to sign messages.  As soon as
+913	   no more OTS on the bottom-level tree are available or as soon as the
+914	   hardware module is broken, the above steps with a new seed from the
+915	   backup medium can be repeated.
+
+917	   Note that the resulting signatures generated from these backed up
+918	   seeds do not require any special processing on the verifier side.
+919	   The signature stored alongside the backed up seed, and the signature
+920	   generated from the bottom-level trees created from the backed up seed
+921	   can be combined to match the format of a signature over the complete
+922	   tree.
+
+924	7.  Security Considerations
+
+926	   Security considerations are given throughout this document.  Further
+927	   security considerations, which are not already covered in this
+928	   document, are given in [SP-800-208], [MCGREW], [FIPS205], [RFC8391]
+929	   and [RFC8554].
+
+931	8.  IANA Considerations
+
+933	   This document has no IANA actions.
+
+935	9.  Informative References
+
+937	   [BH16]     Bruinderink, L. and A. Hülsing, "Oops, I did it again –
+938	              Security of One-Time Signatures under Two-Message
+939	              Attacks.", 2016, <https://eprint.iacr.org/2016/1042.pdf>.
+
+941	   [BSW16]    Bellare, M., Stepanovss, I., and B. Waters, "New Negative
+942	              Results on Differing-Inputs Obfuscation", n.d.,
+943	              <https://link.springer.com/
+944	              chapter/10.1007/978-3-662-49896-5_28>.
+
+946	   [CNSA2.0]  National Security Agency (NSA), "Commercial National
+947	              Security Algorithm Suite 2.0 (CNSA 2.0) Cybersecurity
+948	              Advisory (CSA)", 7 September 2022,
+949	              <https://media.defense.gov/2022/Sep/07/2003071834/-1/-1/0/
+950	              CSA_CNSA_2.0_ALGORITHMS_.PDF>.
+
+952	   [ETSI-TR-103-692]
+953	              European Telecommunications Standards Institute (ETSI),
+954	              "State management for stateful authentication mechanisms",
+955	              November 2021, <https://www.etsi.org/deliver/
+956	              etsi_tr/103600_103699/103692/01.01.01_60/
+957	              tr_103692v010101p.pdf>.
+
+959	   [FIPS204]  National Institute of Standards and Technology, "FIPS 204:
+960	              Module-Lattice-Based Digital Signature Standard", Federal
+961	              Information Processing Standards , 13 August 2024,
+962	              <https://doi.org/10.6028/NIST.FIPS.204>.
+
+964	   [FIPS205]  National Institute of Standards and Technology, "FIPS 205:
+965	              Stateless Hash-Based Digital Signature Standard", Federal
+966	              Information Processing Standards , 13 August 2024,
+967	              <https://doi.org/10.6028/NIST.FIPS.205>.
+
+969	   [Fluhrer23]
+970	              Fluhrer, S., "Oops, I did it again revisited; another look
+971	              at reusing one-time signatures", 2023.
+
+973	   [HBSX509]  Bashiri, K., Fluhrer, S., Gazdag, S., Van Geest, D., and
+974	              S. Kousidis, "Internet X.509 Public Key Infrastructure:
+975	              Algorithm Identifiers for Hash-based Signatures", n.d.,
+976	              <https://www.ietf.org/archive/id/draft-gazdag-x509-hash-
+977	              sigs-02.html>.
+
+979	   [I-D.draft-ietf-suit-mti]
+980	              Moran, B., Rønningstad, O., and A. Tsukamoto,
+981	              "Cryptographic Algorithms for Internet of Things (IoT)
+982	              Devices", Work in Progress, Internet-Draft, draft-ietf-
+983	              suit-mti-23, 22 July 2025,
+984	              <https://datatracker.ietf.org/doc/html/draft-ietf-suit-
+985	              mti-23>.
+
+987	   [MCGREW]   McGrew, D., Kampanakis, P., Fluhrer, S., Gazdag, S.,
+988	              Butin, D., and J. Buchmann, "State Management for Hash-
+989	              Based Signatures", Security Standardization Research
+990	              2016 , 2 November 2016,
+991	              <https://eprint.iacr.org/2016/357.pdf>.
+
+993	   [RFC8391]  Huelsing, A., Butin, D., Gazdag, S., Rijneveld, J., and A.
+994	              Mohaisen, "XMSS: eXtended Merkle Signature Scheme",
+995	              RFC 8391, DOI 10.17487/RFC8391, May 2018,
+996	              <https://www.rfc-editor.org/rfc/rfc8391>.
+
+998	   [RFC8411]  Schaad, J. and R. Andrews, "IANA Registration for the
+999	              Cryptographic Algorithm Object Identifier Range",
+1000	              RFC 8411, DOI 10.17487/RFC8411, August 2018,
+1001	              <https://www.rfc-editor.org/rfc/rfc8411>.
+
+1003	   [RFC8554]  McGrew, D., Curcio, M., and S. Fluhrer, "Leighton-Micali
+1004	              Hash-Based Signatures", RFC 8554, DOI 10.17487/RFC8554,
+1005	              April 2019, <https://www.rfc-editor.org/rfc/rfc8554>.
+
+1007	   [RFC8649]  Housley, R., "Hash Of Root Key Certificate Extension",
+1008	              RFC 8649, DOI 10.17487/RFC8649, August 2019,
+1009	              <https://www.rfc-editor.org/rfc/rfc8649>.
+
+1011	   [RFC9162]  Laurie, B., Messeri, E., and R. Stradling, "Certificate
+1012	              Transparency Version 2.0", RFC 9162, DOI 10.17487/RFC9162,
+1013	              December 2021, <https://www.rfc-editor.org/rfc/rfc9162>.
+
+1015	   [RFC9802]  Van Geest, D., Bashiri, K., Fluhrer, S., Gazdag, S., and
+1016	              S. Kousidis, "Use of the HSS and XMSS Hash-Based Signature
+1017	              Algorithms in Internet X.509 Public Key Infrastructure",
+1018	              RFC 9802, DOI 10.17487/RFC9802, June 2025,
+1019	              <https://www.rfc-editor.org/rfc/rfc9802>.
+
+1021	   [SP-800-208]
+1022	              Cooper, D., Apon, D., Dang, Q., Davidson, M., Dworkin, M.,
+1023	              and C. Miller, "NIST SP 800-208: Recommendation for
+1024	              Stateful Hash-Based Signature Schemes", NIST Special
+1025	              Publication , October 2020,
+1026	              <https://doi.org/10.6028/NIST.SP.800-208>.
+
+1028	   [TIMEFALSEHOODS]
+1029	              Visée, T., "Falsehoods programmers believe about time",
+1030	              n.d., <https://gist.github.com/timvisee/
+1031	              fcda9bbdff88d45cc9061606b4b923ca>.
+
+1033	Acknowledgments
+
+1035	   This document was inspired by discussions at the 2nd Oxford Post-
+1036	   Quantum Cryptography Summit 2023.
+
+1038	   We gratefully acknowledge Melissa Azouaoui for her input to this
+1039	   document.
+
+1041	   The abstract and the introduction are based on the introduction in
+1042	   [HBSX509].  Thanks go to the authors of this document.  "Copying
+1043	   always makes things easier and less error-prone" - [RFC8411].
+
+1045	Contributors
+
+1047	   *  Jeff Andersen (Google)
+
+1049	   *  Bruno Couillard (Crypto4A Technologies)
+
+1051	   *  Stefan-Lukas Gazdag (genua GmbH)
+
+1053	Authors' Addresses
+
+1055	   Thom Wiggers
+1056	   PQShield
+1057	   Email: thom@thomwiggers.nl
+
+1059	   Kaveh Bashiri
+1060	   BSI
+1061	   Germany
+1062	   Email: kaveh.bashiri.ietf@gmail.com
+
+1064	   Stefan Kölbl
+1065	   Google
+1066	   Switzerland
+1067	   Email: kste@google.com
+
+1069	   Jim Goodman
+1070	   Crypto4A Technologies
+1071	   Canada
+1072	   Email: jimg@crypto4a.com
+
+1074	   Stavros Kousidis
+1075	   BSI
+1076	   Germany
+1077	   Email: kousidis.ietf@gmail.com
+
+
+
+
+
+
+
+
+

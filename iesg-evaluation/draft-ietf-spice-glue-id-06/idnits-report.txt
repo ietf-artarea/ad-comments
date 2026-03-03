@@ -1,0 +1,688 @@
+idnits 2.17.1 
+
+draft-ietf-spice-glue-id-06.txt:
+-(557): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+  == There are 4 instances of lines with non-ascii characters in the document.
+
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     Summary: 0 errors (**), 0 flaws (~~), 1 warning (==), 0 comments (--).
+
+--------------------------------------------------------------------------------
+
+
+2	Secure Patterns for Internet CrEdentials                    B. W. Zundel
+3	Internet-Draft
+4	Intended status: Standards Track                               P. Dingle
+5	Expires: 3 September 2026                          Microsoft Corporation
+6	                                                             M. B. Jones
+7	                                                  Self-Issued Consulting
+8	                                                            2 March 2026
+
+10	              GLobal Unique Enterprise (GLUE) Identifiers
+11	                      draft-ietf-spice-glue-id-06
+
+13	Abstract
+
+15	   This specification establishes a URN namespace for GLobal Unique
+16	   Enterprise (GLUE) Identifiers.  This enables URN identifiers to be
+17	   used for businesses and organizations.  It enables organizational
+18	   identities from existing authorities to be represented within this
+19	   URN namespace.
+
+21	About This Document
+
+23	   This note is to be removed before publishing as an RFC.
+
+25	   The latest revision of this draft can be found at https://ietf-wg-
+26	   spice.github.io/draft-ietf-spice-glue-id/draft-ietf-spice-glue-
+27	   id.html.  Status information for this document may be found at
+28	   https://datatracker.ietf.org/doc/draft-ietf-spice-glue-id/.
+
+30	   Discussion of this document takes place on the Secure Patterns for
+31	   Internet CrEdentials Working Group mailing list
+32	   (mailto:spice@ietf.org), which is archived at
+33	   https://mailarchive.ietf.org/arch/browse/spice/.  Subscribe at
+34	   https://www.ietf.org/mailman/listinfo/spice/.
+
+36	   Source for this draft and an issue tracker can be found at
+37	   https://github.com/ietf-wg-spice/draft-ietf-spice-glue-id.
+
+39	Status of This Memo
+
+41	   This Internet-Draft is submitted in full conformance with the
+42	   provisions of BCP 78 and BCP 79.
+
+44	   Internet-Drafts are working documents of the Internet Engineering
+45	   Task Force (IETF).  Note that other groups may also distribute
+46	   working documents as Internet-Drafts.  The list of current Internet-
+47	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+49	   Internet-Drafts are draft documents valid for a maximum of six months
+50	   and may be updated, replaced, or obsoleted by other documents at any
+51	   time.  It is inappropriate to use Internet-Drafts as reference
+52	   material or to cite them other than as "work in progress."
+
+54	   This Internet-Draft will expire on 3 September 2026.
+
+56	Copyright Notice
+
+58	   Copyright (c) 2026 IETF Trust and the persons identified as the
+59	   document authors.  All rights reserved.
+
+61	   This document is subject to BCP 78 and the IETF Trust's Legal
+62	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+63	   license-info) in effect on the date of publication of this document.
+64	   Please review these documents carefully, as they describe your rights
+65	   and restrictions with respect to this document.  Code Components
+66	   extracted from this document must include Revised BSD License text as
+67	   described in Section 4.e of the Trust Legal Provisions and are
+68	   provided without warranty as described in the Revised BSD License.
+
+70	Table of Contents
+
+72	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
+73	     1.1.  Requirements Notation and Conventions . . . . . . . . . .   3
+74	     1.2.  Terminology . . . . . . . . . . . . . . . . . . . . . . .   3
+75	   2.  Core Concepts . . . . . . . . . . . . . . . . . . . . . . . .   4
+76	     2.1.  Uniqueness and Namespacing  . . . . . . . . . . . . . . .   4
+77	   3.  GLUE URIs . . . . . . . . . . . . . . . . . . . . . . . . . .   4
+78	   4.  GLUE Authority Identifiers  . . . . . . . . . . . . . . . . .   6
+79	     4.1.  Equivalence to Similar URIs . . . . . . . . . . . . . . .   6
+80	       4.1.1.  LEI URNs  . . . . . . . . . . . . . . . . . . . . . .   7
+81	   5.  Security Considerations . . . . . . . . . . . . . . . . . . .   7
+82	   6.  Privacy Considerations  . . . . . . . . . . . . . . . . . . .   7
+83	     6.1.  Private Identifiers as Corporate Identifiers  . . . . . .   7
+84	   7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   7
+85	     7.1.  GLUE Authority Identifier URN Registry  . . . . . . . . .   9
+86	       7.1.1.  Registration Template . . . . . . . . . . . . . . . .   9
+87	       7.1.2.  Initial Registry Contents . . . . . . . . . . . . . .  10
+88	   8.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  11
+89	     8.1.  Normative References  . . . . . . . . . . . . . . . . . .  11
+90	     8.2.  Informative References  . . . . . . . . . . . . . . . . .  12
+91	   Acknowledgments . . . . . . . . . . . . . . . . . . . . . . . . .  12
+92	   Document History  . . . . . . . . . . . . . . . . . . . . . . . .  13
+93	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  14
+
+95	1.  Introduction
+
+97	   There are myriad entity identifier types for businesses and
+98	   organizations.  With the increasing use of digital credentials, there
+99	   is a need for a common methodology for expressing these identifiers
+100	   such that claims about and by such entities can be made in a
+101	   consistent and interoperable manner.
+
+103	   This specification establishes a URN namespace that standardizes the
+104	   expression of existing organizational entity identifiers by providing
+105	   a common representation format.  It also establishes an IANA registry
+106	   for managing how existing organizational entity identification
+107	   mechanisms relate to this namespace.
+
+109	   Any organizational entity identifier whose identification mechanism
+110	   has been registered as an Authority Identifier in the registry may be
+111	   represented as a GLUE URI.
+
+113	1.1.  Requirements Notation and Conventions
+
+115	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+116	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+117	   "OPTIONAL" in this document are to be interpreted as described in
+118	   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+119	   capitals, as shown here.
+
+121	1.2.  Terminology
+
+123	   This specification uses the following terms:
+
+125	   GLUE URI:  a URI that uses the GLUE URN namespace established in this
+126	      specification.
+
+128	   Authority Identifier:  identifier for the External Authority
+129	      responsible for assigning the External Identifiers used in GLUE
+130	      URIs over which it has jurisdiction.
+
+132	   External Identifier:  identifier assigned by an External Authority to
+133	      identify a particular organization within GLUE URIs with Authority
+134	      Identifier(s) over which it has jurisdiction.
+
+136	   External Authority:  an organization that allocates External
+137	      Identifiers over which it has jurisdiction that are used in GLUE
+138	      URIs with its Authority Identifier(s).
+
+140	2.  Core Concepts
+
+142	   Every GLUE URI MUST contain the following components:
+
+144	   *  The Authority Identifier
+
+146	   *  The External Identifier
+
+148	2.1.  Uniqueness and Namespacing
+
+150	   Each GLUE URI MUST be globally unique.
+
+152	   An organization can be identified by multiple GLUE URIs, but each
+153	   GLUE URI can only refer to a single organization.
+
+155	   It is assumed that most registered organizational entity
+156	   identification schemes already handle any necessary namespacing as
+157	   part of the External Identifier.  However, if collisions are possible
+158	   within the set of possible external identifiers for an Authority
+159	   Identifier scheme, then further namespacing is necessary at the GLUE
+160	   URI level.  Such namespacing MUST be done using the Authority
+161	   Identifier.  The combination of the Authority Identifier and the
+162	   External Identifier MUST result in a unique GLUE URI.
+
+164	   For example, assume there is an External Authority FEA that provides
+165	   identifiers for organizations in Singapore and South Korea.  The
+166	   identifiers issued in Singapore are unique within Singapore, and the
+167	   identifiers issued in South Korea are unique within South Korea, but
+168	   there is no guarantee that an organization in Singapore will not be
+169	   assigned the same identifier as an organization in South Korea.  Upon
+170	   registration of FEA as an Authority Identifier, it would be necessary
+171	   to separately register two different Authority Identifiers (e.g.,
+172	   FEA-SG and FEA-KR) to provide differentiation between the two sets of
+173	   External Identifiers.
+
+175	3.  GLUE URIs
+
+177	   GLUE URIs comply with [RFC3986].  They begin with urn:glue: and are
+178	   followed by an Authority Identifier, a colon character (":"), and the
+179	   External Identifier allocated by the authority.
+
+181	   Authority Identifiers consist of a sequence of characters beginning
+182	   with a letter or digit and followed by any combination of letters,
+183	   digits, plus ("+"), hyphen ("-"), or period (".").  Although
+184	   Authority Identifiers are case-insensitive, the canonical form is
+185	   lowercase and documents that specify Authority Identifiers must do so
+186	   with lowercase letters.  An implementation should accept uppercase
+187	   letters as equivalent to lowercase in Authority Identifier names
+188	   (e.g., allow "EXAMPLE" as well as "example") for the sake of
+189	   robustness but should only produce lowercase Authority Identifier
+190	   names for consistency.  There is a limit of 50 characters for the
+191	   length of an Authority Identifier.  The ABNF [RFC5234] for Authority
+192	   Identifiers is:
+
+194	   authority-identifier = (ALPHA/DIGIT) *49( ALPHA / DIGIT / "+" / "-" /
+195	   "." )
+
+197	   External Identifiers consist of a sequence of characters beginning
+198	   with a letter or digit or hyphen ("-") and followed by any
+199	   combination of letters, digits, plus ("+"), hyphen ("-"), or period
+200	   (".").  A digit or hyphen is allowed as the first character to permit
+201	   the case where the External Identifier is the representation of a
+202	   number.  It is specific to the Authority Identifier whether the
+203	   External Identifiers are case-insensitive or case-sensitive.  When
+204	   they are case-insensitive, the canonical form is lowercase and
+205	   documents that specify External Identifiers must do so with lowercase
+206	   letters.  There is a limit of 1000 characters for an External
+207	   Identifier.  The ABNF [RFC5234] for External Identifiers is:
+
+209	   external-identifier = ( ALPHA / DIGIT / "-" ) *999( ALPHA / DIGIT /
+210	   "+" / "-" / "." )
+
+212	   Combining these, the ABNF [RFC5234] for a GLUE URI is:
+
+214	   glue-uri = "urn:glue:" authority-identifier ":" external-identifier
+
+216	   For example, the following is a GLUE URI using the Authority
+217	   Identifier "pen" and the External Identifier "32473".  This example
+218	   uses the Enterprise Number "32473" reserved for documentation in
+219	   [RFC5612].
+
+221	   urn:glue:pen:32473
+
+223	   A GLUE URI is defined over the restricted US-ASCII syntax specified
+224	   in this section.  Percent-encoding is not permitted.  Consequently,
+225	   GLUE URIs do not support representation of External Identifiers whose
+226	   canonical form includes non-ASCII characters.  This specification is
+227	   therefore limited to identifier systems whose canonical
+228	   representations are fully within the permitted character set.
+
+230	   The Authority Identifier MUST be registered in the GLUE URI Authority
+231	   Identifier registry defined in Section 7.1.  The External Identifier
+232	   MUST be the identifier assigned to the organization by the External
+233	   Authority.
+
+235	4.  GLUE Authority Identifiers
+
+237	   This section defines the GLUE Authority Identifiers listed in
+238	   Table 1.
+
+240	     +==============+============+===================================+
+241	     | Organization | Authority  | External Authority Specification  |
+242	     |              | Identifier |                                   |
+243	     +==============+============+===================================+
+244	     | GS1          | gln        | https://www.gs1.org/standards/id- |
+245	     |              |            | keys/gln                          |
+246	     +--------------+------------+-----------------------------------+
+247	     | GLEIF        | lei        | https://www.iso.org/              |
+248	     |              |            | standard/78829.html               |
+249	     +--------------+------------+-----------------------------------+
+250	     | Dun &        | duns       | https://www.dnb.com/duns.html     |
+251	     | Bradstreet   |            |                                   |
+252	     +--------------+------------+-----------------------------------+
+253	     | Private      | pen        | https://www.iana.org/assignments/ |
+254	     | Enterprise   |            | enterprise-numbers                |
+255	     | Numbers      |            |                                   |
+256	     +--------------+------------+-----------------------------------+
+257	     | ISO/IEC 6523 | iso6523    | https://www.iso.org/              |
+258	     |              |            | standard/82246.html               |
+259	     +--------------+------------+-----------------------------------+
+
+261	                Table 1: Defined GLUE Authority Identifiers
+
+263	   These are registered in the GLUE Authority Identifier URN Registry in
+264	   Section 7.1.
+
+266	4.1.  Equivalence to Similar URIs
+
+268	   A GLUE URI is an identifier in a distinct URN namespace.  By default,
+269	   a GLUE URI is not equivalent to any other URI, including a URI
+270	   defined by the referenced authority's own namespace.  Equivalence
+271	   between a GLUE URI and a non-GLUE URI exists only when explicitly
+272	   specified for a given Authority Identifier.  Implementations and
+273	   relying parties MUST NOT assume equivalence between GLUE URIs and
+274	   non-GLUE URIs unless such equivalence is explicitly defined by the
+275	   authority or documented in the relevant registry entry.
+
+277	4.1.1.  LEI URNs
+
+279	   [LEI-IANA] registers a URN namespace for Legal Entity Identifiers
+280	   (LEIs).  This means that LEIs can be represented as URNs in at least
+281	   two ways.  Therefore there is an equivalence between a GLUE URI with
+282	   an "lei" Authority Identifier and an LEI URN, provided the 20-digit
+283	   LEI Code of the LEI URN is identifical to the External Identifier of
+284	   the GLUE URI.  For example, "urn:lei:INR2EJN1ERAN0W5ZP974" is
+285	   equivalent to "urn:glue:lei:INR2EJN1ERAN0W5ZP974".
+
+287	5.  Security Considerations
+
+289	   The security considerations inherent to using URNs apply.  Security
+290	   considerations for URNs can be found in [RFC2141].
+
+292	   The global uniqueness of GLUE URIs prevents situations in which the
+293	   same identifier is allocated in different local namespaces and cannot
+294	   be disambiguated when used.  For instance both Canadian and
+295	   Singaporean organization registries might use the local identifier
+296	   "42", but with these referring to different organizations.  Embedding
+297	   these local identifiers in GLUE URIs enables disambiguation.
+
+299	6.  Privacy Considerations
+
+301	6.1.  Private Identifiers as Corporate Identifiers
+
+303	   There are some corporate identifiers that make use of personal
+304	   identifiers.  For example, this is the case for some registered sole-
+305	   proprietor businesses in the United States, where the Tax ID may be
+306	   the same as the Social Security Number (SSN) of the business owner.
+307	   Where the Tax ID uniquely identifies the business, the SSN uniquely
+308	   identifies an individual.
+
+310	   It is possible for such business identifiers to be represented as
+311	   GLUE URIs.  An identifier's expression as a GLUE URI does not change
+312	   the privacy characteristics of that identifier.  The same cautions
+313	   and concerns need to be taken with the GLUE URI representation as
+314	   with the original identifier.
+
+316	   Implementers storing or evaluating GLUE URIs are encouraged to be
+317	   aware the privacy characteristics of each identification scheme
+318	   represented by an Authority Identifier and to appropriately handle
+319	   any GLUE URI which violates privacy policies.
+
+321	7.  IANA Considerations
+
+323	   This section establishes a registry and populates it with its initial
+324	   contents.
+
+326	   Values are registered on a Specification Required (Section 4.6 of
+327	   [RFC8126]) basis after a two-week review period on the spice-ext-
+328	   review@ietf.org mailing list, on the advice of one or more Designated
+329	   Experts.  However, to allow for the allocation of values prior to
+330	   publication of the final version of a specification, the Designated
+331	   Experts may approve registration once they are satisfied that the
+332	   specification will be completed and published.  However, if the
+333	   specification is not completed and published in a timely manner, as
+334	   determined by the Designated Experts, the Designated Experts may
+335	   request that IANA withdraw the registration.
+
+337	   Registration requests sent to the mailing list for review should use
+338	   an appropriate subject (e.g., "Request to register URN
+339	   urn:glue:example").
+
+341	   Within the review period, the Designated Experts will either approve
+342	   or deny the registration request, communicating this decision to the
+343	   review list and IANA.  The Designated Experts verify that a
+344	   specification exists.  Experts are encouraged to be biased towards
+345	   approving registrations unless they are abusive, frivolous, or
+346	   actively harmful (not merely aesthetically displeasing or
+347	   architecturally dubious).
+
+349	   Denials should include an explanation and, if applicable, suggestions
+350	   as to how to make the request successful.  If the designated experts
+351	   are not responsive, the registration requesters should contact IANA
+352	   to escalate the process.
+
+354	   Criteria that should be applied by the Designated Experts includes
+355	   determining whether the proposed registration duplicates existing
+356	   functionality, determining whether it is likely to be of general
+357	   applicability or whether it is useful only for a single application,
+358	   and whether the registration references an existing organizational
+359	   registry operated by an External Authority identified by the proposed
+360	   Authority Identifier.
+
+362	   IANA must only accept registry updates from the Designated Experts
+363	   and should direct all requests for registration to the review mailing
+364	   list.
+
+366	   It is suggested that multiple Designated Experts be appointed who are
+367	   able to represent the perspectives of different applications using
+368	   this specification, in order to enable broadly-informed review of
+369	   registration decisions.  In cases where a registration decision could
+370	   be perceived as creating a conflict of interest for a particular
+371	   Expert, that Expert should defer to the judgment of the other
+372	   Experts.
+
+374	   The reason for the use of the mailing list is to enable public review
+375	   of registration requests, enabling both Designated Experts and other
+376	   interested parties to provide feedback on proposed registrations.
+377	   The reason to allow the Designated Experts to allocate values prior
+378	   to publication as a final specification is to enable giving authors
+379	   of specifications proposing registrations the benefit of review by
+380	   the Designated Experts before the specification is completely done,
+381	   so that if problems are identified, the authors can iterate and fix
+382	   them before publication of the final specification.
+
+384	7.1.  GLUE Authority Identifier URN Registry
+
+386	   This specification establishes the IANA "GLUE Authority Identifier
+387	   URN" registry creating a URN namespace for Authority Identifiers for
+388	   GLobal Unique Enterprise (GLUE) Identifiers.
+
+390	   Each entry registers the URN for an Authority Identifier within the
+391	   "urn:glue:" namespace.  The organization responsible for the
+392	   Authority Identifier is recorded.
+
+394	   IANA is requested to create the "GLobal Unique Enterprise (GLUE)
+395	   Identifiers" registry group located at
+396	   https://www.iana.org/assignments/glue-identifiers/ and place this
+397	   registry there.
+
+399	7.1.1.  Registration Template
+
+401	   Authority Identifier:  identifier for the External Authority
+402	      responsible for assigning the External Identifier used in GLUE
+403	      URIs.  This identifier is not case sensitive and any letters MUST
+404	      be expressed in lowercase characters.  It MUST consist of a
+405	      sequence of characters with a mazimum length of 50, beginning with
+406	      a letter and followed by any combination of letters, digits, plus
+407	      ("+"), period ("."), or hyphen ("-").
+
+409	   URN:  The URN within the "urn:glue:" namespace consisting of
+410	      "urn:glue:" followed by the Authority Identifier.
+
+412	   Organization:  The organization responsible for the Authority
+413	      Identifier.
+
+415	   Change Controller:  For IETF stream RFCs, use "IETF".  For others,
+416	      give the name of the responsible party.  Other details (e.g.,
+417	      postal address, e-mail address, or home page URI) may also be
+418	      included.
+
+420	   Specification Document(s):  Reference to the document or documents
+421	      that specify the Authority Identifier to be registered, preferably
+422	      including URLs that can be used to retrieve the documents.  An
+423	      indication of the relevant sections may also be included, but is
+424	      not required.
+
+426	7.1.2.  Initial Registry Contents
+
+428	7.1.2.1.  gln
+
+430	   *  Authority Identifier: gln
+
+432	   *  URN: urn:glue:gln
+
+434	   *  Organization: GS1
+
+436	   *  Change Controller: IETF
+
+438	   *  Specification Document(s): Section 4 of this specification, [GLN]
+
+440	7.1.2.2.  lei
+
+442	   *  Authority Identifier: lei
+
+444	   *  URN: urn:glue:lei
+
+446	   *  Organization: GLEIF
+
+448	   *  Change Controller: IETF
+
+450	   *  Specification Document(s): Section 4 of this specification, [LEI],
+451	      [LEI-IANA]
+
+453	7.1.2.3.  duns
+
+455	   *  Authority Identifier: duns
+
+457	   *  URN: urn:glue:duns
+
+459	   *  Organization: Dun & Bradstreet
+
+461	   *  Change Controller: IETF
+
+463	   *  Specification Document(s): Section 4 of this specification, [DUNS]
+
+465	7.1.2.4.  pen
+
+467	   *  Authority Identifier: pen
+468	   *  URN: urn:glue:pen
+
+470	   *  Organization: Private Enterprise Numbers
+
+472	   *  Change Controller: IETF
+
+474	   *  Specification Document(s): Section 4 of this specification, [PEN],
+475	      [RFC9371]
+
+477	7.1.2.5.  iso6523
+
+479	   *  Authority Identifier: iso6523
+
+481	   *  URN: urn:glue:iso6523
+
+483	   *  Organization: ISO/IEC 6523
+
+485	   *  Change Controller: IETF
+
+487	   *  Specification Document(s): Section 4 of this specification,
+488	      [ISO6523]
+
+490	8.  References
+
+492	8.1.  Normative References
+
+494	   [DUNS]     "D-U-N-S Numbers", n.d., <https://www.dnb.com/duns.html>.
+
+496	   [GLN]      "Global Location Nymber (GLN)", n.d.,
+497	              <https://www.gs1.org/standards/id-keys/gln>.
+
+499	   [ISO6523]  "ISO/IEC 6523-1:2023. Information technology — Structure
+500	              for the identification of organizations and organization
+501	              parts, Part 1: Identification of organization
+502	              identification schemes", 2023,
+503	              <https://www.iso.org/standard/82246.html>.
+
+505	   [LEI]      "Legal Entity Identifier (LEI)", 2020,
+506	              <https://www.iso.org/standard/78829.html>.
+
+508	   [LEI-IANA] "LEI Namespace Identifier", n.d.,
+509	              <https://www.iana.org/assignments/urn-formal/lei>.
+
+511	   [PEN]      "Private Enterprise Numbers", n.d.,
+512	              <https://www.iana.org/assignments/enterprise-numbers>.
+
+514	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+515	              Requirement Levels", BCP 14, RFC 2119,
+516	              DOI 10.17487/RFC2119, March 1997,
+517	              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+519	   [RFC3986]  Berners-Lee, T., Fielding, R., and L. Masinter, "Uniform
+520	              Resource Identifier (URI): Generic Syntax", STD 66,
+521	              RFC 3986, DOI 10.17487/RFC3986, January 2005,
+522	              <https://www.rfc-editor.org/rfc/rfc3986>.
+
+524	   [RFC5234]  Crocker, D., Ed. and P. Overell, "Augmented BNF for Syntax
+525	              Specifications: ABNF", STD 68, RFC 5234,
+526	              DOI 10.17487/RFC5234, January 2008,
+527	              <https://www.rfc-editor.org/rfc/rfc5234>.
+
+529	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+530	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+531	              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+533	8.2.  Informative References
+
+535	   [RFC2141]  Moats, R., "URN Syntax", RFC 2141, DOI 10.17487/RFC2141,
+536	              May 1997, <https://www.rfc-editor.org/rfc/rfc2141>.
+
+538	   [RFC5612]  Eronen, P. and D. Harrington, "Enterprise Number for
+539	              Documentation Use", RFC 5612, DOI 10.17487/RFC5612, August
+540	              2009, <https://www.rfc-editor.org/rfc/rfc5612>.
+
+542	   [RFC8126]  Cotton, M., Leiba, B., and T. Narten, "Guidelines for
+543	              Writing an IANA Considerations Section in RFCs", BCP 26,
+544	              RFC 8126, DOI 10.17487/RFC8126, June 2017,
+545	              <https://www.rfc-editor.org/rfc/rfc8126>.
+
+547	   [RFC9371]  Baber, A. and P. Hoffman, "Registration Procedures for
+548	              Private Enterprise Numbers (PENs)", RFC 9371,
+549	              DOI 10.17487/RFC9371, March 2023,
+550	              <https://www.rfc-editor.org/rfc/rfc9371>.
+
+552	Acknowledgments
+
+554	   Carsten Bormann, Mohamed Boucadair, Tim Bray, Deb Cooley, Patrik
+555	   Fältström, Arnt Gulbrandsen, Sue Hares, John Klensin, Erik Kline,
+556	   Martin Lindström, Rohan Mahy, James Manger, Orie Steele, Alexander
+557	   (A.J.)  Stein, Martin Thomson, Éric Vyncke, and Peter Yee contributed
+558	   to this specification.
+
+560	Document History
+
+562	   -06
+
+564	   *  Addressed Deb Cooley's review comments, specifically:
+
+566	      -  Reworked term definitions.
+
+568	      -  Added security consideration about uniqueness of GLUE URIs.
+
+570	      -  Updated registration instructions to include a criterion about
+571	         an existing organizational registry operated by an External
+572	         Authority identified by the proposed Authority Identifier.
+
+574	   *  Addressed Mohamed Boucadair's review comments, specifically:
+
+576	      -  Used neutral language "organization" that doesn't assume that
+577	         all organizations are businesses.
+
+579	      -  Reworded confusing text about uniqueness.
+
+581	      -  Made the RFC 5234 reference normative.
+
+583	   *  Addressed Erik Kline's review comments, specifically:
+
+585	      -  Expanded LEI on first use to Legal Entity Identifier (LEI).
+
+587	      -  Included instructions to the designated experts about ensuring
+588	         that the registration references an existing organizational
+589	         registry operated by an External Authority identified by the
+590	         proposed Authority Identifier.
+
+592	   -05
+
+594	   *  Added ISO/IEC 6523 identifiers.
+
+596	   *  The first character of the Authority Identifier may be a digit.
+
+598	   *  Fixed wording in IANA Considerations.
+
+600	   *  Limited character set to US-ASCII.
+
+602	   *  Fixed multiple nits from WGLC.
+
+604	   -04
+
+606	   *  Applied review suggestions from Martin Thomson, specifically:
+
+608	      -  Added references for each registered Authority Identifier.
+
+610	      -  Added size limits for Authority Identifiers and External
+611	         Identifiers.
+
+613	      -  Added a note about LEI URNs.
+
+615	   -03
+
+617	   *  Use the urn:glue URN namespace and delete the urn:ietf:spice URN
+618	      namespace.
+
+620	   *  Addressed early IANA feedback.
+
+622	   -02
+
+624	   *  Improved several descriptions in the specification.
+
+626	   -01
+
+628	   *  Updated Brent's affiliation.
+
+630	   -00
+
+632	   *  Initial working group draft, based on draft-zundel-spice-glue-
+633	      id-02
+
+635	Authors' Addresses
+
+637	   Brent W. Zundel
+638	   United States
+639	   Email: brent.zundel@gmail.com
+
+641	   Pamela Dingle
+642	   Microsoft Corporation
+643	   United States
+644	   Email: pamela.dingle@microsoft.com
+
+646	   Michael B. Jones
+647	   Self-Issued Consulting
+648	   United States
+649	   Email: michael_b_jones@hotmail.com
+650	   URI:   https://self-issued.info/
+
+
+
+
+
+
+
+
+
