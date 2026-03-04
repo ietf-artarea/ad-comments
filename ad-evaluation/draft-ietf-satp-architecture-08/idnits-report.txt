@@ -1,0 +1,1290 @@
+idnits 2.17.1 
+
+draft-ietf-satp-architecture-08.txt:
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/checklist :
+  ----------------------------------------------------------------------------
+
+  ** There are 4 instances of too long lines in the document, the longest one
+     being 1 character in excess of 72.
+
+
+  Miscellaneous warnings:
+  ----------------------------------------------------------------------------
+
+  == The copyright year in the IETF Trust and authors Copyright Line does not
+     match the current year
+
+  -- The document date (31 July 2025) is 198 days in the past.  Is this
+     intentional?
+
+
+  Checking references for intended status: Informational
+  ----------------------------------------------------------------------------
+
+  == Missing Reference: 'HS19' is mentioned on line 931, but not defined
+
+  == Unused Reference: 'NIST' is defined on line 1081, but no explicit
+     reference was found in the text
+
+  == Unused Reference: 'RFC2119' is defined on line 1085, but no explicit
+     reference was found in the text
+
+  == Unused Reference: 'ABCH20' is defined on line 1092, but no explicit
+     reference was found in the text
+
+  == Unused Reference: 'Abebe19' is defined on line 1096, but no explicit
+     reference was found in the text
+
+  == Unused Reference: 'Abebe21' is defined on line 1103, but no explicit
+     reference was found in the text
+
+  == Unused Reference: 'BVGC20' is defined on line 1114, but no explicit
+     reference was found in the text
+
+  == Unused Reference: 'DLVIEW' is defined on line 1126, but no explicit
+     reference was found in the text
+
+  == Unused Reference: 'Herl19' is defined on line 1136, but no explicit
+     reference was found in the text
+
+  == Unused Reference: 'HLP19' is defined on line 1141, but no explicit
+     reference was found in the text
+
+  == Unused Reference: 'HS2019' is defined on line 1146, but no explicit
+     reference was found in the text
+
+  == Unused Reference: 'SATcore' is defined on line 1157, but no explicit
+     reference was found in the text
+
+  == Outdated reference: A later version (-05) exists of
+     draft-belchior-gateway-recovery-01
+
+
+     Summary: 1 error (**), 0 flaws (~~), 14 warnings (==), 1 comment (--).
+
+     Run idnits with the --verbose option for more detailed information about
+     the items above.
+
+--------------------------------------------------------------------------------
+
+
+2	Internet Engineering Task Force                              T. Hardjono
+3	Internet-Draft                                                       MIT
+4	Intended status: Informational                             M. Hargreaves
+5	Expires: 1 February 2026                                   Quant Network
+6	                                                                N. Smith
+7	                                                                   Intel
+8	                                                          V. Ramakrishna
+9	                                                                     IBM
+10	                                                            31 July 2025
+
+12	       Secure Asset Transfer (SAT) Interoperability Architecture
+13	                    draft-ietf-satp-architecture-08
+
+15	Abstract
+
+17	   This document proposes an interoperability architecture for the
+18	   secure transfer of assets between two networks or systems based on
+19	   the gateway model.
+
+21	Status of This Memo
+
+23	   This Internet-Draft is submitted in full conformance with the
+24	   provisions of BCP 78 and BCP 79.
+
+26	   Internet-Drafts are working documents of the Internet Engineering
+27	   Task Force (IETF).  Note that other groups may also distribute
+28	   working documents as Internet-Drafts.  The list of current Internet-
+29	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+31	   Internet-Drafts are draft documents valid for a maximum of six months
+32	   and may be updated, replaced, or obsoleted by other documents at any
+33	   time.  It is inappropriate to use Internet-Drafts as reference
+34	   material or to cite them other than as "work in progress."
+
+36	   This Internet-Draft will expire on 1 February 2026.
+
+38	Copyright Notice
+
+40	   Copyright (c) 2025 IETF Trust and the persons identified as the
+41	   document authors.  All rights reserved.
+
+43	   This document is subject to BCP 78 and the IETF Trust's Legal
+44	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+45	   license-info) in effect on the date of publication of this document.
+46	   Please review these documents carefully, as they describe your rights
+47	   and restrictions with respect to this document.  Code Components
+48	   extracted from this document must include Revised BSD License text as
+49	   described in Section 4.e of the Trust Legal Provisions and are
+50	   provided without warranty as described in the Revised BSD License.
+
+52	Table of Contents
+
+54	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
+55	   2.  Terminology . . . . . . . . . . . . . . . . . . . . . . . . .   3
+56	   3.  Assumptions and Principles  . . . . . . . . . . . . . . . . .   5
+57	     3.1.  Design Principles . . . . . . . . . . . . . . . . . . . .   5
+58	     3.2.  Operational Assumptions . . . . . . . . . . . . . . . . .   5
+59	     3.3.  Assumptions Regarding Gateway Operators . . . . . . . . .   6
+60	   4.  Gateway Interoperability Modes  . . . . . . . . . . . . . . .   6
+61	   5.  Architecture  . . . . . . . . . . . . . . . . . . . . . . . .   7
+62	     5.1.  Goal of Architecture  . . . . . . . . . . . . . . . . . .   7
+63	     5.2.  Overview of Asset Transfer  . . . . . . . . . . . . . . .   8
+64	     5.3.  Desirable Properties of Asset Transfer  . . . . . . . . .   9
+65	     5.4.  Event log-data, crash recovery and backup gateways  . . .  11
+66	     5.5.  Overview of the Stages in Asset Transfer  . . . . . . . .  11
+67	   6.  Pre-transfer Verification and Context Establishment
+68	           (Stage-0) . . . . . . . . . . . . . . . . . . . . . . . .  13
+69	   7.  Transfer Initiation and Commencement (Stage-1)  . . . . . . .  15
+70	   8.  Asset Lock Assertion and Receipt (Stage 2)  . . . . . . . . .  17
+71	   9.  Commitment Preparation and Finalization (Stage 3) . . . . . .  19
+72	   10. The Commitment sub-protocol . . . . . . . . . . . . . . . . .  21
+73	   11. Security Considerations . . . . . . . . . . . . . . . . . . .  21
+74	     11.1.  Multiple intentional aborts by the sender gateway  . . .  22
+75	     11.2.  Multiple intentional aborts by the receiver gateway  . .  22
+76	     11.3.  Failure to transmit ACK-Final Receipt  . . . . . . . . .  23
+77	     11.4.  Failure to extinguish asset  . . . . . . . . . . . . . .  23
+78	     11.5.  Identity impersonations  . . . . . . . . . . . . . . . .  23
+79	   12. Policy Considerations . . . . . . . . . . . . . . . . . . . .  24
+80	   13. Compatibility Considerations  . . . . . . . . . . . . . . . .  24
+81	   14. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  24
+82	   15. References  . . . . . . . . . . . . . . . . . . . . . . . . .  24
+83	     15.1.  Normative References . . . . . . . . . . . . . . . . . .  24
+84	     15.2.  Informative References . . . . . . . . . . . . . . . . .  25
+85	   Appendix A.  Acknowledgments  . . . . . . . . . . . . . . . . . .  27
+86	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  27
+
+88	1.  Introduction
+
+90	   This document proposes an interoperability architecture based on
+91	   gateways, which are points of interconnection between networks or
+92	   systems.
+
+94	   There are several services that may be offered by a gateway, one of
+95	   which being the direct transfer of a digital asset from one network
+96	   to another via pairs of gateways without a mediating third party.
+
+98	   A given network or system may have one or more gateways to perform a
+99	   unidirectional direct transfer of digital assets to another network
+100	   possessing one or more compatible gateway.
+
+102	   The peer gateways must implement a secure asset transfer protocol
+103	   that must satisfy certain security, privacy, atomicity and liveliness
+104	   requirements.
+
+106	   The purpose of this architecture document is to provide technical
+107	   framework within which to define the required properties of a gateway
+108	   that supports the secure asset transfer protocol.
+
+110	2.  Terminology
+
+112	   The current architecture specification borrows existing terminology
+113	   from NIST [NIST and ISO [ISO].  New terms have been introduced
+114	   notably in relation to the use of the gateways paradigm and
+115	   commitment subprotocols.
+
+117	   *  Asset network (system): The network or system where an asset is
+118	      digitally represented (e.g., as a token).
+
+120	   *  Asset Transfer Protocol: The protocol used to transfer (move) a
+121	      digital asset from one network to another using gateways.
+
+123	   *  Origin network: The current asset network where the digital asset
+124	      is located.
+
+126	   *  Destination network: The asset network to which a digital asset is
+127	      to be transferred.
+
+129	   *  Resource Domain: The collection of resources and entities
+130	      participating within an asset network.  The domain denotes a
+131	      boundary for permissible or authorized actions on resources.
+
+133	   *  Interior Resources: The various interior protocols, data
+134	      structures and cryptographic constructs that are a core part of an
+135	      asset network or system.
+
+137	   *  Exterior Resources: The various protocols, data structures and
+138	      cryptographic constructs that are outside of (external to) the
+139	      network or system.
+
+141	   *  Gateway: The collection of services which connects to a minimum of
+142	      one network or system, and which implements the secure asset
+143	      transfer protocol.
+
+145	   *  Entity public-key pair: This the private-public key pairs of an
+146	      entity, where the public-key is available and verifiable outside
+147	      the network.  Among others, it may be utilized for interactions
+148	      with external entities (e.g. communications) located outside the
+149	      network.  The term is used to distinguish this public-key other
+150	      key-pairs belonging to the same entity, but which is only
+151	      available within the (private) network.
+
+153	   *  Originator: Person or organization in an origin network seeking
+154	      the transfer of a digital asset to a beneficiary located in a
+155	      remote network.
+
+157	   *  Beneficiary: Person or organization in an destination network
+158	      seeking to receive the transfer of a digital asset to from an
+159	      originator located in a remote network.
+
+161	   *  Gateway device identity: The identity of the device implementing
+162	      the gateway functions.  The term is used in the sense of the DevID
+163	      (IEEE 802.1AR) [DevID] or the EK/AIK keys (in TPM1.2 and TPM2.0)
+164	      [TPMdevID].
+
+166	   *  Gateway owner: The entity that owns and operates a gateway within
+167	      a network.
+
+169	   *  Application Context-ID: The relevant identifier used by
+170	      originator's application and the beneficiary's application to
+171	      identify the context of the asset transfer at the gateway level.
+172	      The context identifier may also be used to bind the application to
+173	      selected gateway for the given transfer instance, identified by a
+174	      Session-ID.
+
+176	   *  Gateway Session-ID: This is the identifier used between the sender
+177	      gateway G1 and the recipient gateway G2 to identify the specific
+178	      transfer instance between them.  The Session-ID must be included
+179	      in all messages between the peer gateways.
+
+181	3.  Assumptions and Principles
+
+183	   The following assumptions and principles underlie the design of the
+184	   current gateway architecture, and correspond to the design principles
+185	   of the Internet architecture.
+
+187	3.1.  Design Principles
+
+189	   *  Opaque network resources: The interior resources of each network
+190	      is assumed to be opaque to (hidden from) external entities.  Any
+191	      resources to be made accessible to an external entity must be made
+192	      explicitly accessible by a gateway with proper authorization.
+
+194	   *  Externalization of value: The asset transfer protocol is agnostic
+195	      (oblivious) to the economic or monetary value (if any) of the
+196	      digital asset being transferred.
+
+198	   The opaque resources principle permits the architecture to be applied
+199	   in cases where one (or both) networks are private (closed
+200	   membership).  It is the analog of the autonomous systems principle in
+201	   IP networking [Clar88], where interior routes in local subnets are
+202	   not visible to other external networks.
+
+204	   The value-externalization principle permits an asset transfer
+205	   protocol to be designed for efficiency, security and reliability --
+206	   independent of the changes in the perceived economic value of the
+207	   digital asset.  It is the analog of the end-to-end principle in the
+208	   Internet architecture [SRC84], where contextual information is placed
+209	   at the endpoints of the transfer.
+
+211	3.2.  Operational Assumptions
+
+213	   The following conditions are assumed to have occurred, leading to the
+214	   invocation of the asset transfer protocol between two gateways:
+
+216	   *  Application level context establishment: The transfer request from
+217	      an Originator utilizing an application (App1) in the origin
+218	      network is assumed to have occurred, and that some context-
+219	      identifier has subsequently been derived by the respective
+220	      applications (App1 and App2).  Furthermore, this context-
+221	      identifier is assumed to have been delivered by the each
+222	      application to its corresponding gateway, permitting each gateway
+223	      to internally bind the transfer session-identifier to that
+224	      context-identifier.
+
+226	   *  Identification of asset to be transferred: The applications at the
+227	      originator and the beneficiary are assumed to have identified the
+228	      digital asset to be transferred.
+
+230	   *  Identification of originator and beneficiary: The originator and
+231	      beneficiary are assumed to have been identified and that consent
+232	      has been obtained from both parties regarding the asset transfer.
+
+234	   *  Identification of origin and destination asset networks: The
+235	      origin and destination networks is assumed to have been
+236	      identified.
+
+238	   *  Selection of gateway: The two corresponding gateways at the origin
+239	      and destination networks is assumed to have been identified and
+240	      selected.
+
+242	3.3.  Assumptions Regarding Gateway Operators
+
+244	   The following conditions are assumed to have occurred, leading to the
+245	   invocation of the asset transfer protocol between two gateways:
+
+247	   *  Identification of gateway-owners: The owners of the two
+248	      corresponding gateways are assumed to have been identified and
+249	      their ownership status verified.
+
+251	   *  Gateway liabilities: Gateways are performing digital signatures on
+252	      messages.  As such, gateway operators are assumed to take on the
+253	      relevant liabilities for signing the messages.
+
+255	   *  Gateway message signatures: All messages between gateways are
+256	      assumed to be signed and verified (e.g. with X.509).
+
+258	   *  Transitory control of asset by gateway: An asset being transferred
+259	      via SAT will technically be controlled by gateway throughout the
+260	      transfer duration to ensure the state of the asset is not modified
+261	      by another entity.  Gateway owners are liable for the asset
+262	      throughout this duration.
+
+264	   *  Network data: Gateways are assumed to have mechanisms in place to
+265	      trust data returned from their local networks.  This will depend
+266	      on the technical architecture and capabilities of each specific
+267	      network.
+
+269	   *  Gateways are trusted: The gateways are assumed to be trusted to
+270	      carry-out all the stages of the protocol described in this
+271	      architecture.
+
+273	4.  Gateway Interoperability Modes
+
+275	   The current interoperability architecture based on gateways
+276	   recognizes several types of transfer flows:
+
+278	   *  Asset transfer: This refers to the transfer of a digital asset
+279	      from the origin network to a destination network, where a
+280	      successful asset transfer causes the asset to be extinguished
+281	      (burned) in the origin network and be regenerated (minted) at the
+282	      destination network.
+
+284	   *  Data transfer: This refers to the transfer of data only under
+285	      authorization, in such a way that the data can be verified by a
+286	      third party.  The data transfer mode addresses the use-cases where
+287	      the state update in one network or system depends on the existence
+288	      of state information recorded in a different network or system.
+
+290	   *  Asset exchange (swap): This refers to the case where two users are
+291	      present in two networks, and they perform concurrent and atomic
+292	      swaps of two assets in the two corresponding networks, without
+293	      transferring the assets outside (i.e. across) the networks.  The
+294	      gateways aid in coordinating the messages pertaining to the swap.
+
+296	   The current SATP architecture can be extended to address the use-
+297	   cases pertaining to asset exchanges (swap) between two entities, both
+298	   of which are assumed to be present in the origin and destination
+299	   asset networks.  Similarly, the SATP architecture can be utilized for
+300	   the data transfer mode to report the state of an asset within a
+301	   private network, where the gateway acts as an intermediary.  However,
+302	   the asset exchange and data transfer mode will be addressed in future
+303	   specifications.
+
+305	   The remainder of this architecture document will focus on the asset
+306	   transfer flows.
+
+308	5.  Architecture
+
+310	5.1.  Goal of Architecture
+
+312	   The goal of the interoperability architecture is to permit two (2)
+313	   gateways belonging to distinct networks to conduct a transfer of
+314	   digital assets transfer between them, in a secure, atomic and
+315	   verifiable manner.
+
+317	   The asset as understood by the two gateways is expressed in an
+318	   standard digital format in a way meaningful to the gateway
+319	   syntactically and semantically.
+
+321	   The architecture recognizes that there are different networks
+322	   currently in operation and evolving, and that in many cases the
+323	   interior technical constructs in these networks maybe incompatible
+324	   with one another.
+
+326	   The architecture therefore assumes that in addition to implementing
+327	   the bilateral secure asset transfer protocol, a gateway has the role
+328	   of making opaque (i.e. hiding) the constructs that are local and
+329	   specific to its network.
+
+331	   Overall this approach ensures a high degree of interoperability
+332	   across these networks, where each network can operate as a true
+333	   autonomous system.  Additionally, this approach permits each network
+334	   to evolve its interior technology implementations without affecting
+335	   other (external) networks.
+
+337	   The current architecture focuses on unidirectional asset transfers,
+338	   although the building blocks in this architecture can be used to
+339	   support protocols for bidirectional transfers.
+
+341	   For simplicity the current architecture employs two (2) gateways per
+342	   transfer as the basic building block, with one gateway in the origin
+343	   and destination networks respectively.  However, the architecture
+344	   seeks to be extensible to address future cases involving multiple
+345	   gateways at both sides.
+
+347	   The abstract construct of the gateway is used to represent endpoints
+348	   that implement the asset transfer protocol interactions and the
+349	   business logic that coordinates the transfer protocol steps until
+350	   completion satisfying the ACID properties and ensuring liveliness of
+351	   the protocol interactions.  In classical distributed databases, this
+352	   business logic is often referred to as the transaction manager or the
+353	   transaction coordinator.  This architecture specification does not
+354	   prescribe any implementations of gateways.
+
+356	5.2.  Overview of Asset Transfer
+
+358	   An asset transfer between two networks is performed using a secure
+359	   asset transfer protocol implemented by the gateways in the respective
+360	   networks.  The two gateways implement the protocol in a direct
+361	   interaction (unmediated).
+
+363	   A successful transfer results in the asset being extinguished
+364	   (burned) at the origin network, and for the asset to be regenerated
+365	   (minted) at the destination network.
+
+367	   The secure asset transfer protocol provides a coordination between
+368	   the two gateways through the various message flows in the protocol
+369	   that is communicated over a secure channel.
+
+371	   The protocol implements a commitment mechanism between the two
+372	   gateways to ensure that the relevant properties atomicity,
+373	   consistency, isolation, and durability (ACID) are achieved in the
+374	   transfer.
+
+376	   The mechanism to extinguish (burn) or regenerate (mint) an asset
+377	   from/into a network by its gateway is dependent on the specific
+378	   network and is outside the scope of the current architecture
+379	   specification.  The mechanisms used to provide cryptographic proofs
+380	   that an asset has been burned or minted in a given network is also
+381	   out of scope.
+
+383	   As part of the commitment mechanism, the sender gateway in the origin
+384	   network must deliver a signed assertion to the receiver gateway at
+385	   the destination network which states that asset in question has been
+386	   extinguished (burned) from the origin network.
+
+388	   Similarly, the receiver gateway at the destination network must in
+389	   return deliver a signed assertion to the sender gateway at the origin
+390	   network which states that the asset has been regenerated (minted) in
+391	   the destination network.
+
+393	   These two tasks must be performed in a synchronized fashion between
+394	   the two gateways, and the commitment mechanism must provide
+395	   sufficient evidence of the asset transfer that is verifiable by an
+396	   authorized third party.
+
+398	5.3.  Desirable Properties of Asset Transfer
+
+400	   The desirable features of asset transfers between two gateways
+401	   include, but not limited, to the following:
+
+403	   *  Atomicity: A transfer must either commit or entirely fail (failure
+404	      means no change to asset state).
+
+406	   *  Consistency: A transfer (commit or fail) always leaves the
+407	      networks in a consistent state (i.e. the asset is located in one
+408	      network only at any time).
+
+410	   *  Isolation: While the transfer is occurring, the asset state cannot
+411	      be modified in the origin network.
+
+413	   *  Durability: Once a transfer has been committed by both gateways,
+414	      it must remain so regardless of subsequent gateway crashes.
+
+416	   *  Liveliness and safety: The asset transfer protocol results in both
+417	      gateways reaching a non-blocking state (commits or aborts)
+418	      satisfying the above ACID properties.
+
+420	   *  Verifiable by authorized third parties: The proof that the asset
+421	      has been extinguished in the origin network, and the proof that
+422	      the asset has been generated in the destination network must be
+423	      verifiable by an authorized third party.
+
+425	   An implementation of the asset transfer protocol should satisfy these
+426	   properties, independent of whether the implementation employs
+427	   stateful messaging or stateless messaging between the two gateways.
+
+429	   Performing an asset transfer safely and securely is not simply a
+430	   matter of communicating desire or intent between two systems
+431	   represented by gateways, though such communication is a necessary
+432	   part of asset transfer.  The systems, or at least their gateway
+433	   proxies, must be interoperable in order to transfer assets among
+434	   themselves, but such interoperability imposes strictly more demands
+435	   on systems managing digital assets, especially systems that are built
+436	   on distributed ledgers, compared to conventional communication
+437	   interoperability.
+
+439	   Communication interoperability, which is concerned with syntax and
+440	   semantics of information geared towards producing a common
+441	   understanding (or knowledge reconciliation) among systems, is
+442	   insufficient to fulfill an asset transfer that requires systems to
+443	   carry out state updates in concert with each other.  But
+444	   communication, or messaging standards, play a necessary and
+445	   complementary role to asset transfer protocols.  An exemplar of this
+446	   is ISO 20022, which is a comprehensive global standard for financial
+447	   messaging that specifies message syntax for common actions occurring
+448	   in financial business processes, including payments, credit card
+449	   transactions, securities settlements, funds, and trade [ISO20022].
+450	   This standard provides the tools to model business processes from
+451	   basic logical building blocks and schemas to construct messages using
+452	   common formats like XML, JSON, and ASN.1.
+
+454	   As discussed later, such messaging standards are useful to
+455	   communicate information about the states of processes and digital
+456	   assets across systems, to make requests, and to convey intent.  They
+457	   therefore play a necessary and complementary role in asset transfer
+458	   protocols.  However they are by themselves insufficient to ensure the
+459	   ACID and verifiability properties described earlier.  Another way to
+460	   think about the relationship between messaging standards like ISO
+461	   20022 and asset transfer protocols is that the former is concerned
+462	   with the "what" of cross-system interoperability whereas the latter
+463	   is concerned with the "how".  Both kinds of protocols treat systems
+464	   as black boxes, but asset transfer protocols must place some
+465	   responsibility, and depend, on systems to drive a protocol instance
+466	   to successful conclusion.
+
+468	5.4.  Event log-data, crash recovery and backup gateways
+
+470	   Implementations of a gateway should maintain event logs and
+471	   checkpoints for the purpose of gateway crash recovery.  The log-data
+472	   generated by a gateway should be considered as an interior resource
+473	   accessible to other authorized gateways within the same network.
+
+475	   The mechanism used to provide gateway crash-recovery is dependent on
+476	   the specific network.  For interoperability purposes the information
+477	   contained in the log and the format of the log-data should be
+478	   standardized.
+
+480	   A standardized semantics and syntax for log-data generated by SATP
+481	   gateways in the context of asset transfers enables multiple
+482	   implementations of gateways to serve a given asset network.  For
+483	   example, an asset transfer session interrupted by a crashed gateway
+484	   could be resumed by another gateway if the log-data was accessible to
+485	   the second gateway and was in a standardized format.
+
+487	   The resumption of an interrupted transfer session (e.g. due to
+488	   gateway crash, network failure, etc.) should take into consideration
+489	   the aspects of secure channel establishment and the aspects of the
+490	   transfer protocol resumption.  In some cases, a new secure channel
+491	   (e.g. TLS session) may need to be established between the two
+492	   gateways, before a resumption of the transfer can begin.
+
+494	   The log-data collected by a gateway acts also as a checkpoint
+495	   mechanism to assist the recovered (or backup) gateway in continuing
+496	   the transfer.  The point at which to re-start the transfer protocol
+497	   flow is dependent on the implementation of the gateway recovery
+498	   strategy.
+
+500	5.5.  Overview of the Stages in Asset Transfer
+
+502	   The interaction between two gateways in the secure asset transfer
+503	   protocol is summarized in Figure 1, where the origin network is NW1
+504	   and the destination network is NW2.  The gateways are denoted as G1
+505	   and G2 respectively.
+
+507	            Originator                                   Beneficiary
+508	                |                                             |
+509	         +-------------+                               +-------------+
+510	         |   Client    |                               |   Client    |
+511	         | Application |                               | Application |
+512	         |    (App1)   |                               |    (App2)   |
+513	         +-------------+                               +-------------+
+514	                |                                             |
+515	                |                                             |
+516	                |-----------+                     +-----------|
+517	                |           |  |<--(Stage 0)-->|  |           |
+518	                V           |  |               |  |           V
+519	         +-------------+    V  |               |  V    +-------------+
+520	         |    Network  |  +----+<-- Stage 1 -->+----+  |   Network   |
+521	         |     NW1     |  |Gate|               |Gate|  |     NW2     |
+522	         |             |--|way |               |way |--|             |
+523	         | +---------+ |  | G1 |<-- Stage 2 -->| G2 |  | +---------+ |
+524	         | |  State  | |  +----+               +----+  | |   State | |
+525	         | | Data DB1| |       |               |       | | Data DB2| |
+526	         | +---------+ |       |<-- Stage 3--->|       | +---------+ |
+527	         +-------------+                               +-------------+
+
+529	                                  Figure 1
+
+531	   The stages are summarized as follows.
+
+533	   *  Stage 0: Pre-transfer Verification and Context Establishment.  The
+534	      two applications utilized by the originator and beneficiary are
+535	      assumed to interact as part of the asset transfer.  In this stage,
+536	      the applications App1 and App2 may establish some shared transfer
+537	      context information (e.g.  Context-ID) at the application level
+538	      that will be made available to their respective gateways G1 and
+539	      G2.  The verification of the identities of the Originator and
+540	      Beneficiary may occur in this stage.  This stage is outside the
+541	      scope of the current architecture specification.  The Travel Rule
+542	      is defined by the Financial Action Task Force [FATF] as the
+543	      international policy-making body to combat money laundering and
+544	      terrorist financing.  The FATF Recommendation 16 (2018) requires
+545	      that customer information be obtained and validated prior to
+546	      digital asset transfers.
+
+548	   *  Stage 1: Transfer Initiation and Commencement.  In this stage
+549	      gateways G1 and G2 must exchange information (claims) regarding
+550	      the asset to be transferred, the identity information of the
+551	      Originator and Beneficiary and other information regarding
+552	      relevant actors (e.g. gateway owner/operator).  The main task in
+553	      this stage is for both gateways to finalize the parameters
+554	      previously negotiated in Stage 0 and to agree to commence the
+555	      transfer.
+
+557	   *  Stage 2: Lock Assertion and Receipt.  In this stage, gateway G1
+558	      must provide gateway G2 with a signed assertion that the asset in
+559	      NW1 has been immobilized and under the control on G1.  A signed
+560	      assertion is needed because NW1 may be a private or closed
+561	      network, and therefore the state-database (ledger) in NW1 is not
+562	      readable by external entities including by G2.  This means that
+563	      gateway G1 must make an explicit signed assertion about the state
+564	      in NW1.  Note that the owner/operator of G1 takes on liability in
+565	      signing this assertion.
+
+567	   *  Stage 3: Commitment Preparation and Finalization.  In this stage
+568	      gateways G1 and G2 commit to the unidirectional asset transfer
+569	      using a 3PC (3-phase commit) subprotocol.
+
+571	   These stages will be further discussed below.
+
+573	6.  Pre-transfer Verification and Context Establishment (Stage-0)
+
+575	   Although Stage 0 is out of scope for the current architecture, it is
+576	   discussed here in order to provide background with the regards to the
+577	   various asset verification requirements prior to commencing the
+578	   transfer in Stage 1.
+
+580	   Several tasks need to be conducted as part of the pre-transfer:
+
+582	   *  Application level ContextID establishment: The application (App1)
+583	      used by the originator and the application (App2) used by the
+584	      beneficiary may need to establish a transfer context identifier
+585	      (contextID) to uniquely identity the transfer at the application
+586	      level.
+
+588	   *  Identification of the asset in the origin network: The specific
+589	      asset in the origin network NW1 must be located and identified,
+590	      and its ownership be verified by gateway G1.  A gateway should not
+591	      transfer assets whose ownership is unverified.  An asset may be
+592	      identified by way of a combination of the network-identifier and a
+593	      cryptographic hash of the ledger data representing the asset.
+594	      Other syntax may also be used, such as [ISO20022] or ITIN [ITIN].
+
+596	   *  Verification of the class or type of asset: The receiving gateway
+597	      G2 may need to verify the class or type of asset that is to be
+598	      transferred by gateway G1 in network NW1.  This is to ensure that
+599	      the asset type/class conforms to the governing policies in the
+600	      destination network NW2.  Additionally, gateway G2 must ensure
+601	      that network NW2 can technologically receive (mint) the asset of
+602	      that given type/class.  Asset schema definitions and asset profiles
+603	      may assist in this verification process.
+
+605	   *  Validation of asset ownership status: The gateway G1 in the origin
+606	      network NW1 must ensure that an asset to be transferred to an
+607	      external network is owned by the originator who is requesting the
+608	      transfer.
+
+610	   *  Authorization to transfer: The gateway G1 must obtain
+611	      authorization from the owner of the asset (originator) to perform
+612	      the transfer to the beneficiary in network NW2.  Similarly, the
+613	      gateway G2 serving network NW2 must obtain authorization from the
+614	      beneficiary to receive the transfer and assign the asset to the
+615	      beneficiary in NW2.
+
+617	   *  Exchange of Travel Rule information and validation: In
+618	      jurisdictions where the Travel Rule policies regarding originator
+619	      and beneficiary information is enforced [FATF], the owners of
+620	      gateways G1 and G2 must comply to the Travel Rule.  Mechanisms
+621	      must be used to permit gateways G1 and G2 to make available
+622	      originator/beneficiary information to one another in such a away
+623	      that the Travel Rule information can be logged as part of the
+624	      asset transfer history.
+
+626	   *  Validation of the gateway ownership: There must be a means for
+627	      gateway G1 and G2 to verify their respective ownerships (i.e.
+628	      entities owning G1 and G2 respectively).  Examples of ownership
+629	      verification mechanism include X.509 certificates, directories of
+630	      gateways and owners, and others.
+
+632	   *  Mutual device attestations: In cases where device attestation
+633	      [RATS] is required, each gateway must yield attestation evidence
+634	      to the other regarding its configuration.  A gateway may take on
+635	      the role as a attestation verifier, or it may rely on an external
+636	      verifier to appraise the received evidence.
+
+638	   *  Negotiation of transfer protocol and network parameters: Gateway
+639	      G1 and G2 must agree on the parameters to be employed within the
+640	      asset transfer protocol.  Examples include endpoints definitions
+641	      for resources, duration of time-outs of messages, type of
+642	      commitment flows (e.g. 2PC or 3PC), signature algorithms, average
+643	      lock-time durations in their respective networks, and others.
+
+645	   The current specification seeks to reuse as much as possible the
+646	   existing standards related to digital assets.  We seek to rely on
+647	   existing messaging standards like ISO 20022 [ISO20022] or ITIN [ITIN]
+648	   for gateway ownership validation, owner status validation, asset
+649	   profile identification, and communication of travel rule and transfer
+650	   context information.  For identification of digital assets maintained
+651	   by distributed ledgers or blockchain systems, we can also rely on
+652	   standards like ITIN [ITIN].
+
+654	7.  Transfer Initiation and Commencement (Stage-1)
+
+656	   In Stage 1 the sender gateway (G1) and the receiver gateway (G2) must
+657	   explicitly accept the parameters of the transfer which were
+658	   negotiated in the pre-transfer stage (Stage 0).
+
+660	   This explicit acceptance of the parameters takes the form of gateway
+661	   G1 sending a signed Transfer Proposal message containing a Transfer
+662	   Initiation Claims set (namely the parameters agreed upon in Stage 0),
+663	   and for the gateway G2 to respond with a signed Proposal Receipt
+664	   message which carries a hash of the proposal message.
+
+666	       App1  DB1          G1                     G2          DB2    App2
+667	        |     |            |                      |            |     |
+668	        |     |            |      (Stage 0)       |            |     |
+669	        |     |            |                      |            |     |
+670	        |<------------ (transfer context establishment) ------------>|
+671	        |     |            |                      |            |     |
+672	        |---request------->|                      |<------request----|
+673	        |     |            |                      |            |     |
+674	        |     |            |<-Param Negotiation-->|            |     |
+675	        |     |            |                      |            |     |
+676	      ..|.....|............|......................|............|.....|..
+677	        |     |            |       Stage 1        |            |     |
+678	        |     |            |                      |            |     |
+679	        |     |       (1.1)|---Transf. Proposal-->|            |     |
+680	        |     |            |                      |            |     |
+681	        |     |            |                      |            |     |
+682	        |     |       (1.2)|<--Proposal Receipt---|            |     |
+683	        |     |            |                      |            |     |
+684	        |     |            |                      |            |     |
+685	        |     |       (1.3)|---Transf. Commence-->|            |     |
+686	        |     |            |                      |            |     |
+687	        |     |            |                      |            |     |
+688	        |     |       (1.4)|<--- ACK Commence ----|            |     |
+689	        |     |            |                      |            |     |
+690	      ..|.....|............|......................|............|.....|..
+691	        |     |            |                      |            |     |
+
+693	                               Figure 2
+
+695	   There are several steps that may occur in Stage 1:
+
+697	   *  Secure channel establishment between G1 and G2: This includes the
+698	      mutual verification of the gateway device identities and the
+699	      exchange of the relevant parameters for secure channel
+700	      establishment.
+
+702	   *  Transfer Proposal message (1.1): Gateway G1 sends a signed
+703	      transfer proposal message that contains the Transfer Initiation
+704	      Claims to gateway G2.  The claims carry the parameters negotiated
+705	      in Stage 0 (pre-transfer negotiations).
+
+707	   *  Proposal Receipt (1.2): The gateway G2 indicates acceptance of the
+708	      parameters in the Transfer Initiation Claims by way of sending a
+709	      signed Proposal Receipt message to G1.  If gateway G2 decides not
+710	      to accept parameters in the Transfer Initiation Claims, then G2
+711	      can send an abort message to G1, or simply ignore the message
+712	      (time-out).
+
+714	   *  Transfer Commence message (1.3): Once gateway G1 receives the
+715	      signed Proposal Receipt from gateway G2, gateway G1 is ready to
+716	      signal the commencement of the asset transfer.  This is done by
+717	      gateway G1 sending a signed Transfer Commence message to G2.
+
+719	   *  Commence Acknowledgement message (1.4): Gateway G2 accepts the
+720	      formal commencement of the transfer by responding with a signed
+721	      Commence ACK message.
+
+723	   It is important to note the logical separation between the transfer
+724	   proposal/receipt messages from the commencement messages.  This
+725	   separation allows the gateways to decline to proceed during the
+726	   proposal finalization (1.1 and 1.2), prior to starting the 2PC
+727	   subprotocol which formally begins at the Commence messages (1.3 and
+728	   1.4).
+
+730	   This logical separation is useful because in some implementations the
+731	   decision to start the commencement (1.3 and 1.4) implies that the
+732	   gateways and network have sufficient resource to complete the
+733	   transfer.  Gateways that experience extreme loads may use this
+734	   separation to slightly delay the commencement until their loads
+735	   subsides.
+
+737	   Note that some implementations may choose to enable a multi-round
+738	   interactions for steps 1.1 and 1.2.
+
+740	8.  Asset Lock Assertion and Receipt (Stage 2)
+
+742	   In this stage, gateway G1 must issue a signed assertion that the
+743	   asset in origin network NW1 has been immobilized and under the
+744	   control of G1.
+
+746	   The steps of Stage 2 are summarized in Figure 4, and broadly consists
+747	   of the following:
+
+749	   *  G1 Lock/Escrow Asset (2.1): Gateway G1 proceeds to establish a
+750	      lock or escrow the asset belonging to the originator.  This
+751	      prevents other local transactions in NW1 from changing the state
+752	      of the asset until such time the lock by G1 is finalized or
+753	      released.  A time-lock or escrow may also be employed.
+
+755	   *  Lock Assertion (2.2): Gateway G1 sends a digitally signed
+756	      assertion regarding the locked (escrowed or immobilized) state on
+757	      the asset in network NW1.  The signature by G1 is performed using
+758	      its entity public-key pair.  This signature signifies that G1
+759	      (i.e. its owner/operator) is standing behind its statement
+760	      regarding the locked/escrowed state on the asset.  The mechanism
+761	      to lock or immobilize the asset is outside the scope of secure
+762	      asset transfer protocol.
+
+764	   *  G2 Logs Lock-Assertion Information (2.3): Gateway G2 logs/records
+765	      a copy of the signed lock-assertion message received in Step 2.4
+766	      to its local state data DB2.  G2 may also notify the fact of the
+767	      lock-assertion to all members of network NW2.  The mechanism to
+768	      log and to notify is also out of scope.
+
+770	   *  Lock-Assertion Receipt (2.4): If gateway G2 accepts the signed
+771	      assertion from G1, then G2 responds with a digitally signed
+772	      receipt message which includes a hash of the previous lock-
+773	      assertion message.  The signature by G2 is performed using its
+774	      entity public-key pair.  Otherwise, if G2 declines accepting the
+775	      assertion then G2 can simply ignore the transfer and let the
+776	      session time-out (i.e. transfer attempt has failed).
+
+778	         Orig DB1           G1                   G2            DB2  Benef
+779	         |     |            |      (Stage 1)     |              |     |
+780	         |     |            |                    |              |     |
+781	       ..|.....|............|....................|..............|.....|..
+782	         |     |            |       Stage 2      |              |     |
+783	         |     |            |                    |              |     |
+784	         |     |<---Lock----|(2.1)               |              |     |
+785	         |     |            |                    |              |     |
+786	         |     |       (2.2)|--Lock-Assertion--->|              |     |
+787	         |     |            |                    |              |     |
+788	         |     |            |               (2.3)|---Record---->|     |
+789	         |     |            |                    |              |     |
+790	         |     |            |                    |              |     |
+791	         |     |            |<-----Receipt-------|(2.4)         |     |
+792	         |     |            |                    |              |     |
+793	       ..|.....|............|....................|..............|.....|..
+794	         |     |            |                    |              |     |
+
+796	                               Figure 3
+
+798	   The purpose of the signed lock-assertion is for dispute resolution
+799	   between G1 and G2 (i.e. the entities who own and operate G1 and G2
+800	   respectively) in the case that asset state inconsistencies in NW1 and
+801	   NW2 are discovered later.
+
+803	   The gateway G2 must return a digitally signed receipt to G1 regarding
+804	   the earlier signed lock-assertion in order to cover G1 (exculpatory
+805	   proof) in the case of later denial by G2.
+
+807	9.  Commitment Preparation and Finalization (Stage 3)
+
+809	   In Stage 3 the gateways G1 and G2 commit to the asset transfer by
+810	   making permanent the changes they made to the respective networks
+811	   (ledgers).  The previous signed receipt message (2.4) from gateway G2
+812	   to gateway G1 signals the start of the commitment subprotocol in
+813	   Stage 3.
+
+815	   Upon receiving the signed receipt message from G2 in the previous
+816	   stage, G1 begins the commitment (see Figure 5):
+
+818	   *  Commit-prepare (3.1): Gateway G1 indicates to G2 to prepare for
+819	      the commitment of the transfer.  This message should include
+820	      hashes of the previous messages (message 2.2 and 2.4).
+
+822	   *  Temporary asset mint (3.2): Gateway G2 creates (mints) an
+823	      equivalent asset in NW2 assigned to itself as the owner.  This
+824	      step can be reversed (i.e. asset destroyed) in the case of the
+825	      failure in the commitment steps because G2 is still the owner of
+826	      the asset in NW2.
+
+828	   *  Commit-ready (3.3): Gateway G2 sends a commit-ready message to G1
+829	      indicating that it is ready to carry-out the last steps of the
+830	      commitment subprotocol.  Note that that the entire asset transfer
+831	      session can be aborted before this step without affecting the
+832	      asset state in the respective networks.
+
+834	   *  Asset burn (3.4): Gateway G1 extinguishes (burns) the asset in
+835	      network NW1 which it has locked since Step 2.3.
+
+837	   *  Commit-final assertion (3.5): Gateway G1 indicates to G2 that G1
+838	      has performed the extinguishment of the asset in NW1.  This
+839	      message must be digitally signed by G1.
+
+841	   *  Asset-assignment (3.6): Gateway G2 assigns the minted asset (which
+842	      it has been self-holding since Step 3.2) to the Beneficiary.
+
+844	   *  ACK-final receipt (3.7): Gateway G2 sends a signed assertion that
+845	      it has assigned the asset to the intended Beneficiary.
+
+847	   *  Record receipt (3.8): Gateway G1 logs/records a copy of the signed
+848	      receipt message to its local state data DB1.  G1 may also notify
+849	      the fact of the signed receipt to all members of network NW1.  The
+850	      mechanism to log and notify is out of scope.
+
+852	   *  Transfer complete (3.9): Gateway G1 must explicitly close the
+853	      asset transfer session with gateway G2.  This allows both sides to
+854	      close down the secure channel established earlier in Stage 1.
+
+856	         Orig DB1           G1                   G2           DB2  Benef
+857	         |     |             |      (Stage 2)     |            |     |
+858	         |     |             |                    |            |     |
+859	       ..|.....|.............|....................|............|.....|..
+860	         |     |             |       Stage 3      |            |     |
+861	         |     |             |                    |            |     |
+862	         |     |        (3.1)|--Commit Prepare--->|            |     |
+863	         |     |             |                    |            |     |
+864	         |     |             |               (3.2)|----Mint--->|     |
+865	         |     |             |                    |            |     |
+866	         |     |             |<--Commit Ready ----|(3.3)       |     |
+867	         |     |             |                    |            |     |
+868	         |     |             |                    |            |     |
+869	         |     |<---Burn-----|(3.4)               |            |     |
+870	         |     |             |                    |            |     |
+871	         |     |        (3.5)|-Commit Final Asrt->|            |     |
+872	         |     |             |                    |            |     |
+873	         |     |             |                    |            |     |
+874	         |     |             |               (3.6)|---Assign-->|     |
+875	         |     |             |                    |            |     |
+876	         |     |             |<-----ACK Final-----|(3.7)       |     |
+877	         |     |             |                    |            |     |
+878	         |     |             |                    |            |     |
+879	         |     |<---Record---|(3.8)               |            |     |
+880	         |     |             |                    |            |     |
+881	         |     |        (3.9)|-----Completed----->|            |     |
+882	         |     |             |                    |            |     |
+883	       ..|.....|.............|....................|............|.....|..
+884	         |     |             |                    |            |     |
+
+886	                               Figure 4
+
+888	10.  The Commitment sub-protocol
+
+890	   Within Stage 3, the gateways must implement one (or more)
+891	   transactional commitment sub-protocols that permit the coordination
+892	   between two gateways, and the final commitment of the asset transfer.
+
+894	   In the case that there are multiple commitment subprotocols supported
+895	   by the gateways, the choice of the sub-protocol (type/version) and
+896	   the corresponding commitment evidence must be negotiated between the
+897	   gateways during Stage 0.
+
+899	   For example, in Stage 2 and Stage 3 discussed above the gateways G1
+900	   and G2 may implement the classic 2-Phase or 3-Phase Commit (2PC or
+901	   3PC) sub-protocol [Gray81] as a means to ensure efficient and non-
+902	   disputable commitments to the asset transfer.
+
+904	   Historically, transactional commitment protocols employ locking
+905	   mechanisms to prevent update conflicts on the data item in question.
+906	   When used within the context of digital asset transfers across
+907	   networks, the fact that an asset has been locked in NW1 must be
+908	   communicated via an assertion to G2 (as the 3PC participant) in an
+909	   indisputable manner.
+
+911	   Similarly, G2 must return a signed assertion to G1 that the asset has
+912	   been regenerated (minted) in NW2.
+
+914	   These signed assertions must be verifiable by an authorized third
+915	   party, in the case that disputes occur (post event) or where audit is
+916	   required on the asset transfer.
+
+918	   The precise form of these assertions must be standardized (for the
+919	   given transactional commitment protocol) to eliminate any ambiguity.
+
+921	11.  Security Considerations
+
+923	   As an asset network holds an increasing number of digital assets, it
+924	   may become attractive to attackers seeking to compromise the
+925	   cryptographic keys of the entities, services and its end-users.
+
+927	   Gateways are of particular interest to attackers because they enable
+928	   the transferal of digital assets to external networks, which may or
+929	   may not be regulated.  As such, hardening technologies and tamper-
+930	   resistant crypto-processors (e.g. TPM, SGX) should be used for
+931	   implementations of gateways [HS19].
+
+933	   The SAT protocol faces challenges with regards to the confidentiality
+934	   of a transfer between gateways, and the potential issue related to a
+935	   denial-of-service (and resource waste) when either gateway is not
+936	   compliant with the protocol.
+
+938	   For confidentiality of a transfer, the secure asset transfer protocol
+939	   must utilize a TLS1.2 (TLS1.3) secure channel that must be
+940	   established between the sender gateway (G1) and the receiver gateway
+941	   (G2).  The two gateways must first establish this secure channel at
+942	   the start of Stage 1 before they can proceed to execute the asset
+943	   transfer protocol.  This includes both gateways verifying all the
+944	   relevant parameters required for their TLS1.2 session (e.g. correct
+945	   TLS endpoints, certificate validation, identity validation, etc.).
+
+947	   There are several challenges that may arise when gateways are not
+948	   compliant with the SAT protocol.  Some of these are described below.
+
+950	11.1.  Multiple intentional aborts by the sender gateway
+
+952	   A dishonest sender gateway G1 may purposely fail to continue the
+953	   protocol run at certain crucial points.  One such crucial point is in
+954	   Stage-3, where the gateway G1 is expected to transmit the Commit-
+955	   Final Assertion message (3.5).  If the gateway G1 intentionally fails
+956	   to transmit this message, gateway G2 may conclude that the message
+957	   has been lost and may proceed to reverse the temporary hold it has
+958	   previously created (temporary asset mint in message 3.2).  Although
+959	   this dishonest behavior by G1 does not cause asset damage to G2 or
+960	   NW2, it may exhaust computing resources at gateway G2.  If network
+961	   NW2 incurs transaction fees, such a reversal may be costly for
+962	   gateway G2.
+
+964	11.2.  Multiple intentional aborts by the receiver gateway
+
+966	   In a similar manner, a receiver gateway G2 may also purposely fail to
+967	   continue the protocol run at certain crucial points.  One such point
+968	   is the Commit-Ready message (3.3) that it should transmit to G1 after
+969	   receiving the commit prepare message (3.1) from G1.  In this case,
+970	   gateway G1 may conclude that the message is lost and simply abort the
+971	   protocol run.
+
+973	   Another possible denial-of-service attack could arise when G2
+974	   purposefully fails to send a Lock-Assertion-Receipt (2.4), thereby
+975	   forcing G1 to reverse its lock that was performed earlier (2.1).
+
+977	11.3.  Failure to transmit ACK-Final Receipt
+
+979	   Another possible point of attack by a dishonest gateway G2 may occur
+980	   by the gateway intentionally failing to transmit the ACK-Final-
+981	   Receipt (3.7) in response to the Commit-Final Assertion message (3.5)
+982	   from gateway G1.  Here, the sender gateway G1 may conclude that the
+983	   message is lost and will assume that the transaction has reach
+984	   completion in network NW2.  The sender gateway G1 has retained the
+985	   previous Lock-Assertion Receipt (2.4) in Stage-2 that was signed by
+986	   G2, indicating that the gateway G2 has accepted the responsibility of
+987	   ensuring that the asset-assignment (3.6) by G2 will be correctly
+988	   executed.  Failure by G2 to complete this task may become a liability
+989	   for the owner of gateway G2.
+
+991	   In general, it is recommended that multiple redundant gateways be
+992	   utilized within a network to mitigate a single gateway's malicious
+993	   behavior.  Furthermore, there are gateway recovery and failover
+994	   mechanisms that have been defined in [BCH21].
+
+996	11.4.  Failure to extinguish asset
+
+998	   Another potential attack may come from a dishonest gateway G1 who
+999	   intentionally fails to extinguish the asset in network NW1 (in step
+1000	   3.4).  This means G1 is henceforth in control of the asset.  This
+1001	   type of denial-of-service is network specific because it implies that
+1002	   G1 was able to perform a lock on the asset on behalf of the asset-
+1003	   owner (i.e. originator) through one or more mechanisms supported by
+1004	   network NW1 independent of (and prior to) the secure asset transfer
+1005	   protocol.
+
+1007	   This denial-of-service is out of scope for the current architecture
+1008	   specification because it represents a weakness on the part of the
+1009	   network NW1.
+
+1011	11.5.  Identity impersonations
+
+1013	   Another vector of attack may involve a gateway that impersonates an
+1014	   asset holder in a given network.  For example, a gateway G1 may
+1015	   pretend to be the owner of an asset (originator) in network NW1 and
+1016	   proceed to transfer it to a beneficiary located in network NW2.
+
+1018	   The verification of the identity of the originator and beneficiary
+1019	   must be performed as part of the set-up stage (Stage 0) as described
+1020	   in Section 6, which is currently out-of-scope for the secure asset
+1021	   transfer protocol.
+
+1023	   The identity verification includes that of the owner of gateways G1
+1024	   and G2 respectively.  Standard protocols for federated identity
+1025	   management already exist and have wide deployment.
+
+1027	12.  Policy Considerations
+
+1029	   Digital asset transfers must be policy-driven in the sense that it
+1030	   must observe and enforce the policies defined for both networks.
+1031	   Resources that make-up a network are owned and operated by entities
+1032	   (e.g. typically persons or organizations), and these entities
+1033	   typically operate within regulatory jurisdictions [FATF].  It is the
+1034	   responsibility of these entities to translate regulatory policies
+1035	   into functions on networks that comply to the relevant regulatory
+1036	   policies.
+
+1038	   At the application layer, asset transfers must take into
+1039	   consideration the status of assets and incorporate relevant asset-
+1040	   related policies into their business logic.  These policies must
+1041	   permeate down to the gateways that implement the functions of asset
+1042	   transaction processing.
+
+1044	13.  Compatibility Considerations
+
+1046	   As the asset transfer protocol must be agnostic to the anatomy of a
+1047	   digital asset and to the type of ledger technology underlying a
+1048	   system maintaining digital assets, it must be compatible with
+1049	   different asset identification standards like ISO 20022 and ITIN, and
+1050	   with standards for communicating information about business processes
+1051	   (like ISO 20022).  Keeping the Stage-0 specification open and not
+1052	   tied to a specific messaging or identification standard allows the
+1053	   Secure Asset Transfer architecture to be flexible and inclusive, and
+1054	   thereby meet compatibility goals.
+
+1056	14.  IANA Considerations
+
+1058	   This document has no IANA actions.
+
+1060	15.  References
+
+1062	15.1.  Normative References
+
+1064	   [FATF]     FATF, "International Standards on Combating Money
+1065	              Laundering and the Financing of Terrorism and
+1066	              Proliferation - FATF Revision of Recommendation (Updated
+1067	              June 2021)", October 2018, <http://www.fatf-
+1068	              gafi.org/publications/fatfrecommendations/documents/fatf-
+1069	              recommendations.html>.
+
+1071	   [ISO]      ISO, "Blockchain and distributed ledger technologies-
+1072	              Vocabulary (ISO:22739:2020)", July 2020,
+1073	              <https://www.iso.org>.
+
+1075	   [ISO20022] ISO, "Universal Financial Industry Message Scheme (ISO
+1076	              20022).", July 2023, <https://www.iso20022.org>.
+
+1078	   [ITIN]     ITSA, "International Token Identification Number.", July
+1079	              2023, <https://my.itsa.global/what-we-do>.
+
+1081	   [NIST]     Yaga, D., Mell, P., Roby, N., and K. Scarfone, "NIST
+1082	              Blockchain Technology Overview (NISTR-8202)", October
+1083	              2018, <https://doi.org/10.6028/NIST.IR.8202>.
+
+1085	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+1086	              Requirement Levels", BCP 14, RFC 2119,
+1087	              DOI 10.17487/RFC2119, March 1997,
+1088	              <https://www.rfc-editor.org/info/rfc2119>.
+
+1090	15.2.  Informative References
+
+1092	   [ABCH20]   Ankenbrand, T., Bieri, D., Cortivo, R., Hoehener, J., and
+1093	              T. Hardjono, "Proposal for a Comprehensive Crypto Asset
+1094	              Taxonomy", May 2020, <https://arxiv.org/abs/2007.11877>.
+
+1096	   [Abebe19]  Abebe, E., Behl, D., Govindarajan, C., Hu, Y.,
+1097	              Karunamoorthy, D., Novotny, P., Pandit, V., Ramakrishna,
+1098	              V., and C. Vecchiola, "Enabling Enterprise Blockchain
+1099	              Interoperability with Trusted Data Transfer (Middleware
+1100	              2019, Industry Track)", December 2019,
+1101	              <https://arxiv.org/abs/1911.01064>.
+
+1103	   [Abebe21]  Abebe, E., Hu, Y., Irvin, A., Karunamoorthy, D., Pandit,
+1104	              V., Ramakrishna, V., and J. Yu, "Verifiable Observation of
+1105	              Permissioned Ledgers (ICBC2021)", May 2021,
+1106	              <https://arxiv.org/abs/2012.07339>.
+
+1108	   [BCH21]    Belchior, R., Correia, M., and T. Hardjono, "DLT Gateway
+1109	              Crash Recovery Mechanism, IETF, draft-belchior-gateway-
+1110	              recovery-01.", March 2021,
+1111	              <https://datatracker.ietf.org/doc/draft-belchior-gateway-
+1112	              recovery/>.
+
+1114	   [BVGC20]   Belchior, R., Vasconcelos, A., Guerreiro, S., and M.
+1115	              Correia, "A Survey on Blockchain Interoperability: Past,
+1116	              Present, and Future Trends", May 2020,
+1117	              <https://arxiv.org/abs/2005.14282v2>.
+
+1119	   [Clar88]   Clark, D., "The Design Philosophy of the DARPA Internet
+1120	              Protocols, ACM Computer Communication Review, Proc SIGCOMM
+1121	              88, vol. 18, no. 4, pp. 106-114", August 1988.
+
+1123	   [DevID]    IEEE, "802.1AR: Secure Device Identity", August 2018,
+1124	              <https://doi.org/10.1109/IEEESTD.2018.8423794>.
+
+1126	   [DLVIEW]   Ramakrishna, V., Pandit, V., Nishad, S., Narayanam, K.,
+1127	              and D. Vinayagamurthy, "Views and View Addresses for
+1128	              Blockchain/DLT Interoperability, IETF Draft", November
+1129	              2021.
+
+1131	   [Gray81]   Gray, J., "The Transaction Concept: Virtues and
+1132	              Limitations, in VLDB Proceedings of the 7th International
+1133	              Conference, Cannes, France, September 1981, pp. 144-154",
+1134	              September 1981.
+
+1136	   [Herl19]   Herlihy, M., "Blockchains From a Distributed Computing
+1137	              Perspective, Communications of the ACM, vol. 62, no. 2,
+1138	              pp. 78-85", February 2019,
+1139	              <https://doi.org/10.1145/3209623>.
+
+1141	   [HLP19]    Hardjono, T., Lipton, A., and A. Pentland, "Towards and
+1142	              Interoperability Architecture for Blockchain Autonomous
+1143	              Systems, IEEE Transactions on Engineering Management",
+1144	              June 2019, <https://doi:10.1109/TEM.2019.2920154>.
+
+1146	   [HS2019]   Hardjono, T. and N. Smith, "Decentralized Trusted
+1147	              Computing Base for Blockchain Infrastructure Security,
+1148	              Frontiers Journal, Special Issue on Blockchain Technology,
+1149	              Vol. 2, No. 24", December 2019,
+1150	              <https://doi.org/10.3389/fbloc.2019.00024>.
+
+1152	   [RATS]     Birkholz, H., Thaler, D., Richardson, M., Smith, N., and
+1153	              W. Pan, "Remote ATtestation procedureS (RATS)
+1154	              Architecture", January 2023,
+1155	              <https://datatracker.ietf.org/doc/rfc9334/>.
+
+1157	   [SATcore]  Hargreaves, M., Hardjono, T., and R. Belchior, "IETF
+1158	              Secure Asset Transfer Protocol (SATP)", 9 July 2023,
+1159	              <https://datatracker.ietf.org/doc/draft-ietf-satp-
+1160	              core/>.>.
+
+1162	   [SRC84]    Saltzer, J., Reed, D., and D. Clark, "End-to-End Arguments
+1163	              in System Design, ACM Transactions on Computer Systems,
+1164	              vol. 2, no. 4, pp. 277-288", November 1984.
+
+1166	   [TPMdevID] TCG, "TPM 2.0 Keys for Device Identity and Attestation", 8
+1167	              October 2021, <https://trustedcomputinggroup.org/resource/
+1168	              tpm-2-0-keys-for-device-identity-and-attestation/>.
+
+1170	Appendix A.  Acknowledgments
+
+1172	   The authors would like to thank the following people for their input
+1173	   and support:
+
+1175	   Andre Augusto, Denis Avrilionis, Rafael Belchior, Carsten Bormann,
+1176	   Sandip Chakraborty, Shiping Chen, Alexandru Chiriac, Claire Facer,
+1177	   Martin Gfeller, Bishakh Ghosh, Wes Hardaker, David Millman, Paul
+1178	   Hoffman, Russ Housley, Nick Kerrigan, Peter Liu, Krishnasuri
+1179	   Narayanam, Chris Ostrowski, Vinayaka Pandit, Luke Riley, John
+1180	   Robotham, Orie Steele, Peter Somogyvari, Mike Truter, Gilbert
+1181	   Verdian, Dhinakaran Vinayagamurthy, Paul Wouters, Qin Wang, Weijia
+1182	   Zhang.
+
+1184	Authors' Addresses
+
+1186	   Thomas Hardjono
+1187	   MIT
+1188	   Email: hardjono@mit.edu
+
+1190	   Martin Hargreaves
+1191	   Quant Network
+1192	   Email: martin.hargreaves@quant.network
+
+1194	   Ned Smith
+1195	   Intel
+1196	   Email: ned.smith@intel.com
+
+1198	   Venkatraman Ramakrishna
+1199	   IBM
+1200	   Email: vramakr2@in.ibm.com
+
+
+
+
+
+
+
+
+
