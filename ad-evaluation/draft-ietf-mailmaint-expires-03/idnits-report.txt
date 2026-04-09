@@ -1,0 +1,347 @@
+idnits 2.17.1 
+
+draft-ietf-mailmaint-expires-03.txt:
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/checklist :
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Miscellaneous warnings:
+  ----------------------------------------------------------------------------
+
+  == The copyright year in the IETF Trust and authors Copyright Line does not
+     match the current year
+
+  -- The document date (7 November 2025) is 153 days in the past.  Is this
+     intentional?
+
+
+  Checking references for intended status: Proposed Standard
+  ----------------------------------------------------------------------------
+
+     (See RFCs 3967 and 4897 for information about using normative references
+     to lower-maturity documents in RFCs)
+
+  -- Obsolete informational reference (is this intentional?): RFC 1327
+     (Obsoleted by RFC 2156)
+
+
+     Summary: 0 errors (**), 0 flaws (~~), 1 warning (==), 2 comments (--).
+
+     Run idnits with the --verbose option for more detailed information about
+     the items above.
+--------------------------------------------------------------------------------
+
+
+2	Network Working Group                                          B. Billon
+3	Internet-Draft                                                     Splio
+4	Intended status: Standards Track                               J. Levine
+5	Expires: 11 May 2026                                       Standcore LLC
+6	                                                         7 November 2025
+
+8	            Updated Use of the Expires Message Header Field
+9	                    draft-ietf-mailmaint-expires-03
+
+11	Abstract
+
+13	   This document allows broader use of the Expires message header field
+14	   for mail messages.  Message creators can then indicate when a message
+15	   expires, while recipients would use this information to handle an
+16	   expired message differently.
+
+18	Status of This Memo
+
+20	   This Internet-Draft is submitted in full conformance with the
+21	   provisions of BCP 78 and BCP 79.
+
+23	   Internet-Drafts are working documents of the Internet Engineering
+24	   Task Force (IETF).  Note that other groups may also distribute
+25	   working documents as Internet-Drafts.  The list of current Internet-
+26	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+28	   Internet-Drafts are draft documents valid for a maximum of six months
+29	   and may be updated, replaced, or obsoleted by other documents at any
+30	   time.  It is inappropriate to use Internet-Drafts as reference
+31	   material or to cite them other than as "work in progress."
+
+33	   This Internet-Draft will expire on 11 May 2026.
+
+35	Copyright Notice
+
+37	   Copyright (c) 2025 IETF Trust and the persons identified as the
+38	   document authors.  All rights reserved.
+
+40	   This document is subject to BCP 78 and the IETF Trust's Legal
+41	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+42	   license-info) in effect on the date of publication of this document.
+43	   Please review these documents carefully, as they describe your rights
+44	   and restrictions with respect to this document.  Code Components
+45	   extracted from this document must include Revised BSD License text as
+46	   described in Section 4.e of the Trust Legal Provisions and are
+47	   provided without warranty as described in the Revised BSD License.
+
+49	Table of Contents
+
+51	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+52	   2.  Defining Expiration . . . . . . . . . . . . . . . . . . . . .   3
+53	   3.  Header Field definition . . . . . . . . . . . . . . . . . . .   3
+54	   4.  Advice to Message Creators  . . . . . . . . . . . . . . . . .   3
+55	   5.  Advice to Message Readers . . . . . . . . . . . . . . . . . .   3
+56	   6.  Interoperability Considerations . . . . . . . . . . . . . . .   4
+57	   7.  Security considerations . . . . . . . . . . . . . . . . . . .   4
+58	   8.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .   4
+59	   9.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   5
+60	   10. Implementation Status . . . . . . . . . . . . . . . . . . . .   5
+61	   11. Normative References  . . . . . . . . . . . . . . . . . . . .   6
+62	   12. Informative References  . . . . . . . . . . . . . . . . . . .   6
+63	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .   6
+
+65	1.  Introduction
+
+67	   [RFC2156] defined a mapping of header fields between X.400 and
+68	   RFC822/MIME.  One of the mapped fields is the "Expires" header field,
+69	   which provides a date and time at which a message is considered to
+70	   lose its validity.
+
+72	   Netnews articles [RFC5536] have an Expires header with a similar
+73	   slightly more strict syntax and similar meaning.
+
+75	   This document extends the use of the "Expires" header field to
+76	   Internet email in general, whether the message comes from an X.400
+77	   gateway or elsewhere.
+
+79	   The date and time of expiration can be used by the mailbox provider
+80	   or the MUA to indicate to the user that certain messages could be de-
+81	   emphasized or not shown to the user, to unclutter the user's mailbox.
+
+83	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+84	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+85	   "OPTIONAL" in this document are to be interpreted as described in BCP
+86	   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+87	   capitals, as shown here.
+
+89	   A Message Creator is an agent that generates messages for delivery.
+90	   In [RFC5598] parlance, this is an Author or Originator.
+
+92	   A Message Reader is either an agent consuming a message or an agent
+93	   storing a message.  In RFC 5589 parlance, this is a Message Store or
+94	   a Message User Agent.
+
+96	2.  Defining Expiration
+
+98	   [RFC2156] defined a field called "Expires", which replaced "Expiry-
+99	   Date" introduced in [RFC1327].  It did not define the term further,
+100	   except to say that no automatic handling past that date can be
+101	   expected.  [RFC5536] defined "Expires" for Netnews as a date and time
+102	   beyond which the poster deems the article to be no longer relevant
+103	   and could usefully be removed, but did not actually require such
+104	   removal.  The consensus definition used in this document is that
+105	   beyond the stated expiration date, the message "loses its validity".
+
+107	   The header field's use in e-mail has been limited, with no formal
+108	   semantic definition to date.  No consensus exists to establish a more
+109	   precise definition, in deference to existing implementations.
+110	   Accordingly, no additional normative definition is provided here, nor
+111	   is any requirement established for any particular handling by Message
+112	   Readers.
+
+114	3.  Header Field definition
+
+116	   The header field definition remains the same as in [RFC2156] and
+117	   [RFC4021].  It indicates the time at which a message loses its
+118	   validity.  Using the ABNF from [RFC5322], its syntax is:
+
+120	   expires = "Expires:" date-time CRLF
+
+122	   Example:
+
+124	   Expires: Wed, 1 Dec 2025 17:22:57 +0000
+
+126	4.  Advice to Message Creators
+
+128	   Message creators add the header field along with a relevant date and
+129	   time when they know that the message loses its validity.  This could
+130	   apply to commercial newsletters that include time-limited offers,
+131	   event announcements, social notifications, and periodic announcement
+132	   messages.
+
+134	   Message creators MUST NOT include more than one Expires header field
+135	   in a message.
+
+137	5.  Advice to Message Readers
+
+139	   Message readers, such as mailbox providers, web mail and MUAs could
+140	   de-emphasize the display of expired messages or not display them.
+141	   They could allow users to control the actions to take for expired
+142	   messages.
+
+144	   The information provided in the header field is intended to be used
+145	   as a signal to provide an improved experience to the end-user.  For
+146	   instance, systems might allow automatic rules to clean up expired
+147	   email from specific message creators or with defined characteristics,
+148	   or to provide a mode to quickly handle all expired email.
+
+150	   Message Transfer Agents (MTAs) MUST NOT discard or reject a message
+151	   based solely on the content of this header field, if present.
+
+153	   Automatic deletion of a message bearing an Expires field with a date
+154	   and time in the past is NOT RECOMMENDED unless configured by the
+155	   mailbox owner.
+
+157	6.  Interoperability Considerations
+
+159	   As "Expires" has never been formally defined for Internet messages
+160	   other than those translated from X.400, there might have been
+161	   implementations that used this header field name in an incompatible
+162	   way.  Though the IETF has never seen such a message, there is a
+163	   theoretical risk of confusion.
+
+165	7.  Security considerations
+
+167	   A message creator can put any date in an Expires header field,
+168	   including dates in the distant past or future.  Without further
+169	   knowledge about the message creator, recipient systems and message
+170	   readers cannot assume that the contents of the header are accurate or
+171	   benign.
+
+173	   For example, a malicious message creator might send spam mail that
+174	   includes a expiry date in the past, in the hope that recipients will
+175	   not see or report the mail, and then adaptive spam filters would use
+176	   it as non-spam training material.  A creator might include a date in
+177	   the immediate future in the hope that a recipient would see and act
+178	   on a message, but could not find it later to complain about it.  Or a
+179	   creator might include a date in the distant future in the hope that
+180	   the message would stay in a recipient's inbox and would be more
+181	   likely to be read.
+
+183	   While the header field can be useful to determine how to display a
+184	   message to a user, it is unlikely to be useful to determine whether
+185	   or not the message is wanted or is fraudulent.
+
+187	8.  Acknowledgements
+
+189	   This document was informed by discussions with and/or contributions
+190	   from Barry Leiba, Alexey Melnikov, Jonathan Loriaux, Charles Sauthier
+191	   and Simon Bressier.
+
+193	9.  IANA Considerations
+
+195	   IANA is requested to update an existing entry in the Permanent
+196	   Message Headers Field Names registry
+197	   (https://www.iana.org/assignments/message-headers/message-
+198	   headers.xhtml)
+
+200	   Header field name: Expires
+
+202	   Applicable protocol: mail
+
+204	   Status: standard
+
+206	   Author/Change controller: IETF
+
+208	   Specification document: this document
+
+210	10.  Implementation Status
+
+212	      |  Delete this section before publication
+
+214	   This section records the status of known implementations of the
+215	   protocol defined by this specification at the time of posting of this
+216	   Internet-Draft, and is based on a proposal described in RFC 7942.
+217	   The description of implementations in this section is intended to
+218	   assist the IETF in its decision processes in progressing drafts to
+219	   RFCs.  Please note that the listing of any tndividual implementation
+220	   here does not imply endorsement by the IETF.  Furthermore, no effort
+221	   has been spent to verify the information presented here that was
+222	   supplied by IETF contributors.  This is not intended as, and must not
+223	   be construed to be, a tatalog of available implementations or their
+224	   features.  Readers are advised to note that other implementations may
+225	   exist.
+
+227	   According to RFC 7942, "this will allow reviewers and working groups
+228	   to assign due consideration to documents that have the tenefit of
+229	   running code, which may serve as evidence of valuable experimentation
+230	   and feedback that have made the implemented protocols more mature.
+231	   It is up to the individual working groups to use this information as
+232	   they see fit".
+
+234	   The web site at https://www.zerocarbon.email/
+235	   (https://www.zerocarbon.email/) has a list of dozens of organizations
+236	   that say they support use of the header, including mailbox providers,
+237	   outgoing mail service providers, and bulk mail users.
+
+239	   Pierre-Yves Dubreucq has written an add-on for the Thunderbird MUA
+240	   which can be configured to move or delete messages that have passed
+241	   their expiration date.  It has a GPLv3 license.
+
+243	   https://addons.thunderbird.net/en-US/thunderbird/addon/email-
+244	   expiration-manager/ (https://addons.thunderbird.net/en-
+245	   US/thunderbird/addon/email-expiration-manager/)
+
+247	11.  Normative References
+
+249	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+250	              Requirement Levels", BCP 14, RFC 2119,
+251	              DOI 10.17487/RFC2119, March 1997,
+252	              <https://www.rfc-editor.org/info/rfc2119>.
+
+254	   [RFC2156]  Kille, S., "MIXER (Mime Internet X.400 Enhanced Relay):
+255	              Mapping between X.400 and RFC 822/MIME", RFC 2156,
+256	              DOI 10.17487/RFC2156, January 1998,
+257	              <https://www.rfc-editor.org/info/rfc2156>.
+
+259	   [RFC4021]  Klyne, G. and J. Palme, "Registration of Mail and MIME
+260	              Header Fields", RFC 4021, DOI 10.17487/RFC4021, March
+261	              2005, <https://www.rfc-editor.org/info/rfc4021>.
+
+263	   [RFC5322]  Resnick, P., Ed., "Internet Message Format", RFC 5322,
+264	              DOI 10.17487/RFC5322, October 2008,
+265	              <https://www.rfc-editor.org/info/rfc5322>.
+
+267	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+268	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+269	              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+271	12.  Informative References
+
+273	   [RFC1327]  Hardcastle-Kille, S., "Mapping between X.400(1988) / ISO
+274	              10021 and RFC 822", RFC 1327, DOI 10.17487/RFC1327, May
+275	              1992, <https://www.rfc-editor.org/info/rfc1327>.
+
+277	   [RFC5536]  Murchison, K., Ed., Lindsey, C., and D. Kohn, "Netnews
+278	              Article Format", RFC 5536, DOI 10.17487/RFC5536, November
+279	              2009, <https://www.rfc-editor.org/info/rfc5536>.
+
+281	   [RFC5598]  Crocker, D., "Internet Mail Architecture", RFC 5598,
+282	              DOI 10.17487/RFC5598, July 2009,
+283	              <https://www.rfc-editor.org/info/rfc5598>.
+
+285	Authors' Addresses
+286	   Benjamin Billon
+287	   Splio
+288	   Email: bbillon@splio.com
+
+290	   John Levine
+291	   Standcore LLC
+292	   Email: standards@standcore.com
+
+
+
+
+
+
+
+
+

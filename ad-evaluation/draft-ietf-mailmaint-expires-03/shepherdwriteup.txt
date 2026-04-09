@@ -1,0 +1,193 @@
+1. Does the working group (WG) consensus represent the strong concurrence of a
+few individuals, with others being silent, or did it reach broad agreement?
+
+WGLC feedback has been light.  This document was discussed in the DISPATCH
+context prior to formation of MAILMAINT.  There appeared to be consensus to
+proceed, but there were a couple of verbal dissenters.  The concerns were
+discussed, but not resolved to the satisfaction of at least one of the
+dissenters.
+
+2. Was there controversy about particular points, or were there decisions where
+the consensus was particularly rough?
+
+There were two key points of concern, which I believe reduced to the following:
+
+(a) "Expires" has existed for a long time, going back to the X.400 days, but
+it's never been very clearly defined, at least not to the point of being
+standardized.  Section 2 attempts to capture this history and Section 6
+acknowledges the possible ambiguity.  Specifically, it's never been clear what
+an MTA or MUA is supposed to do with a message for which the Expires field is
+present and the date within it has passed: Render it normally?  Don't render
+it?  Render it with a warning?  Instruct the message store to delete it?
+Something else?  The concern is that attempting to assert a specific meaning
+now may be incompatible with extant implementations, leading to
+interoperability issues that could be serious, and this flies in the face of
+the notion of a "Proposed Standard".
+
+(b) The document should be very clear that no destructive or irreversible
+action should be taken by default in response to an apparently expired message.
+
+I believe (b) has been addressed, but there's no prose that can resolve (a), so
+it comes down to whether the problem in (a) is fatal to ever standardizing a
+meaning for this field, versus accepting that "most" (or "many")
+implementations these days do agree on what "Expires" means, and that's worth
+documenting.
+
+3. Has anyone threatened an appeal or otherwise indicated extreme discontent? If
+so, please summarize the areas of conflict in separate email messages to the
+responsible Area Director. (It should be in a separate email because this
+questionnaire is publicly available.)
+
+Not explicitly, but I would not discount this possibility.
+
+4. For protocol documents, are there existing implementations of the contents of
+the document? Have a significant number of potential implementers indicated
+plans to implement? Are any existing implementations reported somewhere,
+either in the document itself (as [<a href="/doc/rfc7942/">RFC 7942</a>][3] recommends) or elsewhere
+(where)?
+
+There are existing implementations.  See Section 10.
+
+## Additional Reviews
+
+5. Do the contents of this document closely interact with technologies in other
+IETF working groups or external organizations, and would it therefore benefit
+from their review? Have those reviews occurred? If yes, describe which
+reviews took place.
+
+Can't think of anything.
+
+6. Describe how the document meets any required formal expert review criteria,
+such as the MIB Doctor, YANG Doctor, media type, and URI type reviews.
+
+An early review by the permanent header field registry experts might be
+helpful, but this is a fairly straightforward registration so I wouldn't
+consider it required before proceeding.
+
+7. If the document contains a YANG module, has the final version of the module
+been checked with any of the [recommended validation tools][4] for syntax and
+formatting validation? If there are any resulting errors or warnings, what is
+the justification for not fixing them at this time? Does the YANG module
+comply with the Network Management Datastore Architecture (NMDA) as specified
+in [<a href="/doc/rfc8342/">RFC 8342</a>][5]?
+
+No YANG here.
+
+8. Describe reviews and automated checks performed to validate sections of the
+final version of the document written in a formal language, such as XML code,
+BNF rules, MIB definitions, CBOR's CDDL, etc.
+
+There's one line of ABNF in Section 3, which looks right.
+
+## Document Shepherd Checks
+
+9. Based on the shepherd's review of the document, is it their opinion that this
+document is needed, clearly written, complete, correctly designed, and ready
+to be handed off to the responsible Area Director?
+
+Yes, modulo the concerns raised above.
+
+10. Several IETF Areas have assembled [lists of common issues that their
+reviewers encounter][6]. For which areas have such issues been identified
+and addressed? For which does this still need to happen in subsequent
+reviews?
+
+I have only checked the ART list.  No issues identified.
+
+11. What type of RFC publication is being requested on the IETF stream ([Best
+Current Practice][12], [Proposed Standard, Internet Standard][13],
+[Informational, Experimental or Historic][14])? Why is this the proper type
+of RFC? Do all Datatracker state attributes correctly reflect this intent?
+
+Proposed Standard, which is appropriate given we're trying to define something
+formally to ensure interoperability, and it's part of a protocol.  It's in all
+the right places in the tracker and the document.
+
+12. Have reasonable efforts been made to remind all authors of the intellectual
+property rights (IPR) disclosure obligations described in [<a href="/doc/bcp79/">BCP 79</a>][7]? To
+the best of your knowledge, have all required disclosures been filed? If
+not, explain why. If yes, summarize any relevant discussion, including links
+to publicly-available messages when applicable.
+
+There have been no such claims, and the authors affirm they know of nothing
+outstanding.
+
+13. Has each author, editor, and contributor shown their willingness to be
+listed as such? If the total number of authors and editors on the front page
+is greater than five, please provide a justification.
+
+Yes.
+
+14. Document any remaining I-D nits in this document. Simply running the [idnits
+tool][8] is not enough; please review the ["Content Guidelines" on
+<a href="http://authors.ietf.org">authors.ietf.org</a>][15]. (Also note that the current idnits tool generates
+some incorrect warnings; a rewrite is underway.)
+
+None.
+
+15. Should any informative references be normative or vice-versa? See the [IESG
+Statement on Normative and Informative References][16].
+
+References look right to me.
+
+16. List any normative references that are not freely available to anyone. Did
+the community have sufficient access to review any such normative
+references?
+
+None.
+
+17. Are there any normative downward references (see [<a href="/doc/rfc3967/">RFC 3967</a>][9] and [<a href="/doc/bcp97/">BCP
+97</a>][10]) that are not already listed in the [DOWNREF registry][17]? If so,
+list them.
+
+No.
+
+18. Are there normative references to documents that are not ready to be
+submitted to the IESG for publication or are otherwise in an unclear state?
+If so, what is the plan for their completion?
+
+No.
+
+19. Will publication of this document change the status of any existing RFCs? If
+so, does the Datatracker metadata correctly reflect this and are those RFCs
+listed on the title page, in the abstract, and discussed in the
+introduction? If not, explain why and point to the part of the document
+where the relationship of this document to these other RFCs is discussed.
+
+No status changes.
+
+20. Describe the document shepherd's review of the IANA considerations section,
+especially with regard to its consistency with the body of the document.
+Confirm that all aspects of the document requiring IANA assignments are
+associated with the appropriate reservations in IANA registries. Confirm
+that any referenced IANA registries have been clearly identified. Confirm
+that each newly created IANA registry specifies its initial contents,
+allocations procedures, and a reasonable name (see [<a href="/doc/rfc8126/">RFC 8126</a>][11]).
+
+There's a single registration, and it looks clear and correct to me.
+
+21. List any new IANA registries that require Designated Expert Review for
+future allocations. Are the instructions to the Designated Expert clear?
+Please include suggestions of designated experts, if appropriate.
+
+No new registries are created.
+
+[1]: <a href="https://www.ietf.org/about/groups/iesg/">https://www.ietf.org/about/groups/iesg/</a>
+[2]: <a href="https://www.rfc-editor.org/rfc/rfc4858.html">https://www.rfc-editor.org/rfc/rfc4858.html</a>
+[3]: <a href="https://www.rfc-editor.org/rfc/rfc7942.html">https://www.rfc-editor.org/rfc/rfc7942.html</a>
+[4]: <a href="https://wiki.ietf.org/group/ops/yang-review-tools">https://wiki.ietf.org/group/ops/yang-review-tools</a>
+[5]: <a href="https://www.rfc-editor.org/rfc/rfc8342.html">https://www.rfc-editor.org/rfc/rfc8342.html</a>
+[6]: <a href="https://wiki.ietf.org/group/iesg/ExpertTopics">https://wiki.ietf.org/group/iesg/ExpertTopics</a>
+[7]: <a href="https://www.rfc-editor.org/info/bcp79">https://www.rfc-editor.org/info/bcp79</a>
+[8]: <a href="https://www.ietf.org/tools/idnits/">https://www.ietf.org/tools/idnits/</a>
+[9]: <a href="https://www.rfc-editor.org/rfc/rfc3967.html">https://www.rfc-editor.org/rfc/rfc3967.html</a>
+[10]: <a href="https://www.rfc-editor.org/info/bcp97">https://www.rfc-editor.org/info/bcp97</a>
+[11]: <a href="https://www.rfc-editor.org/rfc/rfc8126.html">https://www.rfc-editor.org/rfc/rfc8126.html</a>
+[12]: <a href="https://www.rfc-editor.org/rfc/rfc2026.html#section-5">https://www.rfc-editor.org/rfc/rfc2026.html#section-5</a>
+[13]: <a href="https://www.rfc-editor.org/rfc/rfc2026.html#section-4.1">https://www.rfc-editor.org/rfc/rfc2026.html#section-4.1</a>
+[14]: <a href="https://www.rfc-editor.org/rfc/rfc2026.html#section-4.2">https://www.rfc-editor.org/rfc/rfc2026.html#section-4.2</a>
+[15]: <a href="https://authors.ietf.org/en/content-guidelines-overview">https://authors.ietf.org/en/content-guidelines-overview</a>
+[16]:
+<a href="https://www.ietf.org/about/groups/iesg/statements/normative-informative-references/">https://www.ietf.org/about/groups/iesg/statements/normative-informative-references/</a>
+[17]: <a href="https://datatracker.ietf.org/doc/downref/">https://datatracker.ietf.org/doc/downref/</a>
+
