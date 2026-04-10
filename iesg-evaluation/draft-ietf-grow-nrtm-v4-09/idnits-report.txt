@@ -1,0 +1,1258 @@
+idnits 2.17.1 
+
+draft-ietf-grow-nrtm-v4-09.txt:
+-(782): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(783): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+  == There are 7 instances of lines with non-ascii characters in the document.
+
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     Summary: 0 errors (**), 0 flaws (~~), 1 warning (==), 0 comments (--).
+
+--------------------------------------------------------------------------------
+
+
+2	GROW                                                           S. Romijn
+3	Internet-Draft                                            Reliably Coded
+4	Intended status: Standards Track                             J. Snijders
+5	Expires: 18 September 2026                                           BSD
+6	                                                              E. Shryane
+7	                                                                RIPE NCC
+8	                                                         S. Konstantaras
+9	                                                                  AMS-IX
+10	                                                           17 March 2026
+
+12	               Near Real Time Mirroring (NRTM) version 4
+13	                       draft-ietf-grow-nrtm-v4-09
+
+15	Abstract
+
+17	   This document specifies a one-way synchronization protocol for
+18	   Internet Routing Registry (IRR) records, called Near Real Time
+19	   Mirroring version 4 (NRTMv4), in which files are distributed over
+20	   HTTPS.  The protocol allows instances of IRR database servers to
+21	   mirror IRR records, specified in the Routing Policy Specification
+22	   Language (RPSL), between each other.
+
+24	Requirements Language
+
+26	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+27	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+28	   "OPTIONAL" in this document are to be interpreted as described in BCP
+29	   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+30	   capitals, as shown here.
+
+32	Status of This Memo
+
+34	   This Internet-Draft is submitted in full conformance with the
+35	   provisions of BCP 78 and BCP 79.
+
+37	   Internet-Drafts are working documents of the Internet Engineering
+38	   Task Force (IETF).  Note that other groups may also distribute
+39	   working documents as Internet-Drafts.  The list of current Internet-
+40	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+42	   Internet-Drafts are draft documents valid for a maximum of six months
+43	   and may be updated, replaced, or obsoleted by other documents at any
+44	   time.  It is inappropriate to use Internet-Drafts as reference
+45	   material or to cite them other than as "work in progress."
+
+47	   This Internet-Draft will expire on 18 September 2026.
+
+49	Copyright Notice
+
+51	   Copyright (c) 2026 IETF Trust and the persons identified as the
+52	   document authors.  All rights reserved.
+
+54	   This document is subject to BCP 78 and the IETF Trust's Legal
+55	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+56	   license-info) in effect on the date of publication of this document.
+57	   Please review these documents carefully, as they describe your rights
+58	   and restrictions with respect to this document.  Code Components
+59	   extracted from this document must include Revised BSD License text as
+60	   described in Section 4.e of the Trust Legal Provisions and are
+61	   provided without warranty as described in the Revised BSD License.
+
+63	Table of Contents
+
+65	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
+66	   2.  Overview  . . . . . . . . . . . . . . . . . . . . . . . . . .   4
+67	   3.  Terminology . . . . . . . . . . . . . . . . . . . . . . . . .   6
+68	   4.  Mirror Server Use . . . . . . . . . . . . . . . . . . . . . .   6
+69	     4.1.  Key Configuration . . . . . . . . . . . . . . . . . . . .   6
+70	     4.2.  Snapshot Initialization . . . . . . . . . . . . . . . . .   7
+71	     4.3.  Publishing Updates  . . . . . . . . . . . . . . . . . . .   7
+72	       4.3.1.  Delta Files . . . . . . . . . . . . . . . . . . . . .   7
+73	       4.3.2.  Snapshot Files  . . . . . . . . . . . . . . . . . . .   8
+74	       4.3.3.  Update Notification File  . . . . . . . . . . . . . .   9
+75	       4.3.4.  Publication Policy Restrictions . . . . . . . . . . .   9
+76	   5.  Mirror Client Use . . . . . . . . . . . . . . . . . . . . . .  10
+77	     5.1.  Client Configuration  . . . . . . . . . . . . . . . . . .  10
+78	     5.2.  Update Notification File Retrieval  . . . . . . . . . . .  10
+79	     5.3.  Initialization from Snapshot  . . . . . . . . . . . . . .  10
+80	     5.4.  Processing Delta Files  . . . . . . . . . . . . . . . . .  10
+81	     5.5.  Error Recovery  . . . . . . . . . . . . . . . . . . . . .  12
+82	     5.6.  Signature and Staleness Verification  . . . . . . . . . .  12
+83	     5.7.  Policy Restrictions . . . . . . . . . . . . . . . . . . .  13
+84	   6.  Update Notification File  . . . . . . . . . . . . . . . . . .  13
+85	     6.1.  Purpose . . . . . . . . . . . . . . . . . . . . . . . . .  13
+86	     6.2.  Cache Concerns  . . . . . . . . . . . . . . . . . . . . .  13
+87	     6.3.  Payload Format and Validation . . . . . . . . . . . . . .  14
+88	     6.4.  Encoding and signature  . . . . . . . . . . . . . . . . .  16
+89	   7.  Snapshot File . . . . . . . . . . . . . . . . . . . . . . . .  16
+90	     7.1.  Purpose . . . . . . . . . . . . . . . . . . . . . . . . .  17
+91	     7.2.  Cache Concerns  . . . . . . . . . . . . . . . . . . . . .  17
+92	     7.3.  File Format and Validation  . . . . . . . . . . . . . . .  17
+93	   8.  Delta File  . . . . . . . . . . . . . . . . . . . . . . . . .  18
+94	     8.1.  Purpose . . . . . . . . . . . . . . . . . . . . . . . . .  18
+95	     8.2.  Cache Concerns  . . . . . . . . . . . . . . . . . . . . .  18
+96	     8.3.  File Format and Validation  . . . . . . . . . . . . . . .  18
+
+98	   9.  Operational Considerations  . . . . . . . . . . . . . . . . .  20
+99	     9.1.  Time  . . . . . . . . . . . . . . . . . . . . . . . . . .  20
+100	     9.2.  IRR Object Validation . . . . . . . . . . . . . . . . . .  20
+101	     9.3.  Intermediate Mirror Instances . . . . . . . . . . . . . .  21
+102	     9.4.  Reading from Local Files  . . . . . . . . . . . . . . . .  21
+103	     9.5.  Storage Considerations  . . . . . . . . . . . . . . . . .  21
+104	     9.6.  Public Key Rotation . . . . . . . . . . . . . . . . . . .  22
+105	     9.7.  Scalability . . . . . . . . . . . . . . . . . . . . . . .  23
+106	     9.8.  NRTMv3 Compatibility  . . . . . . . . . . . . . . . . . .  23
+107	   10. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  23
+108	   11. Security Considerations . . . . . . . . . . . . . . . . . . .  23
+109	   12. Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .  24
+110	   13. Normative References  . . . . . . . . . . . . . . . . . . . .  24
+111	   14. Informative References  . . . . . . . . . . . . . . . . . . .  26
+112	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  26
+
+114	1.  Introduction
+
+116	   The Internet Routing Registry (IRR) consists of several IRR
+117	   Databases, each storing objects in the Routing Policy Specification
+118	   Language (RPSL) [RFC2622].  About a dozen larger IRR Databases are
+119	   well known and widely used, operated by different organizations such
+120	   as Regional Internet Registries and some large network operators.
+121	   IRR objects serve many purposes, ranging from manual research by
+122	   operators to automated network configuration and filtering.
+
+124	   Most of these well-known IRR Databases mirror IRR objects from some
+125	   others, so that queries run against these instances provide a
+126	   comprehensive view.  Some parties also mirror IRR Databases to
+127	   private IRR server instances, to reduce latency when replying to
+128	   queries, analyze IRR objects, or other purposes.
+
+130	   NRTM version 4 (NRTMv4) is a protocol for IRR mirroring, designed to
+131	   address issues in existing IRR Database mirroring protocols.  In
+132	   NRTMv4, IRR Databases publish their records on an HTTPS [STD97]
+133	   endpoint, with periodic Snapshot Files and regular Delta Files.
+134	   Signing allows integrity checks.  By only generating files once and
+135	   publishing them over HTTPS, scalability is improved.  NRTMv4 borrows
+136	   some concepts in [RFC8182], as there are overlaps between the two
+137	   protocols.
+
+139	   Reliable and secure distribution of IRR data is important for global
+140	   routing operations, as network operators depend on IRR objects for
+141	   route filtering and network configuration.  Prior mirroring protocols
+142	   lack integrity verification, have no formal specification, and scale
+143	   poorly.  NRTMv4 addresses these shortcomings by providing a formally
+144	   specified, scalable, and integrity-protected mirroring protocol.  Of
+145	   earlier NRTM versions, particularly NRTMv3 [NRTMv3] was widely
+146	   deployed.  Some comparisons are made in Section 11.
+
+148	2.  Overview
+
+150	   In NRTMv4, a mirror server is an instance of IRR Database software
+151	   that has a database of IRR objects and publishes them to allow
+152	   mirroring by others.  These objects can be retrieved by mirror
+153	   clients, which then load them into their local storage.  The IRR
+154	   Database has a version, which the mirror server starts at 1, and
+155	   increments every time it publishes a set of changes.
+
+157	                           Mirror Server
+158	                          +--------------+
+159	                          | IRR Database |
+160	                          +------+-------+
+161	                                 |
+162	             +-------------------+-------------------+
+163	             |                   |                   |
+164	         periodic                |               on change
+165	             |                   |                   |
+166	             v                   v                   v
+167	       +------------+      +-----------+      +------------+
+168	       |  Snapshot  |      |  Update   |      |   Delta    |
+169	       |    File    | refs |   Notif.  | refs |  File(s)   |
+170	       |   (all     |<-----|   File    |----->| (changes   |
+171	       |  objects)  |      |  (index)  |      |   only)    |
+172	       +-----+------+      +-----------+      +-----+------+
+173	             |                   |                  |
+174	             |          +--------+--------+         |
+175	             +--------->+  Mirror Client  +<--------+
+176	               initial  | Local Database  |   update
+177	                        +-----------------+
+
+179	                     Figure 1: NRTMv4 Protocol Overview
+
+181	   Publication consists of three different files:
+
+183	   *  A single Update Notification File.  This specifies the current IRR
+184	      Database version and locations of the Snapshot File and Delta
+185	      Files.  It is signed to allow verification of the authenticity of
+186	      the Update Notification File.
+
+188	   *  A single active Snapshot File.  This contains all published IRR
+189	      objects at a particular version.  The mirror server periodically
+190	      generates a new snapshot.
+
+192	   *  Zero or more Delta Files.  These contain the changes between two
+193	      database versions.
+
+195	   The Update Notification File MUST be in the JSON Web Signature
+196	   [RFC7515] format, where the payload is in the JavaScript Object
+197	   Notation (JSON) format [RFC8259].  The Snapshot File and Delta Files
+198	   MUST be in the JSON Text Sequences [RFC7464] format, so that each
+199	   object in large files can be parsed independently.  Files MAY be
+200	   compressed with GZIP [RFC1952].
+
+202	   Mirror clients initially retrieve the small Update Notification File
+203	   and a Snapshot File, from which they initialize their local copy of
+204	   the Database.  After that, mirror clients only retrieve the Update
+205	   Notification File periodically, typically every minute, to determine
+206	   whether there are any changes, and then retrieve only the relevant
+207	   Delta Files, if any.  This minimizes data transfer.  Deltas have
+208	   sequential versions.
+
+210	   Mirror clients are configured with the URL of an Update Notification
+211	   File, name of the IRR Database, and a public signing key.  This
+212	   public key is used to verify the Update Notification File, which in
+213	   turn contains hashes of all the Snapshot and Delta Files.
+
+215	   Upon initialization, the mirror server generates a session identifier
+216	   (session_id) for the Database (Section 4.2).  This allows long term
+217	   caching and is used by the client to determine that the Delta Files
+218	   continue to form a full set of changes allowing an update to the
+219	   latest version.  If the mirror server loses partial history, or the
+220	   mirror client starts mirroring from a different server, the
+221	   session_id change will force a full reload from the latest Snapshot
+222	   File, ensuring there are no accidental mirroring gaps.
+
+224	   Mirror servers can use caching to reduce their load, particularly
+225	   because snapshots and deltas are immutable for a given session_id and
+226	   version number.  These are also the largest files.  Update
+227	   Notification Files may not be cached for longer than one minute, but
+228	   are fairly small.
+
+230	   Note that in NRTMv4, contiguous version numbers are used for the
+231	   Database version and Delta Files.  This is different and unrelated to
+232	   the serial in NRTMv3.  NRTMv3 serials refer to a single change to a
+233	   single object, whereas an NRTMv4 version refers to one delta,
+234	   possibly containing multiple changes to multiple objects.  NRTMv3
+235	   serials can also contain gaps, NRTMv4 versions may not.
+
+237	3.  Terminology
+
+239	   IRR Database  An Internet Routing Registry database that stores
+240	      objects in the Routing Policy Specification Language (RPSL).
+
+242	   Snapshot File  A file that reflects the complete contents of the IRR
+243	      objects in an IRR Database, at a particular point in time.
+
+245	   Delta File  A file that contains all changes for exactly one
+246	      incremental update of the IRR Database.
+
+248	   Update Notification File  A file generated by the mirror server and
+249	      used by mirror clients to discover which changes exist between the
+250	      state of the IRR mirror server and of the mirror client.
+
+252	   Mirror Server  An instance of IRR Database software that has a
+253	      database of IRR objects and publishes them to allow mirroring by
+254	      others.
+
+256	   Mirror Client  An instance of IRR Database software that retrieves
+257	      IRR objects from a mirror server and loads them into its local
+258	      storage.
+
+260	   Version  An incremental number that identifies the IRR Database at a
+261	      particular point in time.
+
+263	4.  Mirror Server Use
+
+265	4.1.  Key Configuration
+
+267	   When enabling NRTMv4 publication for an IRR Database, the operator
+268	   MUST generate a JSON Web Key [RFC7517] pair and configure the private
+269	   key in the mirror server.  The operator then provides the
+270	   corresponding public key, the name of the IRR Database, and
+271	   publication URL of the Update Notification File to any operators of
+272	   mirror clients.  The published public key MUST be encapsulated
+273	   following Textual Encoding of Subject Public Key Info Section 13 of
+274	   [RFC7468], sometimes referred to as "PEM encoding".  The process for
+275	   providing this is not in the scope of this protocol, but a typical
+276	   case is publication on the operator's known website.  Key rotation is
+277	   described in Section 9.6.
+
+279	   It is RECOMMENDED that implementations provide easily accessible
+280	   tools for operators to generate new signing keys to enter into their
+281	   configuration and assist with key rotation.  All configuration
+282	   options SHOULD be clearly named to indicate that they are private
+283	   keys.
+
+285	4.2.  Snapshot Initialization
+
+287	   A mirror server MUST follow the initialization steps upon the first
+288	   export for an IRR Database by that mirror server, or if the server
+289	   lost history and can not reliably produce a continuous set of deltas
+290	   from a previous state.
+
+292	   In other words, either the mirror server guarantees that clients
+293	   following the deltas have a correct and complete view, or must
+294	   reinitialize, which will force clients to reinitialize as well.
+
+296	   Initialization consists of these actions:
+
+298	   *  The mirror server MUST generate a new session_id.  This MUST be a
+299	      Universally Unique Identifier version 4 (UUIDv4) (Section 5.4 of
+300	      [RFC9562]) and MUST be the same across all client sessions.  The
+301	      session_id is unique to the IRR Database, so an instance that
+302	      serves multiple IRR Databases, will create a separate session_id
+303	      for each.
+
+305	   *  The server MUST generate a snapshot for version number one.  This
+306	      may contain an empty array of objects if the IRR Database is
+307	      currently empty.
+
+309	   *  The server MUST generate a new Update Notification File with the
+310	      new session_id, a reference to the new snapshot, and no deltas.
+
+312	   Note that a publication, and its associated session_ids and versions,
+313	   always relates to a single specific IRR Database, even if multiple
+314	   databases are published from one instance.  For example, a mirror
+315	   server publishing NRTMv4 for RIPE and RIPE-NONAUTH, will generate two
+316	   Update Notification Files, referring to two Snapshot Files, and two
+317	   sets of Delta Files each with contiguous version numbers - all
+318	   completely independent of each other, with different session IDs,
+319	   potentially at different times.  This applies even if the same IRR
+320	   server instance produces both.
+
+322	4.3.  Publishing Updates
+
+324	   After creating the initialization files, the mirror server processes
+325	   updates by publishing Delta Files and, periodically, a new Snapshot
+326	   File.
+
+328	4.3.1.  Delta Files
+
+330	   Changes to IRR objects MUST be recorded in Delta Files.  One Delta
+331	   File can contain multiple changes.
+
+333	   Updates are generated as follows:
+
+335	   *  A mirror server MUST publish a Delta File approximately every
+336	      minute, if there have been changes to IRR objects in that time
+337	      frame.
+
+339	   *  If a mirror server is lagging in production of Delta Files, such
+340	      as after an initialization or server downtime, it MUST generate
+341	      one larger "catch up" Delta File, rather than individual Delta
+342	      Files for every one-minute window.
+
+344	   *  A new Delta File MUST be generated with a new version, one greater
+345	      than the last Delta File version, or one greater than the last
+346	      Snapshot File version if there were no prior deltas at all.
+
+348	   *  The Delta File MUST include all changes that happened during the
+349	      time frame, in the order in which they occurred.  If multiple
+350	      changes have occurred within the time frame that would cancel each
+351	      other out, like an addition and immediate deletion of the same
+352	      object, the mirror server MUST still include all these changes.
+
+354	   *  The URL where the Delta File is published MUST contain the session
+355	      ID and version number to allow it to be indefinitely cached.  It
+356	      MUST also contain a random value that can not be predicted before
+357	      publication, to counter negative caching issues.
+
+359	   *  The Update Notification File MUST be updated to include the new
+360	      Delta File.
+
+362	   *  References to Delta Files older than 24 hours SHOULD be removed
+363	      from the Update Notification File.  Refer also to Section 9.5.
+
+365	   *  Note that, as Delta Files always contain changes compared to a
+366	      previous state, there can never be a Delta File with version 1.
+
+368	   Mirror servers with high object churn are RECOMMENDED to generate new
+369	   Snapshot Files more frequently than the required minimum, to limit
+370	   the length of the delta chain that clients must traverse on
+371	   initialization or after a gap.  Long delta chains increase
+372	   initialization time and resource consumption for mirror clients.
+
+374	4.3.2.  Snapshot Files
+
+376	   Snapshot Files after initialization are generated as follows:
+
+378	   *  If there have been no changes to the IRR objects since the last
+379	      snapshot, the mirror server MUST NOT generate a new snapshot.
+
+381	   *  The mirror server MUST generate a new Snapshot File between once
+382	      per hour and once per day, if there have been changes to the IRR
+383	      objects.
+
+385	   *  The version number of the new snapshot MUST be equal to the last
+386	      Delta File version.
+
+388	   *  The URL where the Snapshot File is published MUST contain the
+389	      session ID and version number to allow it to be indefinitely
+390	      cached.  It MUST also contain a random value that can not be
+391	      predicted before publication, to counter negative caching issues.
+
+393	   *  The Update Notification File MUST be updated to include the new
+394	      snapshot, if one was generated.
+
+396	   *  Snapshot generation may take some time, and in that time newer
+397	      changes may occur that are not part of the snapshot in progress.
+398	      The mirror server SHOULD continue to produce Delta Files during
+399	      this window, which means that the server may publish a Snapshot
+400	      File with a version number older than the most recent Delta File
+401	      at the time of publication.
+
+403	4.3.3.  Update Notification File
+
+405	   The Update Notification File MUST be updated when a new Delta or
+406	   Snapshot File is published and, even if there have been no changes,
+407	   at least every 24 hours.
+
+409	4.3.4.  Publication Policy Restrictions
+
+411	   A mirror server MAY have a policy that restricts the publication of
+412	   certain IRR objects or attributes, or modifies these before
+413	   publication.  Typical scenarios for this include preventing the
+414	   distribution of certain personal data or password hashes, or
+415	   excluding objects which do not meet validation rules like Resource
+416	   Public Key Infrastructure (RPKI) consistency.  It is RECOMMENDED to
+417	   modify objects in such a way that this change is evident to humans
+418	   reading the object text, for example, by adding remark lines or
+419	   comments.
+
+421	   Mirror servers are RECOMMENDED to remove password hashes from the
+422	   auth lines in mntner objects, as they have little use beyond the
+423	   authoritative server, and their publication may be a security risk.
+
+425	   If a mirror server has a policy that restricts or modifies object
+426	   publication, this MUST be applied consistently to Snapshot Files and
+427	   Delta Files from the moment the policy is enacted or modified.
+
+429	5.  Mirror Client Use
+
+431	5.1.  Client Configuration
+
+433	   Mirror clients are configured with the name of the IRR Database, the
+434	   URL of the Update Notification File, and the public key currently
+435	   used for signing the Update Notification File.  Key rotation is
+436	   described in Section 9.6.
+
+438	5.2.  Update Notification File Retrieval
+
+440	   Mirror clients may retrieve the Update Notification File to check for
+441	   changes every minute.  Mirror clients MUST NOT check more than once
+442	   per minute.
+
+444	5.3.  Initialization from Snapshot
+
+446	   Clients MUST initialize from a Snapshot File when initially
+447	   configured or if they are not able to update their local data from
+448	   the provided Delta Files:
+
+450	   *  The client MUST retrieve the Update Notification File.
+
+452	   *  The client MUST verify that the source attribute in the Update
+453	      Notification File matches the configured IRR Database name.
+
+455	   *  The client MUST retrieve the Snapshot File and load the objects
+456	      into its local storage.
+
+458	   *  The mirror client MUST verify that the hash of the Snapshot File
+459	      matches the hash in the Update Notification File that referenced
+460	      it.  If the Snapshot File was compressed with GZIP, the hash MUST
+461	      match the compressed data.  In case of a mismatch of this hash,
+462	      the file MUST be rejected.
+
+464	   *  The client MUST record the session_id and version of the loaded
+465	      Snapshot File.
+
+467	   *  If an Update Notification File or a Snapshot File has an invalid
+468	      syntax (e.g. missing mandatory parameters), the file MUST be
+469	      rejected.  For validating the IRR objects contained in the files,
+470	      see Section 9.2.
+
+472	5.4.  Processing Delta Files
+
+474	   If a mirror client has previously initialized from a snapshot:
+
+476	   *  The client MUST retrieve the Update Notification File.
+
+478	   *  The client MUST verify that the source attribute in the Update
+479	      Notification File matches the configured IRR Database name.
+
+481	   *  The client MUST verify that the session_id matches the previously
+482	      known session_id.  If this does not match, the client MUST
+483	      reinitialize from the snapshot.
+
+485	   *  The client MUST verify that the Update Notification File version
+486	      is the same or higher than the client's current most recent
+487	      version.  If not, the Update Notification File MUST be rejected.
+488	      It is RECOMMENDED for the client to distinguish between an Update
+489	      Notification File that is a single version older, and a much older
+490	      version, in any status messages.  The former can occur from time
+491	      to time in synchronization issues, the latter is more likely a
+492	      faulty implementation.
+
+494	   *  The client MUST verify that the Update Notification File contains
+495	      one contiguous set of Delta File versions after the client's
+496	      current most recent version up to the latest version in the Update
+497	      Notification File.  If the Delta File versions are not contiguous,
+498	      the Update Notification File MUST be rejected.  If the available
+499	      Delta File versions do not range from the client's most recent
+500	      version plus one, the client MUST reinitialize from the snapshot.
+
+502	   *  The mirror client MUST verify that the hashes of each Delta and
+503	      Snapshot File have not changed compared to previous entries seen
+504	      for the same file type and version.  If a newer Update
+505	      Notification File contains a different hash for a specific file,
+506	      this indicates a misconfiguration in the server and the client
+507	      MUST reject the Update Notification File.  The client can do this
+508	      by recording the files referenced by the previous valid Update
+509	      Notification File and comparing the overlapping entries with the
+510	      retrieved Update Notification File.
+
+512	   *  The client MUST retrieve all Delta Files for versions since the
+513	      client's last known version, if there are any.
+
+515	   *  The mirror client MUST verify that the hash of each newly
+516	      downloaded Delta File matches the hash in the Update Notification
+517	      File that referenced it.  If the Delta File was compressed with
+518	      GZIP, the hash MUST match the compressed file.  In case of a
+519	      mismatch of this hash, the Delta File MUST be rejected.
+
+521	   *  The client MUST process all changes in the Delta Files in order:
+522	      lowest Delta File version number first, and in the order of the
+523	      changes list in the Delta File.
+
+525	   *  The client MUST update its records of the most recent version to
+526	      the version of the Update Notification File.
+
+528	   *  If an Update Notification File or a Delta File has an invalid
+529	      syntax (including missing mandatory parameters), the file MUST be
+530	      rejected.  For validating the IRR objects contained in the files,
+531	      see Section 9.2.
+
+533	   If the Update Notification File or one of the Delta Files is
+534	   rejected, the mirror client MUST NOT process any newer Deltas than
+535	   those that are valid and have been successfully verified.  If some
+536	   Delta Files are rejected, it MAY process the valid Delta Files, but
+537	   MUST NOT skip over any rejected Delta Files while doing so.
+538	   Additionally, the changes in a specific Delta File MUST be processed
+539	   either completely, or not at all, i.e., a Delta File must never be
+540	   partially processed.
+
+542	5.5.  Error Recovery
+
+544	   When a mirror client fails to retrieve any file due to a transient
+545	   error, such as a network failure or an HTTP 5xx response, the client
+546	   SHOULD retry before concluding the retrieval has failed.  It is
+547	   RECOMMENDED that implementations use a bounded exponential backoff
+548	   strategy, starting from a short initial interval (e.g., a few
+549	   seconds) up to a capped maximum interval (e.g., several minutes),
+550	   with a bounded total retry duration.  Mirror clients SHOULD log retry
+551	   and recovery events including the reason, to aid operator
+552	   troubleshooting.
+
+554	   If a file is rejected, the mirror client MUST NOT load any data from
+555	   it.  If the error may be transient, the mirror client SHOULD retry.
+556	   After exhausting retries, if the required Delta Files remain
+557	   unavailable or are still rejected, the mirror client SHOULD
+558	   reinitialize from the Snapshot File.  If the Snapshot File itself
+559	   cannot be retrieved or is rejected after retries, as there is no
+560	   further fallback, the client SHOULD alert the operator and stop until
+561	   the issue is resolved.
+
+563	5.6.  Signature and Staleness Verification
+
+565	   Every time a mirror client retrieves a new version of the Update
+566	   Notification File, it MUST verify the included signature.  The
+567	   signature MUST be valid for the configured public key for the
+568	   contents of the Update Notification File.  If the signature does not
+569	   match, the mirror client MUST reject the Update Notification File,
+570	   unless a key rotation is in progress as described in Section 9.6.
+
+572	   A mirror client can use the generation timestamp in the Update
+573	   Notification File to check whether the file is stale, as the mirror
+574	   server must update this file at least every 24 hours.  If the
+575	   generation timestamp is more than 24 hours ago, the file is stale and
+576	   the mirror client SHOULD warn the operator in log messages or other
+577	   alerting, but MAY continue to process it otherwise.
+
+579	5.7.  Policy Restrictions
+
+581	   A mirror client MAY have a policy that restricts the processing of
+582	   objects to certain object classes, or other limitations on which
+583	   objects it processes.
+
+585	   If a mirror client has a policy that restricts object processing,
+586	   this MUST be applied consistently to Snapshot Files and Delta Files
+587	   from the moment the policy is enacted or modified.
+
+589	6.  Update Notification File
+
+591	6.1.  Purpose
+
+593	   The Update Notification File is generated by the mirror server and
+594	   used by mirror clients to discover whether any changes exist between
+595	   the state of the IRR mirror server and of the mirror client.  It also
+596	   describes the location of the Snapshot File and incremental Delta
+597	   Files.  Finally, the generation timestamp can be used to detect
+598	   whether the file is stale.
+
+600	   The mirror server MUST generate a new Update Notification File every
+601	   time there are new deltas or snapshots and, even if there have been
+602	   no changes, at least every 24 hours.
+
+604	6.2.  Cache Concerns
+
+606	   A mirror server may use caching infrastructure to cache the Update
+607	   Notification File and reduce the load of HTTPS requests.
+
+609	   However, since this file is used by mirror clients to determine
+610	   whether any updates are available, the mirror server SHOULD ensure
+611	   that this file is not cached for longer than one minute.  An
+612	   exception to this rule is that it is better to serve a stale Update
+613	   Notification File rather than no Update Notification File.
+
+615	   Mirror servers SHOULD set the HTTP Cache-Control response header on
+616	   the Update Notification File to no-cache or max-age=60, consistent
+617	   with the one-minute caching limit.  Mirror servers SHOULD set Cache-
+618	   Control: immutable on responses for Snapshot Files and Delta Files,
+619	   as these are immutable for a given session_id and version.  Mirror
+620	   clients MAY use HTTP conditional requests (e.g., using If-None-Match
+621	   with ETags or If-Modified-Since) when polling the Update Notification
+622	   File, to reduce bandwidth consumption when no changes have occurred.
+
+624	6.3.  Payload Format and Validation
+
+626	   An example payload of an Update Notification File is provided below:
+
+628	   {
+629	     "nrtm_version": 4,
+630	     "timestamp": "2025-12-01T15:00:00Z",
+631	     "type": "notification",
+632	     "next_signing_key": "bnJ0..bXY0",
+633	     "source": "EXAMPLE",
+634	     "session_id": "ca128382-78d9-41d1-8927-1ecef15275be",
+635	     "version": 4,
+636	     "snapshot": {
+637	       "version": 3,
+638	       "url":
+639	   "ca128382-78d9-41d1-8927-1ecef15275be/nrtm-snapshot.2.04759.json.gz",
+640	       "hash": "9a..86"
+641	     },
+642	     "deltas": [
+643	       {
+644	         "version": 2,
+645	         "url":
+646	   "ca128382-78d9-41d1-8927-1ecef15275be/nrtm-delta.1.784a2a6.json",
+647	         "hash": "62..a2"
+648	       },
+649	       {
+650	         "version": 3,
+651	         "url":
+652	   "ca128382-78d9-41d1-8927-1ecef15275be/nrtm-delta.2.0f681f0.json",
+653	         "hash": "25..9a"
+654	       },
+655	       {
+656	         "version": 4,
+657	         "url":
+658	   "ca128382-78d9-41d1-8927-1ecef15275be/nrtm-delta.3.d9c194a.json",
+659	         "hash": "b4..13"
+660	       }
+661	     ],
+662	     "metadata": {}
+663	   }
+
+665	   Note: hash and key values in this example are shortened because of
+666	   formatting.
+
+668	   In this example, the overall version is 4, the snapshot is at version
+669	   3, and deltas are listed for versions 2, 3, and 4.  The deltas at
+670	   versions 2 and 3 predate the snapshot but are still within the
+671	   24-hour retention window.  A new client would initialize from the
+672	   snapshot at version 3 and then apply only delta 4.  An existing
+673	   client already at version 1 can instead apply deltas 2, 3, and 4
+674	   without reinitializing from the snapshot.
+
+676	   The following validation rules MUST be observed when creating or
+677	   parsing Update Notification Files:
+
+679	   *  The nrtm_version MUST be 4.
+
+681	   *  The timestamp MUST be an [RFC3339] timestamp with the time-offset
+682	      set to "Z".
+
+684	   *  The type MUST be "notification".
+
+686	   *  The optional field next_signing_key is used for in-band key
+687	      rotation.  If present, it MUST be a JWK [RFC7517] public key
+688	      encoded in PEM, which matches the private key the mirror server
+689	      will start using to sign the Update Notification File in the near
+690	      future.  Key rotation is described in Section 9.6.  If there is no
+691	      next signing key, this key MUST be omitted.
+
+693	   *  The source MUST be a valid IRR object name [RFC2622].
+
+695	   *  The session_id attribute MUST be a UUIDv4 (Section 5.4 of
+696	      [RFC9562]) unique to this session for this source.
+
+698	   *  The version MUST be an unsigned positive integer and be equal to
+699	      the highest version of the deltas and snapshot.
+
+701	   *  The file MUST contain exactly one snapshot.
+
+703	   *  The file MAY contain one or more deltas.
+
+705	   *  The deltas MUST have a sequential contiguous set of version
+706	      numbers.
+
+708	   *  Each snapshot and delta element MUST have a version, URL and hash
+709	      attribute.  The URL must be relative to the path of the Update
+710	      Notification File.  For example, if the Update Notification File
+711	      example above is published on https://example.com/nrtm/update-
+712	      notification-file.json, the full URL for the referred snapshot is
+713	      https://example.com/nrtm/ca128382-78d9-41d1-8927-1ecef15275be/
+714	      nrtm-snapshot.2.047595d0fae972fbed0c51b4a41c7a349e0c47bb.json.gz.
+715	      If the snapshot or delta file was compressed with GZIP, the
+716	      filename MUST end in ".gz", and the hash MUST match the compressed
+717	      data.
+
+719	   *  The hash attribute in snapshot and delta elements MUST be the
+720	      hexadecimal encoding of the SHA-256 hash [SHS] of the referenced
+721	      file.  The mirror client MUST verify this hash when the file is
+722	      retrieved and reject the file if the hash does not match.
+
+724	   *  The metadata key MAY be present, used for metadata produced by the
+725	      server to aid in tracing and debugging.  This can contain
+726	      information like the name of the host on which the file was
+727	      generated or the name and version of the software used.  Each
+728	      mirror server may choose which fields to include, or choose to not
+729	      include any metadata.  The mirror server SHOULD NOT cause
+730	      excessive size increases by adding extensive metadata in the
+731	      Update Notification File, as it is the most frequently retrieved
+732	      file.
+
+734	6.4.  Encoding and signature
+
+736	   *  The actual Update Notification File content is a JSON Web
+737	      Signature [RFC7515] using JWS Compact Serialization.
+
+739	   *  The JWS Payload is the JSON [RFC8259] serialization of the
+740	      structure described in the previous section.
+
+742	   *  The filename of the serialized data MUST be "update-notification-
+743	      file.jose".
+
+745	   *  Implementations MUST support ES256 for interoperability.  The
+746	      algorithm MUST NOT be Deprecated, and it is RECOMMENDED to use
+747	      Recommended or Recommended+ algorithms, as listed in the IANA JOSE
+748	      Algorithms registry [IANA_jose].
+
+750	7.  Snapshot File
+751	7.1.  Purpose
+
+753	   The Snapshot File reflects the complete and current contents of all
+754	   IRR objects in an IRR Database.  Mirror clients MUST use this to
+755	   initialize their local copy of the IRR Database.
+
+757	7.2.  Cache Concerns
+
+759	   A snapshot reflects the content of the IRR Database at a specific
+760	   point in time; for that reason, it can be considered immutable data.
+761	   Snapshot Files are published at a URL that is unique to the specific
+762	   session and version.  The URL also contains a random value that can
+763	   not be predicted before publication, to counter negative caching
+764	   issues.
+
+766	   Because these files never change, they can be cached.  However, as
+767	   snapshots are large and old snapshots will no longer be referred by
+768	   newer Update Notification Files, it is RECOMMENDED that a limited
+769	   cache interval is used.
+
+771	7.3.  File Format and Validation
+
+773	   Example Snapshot File:
+
+775	   ␞{
+776	     "nrtm_version": 4,
+777	     "type": "snapshot",
+778	     "source": "EXAMPLE",
+779	     "session_id": "ca128382-78d9-41d1-8927-1ecef15275be",
+780	     "version": 3
+781	   }
+782	   ␞{"object": "route: 192.0.2.0/24\norigin: AS64500\nsource: EXAMPLE"}
+783	   ␞{"object": "route: 2001:db8::/32\norigin: AS64500\nsource: EXAMPLE"}
+
+785	   Note: IRR object texts in this example are shortened because of
+786	   formatting.
+
+788	   The file is in JSON Text Sequences [RFC7464] format, and MUST contain
+789	   one or more records (it must contain at least the header).  The first
+790	   record is the file header, and the following validation rules MUST be
+791	   observed when creating or parsing a Snapshot File header:
+
+793	   *  The nrtm_version MUST be 4.
+
+795	   *  The type MUST be "snapshot".
+
+797	   *  The source MUST match the source in the Update Notification File.
+
+799	   *  The session_id attribute MUST match the session_id in the Update
+800	      Notification File.
+
+802	   *  The version MUST be an unsigned positive integer, matching the
+803	      Update Notification File entry for this snapshot.
+
+805	   The remaining records (zero or more) MUST each contain a string
+806	   representation of an IRR object.  The source attribute in the IRR
+807	   object texts MUST match the source attribute of the Snapshot File.
+
+809	8.  Delta File
+
+811	8.1.  Purpose
+
+813	   A Delta File contains all changes for exactly one incremental update
+814	   of the IRR Database.  It may include new, modified and deleted
+815	   objects.  Delta Files can contain multiple alterations to multiple
+816	   objects.
+
+818	8.2.  Cache Concerns
+
+820	   Deltas reflect the difference in content of the IRR Database from one
+821	   version to another; for that reason, it can be considered immutable
+822	   data.  Delta Files are published at a URL that is unique to the
+823	   specific session and version.  The URL also contains a random value
+824	   that can not be predicted before publication, to counter negative
+825	   caching issues.
+
+827	   To avoid race conditions where a mirror client retrieves an Update
+828	   Notification File moments before it's updated, mirror servers SHOULD
+829	   retain old Delta Files for at least 5 minutes after a new Update
+830	   Notification File is published that no longer contains these Delta
+831	   Files.
+
+833	8.3.  File Format and Validation
+
+835	   Example Delta File:
+
+837	   ␞{
+838	     "nrtm_version": 4,
+839	     "type": "delta",
+840	     "source": "EXAMPLE",
+841	     "session_id": "ca128382-78d9-41d1-8927-1ecef15275be",
+842	     "version": 3
+843	   }
+844	   ␞{
+845	     "action": "delete",
+846	     "object_class": "person",
+847	     "primary_key": "PRSN1-EXAMPLE"
+848	   }
+849	   ␞{
+850	     "action": "delete",
+851	     "object_class": "route",
+852	     "primary_key": "192.0.2.0/24AS64500"
+853	   }
+854	   ␞{
+855	     "action": "add_modify",
+856	     "object": "route: 2001:db8::/32\norigin: AS64500\nsource: EXAMPLE"
+857	   }
+
+859	   Note: IRR object texts in this example are shortened because of
+860	   formatting.
+
+862	   The file is in JSON Text Sequences [RFC7464] format, and MUST contain
+863	   two or more records (at least the header and one change).  The first
+864	   record is the file header, and the following validation rules MUST be
+865	   observed when creating or parsing a Delta File header:
+
+867	   *  The nrtm_version MUST be 4.
+
+869	   *  The type MUST be "delta".
+
+871	   *  The source MUST match the source in the Update Notification File.
+
+873	   *  The session_id attribute MUST match the session_id in the Update
+874	      Notification File.
+
+876	   *  The version MUST be an unsigned positive integer, matching the
+877	      Update Notification File entry for this delta.
+
+879	   The remaining records (one or more) MUST each contain a JSON object
+880	   representing a change, which MUST meet the following rules:
+
+882	   *  An action attribute, which is either "delete" for object
+883	      deletions, or "add_modify" for additions or modifications.
+
+885	   *  If action is "delete": an object_class attribute with the RPSL
+886	      object class name, and a primary_key attribute with the primary
+887	      key, of the deleted object.  For objects that are listed in
+888	      [RFC2622] and [RFC4012] the primary key is the value of the RPSL
+889	      field defined as "class key".  For object classes that define a
+890	      pair of attributes as class key, e.g. route, the values of the
+891	      individual attributes are appended together without separators.
+892	      For any other objects, the primary key is the value of the RPSL
+893	      field with the same name as the object class name.  The primary
+894	      key and object class name are not case sensitive and therefore
+895	      mirror clients MUST use case insensitive matching against their
+896	      local database.
+
+898	   *  If action is "add_modify": an object attribute with the RPSL text
+899	      of the new version of the object.
+
+901	9.  Operational Considerations
+
+903	9.1.  Time
+
+905	   IRR clients and servers are RECOMMENDED to use NTP [RFC5905]
+906	   synchronisation to avoid timing discrepancies.
+
+908	9.2.  IRR Object Validation
+
+910	   Throughout the years, various implementations of IRR servers have
+911	   taken liberties with the various RFCs regarding RPSL.
+912	   Implementations have introduced different new object classes,
+913	   attributes and validation rules.  Current IRR Databases also contain
+914	   legacy objects which were created under different validation rules.
+915	   In practice, there is no uniformly implemented standard for RPSL, but
+916	   merely rough outlines partially documented in different places.
+
+918	   This has the potential to create interoperability issues.  Some are
+919	   addressed by NRTMv4, like having a consistent character set when
+920	   mirroring data between implementations.  However, some issues can not
+921	   be addressed in this way, such as one implementation introducing a
+922	   new object class that is entirely unknown to another implementation.
+
+924	   A mirror client SHOULD be able to handle unknown object classes and
+925	   objects that are invalid according to its own validation rules, which
+926	   may mean simply discarding them, without rejecting remaining objects
+927	   or preventing future updates.
+
+929	   It is RECOMMENDED for mirror clients to log these cases, particularly
+930	   those where an object was discarded due to violating validation
+931	   rules.  These cases create an inconsistency between the IRR objects
+932	   of the server and client, and logs facilitate later analysis.
+
+934	   It is RECOMMENDED for mirror clients to be flexible where possible
+935	   and reasonable when applying their own validation rules to IRR
+936	   objects retrieved from mirror servers.  For example, a route object
+937	   with an origin attribute that is not a valid AS number can't be
+938	   usefully interpreted.  There is no way for an IRR server to correctly
+939	   parse and index such an object.  However, a route-set object whose
+940	   name does not start with "RS-" [RFC2622], or an inetnum with an
+941	   unknown extra "org" attribute, still allows the mirror client to
+942	   interpret it unambiguously even if it does not meet the mirror
+943	   client's own validation rules for authoritative records.
+
+945	9.3.  Intermediate Mirror Instances
+
+947	   An IRR Database generally has a single authoritative source.  In some
+948	   cases, an instance run by a third party will function as a kind of
+949	   intermediate: both being a mirror client, mirroring IRR objects from
+950	   the authoritative source, and simultaneously function as a mirror
+951	   server to yet another mirror client.
+
+953	   There are various operational reasons for such a setup, such as the
+954	   intermediate filtering certain records.  Regardless of the reason,
+955	   the mirror client and server function of an IRR server must be
+956	   treated as separate processes.  In particular, this means they MUST
+957	   have separate session IDs.  The intermediate server MUST NOT
+958	   republish the same files it retrieved from the authoritative source
+959	   with the same session ID.
+
+961	9.4.  Reading from Local Files
+
+963	   In the typical use case for NRTMv4, a mirror client retrieves files
+964	   from an HTTPS endpoint.  However, implementations MAY also support
+965	   reading from files on the local filesystem instead, for when
+966	   operators want to use a different method to retrieve or distribute
+967	   the files.  When reading from local files, mirror clients SHOULD
+968	   still follow all validation rules, including the validation of the
+969	   signature and hashes.
+
+971	9.5.  Storage Considerations
+
+973	   After publishing a new Update Notification File, and absent local
+974	   policy, a mirror server SHOULD remove any Snapshot and Delta Files
+975	   that are no longer referenced.  To avoid race conditions where a
+976	   mirror client retrieves an Update Notification File moments before it
+977	   is updated, mirror servers SHOULD retain unreferenced files for at
+978	   least 5 minutes after a new Update Notification File is published.
+
+980	9.6.  Public Key Rotation
+
+982	   It is RECOMMENDED that IRR Database operators rotate the signing key
+983	   on their mirror server about once per year.  The next_signing_key
+984	   field in the Update Notification File supports in-band key rotation
+985	   using the following process:
+
+987	   *  The server operator generates a new key and configures this in the
+988	      mirror server implementation as the upcoming new signing key.
+
+990	   *  The mirror server MUST include this key in the next_signing_key
+991	      field in any Update Notification File generated while the new
+992	      signing key is configured.  Hence, the new signing key will start
+993	      being propagated to the mirror clients with the next publication
+994	      of the Notification File, which will take at most 24 hours.
+995	      Mirror server implementations MAY offer a method to cause the
+996	      Update Notification File to be refreshed earlier, with the
+997	      new_signing_key included, and thus start the propagation earlier.
+
+999	   *  When mirror clients next retrieve the Update Notification File,
+1000	      they MUST detect the next_signing_key field, and store the key in
+1001	      their configuration.
+
+1003	   *  After allowing mirror clients time to have seen the new Update
+1004	      Notification File with the next_signing_key field, the mirror
+1005	      server operator configures the new key as currently active key,
+1006	      and removes the old key.  Any Update Notification File generated
+1007	      after this point MUST be signed with this new key, and will not
+1008	      contain a next_signing_key field.
+
+1010	   *  The RECOMMENDED period between publication of the upcoming key in
+1011	      the next_signing_key field, and removal of the old key, is one
+1012	      week.  This offers all active clients a reasonable chance to
+1013	      follow the rotation process.
+
+1015	   *  When mirror clients retrieve an Update Notification File and find
+1016	      that the signature does not match, they MUST attempt to verify
+1017	      against a next_signing_key encountered in a previous (valid) file.
+1018	      If the signature matches for this new key, the client MUST update
+1019	      its configuration to use the new key for validation.  After this,
+1020	      the client MUST NOT use the old key for validation at any time: a
+1021	      mirror server can not switch back to an old key.
+
+1023	   If a mirror client never retrieves an Update Notification file at any
+1024	   point during the rotation process, it will no longer be able to
+1025	   verify the signature.  In that scenario manual recovery is required,
+1026	   similar to a first time configuration of a new mirror client.
+
+1028	9.7.  Scalability
+
+1030	   As NRTMv4 uses HTTPS for all file retrieval, mirror servers can use
+1031	   standard HTTP caching infrastructure, horizontal scaling, and CDN
+1032	   integration to handle load.  Caching considerations for each file
+1033	   type are discussed in the respective Cache Concerns sections.
+
+1035	   Delta Files are typically small, as they only contain changes since
+1036	   the previous version.  Snapshot Files can be larger, but all files
+1037	   may be compressed with GZIP to reduce storage and bandwidth
+1038	   requirements.
+
+1040	9.8.  NRTMv3 Compatibility
+
+1042	   NRTMv4 is a new protocol that is not backwards compatible with
+1043	   NRTMv3.  There is no migration path between the two protocols;
+1044	   operators wishing to support both can run them in parallel.
+
+1046	10.  IANA Considerations
+
+1048	   This document has no IANA actions.
+
+1050	11.  Security Considerations
+
+1052	   IRR objects serve many purposes, including automated network
+1053	   configuration and filtering.  Manipulation of IRR objects can
+1054	   therefore have a significant security impact.  However, security in
+1055	   existing protocols is mostly absent.
+
+1057	   Before NRTMv4, the most common protocols for IRR Database mirroring
+1058	   are FTP for retrieving full snapshots, and NRTM version 3 for
+1059	   retrieving later changes.  There are no provisions for integrity or
+1060	   authenticity, and there are various scenarios where mirroring may not
+1061	   be reliable.
+
+1063	   NRTMv4 requires integrity verification.  The Delta and Snapshot Files
+1064	   are verified using the SHA-256 hash in the Update Notification File,
+1065	   and the Update Notification File is verified using its signature.
+1066	   Additionally, the channel security offered by HTTPS further limits
+1067	   security risks.
+
+1069	   By allowing publication on any HTTPS endpoint, NRTMv4 allows for
+1070	   extensive scaling, and there are many existing techniques and
+1071	   services to protect against denial-of-service attacks.  In contrast,
+1072	   NRTMv3 required mirror clients to directly query the IRR server
+1073	   instance with special WHOIS queries.  This scales poorly, and there
+1074	   are no standard protections against denial-of-service available.
+
+1076	   The HTTPS endpoint used for NRTMv4 MUST be configured according to
+1077	   the best practices in [BCP195].  Mirror clients MUST NOT use other
+1078	   protocols than HTTPS, such as HTTP or FTP.
+
+1080	12.  Acknowledgments
+
+1082	   The authors would like to thank George Michaelson, Shon Huang, Tim
+1083	   Bruijnzeels, Mahesh Aggarwal, Fedor Vompe, Paul Etchells, and Mohamed
+1084	   Boucadair for their helpful review of this document and/or work on
+1085	   implementations.
+
+1087	   The authors would also like to thank Daniele Ceccarelli, Claudio
+1088	   Allocchio, Menachem Dodge, Julian Reschke, Watson Ladd and Paul
+1089	   Kyzivat, for their reviews during IETF Last Call.
+
+1091	13.  Normative References
+
+1093	   [STD97]    Internet Standard 97,
+1094	              <https://www.rfc-editor.org/info/std97>.
+1095	              At the time of writing, this STD comprises the following:
+
+1097	              Fielding, R., Ed., Nottingham, M., Ed., and J. Reschke,
+1098	              Ed., "HTTP Semantics", STD 97, RFC 9110,
+1099	              DOI 10.17487/RFC9110, June 2022,
+1100	              <https://www.rfc-editor.org/info/rfc9110>.
+
+1102	   [RFC1952]  Deutsch, P., "GZIP file format specification version 4.3",
+1103	              RFC 1952, DOI 10.17487/RFC1952, May 1996,
+1104	              <https://www.rfc-editor.org/info/rfc1952>.
+
+1106	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+1107	              Requirement Levels", BCP 14, RFC 2119,
+1108	              DOI 10.17487/RFC2119, March 1997,
+1109	              <https://www.rfc-editor.org/info/rfc2119>.
+
+1111	   [RFC2622]  Alaettinoglu, C., Villamizar, C., Gerich, E., Kessens, D.,
+1112	              Meyer, D., Bates, T., Karrenberg, D., and M. Terpstra,
+1113	              "Routing Policy Specification Language (RPSL)", RFC 2622,
+1114	              DOI 10.17487/RFC2622, June 1999,
+1115	              <https://www.rfc-editor.org/info/rfc2622>.
+
+1117	   [RFC3339]  Klyne, G. and C. Newman, "Date and Time on the Internet:
+1118	              Timestamps", RFC 3339, DOI 10.17487/RFC3339, July 2002,
+1119	              <https://www.rfc-editor.org/info/rfc3339>.
+
+1121	   [RFC9562]  Davis, K., Peabody, B., and P. Leach, "Universally Unique
+1122	              IDentifiers (UUIDs)", RFC 9562, DOI 10.17487/RFC9562, May
+1123	              2024, <https://www.rfc-editor.org/info/rfc9562>.
+
+1125	   [RFC4012]  Blunk, L., Damas, J., Parent, F., and A. Robachevsky,
+1126	              "Routing Policy Specification Language next generation
+1127	              (RPSLng)", RFC 4012, DOI 10.17487/RFC4012, March 2005,
+1128	              <https://www.rfc-editor.org/info/rfc4012>.
+
+1130	   [RFC7464]  Williams, N., "JavaScript Object Notation (JSON) Text
+1131	              Sequences", RFC 7464, DOI 10.17487/RFC7464, February 2015,
+1132	              <https://www.rfc-editor.org/info/rfc7464>.
+
+1134	   [RFC7468]  Josefsson, S. and S. Leonard, "Textual Encodings of PKIX,
+1135	              PKCS, and CMS Structures", RFC 7468, DOI 10.17487/RFC7468,
+1136	              April 2015, <https://www.rfc-editor.org/info/rfc7468>.
+
+1138	   [RFC7515]  Jones, M., Bradley, J., and N. Sakimura, "JSON Web
+1139	              Signature (JWS)", RFC 7515, DOI 10.17487/RFC7515, May
+1140	              2015, <https://www.rfc-editor.org/info/rfc7515>.
+
+1142	   [RFC7517]  Jones, M., "JSON Web Key (JWK)", RFC 7517,
+1143	              DOI 10.17487/RFC7517, May 2015,
+1144	              <https://www.rfc-editor.org/info/rfc7517>.
+
+1146	   [IANA_jose]
+1147	              IANA, "JSON Object Signing and Encryption (JOSE)",
+1148	              <https://www.iana.org/assignments/jose>.
+
+1150	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+1151	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+1152	              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+1154	   [RFC8259]  Bray, T., Ed., "The JavaScript Object Notation (JSON) Data
+1155	              Interchange Format", STD 90, RFC 8259,
+1156	              DOI 10.17487/RFC8259, December 2017,
+1157	              <https://www.rfc-editor.org/info/rfc8259>.
+
+1159	   [BCP195]   Best Current Practice 195,
+1160	              <https://www.rfc-editor.org/info/bcp195>.
+1161	              At the time of writing, this BCP comprises the following:
+
+1163	              Moriarty, K. and S. Farrell, "Deprecating TLS 1.0 and TLS
+1164	              1.1", BCP 195, RFC 8996, DOI 10.17487/RFC8996, March 2021,
+1165	              <https://www.rfc-editor.org/info/rfc8996>.
+
+1167	              Sheffer, Y., Saint-Andre, P., and T. Fossati,
+1168	              "Recommendations for Secure Use of Transport Layer
+1169	              Security (TLS) and Datagram Transport Layer Security
+1170	              (DTLS)", BCP 195, RFC 9325, DOI 10.17487/RFC9325, November
+1171	              2022, <https://www.rfc-editor.org/info/rfc9325>.
+
+1173	   [SHS]      National Institute of Standards and Technology, "Secure
+1174	              Hash Standard", March 2012,
+1175	              <https://csrc.nist.gov/publications/fips/fips180-4/fips-
+1176	              180-4.pdf>.
+
+1178	14.  Informative References
+
+1180	   [RFC5905]  Mills, D., Martin, J., Ed., Burbank, J., and W. Kasch,
+1181	              "Network Time Protocol Version 4: Protocol and Algorithms
+1182	              Specification", RFC 5905, DOI 10.17487/RFC5905, June 2010,
+1183	              <https://www.rfc-editor.org/info/rfc5905>.
+
+1185	   [RFC8182]  Bruijnzeels, T., Muravskiy, O., Weber, B., and R. Austein,
+1186	              "The RPKI Repository Delta Protocol (RRDP)", RFC 8182,
+1187	              DOI 10.17487/RFC8182, July 2017,
+1188	              <https://www.rfc-editor.org/info/rfc8182>.
+
+1190	   [NRTMv3]   RIPE NCC, "Access to NRTM (v3)", July 2024,
+1191	              <https://docs.db.ripe.net/RIPE-Database-Mirror/Access-to-
+1192	              NRTM/>.
+
+1194	Authors' Addresses
+
+1196	   Sasha Romijn
+1197	   Reliably Coded
+1198	   Amsterdam
+1199	   Netherlands
+1200	   Email: sasha@reliablycoded.nl
+1201	   URI:   https://www.reliablycoded.nl/
+
+1203	   Job Snijders
+1204	   BSD Software Development
+1205	   Amsterdam
+1206	   Netherlands
+1207	   Email: job@bsd.nl
+1208	   URI:   https://www.bsd.nl/
+
+1210	   Edward Shryane
+1211	   RIPE NCC
+1212	   Amsterdam
+1213	   Netherlands
+1214	   Email: eshryane@ripe.net
+1215	   Stavros Konstantaras
+1216	   AMS-IX
+1217	   Amsterdam
+1218	   Netherlands
+1219	   Email: stavros.konstantaras@ams-ix.net
+
+
+
+
+
+
+
+
+
