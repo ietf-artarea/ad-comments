@@ -35,8 +35,11 @@ else
   sed -i "s/DRAFT/$DRAFT_VERSION/g" "$TARGET_FILE"
 fi
 
-# Download the URL using curl and save it to the download directory
+# Download the IDNITS URL using curl and save it to the download directory
 curl -s -o "$TARGET_DIR/idnits-report.txt" "https://author-tools.ietf.org/api/idnits?url=https://www.ietf.org/archive/id/$DRAFT_VERSION.txt"
+
+# Download the draft and save it to the download directory
+curl -s -o "$TARGET_DIR/$DRAFT_VERSION.txt" "https://www.ietf.org/archive/id/$DRAFT_VERSION.txt"
 
 # Download the URL using curl and save it to the download directory
 curl -s "https://datatracker.ietf.org/doc/$DRAFT/shepherdwriteup/" | \
