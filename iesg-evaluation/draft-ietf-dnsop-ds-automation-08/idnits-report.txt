@@ -1,0 +1,1220 @@
+idnits 2.17.1 
+
+draft-ietf-dnsop-ds-automation-08.txt:
+-(288): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(289): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(300): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(731): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(860): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+  == There are 14 instances of lines with non-ascii characters in the
+     document.
+
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     Summary: 0 errors (**), 0 flaws (~~), 1 warning (==), 0 comments (--).
+
+--------------------------------------------------------------------------------
+
+
+2	DNSOP Working Group                                             S. Sheng
+3	Internet-Draft
+4	Intended status: Best Current Practice                      P. Thomassen
+5	Expires: 20 November 2026                                          deSEC
+6	                                                             19 May 2026
+
+8	Operational Recommendations for DNSSEC Delegation Signer (DS) Automation
+9	                   draft-ietf-dnsop-ds-automation-08
+
+11	Abstract
+
+13	   Enabling support for automatic acceptance of DNSSEC Delegation Signer
+14	   (DS) parameters from the Child DNS operator (via RFCs 7344, 8078,
+15	   9615) requires the parental agent, often a registry or registrar, to
+16	   make a number of technical decisions around acceptance checks, error
+17	   and success reporting, and multi-party issues such as concurrent
+18	   updates.  This document describes recommendations about how these
+19	   points are best addressed in practice.
+
+21	Discussion Venues
+
+23	   This note is to be removed before publishing as an RFC.
+
+25	   Discussion of this document takes place on the Domain Name System
+26	   Operations Working Group mailing list (dnsop@ietf.org), which is
+27	   archived at https://mailarchive.ietf.org/arch/browse/dnsop/.
+
+29	   Source for this draft and an issue tracker can be found at
+30	   https://github.com/peterthomassen/draft-shetho-dnsop-ds-automation.
+
+32	Status of This Memo
+
+34	   This Internet-Draft is submitted in full conformance with the
+35	   provisions of BCP 78 and BCP 79.
+
+37	   Internet-Drafts are working documents of the Internet Engineering
+38	   Task Force (IETF).  Note that other groups may also distribute
+39	   working documents as Internet-Drafts.  The list of current Internet-
+40	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+42	   Internet-Drafts are draft documents valid for a maximum of six months
+43	   and may be updated, replaced, or obsoleted by other documents at any
+44	   time.  It is inappropriate to use Internet-Drafts as reference
+45	   material or to cite them other than as "work in progress."
+
+47	   This Internet-Draft will expire on 20 November 2026.
+
+49	Copyright Notice
+
+51	   Copyright (c) 2026 IETF Trust and the persons identified as the
+52	   document authors.  All rights reserved.
+
+54	   This document is subject to BCP 78 and the IETF Trust's Legal
+55	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+56	   license-info) in effect on the date of publication of this document.
+57	   Please review these documents carefully, as they describe your rights
+58	   and restrictions with respect to this document.  Code Components
+59	   extracted from this document must include Revised BSD License text as
+60	   described in Section 4.e of the Trust Legal Provisions and are
+61	   provided without warranty as described in the Revised BSD License.
+
+63	Table of Contents
+
+65	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
+66	     1.1.  Requirements Notation . . . . . . . . . . . . . . . . . .   3
+67	   2.  Terminology . . . . . . . . . . . . . . . . . . . . . . . . .   4
+68	   3.  Recommendations for Deployments of DS Automation  . . . . . .   4
+69	   4.  Acceptance Checks and Safety Measures . . . . . . . . . . . .   5
+70	     4.1.  Recommendations . . . . . . . . . . . . . . . . . . . . .   5
+71	     4.2.  Analysis  . . . . . . . . . . . . . . . . . . . . . . . .   6
+72	       4.2.1.  Continuity of Resolution  . . . . . . . . . . . . . .   6
+73	       4.2.2.  TTLs and Caching  . . . . . . . . . . . . . . . . . .   7
+74	       4.2.3.  CDS vs. CDNSKEY . . . . . . . . . . . . . . . . . . .   7
+75	   5.  Reporting and Transparency  . . . . . . . . . . . . . . . . .   9
+76	     5.1.  Recommendations . . . . . . . . . . . . . . . . . . . . .   9
+77	     5.2.  Analysis  . . . . . . . . . . . . . . . . . . . . . . . .   9
+78	   6.  Registration Locks  . . . . . . . . . . . . . . . . . . . . .  12
+79	     6.1.  Recommendations . . . . . . . . . . . . . . . . . . . . .  12
+80	     6.2.  Analysis  . . . . . . . . . . . . . . . . . . . . . . . .  12
+81	       6.2.1.  Registrar vs. Registry Lock . . . . . . . . . . . . .  12
+82	       6.2.2.  Detailed Rationale  . . . . . . . . . . . . . . . . .  13
+83	   7.  Multiple Submitting Parties . . . . . . . . . . . . . . . . .  14
+84	     7.1.  Recommendations . . . . . . . . . . . . . . . . . . . . .  14
+85	     7.2.  Analysis  . . . . . . . . . . . . . . . . . . . . . . . .  15
+86	       7.2.1.  Necessity of Non-automatic Updates  . . . . . . . . .  16
+87	       7.2.2.  Impact of Non-automatic Updates: When to Suspend
+88	               Automation  . . . . . . . . . . . . . . . . . . . . .  16
+89	       7.2.3.  Concurrent Automatic Updates  . . . . . . . . . . . .  18
+90	   8.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  18
+91	   9.  Operational Considerations  . . . . . . . . . . . . . . . . .  19
+92	   10. Security Considerations . . . . . . . . . . . . . . . . . . .  19
+93	   11. Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .  19
+94	   12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  19
+95	     12.1.  Normative References . . . . . . . . . . . . . . . . . .  19
+96	     12.2.  Informative References . . . . . . . . . . . . . . . . .  21
+
+98	   Appendix A.  Recommendations Overview . . . . . . . . . . . . . .  21
+99	     A.1.  Acceptance Checks and Safety Measures . . . . . . . . . .  21
+100	     A.2.  Reporting and Transparency  . . . . . . . . . . . . . . .  22
+101	     A.3.  Registration Locks  . . . . . . . . . . . . . . . . . . .  23
+102	     A.4.  Multiple Submitting Parties . . . . . . . . . . . . . . .  23
+103	   Appendix B.  Change History (to be removed before publication)  .  24
+104	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  25
+
+106	1.  Introduction
+
+108	   [RFC7344], [RFC8078], and [RFC9615] automate DNSSEC [RFC9364]
+109	   delegation trust maintenance by having the child publish Child DS
+110	   (CDS) and/or Child DNSKEY (CDNSKEY) records which indicate the
+111	   delegation's desired DNSSEC parameters ("DS automation").
+
+113	   Parental Agents using these protocols have to make a number of
+114	   technical decisions relating to issues of acceptance checks, timing,
+115	   error reporting, locks, etc.  Additionally, when using the
+116	   registrant-registrar-registry (RRR) model (as is common amongst top-
+117	   level domains), both the registrar and the registry can effect
+118	   parent-side changes to the delegation.  In such a situation,
+119	   additional opportunities for implementation differences arise.
+
+121	   Not all existing DS automation deployments have made the same choices
+122	   with respect to these questions, leading to somewhat inconsistent
+123	   behavior.  From the perspective of a domain holder with domain names
+124	   under various TLDs, this may be unexpected and confusing.
+
+126	   In the following sections, operational questions are first raised and
+127	   answered with the corresponding recommendations.  Each section is
+128	   concluded with an analysis of its recommendations and related
+129	   considerations.  A combined view of the recommendations from all
+130	   sections is given in Appendix A.
+
+132	   Readers are expected to be familiar with DNSSEC
+133	   [RFC9364][RFC9615][RFC9859].
+
+135	   The core issues addressed in the document are derived from
+136	   Section 4.4 of [SAC126].  Readers are referred to this report for
+137	   additional background.
+
+139	1.1.  Requirements Notation
+
+141	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+142	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+143	   "OPTIONAL" in this document are to be interpreted as described in
+144	   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+145	   capitals, as shown here.
+
+147	2.  Terminology
+
+149	   The term Parental Agent is used as defined in Section 1.1 of
+150	   [RFC7344].  The document also uses terms defined in [RFC9499], in
+151	   particular:
+
+153	   *  DNS operator
+
+155	   *  Registry
+
+157	   *  Registrant
+
+159	   *  Registrar
+
+161	   In addition, the document makes use of the following terms:
+
+163	   Child zone:  DNS zone whose delegation is in the Parent zone.
+
+165	   Child (DNS operator):  DNS operator responsible for a Child zone.
+
+167	   Parent zone:  DNS zone that holds a delegation for a Child zone.
+
+169	   Parent:  The operator responsible for a Parent zone and, thus,
+170	      involved with the maintenance of the delegation's DNSSEC
+171	      parameters (in particular, the acceptance of these parameters and
+172	      the publication of corresponding DS records).
+
+174	   RRR Model:  The registrant-registrar-registry (RRR) interaction
+175	      framework, where registrants interact with a registrar to register
+176	      and manage domain names, and registrars interact with the domain's
+177	      registry for the provision and management of domain names on the
+178	      registrant's behalf.  This model is common amongst TLDs.
+
+180	3.  Recommendations for Deployments of DS Automation
+
+182	   The guidelines for deploying DS automation set out in this document
+183	   are meant to achieve more uniform treatment across suffixes —
+184	   minimizing user surprise and providing baseline safety and uniformity
+185	   of behavior.  They are also intended to prevent disruption of DNS and
+186	   DNSSEC functionality.  At a minimum, compliance with this RFC
+187	   requires support for both DNSSEC bootstrapping [RFC9615] and
+188	   subsequent updates [RFC7344], [RFC8078] under the implementation
+189	   guidance below.
+
+191	   The recommendations optimize interoperability and safety.  In certain
+192	   cases, local policy may take precedence, such as when a registry is
+193	   subjected to national cryptographic policy requirements or performs
+194	   out-of-band verification of DS changes with a human for high-stake
+195	   domains.  However, not following any requirements designated with the
+196	   "SHOULD" key word will generally lead to undesirable effects of
+197	   ambiguity and interoperability issues.  When implementing these
+198	   recommendations, operators have to carefully weigh whether any
+199	   particular deviation is justified in their particular context.
+
+201	   Registries with additional requirements on DS update checks MAY
+202	   implement any additional checks in line with local policy.
+
+204	4.  Acceptance Checks and Safety Measures
+
+206	   This section provides recommendations to address the following
+207	   operational questions:
+
+209	   *  What kind of acceptance checks should be performed on DS
+210	      parameters?
+
+212	   *  Should these checks be performed upon acceptance or also
+213	      continually when in place?
+
+215	   *  How do TTLs and caching impact DS provisioning?  How important is
+216	      timing in a child key change?
+
+218	   *  Are parameters for DS automation best conveyed as CDNSKEY or CDS
+219	      records, or both?
+
+221	4.1.  Recommendations
+
+223	   1.  Entities performing automated DS maintenance MUST verify:
+
+225	       a.  the unambiguous intent of each DS update request as per
+226	           [I-D.ietf-dnsop-cds-consistency], by checking its consistency
+227	           both
+
+229	           *  between any published CDS and CDNSKEY records, and
+
+231	           *  across all authoritative nameservers in the delegation,
+
+233	           and
+
+235	       b.  that the resulting DS record set would allow continued DNSSEC
+236	           validation if deployed,
+
+238	       and cancel the update if the verifications do not succeed.
+
+240	   2.  Parent-side entities (such as registries) SHOULD reduce a DS
+241	       record set's TTL to a value between 5–15 minutes when a new set
+242	       of records is published, and restore the normal TTL value at a
+243	       later occasion (but not before the previous DS RRset's TTL has
+244	       expired).
+
+246	   3.  DNS operators SHOULD publish both CDNSKEY and CDS records, and
+247	       follow best practice for the choice of hash digest type
+248	       [DS-IANA].
+
+250	4.2.  Analysis
+
+252	4.2.1.  Continuity of Resolution
+
+254	   To maintain the basic resolution function, it is important to avoid
+255	   the deployment of flawed DS record sets in the parent zone.  It is
+256	   therefore desirable for the Parent to verify that the DS record set
+257	   resulting from an automated (or even manual) update does not break
+258	   DNSSEC validation if deployed, and otherwise cancel the update.
+
+260	   This is best achieved by:
+
+262	   1.  verifying that consistent CDS/CDNSKEY responses are served by all
+263	       of the delegation's nameservers [I-D.ietf-dnsop-cds-consistency];
+
+265	   2.  verifying that the resulting DS Resource Record set (RRset) does
+266	       not break the delegation if applied ([RFC7344], Section 4.1),
+267	       i.e., it provides at least one valid path for validators to use
+268	       ([RFC6840], Section 5.11).  This is the case if the child's
+269	       DNSKEY RRset has a valid RRSIG signature from a key that is
+270	       referenced by at least one DS record, with the digest type and
+271	       signing algorithm values designated as "RECOMMENDED" or "MUST" in
+272	       the "Use for DNSSEC Validation" columns of the relevant IANA
+273	       registries ([DS-IANA] and [DNSKEY-IANA]).  Note that these checks
+274	       need not be enforced when provisioning DS records manually in
+275	       order to enable the use other digest types or algorithms for
+276	       potentially non-interoperable purposes.
+
+278	   Even without an update being requested, Parents may occasionally
+279	   check whether the current DS contents would still be acceptable if
+280	   they were newly submitted in CDS/CDNSKEY form (see Section 4).  Any
+281	   failures — such as a missing DNSKEY due to improper rollover timing
+282	   ([RFC6781], Section 4.1), or changed algorithm requirements — can
+283	   then be communicated in line with Section 5, without altering or
+284	   removing the existing DS RRset.
+
+286	4.2.2.  TTLs and Caching
+
+288	   To further reduce the impact of any misconfigured DS record set — be
+289	   it from automated or from manual provisioning — the option to quickly
+290	   roll back the delegation's DNSSEC parameters is of great importance.
+291	   This is achieved by setting a comparatively low TTL on the DS record
+292	   set in the parent domain, at the cost of reduced resiliency against
+293	   nameserver unreachability due to the earlier expiration of cached
+294	   records.  The availability risk can be mitigated by limiting such
+295	   TTLs to a brief time period after a change to the DS configuration,
+296	   during which rollbacks are most likely to occur.
+
+298	   Registries therefore should significantly lower the DS RRset's TTL
+299	   for some time following bootstrapping or an update.  Pragmatic values
+300	   for the reduced TTL value range between 5–15 minutes.  Such low TTLs
+301	   might be expected to cause increased load on the corresponding
+302	   authoritative nameservers; however, recent measurements have
+303	   demonstrated them to have negligible impact on the overall load of a
+304	   registry's authoritative nameserver infrastructure [LowTTL].
+
+306	   The reduction should be in effect at least for a couple of days and
+307	   until the previous DS record set has expired from caches, that is,
+308	   the period during which the low-TTL is applied typically will
+309	   significantly exceed the normal TTL value.  When using the Extensible
+310	   Provisioning Protocol (EPP) [RFC5730], the domain <info> command
+311	   described in Section 2.1.1.2 of [RFC9803] is available for
+312	   advertising the server's TTL policy.
+
+314	   While this approach enables quick rollbacks, timing of the desired DS
+315	   update process itself is largely governed by the previous DS RRset's
+316	   TTL, and therefore does not generally benefit from an overall speed-
+317	   up.  Note also that nothing is gained from first lowering the TTL of
+318	   the old DS RRset: such an additional step would, in fact, require
+319	   another wait period while resolver caches adjust.  For the sake of
+320	   completeness, there likewise is no point to increasing any DS TTL
+321	   values beyond their normal value.
+
+323	4.2.3.  CDS vs. CDNSKEY
+
+325	   DS records can be generated from information provided either in DS
+326	   format (CDS) or in DNSKEY format (CDNSKEY).  While the format of CDS
+327	   records is identical to that of DS records (so the record data be
+328	   taken verbatim), generation of a DS record from CDNSKEY information
+329	   involves computing a hash.
+
+331	   Whether a Parent processes CDS or CDNSKEY records depends on their
+332	   preference:
+
+334	   *  Processing (and storing) CDNSKEY information allows the Parent to
+335	      control the choice of hash algorithms.  The Parent may then
+336	      unilaterally regenerate DS records with a different choice of hash
+337	      algorithm(s) whenever deemed appropriate.
+
+339	   *  Processing CDS information allows the Child DNS operator to
+340	      control the hash digest type used in DS records, enabling the
+341	      Child DNS operator to deploy (for example) experimental hash
+342	      digests and removing the need for registry-side changes when
+343	      additional digest types become available.
+
+345	   The need to make a choice in the face of this dichotomy is not
+346	   specific to DS automation: even when DNSSEC parameters are relayed to
+347	   the Parent through conventional channels, the Parent has to make some
+348	   choice about which format(s) to accept.
+
+350	   As there exists no protocol for Child DNS operators to discover a
+351	   Parent's input format preference, it is best for interoperability to
+352	   publish both CDNSKEY as well as CDS records, in line with Section 5
+353	   of [RFC7344].  The choice of hash digest type should follow current
+354	   best practice [DS-IANA].
+
+356	   Publishing the same information in two different formats is not
+357	   ideal.  Still, it is much less complex and costly than burdening the
+358	   Child DNS operator with discovering each Parent's current policy.
+359	   Also, it is very easily automated.  Operators should ensure that
+360	   published RRsets are consistent with each other.
+
+362	   If both RRsets are published, Parents are expected to verify
+363	   consistency between them by verifying that they refer to the same set
+364	   of keys [I-D.ietf-dnsop-cds-consistency].  By not second-guessing
+365	   inconsistencies (such as by RRset recency) and instead rejecting
+366	   them, responsibility to clearly express each update request is placed
+367	   on the Child DNS operator.
+
+369	   CDS records need only be considered for CDNSKEY consistency when
+370	   their digest type field is designated as "MUST" in the "Implement for
+371	   DNSSEC Delegation" column of the "Digest Algorithms" registry
+372	   [DS-IANA].  Consistency of records with other digest types need not
+373	   be verified, especially when the digest type is unsupported; such
+374	   records can be ignored.  Note that this does not imply a restriction
+375	   on the DS hash digest types: if no inconsistencies are found, the
+376	   parent can publish DS records with whatever digest type(s) it
+377	   prefers.
+
+379	5.  Reporting and Transparency
+
+381	   This section provides recommendations to address the following
+382	   operational question:
+
+384	   *  Should a failed (or even successful) DS update trigger a
+385	      notification to anyone?
+
+387	5.1.  Recommendations
+
+389	   1.  For certain DS updates (see analysis (Section 5.2)) and for DS
+390	       deactivation, relevant points of contact known to the parent-side
+391	       entity (registry or registrar) SHOULD be notified.
+
+393	   2.  For error conditions, the child DNS operator and the domain's
+394	       technical contact (if applicable) SHOULD be notified first.  The
+395	       registrant SHOULD NOT be notified unless the problem persists for
+396	       a prolonged amount of time (e.g., three days).
+
+398	   3.  Child DNS operators SHOULD be notified of errors using a report
+399	       query [RFC9567] to the agent domain as described in Section 4 of
+400	       [RFC9859].  Notifications to humans (domain holder) will be
+401	       performed in accordance with the communication preferences
+402	       established with the parent-side entity.  The same condition
+403	       SHOULD NOT be reported unnecessarily frequently to the same
+404	       recipient.
+
+406	   4.  In the RRR model, registries performing DS automation SHOULD
+407	       inform the registrar of any DS record changes via the EPP Change
+408	       Poll Extension [RFC8590] or a similar channel.
+
+410	   5.  The currently active DS configuration SHOULD be made accessible
+411	       to the registrant (or their designated party) through the
+412	       customer portal available for domain management.  The DS update
+413	       history MAY be made available in the same way.
+
+415	5.2.  Analysis
+
+417	   When accepting or rejecting a DS update, it cannot be assumed that
+418	   relevant parties are aware of what's happening.  For example, a
+419	   registrar may not know when an automatic DS update is performed by
+420	   the registry.  Similarly, a Child DNS operator may not be aware when
+421	   their CDS/CDNSKEY RRsets are out of sync across nameservers, causing
+422	   them to be ignored.
+
+424	   To help involved parties act appropriately and in a timely manner,
+425	   entities performing automated DS maintenance should report on
+426	   conditions they encounter.  The following success situations may be
+427	   of particular interest:
+
+429	   1.  A DS RRset has been provisioned
+
+431	       a.  manually;
+
+433	       b.  due to commencing DS automation (either via DNSSEC
+434	           bootstrapping, or for the first time after a manual change;
+435	           see Section 7);
+
+437	       c.  automatically, as an update to an existing DS RRset that had
+438	           itself been automatically provisioned.
+
+440	   2.  The DS RRset has been removed
+
+442	       a.  manually;
+
+444	       b.  automatically, using a delete signal ([RFC8078], Section 4).
+
+446	   In addition, there are error conditions worthy of being reported:
+
+448	   3.  A pending DS update cannot be applied due to an error condition.
+449	       There are various scenarios where an automated DS update might
+450	       have been requested, but can't be fulfilled.  These include:
+
+452	       a.  The new DS record set would break validation/resolution or is
+453	           not acceptable to the Parent for some other reason (see
+454	           Section 4).
+
+456	       b.  A lock prevents DS automation (see Section 6).
+
+458	   4.  No DS update is due, but it was determined that the Child zone is
+459	       no longer compatible with the existing DS record set (e.g., DS
+460	       RRset only references non-existing keys).
+
+462	   In these latter two cases, the entity performing DS automation would
+463	   be justified to attempt communicating the situation.  Potential
+464	   recipients are:
+
+466	   *  Child DNS operator, preferably by making a report query [RFC9567]
+467	      to the agent domain listed in the EDNS0 Report-Channel option of
+468	      the DS update notification that triggered the DS update
+469	      ([RFC9859], Section 4), or else via email to the address contained
+470	      in the child zone's SOA RNAME field (see Sections 3.3.13 and 8 of
+471	      [RFC1035]);
+
+473	   *  Registrar (if DS automation is performed by the registry);
+
+475	   *  Registrant (domain holder; in non-technical language, such as
+476	      "DNSSEC security for your domain has been enabled and will be
+477	      maintained automatically") or technical contact, in accordance
+478	      with the communication preferences established with the parent-
+479	      side entity.
+
+481	   For manual updates (case 1a), commencing DS automation (case 1b), and
+482	   deactivating DNSSEC (case 2), it seems worthwhile to notify both the
+483	   domain's technical contact (if applicable) and the registrant.  This
+484	   will typically lead to one notification during normal operation of a
+485	   domain.  (Case 1c, the regular operation of automation, is not an
+486	   interesting condition to report to a human.)
+
+488	   For error conditions (cases 3 and 4), the registrant need not always
+489	   be involved.  It seems advisable to first notify the domain's
+490	   technical contact and the DNS operator serving the affected Child
+491	   zone, and only if the problem persists for a prolonged amount of time
+492	   (e.g., three days), notify the registrant.
+
+494	   When the RRR model is used and the registry performs DS automation,
+495	   the registrar should always stay informed of any DS record changes,
+496	   e.g., via the EPP Change Poll Extension [RFC8590].
+
+498	   Overly frequent reporting of the same condition to the same recipient
+499	   is discouraged (e.g., no more than twice in a row).  For example,
+500	   when CDS and CDNSKEY records are inconsistent and prevent DS
+501	   initialization, the registrant may be notified twice.  Additional
+502	   notifications may be sent with some back-off mechanism (in increasing
+503	   intervals).
+
+505	   The registrant (or their designated party) should be able to retrieve
+506	   the current DS configuration through the customer portal available
+507	   for domain management.  Ideally, the history of DS updates would also
+508	   be available.  However, due to the associated state requirements and
+509	   the lack of direct operational impact, implementation of this is
+510	   optional.
+
+512	   For troubleshooting, dispute resolution, and post-incident analysis,
+513	   it is instrumental for the Parental Agent to retain structured
+514	   records of DS automation decisions, including timestamp, triggering
+515	   CDS/CDNSKEY RRsets, notification channel, authoritative nameservers
+516	   consulted, verification results, decision outcome, and the applied DS
+517	   RRset or cancellation reason.
+
+519	6.  Registration Locks
+
+521	   This section provides recommendations to address the following
+522	   operational question:
+
+524	   *  How does DS automation interact with other registration state
+525	      parameters, such as registration locks?
+
+527	6.1.  Recommendations
+
+529	   1.  To secure ongoing operations, automated DS maintenance MUST NOT
+530	       be suspended based on a registrar update lock alone (such as EPP
+531	       status clientUpdateProhibited [RFC5731]).
+
+533	   2.  When performed by the registry, automated DS maintenance MUST NOT
+534	       be suspended based on a registry update lock alone (such as EPP
+535	       status serverUpdateProhibited [RFC5731]).
+
+537	6.2.  Analysis
+
+539	   Registries and registrars can set various types of locks for domain
+540	   registrations, usually upon the registrant's request.  An overview of
+541	   standardized locks using EPP, for example, is given in Section 2.3 of
+542	   [RFC5731].  Some registries may offer additional (or other) types of
+543	   locks whose meaning and set/unset mechanisms are defined according to
+544	   a proprietary policy.
+
+546	   While some locks clearly should have no impact on DS automation (such
+547	   as transfer or deletion locks), other types of locks, in particular
+548	   "update locks", deserve a closer analysis.
+
+550	6.2.1.  Registrar vs. Registry Lock
+
+552	   A registrar-side update lock (such as clientUpdateProhibited in EPP)
+553	   protects against various types of accidental or malicious change
+554	   (like unintended changes through the registrar's customer portal).
+555	   Its security model does not prevent the registrar's (nor the
+556	   registry's) actions.  This is because a registrar-side lock can be
+557	   removed by the registrar without an out-of-band interaction.
+
+559	   Under such a security model, no tangible security benefit is gained
+560	   by preventing automated DS maintenance based on a registrar lock
+561	   alone, while preventing it would make maintenance needlessly
+562	   difficult.  It therefore seems reasonable not to suspend automation
+563	   when such a lock is present.
+
+565	   When a registry-side update lock is in place, the registrar cannot
+566	   apply any changes (for security or delinquency or other reasons).
+567	   However, it does not protect against changes made by the registry
+568	   itself.  This is exemplified by the serverUpdateProhibited EPP
+569	   status, which demands only that the registrar's "[r]equests to update
+570	   the object [...] MUST be rejected" (Section 2.3 of [RFC5731]).  This
+571	   type of lock therefore precludes DS automation by the registrar,
+572	   while registry-side automation may continue.
+
+574	   DS automation by the registry further is consistent with Section 2.3
+575	   of [RFC5731], which explicitly notes that an EPP server (registry)
+576	   may override status values set by an EPP client (registrar), subject
+577	   to local server policies.  The risk that DS changes from registry-
+578	   side DS automation might go unnoticed by the registrar is mitigated
+579	   by sending change notifications to the registrar; see Recommendation
+580	   4 of Section 5.
+
+582	6.2.2.  Detailed Rationale
+
+584	   Pre-DNSSEC, it was possible for a registration to be set up once,
+585	   then locked and left alone (no maintenance required).  With DNSSEC
+586	   comes a change to this operational model: the configuration may have
+587	   to be maintained in order to remain secure and operational.  For
+588	   example, the Child DNS operator may switch to another signing
+589	   algorithm if the previous one is no longer deemed appropriate, or
+590	   roll its Secure Entry Point (SEP) key for other reasons.  Such
+591	   changes entail updating the delegation's DS records.
+
+593	   If authenticated, these operations do not qualify as accidental or
+594	   malicious change, but as legitimate and normal activity for securing
+595	   ongoing operation.  The CDS/CDNSKEY method provides an automatic,
+596	   authenticated means to convey DS update requests.  The resulting DS
+597	   update is subject to the parent's acceptance checks; in particular,
+598	   it is not applied when it would break the delegation (see Section 4).
+
+600	   Given that registrar locks protect against unintended changes (such
+601	   as through the customer portal) while not preventing actions done by
+602	   the registrar (or the registry) themself, such a lock is not suitable
+603	   for defending against actions performed illegitimately by the
+604	   registrar or registry (e.g., due to compromise).  Any attack on the
+605	   registration data that is feasible in the presence of a registrar
+606	   lock is also feasible regardless of whether DS maintenance is done
+607	   automatically; in other words, DS automation is orthogonal to the
+608	   attack vector that a registrar lock protects against.
+
+610	   Considering that automated DS updates are required to be
+611	   authenticated and validated for correctness, it thus appears that
+612	   honoring such requests, while in the registrant's interest, comes
+613	   with no additional associated risk.  Suspending automated DS
+614	   maintenance therefore does not seem justified.
+
+616	   Following this line of thought, at the time of document writing some
+617	   registries (e.g., .ch/.cz/.li) perform automated DS maintenance even
+618	   when an "update lock" is in place.  Registries offering proprietary
+619	   locks should carefully consider for each lock whether its scope
+620	   warrants suspension.
+
+622	   In case of a domain not yet secured with DNSSEC, automatic DS
+623	   initialization is not required to maintain ongoing operation;
+624	   however, authenticated DNSSEC bootstrapping [RFC9615] might be
+625	   requested.  Besides being in the interest of security, the fact that
+626	   a Child is requesting DS initialization through an authenticated
+627	   method expresses the registrant's intent to have the delegation
+628	   secured.
+
+630	   Further, some domains are equipped with an update lock by default.
+631	   Not honoring DNSSEC bootstrapping requests then imposes an additional
+632	   burden on the registrant, who has to unlock and relock the domain in
+633	   order to facilitate DS provisioning after registration.  This is a
+634	   needless cost especially for large domain portfolios.  It is also
+635	   unexpected, as the registrant already has arranged for the necessary
+636	   CDS/CDNSKEY records to be published.  DS initialization and rollovers
+637	   therefore should be treated the same way with respect to locks.
+
+639	7.  Multiple Submitting Parties
+
+641	   This section provides recommendations to address the following
+642	   operational questions:
+
+644	   *  How are conflicts resolved when DS parameters are accepted through
+645	      multiple channels (e.g., via a conventional channel and via
+646	      automation)?
+
+648	   *  In case both the registry and the registrar are automating DS
+649	      updates, how to resolve potential collisions?
+
+651	7.1.  Recommendations
+
+653	   1.  Registries and registrars MUST provide another (e.g., manual)
+654	       channel for DS maintenance in order to enable recovery when the
+655	       Child has lost access to its signing key(s).  This out-of-band
+656	       channel is also needed when a DNS operator does not support DS
+657	       automation or refuses to cooperate.
+
+659	   2.  DS update requests SHOULD be executed immediately after
+660	       verification of their authenticity, regardless of whether they
+661	       are received in-band or via an out-of-band channel.
+
+663	   3.  When processing a CDS/CDNSKEY "delete" signal to remove the
+664	       entire DS record set ([RFC8078], Section 4), DS automation MUST
+665	       NOT be suspended.  For all other removal requests (such as when
+666	       received via EPP or a web form), DS automation SHOULD be
+667	       suspended until a new DS record set has been provisioned, in
+668	       order to prevent accidental re-initialization when the registrant
+669	       intended to disable DNSSEC.
+
+671	   4.  Whenever a non-empty DS record set is provisioned, through
+672	       whichever channel, DS automation SHOULD NOT (or no longer) be
+673	       suspended (including after an earlier removal).
+
+675	   5.  In the RRR model, a registry SHOULD NOT automatically initialize
+676	       DS records when it is known that the registrar does not provide a
+677	       way for the domain holder to later disable DNSSEC.  If the
+678	       registrar has declared that it performs automated DS maintenance,
+679	       the registry SHOULD publish the registrar's [RFC9859]
+680	       notification endpoint (if applicable) and refrain from registry-
+681	       side DS automation.
+
+683	7.2.  Analysis
+
+685	   In the RRR model, there are multiple channels through which DS
+686	   parameters can be accepted:
+
+688	   *  The registry can retrieve information about an intended DS update
+689	      automatically from the Child DNS operator and apply the update
+690	      directly;
+
+692	   *  The registrar can retrieve the same and relay it to the registry;
+
+694	   *  The registrar can obtain the information from the registrant
+695	      through another channel (such as a non-automated "manual update"
+696	      via webform submission), and relay it to the registry.
+
+698	   There are several considerations in this context, as discussed in the
+699	   following subsections.
+
+701	7.2.1.  Necessity of Non-automatic Updates
+
+703	   Under special circumstances, it may be necessary to perform a non-
+704	   automatic DS update.  One important example is when the key used for
+705	   authentication of DS updates is destroyed: in this case, an automatic
+706	   key rollover is impossible as the Child DNS operator can no longer
+707	   authenticate the associated information.  Another example is when
+708	   several providers are involved, but one no longer cooperates (e.g.,
+709	   when removing a provider from a multi-provider setup).  Disabling
+710	   manual DS management interfaces is therefore strongly discouraged.
+
+712	   Similarly, when the registrar is known to not support DNSSEC (or to
+713	   lack a DS provisioning interface), it seems adequate for registries
+714	   to not perform automated DS maintenance, in order to prevent
+715	   situations in which a misconfigured delegation cannot be repaired by
+716	   the registrant.
+
+718	7.2.2.  Impact of Non-automatic Updates: When to Suspend Automation
+
+720	   When an out-of-band (e.g., manual) DS update is performed while CDS/
+721	   CDNSKEY records referencing the previous DS RRset's keys are present,
+722	   the delegation's DS records may be reset to their previous state at
+723	   the next run of the automation process.  This section discusses in
+724	   which situations it is appropriate to suspend DS automation after
+725	   such a non-automatic update.
+
+727	   One option is to suspend DS automation after a manual DS update, but
+728	   only until a resumption signal is observed.  In the past, it was
+729	   proposed that seeing an updated SOA serial in the child zone may
+730	   serve as a resumption signal.  However, as any arbitrary modification
+731	   of zone contents — including the regular updating of DNSSEC signature
+732	   validity timestamps — typically causes a change in SOA serial,
+733	   resumption of DS automation after a serial change comes with a high
+734	   risk of surprise.  Additional issues arise if nameservers have
+735	   different serial offsets (e.g., in a multi-provider setup).  This
+736	   practice therefore is NOT RECOMMENDED.
+
+738	   Note also that "automatic rollback" due to old CDS/CDNSKEY RRsets can
+739	   only occur if they are signed with a key authorized by one of new DS
+740	   records.  Acceptance checks described in Section 4 further ensure
+741	   that updates do not break validation.
+
+743	   Removal of a DS record set is triggered either through a CDS/CDNSKEY
+744	   "delete" signal observed by the party performing the automation
+745	   ([RFC8078], Section 4), or by receiving a removal request out-of-band
+746	   (e.g., via EPP or a web form).  In the first case, it is useful to
+747	   keep automation active for the delegation in question, to facilitate
+748	   later DS bootstrapping.  In the second case, it is likely that the
+749	   registrant intends to disable DNSSEC for the domain, and DS
+750	   automation is best suspended (until a new DS record is provisioned
+751	   somehow).
+
+753	   One may ask how a registry can know whether a removal request
+754	   received via EPP was the result of the registrar observing a CDS/
+755	   CDNSKEY "delete" signal.  It turns out that the registry does not
+756	   need to know that; in fact, the advice works out nicely regardless of
+757	   who does the automation:
+
+759	   a.  Only registry: If the registry performs automation, then the
+760	       registry will consider any request received from the registrar as
+761	       out-of-band (in the context of this automation).  When such
+762	       requests demand removal of the entire DS record set, the registry
+763	       therefore should suspend automation.
+
+765	   b.  Only registrar: The registrar can always distinguish between
+766	       removal requests obtained from a CDS/CDNSKEY "delete" signal and
+767	       other registrant requests, and suspend automation as appropriate.
+
+769	   c.  In the (undesirable) case that both parties automate, there are
+770	       two cases:
+
+772	       *  If the registrant submits a manual removal request to the
+773	          registrar, it is out-of-band from the registrar perspective
+774	          (e.g., web form), and also for the registry (e.g., EPP).  As a
+775	          consequence, both will suspend automation (which is the
+776	          correct result).
+
+778	       *  If a CDS/CDNSKEY "delete" signal causes the registrar to
+779	          request DS removal from the registry, then the registry will
+780	          suspend automation (because the removal request is received
+781	          out-of-band, such as via EPP).  This is independent of whether
+782	          the registry's automation has already seen the signal.  The
+783	          registrar, however, will be aware of the in-band nature of the
+784	          request and not suspend automation (which is also the correct
+785	          result).
+
+787	       As a side effect, this works towards avoiding redundant
+788	       automation at the registry.
+
+790	   All in all:
+
+792	   *  It is advisable to generally not suspend in-band DS automation
+793	      when an out-of-band DS update has occurred.
+
+795	   *  An exception from this rule is when the entire DS record set was
+796	      removed through an out-of-band request, in which case the
+797	      registrant likely wants to disable DNSSEC for the domain.  DS
+798	      automation should then be suspended so that automatic re-
+799	      initialization (bootstrapping) does not occur.
+
+801	   *  In all other cases, any properly authenticated DS updates
+802	      received, including through an automated method, are to be
+803	      considered as the current intent of the domain holder.
+
+805	7.2.3.  Concurrent Automatic Updates
+
+807	   When the RRR model is used, there is a potential for collision if
+808	   both the registry and the registrar are automating DS provisioning by
+809	   scanning the child for CDS/CDNSKEY records.  No disruptive
+810	   consequences are expected if both parties perform DS automation.  An
+811	   exception is when during a key rollover, registry and registrar see
+812	   different versions of the Child's DS update requests, such as when
+813	   CDS/CDNSKEY records are retrieved from different vantage points.
+814	   Although unlikely due to Recommendation 1a of Section 4, this may
+815	   lead to flapping of DS updates.  However, it is not expected to be
+816	   harmful as either DS RRset will allow for the validation function to
+817	   continue to work, as ensured by Recommendation 1b of Section 4.  The
+818	   effect subsides as the Child's state eventually becomes consistent
+819	   (roughly, within the child's replication delay); any flapping until
+820	   then will be a minor nuisance only.
+
+822	   The issue disappears entirely when scanning is replaced by
+823	   notifications that trigger DS maintenance through one party's
+824	   designated endpoint [RFC9859], and can otherwise be mitigated if the
+825	   registry and registrar agree that only one of them will perform
+826	   scanning.
+
+828	   As a standard aspect of key rollovers [RFC6781], the Child DNS
+829	   operator is expected to monitor propagation of Child zone updates to
+830	   all authoritative nameserver instances, and only proceed to the next
+831	   step once replication has succeeded everywhere and the DS record set
+832	   was subsequently updated (and in no case before the DS RRset's TTL
+833	   has passed).  Any breakage resulting from improper timing on the
+834	   Child side is outside of the Parent's sphere of influence, and thus
+835	   cannot be handled with only parent-side changes.
+
+837	8.  IANA Considerations
+
+839	   This document has no IANA actions.
+
+841	9.  Operational Considerations
+
+843	   The document provides operational recommendations for DNSSEC DS
+844	   automation.  There are no additional operational considerations
+845	   beyond those listed in Appendix A.
+
+847	10.  Security Considerations
+
+849	   This document considers security aspects throughout, and has no
+850	   separate considerations.
+
+852	11.  Acknowledgments
+
+854	   The authors would like to thank the members of ICANN's Security and
+855	   Stability Advisory Committee (SSAC) who wrote the [SAC126] report on
+856	   which this document is based.
+
+858	   Additional thanks are extended to the following individuals (in the
+859	   order of their first contribution or review): Barbara Jantzen, Matt
+860	   Pounsett, Matthijs Mekking, Ondřej Caletka, Oli Schacher, Kim Davies,
+861	   Jim Reid, Q Misell, Scott Hollenbeck, Tamás Csillag, Philip Homburg,
+862	   Shumon Huque (Document Shepherd), Libor Peltan, Josh Simpson, Johan
+863	   Stenstam, Stefan Ubbink, Viktor Dukhovni, Hugo Salgado, Wes Hardaker,
+864	   Mohamed Boucadair (Area Director), Meir Goldman, Thomas Fossati,
+865	   Peter van Dijk, Jiankang Yao, Donald Eastlake, James Gannon, Roman
+866	   Danyliw
+
+868	12.  References
+
+870	12.1.  Normative References
+
+872	   [DNSKEY-IANA]
+873	              IANA, "DNS Security Algorithm Numbers", n.d.,
+874	              <https://www.iana.org/assignments/dns-sec-alg-numbers/dns-
+875	              sec-alg-numbers.xml#dns-sec-alg-numbers-1>.
+
+877	   [DS-IANA]  IANA, "Delegation Signer (DS) Resource Record (RR) Type
+878	              Digest Algorithms", n.d.,
+879	              <http://www.iana.org/assignments/ds-rr-types>.
+
+881	   [I-D.ietf-dnsop-cds-consistency]
+882	              Thomassen, P., "Clarifications on CDS/CDNSKEY and CSYNC
+883	              Consistency", Work in Progress, Internet-Draft, draft-
+884	              ietf-dnsop-cds-consistency-11, 11 December 2025,
+885	              <https://datatracker.ietf.org/doc/html/draft-ietf-dnsop-
+886	              cds-consistency-11>.
+
+888	   [RFC1035]  Mockapetris, P., "Domain names - implementation and
+889	              specification", STD 13, RFC 1035, DOI 10.17487/RFC1035,
+890	              November 1987, <https://www.rfc-editor.org/rfc/rfc1035>.
+
+892	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+893	              Requirement Levels", BCP 14, RFC 2119,
+894	              DOI 10.17487/RFC2119, March 1997,
+895	              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+897	   [RFC7344]  Kumari, W., Gudmundsson, O., and G. Barwood, "Automating
+898	              DNSSEC Delegation Trust Maintenance", RFC 7344,
+899	              DOI 10.17487/RFC7344, September 2014,
+900	              <https://www.rfc-editor.org/rfc/rfc7344>.
+
+902	   [RFC8078]  Gudmundsson, O. and P. Wouters, "Managing DS Records from
+903	              the Parent via CDS/CDNSKEY", RFC 8078,
+904	              DOI 10.17487/RFC8078, March 2017,
+905	              <https://www.rfc-editor.org/rfc/rfc8078>.
+
+907	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+908	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+909	              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+911	   [RFC8590]  Gould, J. and K. Feher, "Change Poll Extension for the
+912	              Extensible Provisioning Protocol (EPP)", RFC 8590,
+913	              DOI 10.17487/RFC8590, May 2019,
+914	              <https://www.rfc-editor.org/rfc/rfc8590>.
+
+916	   [RFC9364]  Hoffman, P., "DNS Security Extensions (DNSSEC)", BCP 237,
+917	              RFC 9364, DOI 10.17487/RFC9364, February 2023,
+918	              <https://www.rfc-editor.org/rfc/rfc9364>.
+
+920	   [RFC9499]  Hoffman, P. and K. Fujiwara, "DNS Terminology", BCP 219,
+921	              RFC 9499, DOI 10.17487/RFC9499, March 2024,
+922	              <https://www.rfc-editor.org/rfc/rfc9499>.
+
+924	   [RFC9567]  Arends, R. and M. Larson, "DNS Error Reporting", RFC 9567,
+925	              DOI 10.17487/RFC9567, April 2024,
+926	              <https://www.rfc-editor.org/rfc/rfc9567>.
+
+928	   [RFC9615]  Thomassen, P. and N. Wisiol, "Automatic DNSSEC
+929	              Bootstrapping Using Authenticated Signals from the Zone's
+930	              Operator", RFC 9615, DOI 10.17487/RFC9615, July 2024,
+931	              <https://www.rfc-editor.org/rfc/rfc9615>.
+
+933	   [RFC9859]  Stenstam, J., Thomassen, P., and J. Levine, "Generalized
+934	              DNS Notifications", RFC 9859, DOI 10.17487/RFC9859,
+935	              September 2025, <https://www.rfc-editor.org/rfc/rfc9859>.
+
+937	12.2.  Informative References
+
+939	   [LowTTL]   Špaček, P., "DS and DNSKEY low TTL experiments", at DNS
+940	              OARC 41, 6 September 2023, <https://indico.dns-
+941	              oarc.net/event/47/contributions/1010/attachments/958/1811/
+942	              DS%20and%20DNSKEY%20TTL%20experiment.pdf>.
+
+944	   [RFC5730]  Hollenbeck, S., "Extensible Provisioning Protocol (EPP)",
+945	              STD 69, RFC 5730, DOI 10.17487/RFC5730, August 2009,
+946	              <https://www.rfc-editor.org/rfc/rfc5730>.
+
+948	   [RFC5731]  Hollenbeck, S., "Extensible Provisioning Protocol (EPP)
+949	              Domain Name Mapping", STD 69, RFC 5731,
+950	              DOI 10.17487/RFC5731, August 2009,
+951	              <https://www.rfc-editor.org/rfc/rfc5731>.
+
+953	   [RFC6781]  Kolkman, O., Mekking, W., and R. Gieben, "DNSSEC
+954	              Operational Practices, Version 2", RFC 6781,
+955	              DOI 10.17487/RFC6781, December 2012,
+956	              <https://www.rfc-editor.org/rfc/rfc6781>.
+
+958	   [RFC6840]  Weiler, S., Ed. and D. Blacka, Ed., "Clarifications and
+959	              Implementation Notes for DNS Security (DNSSEC)", RFC 6840,
+960	              DOI 10.17487/RFC6840, February 2013,
+961	              <https://www.rfc-editor.org/rfc/rfc6840>.
+
+963	   [RFC9803]  Brown, G., "Extensible Provisioning Protocol (EPP) Mapping
+964	              for DNS Time-to-Live (TTL) Values", RFC 9803,
+965	              DOI 10.17487/RFC9803, June 2025,
+966	              <https://www.rfc-editor.org/rfc/rfc9803>.
+
+968	   [SAC126]   ICANN Security and Stability Advisory Committee (SSAC),
+969	              "SAC126: DNSSEC Delegation Signer (DS) Record Automation",
+970	              12 August 2024, <https://itp.cdn.icann.org/en/files/
+971	              security-and-stability-advisory-committee-ssac-reports/
+972	              sac-126-16-08-2024-en.pdf>.
+
+974	Appendix A.  Recommendations Overview
+
+976	   For ease of review and referencing, the recommendations from this
+977	   document are reproduced here without further comment.  For background
+978	   and analysis, refer to Sections 4–7.
+
+980	A.1.  Acceptance Checks and Safety Measures
+
+982	   1.  Entities performing automated DS maintenance MUST verify:
+
+984	       a.  the unambiguous intent of each DS update request as per
+985	           [I-D.ietf-dnsop-cds-consistency], by checking its consistency
+986	           both
+
+988	           *  between any published CDS and CDNSKEY records, and
+
+990	           *  across all authoritative nameservers in the delegation,
+
+992	           and
+
+994	       b.  that the resulting DS record set would allow continued DNSSEC
+995	           validation if deployed,
+
+997	       and cancel the update if the verifications do not succeed.
+
+999	   2.  Parent-side entities (such as registries) SHOULD reduce a DS
+1000	       record set's TTL to a value between 5–15 minutes when a new set
+1001	       of records is published, and restore the normal TTL value at a
+1002	       later occasion (but not before the previous DS RRset's TTL has
+1003	       expired).
+
+1005	   3.  DNS operators SHOULD publish both CDNSKEY and CDS records, and
+1006	       follow best practice for the choice of hash digest type
+1007	       [DS-IANA].
+
+1009	A.2.  Reporting and Transparency
+
+1011	   1.  For certain DS updates (see analysis (Section 5.2)) and for DS
+1012	       deactivation, relevant points of contact known to the parent-side
+1013	       entity (registry or registrar) SHOULD be notified.
+
+1015	   2.  For error conditions, the child DNS operator and the domain's
+1016	       technical contact (if applicable) SHOULD be notified first.  The
+1017	       registrant SHOULD NOT be notified unless the problem persists for
+1018	       a prolonged amount of time (e.g., three days).
+
+1020	   3.  Child DNS operators SHOULD be notified of errors using a report
+1021	       query [RFC9567] to the agent domain as described in Section 4 of
+1022	       [RFC9859].  Notifications to humans (domain holder) will be
+1023	       performed in accordance with the communication preferences
+1024	       established with the parent-side entity.  The same condition
+1025	       SHOULD NOT be reported unnecessarily frequently to the same
+1026	       recipient.
+
+1028	   4.  In the RRR model, registries performing DS automation SHOULD
+1029	       inform the registrar of any DS record changes via the EPP Change
+1030	       Poll Extension [RFC8590] or a similar channel.
+
+1032	   5.  The currently active DS configuration SHOULD be made accessible
+1033	       to the registrant (or their designated party) through the
+1034	       customer portal available for domain management.  The DS update
+1035	       history MAY be made available in the same way.
+
+1037	A.3.  Registration Locks
+
+1039	   1.  To secure ongoing operations, automated DS maintenance MUST NOT
+1040	       be suspended based on a registrar update lock alone (such as EPP
+1041	       status clientUpdateProhibited [RFC5731]).
+
+1043	   2.  When performed by the registry, automated DS maintenance MUST NOT
+1044	       be suspended based on a registry update lock alone (such as EPP
+1045	       status serverUpdateProhibited [RFC5731]).
+
+1047	A.4.  Multiple Submitting Parties
+
+1049	   1.  Registries and registrars MUST provide another (e.g., manual)
+1050	       channel for DS maintenance in order to enable recovery when the
+1051	       Child has lost access to its signing key(s).  This out-of-band
+1052	       channel is also needed when a DNS operator does not support DS
+1053	       automation or refuses to cooperate.
+
+1055	   2.  DS update requests SHOULD be executed immediately after
+1056	       verification of their authenticity, regardless of whether they
+1057	       are received in-band or via an out-of-band channel.
+
+1059	   3.  When processing a CDS/CDNSKEY "delete" signal to remove the
+1060	       entire DS record set ([RFC8078], Section 4), DS automation MUST
+1061	       NOT be suspended.  For all other removal requests (such as when
+1062	       received via EPP or a web form), DS automation SHOULD be
+1063	       suspended until a new DS record set has been provisioned, in
+1064	       order to prevent accidental re-initialization when the registrant
+1065	       intended to disable DNSSEC.
+
+1067	   4.  Whenever a non-empty DS record set is provisioned, through
+1068	       whichever channel, DS automation SHOULD NOT (or no longer) be
+1069	       suspended (including after an earlier removal).
+
+1071	   5.  In the RRR model, a registry SHOULD NOT automatically initialize
+1072	       DS records when it is known that the registrar does not provide a
+1073	       way for the domain holder to later disable DNSSEC.  If the
+1074	       registrar has declared that it performs automated DS maintenance,
+1075	       the registry SHOULD publish the registrar's [RFC9859]
+1076	       notification endpoint (if applicable) and refrain from registry-
+1077	       side DS automation.
+
+1079	Appendix B.  Change History (to be removed before publication)
+
+1081	   *  draft-ietf-dnsop-ds-automation-08
+
+1083	      Elevate some defining features of DS automation from SHOULD to
+1084	      MUST
+
+1086	   *  draft-ietf-dnsop-ds-automation-07
+
+1088	      Editorial changes from proofreading
+
+1090	      Editorial changes (Telechat review, James Gannon)
+
+1092	      Editorial changes (IETF LC, Donald Eastlake)
+
+1094	   *  draft-ietf-dnsop-ds-automation-06
+
+1096	      Add historic background (IETF LC, Jiankang Yao)
+
+1098	      Editorial changes (IETF LC, Peter van Dijk)
+
+1100	      Point out importance of retaining decision details for
+1101	      troubleshooting (IETF LC, Meir Goldman)
+
+1103	      Editorial changes (IETF LC, Thomas Fossati)
+
+1105	   *  draft-ietf-dnsop-ds-automation-05
+
+1107	      Editorial changes from AD Review
+
+1109	   *  draft-ietf-dnsop-ds-automation-04
+
+1111	      Editorial changes
+
+1113	   *  draft-ietf-dnsop-ds-automation-03
+
+1115	      Editorial changes
+
+1117	   *  draft-ietf-dnsop-ds-automation-02
+
+1119	      Add Appendix with recommendations overview
+
+1121	      Editorial changes
+
+1123	      Change type to BCP
+
+1125	      Fold CDS/CDNSKEY consistency requirements (Section 6) into
+1126	      Section 2 (on acceptance checks)
+1127	      Clarify continuity of validation
+
+1129	      In RRR, clarify that registries should not bootstrap if registrar
+1130	      has no deactivation interface (or if registrar does the
+1131	      automation)
+
+1133	      Remove Appendix C ("Approaches not pursued")
+
+1135	   *  draft-ietf-dnsop-ds-automation-01
+
+1137	      Remove Recommendation 6.1.2 which had told parents to require
+1138	      publication of both CDS and CDNSKEY
+
+1140	      Clarify Recommendation 5.1.3 (on suspension of automation after DS
+1141	      RRset removal) and provide extra analysis
+
+1143	      Providing access to DS update history is now optional
+
+1145	      Humans (domains holders) should be notified according to
+1146	      preferences established with registry/registrar (not necessarily
+1147	      via email)
+
+1149	      Remove redundant Recommendation 5.1.5 (same as 3.1.4)
+
+1151	      Editorial changes
+
+1153	   *  draft-ietf-dnsop-ds-automation-00
+
+1155	      Rename after adoption
+
+1157	   *  draft-shetho-dnsop-ds-automation-02
+
+1159	      Allow DS automation during registry update lock
+
+1161	      Editorial changes
+
+1163	   *  draft-shetho-dnsop-ds-automation-01
+
+1165	      Incorporated various review feedback (editorial + adding TODOs)
+
+1167	   *  draft-shetho-dnsop-ds-automation-00
+
+1169	      Initial public draft.
+
+1171	Authors' Addresses
+
+1173	   Steve Sheng
+1174	   Email: steve.sheng@gmail.com
+1175	   Peter Thomassen
+1176	   deSEC
+1177	   Email: peter@desec.io
+
+
+
+
+
+
+
+
+

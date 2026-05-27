@@ -1,0 +1,1317 @@
+idnits 2.17.1 
+
+draft-ietf-tvr-schedule-yang-08.txt:
+-(995): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+  == There is 1 instance of lines with non-ascii characters in the document.
+
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     Summary: 0 errors (**), 0 flaws (~~), 1 warning (==), 0 comments (--).
+
+--------------------------------------------------------------------------------
+
+
+2	Internet                                                           Y. Qu
+3	Internet-Draft                                    Futurewei Technologies
+4	Intended status: Standards Track                               A. Lindem
+5	Expires: 13 August 2026                                     Arrcus, Inc.
+6	                                                               E. Kinzie
+7	                                                                D. Fedyk
+8	                                                 LabN Consulting, L.L.C.
+9	                                                             M. Blanchet
+10	                                                                Viagenie
+11	                                                         9 February 2026
+
+13	                YANG Data Model for Scheduled Attributes
+14	                    draft-ietf-tvr-schedule-yang-08
+
+16	Abstract
+
+18	   The YANG model in this document includes three modules, and can be
+19	   used to manage network resources and topologies with scheduled
+20	   attributes, such as predictable link loss and link connectivity as a
+21	   function of time.  The intent is to have this information be utilized
+22	   by Time-Variant Routing systems.
+
+24	Status of This Memo
+
+26	   This Internet-Draft is submitted in full conformance with the
+27	   provisions of BCP 78 and BCP 79.
+
+29	   Internet-Drafts are working documents of the Internet Engineering
+30	   Task Force (IETF).  Note that other groups may also distribute
+31	   working documents as Internet-Drafts.  The list of current Internet-
+32	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+34	   Internet-Drafts are draft documents valid for a maximum of six months
+35	   and may be updated, replaced, or obsoleted by other documents at any
+36	   time.  It is inappropriate to use Internet-Drafts as reference
+37	   material or to cite them other than as "work in progress."
+
+39	   This Internet-Draft will expire on 13 August 2026.
+
+41	Copyright Notice
+
+43	   Copyright (c) 2026 IETF Trust and the persons identified as the
+44	   document authors.  All rights reserved.
+
+46	   This document is subject to BCP 78 and the IETF Trust's Legal
+47	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+48	   license-info) in effect on the date of publication of this document.
+49	   Please review these documents carefully, as they describe your rights
+50	   and restrictions with respect to this document.  Code Components
+51	   extracted from this document must include Revised BSD License text as
+52	   described in Section 4.e of the Trust Legal Provisions and are
+53	   provided without warranty as described in the Revised BSD License.
+
+55	Table of Contents
+
+57	   1.  Overview  . . . . . . . . . . . . . . . . . . . . . . . . . .   2
+58	     1.1.  Requirements Language . . . . . . . . . . . . . . . . . .   3
+59	   2.  Tree Diagrams . . . . . . . . . . . . . . . . . . . . . . . .   3
+60	   3.  Design of the model . . . . . . . . . . . . . . . . . . . . .   3
+61	     3.1.  Schedule Definitions  . . . . . . . . . . . . . . . . . .   3
+62	     3.2.  TVR Node YANG Module  . . . . . . . . . . . . . . . . . .   4
+63	     3.3.  TVR Topology YANG Module  . . . . . . . . . . . . . . . .   4
+64	   4.  TVR YANG Trees  . . . . . . . . . . . . . . . . . . . . . . .   5
+65	     4.1.  TVR Node YANG Tree  . . . . . . . . . . . . . . . . . . .   5
+66	     4.2.  TVR Topology YANG Tree  . . . . . . . . . . . . . . . . .   6
+67	   5.  TVR Schedule YANG Modules . . . . . . . . . . . . . . . . . .   8
+68	     5.1.  TVR Schedule YANG Module  . . . . . . . . . . . . . . . .   8
+69	     5.2.  TVR Schedule Node Module  . . . . . . . . . . . . . . . .  10
+70	     5.3.  TVR Network Topology Module . . . . . . . . . . . . . . .  14
+71	   6.  Operational Considerations  . . . . . . . . . . . . . . . . .  18
+72	   7.  Security Considerations . . . . . . . . . . . . . . . . . . .  19
+73	   8.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  19
+74	   9.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  20
+75	   10. Normative References  . . . . . . . . . . . . . . . . . . . .  20
+76	   11. Informative References  . . . . . . . . . . . . . . . . . . .  22
+77	   Appendix A.  Example: Add a scheduled cost to OSPF interface  . .  22
+78	   Appendix B.  Example: TVR Schedule Node Configuration . . . . . .  23
+79	   Appendix C.  Example: TVR Network Topology Configuration  . . . .  25
+80	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  27
+
+82	1.  Overview
+
+84	   YANG [RFC7950] is a data definition language used to define the
+85	   contents of a conceptual data store that allows networked devices to
+86	   be managed using NETCONF [RFC6241].  YANG is proving relevant beyond
+87	   its initial confines, as bindings to other interfaces (e.g., ReST)
+88	   and encodings other than XML (e.g., JSON) are being defined.
+89	   Furthermore, YANG data models can be used as the basis for
+90	   implementation of other interfaces, such as CLI and programmatic
+91	   APIs.
+
+93	   There are use cases where changes to the routing topology are
+94	   expected as part of network operations.  In some network scenarios,
+95	   it's possible to predict the times at which one router will be able
+96	   to establish a link with another router.  Links can be predictably
+97	   lost and re-established, and neighbors may change as a function of
+98	   time.  For examples of such networks and scenarios, please reference
+99	   TVR (Time-Variant Routing) Use Cases [RFC9657].
+
+101	   The YANG model in this document can be used to manage network
+102	   resources and topologies with scheduled attributes.  There are three
+103	   YANG modules in this document.
+
+105	   Module ietf-tvr-schedule.yang contains the schedule YANG definitions.
+106	   Module ietf-tvr-topology.yang defines a network topology with time-
+107	   variant availability.  Module ietf-tvr-node.yang is to be used to
+108	   manage scheduled attributes of a single node.
+
+110	   The YANG modules in this document conform to the Network Management
+111	   Datastore Architecture (NMDA) [RFC8342].
+
+113	1.1.  Requirements Language
+
+115	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+116	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+117	   "OPTIONAL" in this document are to be interpreted as described in BCP
+118	   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+119	   capitals, as shown here.
+
+121	2.  Tree Diagrams
+
+123	   This document uses the graphical representation of data models
+124	   defined in [RFC8340].
+
+126	3.  Design of the model
+
+128	3.1.  Schedule Definitions
+
+130	   Module ietf-tvr-schedule.yang contains schedule definitions that can
+131	   be used by other modules.
+
+133	   The grouping "tvr-schedule" consists of a list of schedules, and each
+134	   schedule is either a single time period or recurring time periods.
+135	   For each schedule instance, it utilizes the groupings "period-of-
+136	   time" and "recurrence-utc" as defined in
+137	   [I-D.ietf-netmod-schedule-yang].
+
+139	   Users can supply attributes or containers that augment the schedule.
+140	   The "tvr-node" has a container "scheduled-attributes" that uses the
+141	   "tvr-schedule".
+
+143	   When an attribute's schedule ends, the "value-default" MAY be used,
+144	   when present.  Alternatively, values can remain as set until another
+145	   schedule alters values.
+
+147	   The following figure provides an illustration of two attributes and
+148	   their scheduled value changes.  The attributes A1 and A2 take on
+149	   different values at different times.  The attribute A1 will take on
+150	   the value v1 from the time t0 until t1, the value v2 from t1 until
+151	   t2, and v3 from t2 until t3.  The schedule of A1 may contain a list
+152	   of 3 time periods with different values.  The attribute A2 will take
+153	   on the value vv1 from time t0 until t1, default value va2 from t1
+154	   until t2, and vv2 from t1 until t3.  The schedule of A2 may contain a
+155	   list of two time periods, and the default value is used between
+156	   scheduled values.
+
+158	   Attributes
+159	             +-------------------+----------+------+
+160	         A1  |       v1          |   v2     |  v3  |
+161	             +-------------------+----------+------+
+162	         A2  |      vv1          |  va2     |  vv2 |
+163	             +-------------------+-----------------+
+164	            t0                  t1        t2      t3
+165	                            Time
+
+167	                     Figure 1: Time Varying Properties
+
+169	3.2.  TVR Node YANG Module
+
+171	   Module ietf-tvr-node.yang is a device model and designed to manage a
+172	   single node with scheduled attributes.
+
+174	   Each node has scheduled power at the node level.  At the interface
+175	   level, a node has a list of interfaces, and each interface has its
+176	   own schedule for availability/power up and down, scheduled bandwidth,
+177	   and scheduled neighbors.
+
+179	3.3.  TVR Topology YANG Module
+
+181	   Module ietf-tvr-topology.yang describes a network topology with a
+182	   time-variant availability schedule.
+
+184	   The module has a list of nodes, identified by a unique "node-id".
+185	   Each node has a list of links.  Links are modeled as unidirectional.
+186	   Link availability is described from the viewpoint of a particular
+187	   source node (the transmitting node) and beginning at a particular
+188	   time.  Each link in the list contains the range of times during which
+189	   it is available.
+
+191	   The "source-link-id" is a string and used to identify a link as
+192	   viewed from the source-node.  Bandwidth and delay are predicted link
+193	   attributes.  Delay is the link propagation time and does not include
+194	   any queuing delays. "destination-node" of a link may follow a
+195	   schedule as well.
+
+197	4.  TVR YANG Trees
+
+199	4.1.  TVR Node YANG Tree
+
+201	   The following figure shows the tree diagram of the TVR Node
+202	   scheduling.
+
+204	   module: ietf-tvr-node
+205	     +--rw node-schedule
+206	        +--rw node-id?               inet:uri
+207	        +--rw node-power-schedule
+208	        |  +--rw power-default?   boolean
+209	        |  +--rw schedule* [schedule-id]
+210	        |     +--rw schedule-id                     uint32
+211	        |     +--rw (schedule-type)?
+212	        |     |  +--:(period)
+213	        |     |  |  +--rw period-description?       string
+214	        |     |  |  +--rw period-start?             yang:date-and-time
+215	        |     |  |  +--rw time-zone-identifier?     sys:timezone-name
+216	        |     |  |  +--rw (period-type)?
+217	        |     |  |     +--:(explicit)
+218	        |     |  |     |  +--rw period-end?         yang:date-and-time
+219	        |     |  |     +--:(duration)
+220	        |     |  |        +--rw duration?           duration
+221	        |     |  +--:(recurrence)
+222	        |     |     +--rw recurrence-first
+223	        |     |     |  +--rw start-time-utc?   yang:date-and-time
+224	        |     |     |  +--rw duration?         uint32
+225	        |     |     +--rw (recurrence-end)?
+226	        |     |     |  +--:(until)
+227	        |     |     |  |  +--rw utc-until?          yang:date-and-time
+228	        |     |     |  +--:(count)
+229	        |     |     |     +--rw count?              uint32
+230	        |     |     +--rw recurrence-description?   string
+231	        |     |     +--rw frequency?                identityref
+232	        |     |     +--rw interval?                 uint32
+233	        |     +--rw power-state?                    boolean
+234	        +--rw interface-schedule
+235	           +--rw interface* [name]
+236	              +--rw name                  union
+237	              +--rw default-available?    boolean
+238	              +--rw default-bandwidth?    yang:gauge64
+239	              +--rw attribute-schedule
+240	                 +--rw schedule* [schedule-id]
+241	                    +--rw schedule-id                     uint32
+242	                    +--rw (schedule-type)?
+243	                    |  +--:(period)
+244	                    |  |  +--rw period-description?       string
+245	                    |  |  +--rw period-start?
+246	                    |  |  |       yang:date-and-time
+247	                    |  |  +--rw time-zone-identifier?
+248	                    |  |  |       sys:timezone-name
+249	                    |  |  +--rw (period-type)?
+250	                    |  |     +--:(explicit)
+251	                    |  |     |  +--rw period-end?
+252	                    |  |     |          yang:date-and-time
+253	                    |  |     +--:(duration)
+254	                    |  |        +--rw duration?           duration
+255	                    |  +--:(recurrence)
+256	                    |     +--rw recurrence-first
+257	                    |     |  +--rw start-time-utc?   yang:date-and-time
+258	                    |     |  +--rw duration?         uint32
+259	                    |     +--rw (recurrence-end)?
+260	                    |     |  +--:(until)
+261	                    |     |  |  +--rw utc-until?
+262	                    |     |  |          yang:date-and-time
+263	                    |     |  +--:(count)
+264	                    |     |     +--rw count?              uint32
+265	                    |     +--rw recurrence-description?   string
+266	                    |     +--rw frequency?                identityref
+267	                    |     +--rw interval?                 uint32
+268	                    +--rw scheduled-attributes
+269	                       +--rw available?   boolean
+270	                       +--rw bandwidth?   yang:gauge64
+271	                       +--rw neighbor?    inet:uri
+
+273	4.2.  TVR Topology YANG Tree
+
+275	   The following figure shows the tree diagram of the TVR Topology
+276	   scheduling.
+
+278	   module: ietf-tvr-topology
+279	     +--rw topology-schedule
+280	        +--rw node* [node-id]
+281	        |  +--rw node-id      inet:uri
+282	        |  +--rw available
+283	        |     +--rw default-node-available?   boolean
+284	        |     +--rw schedule* [schedule-id]
+285	        |        +--rw schedule-id                     uint32
+286	        |        +--rw (schedule-type)?
+287	        |        |  +--:(period)
+288	        |        |  |  +--rw period-description?       string
+289	        |        |  |  +--rw period-start?
+290	        |        |  |  |       yang:date-and-time
+291	        |        |  |  +--rw time-zone-identifier?     sys:timezone-name
+292	        |        |  |  +--rw (period-type)?
+293	        |        |  |     +--:(explicit)
+294	        |        |  |     |  +--rw period-end?
+295	        |        |  |     |          yang:date-and-time
+296	        |        |  |     +--:(duration)
+297	        |        |  |        +--rw duration?           duration
+298	        |        |  +--:(recurrence)
+299	        |        |     +--rw recurrence-first
+300	        |        |     |  +--rw start-time-utc?   yang:date-and-time
+301	        |        |     |  +--rw duration?         uint32
+302	        |        |     +--rw (recurrence-end)?
+303	        |        |     |  +--:(until)
+304	        |        |     |  |  +--rw utc-until?
+305	        |        |     |  |          yang:date-and-time
+306	        |        |     |  +--:(count)
+307	        |        |     |     +--rw count?              uint32
+308	        |        |     +--rw recurrence-description?   string
+309	        |        |     +--rw frequency?                identityref
+310	        |        |     +--rw interval?                 uint32
+311	        |        +--rw node-available?                 boolean
+312	        +--rw link* [source-node source-link-id]
+313	           +--rw source-node                           inet:uri
+314	           +--rw source-link-id                        string
+315	           +--rw available
+316	              +--rw schedule* [schedule-id]
+317	              |  +--rw schedule-id                     uint32
+318	              |  +--rw (schedule-type)?
+319	              |  |  +--:(period)
+320	              |  |  |  +--rw period-description?       string
+321	              |  |  |  +--rw period-start?
+322	              |  |  |  |       yang:date-and-time
+323	              |  |  |  +--rw time-zone-identifier?     sys:timezone-name
+324	              |  |  |  +--rw (period-type)?
+325	              |  |  |     +--:(explicit)
+326	              |  |  |     |  +--rw period-end?
+327	              |  |  |     |          yang:date-and-time
+328	              |  |  |     +--:(duration)
+329	              |  |  |        +--rw duration?           duration
+330	              |  |  +--:(recurrence)
+331	              |  |     +--rw recurrence-first
+332	              |  |     |  +--rw start-time-utc?   yang:date-and-time
+333	              |  |     |  +--rw duration?         uint32
+334	              |  |     +--rw (recurrence-end)?
+335	              |  |     |  +--:(until)
+336	              |  |     |  |  +--rw utc-until?
+337	              |  |     |  |          yang:date-and-time
+338	              |  |     |  +--:(count)
+339	              |  |     |     +--rw count?              uint32
+340	              |  |     +--rw recurrence-description?   string
+341	              |  |     +--rw frequency?                identityref
+342	              |  |     +--rw interval?                 uint32
+343	              |  +--rw link-attributes
+344	              |     +--rw link-available?     boolean
+345	              |     +--rw bandwidth?          yang:gauge64
+346	              |     +--rw delay?              uint32
+347	              |     +--rw destination-node?   inet:uri
+348	              +--rw default-link-available?   boolean
+349	              +--rw default-bandwidth?        yang:gauge64
+350	              +--rw default-delay?            uint32
+
+352	5.  TVR Schedule YANG Modules
+
+354	   The following RFC is not referenced in the document text but is
+355	   referenced in the "ietf-tvr-schedule.yang" module and "ietf-tvr-
+356	   topology.yang" module: [RFC9911].
+
+358	5.1.  TVR Schedule YANG Module
+
+360	   <CODE BEGINS> file "ietf-tvr-schedule@2025-06-30.yang"
+361	   module ietf-tvr-schedule {
+362	     yang-version 1.1;
+363	     namespace "urn:ietf:params:xml:ns:yang:ietf-tvr-schedule";
+364	     prefix tvr-schd;
+
+366	     import ietf-schedule {
+367	       prefix "schedule";
+368	       reference
+369	         "RFC XXXX: A Common YANG Data Model for Scheduling";
+370	     }
+
+372	     organization
+373	       "IETF TVR - Time Variant Routing Working Group";
+374	     contact
+375	       "WG Web:   <http://datatracker.ietf.org/wg/tvr>
+376	        WG List:  <mailto:tvr@ietf.org>
+
+378	        Author:   Yingzhen Qu
+379	                  <mailto:yingzhen.ietf@gmail.com>
+380	        Author:   Acee Lindem
+381	                  <mailto:acee.ietf@gmail.com>
+382	        Author:   Marc Blanchet
+383	                  <mailto:marc.blanchet@viagenie.ca>
+384	        Author:   Eric Kinzie
+385	                  <mailto:ekinzie@labn.net>
+386	        Author:   Don Fedyk
+387	                  <mailto:dfedyk@labn.net>";
+
+389	     description
+390	       "The YANG module contains common YANG definitions for
+391	        time-variant schedule.
+
+393	        This YANG model conforms to the Network Management
+394	        Datastore Architecture (NMDA) as described in RFC 8342.
+
+396	        Copyright (c) 2025 IETF Trust and the persons identified as
+397	        authors of the code.  All rights reserved.
+
+399	        Redistribution and use in source and binary forms, with or
+400	        without modification, is permitted pursuant to, and subject to
+401	        the license terms contained in, the Revised BSD License set
+402	        forth in Section 4.c of the IETF Trust's Legal Provisions
+403	        Relating to IETF Documents
+404	        (https://trustee.ietf.org/license-info).
+
+406	        This version of this YANG module is part of RFC XXXX
+407	        (https://www.rfc-editor.org/info/rfcXXXX); see the RFC itself
+408	        for full legal notices.";
+
+410	     reference
+411	       "RFC XXXX: YANG Data Model for Scheduled Attributes";
+
+413	     revision 2025-06-30 {
+414	       description
+415	         "Initial Version";
+416	       reference
+417	         "RFC XXXX: YANG Data Model for Scheduled Attributes.";
+418	     }
+
+420	     grouping tvr-schedule {
+421	       list schedule {
+422	         key schedule-id;
+423	         leaf schedule-id {
+424	           type uint32;
+425	           description
+426	             "Identifies the schedule.";
+427	         }
+428	         choice schedule-type {
+429	           description
+430	             "Choice of schedule type.";
+
+432	           case period {
+433	             description
+434	               "A schedule with a single instance.";
+435	             uses schedule:period-of-time;
+436	           }
+437	           case recurrence {
+438	             description
+439	               "A schedule with recurrence. The time is defined in UTC
+440	                format.";
+441	             uses schedule:recurrence-utc;
+442	           }
+443	         }
+
+445	         description
+446	           "list of schedules.";
+447	       }
+448	       description
+449	         "A common grouping definition of schedules.";
+450	     }
+
+452	   }
+453	   <CODE ENDS>
+
+455	5.2.  TVR Schedule Node Module
+
+457	  <CODE BEGINS> file "ietf-tvr-node@2026-02-09.yang"
+458	  module ietf-tvr-node {
+459	    yang-version 1.1;
+460	    namespace "urn:ietf:params:xml:ns:yang:ietf-tvr-node";
+461	    prefix tvr-node;
+
+463	    import ietf-inet-types {
+464	      prefix inet;
+465	      reference
+466	        "RFC 9911: Common YANG Data Types";
+467	    }
+
+469	    import ietf-yang-types {
+470	      prefix "yang";
+471	      reference
+472	        "RFC 9911: Common YANG Data Types";
+473	    }
+
+475	    import ietf-tvr-schedule {
+476	      prefix "tvr-schd";
+477	    }
+
+479	    organization
+480	      "IETF TVR - Time Variant Routing Working Group";
+481	    contact
+482	      "WG Web:   <http://datatracker.ietf.org/wg/tvr>
+483	       WG List:  <mailto:tvr@ietf.org>
+
+485	       Author:   Yingzhen Qu
+486	                 <mailto:yingzhen.ietf@gmail.com>
+487	       Author:   Acee Lindem
+488	                 <mailto:acee.ietf@gmail.com>
+489	       Author:   Marc Blanchet
+490	                 <mailto:marc.blanchet@viagenie.ca>
+491	       Author:   Eric Kinzie
+492	                 <mailto:ekinzie@labn.net>
+493	       Author:   Don Fedyk
+494	                 <mailto:dfedyk@labn.net>";
+
+496	    description
+497	      "The YANG module is to configure and manage node attributes
+498	       with schedules.
+
+500	       This YANG model conforms to the Network Management
+501	       Datastore Architecture (NMDA) as described in RFC 8342.
+
+503	       Copyright (c) 2026 IETF Trust and the persons identified as
+504	       authors of the code.  All rights reserved.
+
+506	       Redistribution and use in source and binary forms, with or
+507	       without modification, is permitted pursuant to, and subject to
+508	       the license terms contained in, the Revised BSD License set
+509	       forth in Section 4.c of the IETF Trust's Legal Provisions
+510	       Relating to IETF Documents
+511	       (https://trustee.ietf.org/license-info).
+
+513	       This version of this YANG module is part of RFC XXXX
+514	       (https://www.rfc-editor.org/info/rfcXXXX); see the RFC itself
+515	       for full legal notices.";
+
+517	    reference
+518	      "RFC XXXX: YANG Data Model for Scheduled Attributes";
+
+520	    revision 2022-02-09 {
+521	      description
+522	        "Initial Version";
+523	      reference
+524	        "RFC XXXX: YANG Data Model for Scheduled Attributes.";
+525	    }
+
+527	    container node-schedule {
+528	      description
+529	        "This container defines a node's time variant attributes
+530	         with schedules.";
+
+532	      leaf node-id {
+533	        type inet:uri;
+534	        description
+535	          "Identifier for a node, uniquely identifies a node.";
+536	      }
+
+538	      container node-power-schedule {
+539	        description
+540	          "Power schedule for the node. The node's power is
+541	           represented by a boolean value with 'true' indicating
+542	           the node is powered on and 'false' indicating the node
+543	           is powered off.";
+
+545	        leaf power-default {
+546	          type boolean;
+547	          default false;
+548	          description
+549	            "This indicates the default node power for the time
+550	             periods when no specific power value is specified. If
+551	             unspecified, the node is powered down by default.";
+552	        }
+553	        uses tvr-schd:tvr-schedule {
+554	          augment "schedule" {
+555	            description
+556	              "Augment the power state within each period.";
+557	            leaf power-state {
+558	              type boolean;
+559	              description
+560	                "Indicates whether the node is powered on.";
+561	            }
+562	          }
+563	        }
+564	      }
+
+566	      container interface-schedule {
+567	        description
+568	          "Container for TVR node interface attributes.";
+
+570	        list interface {
+571	          key "name";
+572	          description
+573	            "List of interface with schedules.";
+574	          leaf name {
+575	            type union {
+576	              type yang:xpath1.0;
+577	              type string;
+578	            }
+579	            description
+580	              "Name of the interface.
+581	               If used with the ietf-interfaces module, the xpath name
+582	               is to identify the interface.";
+583	          }
+584	          leaf default-available {
+585	            type boolean;
+586	            default false;
+587	            description
+588	              "By default, the link is not available.";
+589	          }
+590	          leaf default-bandwidth {
+591	            type yang:gauge64;
+592	            units "bits/second";
+593	            default "0";
+594	            description
+595	              "The default interface bandwidth in bits
+596	               per second";
+597	          }
+
+599	          container attribute-schedule {
+600	            description
+601	              "Interface attributes with schedules.";
+
+603	            uses tvr-schd:tvr-schedule {
+604	              augment "schedule" {
+605	                description
+606	                  "Augment scheduled interface state.";
+607	                container scheduled-attributes {
+608	                  description
+609	                    "Augmentation container for links.";
+610	                  leaf available {
+611	                    type boolean;
+612	                    description
+613	                      "Scheduled interface power state. This is to
+614	                       work with the leaf 'enabled' for the configured
+615	                       state of the interface.";
+616	                  }
+617	                  leaf bandwidth {
+618	                    type yang:gauge64;
+619	                    units "bits/second";
+620	                    description
+621	                      "The scheduled bandwidth in bits per second";
+622	                  }
+623	                  leaf neighbor {
+624	                    type inet:uri;
+625	                    description
+626	                      "The node expected to be this interface's neighbor
+627	                      during this time.";
+628	                  }
+629	                }
+630	              }
+631	            }
+632	          }
+633	        }
+634	      }
+635	    }
+636	  }
+637	  <CODE ENDS>
+
+639	5.3.  TVR Network Topology Module
+
+641	 <CODE BEGINS> file "ietf-tvr-topology@2026-02-09.yang"
+642	 module ietf-tvr-topology {
+643	   yang-version 1.1;
+644	   namespace "urn:ietf:params:xml:ns:yang:ietf-tvr-topology";
+645	   prefix tvr-topo;
+
+647	   import ietf-inet-types {
+648	     prefix inet;
+649	     reference
+650	       "RFC 9911: Common YANG Data Types";
+651	   }
+
+653	   import ietf-yang-types {
+654	     prefix "yang";
+655	     reference
+656	       "RFC 9911: Common YANG Data Types";
+657	   }
+
+659	   import ietf-tvr-schedule {
+660	     prefix "tvr-schd";
+661	   }
+
+663	   organization
+664	     "IETF Time-Variant Routing Working Group";
+
+666	   contact
+667	     "WG Web:   <https://datatracker.ietf.org/wg/tvr/>
+668	      WG List:  <mailto:tvr@ietf.org>
+
+670	      Author:   Eric Kinzie
+671	                <mailto:ekinzie@labn.net>
+672	      Author:   Don Fedyk
+673	                <mailto:dfedyk@labn.net>
+674	      Author:   Yingzhen Qu
+675	                <mailto:yingzhen.ietf@gmail.com>
+676	      Author:   Acee Lindem
+677	                <mailto:acee.ietf@gmail.com>
+678	      Author:   Marc Blanchet
+679	                <mailto:marc.blanchet@viagenie.ca>";
+
+681	   description
+682	     "This YANG module contains YANG definitions for describing
+683	     network topology with a time-variant availability schedule.
+
+685	     Copyright (c) 2026 IETF Trust and the persons identified as
+686	     authors of the code.  All rights reserved.
+
+688	     Redistribution and use in source and binary forms, with or
+689	     without modification, is permitted pursuant to, and subject to
+690	     the license terms contained in, the Revised BSD License set forth
+691	     in Section 4.c of the IETF Trust's Legal Provisions Relating
+692	     to IETF Documents (https://trustee.ietf.org/license-info).
+
+694	     This version of this YANG module is part of RFC XXXX
+695	     (https://www.rfc-editor.org/info/rfcXXXX); see the RFC itself
+696	     for full legal notices.
+
+698	     The key words 'MUST', 'MUST NOT', 'REQUIRED', 'SHALL', 'SHALL
+699	     NOT', 'SHOULD', 'SHOULD NOT', 'RECOMMENDED', 'NOT RECOMMENDED',
+700	     'MAY', and 'OPTIONAL' in this document are to be interpreted as
+701	     described in BCP 14 (RFC 2119) (RFC 8174) when, and only when,
+702	     they appear in all capitals, as shown here.";
+
+704	   revision 2026-02-09 {
+705	     description
+706	       "Initial revision";
+707	     reference
+708	       "RFC XXXX: YANG Data Model for Scheduled Attributes";
+709	   }
+
+711	   container topology-schedule {
+712	     description
+713	       "Network topology schedules.";
+714	     list node {
+715	       key "node-id";
+716	       description
+717	         "List of nodes with schedules.";
+718	       leaf node-id {
+719	         type inet:uri;
+720	         description
+721	           "Identifier for a node; uniquely identifies a node. This
+722	            may be the same as the node-id defined in the ietf-network
+723	            module defined in RFC 8345.";
+724	       }
+725	       container available {
+726	         description
+727	           "The time at which this node becomes available.";
+
+729	         leaf default-node-available {
+730	           type boolean;
+731	           default false;
+732	           description
+733	             "By default, the node is powered off.";
+734	         }
+
+736	         uses tvr-schd:tvr-schedule {
+737	           augment "schedule" {
+738	             description
+739	               "Augment scheduled node availability.";
+740	             leaf node-available {
+741	               type boolean;
+742	               description
+743	                 "Node availability.";
+744	             }
+745	           }
+746	         }
+747	       }
+748	     }
+
+750	     list link {
+751	       key "source-node source-link-id";
+752	       description
+753	         "List of links.";
+754	       leaf source-node {
+755	         type inet:uri;
+756	         description
+757	           "A name refers to the source node of the link.";
+758	       }
+759	       leaf source-link-id {
+760	         type string;
+761	         description
+762	           "A name refers to the link of the source node.";
+763	       }
+764	       container available {
+765	         description
+766	           "The time at which this link becomes available.";
+
+768	         uses tvr-schd:tvr-schedule {
+769	           augment "schedule" {
+770	             description
+771	               "Augment scheduled values.";
+772	             container link-attributes {
+773	               description "Augmentation container for links.";
+774	               leaf link-available {
+775	                 type boolean;
+776	                 description
+777	                   "The predicted link availability.";
+778	               }
+779	               leaf bandwidth {
+780	                 type yang:gauge64;
+781	                 units "bits/second";
+782	                 description
+783	                   "The predicted link capacity. If the value measured
+784	                    by the system is less than this value, the system
+785	                    value is used. If the value measured by the system
+786	                    is greater than this value the predicted value
+787	                    SHOULD be used.";
+788	               }
+789	               leaf delay {
+790	                 type uint32 {
+791	                   range "0..16777215";
+792	                 }
+793	                 description
+794	                   "The predicted one-way delay or latency in
+795	                   microseconds. If the value measured by the system is
+796	                   less than this value the predicted value SHOULD be
+797	                   used.";
+798	               }
+799	               leaf destination-node {
+800	                 type inet:uri;
+801	                 description
+802	                   "A name refers to the destination node of the link.";
+803	               }
+804	             }
+805	           }
+806	         }
+807	         leaf default-link-available {
+808	           type boolean;
+809	           default "false";
+810	           description
+811	             "The default link availability.  During times when the
+812	              schedule does not specify an availability, this value
+813	              is used.";
+814	         }
+815	         leaf default-bandwidth {
+816	           type yang:gauge64;
+817	           units "bits/second";
+818	           default "0";
+819	           description
+820	             "The default link capacity specified in a
+821	              generic format.";
+822	         }
+823	         leaf default-delay {
+824	           type uint32 {
+825	             range "0..16777215";
+826	           }
+827	           description
+828	             "The default one-way delay in microseconds.";
+829	         }
+830	       }
+831	     }
+832	   }
+833	 }
+834	 <CODE ENDS>
+
+836	6.  Operational Considerations
+
+838	   The TVR Schedule YANG modules provide a structured mechanism to
+839	   represent time-variant attributes of network elements and topologies.
+840	   The following aspects should be considered by operators deploying the
+841	   modules.
+
+843	   Operators should be aware that these scheduled attributes represent
+844	   planned state changes, not instantaneous configuration changes or
+845	   unplanned breakages.
+
+847	   A schedule can be defined using a series of periods or intervals with
+848	   recurrence.  The model defined in this document doesn't prevent a
+849	   configuration to mix both styles.  However, it's not recommended.
+
+851	   There should be synchronized clocks between controllers and devices.
+852	   The time sources (e.g., NTP, PTP) should be accurate to avoid
+853	   unintended time/schedule offsets.  Inconsistent time bases can lead
+854	   to network misbehavior, such as routing loops or network instability.
+
+856	   The modules are to support TVR use cases where topology and
+857	   attributes vary as a function of time.  How control plane and data
+858	   plane are impacted by the schedules should be considered by the
+859	   operators.
+
+861	   The TVR schedule modules are meant to work together with other models
+862	   that manage node or interface attributes.  Operators should consider
+863	   the conflicting configurations between the scheduled and non-
+864	   scheduled settings and how to handle the conflicts.
+
+866	7.  Security Considerations
+
+868	   The YANG modules specified in this document define a schema for data
+869	   that is designed to be accessed via network management protocols such
+870	   as NETCONF [RFC6241] or RESTCONF [RFC8040].  The lowest NETCONF layer
+871	   is the secure transport layer, and the mandatory-to-implement secure
+872	   transport is Secure Shell (SSH) [RFC6242].  The lowest RESTCONF layer
+873	   is HTTPS, and the mandatory-to-implement secure transport is TLS
+874	   [RFC8446].
+
+876	   The NETCONF access control model [RFC8341] provides the means to
+877	   restrict access for particular NETCONF or RESTCONF users to a pre-
+878	   configured subset of all available NETCONF or RESTCONF protocol
+879	   operations and content.
+
+881	   There are a number of data nodes defined in ietf-tvr-node.yang module
+882	   and ietf-tvr-topology.yang that are writable/creatable/deletable
+883	   (i.e., config true, which is the default).  These data nodes may be
+884	   considered sensitive or vulnerable in some network environments.
+885	   Write operations (e.g., edit-config) to these data nodes without
+886	   proper protection can have a negative effect on network operations.
+887	   There are the subtrees and data nodes and their sensitivity/
+888	   vulnerability:
+
+890	      /node-schedule/node-power-schedule
+891	      /node-schedule/interface-schedule
+892	      /topology-schedule/nodes/available
+893	      /topology-schedule/links/available
+894	      Modifications to these scheduled attributes may result in a denial
+895	      of service.
+
+897	   Some of the readable data nodes in the ietf-tvr-node.yang module and
+898	   ietf-tvr-topolgy.yang module may be considered sensitive or
+899	   vulnerable in some network environments.  It is thus important to
+900	   control read access (e.g., via get, get-config, or notification) to
+901	   these data nodes.
+
+903	8.  IANA Considerations
+
+905	   This document registers a URI in the IETF XML registry [RFC3688].
+906	   Following the format in [RFC3688], the following registration is
+907	   requested to be made:
+
+909	      URI: urn:ietf:params:xml:ns:yang:ietf-tvr-schedule
+910	      Registrant Contact: The IESG.
+911	      XML: N/A, the requested URI is an XML namespace.
+
+913	      URI: urn:ietf:params:xml:ns:yang:ietf-tvr-node
+914	      Registrant Contact: The IESG.
+915	      XML: N/A, the requested URI is an XML namespace.
+
+917	      URI: urn:ietf:params:xml:ns:yang:ietf-tvr-topology
+918	      Registrant Contact: The IESG.
+919	      XML: N/A, the requested URI is an XML namespace.
+
+921	   This document registers a YANG module in the YANG Module Names
+922	   registry [RFC6020].
+
+924	      name: ietf-tvr-schedule
+925	      namespace: urn:ietf:params:xml:ns:yang:ietf-tvr-schedule
+926	      prefix: tvr-schd
+927	      reference: RFC XXXX
+
+929	      name: ietf-tvr-node
+930	      namespace: urn:ietf:params:xml:ns:yang:ietf-tvr-node
+931	      prefix: tvr-node
+932	      reference: RFC XXXX
+
+934	      name: ietf-tvr-topology
+935	      namespace: urn:ietf:params:xml:ns:yang:ietf-tvr-topology
+936	      prefix: tvr-topo
+937	      reference: RFC XXXX
+
+939	9.  Acknowledgements
+
+941	   The YANG model was developed using the suite of YANG tools written
+942	   and maintained by numerous authors.
+
+944	10.  Normative References
+
+946	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+947	              Requirement Levels", BCP 14, RFC 2119,
+948	              DOI 10.17487/RFC2119, March 1997,
+949	              <https://www.rfc-editor.org/info/rfc2119>.
+
+951	   [RFC3688]  Mealling, M., "The IETF XML Registry", BCP 81, RFC 3688,
+952	              DOI 10.17487/RFC3688, January 2004,
+953	              <https://www.rfc-editor.org/info/rfc3688>.
+
+955	   [RFC6020]  Bjorklund, M., Ed., "YANG - A Data Modeling Language for
+956	              the Network Configuration Protocol (NETCONF)", RFC 6020,
+957	              DOI 10.17487/RFC6020, October 2010,
+958	              <https://www.rfc-editor.org/info/rfc6020>.
+
+960	   [RFC6241]  Enns, R., Ed., Bjorklund, M., Ed., Schoenwaelder, J., Ed.,
+961	              and A. Bierman, Ed., "Network Configuration Protocol
+962	              (NETCONF)", RFC 6241, DOI 10.17487/RFC6241, June 2011,
+963	              <https://www.rfc-editor.org/info/rfc6241>.
+
+965	   [RFC6242]  Wasserman, M., "Using the NETCONF Protocol over Secure
+966	              Shell (SSH)", RFC 6242, DOI 10.17487/RFC6242, June 2011,
+967	              <https://www.rfc-editor.org/info/rfc6242>.
+
+969	   [RFC7950]  Bjorklund, M., Ed., "The YANG 1.1 Data Modeling Language",
+970	              RFC 7950, DOI 10.17487/RFC7950, August 2016,
+971	              <https://www.rfc-editor.org/info/rfc7950>.
+
+973	   [RFC8040]  Bierman, A., Bjorklund, M., and K. Watsen, "RESTCONF
+974	              Protocol", RFC 8040, DOI 10.17487/RFC8040, January 2017,
+975	              <https://www.rfc-editor.org/info/rfc8040>.
+
+977	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+978	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+979	              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+981	   [RFC8341]  Bierman, A. and M. Bjorklund, "Network Configuration
+982	              Access Control Model", STD 91, RFC 8341,
+983	              DOI 10.17487/RFC8341, March 2018,
+984	              <https://www.rfc-editor.org/info/rfc8341>.
+
+986	   [RFC8342]  Bjorklund, M., Schoenwaelder, J., Shafer, P., Watsen, K.,
+987	              and R. Wilton, "Network Management Datastore Architecture
+988	              (NMDA)", RFC 8342, DOI 10.17487/RFC8342, March 2018,
+989	              <https://www.rfc-editor.org/info/rfc8342>.
+
+991	   [RFC8446]  Rescorla, E., "The Transport Layer Security (TLS) Protocol
+992	              Version 1.3", RFC 8446, DOI 10.17487/RFC8446, August 2018,
+993	              <https://www.rfc-editor.org/info/rfc8446>.
+
+995	   [RFC9911]  Schönwälder, J., Ed., "Common YANG Data Types", RFC 9911,
+996	              DOI 10.17487/RFC9911, December 2025,
+997	              <https://www.rfc-editor.org/info/rfc9911>.
+
+999	   [I-D.ietf-netmod-schedule-yang]
+1000	              Ma, Q., Wu, Q., Boucadair, M., and D. King, "A Common YANG
+1001	              Data Model for Scheduling", Work in Progress, Internet-
+1002	              Draft, draft-ietf-netmod-schedule-yang-10, 7 August 2025,
+1003	              <https://datatracker.ietf.org/doc/html/draft-ietf-netmod-
+1004	              schedule-yang-10>.
+
+1006	11.  Informative References
+
+1008	   [RFC8340]  Bjorklund, M. and L. Berger, Ed., "YANG Tree Diagrams",
+1009	              BCP 215, RFC 8340, DOI 10.17487/RFC8340, March 2018,
+1010	              <https://www.rfc-editor.org/info/rfc8340>.
+
+1012	   [RFC8792]  Watsen, K., Auerswald, E., Farrel, A., and Q. Wu,
+1013	              "Handling Long Lines in Content of Internet-Drafts and
+1014	              RFCs", RFC 8792, DOI 10.17487/RFC8792, June 2020,
+1015	              <https://www.rfc-editor.org/info/rfc8792>.
+
+1017	   [RFC9657]  Birrane, III, E., Kuhn, N., Qu, Y., Taylor, R., and L.
+1018	              Zhang, "Time-Variant Routing (TVR) Use Cases", RFC 9657,
+1019	              DOI 10.17487/RFC9657, October 2024,
+1020	              <https://www.rfc-editor.org/info/rfc9657>.
+
+1022	Appendix A.  Example: Add a scheduled cost to OSPF interface
+
+1024	   In OSPF (Open Shortest Path First), the interface cost is a metric
+1025	   used to determine the preference or desirability of a particular link
+1026	   or interface.  By default, the OSPF interface cost is calculated
+1027	   based on the bandwidth of the interface, and it is also configurable.
+
+1029	   This example demonstrates how an OSPF interface can be extended with
+1030	   a cost that changes with a schedule.
+
+1032	   module example-tvr-ospf-schedule {
+1033	     yang-version 1.1;
+1034	     namespace "urn:ietf:params:xml:ns:yang:example-tvr-ospf-schedule";
+1035	     prefix ospf-schedule;
+
+1037	     import ietf-routing {
+1038	       prefix "rt";
+1039	       reference
+1040	         "RFC 8349: A YANG Data Model for Routing
+1041	          Management (NMDA Version)";
+1042	     }
+1043	     import ietf-ospf {
+1044	       prefix "ospf";
+1045	       reference
+1046	         "RFC 9129: A YANG Data Model for OSPF Protocol";
+1047	     }
+
+1049	     import ietf-tvr-schedule {
+1050	       prefix "tvr-schd";
+1051	     }
+
+1053	     augment "/rt:routing/rt:control-plane-protocols/"
+1054	       + "rt:control-plane-protocol/ospf:ospf/ospf:areas/ospf:area/"
+1055	       + "ospf:interfaces/ospf:interface" {
+1056	       description
+1057	         "Augment OSPF interface configuration.";
+1058	       container scheduled-cost {
+1059	         description
+1060	           "Augment OSPF interface with a scheduled interface cost.";
+1061	         uses tvr-schd:tvr-schedule {
+1062	           augment "schedule" {
+1063	             leaf cost {
+1064	               type uint32;
+1065	               description
+1066	                "interface cost";
+1067	             }
+1068	             description
+1069	               "Augment schedule with an interface cost.";
+1070	           }
+1071	         }
+1072	       }
+1073	     }
+1074	   }
+
+1076	Appendix B.  Example: TVR Schedule Node Configuration
+
+1078	   The following is an XML example using the ietf-tvr-node YANG module.
+
+1080	   In this example, the node has a node-id of "node:1", and it's
+1081	   scheduled to be powered off starting from 2025-07-26T17:00:00Z to
+1082	   2025-07-26T18:00:00Z.  Interface "eth 1" has a recurrent schedule to
+1083	   be "not available (off)" which starts from 2025-07-20T23:00:00Z,
+1084	   lasts for 7200 seconds (2 hours) each time for 10 times every 2 days.
+
+1086	   Note: '\' line wrapping per [RFC8792].
+
+1088	   <node-schedule xmlns="urn:ietf:params:xml:ns:yang:ietf-tvr-node">
+1089	     <node-id>node:1</node-id>
+1090	     <node-power-schedule>
+1091	       <power-default>true</power-default>
+1092	       <schedule>
+1093	         <schedule-id>1</schedule-id>
+1094	         <period-description>pwr off</period-description>
+1095	         <period-start>2025-07-26T17:00:00Z</period-start>
+1096	         <time-zone-identifier>UTC</time-zone-identifier>
+1097	         <period-end>2025-07-26T18:00:00Z</period-end>
+1098	         <power-state>false</power-state>
+1099	       </schedule>
+1100	     </node-power-schedule>
+1101	     <interface-schedule>
+1102	       <interface>
+1103	         <name>eth 1</name>
+1104	         <attribute-schedule>
+1105	           <schedule>
+1106	             <schedule-id>100</schedule-id>
+1107	             <recurrence-first>
+1108	               <start-time-utc>2025-07-20T23:00:00Z</start-time-utc>
+1109	               <duration>7200</duration>
+1110	             </recurrence-first>
+1111	             <count>10</count>
+1112	             <recurrence-description>daily off</recurrence-description>
+1113	             <frequency xmlns:schedule="urn:ietf:params:xml:ns:yang:\
+1114	               ietf-schedule">schedule:daily</frequency>
+1115	             <interval>2</interval>
+1116	             <scheduled-attributes>
+1117	               <available>false</available>
+1118	             </scheduled-attributes>
+1119	           </schedule>
+1120	         </attribute-schedule>
+1121	       </interface>
+1122	     </interface-schedule>
+1123	   </node-schedule>
+
+1125	   The following is the same example using JSON format.
+
+1127	   {
+1128	       "node-schedule": {
+1129	           "-xmlns": "urn:ietf:params:xml:ns:yang:ietf-tvr-node",
+1130	           "node-id": "node:1",
+1131	           "node-power-schedule": {
+1132	               "power-default": "true",
+1133	               "schedule": {
+1134	                   "schedule-id": "1",
+1135	                   "period-description": "pwr off",
+1136	                   "period-start": "2025-07-26T17:00:00Z",
+1137	                   "time-zone-identifier": "UTC",
+1138	                   "period-end": "2025-07-26T18:00:00Z",
+1139	                   "power-state": "false"
+1140	               }
+1141	           },
+1142	           "interface-schedule": {
+1143	               "interface": {
+1144	                   "name": "eth 1",
+1145	                   "attribute-schedule": {
+1146	                       "schedule": {
+1147	                           "schedule-id": "100",
+1148	                           "recurrence-first": {
+1149	                               "start-time-utc": "2025-07-20T23:00:00Z",
+1150	                               "duration": "7200"
+1151	                           },
+1152	                           "count": "10",
+1153	                           "recurrence-description": "daily off",
+1154	                           "frequency": "ietf-schedule:daily",
+1155	                           "interval": "2",
+1156	                           "scheduled-attributes": {
+1157	                               "available": "false"
+1158	                           }
+1159	                       }
+1160	                   }
+1161	               }
+1162	           }
+1163	       }
+1164	   }
+
+1166	Appendix C.  Example: TVR Network Topology Configuration
+
+1168	   The following is an XML example using the ietf-tvr-topology YANG
+1169	   module.
+
+1171	   In this example, the node with a node-id of "node:1" is scheduled to
+1172	   be powered off start from 2025-07-26T17:00:00Z, for 2 days and four
+1173	   and half hours.
+
+1175	   Node "node:2" is scheduled to be off starting from
+1176	   2025-07-20T23:00:00Z, lasting for 7200 seconds (2 hours) every two
+1177	   days until 2025-08-20T23:00:00Z.
+
+1179	   Note: '\' line wrapping per [RFC8792].
+
+1181	   <topology-schedule xmlns="urn:ietf:params:xml:ns:yang\
+1182	     :ietf-tvr-topology">
+1183	     <node>
+1184	       <node-id>node:1</node-id>
+1185	       <available>
+1186	         <default-node-available>true</default-node-available>
+1187	         <schedule>
+1188	           <schedule-id>101</schedule-id>
+1189	           <period-description>node1 schedule</period-description>
+1190	           <period-start>2025-07-26T17:00:00Z</period-start>
+1191	           <time-zone-identifier>UTC</time-zone-identifier>
+1192	           <duration>P2DT04:30:00</duration>
+1193	           <node-available>false</node-available>
+1194	         </schedule>
+1195	       </available>
+1196	     </node>
+1197	     <node>
+1198	       <node-id>node:2</node-id>
+1199	       <available>
+1200	         <default-node-available>true</default-node-available>
+1201	         <schedule>
+1202	           <schedule-id>201</schedule-id>
+1203	           <recurrence-first>
+1204	             <start-time-utc>2025-07-20T23:00:00Z</start-time-utc>
+1205	             <duration>7200</duration>
+1206	           </recurrence-first>
+1207	           <utc-until>2025-08-20T23:00:00Z</utc-until>
+1208	           <recurrence-description>daily off</recurrence-description>
+1209	           <frequency xmlns:schedule="urn:ietf:params:xml:ns:yang:\
+1210	             ietf-schedule">schedule:daily</frequency>
+1211	           <interval>2</interval>
+1212	           <node-available>false</node-available>
+1213	         </schedule>
+1214	       </available>
+1215	     </node>
+1216	   </topology-schedule>
+
+1218	   The following is the same example using JSON format.
+
+1220	   {
+1221	       "topology-schedule": {
+1222	           "-xmlns": "urn:ietf:params:xml:ns:yang:ietf-tvr-topology",
+1223	           "node": [
+1224	               {
+1225	                   "node-id": "node:1",
+1226	                   "available": {
+1227	                       "default-node-available": "true",
+1228	                       "schedule": {
+1229	                           "schedule-id": "101",
+1230	                           "period-description": "node1 schedule",
+1231	                           "period-start": "2025-07-26T17:00:00Z",
+1232	                           "time-zone-identifier": "UTC",
+1233	                           "duration": "P2DT04:30:00",
+1234	                           "node-available": "false"
+1235	                       }
+1236	                   }
+1237	               },
+1238	               {
+1239	                   "node-id": "node:2",
+1240	                   "available": {
+1241	                       "default-node-available": "true",
+1242	                       "schedule": {
+1243	                           "schedule-id": "201",
+1244	                           "recurrence-first": {
+1245	                               "start-time-utc": "2025-07-20T23:00:00Z",
+1246	                               "duration": "7200"
+1247	                           },
+1248	                           "utc-until": "2025-08-20T23:00:00Z",
+1249	                           "recurrence-description": "daily off",
+1250	                           "frequency": "ietf-schedule:daily",
+1251	                           "interval": "2",
+1252	                           "node-available": "false"
+1253	                       }
+1254	                   }
+1255	               }
+1256	           ]
+1257	       }
+1258	   }
+
+1260	Authors' Addresses
+
+1262	   Yingzhen Qu
+1263	   Futurewei Technologies
+1264	   Email: yingzhen.ietf@gmail.com
+1265	   Acee Lindem
+1266	   Arrcus, Inc.
+1267	   Email: acee.ietf@gmail.com
+
+1269	   Eric Kinzie
+1270	   LabN Consulting, L.L.C.
+1271	   Email: ekinzie@labn.net
+
+1273	   Don Fedyk
+1274	   LabN Consulting, L.L.C.
+1275	   Email: dfedyk@labn.net
+
+1277	   Marc Blanchet
+1278	   Viagenie
+1279	   Email: marc.blanchet@viagenie.ca
+
+
+
+
+
+
+
+
+
