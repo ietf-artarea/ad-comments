@@ -1,0 +1,896 @@
+
+
+
+
+AVTCORE Working Group                                              Y. He
+Internet-Draft                                                  Qualcomm
+Updates: 5104 (if approved)                                  C. Herglotz
+Intended status: Standards Track                                     FAU
+Expires: 2 January 2027                                      E. Francois
+                                                            InterDigital
+                                                             1 July 2026
+
+
+  RTP Control Protocol (RTCP) Messages for Temporal-Spatial Resolution
+               draft-ietf-avtcore-rtcp-green-metadata-13
+
+Abstract
+
+   The RTCP message format specified in this document enables receivers
+   to provide feedback to the senders and thus allows for short-term
+   adaptation and feedback-based energy efficient mechanisms to be
+   implemented.  The message format has broad applicability in real-time
+   video communication services.  Specifically, it can be used for the
+   ISO/IEC International Standard 23001-11, known as Energy Efficient
+   Media Consumption (Green metadata), developed by the ISO/IEC JTC
+   1/SC29/WG3 MPEG Systems.
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 2 January 2027.
+
+Copyright Notice
+
+   Copyright (c) 2026 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+
+
+
+He, et al.               Expires 2 January 2027                 [Page 1]
+
+Internet-Draft    RTCP for Temporal-Spatial Resolution         July 2026
+
+
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.  Code Components
+   extracted from this document must include Revised BSD License text as
+   described in Section 4.e of the Trust Legal Provisions and are
+   provided without warranty as described in the Revised BSD License.
+
+Table of Contents
+
+   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+   2.  Conventions . . . . . . . . . . . . . . . . . . . . . . . . .   3
+   3.  Abbreviations . . . . . . . . . . . . . . . . . . . . . . . .   4
+   4.  Format of RTCP Feedback Messages  . . . . . . . . . . . . . .   4
+     4.1.  Temporal-Spatial Resolution Request . . . . . . . . . . .   4
+       4.1.1.  Message format  . . . . . . . . . . . . . . . . . . .   5
+       4.1.2.  Semantics . . . . . . . . . . . . . . . . . . . . . .   6
+       4.1.3.  Timing Rules  . . . . . . . . . . . . . . . . . . . .   6
+       4.1.4.  Handling of Message in Mixers and Translators . . . .   7
+     4.2.  Temporal-Spatial Resolution Notification (TSRN) . . . . .   7
+       4.2.1.  Message format  . . . . . . . . . . . . . . . . . . .   7
+       4.2.2.  Semantics . . . . . . . . . . . . . . . . . . . . . .   8
+       4.2.3.  Timing Rules  . . . . . . . . . . . . . . . . . . . .   9
+       4.2.4.  Handling of TSRN in Mixers and Translators  . . . . .   9
+   5.  Security Considerations . . . . . . . . . . . . . . . . . . .   9
+   6.  SDP Definitions . . . . . . . . . . . . . . . . . . . . . . .  10
+     6.1.  Extension of the rtcp-fb Attribute  . . . . . . . . . . .  10
+     6.2.  Examples  . . . . . . . . . . . . . . . . . . . . . . . .  10
+       6.2.1.  Example 1 . . . . . . . . . . . . . . . . . . . . . .  10
+       6.2.2.  Example 2 . . . . . . . . . . . . . . . . . . . . . .  11
+   7.  Operational Considerations  . . . . . . . . . . . . . . . . .  12
+   8.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  12
+     8.1.  FMT values  . . . . . . . . . . . . . . . . . . . . . . .  13
+     8.2.  SDP Parameters  . . . . . . . . . . . . . . . . . . . . .  13
+   9.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  13
+     9.1.  Normative References  . . . . . . . . . . . . . . . . . .  13
+     9.2.  Informative References  . . . . . . . . . . . . . . . . .  14
+   Appendix A.  Change History . . . . . . . . . . . . . . . . . . .  15
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  16
+
+1.  Introduction
+
+   ISO/IEC 23001-11 specification, Energy Efficient Media Consumption
+   (Green Metadata) [GreenMetadata], specifies metadata that may help
+   optimize energy usage in the encoding, decoding, and display
+   processes.  New metadata and quality metrics have been specified in
+   the 3rd edition of green metadata specification to support H.266 and
+   ISO/IEC 23090-3 [VVC], and ISO/IEC 23094-1 [EVC] in addition to ITU-T
+   Recommendation H.264 and ISO/IEC 14496-10 [AVC], H.265 and ISO/IEC
+   23008-5 [HEVC].
+
+
+
+He, et al.               Expires 2 January 2027                 [Page 2]
+
+Internet-Draft    RTCP for Temporal-Spatial Resolution         July 2026
+
+
+   Two main types of metadata are defined in the document.  The first
+   type consists of metadata generated by a video encoder which provides
+   information about the decoding complexity of the delivered bitstream
+   and about the quality of the decoded content.  This first type of
+   metadata is conveyed via the supplemental enhancement information
+   (SEI) message mechanism specified in the video coding standard ITU-T
+   Recommendation H.264 and ISO/IEC 14496-10 [AVC], H.265 and ISO/IEC
+   23008-5 [HEVC], H.266 and ISO/IEC 23090-3 [VVC].
+
+   The second type consists of metadata generated by a decoder as
+   feedback conveyed to the encoder to adapt the decoder energy
+   consumption.  This document focuses on this second type of metadata
+   which is conveyed as extension of RTP Control Protocol (RTCP)
+   feedback messages [RFC4585].  The feedback in the second type of
+   metadata specified in ISO/IEC 23001-11 [GreenMetadata] includes
+   decoder operations reduction request, coding tools configuration
+   request and temporal and spatial scaling request.  This document
+   defines new RTCP message formats for the temporal and spatial
+   resolution request and notification feedback message.
+
+   The carriage of green metadata is specified in ISO/IEC 23001-19
+   [GreenMetadataCarriage], including storage and carriage of green
+   metadata using the ISO Base Media File Format (ISOBMFF) as specified
+   in ISO/IEC 23001-10 [TimedMetadata] and encapsulation, signalling,
+   and streaming of green metadata data in a media streaming system,
+   e.g., dynamic adaptive streaming over HTTP (DASH) as specified in
+   ISO/IEC 23009-1 [DASH].
+
+   The primary use case for RTCP messages for temporal and spatial
+   resolution is point-to-point video conferencing.  In such a scenario,
+   each endpoint functions as both a transmitter and a receiver, and the
+   conferencing session may be scheduled in advance.  When a receiver
+   operating on battery power can estimate its power consumption rate
+   and, if necessary, request a reduction in pixel rate to ensure
+   completion of the scheduled session.  Furthermore, when multiple
+   tasks share a processing unit and a software decoder is allocated a
+   limited portion of the available resources, the receiver can, when
+   applicable, monitor real-time throughput and request a lower
+   resolution or frame rate that aligns with the decoder's processing
+   capability.
+
+2.  Conventions
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+   "OPTIONAL" in this document are to be interpreted as described in BCP
+   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+   capitals, as shown here.
+
+
+
+He, et al.               Expires 2 January 2027                 [Page 3]
+
+Internet-Draft    RTCP for Temporal-Spatial Resolution         July 2026
+
+
+3.  Abbreviations
+
+   AVPF: RTP Audio-Visual Profile with Feedback [RFC5104]
+
+   CCM: Codec Control Messages [RFC5104]
+
+   FCI: Feedback Control Information [RFC4585]
+
+   FMT: Feedback Message Type [RFC4585]
+
+   PSFB: Payload-specific FB message [RFC4585]
+
+   RTP: Real-time Transport Protocol [RFC3550]
+
+   RTCP: RTP Control Protocol [RFC3550]
+
+   TSRN: Temporal-Spatial Resolution Notification
+
+   TSRR: Temporal-Spatial Resolution Request
+
+   Commonly-used RTP terms are defined in [RFC3550]
+
+4.  Format of RTCP Feedback Messages
+
+   This document extends the RTCP feedback messages defined in section
+   6.1 of [RFC4585] and [RFC5104] by defining a temporal-spatial
+   resolution feedback message.  The message can be used by the receiver
+   to inform the sender of the desirable coding temporal resolution
+   (frame rate) and spatial resolution of the bitstream delivered, and
+   by the sender to indicate the coding temporal and spatial resolution
+   it will use henceforth.
+
+   RTCP temporal-spatial resolution feedback message follows a similar
+   message format as RTCP Temporal-Spatial Trade-off Request and
+   Notification [RFC5104].  The message may be sent in a regular full
+   compound RTCP packet or in an early RTCP packet, as per the RTP/AVPF
+   rules.
+
+   This document specifies two additional payload-specific feedback
+   messages: Temporal-Spatial Resolution Request (TSRR) and Temporal-
+   Spatial Resolution Notification (TSRN)
+
+4.1.  Temporal-Spatial Resolution Request
+
+   The TSRR feedback message is identified by RTCP packet type value
+   PT=PSFB and FMT=TBD1.
+
+
+
+
+
+He, et al.               Expires 2 January 2027                 [Page 4]
+
+Internet-Draft    RTCP for Temporal-Spatial Resolution         July 2026
+
+
+   - To RFC Editor: please remove this note before publication: These
+   TBD1 value are to be confirmed by IANA -
+
+   The FCI field SHALL contain at least one TSRR FCI entries.
+
+4.1.1.  Message format
+
+   The content of the FCI entry for the Temporal-Spatial Resolution
+   Request (TSRR) is depicted in Figure 1.
+
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                              SSRC                             |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |   Seq nr.     |            Rsvd           |   Frame Rate      |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |     Picture Width         |   Picture Height          | Rsvd  |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+            Figure 1: Syntax of an FCI Entry in the TSRR Message
+
+   SSRC (32 bits): The Synchronization Source (SSRC) of the media sender
+   that is requested to apply the frame rate and picture resolution.
+
+   Within the common packet header for feedback messages (as defined in
+   section 6.1 of [RFC4585]), the "SSRC of packet sender" field
+   indicates the source of the request, and the "SSRC of media source"
+   is not used and SHALL be set to 0.  The SSRCs of the media senders to
+   which the TSRR applies are in the corresponding FCI entries.
+
+   Seq nr. (8 bits): Request sequence number.  The sequence number space
+   is unique for pairing of the SSRC of request source and the SSRC of
+   the request target.  The sequence number SHALL be increased by 1
+   modulo 256 for each new command.  A repetition SHALL NOT increase the
+   sequence number.  The initial value is arbitrary.
+
+   Rsvd (14 bits): All reserved bits SHALL be set to 0 by the sender and
+   SHALL be ignored on reception.
+
+   Frame Rate (10 bits): The requested frame rate in frames per second.
+   This field is equivalent to the frames_per_second as defined in
+   clause 6.3 of [GreenMetadata].  An integer value between 1 and 1023
+   that indicates the coding frame rate that is requested.  The value of
+   Frame Rate equal to 0 MUST NOT be sent.
+
+
+
+
+
+
+He, et al.               Expires 2 January 2027                 [Page 5]
+
+Internet-Draft    RTCP for Temporal-Spatial Resolution         July 2026
+
+
+   Picture Width (14 bits): The requested picture width in the units of
+   luma samples.  This field is equivalent to the
+   pic_width_in_luma_samples defined in clause 6.3 of [GreenMetadata].
+   An integer value between 1 and 16383 that indicates the coding
+   picture width in the units of luma samples that is requested.  The
+   value of Picture Width equal to 0 MUST NOT be sent.
+
+   Picture Height (14 bits): The requested picture height in the units
+   of luma samples.  This field is equivalent to the
+   pic_height_in_luma_samples defined in clause 6.3 of [GreenMetadata].
+   An integer value between 1 and 16383 that indicates the coding
+   picture height in the units of luma samples that is requested.  The
+   value of Picture Height equal to 0 MUST NOT be sent.
+
+   Rsvd (4 bits): All reserved bits SHALL be set to 0 by the sender and
+   SHALL be ignored on reception.
+
+4.1.2.  Semantics
+
+   A decoder can suggest a temporal-spatial resolution by sending a TSRR
+   message to an encoder.  If the encoder is capable of adjusting its
+   temporal-spatial resolution, it MAY take into account the received
+   TSRR message for future coding of pictures.  The temporal and spatial
+   resolutions in a TSRR message SHALL be less than or equal to the
+   temporal and spatial resolutions negotiated via SDP.  The frame rate
+   may be signaled using the SDP framerate attribute [RFC8866].  The
+   picture width and height may be signaled using the SDP imageattr
+   attribute [RFC6236], or derived from the SDP codec-specific fmtp
+   parameters such as profile-level-id [RFC6184] as the codec profile
+   and level specify the maximum luma picture size.
+
+   The selected Frame Rate, Picture Width and Picture Height SHALL be
+   communicated to the media receivers by means of the TSRN message (see
+   Section 4.2).
+
+   A TSRR message MAY contain requests to multiple media senders, using
+   one FCI entry per target media sender.
+
+4.1.3.  Timing Rules
+
+   The timing follows the rules outlined in section 3 of [RFC4585].
+   This request message is not time critical and SHOULD be sent using
+   regular RTCP timing.  When the user requires quick feedback, the
+   message MAY be sent with early or immediate feedback timing.
+
+
+
+
+
+
+
+He, et al.               Expires 2 January 2027                 [Page 6]
+
+Internet-Draft    RTCP for Temporal-Spatial Resolution         July 2026
+
+
+4.1.4.  Handling of Message in Mixers and Translators
+
+   A mixer or media translator (see Section 2.3 of [RFC3550]) that
+   encodes content sent to the session participant issuing the TSRR
+   SHALL consider the request to determine if it can fulfill it by
+   changing its own encoding parameters.  A media translator unable to
+   fulfill the request MAY forward the request unaltered towards the
+   media sender.  A mixer encoding for multiple session participants
+   will need to consider the joint needs of these participants before
+   generating a TSRR on its own behalf towards the media sender.
+
+4.2.  Temporal-Spatial Resolution Notification (TSRN)
+
+   The TSRN message is identified by RTCP packet type value PT=PSFB and
+   FMT=TBD2.
+
+   - To RFC Editor: please remove this note before publication: These
+   TBD2 value are to be confirmed by IANA -
+
+   The FCI field SHALL contain at least one TSRN FCI entry.
+
+4.2.1.  Message format
+
+   The content of the FCI entry for the Temporal-Spatial Resolution
+   Notification (TSRN) is depicted in Figure 2.
+
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                              SSRC                             |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |   Seq nr.     |            Rsvd           |   Frame Rate      |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |     Picture Width         |     Picture Height        | Rsvd  |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+            Figure 2: Syntax of an FCI Entry in the TSRN Message
+
+   SSRC (32 bits): The Synchronization Source (SSRC) of the source of
+   the TSRR that resulted in this notification.
+
+   Within the common packet header for feedback messages (as defined in
+   section 6.1 of [RFC4585]), the "SSRC of packet sender" field
+   indicates the source of the Notification, and the "SSRC of media
+   source" is not used and SHALL be set to 0.  The SSRCs of the
+   requesting entities to which the Notification applies are in the
+   corresponding FCI entries.
+
+
+
+
+He, et al.               Expires 2 January 2027                 [Page 7]
+
+Internet-Draft    RTCP for Temporal-Spatial Resolution         July 2026
+
+
+   Seq nr. (8 bits): The sequence number value from the TSRR that is
+   being acknowledged.
+
+   Rsvd (14 bits): All reserved bits SHALL be set to 0 by the sender and
+   SHALL be ignored on reception.
+
+   Frame Rate (10 bits): The frame rate in frames per second the media
+   sender is using henceforth.  The value of Frame Rate equal to 0 MUST
+   NOT be sent.
+
+   Picture Width (14 bits): The coding picture width in the units of
+   luma samples the media sender is using henceforth.  The value of
+   Picture Width equal to 0 MUST NOT be sent.
+
+   Picture Height (14 bits): The coding picture height in the units of
+   luma samples the media sender is using henceforth.  The value of
+   Picture Height equal to 0 MUST NOT be sent.
+
+   Rsvd (4 bits): All reserved bits SHALL be set to 0 by the sender and
+   SHALL be ignored on reception.
+
+   It is to note that the returned value (Frame Rate, Picture Width,
+   Picture Height) may differ from the requested one, for example, in
+   cases where a media encoder cannot change its frame rate or picture
+   resolution, or when the requested temporal and spatial resolutions
+   are larger than the temporal and spatial resolutions negotiated via
+   SDP, or when pre-recorded content is used.
+
+4.2.2.  Semantics
+
+   This feedback message is used to acknowledge the reception of a TSRR.
+   For each TSRR received targeted at the session participant, a TSRN
+   FCI entry SHALL be sent in a TSRN feedback message.  A single TSRN
+   message MAY acknowledge multiple requests using multiple FCI entries.
+   The Frame Rate, Picture Width and Picture Height value included SHALL
+   be the same in all FCI entries of the TSRN message.  Including an FCI
+   for each requestor allows each requesting entity to determine that
+   the media sender received the request.  The notification SHALL also
+   be sent in response to TSRR repetitions received.  If the request
+   receiver has received TSRR with several different sequence numbers
+   from a single requestor, it SHALL only respond to the request with
+   the highest (modulo 256) sequence number.  Note that the highest
+   sequence number could be a smaller integer value due to the wrapping
+   of the field.  Appendix A.1 of [RFC3550] has an algorithm for keeping
+   track of the highest received sequence number for RTP packets; it
+   could be adapted for this usage.
+
+
+
+
+
+He, et al.               Expires 2 January 2027                 [Page 8]
+
+Internet-Draft    RTCP for Temporal-Spatial Resolution         July 2026
+
+
+   The TSRN SHALL include the Temporal-Spatial Resolution Frame Rate,
+   Picture Width and Picture Height that will be used as a result of the
+   request.  This is not necessarily the same Frame Rate, Picture Width
+   and Picture Height as requested, as the media sender may need to
+   aggregate requests from several requesting session participants.  It
+   may also have some other policies or rules that limit the selection.
+
+4.2.3.  Timing Rules
+
+   The timing follows the rules outlined in section 3 of [RFC4585].
+   This acknowledgement message is not extremely time critical and
+   SHOULD be sent using regular RTCP timing.
+
+4.2.4.  Handling of TSRN in Mixers and Translators
+
+   A mixer or translator (see Section 2.3 of [RFC3550]) that acts upon a
+   TSRR SHALL also send the corresponding TSRN.  In cases where it needs
+   to forward a TSRR itself, the notification message MAY need to be
+   delayed until the TSRR has been responded to.
+
+5.  Security Considerations
+
+   The defined messages have certain properties that have security
+   implications.  These must be addressed and taken into account by
+   users of this protocol.
+
+   Spoofed or maliciously created feedback messages of the type defined
+   in this document can have the following implications:
+
+   *  severely reduced picture resolution due to false TSRR messages
+      that sets the picture width and height to a very low value;
+
+   *  severely reduced frame rate due to false TSRR messages that sets
+      the frame rate to a very low value.
+
+   *  severely increased picture resolution due to false TSRR messages
+      that sets the picture width and height to a value that is larger
+      than the value negotiated via SDP;
+
+   *  severely increased frame rate due to false TSRR messages that sets
+      the frame rate to a value that is larger than the value negotiated
+      via SDP.
+
+   *  severely frequent requests that set the picture width, height and/
+      or frame rate.
+
+
+
+
+
+
+He, et al.               Expires 2 January 2027                 [Page 9]
+
+Internet-Draft    RTCP for Temporal-Spatial Resolution         July 2026
+
+
+   To prevent these attacks, there is a need to apply authentication and
+   integrity protection of the feedback messages.  This can be
+   accomplished against threats external to the current RTP session
+   using the RTP profile that combines Secure RTP [SRTP] and AVPF into
+   SAVPF [SAVPF].  In the mixer cases, separate security contexts and
+   filtering can be applied between the mixer and the participants, thus
+   protecting other users on the mixer from a misbehaving participant.
+   The security considerations
+
+   [RFC4585] specifies the timing rules governing the transmission of
+   RTCP feedback messages and discusses the security implications of
+   violating those rules.  Implementations of TSRR are expected to
+   follow the RTCP timing procedures in [RFC4585].  Excessively frequent
+   TSRR requests may indicate either a non-compliant implementation or a
+   malicious attempt to increase processing or network load, senders and
+   receivers SHOULD behave conservatively when observing unusual or
+   unexpected reporting behavior.
+
+6.  SDP Definitions
+
+   The capability of handling messages defined in this document MAY be
+   exchanged at a higher layer such as SDP.  This document follows all
+   the rules defined in AVPF [RFC4585] and CCM [RFC5104] for an "rtcp-
+   fb" attribute relating to the payload type in a session description.
+
+6.1.  Extension of the rtcp-fb Attribute
+
+   This document defines a new parameter "tsrr" to the "ccm" feedback
+   value defined in CCM [RFC5104] to indicate support of the Temporal-
+   Spatial Resolution Request/Notification (TSRR/TSRN).  All the rules
+   described in [RFC4585] for rtcp-fb attribute relating to payload type
+   and to multiple rtcp-fb attributes in a session description also
+   apply to the new feedback messages defined in this document.
+
+   The following ABNF [RFC5234] rule extends the definition of "rtcp-fb-
+   ccm-param" in section 7.1 of [RFC5104]:
+
+       rtcp-fb-ccm-param  =/ SP "tsrr"   ; Temporal-Spatial Resolution
+
+6.2.  Examples
+
+6.2.1.  Example 1
+
+   The following SDP describes a point-to-point video call with H.266,
+   with the originator of the call declaring its capability to support
+   the FIR and TSRR/TSRN codec control messages.  The SDP is carried in
+   a high-level signaling protocol like SIP.
+
+
+
+
+He, et al.               Expires 2 January 2027                [Page 10]
+
+Internet-Draft    RTCP for Temporal-Spatial Resolution         July 2026
+
+
+       v=0
+       o=alice 3203093520 3203093520 IN IP4 host.example.com
+       s=Point-to-Point call
+       c=IN IP4 192.0.2.124
+       m=audio 49170 RTP/AVP 0
+       a=rtpmap:0 PCMU/8000
+       m=video 51372 RTP/AVPF 98
+       a=rtpmap:98 H266/90000
+       a=rtcp-fb:98 ccm tsrr
+       a=rtcp-fb:98 ccm fir
+
+                                  Figure 3
+
+   When the sender receives a TSRR message from the remote party, it is
+   capable of adjusting the temporal or spatial resolutionas indicated
+   in the RTCP TSRN feedback message.
+
+6.2.2.  Example 2
+
+   This example illustrates how support for codec control messages is
+   negotiated using the SDP Offer/Answer model.  The offerer includes
+   support for "tstr", "fir", and "tsrr".  The answerer accepts only
+   "tstr" and "fir", thus rejecting "tsrr".  The purpose of this example
+   is to illustrate that support for "tsrr" is not carried forward into
+   the answer and is therefore not negotiated for use in the session.
+
+   The offerer wishes to support "tstr", "fir" and "tsrr".  The offered
+   SDP is
+
+       -------------> Offer
+       v=0
+       o=alice 3203093520 3203093520 IN IP4 host.example.com
+       s=Offer/Answer
+       c=IN IP4 192.0.2.124
+       m=audio 49170 RTP/AVP 0
+       a=rtpmap:0 PCMU/8000
+       m=video 51372 RTP/AVPF 98
+       a=rtpmap:98 H266/90000
+       a=rtcp-fb:98 ccm tstr
+       a=rtcp-fb:98 ccm fir
+       a=rtcp-fb:* ccm tsrr
+
+                                  Figure 4
+
+   The answerer wishes to support only the FIR and TSTR/TSTN messages
+   and the answerer SDP is
+
+
+
+
+
+He, et al.               Expires 2 January 2027                [Page 11]
+
+Internet-Draft    RTCP for Temporal-Spatial Resolution         July 2026
+
+
+       ---------------- Answer
+       v=0
+       o=alice 3203093520 3203093524 IN IP4 otherhost.example.com
+       s=Offer/Answer
+       c=IN IP4 192.0.2.37
+       m=audio 47190 RTP/AVP 0
+       a=rtpmap:0 PCMU/8000
+       m=video 53273 RTP/AVPF 98
+       a=rtpmap:98 H266/90000
+       a=rtcp-fb:98 ccm tstr
+       a=rtcp-fb:98 ccm fir
+
+                                  Figure 5
+
+   This demonstrates that only the intersection of supported codec
+   control messages is retained after negotiation.
+
+7.  Operational Considerations
+
+   *  This is a change that needs to be implemented at both endpoints,
+      implementing at only one endpoint will result in no change to the
+      RTP service.
+
+   *  Remote support for this RFC is indicated by receiving a TSRR
+      message from a remote party using SDP (see Section 6) and
+      confirmed by receiving a valid TSRR feedback message.
+
+   *  A mixer or translator needs to be updated to support the TSRR
+      message if it wishes to interact with the protocol (see
+      Section 4.2.4).
+
+   *  Operational security considerations are provided in the security
+      considerations (see Section 5).
+
+   *  The quality of experience may be impacted by honoring inadequate
+      suggestions from a receiver (e.g., default values).  Users may
+      complain about the quality of service that was lowered because of
+      such adjustment queries.  Operators deploying media senders should
+      be aware of that risk and may calibrate hints that they can
+      accommodate (acceptable ranges).  Tools and procedures for service
+      level agreement (SLA) fulfillment and assurance should take this
+      into account.
+
+8.  IANA Considerations
+
+
+
+
+
+
+
+He, et al.               Expires 2 January 2027                [Page 12]
+
+Internet-Draft    RTCP for Temporal-Spatial Resolution         July 2026
+
+
+8.1.  FMT values
+
+   IANA is requested to allocate the following two new Values in the
+   "FMT Values for PSFB Payload Types" registry in the "Real-Time
+   Transport Protocol (RTP) Parameters" registry group
+   [IANA-RTCP-FMT-PSFB-PT]:
+
+   Value: TBD1
+   Name: TSRR
+   Long Name: Temporal-Spatial Resolution Request
+   Reference: Section 4.1 of this RFC
+
+   Value: TBD2
+   Name: TSRN
+   Long Name: Temporal-Spatial Resolution Notification
+   Reference: Section 4.2 of this RFC
+
+8.2.  SDP Parameters
+
+   IANA is requested to register the following in the "Codec Control
+   Messages" registry in the "Session Description Protocol (SDP)
+   Parameters" registry group [IANA-SDP]:
+
+   Value Name: tsrr
+
+   Long Name: Temporal-Spatial Resolution
+
+   Usable with: ccm
+
+   Mux: IDENTICAL-PER-PT
+
+   Reference: Section 6.1 of this RFC
+
+9.  References
+
+9.1.  Normative References
+
+   [GreenMetadata]
+              "ISO/IEC FDIS 23001-11, Information technology - MPEG
+              Systems Technologies - Part 11: Energy-Efficient Media
+              Consumption (green metadata)", 2023,
+              <https://www.iso.org/standard/83674.html>.
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/info/rfc2119>.
+
+
+
+
+He, et al.               Expires 2 January 2027                [Page 13]
+
+Internet-Draft    RTCP for Temporal-Spatial Resolution         July 2026
+
+
+   [RFC3550]  Schulzrinne, H., Casner, S., Frederick, R., and V.
+              Jacobson, "RTP: A Transport Protocol for Real-Time
+              Applications", STD 64, RFC 3550, DOI 10.17487/RFC3550,
+              July 2003, <https://www.rfc-editor.org/info/rfc3550>.
+
+   [RFC4585]  Ott, J., Wenger, S., Sato, N., Burmeister, C., and J. Rey,
+              "Extended RTP Profile for Real-time Transport Control
+              Protocol (RTCP)-Based Feedback (RTP/AVPF)", RFC 4585,
+              DOI 10.17487/RFC4585, July 2006,
+              <https://www.rfc-editor.org/info/rfc4585>.
+
+   [RFC5104]  Wenger, S., Chandra, U., Westerlund, M., and B. Burman,
+              "Codec Control Messages in the RTP Audio-Visual Profile
+              with Feedback (AVPF)", RFC 5104, DOI 10.17487/RFC5104,
+              February 2008, <https://www.rfc-editor.org/info/rfc5104>.
+
+   [RFC5234]  Ed, D. and P. Overell, "Augmented BNF for Syntax
+              Specifications: ABNF", RFC 5234, DOI 10.17487/RFC5234,
+              January 2008, <https://www.rfc-editor.org/info/rfc5234>.
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+9.2.  Informative References
+
+   [AVC]      "Advanced video coding, ITU-T Recommendation H.264", 2021,
+              <https://www.itu.int/rec/T-REC-H.264>.
+
+   [DASH]     "Information technology - Dynamic adaptive streaming over
+              HTTP (DASH) Part 1: Media presentation description and
+              segment formats", 2022,
+              <https://www.iso.org/standard/83314.html>.
+
+   [EVC]      "Information technology - General video coding Part 1:
+              Essential video coding", 2020,
+              <https://www.iso.org/standard/57797.html>.
+
+   [GreenMetadataCarriage]
+              "Information technology - MPEG systems technologies Part
+              19: Carriage of green metadata", 2025,
+              <https://www.iso.org/standard/90211.html>.
+
+   [HEVC]     "High efficiency video coding, ITU-T Recommendation
+              H.265", 2021, <https://www.itu.int/rec/T-REC-H.265>.
+
+
+
+
+
+
+He, et al.               Expires 2 January 2027                [Page 14]
+
+Internet-Draft    RTCP for Temporal-Spatial Resolution         July 2026
+
+
+   [IANA-RTCP-FMT-PSFB-PT]
+              "IANA-RTCP-FMT-PSFB-PT", 2025,
+              <https://www.iana.org/assignments/rtp-parameters/rtp-
+              parameters.xhtml#rtp-parameters>.
+
+   [IANA-SDP] "IANA-SDP", 2026, <https://www.iana.org/assignments/sdp-
+              parameters/sdp-parameters.xhtml>.
+
+   [RFC6184]  Wang, Y.-K., Even, R., Kristensen, T., and R. Jesup, "RTP
+              Payload Format for H.264 Video", BCP 14, RFC 6184,
+              DOI 10.17487/RFC6184, May 2011,
+              <https://www.rfc-editor.org/info/rfc6184>.
+
+   [RFC6236]  Johansson, I. and K. June, "Negotiation of Generic Image
+              Attributes in the Session Description Protocol (SDP)",
+              BCP 14, RFC 6236, DOI 10.17487/RFC6236, May 2011,
+              <https://www.rfc-editor.org/info/rfc6236>.
+
+   [RFC8866]  Begen, B., Kyzivat, P., Perkins, C., and M. Handley, "SDP:
+              Session Description Protocol", BCP 14, RFC 8866,
+              DOI 10.17487/RFC8866, January 2021,
+              <https://www.rfc-editor.org/info/rfc8866>.
+
+   [SAVPF]    Ott, J. and E. Carrara, "Extended Secure RTP Profile for
+              RTCP-based Feedback (RTP/SAVPF)", 2008,
+              <https://datatracker.ietf.org/doc/pdf/rfc5124>.
+
+   [SRTP]     Baugher, M., McGrew, D., Naslund, M., Carrara, E., and K.
+              Norrman, "The Secure Real-time Transport Protocol(SRTP)",
+              2004, <https://datatracker.ietf.org/doc/pdf/rfc3711>.
+
+   [TimedMetadata]
+              "Information technology - MPEG systems technologies Part
+              10: Carriage of timed metadata metrics of media in ISO
+              base media file format", 2020,
+              <https://www.iso.org/standard/78824.html>.
+
+   [VVC]      "Versatile Video Coding, ITU-T Recommendation H.266",
+              2022, <http://www.itu.int/rec/T-REC-H.266>.
+
+Appendix A.  Change History
+
+   - To RFC Editor: PLEASE REMOVE ThIS SECTION BEFORE PUBLICATION -
+
+   draft-ietf-avtcore-rtcp-green-metadata-00 ....initial version
+
+   draft-ietf-avtcore-rtcp-green-metadata-01 ....title and editorial
+   changes
+
+
+
+He, et al.               Expires 2 January 2027                [Page 15]
+
+Internet-Draft    RTCP for Temporal-Spatial Resolution         July 2026
+
+
+   draft-ietf-avtcore-rtcp-green-metadata-02 ....editorial changes
+
+   draft-ietf-avtcore-rtcp-green-metadata-03 ....no changes
+
+   draft-ietf-avtcore-rtcp-green-metadata-04 ....no changes
+
+   draft-ietf-avtcore-rtcp-green-metadata-05 ....editorial changes
+
+   draft-ietf-avtcore-rtcp-green-metadata-06 ....no changes
+
+   draft-ietf-avtcore-rtcp-green-metadata-07 ....editorial changes
+
+   draft-ietf-avtcore-rtcp-green-metadata-08 ....editorial changes
+
+   draft-ietf-avtcore-rtcp-green-metadata-09 ....editorial changes
+
+   draft-ietf-avtcore-rtcp-green-metadata-10 ....editorial changes
+
+   draft-ietf-avtcore-rtcp-green-metadata-11 ....editorial changes
+
+   draft-ietf-avtcore-rtcp-green-metadata-12 ....editorial changes
+
+   draft-ietf-avtcore-rtcp-green-metadata-13 ....editorial changes
+
+Authors' Addresses
+
+   Yong He
+   Qualcomm
+   5775 Morehouse Drive
+   San Diego,  92121
+   United States of America
+   Email: yonghe@qti.qualcomm.com
+
+
+   Christian Herglotz
+   FAU
+   Schlossplatz 4
+   91054 Erlangen
+   Germany
+   Email: christian.herglotz@fau.de
+
+
+   Edouard Francois
+   InterDigital
+   975 Avenue des Champs Blancs
+   35576 Cesson-Sevigne
+   France
+   Email: edouard.francois@interdigital.com
+
+
+
+He, et al.               Expires 2 January 2027                [Page 16]

@@ -1,0 +1,786 @@
+idnits 2.17.1 
+
+draft-ietf-avtcore-rtcp-green-metadata-13.txt:
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     No nits found.
+--------------------------------------------------------------------------------
+
+
+2	AVTCORE Working Group                                              Y. He
+3	Internet-Draft                                                  Qualcomm
+4	Updates: 5104 (if approved)                                  C. Herglotz
+5	Intended status: Standards Track                                     FAU
+6	Expires: 2 January 2027                                      E. Francois
+7	                                                            InterDigital
+8	                                                             1 July 2026
+
+10	  RTP Control Protocol (RTCP) Messages for Temporal-Spatial Resolution
+11	               draft-ietf-avtcore-rtcp-green-metadata-13
+
+13	Abstract
+
+15	   The RTCP message format specified in this document enables receivers
+16	   to provide feedback to the senders and thus allows for short-term
+17	   adaptation and feedback-based energy efficient mechanisms to be
+18	   implemented.  The message format has broad applicability in real-time
+19	   video communication services.  Specifically, it can be used for the
+20	   ISO/IEC International Standard 23001-11, known as Energy Efficient
+21	   Media Consumption (Green metadata), developed by the ISO/IEC JTC
+22	   1/SC29/WG3 MPEG Systems.
+
+24	Status of This Memo
+
+26	   This Internet-Draft is submitted in full conformance with the
+27	   provisions of BCP 78 and BCP 79.
+
+29	   Internet-Drafts are working documents of the Internet Engineering
+30	   Task Force (IETF).  Note that other groups may also distribute
+31	   working documents as Internet-Drafts.  The list of current Internet-
+32	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+34	   Internet-Drafts are draft documents valid for a maximum of six months
+35	   and may be updated, replaced, or obsoleted by other documents at any
+36	   time.  It is inappropriate to use Internet-Drafts as reference
+37	   material or to cite them other than as "work in progress."
+
+39	   This Internet-Draft will expire on 2 January 2027.
+
+41	Copyright Notice
+
+43	   Copyright (c) 2026 IETF Trust and the persons identified as the
+44	   document authors.  All rights reserved.
+
+46	   This document is subject to BCP 78 and the IETF Trust's Legal
+47	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+48	   license-info) in effect on the date of publication of this document.
+49	   Please review these documents carefully, as they describe your rights
+50	   and restrictions with respect to this document.  Code Components
+51	   extracted from this document must include Revised BSD License text as
+52	   described in Section 4.e of the Trust Legal Provisions and are
+53	   provided without warranty as described in the Revised BSD License.
+
+55	Table of Contents
+
+57	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+58	   2.  Conventions . . . . . . . . . . . . . . . . . . . . . . . . .   3
+59	   3.  Abbreviations . . . . . . . . . . . . . . . . . . . . . . . .   4
+60	   4.  Format of RTCP Feedback Messages  . . . . . . . . . . . . . .   4
+61	     4.1.  Temporal-Spatial Resolution Request . . . . . . . . . . .   4
+62	       4.1.1.  Message format  . . . . . . . . . . . . . . . . . . .   5
+63	       4.1.2.  Semantics . . . . . . . . . . . . . . . . . . . . . .   6
+64	       4.1.3.  Timing Rules  . . . . . . . . . . . . . . . . . . . .   6
+65	       4.1.4.  Handling of Message in Mixers and Translators . . . .   7
+66	     4.2.  Temporal-Spatial Resolution Notification (TSRN) . . . . .   7
+67	       4.2.1.  Message format  . . . . . . . . . . . . . . . . . . .   7
+68	       4.2.2.  Semantics . . . . . . . . . . . . . . . . . . . . . .   8
+69	       4.2.3.  Timing Rules  . . . . . . . . . . . . . . . . . . . .   9
+70	       4.2.4.  Handling of TSRN in Mixers and Translators  . . . . .   9
+71	   5.  Security Considerations . . . . . . . . . . . . . . . . . . .   9
+72	   6.  SDP Definitions . . . . . . . . . . . . . . . . . . . . . . .  10
+73	     6.1.  Extension of the rtcp-fb Attribute  . . . . . . . . . . .  10
+74	     6.2.  Examples  . . . . . . . . . . . . . . . . . . . . . . . .  10
+75	       6.2.1.  Example 1 . . . . . . . . . . . . . . . . . . . . . .  10
+76	       6.2.2.  Example 2 . . . . . . . . . . . . . . . . . . . . . .  11
+77	   7.  Operational Considerations  . . . . . . . . . . . . . . . . .  12
+78	   8.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  12
+79	     8.1.  FMT values  . . . . . . . . . . . . . . . . . . . . . . .  13
+80	     8.2.  SDP Parameters  . . . . . . . . . . . . . . . . . . . . .  13
+81	   9.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  13
+82	     9.1.  Normative References  . . . . . . . . . . . . . . . . . .  13
+83	     9.2.  Informative References  . . . . . . . . . . . . . . . . .  14
+84	   Appendix A.  Change History . . . . . . . . . . . . . . . . . . .  15
+85	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  16
+
+87	1.  Introduction
+
+89	   ISO/IEC 23001-11 specification, Energy Efficient Media Consumption
+90	   (Green Metadata) [GreenMetadata], specifies metadata that may help
+91	   optimize energy usage in the encoding, decoding, and display
+92	   processes.  New metadata and quality metrics have been specified in
+93	   the 3rd edition of green metadata specification to support H.266 and
+94	   ISO/IEC 23090-3 [VVC], and ISO/IEC 23094-1 [EVC] in addition to ITU-T
+95	   Recommendation H.264 and ISO/IEC 14496-10 [AVC], H.265 and ISO/IEC
+96	   23008-5 [HEVC].
+
+98	   Two main types of metadata are defined in the document.  The first
+99	   type consists of metadata generated by a video encoder which provides
+100	   information about the decoding complexity of the delivered bitstream
+101	   and about the quality of the decoded content.  This first type of
+102	   metadata is conveyed via the supplemental enhancement information
+103	   (SEI) message mechanism specified in the video coding standard ITU-T
+104	   Recommendation H.264 and ISO/IEC 14496-10 [AVC], H.265 and ISO/IEC
+105	   23008-5 [HEVC], H.266 and ISO/IEC 23090-3 [VVC].
+
+107	   The second type consists of metadata generated by a decoder as
+108	   feedback conveyed to the encoder to adapt the decoder energy
+109	   consumption.  This document focuses on this second type of metadata
+110	   which is conveyed as extension of RTP Control Protocol (RTCP)
+111	   feedback messages [RFC4585].  The feedback in the second type of
+112	   metadata specified in ISO/IEC 23001-11 [GreenMetadata] includes
+113	   decoder operations reduction request, coding tools configuration
+114	   request and temporal and spatial scaling request.  This document
+115	   defines new RTCP message formats for the temporal and spatial
+116	   resolution request and notification feedback message.
+
+118	   The carriage of green metadata is specified in ISO/IEC 23001-19
+119	   [GreenMetadataCarriage], including storage and carriage of green
+120	   metadata using the ISO Base Media File Format (ISOBMFF) as specified
+121	   in ISO/IEC 23001-10 [TimedMetadata] and encapsulation, signalling,
+122	   and streaming of green metadata data in a media streaming system,
+123	   e.g., dynamic adaptive streaming over HTTP (DASH) as specified in
+124	   ISO/IEC 23009-1 [DASH].
+
+126	   The primary use case for RTCP messages for temporal and spatial
+127	   resolution is point-to-point video conferencing.  In such a scenario,
+128	   each endpoint functions as both a transmitter and a receiver, and the
+129	   conferencing session may be scheduled in advance.  When a receiver
+130	   operating on battery power can estimate its power consumption rate
+131	   and, if necessary, request a reduction in pixel rate to ensure
+132	   completion of the scheduled session.  Furthermore, when multiple
+133	   tasks share a processing unit and a software decoder is allocated a
+134	   limited portion of the available resources, the receiver can, when
+135	   applicable, monitor real-time throughput and request a lower
+136	   resolution or frame rate that aligns with the decoder's processing
+137	   capability.
+
+139	2.  Conventions
+
+141	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+142	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+143	   "OPTIONAL" in this document are to be interpreted as described in BCP
+144	   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+145	   capitals, as shown here.
+
+147	3.  Abbreviations
+
+149	   AVPF: RTP Audio-Visual Profile with Feedback [RFC5104]
+
+151	   CCM: Codec Control Messages [RFC5104]
+
+153	   FCI: Feedback Control Information [RFC4585]
+
+155	   FMT: Feedback Message Type [RFC4585]
+
+157	   PSFB: Payload-specific FB message [RFC4585]
+
+159	   RTP: Real-time Transport Protocol [RFC3550]
+
+161	   RTCP: RTP Control Protocol [RFC3550]
+
+163	   TSRN: Temporal-Spatial Resolution Notification
+
+165	   TSRR: Temporal-Spatial Resolution Request
+
+167	   Commonly-used RTP terms are defined in [RFC3550]
+
+169	4.  Format of RTCP Feedback Messages
+
+171	   This document extends the RTCP feedback messages defined in section
+172	   6.1 of [RFC4585] and [RFC5104] by defining a temporal-spatial
+173	   resolution feedback message.  The message can be used by the receiver
+174	   to inform the sender of the desirable coding temporal resolution
+175	   (frame rate) and spatial resolution of the bitstream delivered, and
+176	   by the sender to indicate the coding temporal and spatial resolution
+177	   it will use henceforth.
+
+179	   RTCP temporal-spatial resolution feedback message follows a similar
+180	   message format as RTCP Temporal-Spatial Trade-off Request and
+181	   Notification [RFC5104].  The message may be sent in a regular full
+182	   compound RTCP packet or in an early RTCP packet, as per the RTP/AVPF
+183	   rules.
+
+185	   This document specifies two additional payload-specific feedback
+186	   messages: Temporal-Spatial Resolution Request (TSRR) and Temporal-
+187	   Spatial Resolution Notification (TSRN)
+
+189	4.1.  Temporal-Spatial Resolution Request
+
+191	   The TSRR feedback message is identified by RTCP packet type value
+192	   PT=PSFB and FMT=TBD1.
+
+194	   - To RFC Editor: please remove this note before publication: These
+195	   TBD1 value are to be confirmed by IANA -
+
+197	   The FCI field SHALL contain at least one TSRR FCI entries.
+
+199	4.1.1.  Message format
+
+201	   The content of the FCI entry for the Temporal-Spatial Resolution
+202	   Request (TSRR) is depicted in Figure 1.
+
+204	    0                   1                   2                   3
+205	    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+206	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+207	   |                              SSRC                             |
+208	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+209	   |   Seq nr.     |            Rsvd           |   Frame Rate      |
+210	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+211	   |     Picture Width         |   Picture Height          | Rsvd  |
+212	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+214	            Figure 1: Syntax of an FCI Entry in the TSRR Message
+
+216	   SSRC (32 bits): The Synchronization Source (SSRC) of the media sender
+217	   that is requested to apply the frame rate and picture resolution.
+
+219	   Within the common packet header for feedback messages (as defined in
+220	   section 6.1 of [RFC4585]), the "SSRC of packet sender" field
+221	   indicates the source of the request, and the "SSRC of media source"
+222	   is not used and SHALL be set to 0.  The SSRCs of the media senders to
+223	   which the TSRR applies are in the corresponding FCI entries.
+
+225	   Seq nr. (8 bits): Request sequence number.  The sequence number space
+226	   is unique for pairing of the SSRC of request source and the SSRC of
+227	   the request target.  The sequence number SHALL be increased by 1
+228	   modulo 256 for each new command.  A repetition SHALL NOT increase the
+229	   sequence number.  The initial value is arbitrary.
+
+231	   Rsvd (14 bits): All reserved bits SHALL be set to 0 by the sender and
+232	   SHALL be ignored on reception.
+
+234	   Frame Rate (10 bits): The requested frame rate in frames per second.
+235	   This field is equivalent to the frames_per_second as defined in
+236	   clause 6.3 of [GreenMetadata].  An integer value between 1 and 1023
+237	   that indicates the coding frame rate that is requested.  The value of
+238	   Frame Rate equal to 0 MUST NOT be sent.
+
+240	   Picture Width (14 bits): The requested picture width in the units of
+241	   luma samples.  This field is equivalent to the
+242	   pic_width_in_luma_samples defined in clause 6.3 of [GreenMetadata].
+243	   An integer value between 1 and 16383 that indicates the coding
+244	   picture width in the units of luma samples that is requested.  The
+245	   value of Picture Width equal to 0 MUST NOT be sent.
+
+247	   Picture Height (14 bits): The requested picture height in the units
+248	   of luma samples.  This field is equivalent to the
+249	   pic_height_in_luma_samples defined in clause 6.3 of [GreenMetadata].
+250	   An integer value between 1 and 16383 that indicates the coding
+251	   picture height in the units of luma samples that is requested.  The
+252	   value of Picture Height equal to 0 MUST NOT be sent.
+
+254	   Rsvd (4 bits): All reserved bits SHALL be set to 0 by the sender and
+255	   SHALL be ignored on reception.
+
+257	4.1.2.  Semantics
+
+259	   A decoder can suggest a temporal-spatial resolution by sending a TSRR
+260	   message to an encoder.  If the encoder is capable of adjusting its
+261	   temporal-spatial resolution, it MAY take into account the received
+262	   TSRR message for future coding of pictures.  The temporal and spatial
+263	   resolutions in a TSRR message SHALL be less than or equal to the
+264	   temporal and spatial resolutions negotiated via SDP.  The frame rate
+265	   may be signaled using the SDP framerate attribute [RFC8866].  The
+266	   picture width and height may be signaled using the SDP imageattr
+267	   attribute [RFC6236], or derived from the SDP codec-specific fmtp
+268	   parameters such as profile-level-id [RFC6184] as the codec profile
+269	   and level specify the maximum luma picture size.
+
+271	   The selected Frame Rate, Picture Width and Picture Height SHALL be
+272	   communicated to the media receivers by means of the TSRN message (see
+273	   Section 4.2).
+
+275	   A TSRR message MAY contain requests to multiple media senders, using
+276	   one FCI entry per target media sender.
+
+278	4.1.3.  Timing Rules
+
+280	   The timing follows the rules outlined in section 3 of [RFC4585].
+281	   This request message is not time critical and SHOULD be sent using
+282	   regular RTCP timing.  When the user requires quick feedback, the
+283	   message MAY be sent with early or immediate feedback timing.
+
+285	4.1.4.  Handling of Message in Mixers and Translators
+
+287	   A mixer or media translator (see Section 2.3 of [RFC3550]) that
+288	   encodes content sent to the session participant issuing the TSRR
+289	   SHALL consider the request to determine if it can fulfill it by
+290	   changing its own encoding parameters.  A media translator unable to
+291	   fulfill the request MAY forward the request unaltered towards the
+292	   media sender.  A mixer encoding for multiple session participants
+293	   will need to consider the joint needs of these participants before
+294	   generating a TSRR on its own behalf towards the media sender.
+
+296	4.2.  Temporal-Spatial Resolution Notification (TSRN)
+
+298	   The TSRN message is identified by RTCP packet type value PT=PSFB and
+299	   FMT=TBD2.
+
+301	   - To RFC Editor: please remove this note before publication: These
+302	   TBD2 value are to be confirmed by IANA -
+
+304	   The FCI field SHALL contain at least one TSRN FCI entry.
+
+306	4.2.1.  Message format
+
+308	   The content of the FCI entry for the Temporal-Spatial Resolution
+309	   Notification (TSRN) is depicted in Figure 2.
+
+311	    0                   1                   2                   3
+312	    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+313	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+314	   |                              SSRC                             |
+315	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+316	   |   Seq nr.     |            Rsvd           |   Frame Rate      |
+317	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+318	   |     Picture Width         |     Picture Height        | Rsvd  |
+319	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+321	            Figure 2: Syntax of an FCI Entry in the TSRN Message
+
+323	   SSRC (32 bits): The Synchronization Source (SSRC) of the source of
+324	   the TSRR that resulted in this notification.
+
+326	   Within the common packet header for feedback messages (as defined in
+327	   section 6.1 of [RFC4585]), the "SSRC of packet sender" field
+328	   indicates the source of the Notification, and the "SSRC of media
+329	   source" is not used and SHALL be set to 0.  The SSRCs of the
+330	   requesting entities to which the Notification applies are in the
+331	   corresponding FCI entries.
+
+333	   Seq nr. (8 bits): The sequence number value from the TSRR that is
+334	   being acknowledged.
+
+336	   Rsvd (14 bits): All reserved bits SHALL be set to 0 by the sender and
+337	   SHALL be ignored on reception.
+
+339	   Frame Rate (10 bits): The frame rate in frames per second the media
+340	   sender is using henceforth.  The value of Frame Rate equal to 0 MUST
+341	   NOT be sent.
+
+343	   Picture Width (14 bits): The coding picture width in the units of
+344	   luma samples the media sender is using henceforth.  The value of
+345	   Picture Width equal to 0 MUST NOT be sent.
+
+347	   Picture Height (14 bits): The coding picture height in the units of
+348	   luma samples the media sender is using henceforth.  The value of
+349	   Picture Height equal to 0 MUST NOT be sent.
+
+351	   Rsvd (4 bits): All reserved bits SHALL be set to 0 by the sender and
+352	   SHALL be ignored on reception.
+
+354	   It is to note that the returned value (Frame Rate, Picture Width,
+355	   Picture Height) may differ from the requested one, for example, in
+356	   cases where a media encoder cannot change its frame rate or picture
+357	   resolution, or when the requested temporal and spatial resolutions
+358	   are larger than the temporal and spatial resolutions negotiated via
+359	   SDP, or when pre-recorded content is used.
+
+361	4.2.2.  Semantics
+
+363	   This feedback message is used to acknowledge the reception of a TSRR.
+364	   For each TSRR received targeted at the session participant, a TSRN
+365	   FCI entry SHALL be sent in a TSRN feedback message.  A single TSRN
+366	   message MAY acknowledge multiple requests using multiple FCI entries.
+367	   The Frame Rate, Picture Width and Picture Height value included SHALL
+368	   be the same in all FCI entries of the TSRN message.  Including an FCI
+369	   for each requestor allows each requesting entity to determine that
+370	   the media sender received the request.  The notification SHALL also
+371	   be sent in response to TSRR repetitions received.  If the request
+372	   receiver has received TSRR with several different sequence numbers
+373	   from a single requestor, it SHALL only respond to the request with
+374	   the highest (modulo 256) sequence number.  Note that the highest
+375	   sequence number could be a smaller integer value due to the wrapping
+376	   of the field.  Appendix A.1 of [RFC3550] has an algorithm for keeping
+377	   track of the highest received sequence number for RTP packets; it
+378	   could be adapted for this usage.
+
+380	   The TSRN SHALL include the Temporal-Spatial Resolution Frame Rate,
+381	   Picture Width and Picture Height that will be used as a result of the
+382	   request.  This is not necessarily the same Frame Rate, Picture Width
+383	   and Picture Height as requested, as the media sender may need to
+384	   aggregate requests from several requesting session participants.  It
+385	   may also have some other policies or rules that limit the selection.
+
+387	4.2.3.  Timing Rules
+
+389	   The timing follows the rules outlined in section 3 of [RFC4585].
+390	   This acknowledgement message is not extremely time critical and
+391	   SHOULD be sent using regular RTCP timing.
+
+393	4.2.4.  Handling of TSRN in Mixers and Translators
+
+395	   A mixer or translator (see Section 2.3 of [RFC3550]) that acts upon a
+396	   TSRR SHALL also send the corresponding TSRN.  In cases where it needs
+397	   to forward a TSRR itself, the notification message MAY need to be
+398	   delayed until the TSRR has been responded to.
+
+400	5.  Security Considerations
+
+402	   The defined messages have certain properties that have security
+403	   implications.  These must be addressed and taken into account by
+404	   users of this protocol.
+
+406	   Spoofed or maliciously created feedback messages of the type defined
+407	   in this document can have the following implications:
+
+409	   *  severely reduced picture resolution due to false TSRR messages
+410	      that sets the picture width and height to a very low value;
+
+412	   *  severely reduced frame rate due to false TSRR messages that sets
+413	      the frame rate to a very low value.
+
+415	   *  severely increased picture resolution due to false TSRR messages
+416	      that sets the picture width and height to a value that is larger
+417	      than the value negotiated via SDP;
+
+419	   *  severely increased frame rate due to false TSRR messages that sets
+420	      the frame rate to a value that is larger than the value negotiated
+421	      via SDP.
+
+423	   *  severely frequent requests that set the picture width, height and/
+424	      or frame rate.
+
+426	   To prevent these attacks, there is a need to apply authentication and
+427	   integrity protection of the feedback messages.  This can be
+428	   accomplished against threats external to the current RTP session
+429	   using the RTP profile that combines Secure RTP [SRTP] and AVPF into
+430	   SAVPF [SAVPF].  In the mixer cases, separate security contexts and
+431	   filtering can be applied between the mixer and the participants, thus
+432	   protecting other users on the mixer from a misbehaving participant.
+433	   The security considerations
+
+435	   [RFC4585] specifies the timing rules governing the transmission of
+436	   RTCP feedback messages and discusses the security implications of
+437	   violating those rules.  Implementations of TSRR are expected to
+438	   follow the RTCP timing procedures in [RFC4585].  Excessively frequent
+439	   TSRR requests may indicate either a non-compliant implementation or a
+440	   malicious attempt to increase processing or network load, senders and
+441	   receivers SHOULD behave conservatively when observing unusual or
+442	   unexpected reporting behavior.
+
+444	6.  SDP Definitions
+
+446	   The capability of handling messages defined in this document MAY be
+447	   exchanged at a higher layer such as SDP.  This document follows all
+448	   the rules defined in AVPF [RFC4585] and CCM [RFC5104] for an "rtcp-
+449	   fb" attribute relating to the payload type in a session description.
+
+451	6.1.  Extension of the rtcp-fb Attribute
+
+453	   This document defines a new parameter "tsrr" to the "ccm" feedback
+454	   value defined in CCM [RFC5104] to indicate support of the Temporal-
+455	   Spatial Resolution Request/Notification (TSRR/TSRN).  All the rules
+456	   described in [RFC4585] for rtcp-fb attribute relating to payload type
+457	   and to multiple rtcp-fb attributes in a session description also
+458	   apply to the new feedback messages defined in this document.
+
+460	   The following ABNF [RFC5234] rule extends the definition of "rtcp-fb-
+461	   ccm-param" in section 7.1 of [RFC5104]:
+
+463	       rtcp-fb-ccm-param  =/ SP "tsrr"   ; Temporal-Spatial Resolution
+
+465	6.2.  Examples
+
+467	6.2.1.  Example 1
+
+469	   The following SDP describes a point-to-point video call with H.266,
+470	   with the originator of the call declaring its capability to support
+471	   the FIR and TSRR/TSRN codec control messages.  The SDP is carried in
+472	   a high-level signaling protocol like SIP.
+
+474	       v=0
+475	       o=alice 3203093520 3203093520 IN IP4 host.example.com
+476	       s=Point-to-Point call
+477	       c=IN IP4 192.0.2.124
+478	       m=audio 49170 RTP/AVP 0
+479	       a=rtpmap:0 PCMU/8000
+480	       m=video 51372 RTP/AVPF 98
+481	       a=rtpmap:98 H266/90000
+482	       a=rtcp-fb:98 ccm tsrr
+483	       a=rtcp-fb:98 ccm fir
+
+485	                                  Figure 3
+
+487	   When the sender receives a TSRR message from the remote party, it is
+488	   capable of adjusting the temporal or spatial resolutionas indicated
+489	   in the RTCP TSRN feedback message.
+
+491	6.2.2.  Example 2
+
+493	   This example illustrates how support for codec control messages is
+494	   negotiated using the SDP Offer/Answer model.  The offerer includes
+495	   support for "tstr", "fir", and "tsrr".  The answerer accepts only
+496	   "tstr" and "fir", thus rejecting "tsrr".  The purpose of this example
+497	   is to illustrate that support for "tsrr" is not carried forward into
+498	   the answer and is therefore not negotiated for use in the session.
+
+500	   The offerer wishes to support "tstr", "fir" and "tsrr".  The offered
+501	   SDP is
+
+503	       -------------> Offer
+504	       v=0
+505	       o=alice 3203093520 3203093520 IN IP4 host.example.com
+506	       s=Offer/Answer
+507	       c=IN IP4 192.0.2.124
+508	       m=audio 49170 RTP/AVP 0
+509	       a=rtpmap:0 PCMU/8000
+510	       m=video 51372 RTP/AVPF 98
+511	       a=rtpmap:98 H266/90000
+512	       a=rtcp-fb:98 ccm tstr
+513	       a=rtcp-fb:98 ccm fir
+514	       a=rtcp-fb:* ccm tsrr
+
+516	                                  Figure 4
+
+518	   The answerer wishes to support only the FIR and TSTR/TSTN messages
+519	   and the answerer SDP is
+520	       ---------------- Answer
+521	       v=0
+522	       o=alice 3203093520 3203093524 IN IP4 otherhost.example.com
+523	       s=Offer/Answer
+524	       c=IN IP4 192.0.2.37
+525	       m=audio 47190 RTP/AVP 0
+526	       a=rtpmap:0 PCMU/8000
+527	       m=video 53273 RTP/AVPF 98
+528	       a=rtpmap:98 H266/90000
+529	       a=rtcp-fb:98 ccm tstr
+530	       a=rtcp-fb:98 ccm fir
+
+532	                                  Figure 5
+
+534	   This demonstrates that only the intersection of supported codec
+535	   control messages is retained after negotiation.
+
+537	7.  Operational Considerations
+
+539	   *  This is a change that needs to be implemented at both endpoints,
+540	      implementing at only one endpoint will result in no change to the
+541	      RTP service.
+
+543	   *  Remote support for this RFC is indicated by receiving a TSRR
+544	      message from a remote party using SDP (see Section 6) and
+545	      confirmed by receiving a valid TSRR feedback message.
+
+547	   *  A mixer or translator needs to be updated to support the TSRR
+548	      message if it wishes to interact with the protocol (see
+549	      Section 4.2.4).
+
+551	   *  Operational security considerations are provided in the security
+552	      considerations (see Section 5).
+
+554	   *  The quality of experience may be impacted by honoring inadequate
+555	      suggestions from a receiver (e.g., default values).  Users may
+556	      complain about the quality of service that was lowered because of
+557	      such adjustment queries.  Operators deploying media senders should
+558	      be aware of that risk and may calibrate hints that they can
+559	      accommodate (acceptable ranges).  Tools and procedures for service
+560	      level agreement (SLA) fulfillment and assurance should take this
+561	      into account.
+
+563	8.  IANA Considerations
+564	8.1.  FMT values
+
+566	   IANA is requested to allocate the following two new Values in the
+567	   "FMT Values for PSFB Payload Types" registry in the "Real-Time
+568	   Transport Protocol (RTP) Parameters" registry group
+569	   [IANA-RTCP-FMT-PSFB-PT]:
+
+571	   Value: TBD1
+572	   Name: TSRR
+573	   Long Name: Temporal-Spatial Resolution Request
+574	   Reference: Section 4.1 of this RFC
+
+576	   Value: TBD2
+577	   Name: TSRN
+578	   Long Name: Temporal-Spatial Resolution Notification
+579	   Reference: Section 4.2 of this RFC
+
+581	8.2.  SDP Parameters
+
+583	   IANA is requested to register the following in the "Codec Control
+584	   Messages" registry in the "Session Description Protocol (SDP)
+585	   Parameters" registry group [IANA-SDP]:
+
+587	   Value Name: tsrr
+
+589	   Long Name: Temporal-Spatial Resolution
+
+591	   Usable with: ccm
+
+593	   Mux: IDENTICAL-PER-PT
+
+595	   Reference: Section 6.1 of this RFC
+
+597	9.  References
+
+599	9.1.  Normative References
+
+601	   [GreenMetadata]
+602	              "ISO/IEC FDIS 23001-11, Information technology - MPEG
+603	              Systems Technologies - Part 11: Energy-Efficient Media
+604	              Consumption (green metadata)", 2023,
+605	              <https://www.iso.org/standard/83674.html>.
+
+607	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+608	              Requirement Levels", BCP 14, RFC 2119,
+609	              DOI 10.17487/RFC2119, March 1997,
+610	              <https://www.rfc-editor.org/info/rfc2119>.
+
+612	   [RFC3550]  Schulzrinne, H., Casner, S., Frederick, R., and V.
+613	              Jacobson, "RTP: A Transport Protocol for Real-Time
+614	              Applications", STD 64, RFC 3550, DOI 10.17487/RFC3550,
+615	              July 2003, <https://www.rfc-editor.org/info/rfc3550>.
+
+617	   [RFC4585]  Ott, J., Wenger, S., Sato, N., Burmeister, C., and J. Rey,
+618	              "Extended RTP Profile for Real-time Transport Control
+619	              Protocol (RTCP)-Based Feedback (RTP/AVPF)", RFC 4585,
+620	              DOI 10.17487/RFC4585, July 2006,
+621	              <https://www.rfc-editor.org/info/rfc4585>.
+
+623	   [RFC5104]  Wenger, S., Chandra, U., Westerlund, M., and B. Burman,
+624	              "Codec Control Messages in the RTP Audio-Visual Profile
+625	              with Feedback (AVPF)", RFC 5104, DOI 10.17487/RFC5104,
+626	              February 2008, <https://www.rfc-editor.org/info/rfc5104>.
+
+628	   [RFC5234]  Ed, D. and P. Overell, "Augmented BNF for Syntax
+629	              Specifications: ABNF", RFC 5234, DOI 10.17487/RFC5234,
+630	              January 2008, <https://www.rfc-editor.org/info/rfc5234>.
+
+632	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+633	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+634	              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+636	9.2.  Informative References
+
+638	   [AVC]      "Advanced video coding, ITU-T Recommendation H.264", 2021,
+639	              <https://www.itu.int/rec/T-REC-H.264>.
+
+641	   [DASH]     "Information technology - Dynamic adaptive streaming over
+642	              HTTP (DASH) Part 1: Media presentation description and
+643	              segment formats", 2022,
+644	              <https://www.iso.org/standard/83314.html>.
+
+646	   [EVC]      "Information technology - General video coding Part 1:
+647	              Essential video coding", 2020,
+648	              <https://www.iso.org/standard/57797.html>.
+
+650	   [GreenMetadataCarriage]
+651	              "Information technology - MPEG systems technologies Part
+652	              19: Carriage of green metadata", 2025,
+653	              <https://www.iso.org/standard/90211.html>.
+
+655	   [HEVC]     "High efficiency video coding, ITU-T Recommendation
+656	              H.265", 2021, <https://www.itu.int/rec/T-REC-H.265>.
+
+658	   [IANA-RTCP-FMT-PSFB-PT]
+659	              "IANA-RTCP-FMT-PSFB-PT", 2025,
+660	              <https://www.iana.org/assignments/rtp-parameters/rtp-
+661	              parameters.xhtml#rtp-parameters>.
+
+663	   [IANA-SDP] "IANA-SDP", 2026, <https://www.iana.org/assignments/sdp-
+664	              parameters/sdp-parameters.xhtml>.
+
+666	   [RFC6184]  Wang, Y.-K., Even, R., Kristensen, T., and R. Jesup, "RTP
+667	              Payload Format for H.264 Video", BCP 14, RFC 6184,
+668	              DOI 10.17487/RFC6184, May 2011,
+669	              <https://www.rfc-editor.org/info/rfc6184>.
+
+671	   [RFC6236]  Johansson, I. and K. June, "Negotiation of Generic Image
+672	              Attributes in the Session Description Protocol (SDP)",
+673	              BCP 14, RFC 6236, DOI 10.17487/RFC6236, May 2011,
+674	              <https://www.rfc-editor.org/info/rfc6236>.
+
+676	   [RFC8866]  Begen, B., Kyzivat, P., Perkins, C., and M. Handley, "SDP:
+677	              Session Description Protocol", BCP 14, RFC 8866,
+678	              DOI 10.17487/RFC8866, January 2021,
+679	              <https://www.rfc-editor.org/info/rfc8866>.
+
+681	   [SAVPF]    Ott, J. and E. Carrara, "Extended Secure RTP Profile for
+682	              RTCP-based Feedback (RTP/SAVPF)", 2008,
+683	              <https://datatracker.ietf.org/doc/pdf/rfc5124>.
+
+685	   [SRTP]     Baugher, M., McGrew, D., Naslund, M., Carrara, E., and K.
+686	              Norrman, "The Secure Real-time Transport Protocol(SRTP)",
+687	              2004, <https://datatracker.ietf.org/doc/pdf/rfc3711>.
+
+689	   [TimedMetadata]
+690	              "Information technology - MPEG systems technologies Part
+691	              10: Carriage of timed metadata metrics of media in ISO
+692	              base media file format", 2020,
+693	              <https://www.iso.org/standard/78824.html>.
+
+695	   [VVC]      "Versatile Video Coding, ITU-T Recommendation H.266",
+696	              2022, <http://www.itu.int/rec/T-REC-H.266>.
+
+698	Appendix A.  Change History
+
+700	   - To RFC Editor: PLEASE REMOVE ThIS SECTION BEFORE PUBLICATION -
+
+702	   draft-ietf-avtcore-rtcp-green-metadata-00 ....initial version
+
+704	   draft-ietf-avtcore-rtcp-green-metadata-01 ....title and editorial
+705	   changes
+706	   draft-ietf-avtcore-rtcp-green-metadata-02 ....editorial changes
+
+708	   draft-ietf-avtcore-rtcp-green-metadata-03 ....no changes
+
+710	   draft-ietf-avtcore-rtcp-green-metadata-04 ....no changes
+
+712	   draft-ietf-avtcore-rtcp-green-metadata-05 ....editorial changes
+
+714	   draft-ietf-avtcore-rtcp-green-metadata-06 ....no changes
+
+716	   draft-ietf-avtcore-rtcp-green-metadata-07 ....editorial changes
+
+718	   draft-ietf-avtcore-rtcp-green-metadata-08 ....editorial changes
+
+720	   draft-ietf-avtcore-rtcp-green-metadata-09 ....editorial changes
+
+722	   draft-ietf-avtcore-rtcp-green-metadata-10 ....editorial changes
+
+724	   draft-ietf-avtcore-rtcp-green-metadata-11 ....editorial changes
+
+726	   draft-ietf-avtcore-rtcp-green-metadata-12 ....editorial changes
+
+728	   draft-ietf-avtcore-rtcp-green-metadata-13 ....editorial changes
+
+730	Authors' Addresses
+
+732	   Yong He
+733	   Qualcomm
+734	   5775 Morehouse Drive
+735	   San Diego,  92121
+736	   United States of America
+737	   Email: yonghe@qti.qualcomm.com
+
+739	   Christian Herglotz
+740	   FAU
+741	   Schlossplatz 4
+742	   91054 Erlangen
+743	   Germany
+744	   Email: christian.herglotz@fau.de
+
+746	   Edouard Francois
+747	   InterDigital
+748	   975 Avenue des Champs Blancs
+749	   35576 Cesson-Sevigne
+750	   France
+751	   Email: edouard.francois@interdigital.com
+
+
+
+
+
+
+
+
+
