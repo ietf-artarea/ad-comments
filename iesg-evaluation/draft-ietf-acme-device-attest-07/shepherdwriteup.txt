@@ -1,0 +1,174 @@
+UPDATE June 2, 2026:
+During the WGLC period between January and May, two additional authors (Corey
+Bonnell and Ryan Hurst) were added to help address technical feedback that
+required design work outside the depth of the original authors. Additionally, a
+new Contributors section was added to recognize the design and implementation
+contributions of Mariano Cano and Herman Slatman during the early phase of this
+draft's development.
+
+# Document Shepherd Write-Up for Group Documents
+
+*This version is dated 8 December 2025.*
+Document History
+1. Does the working group (WG) consensus represent the strong concurrence of a
+few individuals, with others being silent, or did it reach broad agreement?
+
+This document, as a whole, has been non-contentious since it is documenting a
+technology already in wide adoption. There has not been much debate, but mainly
+because I think its usefulness as an RFC is obvious.
+
+2. Was there controversy about particular points, or were there decisions where
+the consensus was particularly rough?
+
+There has been spirited debate about how this document interacts with the RATS
+WG, <a href="/doc/draft-liu-acme-rats/">draft-liu-acme-rats</a>, and <a href="/doc/draft-ietf-acme-client/">draft-ietf-acme-client</a>; but the debate has been
+about what content should be in the other drafts; this document is a
+well-scoped, self-contained, and broadly-deployed technology, so nobody
+suggested changing it.
+
+3. Has anyone threatened an appeal or otherwise indicated extreme discontent? If
+so, please summarize the areas of conflict in separate email messages to the
+responsible Area Director. (It should be in a separate email because this
+questionnaire is publicly available.)
+
+No.
+
+4. For protocol documents, are there existing implementations of the contents of
+the document? Have a significant number of potential implementers indicated
+plans to implement? Are any existing implementations reported somewhere,
+either in the document itself (as <a href="/doc/rfc7942/">RFC 7942</a> recommends) or elsewhere
+(where)?
+
+The protocol described in this document is implemented in Android, among others.
+<a href="https://developer.android.com/privacy-and-security/security-key-attestation">https://developer.android.com/privacy-and-security/security-key-attestation</a>
+We know that several public and private CAs support or intend to support
+carrying this data over ACME once an RFC exists. I have heard through the
+grapevine that CA/B Forum is waiting for an RFC and then will adopt this.
+
+Additional Reviews
+
+5. Do the contents of this document closely interact with technologies in other
+IETF working groups or external organizations, and would it therefore benefit
+from their review? Have those reviews occurred? If yes, describe which
+reviews took place.
+It interacts with IETF RATS WG, and W3C WebAuthn, but it is merely providing a
+way to transport those things over ACME, so I do not believe it requires review
+from those experts.
+
+6. Describe how the document meets any required formal expert review criteria,
+such as the MIB Doctor, YANG Doctor, media type, and URI type reviews.
+
+I don’t know. I don’t believe that any of this applies.
+
+7. If the document contains a YANG module, has the final version of the module
+been checked with any of the recommended validation tools for syntax and
+formatting validation? If there are any resulting errors or warnings, what is
+the justification for not fixing them at this time? Does the YANG module
+comply with the Network Management Datastore Architecture (NMDA) as specified
+in <a href="/doc/rfc8342/">RFC 8342</a>?
+
+It does not contain a YANG module.
+
+8. Describe reviews and automated checks performed to validate sections of the
+final version of the document written in a formal language, such as XML code,
+BNF rules, MIB definitions, CBOR's CDDL, etc.
+
+None, as far as I know.
+
+Document Shepherd Checks
+
+9. Based on the shepherd's review of the document, is it their opinion that this
+document is needed, clearly written, complete, correctly designed, and ready
+to be handed off to the responsible Area Director?
+
+Yes.
+
+10. Several IETF Areas have assembled lists of common issues that their
+reviewers encounter. For which areas have such issues been identified
+and addressed? For which does this still need to happen in subsequent
+reviews?
+
+This document would benefit from an HTTP dir review.
+
+11. What type of RFC publication is being requested on the IETF stream (Best
+Current Practice, Proposed Standard, Internet Standard,
+Informational, Experimental or Historic)? Why is this the proper type
+of RFC? Do all Datatracker state attributes correctly reflect this intent?
+This document should be Proposed Standard.
+I believe it is correctly tagged in Datatracker.
+
+12. Have reasonable efforts been made to remind all authors of the intellectual
+property rights (IPR) disclosure obligations described in <a href="/doc/bcp79/">BCP 79</a>? To
+the best of your knowledge, have all required disclosures been filed? If
+not, explain why. If yes, summarize any relevant discussion, including links
+to publicly-available messages when applicable.
+
+To my knowledge, there is no IPR relating to the new ACME mechanism defined in
+this document; I have no idea if the same statement is true of the re-packaged
+W3C WebAuthn payload which is a mandatory-to-implement part of this document.
+Sven and Ganesh confirm as much. Brandon is unreachable.
+
+13. Has each author, editor, and contributor shown their willingness to be
+listed as such? If the total number of authors and editors on the front page
+is greater than five, please provide a justification.
+
+Yes.
+
+14. Document any remaining I-D nits in this document. Simply running the idnits
+tool is not enough; please review the "Content Guidelines" on
+<a href="http://authors.ietf.org">authors.ietf.org</a>. (Also note that the current idnits tool generates
+some incorrect warnings; a rewrite is underway.)
+
+Since the content is specific to WebAuthn, the authors received a WGLC comment
+to add the word “WebAuthn” somehow to the in-document title. I am not aware of
+any other violations of the content guidelines, but I also have not looked
+super carefully.
+
+15. Should any informative references be normative or vice-versa? See the IESG
+Statement on Normative and Informative References.
+
+All Normative references look reasonable to me to be Normative, except that
+maybe [<a href="/doc/rfc8809/">RFC8809</a>] could be moved to Informative?
+
+16. List any normative references that are not freely available to anyone. Did
+the community have sufficient access to review any such normative
+references?
+
+None.
+
+17. Are there any normative downward references (see <a href="/doc/rfc3967/">RFC 3967</a> and <a href="/doc/bcp97/">BCP
+97</a>) that are not already listed in the DOWNREF registry? If so,
+list them.
+[<a href="/doc/rfc8809/">RFC8809</a>] is Informational. This should be moved to Informative.
+[<a href="/doc/rfc2985/">RFC2985</a>] is Information, but already in DownRef registry.
+Everything else looks fine.
+
+18. Are there normative references to documents that are not ready to be
+submitted to the IESG for publication or are otherwise in an unclear state?
+If so, what is the plan for their completion?
+
+No.
+
+19. Will publication of this document change the status of any existing RFCs? If
+so, does the Datatracker metadata correctly reflect this and are those RFCs
+listed on the title page, in the abstract, and discussed in the
+introduction? If not, explain why and point to the part of the document
+where the relationship of this document to these other RFCs is discussed.
+
+No.
+
+20. Describe the document shepherd's review of the IANA considerations section,
+especially with regard to its consistency with the body of the document.
+Confirm that all aspects of the document requiring IANA assignments are
+associated with the appropriate reservations in IANA registries. Confirm
+that any referenced IANA registries have been clearly identified. Confirm
+that each newly created IANA registry specifies its initial contents,
+allocations procedures, and a reasonable name (see <a href="/doc/rfc8126/">RFC 8126</a>).
+This document has a fairly complex IANA Considerations, but it seems reasonable
+to create these registries in order to track which W3C-defined things are
+allowed in X.509 certificate requests.
+
+21. List any new IANA registries that require Designated Expert Review for
+future allocations. Are the instructions to the Designated Expert clear?
+Please include suggestions of designated experts, if appropriate.
+

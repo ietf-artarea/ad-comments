@@ -1,0 +1,980 @@
+idnits 2.17.1 
+
+draft-ietf-acme-device-attest-07.txt:
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     No nits found.
+
+--------------------------------------------------------------------------------
+
+
+2	ACME Working Group                                              B. Weeks
+3	Internet-Draft                                                Google Inc
+4	Intended status: Standards Track                              G. Mallaya
+5	Expires: 15 December 2026                                  AppViewX Inc.
+6	                                                               S. Rajala
+7	                                                               Keyfactor
+8	                                                              C. Bonnell
+9	                                                    TurboLight Solutions
+10	                                                                R. Hurst
+11	                                                       Peculiar Ventures
+12	                                                            13 June 2026
+
+14	 Automated Certificate Management Environment (ACME) Device Attestation
+15	                               Extension
+16	                    draft-ietf-acme-device-attest-07
+
+18	Abstract
+
+20	   This document specifies new identifiers and a challenge for the
+21	   Automated Certificate Management Environment (ACME) protocol which
+22	   allows validating the identity of a device using attestation.
+
+24	Status of This Memo
+
+26	   This Internet-Draft is submitted in full conformance with the
+27	   provisions of BCP 78 and BCP 79.
+
+29	   Internet-Drafts are working documents of the Internet Engineering
+30	   Task Force (IETF).  Note that other groups may also distribute
+31	   working documents as Internet-Drafts.  The list of current Internet-
+32	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+34	   Internet-Drafts are draft documents valid for a maximum of six months
+35	   and may be updated, replaced, or obsoleted by other documents at any
+36	   time.  It is inappropriate to use Internet-Drafts as reference
+37	   material or to cite them other than as "work in progress."
+
+39	   This Internet-Draft will expire on 15 December 2026.
+
+41	Copyright Notice
+
+43	   Copyright (c) 2026 IETF Trust and the persons identified as the
+44	   document authors.  All rights reserved.
+
+46	   This document is subject to BCP 78 and the IETF Trust's Legal
+47	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+48	   license-info) in effect on the date of publication of this document.
+49	   Please review these documents carefully, as they describe your rights
+50	   and restrictions with respect to this document.  Code Components
+51	   extracted from this document must include Revised BSD License text as
+52	   described in Section 4.e of the Trust Legal Provisions and are
+53	   provided without warranty as described in the Revised BSD License.
+
+55	Table of Contents
+
+57	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
+58	   2.  Conventions and Definitions . . . . . . . . . . . . . . . . .   4
+59	   3.  Permanent Identifier  . . . . . . . . . . . . . . . . . . . .   4
+60	     3.1.  Representation in Order resources . . . . . . . . . . . .   4
+61	     3.2.  Representation in Certificate Signing Requests (CSRs) and
+62	           X.509 Certificates  . . . . . . . . . . . . . . . . . . .   5
+63	   4.  Hardware Module . . . . . . . . . . . . . . . . . . . . . . .   6
+64	     4.1.  Representation in Order resources . . . . . . . . . . . .   7
+65	     4.2.  Representation in Certificate Signing Requests and X.509
+66	           Certificates  . . . . . . . . . . . . . . . . . . . . . .   7
+67	   5.  Device Attestation Challenge  . . . . . . . . . . . . . . . .   9
+68	   6.  Operational Considerations  . . . . . . . . . . . . . . . . .  11
+69	     6.1.  Enterprise PKI  . . . . . . . . . . . . . . . . . . . . .  11
+70	       6.1.1.  External Account Binding  . . . . . . . . . . . . . .  11
+71	       6.1.2.  Attestation Posture . . . . . . . . . . . . . . . . .  12
+72	       6.1.3.  Multiple Challenge Types  . . . . . . . . . . . . . .  12
+73	     6.2.  Attestation Trust . . . . . . . . . . . . . . . . . . . .  12
+74	   7.  Privacy Considerations  . . . . . . . . . . . . . . . . . . .  13
+75	     7.1.  Identification and Correlation  . . . . . . . . . . . . .  13
+76	     7.2.  Fingerprinting via Attestation Payloads . . . . . . . . .  14
+77	     7.3.  Secondary Use of Attestation Data . . . . . . . . . . . .  14
+78	     7.4.  Privacy-Preserving Certificate Issuance . . . . . . . . .  15
+79	     7.5.  Stored Data and Account Binding . . . . . . . . . . . . .  16
+80	     7.6.  Implementer Decision Guidance . . . . . . . . . . . . . .  16
+81	   8.  Security Considerations . . . . . . . . . . . . . . . . . . .  17
+82	   9.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  18
+83	     9.1.  ACME Identifier Types . . . . . . . . . . . . . . . . . .  18
+84	     9.2.  ACME Validation Method  . . . . . . . . . . . . . . . . .  18
+85	     9.3.  New Error Types . . . . . . . . . . . . . . . . . . . . .  19
+86	   10. References  . . . . . . . . . . . . . . . . . . . . . . . . .  19
+87	     10.1.  Normative References . . . . . . . . . . . . . . . . . .  19
+88	     10.2.  Informative References . . . . . . . . . . . . . . . . .  20
+89	   Acknowledgments . . . . . . . . . . . . . . . . . . . . . . . . .  20
+90	   Contributors  . . . . . . . . . . . . . . . . . . . . . . . . . .  20
+91	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  21
+
+93	1.  Introduction
+
+95	   The Automatic Certificate Management Environment (ACME) [RFC8555]
+96	   standard specifies methods for validating control over identifiers,
+97	   such as domain names.  It is also useful to be able to validate
+98	   properties of the device requesting the certificate, such as the
+99	   identity of the device and whether the certificate key is protected
+100	   by a secure cryptoprocessor.
+
+102	   Many operating systems and device vendors offer functionality
+103	   enabling a device to generate a cryptographic attestation of their
+104	   identity, such as:
+
+106	   *  Android Key Attestation
+107	      (https://source.android.com/security/keystore/attestation)
+
+109	   *  Chrome OS Verified Access (https://developers.google.com/chrome/
+110	      verified-access/overview)
+
+112	   *  Trusted Platform Module
+113	      (https://trustedcomputinggroup.org/resource/trusted-platform-
+114	      module-tpm-summary/)
+
+116	   *  Managed Device Attestation for Apple Devices
+117	      (https://support.apple.com/en-om/guide/deployment/dep28afbde6a/
+118	      web)
+
+120	   Using ACME and device attestation to issue client certificates for
+121	   enterprise PKI will be a common use case.  The following variances to
+122	   the ACME specification are described in this document:
+
+124	   *  Addition of permanent-identifier [RFC4043] and hardware-module
+125	      [RFC4108] identifier types.
+
+127	   *  Addition of the device-attest-01 challenge type to prove control
+128	      of the permanent-identifier and hardware-module identifier types.
+
+130	   *  The challenge response payload contains a serialized WebAuthn
+131	      attestation statement format instead of an empty JSON object ({}).
+
+133	   *  Accounts and external account binding being used as a mechanism to
+134	      pre-authenticate requests to an enterprise CA.
+
+136	   This document does not specify the attestation verification
+137	   procedures.  Section 13 of [WebAuthn] gives some guidance, however
+138	   verification procedures are complex and may require changes to
+139	   address future security issues.
+
+141	   Efforts are underway within the Remote ATtestation ProcedureS (RATS)
+142	   working group to define a set of standard formats and protocols for
+143	   attestation.  An explicit aim of this document is to support vendor
+144	   specific formats and protocols that are widely deployed at
+145	   publication time of this specification.
+
+147	2.  Conventions and Definitions
+
+149	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+150	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+151	   "OPTIONAL" in this document are to be interpreted as described in
+152	   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+153	   capitals, as shown here.
+
+155	3.  Permanent Identifier
+
+157	   A new identifier type, permanent-identifier is introduced to
+158	   represent the identity of a device assigned by the manufacturer,
+159	   typically a serial number.  Additionally, the assigner of the
+160	   identifier MAY also be specified.  The name of this identifier type
+161	   was chosen to align with [RFC4043].  This specification does not
+162	   prescribe the lifetime of the identifier, which is at the discretion
+163	   of the Assigner Authority.
+
+165	   Although [RFC4043] permits any valid UTF-8 string to be used as the
+166	   identifier, this specification mandates that identifiers MUST NOT
+167	   contain the forward-slash "/" (UTF-8: U+002F) character.  This
+168	   restriction is required to make the ABNF production rule for the
+169	   permanent-identifier-value unambiguous.
+
+171	3.1.  Representation in Order resources
+
+173	   The identifier's value field contains a UTF-8 string representation
+174	   of the identity of the device.  In addition to the value being a
+175	   valid UTF-8 string, the value MUST match the permanent-identifier-
+176	   value production rule as defined in this ABNF [RFC5234] syntax:
+
+178	assigner-value = first-and-second-components *("." component)
+179	first-and-second-components = (("0" / "1") "." (*1(%x31-33) %x30-39))) / ("2" "." component)
+180	component = "0" / (%x31-39 *%x30-39)
+181	device-identifier-value = 1*(%x00-2E / %x30-FF)
+
+183	permanent-identifier-value = device-identifier-value ["/" assigner-value]
+184	   A valid permanent-identifier-value value is a UTF-8 string that
+185	   contains an identity consisting of one or more characters without any
+186	   forward-slash "/" (UTF-8: U+002F) characters.  Optionally, a forward-
+187	   slash "/" character and "dotted-decimal" object identifier
+188	   identifying the assigner may follow the identity.  The assigner-value
+189	   is a dotted-decimal representation of an ASN.1 OBJECT IDENTIFIER.
+
+191	   The Server MUST verify that identifier values in newOrder requests
+192	   conform to the permanent-identifier-value production rule and MUST
+193	   reject requests containing non-conforming values with a "malformed"
+194	   error.
+
+196	   Example identifier without an assigner:
+
+198	   {
+199	     "type": "permanent-identifier",
+200	     "value": "ABCDEF123456"
+201	   }
+
+203	   Example identifier with an assigner:
+
+205	   {
+206	     "type": "permanent-identifier",
+207	     "value": "ABCDEF123456/1.2.3.4"
+208	   }
+
+210	3.2.  Representation in Certificate Signing Requests (CSRs) and X.509
+211	      Certificates
+
+213	   This section describes the X.509 representation of the permanent-
+214	   identifier.  Other credential types may use the same identifier
+215	   values with representations appropriate to those credential types.
+
+217	   The identity is included in the Subject Alternative Name Extension
+218	   using the identifierValue field of the PermanentIdentifier form
+219	   described in [RFC4043].  Although [RFC4043] permits the requester to
+220	   include the identifierValue in a serialNumber subject attribute, this
+221	   specification mandates that the identifierValue field of the
+222	   PermanentIdentifier MUST be present and MUST contain the identifier.
+
+224	   The value of the identifierValue field of the PermanentIdentifier
+225	   MUST be an octet-for-octet match of the device-identifier-value value
+226	   as encoded in the Order resource.  If the assigner-value value is
+227	   included in the identifier as encoded in the Order resource, then the
+228	   assigner field of the PermanentIdentifier MUST be the encoding of the
+229	   "dotted-decimal" object identifier encoded as the assigner-value
+230	   value.
+
+232	   This strict matching requirement ensures that the SAN in the issued
+233	   certificate appears exactly as it appeared during proof-of-ownership
+234	   validation, preventing identifier malleability.  Serial number
+235	   allocation schemes may be case-sensitive or otherwise sensitive to
+236	   exact byte representation, so no normalization or transformation is
+237	   permitted.
+
+239	   To ensure that the identifier as presented in the Order resource and
+240	   CSR match, the Server MUST perform the logical equivalent of
+241	   extracting the device-identifier-value and assigner-value values from
+242	   the CSR and reconstructing the UTF-8 representation of the
+243	   identifier.  The Server MUST then ensure that the UTF-8
+244	   representation and the identifier presented in the Order resource are
+245	   an octet-for-octet match and reject the Order otherwise.  Servers
+246	   that derive identifier values directly from verified attestation
+247	   evidence and construct the certificate SAN from that evidence,
+248	   provided the derived values are verified against the attested device
+249	   identity in the attestation statement, satisfy the intent of this
+250	   requirement.
+
+252	   [RFC8555] section 7.4 mandates that "The CSR MUST indicate the exact
+253	   same set of requested identifiers as the initial newOrder request".
+254	   However, there are some environments where the Server requires
+255	   validation of the identifier but does not include the identifier in
+256	   certificates due to privacy concerns.  To support privacy-preserving
+257	   certificates, Clients MAY omit this identifier in the certificate
+258	   signing request (CSR).  Similarly, if the Server wishes to issue
+259	   privacy-preserving certificates, it MAY reject CSRs containing a
+260	   PermanentIdentifier in the subjectAltName extension.  See the
+261	   Section 7 for more information.
+
+263	4.  Hardware Module
+
+265	   A new identifier type, hardware-module is introduced to represent the
+266	   identity of the secure crypto-processor that generated the
+267	   certificate key.  The identity is modeled after the
+268	   HardwareModuleName form described in [RFC4108].  It consists of two
+269	   components: an OBJECT IDENTIFIER to represent the type of hardware
+270	   module, and a serial number that identifies the specific hardware
+271	   module.
+
+273	   Although [RFC4108] specifies that serial numbers can be represented
+274	   as any sequence of bytes, this specification requires that serial
+275	   numbers MUST be representable as valid UTF-8 strings consisting of at
+276	   least one code point and MUST NOT contain a forward-slash "/" (UTF-8:
+277	   U+002F) character.  This restriction ensures that serial numbers can
+278	   be included in hardware-module identifier string values and that the
+279	   ABNF production rule for the value is unambiguous.
+
+281	4.1.  Representation in Order resources
+
+283	   The identifier's value field contains a UTF-8 string representation
+284	   of the identity of the hardware module.  In addition to the value
+285	   being a valid UTF-8 string, the value MUST match the hardware-module-
+286	   value production rule as defined in this ABNF [RFC5234] syntax:
+
+288	hw-type-value = first-and-second-components *("." component)
+289	first-and-second-components = (("0" / "1") "." (*1(%x31-33) %x30-39))) / ("2" "." component)
+290	component = "0" / (%x31-39 *%x30-39)
+291	hw-serial-num-value = 1*(%x00-2E / %x30-FF)
+
+293	hardware-module-value = hw-serial-num-value ["/" hw-type-value]
+
+295	   A valid hardware-module-value value is a UTF-8 string that contains a
+296	   serial number consisting of one or more characters without any
+297	   forward-slash "/" (UTF-8: U+002F) characters.  Optionally, a forward-
+298	   slash "/" character and "dotted-decimal" object identifier
+299	   identifying the hardware type may follow the serial number.
+
+301	   The Server MUST verify that identifier values in newOrder requests
+302	   conform to the hardware-module-value production rule and MUST reject
+303	   requests containing non-conforming values with a "malformed" error.
+
+305	   Example identifier with the type of the hardware module represented
+306	   using the OBJECT IDENTIFIER "1.2.3.4" and a serial number of "ABCD":
+
+308	   {
+309	     "type": `hardware-module`,
+310	     "value": "ABCD/1.2.3.4"
+311	   }
+
+313	   Example identifier with no type specified and a serial number of
+314	   "ABCD":
+
+316	   {
+317	     "type": `hardware-module`,
+318	     "value": "ABCD"
+319	   }
+
+321	4.2.  Representation in Certificate Signing Requests and X.509
+322	      Certificates
+
+324	   This section describes the X.509 representation of the hardware-
+325	   module identifier.  Other credential types may use the same
+326	   identifier values with representations appropriate to those
+327	   credential types.
+
+329	   The hardware module identity is included in the Subject Alternate
+330	   Name Extension using the HardwareModuleName form described in
+331	   [RFC4108].  The HardwareModuleName is encoded as an otherName with
+332	   the OID id-on-hardwareModuleName (1.3.6.1.5.5.7.8.4) and consists of:
+
+334	   *  hwType: An OBJECT IDENTIFIER that identifies the type of hardware
+335	      module
+
+337	   *  hwSerialNum: An OCTET STRING containing the hardware module serial
+338	      number
+
+340	   The value of the hwSerialNum field of the HardwareModuleName MUST be
+341	   an octet-for-octet match of the hw-serial-num-value value as encoded
+342	   in the Order resource.  If the hw-type-value value is included in the
+343	   identifier as encoded in the Order resource, then the hwType field of
+344	   the HardwareModuleName MUST be the encoding of the "dotted-decimal"
+345	   object identifier encoded as the hw-type-value value.
+
+347	   This strict matching requirement ensures that the SAN in the issued
+348	   certificate appears exactly as it appeared during proof-of-ownership
+349	   validation, preventing identifier malleability.  Serial number
+350	   allocation schemes may be case-sensitive or otherwise sensitive to
+351	   exact byte representation, so no normalization or transformation is
+352	   permitted.
+
+354	   To ensure that the identifier as presented in the Order resource and
+355	   CSR match, the Server MUST perform the logical equivalent of
+356	   extracting the hw-serial-num-value and hw-type-value values from the
+357	   CSR and reconstructing the UTF-8 representation of the identifier.
+358	   The Server MUST then ensure that the UTF-8 representation and the
+359	   identifier presented in the Order resource are an octet-for-octet
+360	   match and reject the Order otherwise.  Servers that derive identifier
+361	   values directly from verified attestation evidence and construct the
+362	   certificate SAN from that evidence, provided the derived values are
+363	   verified against the attested device identity in the attestation
+364	   statement, satisfy the intent of this requirement.
+
+366	   [RFC8555] section 7.4 mandates that "The CSR MUST indicate the exact
+367	   same set of requested identifiers as the initial newOrder request".
+368	   However, there are some environments where the Server requires
+369	   validation of the identifier but does not include the identifier in
+370	   certificates due to privacy concerns.  To support privacy-preserving
+371	   certificates, Clients MAY omit this identifier in the certificate
+372	   signing request (CSR).  Similarly, if the Server wishes to issue
+373	   privacy-preserving certificates, it MAY reject CSRs containing a
+374	   HardwareModuleName in the subjectAltName extension.  See the
+375	   Section 7 for more information.
+
+377	5.  Device Attestation Challenge
+
+379	   The Client can prove control over a permanent identifier of a device
+380	   by providing an attestation statement containing the identifier of
+381	   the device.
+
+383	   The device-attest-01 ACME challenge object has the following format:
+
+385	   type (required, string):  The string "device-attest-01".
+
+387	   token (required, string):  A random value that uniquely identifies
+388	      the challenge.
+
+390	   {
+391	     "type": "device-attest-01",
+392	     "url": "https://example.com/acme/chall/Rg5dV14Gh1Q",
+393	     "status": "pending",
+394	     "token": "evaGxfADs6pSRb2LAv9IZf17Dt3juxGJ-PCt92wr-oA"
+395	   }
+
+397	   A Client fulfills this challenge by constructing a key authorization
+398	   (Section 8.1 of [RFC8555]) from the "token" value provided in the
+399	   challenge and the Client's account key.  The Client then generates a
+400	   WebAuthn attestation object using the key authorization as the
+401	   challenge.
+
+403	   This specification borrows the WebAuthn _attestation object_
+404	   representation as described in Section 6.5.4 of [WebAuthn] for
+405	   encapsulating attestation formats, but with these modifications:
+
+407	   *  The key authorization is used to form _attToBeSigned_. This
+408	      replaces the concatenation of _authenticatorData_ and
+409	      _clientDataHash_. _attToBeSigned_ is hashed using an algorithm
+410	      specified by the attestation format.
+
+412	   *  Some attestation formats use an external attestation authority
+413	      that issues a certificate binding the challenge to the device
+414	      before the Client's account key is available.  In these formats,
+415	      _attToBeSigned_ is formed from the token alone rather than the
+416	      full key authorization, because the external authority signs at
+417	      attestation time before the account key thumbprint can be
+418	      incorporated.  The token construction provides freshness.  The key
+419	      authorization construction additionally binds the attestation to a
+420	      specific account key.  The Server MUST consult format-specific
+421	      documentation to determine which construction applies and MUST
+422	      verify accordingly.  Attestation formats whose signing procedure
+423	      does not incorporate _attToBeSigned_ cannot be used to satisfy
+424	      this challenge type.
+
+426	   *  The _authData_ field carries browser-context data (including the
+427	      RP ID hash) that has no meaning in the ACME context and SHOULD be
+428	      omitted.
+
+430	   A Client responds with the response object containing the WebAuthn
+431	   attestation object in the "attObj" field to acknowledge that the
+432	   challenge can be validated by the Server.  Clients MAY include
+433	   additional fields beyond "attObj" in the response object.  Servers
+434	   MUST ignore unrecognized fields in the challenge response.
+
+436	   On receiving a response, the Server constructs and stores the key
+437	   authorization from the challenge's "token" value and the current
+438	   Client account key.
+
+440	   To validate a device attestation challenge, the Server performs the
+441	   following steps:
+
+443	   1.  Perform the verification procedures described in Section 6 of
+444	       [WebAuthn].
+
+446	   2.  Verify that _attToBeSigned_ contains the key authorization or the
+447	       token, according to the construction required by the attestation
+448	       format, and that the value matches what the Server stored.
+
+450	   3.  Verify that the attestation statement contains a device
+451	       identifier and that it matches the identifier in the Order.  The
+452	       means by which the identifier is encoded in the attestation
+453	       statement are specific to the attestation format.
+
+455	   If any of the steps fail, then the Server MUST respond to the Client
+456	   with a "badAttestationStatement" error and set the status of the
+457	   challenge object to "invalid".  The Server SHOULD provide the reason
+458	   for rejecting the challenge in the "detail" field of the problem
+459	   document.
+
+461	   POST /acme/chall/Rg5dV14Gh1Q
+462	   Host: example.com
+463	   Content-Type: application/jose+json
+
+465	   {
+466	     "protected": base64url({
+467	       "alg": "ES256",
+468	       "kid": "https://example.com/acme/acct/evOfKhNU60wg",
+469	       "nonce": "SS2sSl1PtspvFZ08kNtzKd",
+470	       "url": "https://example.com/acme/chall/Rg5dV14Gh1Q"
+471	     }),
+472	     "payload": base64url({
+473	       "attObj": base64url(/* WebAuthn attestation object */),
+474	     }),
+475	     "signature": "Q1bURgJoEslbD1c5...3pYdSMLio57mQNN4"
+476	   }
+
+478	   The webauthn payload MAY contain any identifiers registered in
+479	   "WebAuthn Attestation Statement Format Identifiers" and any
+480	   extensions registered in "WebAuthn Extension Identifiers"
+481	   [IANA-Webauthn], [RFC8809].
+
+483	6.  Operational Considerations
+
+485	   Although this document focuses guidance on implementing new
+486	   identifier types and a challenge for certificate issuance using ACME,
+487	   it does not define a new protocol, a protocol extension, or an
+488	   architecture.
+
+490	6.1.  Enterprise PKI
+
+492	   ACME was originally envisioned for issuing certificates in the Web
+493	   PKI, however this extension will primarily be useful in enterprise
+494	   PKI.
+
+496	6.1.1.  External Account Binding
+
+498	   An enterprise CA likely only wants to receive requests from
+499	   authorized devices.  It is RECOMMENDED that the Server require a
+500	   value for the "externalAccountBinding" field to be present in
+501	   "newAccount" requests.
+
+503	   If an enterprise CA desires to limit the number of certificates that
+504	   can be requested with a given account, including limiting an account
+505	   to a single certificate, after the desired number of certificates
+506	   have been issued to an account the Server MAY revoke the account as
+507	   described in Section 7.1.2 of [RFC8555].
+
+509	6.1.2.  Attestation Posture
+
+511	   Enterprise deployments often consist of heterogeneous device fleets
+512	   where not all devices are capable of hardware attestation.  A Server
+513	   MAY offer device-attest-01 alongside other challenge types within a
+514	   single authorization, allowing capable devices to complete device-
+515	   attest-01 while other devices complete an alternative challenge.
+516	   This posture allows operators to observe fleet attestation coverage
+517	   before enforcing policy and is compatible with phased deployments.
+
+519	   Servers MAY rely on other authorization mechanisms, such as external
+520	   account binding or pre-authorized accounts, to establish device
+521	   identity instead of completing the device-attest-01 challenge.
+
+523	6.1.3.  Multiple Challenge Types
+
+525	   [RFC8555] permits a Server to offer multiple challenge types within a
+526	   single authorization, with any one being sufficient to complete it.
+527	   Servers MAY offer device-attest-01 alongside other challenge types
+528	   for the same authorization, allowing capable devices to attest while
+529	   other devices use an alternative challenge type.
+
+531	6.2.  Attestation Trust
+
+533	   Attestation formats differ in the authority that enforces the
+534	   boundary around the attested key and in the claims that authority can
+535	   make.  At one end, dedicated security hardware (such as a TPM or HSM)
+536	   provides manufacturer-backed guarantees that the key is generated and
+537	   stored within the hardware and cannot be exported.  At the other end,
+538	   OS-enforced isolation boundaries (such as platform keystores
+539	   protected by the operating system kernel) provide meaningful key
+540	   protection guarantees without discrete security hardware.
+541	   Intermediate cases include TEE-based attestation where a hypervisor
+542	   or trusted execution environment acts as the authority.
+
+544	   Servers SHOULD consider the trust properties of each attestation
+545	   format when establishing issuance policy, including the nature of the
+546	   authority making the attestation and the key protection guarantees it
+547	   can assert.  The key authorization construction described in
+548	   Section 5 also contributes to this trust model: formats that use the
+549	   full key authorization as _attToBeSigned_ bind the attestation to a
+550	   specific account key, while formats that use the token alone provide
+551	   freshness without account key binding.
+
+553	7.  Privacy Considerations
+
+555	   This section analyzes the privacy implications of the permanent-
+556	   identifier and hardware-module identifier types introduced in this
+557	   document.  The guidance here is informed by the threat taxonomy
+558	   defined in [RFC6973] and is intended to help implementers make
+559	   informed decisions about whether and when to include these
+560	   identifiers in certificate requests and issued certificates.
+
+562	   Both identifier types represent unchanging hardware-bound properties
+563	   of a device.  Unlike domain names or other identifiers whose lifetime
+564	   is bounded by operational changes, these identifiers typically
+565	   persist across the entire operational life of a device and cannot be
+566	   rotated or revoked by the device owner.  This permanence has material
+567	   privacy consequences that implementers must weigh carefully.
+
+569	   The privacy analysis below addresses the two phases in which these
+570	   identifiers appear: the attestation exchange between the Client and
+571	   server during challenge validation, and the optional embedding of
+572	   identifiers in the issued certificate.
+
+574	7.1.  Identification and Correlation
+
+576	   The permanent-identifier type encodes a manufacturer assigned device
+577	   identity, typically a serial number.  The hardware-module type
+578	   encodes the identity of the secure cryptoprocessor that generated the
+579	   certificate key.  In both cases, the identifier is globally unique
+580	   within its assigner scope and unchanging for the lifetime of the
+581	   device or hardware module.
+
+583	   From the perspective of [RFC6973] Section 5.2.2, such identifiers
+584	   enable direct identification of a device across protocol
+585	   interactions, deployments, and time.  Any entity that receives or
+586	   observes these identifiers, including the server, intermediary
+587	   infrastructure, and any relying party that processes the issued
+588	   certificate acquires an observable reference that can be used to
+589	   track the device's certificate issuance history, renewal patterns,
+590	   and operational context.
+
+592	   When the same permanent-identifier or hardware-module value appears
+593	   across multiple certificate requests (as it will in any recurring
+594	   renewal workflow), it enables [RFC6973] correlation: an observer with
+595	   access to server logs can reconstruct the full lifecycle of a
+596	   device's certificate activity.  Similarly, when such identifiers are
+597	   included in issued certificates, logging issued certificates in a
+598	   central location (in certificate transparency logs, etc.) produces a
+599	   persistent device audit trail regardless of whether the log operator
+600	   intends to maintain one.
+
+602	   Implementers SHOULD assess whether the operational benefit of
+603	   unchanging device identification outweighs this correlation exposure.
+604	   In deployments where device anonymity or pseudonymity is a
+605	   requirement, such as systems handling sensitive workloads on behalf
+606	   of individuals, implementers SHOULD consider whether alternative
+607	   validation mechanisms that do not bind the certificate to a permanent
+608	   hardware identifier are more appropriate.
+
+610	7.2.  Fingerprinting via Attestation Payloads
+
+612	   The device-attest-01 challenge response carries a WebAuthn
+613	   attestation object that may contain significantly more information
+614	   than the identifier value alone.  Depending on the attestation
+615	   format, this payload may include device model, firmware version,
+616	   bootloader state, hardware security level, and operating system
+617	   version.  Even when the resulting certificate is issued in a privacy-
+618	   preserving form that omits the identifier from the subjectAltName
+619	   extension (see Section 3.2 and Section 4.2), the attestation payload
+620	   itself is transmitted to and evaluated by the server during challenge
+621	   validation.
+
+623	   This constitutes a fingerprinting surface as defined in [RFC6973]
+624	   Section 3.2.  The combination of a hardware serial number, hardware
+625	   type OID, and firmware attestation attributes may uniquely identify
+626	   not just the device model but the specific device unit, even in the
+627	   absence of an explicit permanent-identifier value.  Implementers
+628	   operating servers may consider applying data minimization principles
+629	   to attestation payload handling by limiting only the attributes
+630	   necessary to make the authorization decision should be evaluated, and
+631	   the full attestation payload SHOULD NOT be retained beyond the
+632	   duration of the challenge validation exchange unless there is a
+633	   specific, documented operational requirement to do so.
+
+635	   Implementers operating ACME Clients SHOULD be aware that the
+636	   attestation format selected may expose more device state than is
+637	   necessary to satisfy the server's authorization policy.  Where
+638	   multiple attestation formats are available, Clients SHOULD prefer
+639	   formats that minimize the set of disclosed attributes.
+
+641	7.3.  Secondary Use of Attestation Data
+
+643	   The server receives attestation data in the context of authorizing a
+644	   certificate issuance request.  [RFC6973] Section 5.2.3 identifies
+645	   secondary use as the processing of data for purposes beyond the
+646	   original collection context and as a distinct privacy threat.
+
+648	   Attestation payloads received during challenge validation may contain
+649	   information about device health, software configuration, and hardware
+650	   capability that is operationally useful beyond certificate issuance.
+651	   For example, for asset inventory, compliance monitoring, or security
+652	   posture assessment.  Implementers operating servers must clearly
+653	   define and document the purposes for which attestation data is
+654	   processed and must not process attestation data for purposes
+655	   materially different from authorization of the certificate request
+656	   without explicit policy disclosure to the device owner or operator.
+
+658	   Implementers integrating ACME device attestation into enterprise PKI
+659	   platforms should publish a clear attestation data handling policy
+660	   that specifies what attributes are evaluated, how long they are
+661	   retained, and whether they are shared with other systems.
+
+663	7.4.  Privacy-Preserving Certificate Issuance
+
+665	   This document provides an explicit mechanism to decouple attestation-
+666	   based validation from identifier disclosure in the issued
+667	   certificate.  Clients MAY omit the permanent-identifier or hardware-
+668	   module from the CSR, and servers MAY issue certificates that do not
+669	   contain these identifiers in the subjectAltName extension, even when
+670	   those identifiers were used to authorize the request.
+
+672	   Implementers should treat this privacy-preserving mode as the default
+673	   posture unless there is a specific operational requirement for the
+674	   identifier to appear in the certificate.  The following
+675	   considerations apply to this decision:
+
+677	   *  If the issued certificate will be presented to relying parties
+678	      outside the issuing organization's trust boundary, embedding a
+679	      permanent-identifier or hardware-module value in the certificate
+680	      enables those relying parties to correlate certificate
+681	      presentations with specific physical hardware.  This may be
+682	      acceptable in closed enterprise environments but is likely
+683	      inappropriate in any context where the certificate is presented to
+684	      external services, counter-parties, or public infrastructure.
+
+686	   *  If the certificate is used for mutual TLS in a workload identity
+687	      context, embedding an unchanging hardware identifier couples the
+688	      cryptographic identity of the workload to the physical device
+689	      rather than to the logical identity of the workload.  This can
+690	      impede key rotation, device replacement, and workload migration,
+691	      in addition to creating the correlation risks described above.  In
+692	      such cases, implementers should prefer logical workload
+693	      identifiers (such as SPIFFE URIs) in the issued certificate and
+694	      treat the hardware attestation as a bootstrap authorization
+695	      mechanism only.
+
+697	   *  If the certificate is intended for use in certificate transparency
+698	      logs, implementers MUST consider that embedding a permanent-
+699	      identifier or hardware-module value will make that identifier
+700	      permanently and publicly discoverable, indexed by issuance time,
+701	      issuer, and subject.  This constitutes an irreversible disclosure
+702	      under [RFC6973] Section 5.2.4 and should be avoided unless public
+703	      discoverability of the device identifier is an explicit
+704	      operational requirement.
+
+706	7.5.  Stored Data and Account Binding
+
+708	   This document recommends the use of externalAccountBinding to pre-
+709	   authenticate device requests to an enterprise server.  When an ACME
+710	   account is persistently bound to a device identity, the server's
+711	   account store contains a durable mapping between the cryptographic
+712	   account credential and the physical device.  Per [RFC6973]
+713	   Section 5.1.2, this stored association constitutes a target for
+714	   compromise: an attacker who obtains the account store gains not only
+715	   account credentials but a historical record of device-to-identity
+716	   mappings across all certificate issuances.
+
+718	   Implementers operating servers SHOULD store account-to-device
+719	   bindings using the minimum fidelity necessary for authorization
+720	   decisions.  Where the operational requirement is only to confirm that
+721	   a given device is authorized to request certificates, it may be
+722	   sufficient to store a hash or other one-way transformation of the
+723	   device identifier rather than the identifier itself.  Implementers
+724	   should also define and enforce retention limits on historical
+725	   account-to-certificate linkage records.
+
+727	7.6.  Implementer Decision Guidance
+
+729	   Implementers considering whether to include permanent-identifier or
+730	   hardware-module in CSRs and issued certificates SHOULD work through
+731	   the following questions before enabling these identifiers:
+
+733	   *  Is unchanging hardware identity in the certificate necessary for
+734	      the relying party to make authorization decisions, or is it
+735	      sufficient for the server to have validated it at issuance time?
+736	      If the latter, prefer privacy-preserving certificate mode.
+
+738	   *  Will the certificate be logged to a certificate transparency log
+739	      or otherwise made publicly accessible?  If so, embedding a
+740	      permanent hardware identifier creates an irrevocable, publicly
+741	      indexed disclosure and should be avoided unless explicitly
+742	      required.
+
+744	   *  Will the certificate be presented to parties outside the issuing
+745	      organization's administrative control?  If so, consider whether
+746	      those parties should have visibility into the device's hardware
+747	      identity.
+
+749	   *  Does the deployment have requirements for device replacement or
+750	      key rotation without service interruption?  Binding the
+751	      certificate's identity to a specific hardware module OID and
+752	      serial number complicates these operational scenarios and may
+753	      require reissuance policies that expose additional identifier
+754	      churn in logs.
+
+756	   *  What is the attestation data handling policy of the server
+757	      operator?  If this is not documented or auditable, device
+758	      operators SHOULD treat the attestation exchange as a full
+759	      disclosure of all attributes present in the attestation payload.
+
+761	8.  Security Considerations
+
+763	   Please reference [RFC8555] for other security considerations.
+
+765	   See Section 13 of [WebAuthn] for additional security considerations
+766	   related to attestation statement formats, including certificate
+767	   revocation.
+
+769	   Key attestation statements may include a variety of information in
+770	   addition to the public key being attested.  While not described in
+771	   this document, the Server MAY use any policy when evaluating this
+772	   information.  This evaluation can result in rejection of a
+773	   certificate request that features a verifiable key attestation for
+774	   the public key contained in the request.  For example, an attestation
+775	   statement may indicate use of an unacceptable firmware version.
+
+777	   The "token" value MUST have at least 128 bits of entropy.  It MUST
+778	   NOT contain any characters outside the base64url alphabet, including
+779	   padding characters ("=").  See [I-D.ietf-tls-rfc8446bis],
+780	   Appendix C.1 for additional information on randomness requirements.
+
+782	   The binding between the certified public key and the device
+783	   identifier is established through the attestation statement rather
+784	   than through the CSR alone.  The attestation authority
+785	   cryptographically binds the public key to the device identity, either
+786	   by signing the attestation statement directly, by issuing an
+787	   attestation certificate, or by other cryptographic means specific to
+788	   the attestation format.  The Server verifies this chain: the
+789	   attestation is produced by a trusted attestation authority, the
+790	   public key in the attestation matches the public key in the CSR, and
+791	   the device identifier in the attestation matches the identifier in
+792	   the Order.  This three-way binding is the basis on which the Server
+793	   can associate a certified public key with a particular device.
+
+795	9.  IANA Considerations
+
+797	9.1.  ACME Identifier Types
+
+799	   The "ACME Identifier Types" registry is to be updated to include the
+800	   following entries:
+
+802	                   +======================+===========+
+803	                   | Label                | Reference |
+804	                   +======================+===========+
+805	                   | permanent-identifier | RFC XXXX  |
+806	                   +----------------------+-----------+
+807	                   | hardware-module      | RFC XXXX  |
+808	                   +----------------------+-----------+
+
+810	                                 Table 1
+
+812	9.2.  ACME Validation Method
+
+814	   The "ACME Validation Methods" registry is to be updated to include
+815	   the following entries:
+
+817	      +==================+======================+======+===========+
+818	      | Label            | Identifier Type      | ACME | Reference |
+819	      +==================+======================+======+===========+
+820	      | device-attest-01 | permanent-identifier | Y    | RFC XXXX  |
+821	      +------------------+----------------------+------+-----------+
+822	      | device-attest-01 | hardware-module      | Y    | RFC XXXX  |
+823	      +------------------+----------------------+------+-----------+
+
+825	                                 Table 2
+
+827	9.3.  New Error Types
+
+829	   The "ACME Error Types" registry is to be updated to include the
+830	   following entry:
+
+832	    +=========================+===========================+===========+
+833	    | Type                    | Description               | Reference |
+834	    +=========================+===========================+===========+
+835	    | badAttestationStatement | The attestation statement | RFC XXXX  |
+836	    |                         | is unacceptable (e.g. not |           |
+837	    |                         | signed by an attestation  |           |
+838	    |                         | authority trusted by the  |           |
+839	    |                         | CA)                       |           |
+840	    +-------------------------+---------------------------+-----------+
+
+842	                                  Table 3
+
+844	10.  References
+
+846	10.1.  Normative References
+
+848	   [I-D.ietf-tls-rfc8446bis]
+849	              Rescorla, E., "The Transport Layer Security (TLS) Protocol
+850	              Version 1.3", Work in Progress, Internet-Draft, draft-
+851	              ietf-tls-rfc8446bis-14, 13 September 2025,
+852	              <https://datatracker.ietf.org/doc/html/draft-ietf-tls-
+853	              rfc8446bis-14>.
+
+855	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+856	              Requirement Levels", BCP 14, RFC 2119,
+857	              DOI 10.17487/RFC2119, March 1997,
+858	              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+860	   [RFC4043]  Pinkas, D. and T. Gindin, "Internet X.509 Public Key
+861	              Infrastructure Permanent Identifier", RFC 4043,
+862	              DOI 10.17487/RFC4043, May 2005,
+863	              <https://www.rfc-editor.org/rfc/rfc4043>.
+
+865	   [RFC4108]  Housley, R., "Using Cryptographic Message Syntax (CMS) to
+866	              Protect Firmware Packages", RFC 4108,
+867	              DOI 10.17487/RFC4108, August 2005,
+868	              <https://www.rfc-editor.org/rfc/rfc4108>.
+
+870	   [RFC5234]  Crocker, D., Ed. and P. Overell, "Augmented BNF for Syntax
+871	              Specifications: ABNF", STD 68, RFC 5234,
+872	              DOI 10.17487/RFC5234, January 2008,
+873	              <https://www.rfc-editor.org/rfc/rfc5234>.
+
+875	   [RFC6973]  Cooper, A., Tschofenig, H., Aboba, B., Peterson, J.,
+876	              Morris, J., Hansen, M., and R. Smith, "Privacy
+877	              Considerations for Internet Protocols", RFC 6973,
+878	              DOI 10.17487/RFC6973, July 2013,
+879	              <https://www.rfc-editor.org/rfc/rfc6973>.
+
+881	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+882	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+883	              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+885	   [RFC8555]  Barnes, R., Hoffman-Andrews, J., McCarney, D., and J.
+886	              Kasten, "Automatic Certificate Management Environment
+887	              (ACME)", RFC 8555, DOI 10.17487/RFC8555, March 2019,
+888	              <https://www.rfc-editor.org/rfc/rfc8555>.
+
+890	   [RFC8809]  Hodges, J., Mandyam, G., and M. Jones, "Registries for Web
+891	              Authentication (WebAuthn)", RFC 8809,
+892	              DOI 10.17487/RFC8809, August 2020,
+893	              <https://www.rfc-editor.org/rfc/rfc8809>.
+
+895	   [WebAuthn] Hodges, J., Jones, J., Jones, M. B., Kumar, A., and E.
+896	              Lundberg, "Web Authentication: An API for accessing Public
+897	              Key Credentials Level 2", April 2021,
+898	              <https://www.w3.org/TR/webauthn-2/>.
+
+900	10.2.  Informative References
+
+902	   [IANA-Webauthn]
+903	              "IANA Registries for Web Authentication (WebAuthn)", n.d.,
+904	              <https://www.iana.org/assignments/webauthn/
+905	              webauthn.xhtml>.
+
+907	Acknowledgments
+
+909	   We thank the participants on the ACME Working Group mailing list for
+910	   their insightful feedback and comments.  In particular, the authors
+911	   extend sincere appreciation to Mike Ounsworth, Deb Cooley, Aaron
+912	   Gable, and Richard Barnes for their reviews and suggestions, which
+913	   greatly improved the quality of this document.
+
+915	Contributors
+
+917	   These contributors provided significant implementation experience
+918	   using Smallstep CA, which shaped the evolution and design of this
+919	   document.
+
+921	   Mariano Cano Smallstep mariano.cano@gmail.com
+922	   Herman Slatman Smallstep mail@hermanslatman.nl
+
+924	Authors' Addresses
+
+926	   Brandon Weeks
+927	   Google Inc
+928	   Email: me@brandonweeks.com
+
+930	   Ganesh Mallaya
+931	   AppViewX Inc.
+932	   Email: ganesh.mallaya@appviewx.com
+
+934	   Sven Rajala
+935	   Keyfactor
+936	   Email: sven.rajala@keyfactor.com
+
+938	   Corey Bonnell
+939	   TurboLight Solutions
+940	   Email: corey.bonnell@turbolightsolutions.com
+
+942	   Ryan Hurst
+943	   Peculiar Ventures
+944	   Email: ryan.hurst+ietf@peculiarventures.com
+
+
+
+
+
+
+
+
+

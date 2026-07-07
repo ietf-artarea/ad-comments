@@ -1,0 +1,853 @@
+idnits 2.17.1 
+
+draft-ietf-regext-epp-quic-10.txt:
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+  == There is 1 instance of lines with non-ascii characters in the document.
+
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     Summary: 0 errors (**), 0 flaws (~~), 1 warning (==), 0 comments (--).
+
+--------------------------------------------------------------------------------
+
+
+2	Internet Engineering Task Force                                   J. Yao
+3	Internet-Draft                                                     H. Li
+4	Intended status: Standards Track                                M. Zhang
+5	Expires: 25 December 2026                                          CNNIC
+6	                                                             D. Keathley
+7	                                                                J. Gould
+8	                                                          VeriSign, Inc.
+9	                                                            23 June 2026
+
+11	       Extensible Provisioning Protocol (EPP) Transport over QUIC
+12	                     draft-ietf-regext-epp-quic-10
+
+14	Abstract
+
+16	   This document specifies how an Extensible Provisioning Protocol (EPP)
+17	   session is mapped onto a QUIC connection.  EPP over QUIC (EoQ)
+18	   leverages features of the QUIC protocol.
+
+20	Status of This Memo
+
+22	   This Internet-Draft is submitted in full conformance with the
+23	   provisions of BCP 78 and BCP 79.
+
+25	   Internet-Drafts are working documents of the Internet Engineering
+26	   Task Force (IETF).  Note that other groups may also distribute
+27	   working documents as Internet-Drafts.  The list of current Internet-
+28	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+30	   Internet-Drafts are draft documents valid for a maximum of six months
+31	   and may be updated, replaced, or obsoleted by other documents at any
+32	   time.  It is inappropriate to use Internet-Drafts as reference
+33	   material or to cite them other than as "work in progress."
+
+35	   This Internet-Draft will expire on 25 December 2026.
+
+37	Copyright Notice
+
+39	   Copyright (c) 2026 IETF Trust and the persons identified as the
+40	   document authors.  All rights reserved.
+
+42	   This document is subject to BCP 78 and the IETF Trust's Legal
+43	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+44	   license-info) in effect on the date of publication of this document.
+45	   Please review these documents carefully, as they describe your rights
+46	   and restrictions with respect to this document.  Code Components
+47	   extracted from this document must include Revised BSD License text as
+48	   described in Section 4.e of the Trust Legal Provisions and are
+49	   provided without warranty as described in the Revised BSD License.
+
+51	Table of Contents
+
+53	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
+54	   2.  Terminology . . . . . . . . . . . . . . . . . . . . . . . . .   3
+55	   3.  Session Management  . . . . . . . . . . . . . . . . . . . . .   4
+56	   4.  Message Exchange  . . . . . . . . . . . . . . . . . . . . . .   5
+57	   5.  Data Unit Format  . . . . . . . . . . . . . . . . . . . . . .   8
+58	   6.  EoQ Connection Start Packet . . . . . . . . . . . . . . . . .   8
+59	   7.  Transport Considerations  . . . . . . . . . . . . . . . . . .   9
+60	   8.  Operational Considerations  . . . . . . . . . . . . . . . . .  10
+61	     8.1.  Clients Fall Back with Management of Multiple
+62	           Transport . . . . . . . . . . . . . . . . . . . . . . . .  10
+63	     8.2.  Port Reuse  . . . . . . . . . . . . . . . . . . . . . . .  10
+64	     8.3.  QUIC Support Announcement and Discovery . . . . . . . . .  10
+65	     8.4.  Configuration Parameters  . . . . . . . . . . . . . . . .  10
+66	     8.5.  Diagnostic and Troubleshooting  . . . . . . . . . . . . .  11
+67	     8.6.  Address Validation  . . . . . . . . . . . . . . . . . . .  11
+68	     8.7.  Authentication Considerations . . . . . . . . . . . . . .  11
+69	     8.8.  0-RTT and Session Resumption  . . . . . . . . . . . . . .  11
+70	     8.9.  MTU and Fragmentation . . . . . . . . . . . . . . . . . .  11
+71	   9.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  12
+72	     9.1.  Registration of an EoQ Identification String  . . . . . .  12
+73	     9.2.  Registration of Port Number . . . . . . . . . . . . . . .  12
+74	   10. Implementation Status . . . . . . . . . . . . . . . . . . . .  12
+75	     10.1.  Verisign EPP SDK . . . . . . . . . . . . . . . . . . . .  13
+76	   11. Security Considerations . . . . . . . . . . . . . . . . . . .  13
+77	   12. Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  14
+78	   13. References  . . . . . . . . . . . . . . . . . . . . . . . . .  14
+79	     13.1.  Normative References . . . . . . . . . . . . . . . . . .  14
+80	     13.2.  Informative References . . . . . . . . . . . . . . . . .  15
+81	   Appendix A.  Change History . . . . . . . . . . . . . . . . . . .  15
+82	     A.1.  Change from 00 to 01  . . . . . . . . . . . . . . . . . .  15
+83	     A.2.  Change from 01 to 02  . . . . . . . . . . . . . . . . . .  15
+84	     A.3.  Change from 02 to 03  . . . . . . . . . . . . . . . . . .  16
+85	     A.4.  draft-ietf-regext-epp-quic-00 . . . . . . . . . . . . . .  16
+86	     A.5.  draft-ietf-regext-epp-quic-01 . . . . . . . . . . . . . .  16
+87	     A.6.  draft-ietf-regext-epp-quic-02 . . . . . . . . . . . . . .  16
+88	     A.7.  draft-ietf-regext-epp-quic-03 . . . . . . . . . . . . . .  16
+89	     A.8.  draft-ietf-regext-epp-quic-04 . . . . . . . . . . . . . .  16
+90	     A.9.  draft-ietf-regext-epp-quic-05 . . . . . . . . . . . . . .  17
+91	     A.10. draft-ietf-regext-epp-quic-06 . . . . . . . . . . . . . .  17
+92	     A.11. draft-ietf-regext-epp-quic-07 . . . . . . . . . . . . . .  17
+93	     A.12. draft-ietf-regext-epp-quic-08 . . . . . . . . . . . . . .  17
+94	     A.13. draft-ietf-regext-epp-quic-09 . . . . . . . . . . . . . .  17
+95	     A.14. draft-ietf-regext-epp-quic-10 . . . . . . . . . . . . . .  17
+96	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  18
+
+98	1.  Introduction
+
+100	   This document specifies how the Extensible Provisioning Protocol
+101	   (EPP)[RFC5730] is mapped onto the QUIC transport [RFC9000].  QUIC is
+102	   a network protocol that is based on UDP and incorporates native
+103	   encryption support using TLS [RFC9001].  Though based on UDP, QUIC
+104	   provides connection semantics like other stateful protocols.  This
+105	   document discusses how EPP implementations can work with this and
+106	   other features of QUIC while preserving the core EPP semantics.
+
+108	   EPP sessions use a single QUIC stream for all command and response
+109	   exchanges throughout the session lifecycle.  Unlike stateless
+110	   transaction protocols that permit per-command independent streams,
+111	   EPP is a stateful protocol with inherent sequential command
+112	   dependencies defined in [RFC5730].  Maintaining a single stream
+113	   preserves ordered transaction processing, consistent session state,
+114	   and full compatibility with existing EPP operational and
+115	   implementation models.
+
+117	   EPP [RFC5730] was designed for pluggability of transports that must
+118	   follow Section 2.1 of [RFC5730].  EoQ defines a fully pluggable QUIC
+119	   transport for EPP as an alternative to other EPP transports, such as
+120	   EPP over TCP (EoT) defined in [RFC5734].  The server can choose to
+121	   offer EoQ in addition to EoT or as a replacement for EoT, based on
+122	   the security and performance considerations of QUIC and the preferred
+123	   deployment architecture of the server and clients.
+
+125	2.  Terminology
+
+127	   This document makes use of the following terms:
+
+129	   EoQ:  The acronym used for the EPP over QUIC transport that defines
+130	      the use of QUIC as an EPP transport following the considerations
+131	      in Section 2.1 of [RFC5730].
+
+133	   EoQ connection:  Is a client-initiated bidirectional QUIC stream
+134	      established on a QUIC connection using the "EoQ" Application-Layer
+135	      Protocol Negotiation (ALPN) [RFC7301] value.  The EoQ connection
+136	      maps to the client-server connection defined in Section 2.1 of
+137	      [RFC5730], where the server returns an EPP <greeting>.  A single
+138	      QUIC connection supports many EoQ connections.
+
+140	   EoQ session:  Is an authenticated EoQ connection, which occurs after
+141	      a successful EPP <login>.
+
+143	   EoQ Connection Start Packet:  Used by clients to complete the
+144	      creation of an EoQ connection by signaling the server to create
+145	      the QUIC stream and return the EPP <greeting> needed for an EPP
+146	      connection.  Section 6 formally defines the EoQ Connection Start
+147	      Packet.
+
+149	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+150	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+151	   "OPTIONAL" in this document are to be interpreted as described in BCP
+152	   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+153	   capitals, as shown here.
+
+155	3.  Session Management
+
+157	   Mapping EPP session management facilities onto the QUIC service is
+158	   accomplished with a combination of a QUIC connection with the "EoQ"
+159	   ALPN [RFC7301] value and client-initiated, bidirectional QUIC
+160	   streams.  QUIC supports four stream types (Section 2.1 of [RFC9000]),
+161	   but EoQ only supports the client-initiated, bidirectional stream
+162	   type.
+
+164	   As shown in Figure 1 in Section 4, an EPP session first requires
+165	   creation of a QUIC connection between two peers, one that initiates
+166	   the connection request and one that responds to the connection
+167	   request.  The initiating peer is called the "client", and the
+168	   responding peer is called the "server".  By default, an EPP server
+169	   MUST listen for QUIC connection requests on a well-known UDP port
+170	   number assigned by IANA (see Section 9.2), unless there is a mutual
+171	   agreement to use another port number.
+
+173	   A successfully established QUIC connection is secured by the native
+174	   TLS support that QUIC provides using the "EoQ" ALPN value.
+
+176	   Once the QUIC connection is established, the EPP client MUST then
+177	   create a bidirectional QUIC stream by sending the EoQ Connection
+178	   Start Packet (Section 6).  [RFC9000] states that "streams are created
+179	   by sending data".  If the EPP server accepts the QUIC stream, it
+180	   reads the EoQ Connection Start Packet (Section 6) and returns an EPP
+181	   <greeting> to the client on the same QUIC stream.  After reading the
+182	   EPP <greeting> message, and absent processing errors, the EPP client
+183	   sends EPP commands and receives EPP responses on the same stream.  A
+184	   QUIC stream corresponds to an EPP connection, which is referred to as
+185	   an EoQ connection.  An authenticated QUIC stream, via a successful
+186	   EPP <login>, corresponds to an EPP session, which is referred to as
+187	   an EoQ session.
+
+189	   An EPP session is normally ended by the client issuing an EPP
+190	   <logout> command.  A server receiving an EPP <logout> command MUST
+191	   end the EPP session and close the QUIC stream.  A client MAY end an
+192	   EoQ session by closing the QUIC stream and the server MUST end the
+193	   EoQ session by closing the QUIC stream.
+
+195	   EoQ connections are established as described in the QUIC transport
+196	   specification [RFC9000].  During connection establishment, EoQ
+197	   support is indicated using the "EoQ" ALPN value in the cryptographic
+198	   handshake.
+
+200	   A single QUIC connection may allow multiple QUIC streams.  This means
+201	   that a single QUIC connection may support multiple EoQ sessions.  A
+202	   server MAY limit the life span of an established EoQ session.  EoQ
+203	   sessions that are inactive for more than a server-defined period MAY
+204	   be ended by the server closing the QUIC stream.  A server MAY close
+205	   EoQ sessions that have been open and active for longer than a server-
+206	   defined limit.  The max_idle_timeout transport parameter defined in
+207	   Section 18.2 of [RFC9000] MUST NOT be set to a non-zero value by the
+208	   client or server.  Once the last QUIC stream for a QUIC connection is
+209	   closed, the server MAY end the QUIC connection immediately.
+
+211	4.  Message Exchange
+
+213	   EPP messages are passed on an EoQ connection, which is a client-
+214	   initiated, bidirectional QUIC stream, defined in Section 3.  Except
+215	   for the EPP server <greeting>, EPP messages are initiated by the EPP
+216	   client in the form of EPP commands.  An EPP server MUST return an EPP
+217	   response to an EPP command on the same QUIC stream that carried the
+218	   command.  If the QUIC stream is closed after a server receives and
+219	   successfully processes a command but before the response can be
+220	   returned to the client, the server MAY attempt to undo the effects of
+221	   the command to ensure a consistent state between the client and the
+222	   server.  EPP commands are idempotent, so processing a command more
+223	   than once produces the same net effect on the repository as
+224	   successfully processing the command once.
+
+226	   An EPP client streams EPP commands to an EPP server on an established
+227	   QUIC stream.  A client MAY establish multiple QUIC streams to support
+228	   multiple EoQ sessions with each EoQ session mapped to a single QUIC
+229	   stream.  A server SHOULD limit a client to a maximum number of QUIC
+230	   streams per QUIC connection based on server capabilities and
+231	   operational load.  Absent such limit, a server may be subject to
+232	   overload and resource exhaustion.
+
+234	   EPP describes client-server interaction as a command-response
+235	   exchange where the client sends one command to the server and the
+236	   server returns one response to the client.
+
+238	   Each EPP data unit MUST contain a single EPP message.  Commands MUST
+239	   be processed independently.
+
+241	   A server SHOULD impose a limit on the amount of time required for a
+242	   client to issue a well-formed EPP command to reduce the risk
+243	   associated with a resource exhaustion attack.  For example, the time
+244	   limit is 10-minutes for the server idle timeout and 8-minutes for
+245	   client keep-alive.  Absent local policy, a server SHOULD end an EoQ
+246	   session and close the QUIC stream if a well-formed command is not
+247	   received within the time limit.
+
+249	   A general state machine for an EPP server is described in Section 2
+250	   of [RFC5730].  A general client-server message exchange using QUIC
+251	   transport is illustrated in Figure 1.  It shows an example of
+252	   successful exchange over a single QUIC stream of a QUIC connection.
+253	   Many QUIC streams may be opened and closed during the life of a QUIC
+254	   connection.
+
+256	                       Client                  Server
+257	                  |                                     |
+258	                  |      Successful QUIC Connection     |
+259	                  | <<------------------------------->> |
+260	                  |                                     |
+261	                  |     Successful QUIC Stream with     |
+262	                  |     EoQ Connection Start Packet     |
+263	                  | <<------------------------------->> |
+264	                  |                                     |
+265	                  |             Send Greeting           |
+266	                  | <<-------------------------------<< |
+267	                  |                                     |
+268	                  |             Send <login>            |
+269	                  | >>------------------------------->> |
+270	                  |                                     |
+271	                  |             Send Response           |
+272	                  | <<-------------------------------<< |
+273	                  |                                     |
+274	                  |            Send Command X           |
+275	                  | >>------------------------------->> |
+276	                  |                                     |
+277	                  |            Send Response X          |
+278	                  | <<-------------------------------<< |
+279	                  |                                     |
+280	                  |            Send Command Y           |
+281	                  | >>------------------------------->> |
+282	                  |                                     |
+283	                  |            Send Response Y          |
+284	                  | <<-------------------------------<< |
+285	                  |                  .                  |
+286	                                     .
+287	                                     .
+288	                  |            Send <logout>            |
+289	                  | >>------------------------------->> |
+290	                  |                                     |
+291	                  |            Send Response            |
+292	                  | <<-------------------------------<< |
+293	                  |                                     |
+294	                  |          Close QUIC Stream          |
+295	                  | <<------------------------------->> |
+296	                  |                                     |
+297	                  |        Close QUIC Connection        |
+298	                  | <<------------------------------->> |
+
+300	     Figure 1: Example of Successful QUIC Client-Server Message Exchange
+
+302	   The EPP server MUST follow the "EPP Server State Machine" procedure
+303	   described in [RFC5730].
+
+305	5.  Data Unit Format
+
+307	   The EPP data unit contains two fields: a 32-bit header that describes
+308	   the total length of the data unit, and the EPP XML instance.  The
+309	   length of the EPP XML instance is determined by subtracting four
+310	   octets from the total length of the data unit.  A receiver must
+311	   successfully read that many octets to retrieve the complete EPP XML
+312	   instance before processing the EPP message.  The EPP Data Unit Format
+313	   is depicted in Figure 2 (one tick mark represents one bit position).
+
+315	        0                   1                   2                   3
+316	        0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+317	       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+318	       |                           Total Length                        |
+319	       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+320	       |                         EPP XML Instance                      |
+321	       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+323	                             Figure 2: EPP Data Unit Format
+
+325	   The description of the fields shown in Figure 2 is as follows:
+
+327	   Total Length (32 bits): The total length of the EPP data unit
+328	   measured in octets in network (big endian) byte order.  The octets
+329	   contained in this field MUST be included in the total length
+330	   calculation.  The 32 bits total length matches the total length used
+331	   in EoT, defined in [RFC5734], to support transport pluggability.
+
+333	   EPP XML Instance (variable length): The EPP XML instance carried in
+334	   the data unit.
+
+336	6.  EoQ Connection Start Packet
+
+338	   The EoQ Connection Start Packet is written by the client after
+339	   creating a QUIC stream to signal to the server to initialize the QUIC
+340	   stream.  Absent processing errors or local policy, the server accepts
+341	   the QUIC stream, reads the EoQ Connection Start Packet, and returns
+342	   the EPP <greeting> to the client on same QUIC stream.
+
+344	   The EoQ Connection Start Packet follows the Data Unit Format
+345	   (Section 5) with two fields: a 32-bit header that describes the total
+346	   length of the data unit, and the constant value of "EoQ Connection
+347	   Start" instead of an "EPP XML Instance".  The length of a valid data
+348	   unit MUST be 24 octets that includes 4 octets for the Total Length
+349	   and 20 octets for the "EoQ Connection Start" constant value.
+
+351	7.  Transport Considerations
+
+353	   Section 2.1 of [RFC5730] describes considerations to be addressed by
+354	   protocol transport mappings.  This document addresses each of those
+355	   considerations using a combination of features of the QUIC protocol
+356	   and features of this document as discussed below:
+
+358	   *  Command Order: QUIC guarantees ordered processing of data within
+359	      each stream.  Section 2 of [RFC9000] describes streams in detail.
+
+361	   *  Session Mapping: EPP session management utilizes QUIC streams and
+362	      is described in Section 3
+
+364	   *  Stateful Nature: QUIC supports stateful communications between
+365	      endpoints via Connection IDs and long-lived streams within each
+366	      connection.  QUIC streams on top of QUIC connections, defined in
+367	      section 2 and section 5 of [RFC9000] , are used to create stateful
+368	      communications between the client and server.
+
+370	   *  Frame Data Units: EoQ uses the packet framing defined in
+371	      Section 5.
+
+373	   *  Congestion Avoidance: QUIC provides various mechanisms to help
+374	      achieve congestion avoidance.  [RFC9002] describes these
+375	      mechanisms in detail.
+
+377	   *  Reliability: QUIC uses message acknowledgement, packet
+378	      retransmission, and other features to ensure reliability.
+379	      Section 13 of [RFC9000] describes these features in detail.
+
+381	   *  Pipelining: Pipelining is allowed in EoQ.  QUIC streams support
+382	      sending multiple frames without waiting for responses from the
+383	      other peer.  This does not change the basic single command, single
+384	      response operating mode of the core EPP.
+
+386	      Commands MUST be processed independently and in the same order as
+387	      sent from the client.
+
+389	      Batch-oriented processing (combining multiple EPP commands in a
+390	      single data unit) is not permitted.  Each EPP data unit must
+391	      contain a single EPP message.
+
+393	      An EPP x5zz "Connection Management" error response, defined in
+394	      Section 3 of [RFC5730], of a well-formed EPP client packet results
+395	      in the server closing the EoQ connection after returning the error
+396	      response.  A malformed EPP client packet results in the server
+397	      closing the EoQ connection without providing an error response.
+398	      All subsequent EPP commands sent on the EoQ connection will not be
+399	      processed.
+
+401	8.  Operational Considerations
+
+403	   Some of the concerns examined within this section are also addressed
+404	   in [RFC9308].  Authors of this specification encourage implementers
+405	   to understand [RFC9308].
+
+407	8.1.  Clients Fall Back with Management of Multiple Transport
+
+409	   If the establishment of an EoQ connection fails, clients MAY attempt
+410	   to fall back to EPP over TCP as specified in [RFC5734], depending on
+411	   local deployment and security policy.  It is up to clients to
+412	   determine the mix of transports that best meets their business needs.
+
+414	8.2.  Port Reuse
+
+416	   Although [RFC5734] does only a request for TCP, the companion UDP
+417	   number was also allocated.  That practice was prior to [RFC6335] when
+418	   TCP and UDP port numbers were simultaneously assigned when either was
+419	   requested.  Section 9.2 updates EPP UDP/700 allocation to be used for
+420	   EoQ.  This update does not introduce any operational issues given
+421	   that there are no known implementations of EPP over UDP that exist.
+
+423	8.3.  QUIC Support Announcement and Discovery
+
+425	   There is no dedicated in-band mechanism defined in this specification
+426	   for a server to explicitly announce EoQ support to clients.
+427	   Operators MAY use out-of-band configuration or provisioning channels
+428	   to advertise server EoQ support to clients in advance.
+
+430	8.4.  Configuration Parameters
+
+432	   Implementations MAY configure operational parameters to control EoQ
+433	   session behavior.  These parameters can include idle session timeout,
+434	   maximum QUIC streams per connection,command processing timeout, and
+435	   maximum session timeout.  Servers and clients SHOULD configure limits
+436	   to avoid session disruption and resource exhaustion.
+
+438	   Implementation Note: There is no in-band protocol mechanism to align
+439	   limits.  Operators typically distribute standard settings via SDKs.
+440	   Client timeout and stream limits shall be set lower than server
+441	   values for graceful connection handling.  Timeout rules are
+442	   consistent across EoT and EoQ; per-connection stream limits are newly
+443	   introduced in EoQ.
+
+445	8.5.  Diagnostic and Troubleshooting
+
+447	   Operators SHOULD log EoQ connection establishment status, stream
+448	   lifecycle events, and command transaction results for diagnostic
+449	   purposes.  QUIC transport errors and EPP protocol failures ought to
+450	   be distinguishable to facilitate efficient troubleshooting.
+451	   Implementations MAY provide granular error reporting to help identify
+452	   session termination, connection timeout, and stream closure root
+453	   causes.  Operators MUST redact sensitive data in the logs, such as
+454	   user credentials and authorization information values.
+
+456	8.6.  Address Validation
+
+458	   EoQ implementations MUST follow the address validation requirements
+459	   defined in Section 8 of [RFC9000] to mitigate potential amplification
+460	   attacks and validate client address reachability.
+
+462	8.7.  Authentication Considerations
+
+464	   EoQ relies on the TLS authentication mechanisms defined in [RFC9001]
+465	   for peer authentication and credential validation.  Implementations
+466	   MUST follow the same authentication practices specified for EPP over
+467	   TLS in [RFC5734].  Server and client authentication procedures remain
+468	   unchanged from existing EPP deployment models when running over QUIC
+469	   transport.
+
+471	8.8.  0-RTT and Session Resumption
+
+473	   Using 0-RTT for EoQ allows clients to establish connections and
+474	   initiate EPP transactions without round-trip delay, enabling servers
+475	   to use shorter idle timers and reduce connection overhead.  Session
+476	   resumption and 0-RTT introduce privacy and replay risks.  EoQ
+477	   implementations SHOULD follow [RFC8446] and [RFC9001] guidance to
+478	   balance performance and risk mitigation.  Failure to do so increases
+479	   privacy exposure and replay attack risks.
+
+481	8.9.  MTU and Fragmentation
+
+483	   EoQ implementations MUST follow the MTU and fragmentation guidance
+484	   defined in [RFC9000].  Operators are encouraged to provision network
+485	   paths with appropriate MTU sizes to avoid packet fragmentation for
+486	   EPP message delivery.
+
+488	9.  IANA Considerations
+
+490	   RFC Editor Note: Please replace all occurrences of XXXX with the RFC
+491	   number to be assigned to this document.
+
+493	9.1.  Registration of an EoQ Identification String
+
+495	   This document creates a new registration for the identification of
+496	   EoQ in the "TLS Application-Layer Protocol Negotiation (ALPN)
+497	   Protocol IDs" registry under Transport Layer Security (TLS)
+498	   Extensions registry group available at
+499	   https://www.iana.org/assignments/tls-extensiontype-values/.
+
+501	   *  Protocol: EoQ
+
+503	   *  Identification Sequence: 0x45 0x6F 0x51 ("EoQ")
+
+505	   *  Reference: RFC XXXX
+
+507	9.2.  Registration of Port Number
+
+509	   The "Service Name and Transport Protocol Port Number Registry"
+510	   (https://www.iana.org/assignments/service-names-port-numbers/)
+511	   contains an entry for EPP UDP/700.  However, no known implementations
+512	   of EPP over UDP exist.  This document requests IANA to update that
+513	   entry so that it is reassigned to EPP and add a reference to this
+514	   document.
+
+516	   *  Service Name: epp
+
+518	   *  Port Number: 700
+
+520	   *  Transport Protocol(s): UDP
+
+522	   *  Assignee: IESG
+
+524	   *  Contact: IETF Chair
+
+526	   *  Description: EPP run over QUIC
+
+528	   *  Reference: [RFC5734] RFC XXXX
+
+530	10.  Implementation Status
+
+532	   Note to RFC Editor: Please remove this section and the reference to
+533	   RFC 7942 [RFC7942] before publication.
+
+535	   This section records the status of known implementations of the
+536	   protocol defined by this specification at the time of posting of this
+537	   Internet-Draft, and is based on a proposal described in RFC 7942
+538	   [RFC7942].  The description of implementations in this section is
+539	   intended to assist the IETF in its decision processes in progressing
+540	   drafts to RFCs.  Please note that the listing of any individual
+541	   implementation here does not imply endorsement by the IETF.
+542	   Furthermore, no effort has been spent to verify the information
+543	   presented here that was supplied by IETF contributors.  This is not
+544	   intended as, and must not be construed to be, a catalog of available
+545	   implementations or their features.  Readers are advised to note that
+546	   other implementations may exist.
+
+548	   According to RFC 7942 [RFC7942], "this will allow reviewers and
+549	   working groups to assign due consideration to documents that have the
+550	   benefit of running code, which may serve as evidence of valuable
+551	   experimentation and feedback that have made the implemented protocols
+552	   more mature.  It is up to the individual working groups to use this
+553	   information as they see fit".
+
+555	10.1.  Verisign EPP SDK
+
+557	   Organization: Verisign Inc.
+
+559	   Name: Verisign EPP SDK
+
+561	   Description: The Verisign EPP SDK includes both a full client
+562	   implementation and a full server stub implementation of this
+563	   specification.
+
+565	   Level of maturity: Development
+
+567	   Coverage: All aspects of the protocol are implemented with QUIC V1.
+
+569	   Licensing: GNU Lesser General Public License
+
+571	   Contact: jgould@verisign.com
+
+573	   URL: https://www.verisign.com/resources/registrar-resources/epp-sdk/
+
+575	11.  Security Considerations
+
+577	   EPP over QUIC provides the similar security with EPP over TCP with
+578	   TLS.  Some related security issues have been discussed in [RFC5734]
+579	   and [RFC9000].  Sections 8.7 and 8.8 of this document also discuss
+580	   related security issues.
+
+582	   EoQ servers run the risk of a resource exhaustion attack by allowing
+583	   the creation of unlimited QUIC streams per QUIC connection.  As
+584	   indicated in Section 8.4, servers should limit a client to a maximum
+585	   number of QUIC streams per QUIC connection based on server
+586	   capabilities and operational load.  Absent such limit, the server may
+587	   be subject to overload that would exhaust its resources.
+
+589	12.  Acknowledgements
+
+591	   The authors wish to thank the following persons for their feedback
+592	   and suggestions: Scott Hollenbeck, Lucas Pardue, Martin Thomson, and
+593	   Mohamed Boucadair.
+
+595	13.  References
+
+597	13.1.  Normative References
+
+599	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+600	              Requirement Levels", BCP 14, RFC 2119,
+601	              DOI 10.17487/RFC2119, March 1997,
+602	              <https://www.rfc-editor.org/info/rfc2119>.
+
+604	   [RFC5730]  Hollenbeck, S., "Extensible Provisioning Protocol (EPP)",
+605	              STD 69, RFC 5730, DOI 10.17487/RFC5730, August 2009,
+606	              <https://www.rfc-editor.org/info/rfc5730>.
+
+608	   [RFC5734]  Hollenbeck, S., "Extensible Provisioning Protocol (EPP)
+609	              Transport over TCP", STD 69, RFC 5734,
+610	              DOI 10.17487/RFC5734, August 2009,
+611	              <https://www.rfc-editor.org/info/rfc5734>.
+
+613	   [RFC6335]  Cotton, M., Eggert, L., Touch, J., Westerlund, M., and S.
+614	              Cheshire, "Internet Assigned Numbers Authority (IANA)
+615	              Procedures for the Management of the Service Name and
+616	              Transport Protocol Port Number Registry", BCP 165,
+617	              RFC 6335, DOI 10.17487/RFC6335, August 2011,
+618	              <https://www.rfc-editor.org/info/rfc6335>.
+
+620	   [RFC7301]  Friedl, S., Popov, A., Langley, A., and E. Stephan,
+621	              "Transport Layer Security (TLS) Application-Layer Protocol
+622	              Negotiation Extension", RFC 7301, DOI 10.17487/RFC7301,
+623	              July 2014, <https://www.rfc-editor.org/info/rfc7301>.
+
+625	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+626	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+627	              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+629	   [RFC8446]  Rescorla, E., "The Transport Layer Security (TLS) Protocol
+630	              Version 1.3", RFC 8446, DOI 10.17487/RFC8446, August 2018,
+631	              <https://www.rfc-editor.org/info/rfc8446>.
+
+633	   [RFC9000]  Iyengar, J., Ed. and M. Thomson, Ed., "QUIC: A UDP-Based
+634	              Multiplexed and Secure Transport", RFC 9000,
+635	              DOI 10.17487/RFC9000, May 2021,
+636	              <https://www.rfc-editor.org/info/rfc9000>.
+
+638	   [RFC9001]  Thomson, M., Ed. and S. Turner, Ed., "Using TLS to Secure
+639	              QUIC", RFC 9001, DOI 10.17487/RFC9001, May 2021,
+640	              <https://www.rfc-editor.org/info/rfc9001>.
+
+642	   [RFC9002]  Iyengar, J., Ed. and I. Swett, Ed., "QUIC Loss Detection
+643	              and Congestion Control", RFC 9002, DOI 10.17487/RFC9002,
+644	              May 2021, <https://www.rfc-editor.org/info/rfc9002>.
+
+646	13.2.  Informative References
+
+648	   [RFC7942]  Sheffer, Y. and A. Farrel, "Improving Awareness of Running
+649	              Code: The Implementation Status Section", BCP 205,
+650	              RFC 7942, DOI 10.17487/RFC7942, July 2016,
+651	              <https://www.rfc-editor.org/info/rfc7942>.
+
+653	   [RFC9308]  Kühlewind, M. and B. Trammell, "Applicability of the QUIC
+654	              Transport Protocol", RFC 9308, DOI 10.17487/RFC9308,
+655	              September 2022, <https://www.rfc-editor.org/info/rfc9308>.
+
+657	Appendix A.  Change History
+
+659	A.1.  Change from 00 to 01
+
+661	   1.  Added Dan Keathley and James Gould as co-authors and aligned the
+662	       draft with EPP RFC 5734.
+
+664	A.2.  Change from 01 to 02
+
+666	   1.  Make the clear distinction between an EPP connection and an EPP
+667	       session for EoQ in the Session Management section.
+668	   2.  Align the handling of the EPP <logout> command with RFC 5734, by
+669	       including "A client MAY end an EoQ session by closing the QUIC
+670	       stream" in the Session Management section.
+671	   3.  Ensure that the relationship of the EoQ connection and the EoQ
+672	       stream is maintained with the sentence "This means that a single
+673	       QUIC connection may support multiple EoQ sessions" in the Session
+674	       Management section.
+675	   4.  Leverage the EoQ session in place of the more generic EPP session
+676	       in the Message Exchange section.
+
+678	A.3.  Change from 02 to 03
+
+680	   1.  Added the definition and use of the EoQ Connection Start Packet
+681	       to explicitly trigger the creation of the QUIC stream and the EoQ
+682	       connection to the server.
+683	   2.  Added the Implementation Status section with the Verisign EPP SDK
+684	       implementation.
+
+686	A.4.  draft-ietf-regext-epp-quic-00
+
+688	   1.  updated to WG document
+
+690	A.5.  draft-ietf-regext-epp-quic-01
+
+692	   1.  add section 8.1.  EPP Extension Registry
+
+694	A.6.  draft-ietf-regext-epp-quic-02
+
+696	   Incorporated feedback from Lucas Pardue:
+
+698	   1.  Added a list of terms in Section 2 "Conventions Used in This
+699	       Document".
+700	   2.  Changed ALPN "eoq" value to "eoq/0.1" to support versioning,
+701	       which will be changed to "eoq/1.0" once passing WGLC.
+702	   3.  Changed "A client MAY end an EoQ session by closing the QUIC
+703	       stream" to "A client MAY end an EoQ session by closing the QUIC
+704	       stream and the server MUST end the EoQ session by closing the
+705	       QUIC stream".
+706	   4.  Added language to Section 3 "Session Management" to make it clear
+707	       that a bidirectional QUIC stream is client-initiated and
+708	       inclusion of the "eoq/0.1" ALPN was added for the QUIC
+709	       connection.
+710	   5.  Added "QUIC supports four stream types, but EoQ only supports the
+711	       client-initiated, bidirectional stream type." to Section 3
+712	       "Session Management" to be clear the stream types supported by
+713	       EoQ.
+
+715	A.7.  draft-ietf-regext-epp-quic-03
+
+717	   Nit fixes, such as spelling fixes and small wording changes.
+
+719	A.8.  draft-ietf-regext-epp-quic-04
+
+721	   Incorporated feedback from Martin Thompson:
+
+723	   1.  Changed ALPN "eoq/0.1" value to "EoQ" to match the value of "DoQ"
+724	       for DNS over QUIC in RFC 9250, which doesn't include versioning.
+
+726	   2.  Added a reference to section 5 "Data Unit Format" in Section 7
+727	       for defining the packet framing of EoQ.
+728	   3.  Address the additional pipelining considerations (independent
+729	       command processing, batching, error in processing commands).
+
+731	   In the IANA Considerations section, removed the registration of the
+732	   EoQ transport in the EPP Extension Registry.
+
+734	A.9.  draft-ietf-regext-epp-quic-05
+
+736	   Incorporated feedback from the Working Group Last Call (WGLC):
+
+738	   1.  Made references consistent for the ALPN "EoQ" value with a
+739	       reference to RFC 7301.
+740	   2.  Add missing comma in the Acknowledgments section between Scott
+741	       Hollenbeck and Lucas Pardue.
+742	   3.  Removed normative reference to RFC 7451.
+
+744	A.10.  draft-ietf-regext-epp-quic-06
+
+746	   Incorporated feedback from the document shepherd review:
+
+748	   1.  Updated the Verisign EPP SDK link to
+749	       "https://www.verisign.com/resources/registrar-resources/epp-
+750	       sdk/".
+751	   2.  Updated Section 2 "Conventions Used in This Document" to
+752	       reference RFC 2119 and RFC 8174.
+
+754	A.11.  draft-ietf-regext-epp-quic-07
+
+756	   Update the draft based on AD's comments:
+
+758	   1.  Refine the texts.
+759	   2.  Add the Operational Considerations section.
+
+761	A.12.  draft-ietf-regext-epp-quic-08
+
+763	   Refine the texts based on AD's further comments
+
+765	A.13.  draft-ietf-regext-epp-quic-09
+
+767	   Refine the texts based on AD's comments
+
+769	A.14.  draft-ietf-regext-epp-quic-10
+
+771	   Refine the texts based on last call comments
+772	   Move the Operations Considerations section to be just before the IANA
+773	   Considerations section based on Giuseppe's comment
+
+775	Authors' Addresses
+
+777	   Jiankang Yao
+778	   CNNIC
+779	   4 South 4th Street,Zhongguancun,Haidian District
+780	   Beijing
+781	   Beijing, 100190
+782	   China
+783	   Phone: +86 10 59116505
+784	   Email: yaojk@cnnic.cn
+
+786	   Hongtao Li
+787	   CNNIC
+788	   4 South 4th Street,Zhongguancun,Haidian District
+789	   Beijing
+790	   Beijing, 100190
+791	   China
+792	   Email: lihongtao@cnnic.cn
+
+794	   Man Zhang
+795	   CNNIC
+796	   4 South 4th Street,Zhongguancun,Haidian District
+797	   Beijing
+798	   Beijing, 100190
+799	   China
+800	   Email: zhangman@cnnic.cn
+
+802	   Daniel Keathley
+803	   VeriSign, Inc.
+804	   12061 Bluemont Way
+805	   Reston, VA 20190
+806	   United States of America
+807	   Email: dkeathley@verisign.com
+808	   URI:   http://www.verisigninc.com
+
+810	   James Gould
+811	   VeriSign, Inc.
+812	   12061 Bluemont Way
+813	   Reston, VA 20190
+814	   United States of America
+815	   Email: jgould@verisign.com
+816	   URI:   http://www.verisigninc.com
+
+
+
+
+
+
+
+
+
