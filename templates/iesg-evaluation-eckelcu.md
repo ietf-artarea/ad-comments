@@ -1,4 +1,4 @@
-# Charles Eckel, ART AD, comments for DRAFT 
+# Charles Eckel, ART AD, IESG ballot for DRAFT 
 CC @eckelcu
 
 * line numbers:
