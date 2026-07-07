@@ -1,0 +1,1064 @@
+
+
+
+
+Internet Engineering Task Force                                   J. Yao
+Internet-Draft                                                     H. Li
+Intended status: Standards Track                                M. Zhang
+Expires: 25 December 2026                                          CNNIC
+                                                             D. Keathley
+                                                                J. Gould
+                                                          VeriSign, Inc.
+                                                            23 June 2026
+
+
+       Extensible Provisioning Protocol (EPP) Transport over QUIC
+                     draft-ietf-regext-epp-quic-10
+
+Abstract
+
+   This document specifies how an Extensible Provisioning Protocol (EPP)
+   session is mapped onto a QUIC connection.  EPP over QUIC (EoQ)
+   leverages features of the QUIC protocol.
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 25 December 2026.
+
+Copyright Notice
+
+   Copyright (c) 2026 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+
+
+
+
+
+
+
+
+
+
+Yao, et al.             Expires 25 December 2026                [Page 1]
+
+Internet-Draft                EPP over QUIC                    June 2026
+
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.  Code Components
+   extracted from this document must include Revised BSD License text as
+   described in Section 4.e of the Trust Legal Provisions and are
+   provided without warranty as described in the Revised BSD License.
+
+Table of Contents
+
+   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
+   2.  Terminology . . . . . . . . . . . . . . . . . . . . . . . . .   3
+   3.  Session Management  . . . . . . . . . . . . . . . . . . . . .   4
+   4.  Message Exchange  . . . . . . . . . . . . . . . . . . . . . .   5
+   5.  Data Unit Format  . . . . . . . . . . . . . . . . . . . . . .   8
+   6.  EoQ Connection Start Packet . . . . . . . . . . . . . . . . .   8
+   7.  Transport Considerations  . . . . . . . . . . . . . . . . . .   9
+   8.  Operational Considerations  . . . . . . . . . . . . . . . . .  10
+     8.1.  Clients Fall Back with Management of Multiple
+           Transport . . . . . . . . . . . . . . . . . . . . . . . .  10
+     8.2.  Port Reuse  . . . . . . . . . . . . . . . . . . . . . . .  10
+     8.3.  QUIC Support Announcement and Discovery . . . . . . . . .  10
+     8.4.  Configuration Parameters  . . . . . . . . . . . . . . . .  10
+     8.5.  Diagnostic and Troubleshooting  . . . . . . . . . . . . .  11
+     8.6.  Address Validation  . . . . . . . . . . . . . . . . . . .  11
+     8.7.  Authentication Considerations . . . . . . . . . . . . . .  11
+     8.8.  0-RTT and Session Resumption  . . . . . . . . . . . . . .  11
+     8.9.  MTU and Fragmentation . . . . . . . . . . . . . . . . . .  11
+   9.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  12
+     9.1.  Registration of an EoQ Identification String  . . . . . .  12
+     9.2.  Registration of Port Number . . . . . . . . . . . . . . .  12
+   10. Implementation Status . . . . . . . . . . . . . . . . . . . .  12
+     10.1.  Verisign EPP SDK . . . . . . . . . . . . . . . . . . . .  13
+   11. Security Considerations . . . . . . . . . . . . . . . . . . .  13
+   12. Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  14
+   13. References  . . . . . . . . . . . . . . . . . . . . . . . . .  14
+     13.1.  Normative References . . . . . . . . . . . . . . . . . .  14
+     13.2.  Informative References . . . . . . . . . . . . . . . . .  15
+   Appendix A.  Change History . . . . . . . . . . . . . . . . . . .  15
+     A.1.  Change from 00 to 01  . . . . . . . . . . . . . . . . . .  15
+     A.2.  Change from 01 to 02  . . . . . . . . . . . . . . . . . .  15
+     A.3.  Change from 02 to 03  . . . . . . . . . . . . . . . . . .  16
+     A.4.  draft-ietf-regext-epp-quic-00 . . . . . . . . . . . . . .  16
+     A.5.  draft-ietf-regext-epp-quic-01 . . . . . . . . . . . . . .  16
+     A.6.  draft-ietf-regext-epp-quic-02 . . . . . . . . . . . . . .  16
+     A.7.  draft-ietf-regext-epp-quic-03 . . . . . . . . . . . . . .  16
+     A.8.  draft-ietf-regext-epp-quic-04 . . . . . . . . . . . . . .  16
+
+
+
+Yao, et al.             Expires 25 December 2026                [Page 2]
+
+Internet-Draft                EPP over QUIC                    June 2026
+
+
+     A.9.  draft-ietf-regext-epp-quic-05 . . . . . . . . . . . . . .  17
+     A.10. draft-ietf-regext-epp-quic-06 . . . . . . . . . . . . . .  17
+     A.11. draft-ietf-regext-epp-quic-07 . . . . . . . . . . . . . .  17
+     A.12. draft-ietf-regext-epp-quic-08 . . . . . . . . . . . . . .  17
+     A.13. draft-ietf-regext-epp-quic-09 . . . . . . . . . . . . . .  17
+     A.14. draft-ietf-regext-epp-quic-10 . . . . . . . . . . . . . .  17
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  18
+
+1.  Introduction
+
+   This document specifies how the Extensible Provisioning Protocol
+   (EPP)[RFC5730] is mapped onto the QUIC transport [RFC9000].  QUIC is
+   a network protocol that is based on UDP and incorporates native
+   encryption support using TLS [RFC9001].  Though based on UDP, QUIC
+   provides connection semantics like other stateful protocols.  This
+   document discusses how EPP implementations can work with this and
+   other features of QUIC while preserving the core EPP semantics.
+
+   EPP sessions use a single QUIC stream for all command and response
+   exchanges throughout the session lifecycle.  Unlike stateless
+   transaction protocols that permit per-command independent streams,
+   EPP is a stateful protocol with inherent sequential command
+   dependencies defined in [RFC5730].  Maintaining a single stream
+   preserves ordered transaction processing, consistent session state,
+   and full compatibility with existing EPP operational and
+   implementation models.
+
+   EPP [RFC5730] was designed for pluggability of transports that must
+   follow Section 2.1 of [RFC5730].  EoQ defines a fully pluggable QUIC
+   transport for EPP as an alternative to other EPP transports, such as
+   EPP over TCP (EoT) defined in [RFC5734].  The server can choose to
+   offer EoQ in addition to EoT or as a replacement for EoT, based on
+   the security and performance considerations of QUIC and the preferred
+   deployment architecture of the server and clients.
+
+2.  Terminology
+
+   This document makes use of the following terms:
+
+   EoQ:  The acronym used for the EPP over QUIC transport that defines
+      the use of QUIC as an EPP transport following the considerations
+      in Section 2.1 of [RFC5730].
+
+   EoQ connection:  Is a client-initiated bidirectional QUIC stream
+
+
+
+
+
+
+
+Yao, et al.             Expires 25 December 2026                [Page 3]
+
+Internet-Draft                EPP over QUIC                    June 2026
+
+
+      established on a QUIC connection using the "EoQ" Application-Layer
+      Protocol Negotiation (ALPN) [RFC7301] value.  The EoQ connection
+      maps to the client-server connection defined in Section 2.1 of
+      [RFC5730], where the server returns an EPP <greeting>.  A single
+      QUIC connection supports many EoQ connections.
+
+   EoQ session:  Is an authenticated EoQ connection, which occurs after
+      a successful EPP <login>.
+
+   EoQ Connection Start Packet:  Used by clients to complete the
+      creation of an EoQ connection by signaling the server to create
+      the QUIC stream and return the EPP <greeting> needed for an EPP
+      connection.  Section 6 formally defines the EoQ Connection Start
+      Packet.
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+   "OPTIONAL" in this document are to be interpreted as described in BCP
+   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+   capitals, as shown here.
+
+3.  Session Management
+
+   Mapping EPP session management facilities onto the QUIC service is
+   accomplished with a combination of a QUIC connection with the "EoQ"
+   ALPN [RFC7301] value and client-initiated, bidirectional QUIC
+   streams.  QUIC supports four stream types (Section 2.1 of [RFC9000]),
+   but EoQ only supports the client-initiated, bidirectional stream
+   type.
+
+   As shown in Figure 1 in Section 4, an EPP session first requires
+   creation of a QUIC connection between two peers, one that initiates
+   the connection request and one that responds to the connection
+   request.  The initiating peer is called the "client", and the
+   responding peer is called the "server".  By default, an EPP server
+   MUST listen for QUIC connection requests on a well-known UDP port
+   number assigned by IANA (see Section 9.2), unless there is a mutual
+   agreement to use another port number.
+
+   A successfully established QUIC connection is secured by the native
+   TLS support that QUIC provides using the "EoQ" ALPN value.
+
+   Once the QUIC connection is established, the EPP client MUST then
+   create a bidirectional QUIC stream by sending the EoQ Connection
+   Start Packet (Section 6).  [RFC9000] states that "streams are created
+   by sending data".  If the EPP server accepts the QUIC stream, it
+   reads the EoQ Connection Start Packet (Section 6) and returns an EPP
+   <greeting> to the client on the same QUIC stream.  After reading the
+
+
+
+Yao, et al.             Expires 25 December 2026                [Page 4]
+
+Internet-Draft                EPP over QUIC                    June 2026
+
+
+   EPP <greeting> message, and absent processing errors, the EPP client
+   sends EPP commands and receives EPP responses on the same stream.  A
+   QUIC stream corresponds to an EPP connection, which is referred to as
+   an EoQ connection.  An authenticated QUIC stream, via a successful
+   EPP <login>, corresponds to an EPP session, which is referred to as
+   an EoQ session.
+
+   An EPP session is normally ended by the client issuing an EPP
+   <logout> command.  A server receiving an EPP <logout> command MUST
+   end the EPP session and close the QUIC stream.  A client MAY end an
+   EoQ session by closing the QUIC stream and the server MUST end the
+   EoQ session by closing the QUIC stream.
+
+   EoQ connections are established as described in the QUIC transport
+   specification [RFC9000].  During connection establishment, EoQ
+   support is indicated using the "EoQ" ALPN value in the cryptographic
+   handshake.
+
+   A single QUIC connection may allow multiple QUIC streams.  This means
+   that a single QUIC connection may support multiple EoQ sessions.  A
+   server MAY limit the life span of an established EoQ session.  EoQ
+   sessions that are inactive for more than a server-defined period MAY
+   be ended by the server closing the QUIC stream.  A server MAY close
+   EoQ sessions that have been open and active for longer than a server-
+   defined limit.  The max_idle_timeout transport parameter defined in
+   Section 18.2 of [RFC9000] MUST NOT be set to a non-zero value by the
+   client or server.  Once the last QUIC stream for a QUIC connection is
+   closed, the server MAY end the QUIC connection immediately.
+
+4.  Message Exchange
+
+   EPP messages are passed on an EoQ connection, which is a client-
+   initiated, bidirectional QUIC stream, defined in Section 3.  Except
+   for the EPP server <greeting>, EPP messages are initiated by the EPP
+   client in the form of EPP commands.  An EPP server MUST return an EPP
+   response to an EPP command on the same QUIC stream that carried the
+   command.  If the QUIC stream is closed after a server receives and
+   successfully processes a command but before the response can be
+   returned to the client, the server MAY attempt to undo the effects of
+   the command to ensure a consistent state between the client and the
+   server.  EPP commands are idempotent, so processing a command more
+   than once produces the same net effect on the repository as
+   successfully processing the command once.
+
+   An EPP client streams EPP commands to an EPP server on an established
+   QUIC stream.  A client MAY establish multiple QUIC streams to support
+   multiple EoQ sessions with each EoQ session mapped to a single QUIC
+   stream.  A server SHOULD limit a client to a maximum number of QUIC
+
+
+
+Yao, et al.             Expires 25 December 2026                [Page 5]
+
+Internet-Draft                EPP over QUIC                    June 2026
+
+
+   streams per QUIC connection based on server capabilities and
+   operational load.  Absent such limit, a server may be subject to
+   overload and resource exhaustion.
+
+   EPP describes client-server interaction as a command-response
+   exchange where the client sends one command to the server and the
+   server returns one response to the client.
+
+   Each EPP data unit MUST contain a single EPP message.  Commands MUST
+   be processed independently.
+
+   A server SHOULD impose a limit on the amount of time required for a
+   client to issue a well-formed EPP command to reduce the risk
+   associated with a resource exhaustion attack.  For example, the time
+   limit is 10-minutes for the server idle timeout and 8-minutes for
+   client keep-alive.  Absent local policy, a server SHOULD end an EoQ
+   session and close the QUIC stream if a well-formed command is not
+   received within the time limit.
+
+   A general state machine for an EPP server is described in Section 2
+   of [RFC5730].  A general client-server message exchange using QUIC
+   transport is illustrated in Figure 1.  It shows an example of
+   successful exchange over a single QUIC stream of a QUIC connection.
+   Many QUIC streams may be opened and closed during the life of a QUIC
+   connection.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Yao, et al.             Expires 25 December 2026                [Page 6]
+
+Internet-Draft                EPP over QUIC                    June 2026
+
+
+                       Client                  Server
+                  |                                     |
+                  |      Successful QUIC Connection     |
+                  | <<------------------------------->> |
+                  |                                     |
+                  |     Successful QUIC Stream with     |
+                  |     EoQ Connection Start Packet     |
+                  | <<------------------------------->> |
+                  |                                     |
+                  |             Send Greeting           |
+                  | <<-------------------------------<< |
+                  |                                     |
+                  |             Send <login>            |
+                  | >>------------------------------->> |
+                  |                                     |
+                  |             Send Response           |
+                  | <<-------------------------------<< |
+                  |                                     |
+                  |            Send Command X           |
+                  | >>------------------------------->> |
+                  |                                     |
+                  |            Send Response X          |
+                  | <<-------------------------------<< |
+                  |                                     |
+                  |            Send Command Y           |
+                  | >>------------------------------->> |
+                  |                                     |
+                  |            Send Response Y          |
+                  | <<-------------------------------<< |
+                  |                  .                  |
+                                     .
+                                     .
+                  |            Send <logout>            |
+                  | >>------------------------------->> |
+                  |                                     |
+                  |            Send Response            |
+                  | <<-------------------------------<< |
+                  |                                     |
+                  |          Close QUIC Stream          |
+                  | <<------------------------------->> |
+                  |                                     |
+                  |        Close QUIC Connection        |
+                  | <<------------------------------->> |
+
+     Figure 1: Example of Successful QUIC Client-Server Message Exchange
+
+
+
+
+
+
+Yao, et al.             Expires 25 December 2026                [Page 7]
+
+Internet-Draft                EPP over QUIC                    June 2026
+
+
+   The EPP server MUST follow the "EPP Server State Machine" procedure
+   described in [RFC5730].
+
+5.  Data Unit Format
+
+   The EPP data unit contains two fields: a 32-bit header that describes
+   the total length of the data unit, and the EPP XML instance.  The
+   length of the EPP XML instance is determined by subtracting four
+   octets from the total length of the data unit.  A receiver must
+   successfully read that many octets to retrieve the complete EPP XML
+   instance before processing the EPP message.  The EPP Data Unit Format
+   is depicted in Figure 2 (one tick mark represents one bit position).
+
+
+        0                   1                   2                   3
+        0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+       |                           Total Length                        |
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+       |                         EPP XML Instance                      |
+       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+                             Figure 2: EPP Data Unit Format
+
+   The description of the fields shown in Figure 2 is as follows:
+
+   Total Length (32 bits): The total length of the EPP data unit
+   measured in octets in network (big endian) byte order.  The octets
+   contained in this field MUST be included in the total length
+   calculation.  The 32 bits total length matches the total length used
+   in EoT, defined in [RFC5734], to support transport pluggability.
+
+   EPP XML Instance (variable length): The EPP XML instance carried in
+   the data unit.
+
+6.  EoQ Connection Start Packet
+
+   The EoQ Connection Start Packet is written by the client after
+   creating a QUIC stream to signal to the server to initialize the QUIC
+   stream.  Absent processing errors or local policy, the server accepts
+   the QUIC stream, reads the EoQ Connection Start Packet, and returns
+   the EPP <greeting> to the client on same QUIC stream.
+
+
+
+
+
+
+
+
+
+Yao, et al.             Expires 25 December 2026                [Page 8]
+
+Internet-Draft                EPP over QUIC                    June 2026
+
+
+   The EoQ Connection Start Packet follows the Data Unit Format
+   (Section 5) with two fields: a 32-bit header that describes the total
+   length of the data unit, and the constant value of "EoQ Connection
+   Start" instead of an "EPP XML Instance".  The length of a valid data
+   unit MUST be 24 octets that includes 4 octets for the Total Length
+   and 20 octets for the "EoQ Connection Start" constant value.
+
+7.  Transport Considerations
+
+   Section 2.1 of [RFC5730] describes considerations to be addressed by
+   protocol transport mappings.  This document addresses each of those
+   considerations using a combination of features of the QUIC protocol
+   and features of this document as discussed below:
+
+   *  Command Order: QUIC guarantees ordered processing of data within
+      each stream.  Section 2 of [RFC9000] describes streams in detail.
+
+   *  Session Mapping: EPP session management utilizes QUIC streams and
+      is described in Section 3
+
+   *  Stateful Nature: QUIC supports stateful communications between
+      endpoints via Connection IDs and long-lived streams within each
+      connection.  QUIC streams on top of QUIC connections, defined in
+      section 2 and section 5 of [RFC9000] , are used to create stateful
+      communications between the client and server.
+
+   *  Frame Data Units: EoQ uses the packet framing defined in
+      Section 5.
+
+   *  Congestion Avoidance: QUIC provides various mechanisms to help
+      achieve congestion avoidance.  [RFC9002] describes these
+      mechanisms in detail.
+
+   *  Reliability: QUIC uses message acknowledgement, packet
+      retransmission, and other features to ensure reliability.
+      Section 13 of [RFC9000] describes these features in detail.
+
+   *  Pipelining: Pipelining is allowed in EoQ.  QUIC streams support
+      sending multiple frames without waiting for responses from the
+      other peer.  This does not change the basic single command, single
+      response operating mode of the core EPP.
+
+      Commands MUST be processed independently and in the same order as
+      sent from the client.
+
+      Batch-oriented processing (combining multiple EPP commands in a
+      single data unit) is not permitted.  Each EPP data unit must
+      contain a single EPP message.
+
+
+
+Yao, et al.             Expires 25 December 2026                [Page 9]
+
+Internet-Draft                EPP over QUIC                    June 2026
+
+
+      An EPP x5zz "Connection Management" error response, defined in
+      Section 3 of [RFC5730], of a well-formed EPP client packet results
+      in the server closing the EoQ connection after returning the error
+      response.  A malformed EPP client packet results in the server
+      closing the EoQ connection without providing an error response.
+      All subsequent EPP commands sent on the EoQ connection will not be
+      processed.
+
+8.  Operational Considerations
+
+   Some of the concerns examined within this section are also addressed
+   in [RFC9308].  Authors of this specification encourage implementers
+   to understand [RFC9308].
+
+8.1.  Clients Fall Back with Management of Multiple Transport
+
+   If the establishment of an EoQ connection fails, clients MAY attempt
+   to fall back to EPP over TCP as specified in [RFC5734], depending on
+   local deployment and security policy.  It is up to clients to
+   determine the mix of transports that best meets their business needs.
+
+8.2.  Port Reuse
+
+   Although [RFC5734] does only a request for TCP, the companion UDP
+   number was also allocated.  That practice was prior to [RFC6335] when
+   TCP and UDP port numbers were simultaneously assigned when either was
+   requested.  Section 9.2 updates EPP UDP/700 allocation to be used for
+   EoQ.  This update does not introduce any operational issues given
+   that there are no known implementations of EPP over UDP that exist.
+
+8.3.  QUIC Support Announcement and Discovery
+
+   There is no dedicated in-band mechanism defined in this specification
+   for a server to explicitly announce EoQ support to clients.
+   Operators MAY use out-of-band configuration or provisioning channels
+   to advertise server EoQ support to clients in advance.
+
+8.4.  Configuration Parameters
+
+   Implementations MAY configure operational parameters to control EoQ
+   session behavior.  These parameters can include idle session timeout,
+   maximum QUIC streams per connection,command processing timeout, and
+   maximum session timeout.  Servers and clients SHOULD configure limits
+   to avoid session disruption and resource exhaustion.
+
+   Implementation Note: There is no in-band protocol mechanism to align
+   limits.  Operators typically distribute standard settings via SDKs.
+   Client timeout and stream limits shall be set lower than server
+
+
+
+Yao, et al.             Expires 25 December 2026               [Page 10]
+
+Internet-Draft                EPP over QUIC                    June 2026
+
+
+   values for graceful connection handling.  Timeout rules are
+   consistent across EoT and EoQ; per-connection stream limits are newly
+   introduced in EoQ.
+
+8.5.  Diagnostic and Troubleshooting
+
+   Operators SHOULD log EoQ connection establishment status, stream
+   lifecycle events, and command transaction results for diagnostic
+   purposes.  QUIC transport errors and EPP protocol failures ought to
+   be distinguishable to facilitate efficient troubleshooting.
+   Implementations MAY provide granular error reporting to help identify
+   session termination, connection timeout, and stream closure root
+   causes.  Operators MUST redact sensitive data in the logs, such as
+   user credentials and authorization information values.
+
+8.6.  Address Validation
+
+   EoQ implementations MUST follow the address validation requirements
+   defined in Section 8 of [RFC9000] to mitigate potential amplification
+   attacks and validate client address reachability.
+
+8.7.  Authentication Considerations
+
+   EoQ relies on the TLS authentication mechanisms defined in [RFC9001]
+   for peer authentication and credential validation.  Implementations
+   MUST follow the same authentication practices specified for EPP over
+   TLS in [RFC5734].  Server and client authentication procedures remain
+   unchanged from existing EPP deployment models when running over QUIC
+   transport.
+
+8.8.  0-RTT and Session Resumption
+
+   Using 0-RTT for EoQ allows clients to establish connections and
+   initiate EPP transactions without round-trip delay, enabling servers
+   to use shorter idle timers and reduce connection overhead.  Session
+   resumption and 0-RTT introduce privacy and replay risks.  EoQ
+   implementations SHOULD follow [RFC8446] and [RFC9001] guidance to
+   balance performance and risk mitigation.  Failure to do so increases
+   privacy exposure and replay attack risks.
+
+8.9.  MTU and Fragmentation
+
+   EoQ implementations MUST follow the MTU and fragmentation guidance
+   defined in [RFC9000].  Operators are encouraged to provision network
+   paths with appropriate MTU sizes to avoid packet fragmentation for
+   EPP message delivery.
+
+
+
+
+
+Yao, et al.             Expires 25 December 2026               [Page 11]
+
+Internet-Draft                EPP over QUIC                    June 2026
+
+
+9.  IANA Considerations
+
+   RFC Editor Note: Please replace all occurrences of XXXX with the RFC
+   number to be assigned to this document.
+
+9.1.  Registration of an EoQ Identification String
+
+   This document creates a new registration for the identification of
+   EoQ in the "TLS Application-Layer Protocol Negotiation (ALPN)
+   Protocol IDs" registry under Transport Layer Security (TLS)
+   Extensions registry group available at
+   https://www.iana.org/assignments/tls-extensiontype-values/.
+
+   *  Protocol: EoQ
+
+   *  Identification Sequence: 0x45 0x6F 0x51 ("EoQ")
+
+   *  Reference: RFC XXXX
+
+9.2.  Registration of Port Number
+
+   The "Service Name and Transport Protocol Port Number Registry"
+   (https://www.iana.org/assignments/service-names-port-numbers/)
+   contains an entry for EPP UDP/700.  However, no known implementations
+   of EPP over UDP exist.  This document requests IANA to update that
+   entry so that it is reassigned to EPP and add a reference to this
+   document.
+
+   *  Service Name: epp
+
+   *  Port Number: 700
+
+   *  Transport Protocol(s): UDP
+
+   *  Assignee: IESG
+
+   *  Contact: IETF Chair
+
+   *  Description: EPP run over QUIC
+
+   *  Reference: [RFC5734] RFC XXXX
+
+10.  Implementation Status
+
+   Note to RFC Editor: Please remove this section and the reference to
+   RFC 7942 [RFC7942] before publication.
+
+
+
+
+
+Yao, et al.             Expires 25 December 2026               [Page 12]
+
+Internet-Draft                EPP over QUIC                    June 2026
+
+
+   This section records the status of known implementations of the
+   protocol defined by this specification at the time of posting of this
+   Internet-Draft, and is based on a proposal described in RFC 7942
+   [RFC7942].  The description of implementations in this section is
+   intended to assist the IETF in its decision processes in progressing
+   drafts to RFCs.  Please note that the listing of any individual
+   implementation here does not imply endorsement by the IETF.
+   Furthermore, no effort has been spent to verify the information
+   presented here that was supplied by IETF contributors.  This is not
+   intended as, and must not be construed to be, a catalog of available
+   implementations or their features.  Readers are advised to note that
+   other implementations may exist.
+
+   According to RFC 7942 [RFC7942], "this will allow reviewers and
+   working groups to assign due consideration to documents that have the
+   benefit of running code, which may serve as evidence of valuable
+   experimentation and feedback that have made the implemented protocols
+   more mature.  It is up to the individual working groups to use this
+   information as they see fit".
+
+10.1.  Verisign EPP SDK
+
+   Organization: Verisign Inc.
+
+   Name: Verisign EPP SDK
+
+   Description: The Verisign EPP SDK includes both a full client
+   implementation and a full server stub implementation of this
+   specification.
+
+   Level of maturity: Development
+
+   Coverage: All aspects of the protocol are implemented with QUIC V1.
+
+   Licensing: GNU Lesser General Public License
+
+   Contact: jgould@verisign.com
+
+   URL: https://www.verisign.com/resources/registrar-resources/epp-sdk/
+
+11.  Security Considerations
+
+   EPP over QUIC provides the similar security with EPP over TCP with
+   TLS.  Some related security issues have been discussed in [RFC5734]
+   and [RFC9000].  Sections 8.7 and 8.8 of this document also discuss
+   related security issues.
+
+
+
+
+
+Yao, et al.             Expires 25 December 2026               [Page 13]
+
+Internet-Draft                EPP over QUIC                    June 2026
+
+
+   EoQ servers run the risk of a resource exhaustion attack by allowing
+   the creation of unlimited QUIC streams per QUIC connection.  As
+   indicated in Section 8.4, servers should limit a client to a maximum
+   number of QUIC streams per QUIC connection based on server
+   capabilities and operational load.  Absent such limit, the server may
+   be subject to overload that would exhaust its resources.
+
+12.  Acknowledgements
+
+   The authors wish to thank the following persons for their feedback
+   and suggestions: Scott Hollenbeck, Lucas Pardue, Martin Thomson, and
+   Mohamed Boucadair.
+
+13.  References
+
+13.1.  Normative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/info/rfc2119>.
+
+   [RFC5730]  Hollenbeck, S., "Extensible Provisioning Protocol (EPP)",
+              STD 69, RFC 5730, DOI 10.17487/RFC5730, August 2009,
+              <https://www.rfc-editor.org/info/rfc5730>.
+
+   [RFC5734]  Hollenbeck, S., "Extensible Provisioning Protocol (EPP)
+              Transport over TCP", STD 69, RFC 5734,
+              DOI 10.17487/RFC5734, August 2009,
+              <https://www.rfc-editor.org/info/rfc5734>.
+
+   [RFC6335]  Cotton, M., Eggert, L., Touch, J., Westerlund, M., and S.
+              Cheshire, "Internet Assigned Numbers Authority (IANA)
+              Procedures for the Management of the Service Name and
+              Transport Protocol Port Number Registry", BCP 165,
+              RFC 6335, DOI 10.17487/RFC6335, August 2011,
+              <https://www.rfc-editor.org/info/rfc6335>.
+
+   [RFC7301]  Friedl, S., Popov, A., Langley, A., and E. Stephan,
+              "Transport Layer Security (TLS) Application-Layer Protocol
+              Negotiation Extension", RFC 7301, DOI 10.17487/RFC7301,
+              July 2014, <https://www.rfc-editor.org/info/rfc7301>.
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+
+
+
+
+Yao, et al.             Expires 25 December 2026               [Page 14]
+
+Internet-Draft                EPP over QUIC                    June 2026
+
+
+   [RFC8446]  Rescorla, E., "The Transport Layer Security (TLS) Protocol
+              Version 1.3", RFC 8446, DOI 10.17487/RFC8446, August 2018,
+              <https://www.rfc-editor.org/info/rfc8446>.
+
+   [RFC9000]  Iyengar, J., Ed. and M. Thomson, Ed., "QUIC: A UDP-Based
+              Multiplexed and Secure Transport", RFC 9000,
+              DOI 10.17487/RFC9000, May 2021,
+              <https://www.rfc-editor.org/info/rfc9000>.
+
+   [RFC9001]  Thomson, M., Ed. and S. Turner, Ed., "Using TLS to Secure
+              QUIC", RFC 9001, DOI 10.17487/RFC9001, May 2021,
+              <https://www.rfc-editor.org/info/rfc9001>.
+
+   [RFC9002]  Iyengar, J., Ed. and I. Swett, Ed., "QUIC Loss Detection
+              and Congestion Control", RFC 9002, DOI 10.17487/RFC9002,
+              May 2021, <https://www.rfc-editor.org/info/rfc9002>.
+
+13.2.  Informative References
+
+   [RFC7942]  Sheffer, Y. and A. Farrel, "Improving Awareness of Running
+              Code: The Implementation Status Section", BCP 205,
+              RFC 7942, DOI 10.17487/RFC7942, July 2016,
+              <https://www.rfc-editor.org/info/rfc7942>.
+
+   [RFC9308]  Kühlewind, M. and B. Trammell, "Applicability of the QUIC
+              Transport Protocol", RFC 9308, DOI 10.17487/RFC9308,
+              September 2022, <https://www.rfc-editor.org/info/rfc9308>.
+
+Appendix A.  Change History
+
+A.1.  Change from 00 to 01
+
+   1.  Added Dan Keathley and James Gould as co-authors and aligned the
+       draft with EPP RFC 5734.
+
+A.2.  Change from 01 to 02
+
+   1.  Make the clear distinction between an EPP connection and an EPP
+       session for EoQ in the Session Management section.
+   2.  Align the handling of the EPP <logout> command with RFC 5734, by
+       including "A client MAY end an EoQ session by closing the QUIC
+       stream" in the Session Management section.
+   3.  Ensure that the relationship of the EoQ connection and the EoQ
+       stream is maintained with the sentence "This means that a single
+       QUIC connection may support multiple EoQ sessions" in the Session
+       Management section.
+   4.  Leverage the EoQ session in place of the more generic EPP session
+       in the Message Exchange section.
+
+
+
+Yao, et al.             Expires 25 December 2026               [Page 15]
+
+Internet-Draft                EPP over QUIC                    June 2026
+
+
+A.3.  Change from 02 to 03
+
+   1.  Added the definition and use of the EoQ Connection Start Packet
+       to explicitly trigger the creation of the QUIC stream and the EoQ
+       connection to the server.
+   2.  Added the Implementation Status section with the Verisign EPP SDK
+       implementation.
+
+A.4.  draft-ietf-regext-epp-quic-00
+
+   1.  updated to WG document
+
+A.5.  draft-ietf-regext-epp-quic-01
+
+   1.  add section 8.1.  EPP Extension Registry
+
+A.6.  draft-ietf-regext-epp-quic-02
+
+   Incorporated feedback from Lucas Pardue:
+
+   1.  Added a list of terms in Section 2 "Conventions Used in This
+       Document".
+   2.  Changed ALPN "eoq" value to "eoq/0.1" to support versioning,
+       which will be changed to "eoq/1.0" once passing WGLC.
+   3.  Changed "A client MAY end an EoQ session by closing the QUIC
+       stream" to "A client MAY end an EoQ session by closing the QUIC
+       stream and the server MUST end the EoQ session by closing the
+       QUIC stream".
+   4.  Added language to Section 3 "Session Management" to make it clear
+       that a bidirectional QUIC stream is client-initiated and
+       inclusion of the "eoq/0.1" ALPN was added for the QUIC
+       connection.
+   5.  Added "QUIC supports four stream types, but EoQ only supports the
+       client-initiated, bidirectional stream type." to Section 3
+       "Session Management" to be clear the stream types supported by
+       EoQ.
+
+A.7.  draft-ietf-regext-epp-quic-03
+
+   Nit fixes, such as spelling fixes and small wording changes.
+
+A.8.  draft-ietf-regext-epp-quic-04
+
+   Incorporated feedback from Martin Thompson:
+
+   1.  Changed ALPN "eoq/0.1" value to "EoQ" to match the value of "DoQ"
+       for DNS over QUIC in RFC 9250, which doesn't include versioning.
+
+
+
+
+Yao, et al.             Expires 25 December 2026               [Page 16]
+
+Internet-Draft                EPP over QUIC                    June 2026
+
+
+   2.  Added a reference to section 5 "Data Unit Format" in Section 7
+       for defining the packet framing of EoQ.
+   3.  Address the additional pipelining considerations (independent
+       command processing, batching, error in processing commands).
+
+   In the IANA Considerations section, removed the registration of the
+   EoQ transport in the EPP Extension Registry.
+
+A.9.  draft-ietf-regext-epp-quic-05
+
+   Incorporated feedback from the Working Group Last Call (WGLC):
+
+   1.  Made references consistent for the ALPN "EoQ" value with a
+       reference to RFC 7301.
+   2.  Add missing comma in the Acknowledgments section between Scott
+       Hollenbeck and Lucas Pardue.
+   3.  Removed normative reference to RFC 7451.
+
+A.10.  draft-ietf-regext-epp-quic-06
+
+   Incorporated feedback from the document shepherd review:
+
+   1.  Updated the Verisign EPP SDK link to
+       "https://www.verisign.com/resources/registrar-resources/epp-
+       sdk/".
+   2.  Updated Section 2 "Conventions Used in This Document" to
+       reference RFC 2119 and RFC 8174.
+
+A.11.  draft-ietf-regext-epp-quic-07
+
+   Update the draft based on AD's comments:
+
+   1.  Refine the texts.
+   2.  Add the Operational Considerations section.
+
+A.12.  draft-ietf-regext-epp-quic-08
+
+   Refine the texts based on AD's further comments
+
+A.13.  draft-ietf-regext-epp-quic-09
+
+   Refine the texts based on AD's comments
+
+A.14.  draft-ietf-regext-epp-quic-10
+
+   Refine the texts based on last call comments
+
+
+
+
+
+Yao, et al.             Expires 25 December 2026               [Page 17]
+
+Internet-Draft                EPP over QUIC                    June 2026
+
+
+   Move the Operations Considerations section to be just before the IANA
+   Considerations section based on Giuseppe's comment
+
+Authors' Addresses
+
+   Jiankang Yao
+   CNNIC
+   4 South 4th Street,Zhongguancun,Haidian District
+   Beijing
+   Beijing, 100190
+   China
+   Phone: +86 10 59116505
+   Email: yaojk@cnnic.cn
+
+
+   Hongtao Li
+   CNNIC
+   4 South 4th Street,Zhongguancun,Haidian District
+   Beijing
+   Beijing, 100190
+   China
+   Email: lihongtao@cnnic.cn
+
+
+   Man Zhang
+   CNNIC
+   4 South 4th Street,Zhongguancun,Haidian District
+   Beijing
+   Beijing, 100190
+   China
+   Email: zhangman@cnnic.cn
+
+
+   Daniel Keathley
+   VeriSign, Inc.
+   12061 Bluemont Way
+   Reston, VA 20190
+   United States of America
+   Email: dkeathley@verisign.com
+   URI:   http://www.verisigninc.com
+
+
+   James Gould
+   VeriSign, Inc.
+   12061 Bluemont Way
+   Reston, VA 20190
+   United States of America
+   Email: jgould@verisign.com
+
+
+
+Yao, et al.             Expires 25 December 2026               [Page 18]
+
+Internet-Draft                EPP over QUIC                    June 2026
+
+
+   URI:   http://www.verisigninc.com
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Yao, et al.             Expires 25 December 2026               [Page 19]

@@ -1,0 +1,172 @@
+<a href="/doc/draft-ietf-dnsop-structured-dns-error/">draft-ietf-dnsop-structured-dns-error</a>
+
+(1) What type of RFC is being requested (BCP, Proposed Standard, Internet
+Standard, Informational, Experimental, or Historic)?
+
+The <a href="/doc/draft-ietf-dnsop-structured-dns-error/">draft-ietf-dnsop-structured-dns-error</a> has the intended status of Proposed
+Standard.  This is the correct status for the document as it specifies an
+update to <a href="/doc/rfc8914/">RFC 8914</a> by providing additional details on DNS filtering.  This
+document does not recommend DNS filtering, but provides a mechanism for greater
+transparency to explain to users why some DNS queries are filtered.  Having
+Proposed Standard status will help support implementation and adoption.
+
+The draft does not conflict with other documents in the DNSOP or other working
+groups that specify work related to or aligned with the draft.  See the Working
+Group Summary below for more information.
+
+(2) The IESG approval announcement includes a Document Announcement Write-Up.
+Please provide such a Document Announcement Write-Up. Recent examples can be
+found in the "Action" announcements for approved documents. The approval
+announcement contains the following sections:
+
+Technical Summary:
+
+DNS filtering is commonly used for purposes such as enhancing network security.
+However, when DNS responses are filtered, they often do not provide users with
+clear, structured information explaining why the filtering occurred.  Existing
+methods for sharing such details can inadvertently cause issues, particularly
+when the blocked DNS response involves HTTPS resources.
+
+This document proposes an update to <a href="/doc/rfc8914/">RFC 8914</a>, introducing a mechanism to
+structure the EXTRA-TEXT field of the Extended DNS Error (EDE).  This allows
+clients to signal their support for receiving detailed explanations about DNS
+filtering.  The draft makes the filtering-related information machine-readable
+and safer to use, especially in HTTPS contexts.  These details can then be
+parsed by the client and utilized in various ways, such as displaying them to
+users, logging the information, or applying it for other purposes.
+
+Working Group Summary:
+
+Initially, in 2020, the draft encountered substantial objections within the
+DNSOP Working Group.  The authors iteratively improved the document based on
+feedback from WG discussions, and over time it gained support from several
+industry stakeholders.  Following the first Working Group Last Call (WGLC), the
+WG concluded that consensus had been reached.
+
+However, during IETF Last Call, concerns were raised by participants from the
+Security Area, as well as potential misalignment with the related draft
+draft-nottingham-dnsop-censorship-transparency.
+
+The draft was therefore returned to the DNSOP Working Group, and a virtual
+interim meeting was held to address the feedback and alignment issues. This led
+to further revisions and a second, extended WGLC, during which constructive
+discussion resulted in additional improvements to the document.
+
+Document Quality:
+
+As part of the protocol design, a proof-of-concept implementation and demo were
+presented by Gianpaolo Scalone and Ralf Weber during the DNSOP WG sessions at
+IETF 116. Several vendors have since indicated their intention to implement the
+standard in their products, and operators have expressed interest in deploying
+it within their network services.
+
+Following the virtual interim and second WGLC, the document received thorough
+DNS Directorate review, as well as additional input from participants who had
+raised concerns during IETF Last Call.  The document has been updated
+accordingly and there are no conflicts between other ongoing related work.
+
+Personnel:
+
+The Document Shepherd is Benno Overeinder and Éric Vyncke is the Responsible
+Area Director.
+
+(3) Briefly describe the review of this document that was performed by the
+Document Shepherd. If this version of the document is not ready for
+publication, please explain why the document is being forwarded to the IESG.
+
+The Document Shepherd did a detailed review of the document for content as well
+as simple editorial checks (spelling/grammar).  The shepherd feels the document
+is ready for publication.
+
+(4) Does the document Shepherd have any concerns about the depth or breadth of
+the reviews that have been performed?
+
+The Document Shepherd has no concerns about the depth or breadth of the reviews.
+
+(5) Do portions of the document need review from a particular or from a broader
+perspective.
+
+There has been a number of directorate reviews, among which a multiple DNSDIR
+reviews of the document at the request of the DNSOP WG chairs.  All comments
+were incorporated or discussed on the mailing list to reach agreement.
+
+(6) Describe any specific concerns or issues that the Document Shepherd has
+with this document that the Responsible Area Director and/or the IESG should be
+aware of?
+
+The Document Shepherd has no concerns about the document.
+
+(7) Has each author confirmed that any and all appropriate IPR disclosures
+required for full conformance with the provisions of <a href="/doc/bcp78/">BCP 78</a> and <a href="/doc/bcp79/">BCP 79</a> have
+already been filed. If not, explain why?
+
+There is no IPR.
+
+(8) Has an IPR disclosure been filed that references this document?
+
+There is no IPR.
+
+(9) How solid is the WG consensus behind this document?
+
+There was a solid consensus on the document.  During the process, feedback from
+the WG was shared with the authors, who incorporated it or discussed it on the
+mailing to reach agreement.
+
+(10) Has anyone threatened an appeal or otherwise indicated extreme discontent?
+
+There have been no appeals.
+
+(11) Identify any ID nits the Document Shepherd has found in this document.
+
+No issues found here.
+
+(12) Describe how the document meets any required formal review criteria, such
+as the MIB Doctor, YANG Doctor, media type, and URI type reviews.
+
+No formal review is required.
+
+(13) Have all references within this document been identified as either
+normative or informative?
+
+All references have been identified as normative or informative.
+
+(14) Are there normative references to documents that are not ready for
+advancement or are otherwise in an unclear state? If such normative references
+exist, what is the plan for their completion?
+
+All normative references are in a clear state.
+
+(15) Are there downward normative references (see <a href="/doc/rfc3967/">RFC 3967</a>)?
+
+No issues found here.
+
+(16) Will publication of this document change the status of any existing RFCs?
+
+This RFC will not change any existing RFCs.
+
+(17) Describe the Document Shepherd's review of the IANA considerations
+section, especially with regard to its consistency with the body of the
+document.
+
+The IANA section of the document correctly requests the assignment of an
+extended DNS error code from the Domain Name System (DNS) Parameters, Extended
+DNS Error Codes registry.
+
+(18) List any new IANA registries that require Expert Review for future
+allocations. Provide any public guidance that the IESG would find useful in
+selecting the IANA Experts for these new registries.
+
+There is no new IANA registry requested.
+
+(19) Describe reviews and automated checks performed by the Document Shepherd
+to validate sections of the document written in a formal language, such as XML
+code, BNF rules, MIB definitions, YANG modules, etc.
+
+Not relevant.
+
+(20) If the document contains a YANG module, has the module been checked with
+any of the recommended validation tools
+(<a href="https://trac.ietf.org/trac/ops/wiki/yang-review-tools">https://trac.ietf.org/trac/ops/wiki/yang-review-tools</a>) for syntax and
+formatting validation?
+
+There is no YANG module.

@@ -1,0 +1,1238 @@
+idnits 2.17.1 
+
+draft-ietf-dnsop-structured-dns-error-24.txt:
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+  == There are 2 instances of lines with non-ascii characters in the document.
+
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     Summary: 0 errors (**), 0 flaws (~~), 1 warning (==), 0 comments (--).
+
+--------------------------------------------------------------------------------
+
+
+2	DNS Operations Working Group                                     D. Wing
+3	Internet-Draft                                                    Citrix
+4	Updates: 8914 (if approved)                                     T. Reddy
+5	Intended status: Standards Track                                   Nokia
+6	Expires: 7 January 2027                                          N. Cook
+7	                                                            Open-Xchange
+8	                                                            M. Boucadair
+9	                                                                  Orange
+10	                                                             6 July 2026
+
+12	                 Structured Error Data for Filtered DNS
+13	                draft-ietf-dnsop-structured-dns-error-24
+
+15	Abstract
+
+17	   DNS filtering is widely deployed for various reasons, including
+18	   network security and policy enforcement.  However, filtered DNS
+19	   responses lack structured information for end users to understand the
+20	   reason for the filtering.  Existing mechanisms to provide explanatory
+21	   details to end users cause harm especially if the blocked DNS
+22	   response is for HTTPS resources.
+
+24	   This document updates RFC 8914 by signaling client support for
+25	   structuring the EXTRA-TEXT field of the Extended DNS Error to provide
+26	   details on the DNS filtering.  Such details can be parsed by the
+27	   client and displayed, logged, or used for other purposes.
+
+29	About This Document
+
+31	   This note is to be removed before publishing as an RFC.
+
+33	   The latest revision of this draft can be found at https://ietf-wg-
+34	   dnsop.github.io/draft-ietf-dnsop-structured-dns-error/draft-ietf-
+35	   dnsop-structured-dns-error.html.  Status information for this
+36	   document may be found at https://datatracker.ietf.org/doc/draft-ietf-
+37	   dnsop-structured-dns-error/.
+
+39	   Discussion of this document takes place on the dnsop Working Group
+40	   mailing list (mailto:dnsop@ietf.org), which is archived at
+41	   https://mailarchive.ietf.org/arch/browse/dnsop/.  Subscribe at
+42	   https://www.ietf.org/mailman/listinfo/dnsop/.
+
+44	   Source for this draft and an issue tracker can be found at
+45	   https://github.com/ietf-wg-dnsop/draft-ietf-dnsop-structured-dns-
+46	   error.
+
+48	Status of This Memo
+
+50	   This Internet-Draft is submitted in full conformance with the
+51	   provisions of BCP 78 and BCP 79.
+
+53	   Internet-Drafts are working documents of the Internet Engineering
+54	   Task Force (IETF).  Note that other groups may also distribute
+55	   working documents as Internet-Drafts.  The list of current Internet-
+56	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+58	   Internet-Drafts are draft documents valid for a maximum of six months
+59	   and may be updated, replaced, or obsoleted by other documents at any
+60	   time.  It is inappropriate to use Internet-Drafts as reference
+61	   material or to cite them other than as "work in progress."
+
+63	   This Internet-Draft will expire on 7 January 2027.
+
+65	Copyright Notice
+
+67	   Copyright (c) 2026 IETF Trust and the persons identified as the
+68	   document authors.  All rights reserved.
+
+70	   This document is subject to BCP 78 and the IETF Trust's Legal
+71	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+72	   license-info) in effect on the date of publication of this document.
+73	   Please review these documents carefully, as they describe your rights
+74	   and restrictions with respect to this document.  Code Components
+75	   extracted from this document must include Revised BSD License text as
+76	   described in Section 4.e of the Trust Legal Provisions and are
+77	   provided without warranty as described in the Revised BSD License.
+
+79	Table of Contents
+
+81	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
+82	   2.  Conventions and Definitions . . . . . . . . . . . . . . . . .   4
+83	   3.  DNS Filtering Techniques and Their Limitations  . . . . . . .   5
+84	     3.1.  Forged Responses  . . . . . . . . . . . . . . . . . . . .   5
+85	     3.2.  Forged NXDOMAIN Answer  . . . . . . . . . . . . . . . . .   7
+86	     3.3.  Extended Error Codes (EDEs) . . . . . . . . . . . . . . .   7
+87	   4.  I-JSON in EXTRA-TEXT Field  . . . . . . . . . . . . . . . . .   8
+88	     4.1.  JSON Names  . . . . . . . . . . . . . . . . . . . . . . .   8
+89	     4.2.  Future JSON Names Requirements  . . . . . . . . . . . . .  10
+90	   5.  Protocol Operation  . . . . . . . . . . . . . . . . . . . . .  10
+91	     5.1.  Client Generating Request . . . . . . . . . . . . . . . .  10
+92	     5.2.  Server Generating Response  . . . . . . . . . . . . . . .  10
+93	     5.3.  Client Processing Response  . . . . . . . . . . . . . . .  11
+94	     5.4.  Structured DNS Error (SDE) EDNS(0) Option Format  . . . .  13
+95	   6.  New Sub-Error Codes Definition  . . . . . . . . . . . . . . .  13
+96	     6.1.  Reserved  . . . . . . . . . . . . . . . . . . . . . . . .  13
+97	     6.2.  Network Operator Policy . . . . . . . . . . . . . . . . .  13
+98	     6.3.  DNS Operator Policy . . . . . . . . . . . . . . . . . . .  13
+99	   7.  New Extended DNS Errors . . . . . . . . . . . . . . . . . . .  14
+100	     7.1.  Extended DNS Error Code TBA1 - Blocked by Upstream DNS
+101	           Server  . . . . . . . . . . . . . . . . . . . . . . . . .  14
+102	   8.  Examples  . . . . . . . . . . . . . . . . . . . . . . . . . .  14
+103	   9.  Operational Considerations  . . . . . . . . . . . . . . . . .  15
+104	     9.1.  Backward Compatibility  . . . . . . . . . . . . . . . . .  15
+105	     9.2.  Client Updates  . . . . . . . . . . . . . . . . . . . . .  15
+106	   10. Security Considerations . . . . . . . . . . . . . . . . . . .  16
+107	     10.1.  Authentication and Confidentiality . . . . . . . . . . .  16
+108	     10.2.  Restrictions on Display of "c", "o", and "j" Fields  . .  16
+109	     10.3.  Security Risks from Legacy DNS Forwarders  . . . . . . .  17
+110	     10.4.  Privacy Considerations . . . . . . . . . . . . . . . . .  17
+111	   11. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  18
+112	     11.1.  Structured DNS Error EDNS Option . . . . . . . . . . . .  18
+113	     11.2.  New Registry for JSON Names  . . . . . . . . . . . . . .  18
+114	     11.3.  New Registry for Contact URI Scheme  . . . . . . . . . .  19
+115	     11.4.  New Registry for Extended DNS Sub-Error Codes  . . . . .  20
+116	     11.5.  New Extended DNS Error Code  . . . . . . . . . . . . . .  21
+117	   12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  22
+118	     12.1.  Normative References . . . . . . . . . . . . . . . . . .  22
+119	     12.2.  Informative References . . . . . . . . . . . . . . . . .  23
+120	   Appendix A.  Interoperation with RPZ Servers  . . . . . . . . . .  24
+121	   Appendix B.  Implementation Status  . . . . . . . . . . . . . . .  25
+122	   Acknowledgements  . . . . . . . . . . . . . . . . . . . . . . . .  25
+123	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  25
+
+125	1.  Introduction
+
+127	   DNS filters are deployed for a variety of reasons, e.g., endpoint
+128	   security, parental filtering, and filtering required by law
+129	   enforcement.  Network-based security solutions such as firewalls and
+130	   Intrusion Prevention Systems (IPS) rely upon network traffic
+131	   inspection to implement perimeter-based security policies and operate
+132	   by filtering DNS responses.  In a home network, DNS filtering is used
+133	   for the same reasons as above and additionally for parental control.
+134	   Internet Service Providers (ISPs) typically block access to some DNS
+135	   domains due to a requirement imposed by an external entity (e.g., law
+136	   enforcement agency) also performed using DNS-based content filtering.
+
+138	   End users or network administrators leveraging DNS services that
+139	   perform filtering may wish to receive more explanatory information
+140	   about such a filtering to resolve problems with the filter -- for
+141	   example, to contact the DNS service administrator to allowlist a DNS
+142	   domain that was erroneously filtered or to understand the reason a
+143	   particular domain was filtered.  With that information, they can
+144	   choose to use another network, open a trouble ticket with the DNS
+145	   service administrator to resolve erroneous filtering, log the
+146	   information, etc.
+
+148	   For the DNS filtering mechanisms described in Section 3, the DNS
+149	   server can return extended error codes Blocked, Filtered, Censored,
+150	   or Forged Answer defined in Section 4 of [RFC8914].  However, these
+151	   codes only explain that filtering occurred but lack detail for the
+152	   user to diagnose erroneous filtering.
+
+154	   No matter which type of response is generated (forged IP address(es),
+155	   NXDOMAIN or empty answer, even with an extended error code), the end
+156	   user who triggered the DNS query has little chance to understand
+157	   which entity filtered the query, how to report a mistake in the
+158	   filter, or why the entity filtered it at all.  This document
+159	   describes a mechanism to provide such detail.
+
+161	   As noted in Section 6 of [RFC7754], promptly informing the endpoint
+162	   that blocking has occurred provides necessary transparency to redress
+163	   any errors, particularly as they relate to collateral damage
+164	   introduced by errant filters.
+
+166	   One of the other benefits of the approach described in this document
+167	   is to eliminate the need to "spoof" block pages for HTTPS resources.
+168	   This is achieved since clients implementing this approach would be
+169	   able to display a meaningful error message, and would not need to
+170	   connect to such a block page.  This approach thus avoids the need to
+171	   install a local root certificate authority on those IT-managed
+172	   devices.
+
+174	   This document describes a format for machine-readable data in the
+175	   EXTRA-TEXT field of [RFC8914].  The document updates Section 2 of
+176	   [RFC8914], which says the information in EXTRA-TEXT field is intended
+177	   for human consumption (not automated parsing).
+
+179	   This document does not recommend DNS filtering but provides a
+180	   mechanism for better transparency to explain to the end users why
+181	   some DNS queries are filtered.
+
+183	2.  Conventions and Definitions
+
+185	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+186	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+187	   "OPTIONAL" in this document are to be interpreted as described in
+188	   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+189	   capitals, as shown here.
+
+191	   This document uses terms defined in DNS Terminology [RFC9499].
+
+193	   "Encrypted DNS" refers to any encrypted scheme to convey DNS
+194	   messages, for example, DNS over HTTPS (DoH) [RFC8484], DNS over TLS
+195	   (DoT) [RFC7858], or DNS over QUIC (DoQ) [RFC9250].
+
+197	   The document refers to an Extended DNS Error (EDE) using its purpose,
+198	   not its INFO-CODE as per Table 3 of [RFC8914].  "Forged Answer",
+199	   "Blocked", "Censored", and "Filtered" are thus used to refer to
+200	   "Forged Answer (4)", "Blocked (15)", "Censored (16)", and "Filtered
+201	   (17)".
+
+203	   In this document, "client security policy evaluation" refers to
+204	   implementation-defined decision-making performed by the DNS client or
+205	   consuming application (e.g., web browser) to determine how, or
+206	   whether, structured error information is used, displayed, or acted
+207	   upon.
+
+209	   Structured DNS Error (SDE) is an EDNS(0) option indicating support
+210	   for structured encoding of the EXTRA-TEXT field.  See also
+211	   Section 5.4.
+
+213	   "DNS administrator" refers to the party responsible for operating and
+214	   configuring the DNS server, including the definition of filtering
+215	   policies.
+
+217	   "IT/InfoSec team" refers to the organizational team responsible for
+218	   receiving and handling end-user reports of misclassified DNS
+219	   filtering, including decisions on allowlisting domains or revising
+220	   filtering policies.
+
+222	3.  DNS Filtering Techniques and Their Limitations
+
+224	   DNS responses can be filtered by sending, e.g., a bogus (also called
+225	   "forged") response, NXDOMAIN error, or empty answer.  Also, clients
+226	   can be informed that filtering occurred by sending an Extended DNS
+227	   Error code defined in [RFC8914].  Each of these methods have
+228	   advantages and disadvantages that are discussed in the following
+229	   subsections.
+
+231	3.1.  Forged Responses
+
+233	   The DNS response is forged to provide a list of IP addresses that
+234	   points to an HTTP(S) server alerting the end user about the reason
+235	   for blocking access to the requested domain (e.g., malware).  If the
+236	   host component [RFC3986] of an HTTP URL is blocked, the network
+237	   security device (e.g., Customer Premises Equipment (CPE) or firewall)
+238	   presents a block page instead of the HTTP response from the content
+239	   provider hosting that domain.  This works successfully with HTTP.
+
+241	   If this is an HTTPS URL, the network security device attempts to
+242	   serve the block page over HTTPS.  In order to return a block page
+243	   over HTTPS, the network security device uses a locally generated root
+244	   certificate and corresponding key pair.  The local root certificate
+245	   is installed on the endpoint while the network security device stores
+246	   a copy of the private key.  During the TLS handshake, the on-path
+247	   network security device modifies the certificate provided by the
+248	   server and (re)signs it using the private key from the local root
+249	   certificate.
+
+251	   Note that:
+
+253	   *  In deployments where DNSSEC is used, this approach becomes
+254	      ineffective because DNSSEC ensures the integrity and authenticity
+255	      of DNS responses, preventing forged DNS responses from being
+256	      accepted.
+
+258	   *  The HTTPS server hosted on the network security device will have
+259	      access to the client's IP address, the hostname, and the URL path
+260	      component of the request.  This information will be sensitive, as
+261	      it will expose the end user's identity and the specific resource
+262	      that an end user attempted to access.
+
+264	   *  Configuring a local root certificate on endpoints is not a viable
+265	      option in several deployments like home networks, schools, Small
+266	      Office/Home Office (SOHO), or Small/Medium Enterprise (SME).  In
+267	      these cases, the typical behavior is that the filtered DNS
+268	      response points to a server that will display the block page.  If
+269	      the client is using HTTPS (via a web browser or another
+270	      application) this results in a certificate validation error which
+271	      gives no information to the end user about the reason for the DNS
+272	      filtering.
+
+274	   *  Enterprise networks do not always assume that all the connected
+275	      devices are managed by the IT team or Mobile Device Management
+276	      (MDM) devices, especially in the quite common Bring Your Own
+277	      Device (BYOD) scenario.  In addition, the local root certificate
+278	      cannot be installed on IoT devices without a device management
+279	      tool.
+
+281	   *  An end user does not know why the connection was prevented and,
+282	      consequently, may repeatedly try to reach the domain but with no
+283	      success.  Frustrated, the end user may switch to an alternate
+284	      network that offers no DNS filtering against malware and phishing,
+285	      potentially compromising both security and privacy.  Furthermore,
+286	      certificate errors train end users to click through certificate
+287	      errors, which is a bad security practice.  To eliminate the need
+288	      for an end user to click through certificate errors, an end user
+289	      may manually install a local root certificate on a host device.
+290	      Doing so, however, is also a bad security practice as it creates a
+291	      security vulnerability that may be exploited by a MITM attack.
+292	      When a manually installed local root certificate expires, the end
+293	      user has to (again) manually install the new local root
+294	      certificate.
+
+296	3.2.  Forged NXDOMAIN Answer
+
+298	   The DNS response is forged to provide an NXDOMAIN answer, causing the
+299	   DNS lookup to fail.  This approach is incompatible with DNSSEC when
+300	   the client performs validation, as the forged response will fail
+301	   DNSSEC checks.  However, in deployments where the client relies on
+302	   the DNS server to perform DNSSEC validation, a filtering DNS server
+303	   can forge an NXDOMAIN response for a valid domain, and the client
+304	   will trust it.  This undermines the integrity guarantees of DNSSEC,
+305	   as the client has no way to distinguish between a genuine and a
+306	   forged response.  Further, the end user may not understand why a
+307	   domain cannot be reached and may repeatedly attempt access without
+308	   success.  Frustrated, the end user may resort to using insecure
+309	   methods to reach the domain, potentially compromising both security
+310	   and privacy.
+
+312	3.3.  Extended Error Codes (EDEs)
+
+314	   The extended error codes Blocked and Filtered defined in Section 4 of
+315	   [RFC8914] can be returned by a DNS server to provide additional
+316	   information about the cause of a DNS error.  These extended error
+317	   codes do not suffer from the limitations discussed in bullets (1) and
+318	   (2), but the user still does not know the exact reason nor is aware
+319	   of the exact entity blocking the access to the domain.  For example,
+320	   a DNS server may block access to a domain based on the content
+321	   category such as "Malware" to protect the endpoint from malicious
+322	   software, "Phishing" to prevent the end user from revealing sensitive
+323	   information to the attacker, etc.  An end user may need to know the
+324	   contact details of the IT/InfoSec team to raise a complaint.
+325	   Further, the information conveyed by [RFC8914] is intended for
+326	   diagnostic purposes and is not structured for automated processing,
+327	   localization, or extensibility.
+
+329	   This document defines a structured, machine-readable format for
+330	   conveying such details in the EXTRA-TEXT field, enabling clients to
+331	   process the information programmatically and present it to end users
+332	   (e.g., with localization support), while allowing for extensibility
+333	   and more granular, client security policy-driven handling of the
+334	   information.  This specification requires that clients only act upon
+335	   such information when it is received over an integrity-protected DNS
+336	   response.
+
+338	4.  I-JSON in EXTRA-TEXT Field
+
+340	4.1.  JSON Names
+
+342	   DNS servers that are compliant with this specification and have
+343	   received an indication that the client also supports this
+344	   specification as per Section 5.1 send data in the EXTRA-TEXT field
+345	   [RFC8914] as a JSON object encoded using the Internet JSON (I-JSON)
+346	   message format [RFC7493].
+
+348	   This document defines the following JSON names:
+
+350	   c: (contact)  The contact details of the IT/InfoSec team to report
+351	      misclassified DNS filtering.  This information is important for
+352	      transparency and also to ease unblocking a legitimate domain name
+353	      that got blocked due to wrong classification.
+
+355	      The field is a JSON array of contact URIs.  When multiple contact
+356	      details are provided, each contact URI is represented as a
+357	      separate array element in the JSON array.
+
+359	      Contact URIs conveyed in the "c" field MUST use URI schemes
+360	      registered in Section 11.3.
+
+362	      This field is optional.
+
+364	   j: (justification)  'UTF-8'-encoded [RFC5198] human-readable
+365	      explanation for the DNS filtering decision.
+
+367	      This field is particularly useful when no applicable sub-error
+368	      code is defined or provided for the returned Extended DNS Error.
+
+370	      The information conveyed in this field MUST NOT be used as input
+371	      to automated processing that affects security policy enforcement
+372	      or DNS protocol behavior.
+
+374	      The DNS client determines, according to its client security
+375	      policy, whether the contents of this field are displayed to the
+376	      end user, logged, or ignored.
+
+378	      Returning non-UTF-8 data, syntactically invalid content, or
+379	      deliberately meaningless values (including empty strings)
+380	      indicates that a DNS server is misbehaving.
+
+382	      This field is optional.
+
+384	   s: (sub-error)  An integer representing the sub-error code for this
+385	      particular DNS filtering case.
+
+387	      The integer values are defined in the IANA-managed registry for
+388	      Extended DNS Sub-Error Codes in Section 11.4.
+
+390	      This field is optional.
+
+392	      When multiple blocking causes apply simultaneously (e.g., a domain
+393	      is blocked for both malware and phishing reasons), a single SDE
+394	      response is returned.  If "s" is supplied, then the "s" field MUST
+395	      convey the primary blocking cause.  In such case, the "j" field
+396	      MUST be used to provide additional context describing all
+397	      applicable causes.
+
+399	   o: (organization)  'UTF-8'-encoded human-friendly name of the
+400	      organization that filtered this particular DNS query.
+
+402	      This field is optional.
+
+404	   l: (language)  The "l" field indicates the language used for the
+405	      JSON-encoded "j" and "o" fields.  The value of this field MUST
+406	      conform to the language tag syntax specified in Section 2.1 of
+407	      [RFC5646].
+
+409	      This field is REQUIRED when either the "j" or "o" fields are
+410	      present.
+
+412	   The text in the "j" and "o" names can include international
+413	   characters.  The text will be in natural language, chosen by the DNS
+414	   administrator to match its expected audience.
+
+416	   The "o" field MAY be displayed to end users, subject to the
+417	   conditions described in Section 10.
+
+419	   To avoid exceeding the maximum EDNS0 size [RFC9715], the generated
+420	   JSON values SHOULD be as short as possible: concise text in the
+421	   values for the "j" and "o" names, and minified JSON (that is, without
+422	   spaces or line breaks between JSON elements).  Otherwise, there is a
+423	   risk that the response will get fragmented.
+
+425	   The JSON data can be parsed to display to the user, logged, or
+426	   otherwise used to assist troubleshooting and diagnosis of DNS
+427	   filtering.
+
+429	   The sub-error codes provide a structured way to communicate more
+430	   detailed and precise description of the cause of an error (e.g.,
+431	   distinguishing between malware-related blocking and phishing-related
+432	   blocking under the general blocked error).
+
+434	      An alternate design for conveying the sub-error would be to define
+435	      new EDE codes for these errors.  However, such design is
+436	      suboptimal because it requires replicating an error code for each
+437	      EDE code to which the sub-error applies (e.g., "Malware" sub-error
+438	      in Table 3 would consume three EDE codes).
+
+440	4.2.  Future JSON Names Requirements
+
+442	   New JSON names may be defined in the future.  This section specifies
+443	   the requirements to take into account for such names.
+
+445	   New JSON names MUST consist only of lower-case ASCII characters,
+446	   digits, and hyphen-minus (that is, Unicode characters U+0061 through
+447	   007A, U+0030 through U+0039, and U+002D).  Also, these names MUST be
+448	   63 characters or shorter and it is RECOMMENDED they be as short as
+449	   possible to reduce contribution to exceeding maximum EDNS0 response
+450	   size.  Refer to [RFC9715] for a discusson on IP fragmentation
+451	   avoidance in DNS.
+
+453	5.  Protocol Operation
+
+455	5.1.  Client Generating Request
+
+457	   When generating a DNS query, a client that supports this
+458	   specification SHOULD include the Structured DNS Error (SDE) option
+459	   defined in Section 5.4, unless instructed by local policy otherwise.
+
+461	   The presence of the SDE option indicates that the client desires the
+462	   DNS server to include an EDE option in the DNS response when DNS
+463	   filtering is performed and that any data conveyed in the EXTRA-TEXT
+464	   field of the EDE option is encoded in accordance with this
+465	   specification.
+
+467	5.2.  Server Generating Response
+
+469	   When the DNS server filters its DNS response to a query (e.g., A or
+470	   AAAA resource record query), the DNS response MAY contain an empty
+471	   answer, NXDOMAIN, or (less ideally) forged response, as desired by
+472	   the DNS server.
+
+474	   If the query contained the SDE EDNS option (Section 5.1), and the DNS
+475	   server returns an EDE code of "Blocked", "Filtered", "Censored", or
+476	   "Blocked by Upstream DNS Server", the DNS server SHOULD include
+477	   additional detail in the EXTRA-TEXT field encoded as structured and
+478	   machine-readable data in accordance with the present specification,
+479	   unless configured otherwise.  If the DNS response is sent over UDP
+480	   and including the additional detail would cause the response to
+481	   exceed the EDNS0 size [RFC9715] (and thus setting TC=1), the server
+482	   MUST first attempt to reduce the response size by omitting the "j"
+483	   and "o" fields before omitting the EXTRA-TEXT entirely.  In
+484	   deployments using DoT, DoH, or DoQ, transport size limitations are
+485	   unlikely to necessitate omission of structured data in the EXTRA-TEXT
+486	   field.
+
+488	   If the SDE option was not present in the DNS request, the DNS server
+489	   MUST process the request in accordance with [RFC8914] and MUST NOT
+490	   assume that the client supports this specification.  This preserves
+491	   compatibility with clients and servers that implement [RFC8914] but
+492	   do not support this specification.
+
+494	   Servers MAY return small TTL values in filtered DNS responses (e.g.,
+495	   10 seconds) to handle domain category and reputation updates.  Short
+496	   TTLs allow for quick adaptation to dynamic changes in domain
+497	   filtering decisions, but can result in increased query traffic.  In
+498	   cases where updates are less frequent, TTL values of 30 to 60 seconds
+499	   might provide a better balance, reducing server load while still
+500	   ensuring reasonable flexibility for updates.
+
+502	   If the query includes the SDE option as per Section 5.1, the server
+503	   MUST NOT return the "Forged Answer" extended error code because the
+504	   client can take advantage of EDE's more sophisticated error reporting
+505	   (e.g., "Filtered" or "Blocked").  Continuing to send "Forged Answer"
+506	   even to an EDE-supporting client will cause the persistence of the
+507	   drawbacks described in Section 3.
+
+509	   When the "Censored" extended error code is included in the DNS
+510	   response, the "c", "j", "o", and "l" fields may be conveyed in the
+511	   EXTRA-TEXT field.  The sub-error codes defined in this specification
+512	   are not applicable to the "Censored" extended error code and MUST NOT
+513	   be used in conjunction with it.  Future specifications may update
+514	   this behavior by defining sub-error codes applicable to "Censored".
+
+516	5.3.  Client Processing Response
+
+518	   On receipt of a DNS response with an EDE option from a DNS server,
+519	   the following ordered actions are performed on the EXTRA-TEXT field:
+
+521	   1.  If the integrity of the DNS response is not guaranteed, the DNS
+522	       client MUST NOT act upon data in the EXTRA-TEXT field, as the
+523	       data is vulnerable to modification by an on-path attacker.  An
+524	       attacker can inject or modify a structured DNS error response in
+525	       transit without detection, enabling fabrication of filtering
+526	       information (e.g., misleading contact information or false
+527	       resolver identity information) that appears to originate from the
+528	       resolver.  The data MAY be retained for diagnostic or client
+529	       security policy evaluation purposes.
+
+531	   2.  The DNS response MUST also contain an EDE code of "Blocked by
+532	       Upstream DNS Server", "Blocked", "Censored", or "Filtered"
+533	       [RFC8914], otherwise the EXTRA-TEXT field is discarded.
+
+535	   3.  Servers that do not support this specification might use plain
+536	       text in the EXTRA-TEXT field.  To ensure compatibility with
+537	       those, DNS clients SHOULD handle both plaintext and structured
+538	       content.  The client attempts to parse the EXTRA-TEXT field as
+539	       I-JSON.  If parsing fails or the content is not valid I-JSON, the
+540	       client MUST treat the data as invalid and MUST NOT process it
+541	       according to this specification.  The client MAY instead process
+542	       the EXTRA-TEXT field as unstructured text as specified in
+543	       [RFC8914].
+
+545	   4.  If the JSON object contains an "s" field and the sub-error code
+546	       is not defined as applicable to the accompanying Extended DNS
+547	       Error (EDE) code, the client MUST ignore the value of the "s"
+548	       field and continue processing the remaining fields in accordance
+549	       with this specification.
+
+551	   5.  If the EXTRA-TEXT field does not contain at least one of the JSON
+552	       names "c", "j", or "s", or if all of the fields that are present
+553	       have empty values, the entire JSON object MUST be discarded.
+
+555	   6.  If the JSON object contains a "c" field any of its Contact URIs
+556	       with schemes not registered in the Section 11.3 registry are
+557	       ignored.  Remaining Contact URIs using registered schemes can be
+558	       processed.
+
+560	   7.  If the identity of the DNS server cannot be verified (e.g., when
+561	       using opportunistic privacy such as Section 5 of [RFC8310] or
+562	       opportunistic discovery [RFC9462]), the DNS client MUST ignore
+563	       the "c", "j", and "o" fields, as these fields may influence end
+564	       user behavior and are vulnerable to active attacks in the absence
+565	       of resolver authentication.  If the DNS response was received
+566	       over an encrypted connection without server authentication, the
+567	       client MAY process the "s" field and other parts of the response,
+568	       as the "s" field is a registry-defined, enumerated value and does
+569	       not contain free-form text.
+
+571	   8.  If the DNS client uses an authenticated connection to the DNS
+572	       server (e.g., when using a strict privacy profile for DoT
+573	       (Section 5 of [RFC8310]) or an authenticated DoH or DoQ
+574	       connection), this mitigates both passive eavesdropping and client
+575	       redirection (at the expense of providing no DNS service if such a
+576	       connection is not available).  In such cases, the DNS client MAY
+577	       process the EXTRA-TEXT field of the DNS response.
+
+579	   9.  The DNS client MUST ignore any other JSON names that it does not
+580	       support.
+
+582	      Note that the strict and opportunistic privacy profiles as defined
+583	      in [RFC8310] only apply to DoT; there has been no such distinction
+584	      made for DoH.
+
+586	5.4.  Structured DNS Error (SDE) EDNS(0) Option Format
+
+588	   The Structured DNS Error (SDE) EDNS(0) option is used by a client to
+589	   indicate support for I-JSON encoding in the EXTRA-TEXT field of an
+590	   Extended DNS Error (EDE) option.
+
+592	   The SDE option has no OPTION-DATA.  The OPTION-LENGTH field MUST be
+593	   set to 0.  A server receiving an SDE option with a non-zero OPTION-
+594	   LENGTH MUST silently ignore the OPTION-DATA.
+
+596	   The presence of the SDE option in a query indicates that the client
+597	   supports processing the EXTRA-TEXT field in accordance with this
+598	   specification.
+
+600	6.  New Sub-Error Codes Definition
+
+602	   The document defines the following new IANA-registered Sub-Error
+603	   codes.  See Section 11.4.
+
+605	6.1.  Reserved
+
+607	   This sub-error code value MUST NOT be sent.  If received, it has no
+608	   meaning.
+
+610	6.2.  Network Operator Policy
+
+612	   The code indicates that the request was filtered according to a
+613	   policy imposed by the operator of the local network (where local
+614	   network is a relative term, e.g., it may refer to a Local Area
+615	   Network or to the network of the ISP selected by the end user).
+
+617	6.3.  DNS Operator Policy
+
+619	   The code indicates that the request was filtered according to policy
+620	   determined by the operator of the DNS server.  This is different from
+621	   the "Network Operator Policy" code when a third-party DNS resolver is
+622	   used.
+
+624	7.  New Extended DNS Errors
+
+626	   This document defines an addition to the EDE codes defined in
+627	   [RFC8914].
+
+629	7.1.  Extended DNS Error Code TBA1 - Blocked by Upstream DNS Server
+
+631	   The DNS server is unable to respond to the request because the domain
+632	   is on a blocklist due to an internal security policy imposed by an
+633	   upstream DNS server.  This error code is useful in deployments where
+634	   a network-provided DNS forwarder is configured to use an external
+635	   resolver that filters malicious domains.  When the DNS forwarder
+636	   receives a Blocked (15) error code from the upstream DNS server, it
+637	   can replace it with "Blocked by Upstream DNS Server" (TBA1) before
+638	   forwarding the reply to the DNS client.  Additionally, the EXTRA-TEXT
+639	   field may be forwarded to the DNS client.
+
+641	   Implementations should ensure that the communication channel with the
+642	   upstream DNS server provides adequate integrity protection to
+643	   mitigate the threats described in step 1 of Section 5.3.
+
+645	8.  Examples
+
+647	   An example showing the nameserver at 'ns.example.net' that filtered a
+648	   DNS "A" record query for 'example.org' is provided in Figure 1.
+
+650	   {
+651	     "c": [
+652	       "tel:+358-555-1234567"
+653	     ],
+654	     "j": "malware present for 23 days",
+655	     "s": 1,
+656	     "o": "example-org",
+657	     "l": "en"
+658	   }
+
+660	     Figure 1: JSON Returned in EXTRA-TEXT Field of Extended DNS Error
+661	                                  Response
+
+663	   In Figure 2 the same content is shown with minified JSON (no
+664	   whitespace, no blank lines) with '\' line wrapping per [RFC8792].
+
+666	   { "c":["tel:+358-555-1234567"],\
+667	   "j":"malware present for 23 days",\
+668	   "s":1,\
+669	   "o":"example-org",\
+670	   "l":"en" }
+671	                        Figure 2: Minified Response
+
+673	   Figure 3 shows how the SDE and EDE options appear in a dig response
+674	   for the same query.
+
+676	   ;; ->>HEADER<<- opcode: QUERY, status: NXDOMAIN, id: 12345
+677	   ;; flags: qr rd ra; QUERY: 1, ANSWER: 0, AUTHORITY: 1, ADDITIONAL: 1
+
+679	   ;; OPT PSEUDOSECTION:
+680	   ; EDNS: version: 0, flags:; udp: 1232
+681	   ; OPT=TBD1 (Structured DNS Error): (no data)
+682	   ; EDE: 15 (Blocked): ({"c":["tel:+358-555-1234567"],\
+683	     "j":"malware present for 23 days",\
+684	     "s":1,"o":"example-org","l":"en"})
+
+686	             Figure 3: dig Response Showing SDE and EDE Options
+
+688	9.  Operational Considerations
+
+690	   When a forwarder receives an EDE option, whether or not (and how) to
+691	   pass along JSON information in the EXTRA-TEXT field to its client is
+692	   implementation-dependent [RFC5625] and depends on operator policy.
+693	   Implementations MAY choose not to forward the JSON information, or
+694	   they MAY choose to create a new EDE option that conveys the
+695	   information in the "c", "s", and "j" fields encoded in the JSON
+696	   object.
+
+698	   The application that triggered the DNS request may have a client
+699	   security policy to override the contact information (e.g., redirect
+700	   all complaint calls to a single contact point).  In such cases, the
+701	   content of the "c" attribute MAY be ignored.
+
+703	9.1.  Backward Compatibility
+
+705	   Future extensions MUST NOT introduce mandatory JSON attributes, as
+706	   existing implementations are required to ignore unknown JSON names
+707	   (see Section 5.3).
+
+709	9.2.  Client Updates
+
+711	   The specification relies on several IANA-maintained registries.  In
+712	   particular, since the content of these registries may change with
+713	   time, clients that implement this extension have to periodically
+714	   update the list of supported values in the "Contact URI Schemes"
+715	   registry Section 11.3 to avoid discarding a recently-added Contact
+716	   URI.
+
+718	10.  Security Considerations
+
+720	10.1.  Authentication and Confidentiality
+
+722	   Security considerations in Section 6 of [RFC8914] apply to this
+723	   document.  [RFC8914] cautions against relying on EDE information
+724	   because it may be unauthenticated and transmitted in cleartext.  This
+725	   specification assumes the use of authenticated, integrity-protected
+726	   DNS transports (e.g., DoT, DoH, or DoQ).  Such transports MUST be
+727	   based on TLS 1.3 [RFC8446] or later.  Under these conditions, EDE
+728	   information is integrity-protected, reducing the risks associated
+729	   with relying on structured EDE content.
+
+731	   To minimize impact of active on-path attacks on the DNS channel, the
+732	   client validates the response as described in Section 5.3.
+
+734	10.2.  Restrictions on Display of "c", "o", and "j" Fields
+
+736	   A client might choose to display the information in the "c" field to
+737	   the end user if and only if the encrypted resolver has sufficient
+738	   reputation, according to some client security policy (e.g.,
+739	   administrative configuration, or a built-in list of respectable
+740	   resolvers).  This limits the ability of a malicious encrypted
+741	   resolver to cause harm.  For example, an end user can use the details
+742	   in the "c" field to contact an attacker to solve the problem of being
+743	   unable to reach a domain.  The attacker can mislead the end user to
+744	   install malware or spyware to compromise the device security posture
+745	   or mislead the end user to reveal personal data.  If the client
+746	   decides not to display all of the information in the EXTRA-TEXT
+747	   field, it can be logged for diagnostics purpose and the client can
+748	   only display the resolver hostname that blocked the domain, error
+749	   description for the EDE code and the sub-error description for the
+750	   "s" field to the end user.
+
+752	   The same client security policy considerations apply to the display
+753	   of the "j" field, as it contains free-form, human-readable text that
+754	   may influence end user behavior.
+
+756	   When displaying the free-form text of "o", the client MUST NOT make
+757	   any of those elements into actionable (clickable) links and these
+758	   fields need to be rendered as text, not as HTML.  The contact details
+759	   of "c" can be made into clickable links to provide a convenient way
+760	   for end users to initiate, e.g., voice calls.  The client might
+761	   choose to display the contact details only when the identity of the
+762	   DNS server is verified.
+
+764	   Clients MUST NOT automatically initiate connections to URIs derived
+765	   from the EXTRA-TEXT field.  Doing so could allow a resolver to
+766	   silently report client activity to third parties, enable denial-of-
+767	   service reflection attacks, or be used to entrap a client.  The
+768	   restriction of Contact URI schemes to "tel" and "mailto" is
+769	   intentional, as these schemes do not result in automatic HTTP
+770	   connections.
+
+772	   Furthermore, clients MUST NOT display the value of the "o" field to
+773	   the end user unless one of the following conditions is met:
+
+775	   *  The value matches a registered organization name in a trust list
+776	      maintained by the client, OR
+
+778	   *  The value consists solely of an organization name and does not
+779	      contain any additional free-form content (e.g., URLs), as
+780	      determined by client security policy or heuristics.
+
+782	   If the organization name cannot be verified through registry checks
+783	   or heuristics, the client MUST NOT display the "o" field to the end
+784	   user.
+
+786	   It is beyond the scope of this document to describe how the trust
+787	   list is created and updated, and how the structured DNS error
+788	   response interacts with the trust list to influence user experience
+789	   or user interface elements.
+
+791	   DNS clients MAY keep all fields conveyed in the EXTRA-TEXT field for
+792	   evaluation according to the client security policy.  Such data MUST
+793	   NOT be automatically trusted, displayed to end users, or used to
+794	   influence security decisions without appropriate validation.
+
+796	10.3.  Security Risks from Legacy DNS Forwarders
+
+798	   An attacker might inject (or modify) the EDE EXTRA-TEXT field with a
+799	   DNS proxy or DNS forwarder that is unaware of EDE.  Such a DNS proxy
+800	   or DNS forwarder will forward that attacker-controlled EDE option.
+801	   To prevent such an attack, clients can be configured to process EDE
+802	   only from explicitly configured DNS servers or utilize RESINFO
+803	   [RFC9606].
+
+805	10.4.  Privacy Considerations
+
+807	   The EXTRA-TEXT field may reveal details about the filtering
+808	   organization and its policies.  Clients MUST NOT log or transmit the
+809	   contents of the EXTRA-TEXT field to third parties without the end
+810	   user's knowledge.
+
+812	   This specification requires the use of an encrypted DNS transport
+813	   (e.g., DoT, DoH, or DoQ), which protects both the DNS query and the
+814	   structured error response from passive observers.
+
+816	11.  IANA Considerations
+
+818	   This document requests five IANA actions as described in the
+819	   following subsections.
+
+821	      Notes to the RFC Editor: Please replace RFCXXXX with the RFC
+822	      number assigned to this document and "TBA1" with the value
+823	      assigned by IANA, and replace "TBD1" in Figure 3 with the value
+824	      assigned by IANA.
+
+826	11.1.  Structured DNS Error EDNS Option
+
+828	   IANA is requested to register the following new EDNS(0) Option Code
+829	   in the "DNS EDNS0 Option Codes (OPT)" registry under the "Domain Name
+830	   System (DNS) Parameters" registry group [IANA-DNS]:
+
+832	   Value:  TBD
+
+834	   Name:  Structured DNS Error
+
+836	   Status:  Standard
+
+838	   Reference:  RFC XXXX
+
+840	11.2.  New Registry for JSON Names
+
+842	   This document requests IANA to create a new registry, entitled
+843	   "EXTRA-TEXT JSON Names" under "Extended DNS Error Codes" registry,
+844	   which is under the "Domain Name System (DNS) Parameters" registry
+845	   group [IANA-DNS].  The registration request for a new JSON name must
+846	   include the following fields:
+
+848	   JSON Name:  Specifies the name of an attribute that is present in the
+849	      JSON data enclosed in EXTRA-TEXT field.  The name must follow the
+850	      guidelines in Section 4.
+
+852	   Field Meaning:  Provides a brief, human-readable label summarizing
+853	      the purpose of the JSON attribute.
+
+855	   Short description:  Includes a short description of the requested
+856	      JSON name.
+
+858	   Specification:  Provides a pointer to the reference document that
+859	      specifies the attribute.
+
+861	   The registry is initially populated with the following values:
+
+863	   +======+===============+============================+===============+
+864	   | JSON | Field Meaning | Description                | Specification |
+865	   | Name |               |                            |               |
+866	   +======+===============+============================+===============+
+867	   |  c   | contact       | The contact details of     |  Section 4 of |
+868	   |      |               | the IT/InfoSec team to     |    RFCXXXX    |
+869	   |      |               | report misclassified       |               |
+870	   |      |               | DNS filtering              |               |
+871	   +------+---------------+----------------------------+---------------+
+872	   |  j   | justification | UTF-8-encoded [RFC5198]    |  Section 4 of |
+873	   |      |               | textual justification      |    RFCXXXX    |
+874	   |      |               | for a particular DNS       |               |
+875	   |      |               | filtering                  |               |
+876	   +------+---------------+----------------------------+---------------+
+877	   |  s   | sub-error     | Integer representing       |  Section 4 of |
+878	   |      |               | the sub-error code for     |    RFCXXXX    |
+879	   |      |               | this DNS filtering case    |               |
+880	   +------+---------------+----------------------------+---------------+
+881	   |  o   | organization  | UTF-8-encoded human-       |  Section 4 of |
+882	   |      |               | friendly name of the       |    RFCXXXX    |
+883	   |      |               | organization that          |               |
+884	   |      |               | filtered this              |               |
+885	   |      |               | particular DNS query       |               |
+886	   +------+---------------+----------------------------+---------------+
+887	   |  l   | language      | Indicates the language     |  Section 4 of |
+888	   |      |               | of the "j" and "o"         |    RFCXXXX    |
+889	   |      |               | fields as defined in       |               |
+890	   |      |               | [RFC5646]                  |               |
+891	   +------+---------------+----------------------------+---------------+
+
+893	                    Table 1: Initial JSON Names Registry
+
+895	   New JSON names are registered via IETF Review (Section 4.8 of
+896	   [RFC8126]) and their formatting constraints are described in
+897	   Section 4.
+
+899	11.3.  New Registry for Contact URI Scheme
+
+901	   This document requests IANA to create a new registry, entitled
+902	   "Contact URI Schemes" under "Extended DNS Error Codes" registry,
+903	   which is under the "Domain Name System (DNS) Parameters" registry
+904	   group [IANA-DNS].  The registration request for a new Contact URI
+905	   scheme has to include the following fields:
+
+907	   *  Name: URI scheme name.
+
+909	   *  Meaning: Provides a short description of the scheme.
+
+911	   *  Reference: Provides a pointer to an IETF-approved specification
+912	      that defines the URI scheme.
+
+914	   The Contact URI scheme registry is initially populated with the
+915	   following schemes:
+
+917	                 +========+==================+===========+
+918	                 |  Name  | Meaning          | Reference |
+919	                 +========+==================+===========+
+920	                 |  tel   | Telephone Number | [RFC3966] |
+921	                 +--------+------------------+-----------+
+922	                 | mailto | Internet mail    | [RFC6068] |
+923	                 +--------+------------------+-----------+
+
+925	                                  Table 2
+
+927	   The registration procedure for adding new Contact URI schemes to the
+928	   "Contact URI Schemes" registry is "IETF Review" as defined in
+929	   Section 4.8 of [RFC8126].
+
+931	11.4.  New Registry for Extended DNS Sub-Error Codes
+
+933	   This document requests IANA to create a new registry, entitled
+934	   "Extended DNS Sub-Error Codes" under "Extended DNS Error Codes"
+935	   registry, which is under the "Domain Name System (DNS) Parameters"
+936	   registry group [IANA-DNS].  The registration request for a new sub-
+937	   error code must include the following fields:
+
+939	   *  Number: Is the wire format sub-error code (range 0-255).
+
+941	   *  Meaning: Provides a short description of the sub-error.
+
+943	   *  EDE Codes Applicability: Indicates which Extended DNS Error (EDE)
+944	      Codes apply to this sub-error code.
+
+946	   *  Reference: Provides a pointer to an IETF-approved specification
+947	      that registered the code and/or an authoritative specification
+948	      that describes the meaning of this code.
+
+950	   The Sub-Error Code registry is initially populated with the following
+951	   values:
+
+953	       +========+==========+=====================+================+
+954	       | Number | Meaning  | EDE Codes           | Reference      |
+955	       |        |          | Applicability       |                |
+956	       +========+==========+=====================+================+
+957	       |   0    | Reserved | Not used            | Section 6.1 of |
+958	       |        |          |                     | this document  |
+959	       +--------+----------+---------------------+----------------+
+960	       |   1    | Malware  | "Blocked", "Blocked | Section 5.5 of |
+961	       |        |          | by Upstream DNS     | [RFC5901]      |
+962	       |        |          | Server", "Filtered" |                |
+963	       +--------+----------+---------------------+----------------+
+964	       |   2    | Phishing | "Blocked", "Blocked | Section 5.5 of |
+965	       |        |          | by Upstream DNS     | [RFC5901]      |
+966	       |        |          | Server", "Filtered" |                |
+967	       +--------+----------+---------------------+----------------+
+968	       |   3    | Spam     | "Blocked", "Blocked | Page 289 of    |
+969	       |        |          | by Upstream DNS     | [RFC4949]      |
+970	       |        |          | Server", "Filtered" |                |
+971	       +--------+----------+---------------------+----------------+
+972	       |   4    | Spyware  | "Blocked", "Blocked | Page 291 of    |
+973	       |        |          | by Upstream DNS     | [RFC4949]      |
+974	       |        |          | Server", "Filtered" |                |
+975	       +--------+----------+---------------------+----------------+
+976	       |   5    | Network  | "Blocked"           | Section 6.2 of |
+977	       |        | operator |                     | this document  |
+978	       |        | policy   |                     |                |
+979	       +--------+----------+---------------------+----------------+
+980	       |   6    | DNS      | "Blocked"           | Section 6.3 of |
+981	       |        | operator |                     | this document  |
+982	       |        | policy   |                     |                |
+983	       +--------+----------+---------------------+----------------+
+
+985	                 Table 3: Initial Sub-Error Code Registry
+
+987	   The registration procedure to add new Sub-Error Codes is IETF Review
+988	   as defined in Section 4.8 of [RFC8126].
+
+990	11.5.  New Extended DNS Error Code
+
+992	   IANA is requested to assign the following Extended DNS Error code
+993	   from the "Extended DNS Error Codes" registry under the "Domain Name
+994	   System (DNS) Parameters" registry group [IANA-DNS]:
+
+996	        +===========+================================+===========+
+997	        | INFO-CODE | Purpose                        | Reference |
+998	        +===========+================================+===========+
+999	        |    TBA1   | Blocked by Upstream DNS Server |  RFCXXXX  |
+1000	        +-----------+--------------------------------+-----------+
+
+1002	                       Table 4: New DNS Error Code
+
+1004	12.  References
+
+1006	12.1.  Normative References
+
+1008	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+1009	              Requirement Levels", BCP 14, RFC 2119,
+1010	              DOI 10.17487/RFC2119, March 1997,
+1011	              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+1013	   [RFC3966]  Schulzrinne, H., "The tel URI for Telephone Numbers",
+1014	              RFC 3966, DOI 10.17487/RFC3966, December 2004,
+1015	              <https://www.rfc-editor.org/rfc/rfc3966>.
+
+1017	   [RFC4949]  Shirey, R., "Internet Security Glossary, Version 2",
+1018	              FYI 36, RFC 4949, DOI 10.17487/RFC4949, August 2007,
+1019	              <https://www.rfc-editor.org/rfc/rfc4949>.
+
+1021	   [RFC5198]  Klensin, J. and M. Padlipsky, "Unicode Format for Network
+1022	              Interchange", RFC 5198, DOI 10.17487/RFC5198, March 2008,
+1023	              <https://www.rfc-editor.org/rfc/rfc5198>.
+
+1025	   [RFC5646]  Phillips, A., Ed. and M. Davis, Ed., "Tags for Identifying
+1026	              Languages", BCP 47, RFC 5646, DOI 10.17487/RFC5646,
+1027	              September 2009, <https://www.rfc-editor.org/rfc/rfc5646>.
+
+1029	   [RFC5901]  Cain, P. and D. Jevans, "Extensions to the IODEF-Document
+1030	              Class for Reporting Phishing", RFC 5901,
+1031	              DOI 10.17487/RFC5901, July 2010,
+1032	              <https://www.rfc-editor.org/rfc/rfc5901>.
+
+1034	   [RFC6068]  Duerst, M., Masinter, L., and J. Zawinski, "The 'mailto'
+1035	              URI Scheme", RFC 6068, DOI 10.17487/RFC6068, October 2010,
+1036	              <https://www.rfc-editor.org/rfc/rfc6068>.
+
+1038	   [RFC7493]  Bray, T., Ed., "The I-JSON Message Format", RFC 7493,
+1039	              DOI 10.17487/RFC7493, March 2015,
+1040	              <https://www.rfc-editor.org/rfc/rfc7493>.
+
+1042	   [RFC8126]  Cotton, M., Leiba, B., and T. Narten, "Guidelines for
+1043	              Writing an IANA Considerations Section in RFCs", BCP 26,
+1044	              RFC 8126, DOI 10.17487/RFC8126, June 2017,
+1045	              <https://www.rfc-editor.org/rfc/rfc8126>.
+
+1047	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+1048	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+1049	              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+1051	   [RFC8310]  Dickinson, S., Gillmor, D., and T. Reddy, "Usage Profiles
+1052	              for DNS over TLS and DNS over DTLS", RFC 8310,
+1053	              DOI 10.17487/RFC8310, March 2018,
+1054	              <https://www.rfc-editor.org/rfc/rfc8310>.
+
+1056	   [RFC8446]  Rescorla, E., "The Transport Layer Security (TLS) Protocol
+1057	              Version 1.3", RFC 8446, DOI 10.17487/RFC8446, August 2018,
+1058	              <https://www.rfc-editor.org/rfc/rfc8446>.
+
+1060	   [RFC8914]  Kumari, W., Hunt, E., Arends, R., Hardaker, W., and D.
+1061	              Lawrence, "Extended DNS Errors", RFC 8914,
+1062	              DOI 10.17487/RFC8914, October 2020,
+1063	              <https://www.rfc-editor.org/rfc/rfc8914>.
+
+1065	   [RFC9499]  Hoffman, P. and K. Fujiwara, "DNS Terminology", BCP 219,
+1066	              RFC 9499, DOI 10.17487/RFC9499, March 2024,
+1067	              <https://www.rfc-editor.org/rfc/rfc9499>.
+
+1069	12.2.  Informative References
+
+1071	   [IANA-DNS] IANA, "Domain Name System (DNS) Parameters, Extended DNS
+1072	              Error Codes", <https://www.iana.org/assignments/dns-
+1073	              parameters/dns-parameters.xhtml#extended-dns-error-codes>.
+
+1075	   [Impl-1]   "Use of DNS Errors To improve Browsing User Experience
+1076	              With network based malware protection", March 2023,
+1077	              <https://datatracker.ietf.org/meeting/116/materials/
+1078	              slides-116-dnsop-dns-errors-implementation-proposal-
+1079	              slides-116-dnsop-update-on-dns-errors-implementation-00>.
+
+1081	   [RFC3986]  Berners-Lee, T., Fielding, R., and L. Masinter, "Uniform
+1082	              Resource Identifier (URI): Generic Syntax", STD 66,
+1083	              RFC 3986, DOI 10.17487/RFC3986, January 2005,
+1084	              <https://www.rfc-editor.org/rfc/rfc3986>.
+
+1086	   [RFC5625]  Bellis, R., "DNS Proxy Implementation Guidelines",
+1087	              BCP 152, RFC 5625, DOI 10.17487/RFC5625, August 2009,
+1088	              <https://www.rfc-editor.org/rfc/rfc5625>.
+
+1090	   [RFC7754]  Barnes, R., Cooper, A., Kolkman, O., Thaler, D., and E.
+1091	              Nordmark, "Technical Considerations for Internet Service
+1092	              Blocking and Filtering", RFC 7754, DOI 10.17487/RFC7754,
+1093	              March 2016, <https://www.rfc-editor.org/rfc/rfc7754>.
+
+1095	   [RFC7858]  Hu, Z., Zhu, L., Heidemann, J., Mankin, A., Wessels, D.,
+1096	              and P. Hoffman, "Specification for DNS over Transport
+1097	              Layer Security (TLS)", RFC 7858, DOI 10.17487/RFC7858, May
+1098	              2016, <https://www.rfc-editor.org/rfc/rfc7858>.
+
+1100	   [RFC8484]  Hoffman, P. and P. McManus, "DNS Queries over HTTPS
+1101	              (DoH)", RFC 8484, DOI 10.17487/RFC8484, October 2018,
+1102	              <https://www.rfc-editor.org/rfc/rfc8484>.
+
+1104	   [RFC8792]  Watsen, K., Auerswald, E., Farrel, A., and Q. Wu,
+1105	              "Handling Long Lines in Content of Internet-Drafts and
+1106	              RFCs", RFC 8792, DOI 10.17487/RFC8792, June 2020,
+1107	              <https://www.rfc-editor.org/rfc/rfc8792>.
+
+1109	   [RFC9250]  Huitema, C., Dickinson, S., and A. Mankin, "DNS over
+1110	              Dedicated QUIC Connections", RFC 9250,
+1111	              DOI 10.17487/RFC9250, May 2022,
+1112	              <https://www.rfc-editor.org/rfc/rfc9250>.
+
+1114	   [RFC9462]  Pauly, T., Kinnear, E., Wood, C. A., McManus, P., and T.
+1115	              Jensen, "Discovery of Designated Resolvers", RFC 9462,
+1116	              DOI 10.17487/RFC9462, November 2023,
+1117	              <https://www.rfc-editor.org/rfc/rfc9462>.
+
+1119	   [RFC9606]  Reddy.K, T. and M. Boucadair, "DNS Resolver Information",
+1120	              RFC 9606, DOI 10.17487/RFC9606, June 2024,
+1121	              <https://www.rfc-editor.org/rfc/rfc9606>.
+
+1123	   [RFC9715]  Fujiwara, K. and P. Vixie, "IP Fragmentation Avoidance in
+1124	              DNS over UDP", RFC 9715, DOI 10.17487/RFC9715, January
+1125	              2025, <https://www.rfc-editor.org/rfc/rfc9715>.
+
+1127	   [RPZ]      "Response Policy Zone", <https://dnsrpz.info>.
+
+1129	Appendix A.  Interoperation with RPZ Servers
+
+1131	   This appendix provides a non-normative guidance for operation with a
+1132	   Response Policy Zones (RPZ) server [RPZ] that indicates filtering
+1133	   with a NXDOMAIN response with the Recursion Available bit cleared
+1134	   (RA=0).  This guidance is provided to ease interoperation with RPZ.
+
+1136	   When a DNS client supports this specification, it includes the SDE
+1137	   option in its DNS query.
+
+1139	   If the server does not support this specification and is performing
+1140	   RPZ filtering, the server ignores the SDE option in the DNS query and
+1141	   replies with NXDOMAIN and RA=0.  The DNS client can continue to
+1142	   accept such responses.
+
+1144	   If the server does support this specification and is performing RPZ
+1145	   filtering, the server can use the SDE option in the query to identify
+1146	   an SDE-aware client and respond appropriately (that is, by generating
+1147	   a response described in Section 5.2) as NXDOMAIN and RA=0 are not
+1148	   necessary when generating a response to such a client.
+
+1150	Appendix B.  Implementation Status
+
+1152	      Note to the RFC Editor: please remove this appendix prior
+1153	      publication.
+
+1155	   At IETF#116, Gianpaolo Scalone (Vodafone) and Ralf Weber (Akamai)
+1156	   presented an implementation of this specification.  More details can
+1157	   be found at [Impl-1].
+
+1159	Acknowledgements
+
+1161	   Thanks to Vittorio Bertola, Wes Hardaker, Ben Schwartz, Erid Orth,
+1162	   Viktor Dukhovni, Warren Kumari, Paul Wouters, John Levine, Bob
+1163	   Harold, Mukund Sivaraman, Gianpaolo Angelo Scalone, Mark Nottingham,
+1164	   Stephane Bortzmeyer, Daniel Migault, Lars Eggert, and Stephen Farrell
+1165	   for the comments.
+
+1167	   Thanks to Ralf Weber and Gianpaolo Scalone for sharing details about
+1168	   their implementation.
+
+1170	   Thanks Petr Špaček, Di Ma and Matt Brown for the DNSDIR reviews,
+1171	   Joseph Salowey for the SECDIR review, and Paul Kyzivat for the ARTART
+1172	   reviews.
+
+1174	   Thanks to Éric Vyncke for the AD review.
+
+1176	   Thanks to Mike Bishop for the IESG review.
+
+1178	Authors' Addresses
+
+1180	   Dan Wing
+1181	   Citrix Systems, Inc.
+1182	   United States of America
+1183	   Email: danwing@gmail.com
+1184	   Tirumaleswar Reddy
+1185	   Nokia
+1186	   Bangalore
+1187	   Karnataka
+1188	   India
+1189	   Email: kondtir@gmail.com
+
+1191	   Neil Cook
+1192	   Open-Xchange
+1193	   United Kingdom
+1194	   Email: neil.cook@noware.co.uk
+
+1196	   Mohamed Boucadair
+1197	   Orange
+1198	   Rennes
+1199	   35000
+1200	   France
+1201	   Email: mohamed.boucadair@orange.com
+
+
+
+
+
+
+
+
+
