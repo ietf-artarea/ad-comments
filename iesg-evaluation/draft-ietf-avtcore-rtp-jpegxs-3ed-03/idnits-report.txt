@@ -1,0 +1,1663 @@
+idnits 2.17.1 
+
+draft-ietf-avtcore-rtp-jpegxs-3ed-03.txt:
+-(1587): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+  == There are 3 instances of lines with non-ascii characters in the document.
+
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     Summary: 0 errors (**), 0 flaws (~~), 1 warning (==), 0 comments (--).
+
+--------------------------------------------------------------------------------
+
+
+2	avtcore                                                     T. Bruylants
+3	Internet-Draft                                                   intoPIX
+4	Obsoletes: 9134 (if approved)                                 T. Richter
+5	Intended status: Standards Track                          Fraunhofer IIS
+6	Expires: 4 January 2027                                C. Damman Geeroms
+7	                                                                 intoPIX
+8	                                                             A. Descampe
+9	                                                               UCLouvain
+10	                                                             3 July 2026
+
+12	             RTP Payload Format for ISO/IEC 21122 (JPEG XS)
+13	                  draft-ietf-avtcore-rtp-jpegxs-3ed-03
+
+15	Abstract
+
+17	   This document specifies a Real-Time Transport Protocol (RTP) payload
+18	   format for transport of a video signal encoded with JPEG XS (ISO/IEC
+19	   21122).  JPEG XS is a low-latency and low-complexity video coding
+20	   system.  Employing this format allows achieving encoding-decoding
+21	   latencies confined to a fraction of a video frame.
+
+23	   This document is a necessary revision of RFC 9134 to incorporate
+24	   support for new features introduced in the third edition of JPEG XS.
+25	   Most notably, it contains the necessary provisions to support the TDC
+26	   coding mode.  This document obsoletes RFC 9134; however, the revised
+27	   payload format is designed to ensure that existing compliant
+28	   implementations of RFC 9134 remain valid under the updated
+29	   specification.  Additionally, this document consolidates the errata
+30	   of RFC 9134 and includes improvements and clarifications to its
+31	   implementers and users.
+
+33	Status of This Memo
+
+35	   This Internet-Draft is submitted in full conformance with the
+36	   provisions of BCP 78 and BCP 79.
+
+38	   Internet-Drafts are working documents of the Internet Engineering
+39	   Task Force (IETF).  Note that other groups may also distribute
+40	   working documents as Internet-Drafts.  The list of current Internet-
+41	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+43	   Internet-Drafts are draft documents valid for a maximum of six months
+44	   and may be updated, replaced, or obsoleted by other documents at any
+45	   time.  It is inappropriate to use Internet-Drafts as reference
+46	   material or to cite them other than as "work in progress."
+
+48	   This Internet-Draft will expire on 4 January 2027.
+
+50	Copyright Notice
+
+52	   Copyright (c) 2026 IETF Trust and the persons identified as the
+53	   document authors.  All rights reserved.
+
+55	   This document is subject to BCP 78 and the IETF Trust's Legal
+56	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+57	   license-info) in effect on the date of publication of this document.
+58	   Please review these documents carefully, as they describe your rights
+59	   and restrictions with respect to this document.  Code Components
+60	   extracted from this document must include Revised BSD License text as
+61	   described in Section 4.e of the Trust Legal Provisions and are
+62	   provided without warranty as described in the Revised BSD License.
+
+64	Table of Contents
+
+66	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
+67	   2.  Conventions, Definitions, and Abbreviations . . . . . . . . .   3
+68	   3.  Media Format Description  . . . . . . . . . . . . . . . . . .   5
+69	     3.1.  Data Structures . . . . . . . . . . . . . . . . . . . . .   6
+70	     3.2.  Codestream  . . . . . . . . . . . . . . . . . . . . . . .   6
+71	     3.3.  Video Support box and Color Specification box . . . . . .   7
+72	     3.4.  JPEG XS frame and picture segment . . . . . . . . . . . .   8
+73	   4.  RTP Payload Format  . . . . . . . . . . . . . . . . . . . . .   8
+74	     4.1.  RTP Packetization . . . . . . . . . . . . . . . . . . . .   9
+75	     4.2.  RTP Header Usage  . . . . . . . . . . . . . . . . . . . .  11
+76	     4.3.  Payload Header Usage  . . . . . . . . . . . . . . . . . .  13
+77	     4.4.  Payload Data  . . . . . . . . . . . . . . . . . . . . . .  15
+78	   5.  Traffic Shaping and Delivery Timing . . . . . . . . . . . . .  20
+79	   6.  Congestion Control Considerations . . . . . . . . . . . . . .  21
+80	   7.  Payload Format Parameters . . . . . . . . . . . . . . . . . .  21
+81	     7.1.  Media Type Registration . . . . . . . . . . . . . . . . .  22
+82	   8.  SDP Parameters  . . . . . . . . . . . . . . . . . . . . . . .  27
+83	     8.1.  Mapping of Payload Type Parameters to SDP . . . . . . . .  27
+84	     8.2.  Usage with SDP Offer/Answer Model . . . . . . . . . . . .  28
+85	   9.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  28
+86	   10. Security Considerations . . . . . . . . . . . . . . . . . . .  28
+87	   11. Operational Considerations  . . . . . . . . . . . . . . . . .  29
+88	   12. RFC Editor Considerations . . . . . . . . . . . . . . . . . .  30
+89	   13. References  . . . . . . . . . . . . . . . . . . . . . . . . .  31
+90	     13.1.  Normative References . . . . . . . . . . . . . . . . . .  31
+91	     13.2.  Informative References . . . . . . . . . . . . . . . . .  32
+92	   Acknowledgements  . . . . . . . . . . . . . . . . . . . . . . . .  35
+93	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  35
+
+95	1.  Introduction
+
+97	   This document specifies a payload format for packetization of video
+98	   signals encoded with JPEG XS [ISO21122-1] into the Real-time
+99	   Transport Protocol (RTP) [RFC3550].
+
+101	   The JPEG XS coding system offers compression and recompression of
+102	   video signals with very moderate computational resources while
+103	   remaining robust under multiple compression and decompression cycles
+104	   as well as mixing of content sources, e.g., embedding of subtitles,
+105	   overlays, or logos.  Typical target compression ratios ensuring
+106	   visually lossless quality are in the range of 2:1 to 18:1 depending
+107	   on the nature of the source material.  The latency that is introduced
+108	   by the encoding-decoding process can be confined to a fraction of a
+109	   video frame, typically expressed in a number of lines.
+
+111	   Initially, the first and second editions of JPEG XS only supported
+112	   intra coding for video content.  However, the third edition of the
+113	   standard introduced the so-called Temporal Differential Coding (TDC)
+114	   mode that provides a temporal decorrelation step in the wavelet
+115	   domain.  For progressive video content, a single frame buffer is used
+116	   for the decorrelation of successive video frames.  For interlaced
+117	   content, two separate frame buffers are used, one for per video
+118	   field.
+
+120	   This document is a necessary revision of [RFC9134] to incorporate
+121	   support for new features introduced in the third edition of JPEG XS.
+122	   Most notably, it contains the necessary provisions to support the TDC
+123	   coding mode.  This document obsoletes [RFC9134]; however, the revised
+124	   payload format is designed to ensure that existing compliant
+125	   implementations of [RFC9134] remain valid under the updated
+126	   specification.  Additionally, this document consolidates the errata
+127	   of [RFC9134] and includes improvements and clarifications to its
+128	   implementers and users.  Section 11 provides more details on the
+129	   changes between [RFC9134] and this revision.
+
+131	2.  Conventions, Definitions, and Abbreviations
+
+133	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+134	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+135	   "OPTIONAL" in this document are to be interpreted as described in
+136	   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+137	   capitals, as shown here.
+
+139	   Application Data Unit (ADU):
+140	      The unit of source data provided as payload to the transport
+141	      layer.  In this RTP payload definition, it corresponds to a single
+142	      JPEG XS video frame.
+
+144	   Color Specification (CS) box:
+145	      An ISO Color Specification box defined in [ISO21122-3] that
+146	      includes color-related metadata required to correctly display JPEG
+147	      XS video frames, such as color primaries, transfer
+148	      characteristics, and matrix coefficients.
+
+150	   End of Codestream (EOC) marker:
+151	      A marker that consists of the two bytes 0xff11 indicating the end
+152	      of a JPEG XS codestream, as defined in [ISO21122-1].
+
+154	   Frame Buffer Bandwidth (FBB):
+155	      The bandwidth defined in [ISO21122-2] needed to read from and
+156	      write to the internal frame buffer when employing the TDC coding
+157	      mode.  This bandwidth is modeled and capped based on an FBB level
+158	      parameter.
+
+160	   JPEG XS codestream:
+161	      A sequence of bytes representing a compressed video frame
+162	      (progressive) or field (interlaced), formatted according to
+163	      [ISO21122-1].
+
+165	   JPEG XS codestream header:
+166	      A sequence of bytes, starting with an SOC marker, at the beginning
+167	      of each JPEG XS codestream encoded in multiple markers and marker
+168	      segments, that does not carry entropy coded data, but only
+169	      metadata such as the video frame dimension and component
+170	      precision.
+
+172	   JPEG XS frame:
+173	      In the case of progressive video, a single JPEG XS picture
+174	      segment.  In the case of interlaced video, the concatenation of
+175	      two JPEG XS picture segments.
+
+177	   JPEG XS header segment:
+178	      The concatenation of a Video Support box [ISO21122-3], a Color
+179	      Specification box [ISO21122-3], and a JPEG XS codestream header.
+
+181	   JPEG XS picture segment:
+182	      The concatenation of a Video Support box [ISO21122-3], a Color
+183	      Specification box [ISO21122-3], and a JPEG XS codestream.
+
+185	   JPEG XS stream:
+186	      A sequence of JPEG XS frames.
+
+188	   Marker:
+189	      A two-byte functional sequence that is part of a JPEG XS
+190	      codestream starting with a 0xff byte and a subsequent byte
+191	      defining its function.
+
+193	   Marker segment:
+194	      A marker along with a 16-bit marker size and payload data
+195	      following the size.
+
+197	   Packetization unit:
+198	      A portion of an ADU whose boundaries coincide with boundaries of
+199	      RTP packet payloads (excluding payload header), i.e., the first
+200	      (or respectively, last) byte of a packetization unit is the first
+201	      (or respectively, last) byte of an RTP packet payload (excluding
+202	      its payload header).
+
+204	   SLH (Slice header) marker:
+205	      A marker that represents a slice header, as defined in
+206	      [ISO21122-1].
+
+208	   SLI (TDC enabling slice header) marker:
+209	      A marker that represents a TDC enabling slice header, as defined
+210	      in [ISO21122-1].
+
+212	   Slice:
+213	      The smallest independently decodable unit of a JPEG XS codestream,
+214	      bearing in mind that it decodes to wavelet coefficients, which
+215	      still require inverse wavelet filtering before visualization.
+
+217	   Start of a Codestream (SOC) marker:
+218	      A marker that consists of the two bytes 0xff10 indicating the
+219	      start of a JPEG XS codestream, as defined in [ISO21122-1].  The
+220	      SOC marker is considered an integral part of the JPEG XS
+221	      codestream header.
+
+223	   Temporal Differential Coding (TDC):
+224	      An inter-frame coding mode used by certain JPEG XS profiles, as
+225	      defined in [ISO21122-2].
+
+227	   Video Support (VS) box:
+228	      An ISO Video Support box, as defined in [ISO21122-3], that
+229	      includes metadata required to play back a JPEG XS stream; such
+230	      metadata could include its maximum bit rate, its subsampling
+231	      structure, its buffer model, and its frame rate.
+
+233	3.  Media Format Description
+
+235	   This section explains the terminology and concepts used in this memo
+236	   specific to JPEG XS as specified in [ISO21122-1], [ISO21122-2], and
+237	   [ISO21122-3].
+
+239	3.1.  Data Structures
+
+241	   JPEG XS is a low-latency and lightweight coding system for
+242	   compression of digital continuous-tone grayscale and color signals,
+243	   like images and videos.
+
+245	   This coding system provides an efficient representation of visual
+246	   content through the mathematical tool of wavelet analysis.  The
+247	   wavelet filter process separates each component into multiple bands,
+248	   where each band consists of multiple coefficients describing the
+249	   visual signal of a given component within a frequency domain specific
+250	   to the wavelet filter type, i.e., the particular filter corresponding
+251	   to the band.
+
+253	   Wavelet coefficients are grouped into precincts, where each precinct
+254	   includes all coefficients over all bands that contribute to a spatial
+255	   region of the picture.
+
+257	   One or multiple precincts are furthermore combined into slices
+258	   consisting of an integer number of precincts.  Precincts do not cross
+259	   slice boundaries, and wavelet coefficients in precincts that are part
+260	   of different slices can be decoded independently of each other.
+261	   However, note that the wavelet transformation runs across slice
+262	   boundaries.  A slice always extends over the full width of the
+263	   picture segment but may only cover parts of its height.
+
+265	3.2.  Codestream
+
+267	   A JPEG XS codestream is formed by (in the given order):
+
+269	   *  a JPEG XS codestream header, which starts with a Start of
+270	      Codestream (SOC) marker,
+
+272	   *  one or more slices, each starting with either an SLH or SLI
+273	      marker,
+
+275	   *  an EOC marker to signal the end of the codestream.
+
+277	   The JPEG XS codestream format, including the definition of all
+278	   markers, is further provided in [ISO21122-1].  It represents sample
+279	   values of a single picture, without any interpretation relative to a
+280	   color space.
+
+282	   As defined in [ISO21122-1], slices are represented in the codestream
+283	   as contiguous sequences of bytes, always beginning with a slice
+284	   header followed by one or more precincts, and optionally including
+285	   slice-based extension markers.  The slice header SHALL be either an
+286	   SLH or an SLI marker.  The last byte of a slice in the codestream
+287	   SHALL immediately precede either an SLH or SLI marker (indicating the
+288	   start of the next slice) or an EOC marker (in the case of the final
+289	   slice).
+
+291	   A JPEG XS codestream not using the TDC coding mode can be decoded
+292	   independently as a stand-alone picture (a video frame or field).
+293	   However, a codestream that employs the TDC coding mode has a
+294	   potential dependency on the contents stored in a frame buffer as
+295	   described in [ISO21122-1].  This frame buffer holds a quantized
+296	   version of all wavelet coefficients that were reconstructed from
+297	   decoding the previous codestream.  For progressive video streams, a
+298	   single frame buffer is maintained.  For interlaced video streams, two
+299	   separate frame buffers are maintained, one for each video field (i.e.
+300	   video fields are independent of each other).
+
+302	3.3.  Video Support box and Color Specification box
+
+304	   While the information defined in the codestream is sufficient to
+305	   reconstruct the sample values of one picture, the interpretation of
+306	   the samples remains undefined by the codestream itself.  The metadata
+307	   that allows such interpretation is for the purpose of this payload
+308	   format signaled in the Video Support box and the Color Specification
+309	   box, which are taken from [ISO21122-3].  These boxes contain the
+310	   necessary information that is otherwise missing in the raw codestream
+311	   and allows for correct interpretation and rendering of the JPEG XS
+312	   stream.  The layout and syntax of these boxes, together with their
+313	   content, are defined in [ISO21122-3].
+
+315	   The Video Support box provides information on the maximum bit rate,
+316	   the frame rate, the interlaced mode (progressive or interlaced), the
+317	   colour subsampling format, the informative timecode of the current
+318	   JPEG XS frame or field, the profile, the level/sublevel used, and
+319	   optionally the buffer model and the mastering display metadata.
+
+321	   Note that the profile and level/sublevel/fbblevel, specified
+322	   respectively by the Ppih and Plev fields [ISO21122-2], specify limits
+323	   on the capabilities needed to decode the codestream and handle the
+324	   output.  Profiles represent a limit on the required algorithmic
+325	   features and parameter ranges used in the codestream.  The
+326	   combination of level and sublevel defines a lower bound on the
+327	   required throughput for a decoder in the visual (or decoded) domain
+328	   and the codestream (or coded) domain, respectively.  The frame buffer
+329	   bandwidth (FBB) level defines a lower bound on the required bandwidth
+330	   to read from and write to the frame buffer(s) when using the TDC
+331	   coding mode.  The actual defined profiles and levels/sublevels/
+332	   fbblevel, along with the associated values for the Ppih and Plev
+333	   fields, are defined in [ISO21122-2].
+
+335	   The Color Specification box indicates the color primaries, transfer
+336	   characteristics, matrix coefficients, and video full range flag
+337	   needed to specify the color space of the video stream.
+
+339	3.4.  JPEG XS frame and picture segment
+
+341	   The concatenation of a Video Support box, a Color Specification box,
+342	   and a JPEG XS codestream forms a JPEG XS picture segment.
+
+344	   In the case of a progressive video stream, each JPEG XS frame
+345	   consists of one single JPEG XS picture segment.
+
+347	   In the case of an interlaced video stream, each JPEG XS frame
+348	   consists of two concatenated JPEG XS picture segments.  Each JPEG XS
+349	   picture segment corresponds exclusively to one of the two fields of
+350	   the interlaced frame.
+
+352	   Note that Section 4.4 further mandates that the Video Support boxes
+353	   and all of the Color Specification boxes in both picture segments of
+354	   each JPEG XS frame SHALL have the same respective layouts.
+
+356	   Note that the interlaced mode, as signaled by the frat field
+357	   [ISO21122-3] in the Video Support box, indicates either progressive,
+358	   interlaced top-field-first, or interlaced bottom-field-first mode.
+359	   Thus, in the case of interlaced video, its value SHALL also be
+360	   identical in both picture segments.
+
+362	   Note that the frat field [ISO21122-3] in the Video Support box always
+363	   signals the frame rate, even in the case of interlaced video.  This
+364	   should not be confused with the field rate.
+
+366	4.  RTP Payload Format
+
+368	   This section specifies the payload format for JPEG XS streams over
+369	   the Real-time Transport Protocol (RTP) [RFC3550].
+
+371	   In order to be transported over RTP, each JPEG XS stream is
+372	   transported in a distinct RTP stream, identified by a distinct
+373	   synchronization source (SSRC) [RFC3550].
+
+375	   A JPEG XS stream is divided into Application Data Units (ADUs), each
+376	   ADU corresponding to a single JPEG XS frame.
+
+378	4.1.  RTP Packetization
+
+380	   An ADU is made of several packetization units.  If a packetization
+381	   unit is bigger than the maximum size of an RTP packet payload, the
+382	   unit is split into multiple RTP packet payloads, as illustrated in
+383	   Figure 1.  As seen there, each packet SHALL contain (part of) one,
+384	   and only one, packetization unit.  A packetization unit may extend
+385	   over multiple packets.  The payload of every packet SHALL have the
+386	   same size (e.g., based on the largest packet size supported by the
+387	   network path) with the possible exception of the last packet of a
+388	   packetization unit.  The boundaries of a packetization unit SHALL
+389	   coincide with the boundaries of the payload of a packet (excluding
+390	   the payload header), i.e., the first (or, respectively, last) byte of
+391	   the packetization unit SHALL be the first (or, respectively, last)
+392	   byte of the payload (excluding its header).  Note that for interlaced
+393	   frames the requirements of the RTP packetization imply that each
+394	   packet will only contain data corresponding to exactly one field.
+
+396	   RTP        +-----+------------------------+
+397	   Packet #1  | Hdr | Packetization unit #1  |
+398	              +-----+------------------------+
+399	   RTP        +-----+--------------------------------------+
+400	   Packet #2  | Hdr | Packetization unit #2                |
+401	              +-----+--------------------------------------+
+402	   RTP        +-----+--------------------------------------------------+
+403	   Packet #3  | Hdr | Packetization unit #3  (part 1/3)                |
+404	              +-----+--------------------------------------------------+
+405	   RTP        +-----+--------------------------------------------------+
+406	   Packet #4  | Hdr | Packetization unit #3  (part 2/3)                |
+407	              +-----+--------------------------------------------------+
+408	   RTP        +-----+----------------------------------------------+
+409	   Packet #5  | Hdr | Packetization unit #3  (part 3/3)            |
+410	              +-----+----------------------------------------------+
+411	                ...
+412	   RTP        +-----+-----------------------------------------+
+413	   Packet #P  | Hdr | Packetization unit #N  (part q/q)       |
+414	              +-----+-----------------------------------------+
+
+416	                   Figure 1: Example of ADU Packetization
+
+418	   There are two different packetization modes defined for this RTP
+419	   payload format.
+
+421	   Codestream packetization mode:
+
+423	      In this mode, the packetization unit SHALL be the entire JPEG XS
+424	      picture segment (i.e., codestream preceded by boxes).  This means
+425	      that a progressive frame will have a single packetization unit,
+426	      while an interlaced frame will have two.  The progressive case is
+427	      illustrated in Figure 2.
+
+429	   Slice packetization mode:
+430	      In this mode, the packetization unit SHALL be the slice, i.e.,
+431	      there SHALL be data from no more than one slice per RTP packet.
+432	      The first packetization unit of each JPEG XS picture segment SHALL
+433	      contain the JPEG XS header segment (i.e., the concatenation of the
+434	      VS box, the CS box, and the JPEG XS codestream header).  This
+435	      first unit is then followed by successive units, each containing
+436	      one and only one slice.  The packetization unit containing the
+437	      last slice of a JPEG XS picture segment SHALL also contain the EOC
+438	      marker immediately following this last slice.  This is illustrated
+439	      in Figure 3.  In the case of an interlaced frame, the JPEG XS
+440	      header segment of the second field SHALL be in its own
+441	      packetization unit.
+
+443	   RTP        +-----+--------------------------------------------------+
+444	   Packet #1  | Hdr | VS box + CS box + JPEG XS codestream (part 1/q)  |
+445	              +-----+--------------------------------------------------+
+446	   RTP        +-----+--------------------------------------------------+
+447	   Packet #2  | Hdr | JPEG XS codestream (part 2/q)                    |
+448	              +-----+--------------------------------------------------+
+449	                ...
+450	   RTP        +-----+--------------------------------------+
+451	   Packet #P  | Hdr | JPEG XS codestream (part q/q)        |
+452	              +-----+--------------------------------------+
+
+454	             Figure 2: Example of Codestream Packetization Mode
+
+456	   RTP        +-----+----------------------------+
+457	   Packet #1  | Hdr | JPEG XS header segment     |
+458	              +-----+----------------------------+
+459	   RTP        +-----+--------------------------------------------------+
+460	   Packet #2  | Hdr | Slice #1  (part 1/2)                             |
+461	              +-----+--------------------------------------------------+
+462	   RTP        +-----+-------------------------------------------+
+463	   Packet #3  | Hdr | Slice #1  (part 2/2)                      |
+464	              +-----+-------------------------------------------+
+465	   RTP        +-----+--------------------------------------------------+
+466	   Packet #4  | Hdr | Slice #2  (part 1/3)                             |
+467	              +-----+--------------------------------------------------+
+468	                ...
+469	   RTP        +-----+---------------------------------------+
+470	   Packet #P  | Hdr | Slice #N  (part q/q) + EOC marker     |
+471	              +-----+---------------------------------------+
+
+473	               Figure 3: Example of Slice Packetization Mode
+
+475	   In a constant bitrate (CBR) scenario of JPEG XS, the codestream
+476	   packetization mode guarantees that a JPEG XS RTP stream will produce
+477	   both a constant number of bytes per video frame and a constant number
+478	   of RTP packets per video frame.  However, to provide similar
+479	   guarantees with JPEG XS in a variable bitrate (VBR) mode or when
+480	   using the slice packetization mode (for either CBR or VBR),
+481	   additional mechanisms are needed.  This can involve a constraint at
+482	   the rate allocation stage in the JPEG XS encoder to impose a CBR at
+483	   the slice level, the usage of padding data, or the insertion of empty
+484	   RTP packets (i.e., an RTP packet whose payload data is empty).  But,
+485	   management of the amount of produced packets per video frame depends
+486	   on the application and not a strict requirement of this RTP payload
+487	   specification.
+
+489	4.2.  RTP Header Usage
+
+491	   The format of the RTP header is specified in [RFC3550] and reprinted
+492	   in Figure 4 for convenience.  This RTP payload format uses the fields
+493	   of the header in a manner consistent with that specification.
+
+495	   The RTP payload (and the settings for some RTP header bits) for
+496	   packetization units are specified in Section 4.3.
+
+498	    0                   1                   2                   3
+499	    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+500	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+501	   |V=2|P|X|  CC   |M|     PT      |       sequence number         |
+502	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+503	   |                           timestamp                           |
+504	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+505	   |           synchronization source (SSRC) identifier            |
+506	   +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+507	   |            contributing source (CSRC) identifiers             |
+508	   |                             ....                              |
+509	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+511	                 Figure 4: RTP Header According to RFC 3550
+
+513	   The version (V), padding (P), extension (X), CSRC count (CC),
+514	   sequence number, synchronization source (SSRC), and contributing
+515	   source (CSRC) fields follow their respective definitions in
+516	   [RFC3550].
+
+518	   The remaining RTP header information to be set according to this RTP
+519	   payload format is set as follows:
+
+521	   Marker (M) [1 bit]:
+522	      If progressive video is being transmitted, the marker bit denotes
+523	      the end of a video frame.  If interlaced video is being
+524	      transmitted, it denotes the end of a field.  The marker bit SHALL
+525	      be set to 1 for the last packet of a JPEG XS picture segment.  It
+526	      SHALL be set to 0 for all other packets.
+
+528	   Payload Type (PT) [7 bits]:
+529	      The payload type is a dynamically allocated payload type field
+530	      that designates the payload as JPEG XS video.
+
+532	   Timestamp [32 bits]:
+533	      The RTP timestamp is set to the sampling timestamp of the content
+534	      (see also [RFC3550] and [RFC4175]).  A 90 kHz clock rate SHALL be
+535	      used.  If the sampling instant does not correspond to an integer
+536	      value of the clock, the value SHALL be rounded up to the next
+537	      lowest integer, with no ambiguity.
+
+539	      For progressive video, the timestamp denotes the sampling instant
+540	      of the frame to which the RTP packet belongs.  Packets SHALL NOT
+541	      include data from multiple frames, and all packets belonging to
+542	      the same frame SHALL have the same timestamp.
+
+544	      For interlaced video, the timestamp denotes the sampling instant
+545	      of the field to which the RTP packet belongs.  Packets SHALL NOT
+546	      include data from multiple fields, and all packets belonging to
+547	      the same field SHALL have the same timestamp.  Use of field
+548	      timestamps, rather than a frame timestamp and field indicator bit,
+549	      is needed to support reverse 3-2 pulldown.
+
+551	      Several successive RTP packets will consequently have equal
+552	      timestamps if they belong to the same video frame for progressive
+553	      content, or the same video field for interlaced content.  That is,
+554	      the time stamp does not change until after the marker bit (M) is
+555	      set to 1, marking the last packet of the video frame or field.
+556	      The timestamp is only increased when a new video frame or field
+557	      begins.
+
+559	4.3.  Payload Header Usage
+
+561	   The first four bytes of the payload of an RTP packet in this RTP
+562	   payload format are referred to as the "payload header".  Figure 5
+563	   illustrates the structure of this payload header.
+
+565	    0                   1                   2                   3
+566	    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+567	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+568	   |T|K|L| I |F counter|     SEP counter     |     P counter       |
+569	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+571	                          Figure 5: Payload Header
+
+573	   The payload header consists of the following fields:
+
+575	   Transmission mode (T) [1 bit]:
+576	      The T bit SHALL indicate whether the transmitter guarantees
+577	      sequential packet transmission or whether packets may be
+578	      transmitted out of order.  This information allows a receiver to
+579	      dimension its input buffer(s) accordingly.  If T=0, nothing can be
+580	      assumed about the transmission order and the transmitter may send
+581	      out its packets in any order.  If T=1, the transmitter SHALL send
+582	      out the packets as a monotonically increasing sequence according
+583	      to the F, SEP, and P fields.  The T bit value SHALL be identical
+584	      for all packets of the RTP stream.  Note that even with T=1,
+585	      packets may still arrive out of order relative to the sequence in
+586	      which they were sent.
+
+588	   pacKetization mode (K) [1 bit]:
+589	      The K bit SHALL indicate which packetization mode is used.  K=0
+590	      indicates codestream packetization mode, while K=1 indicates slice
+591	      packetization mode.  In the case that the Transmission mode (T) is
+592	      set to 0 (arbitrary sending order), then K SHALL be set to 1
+593	      (slice packetization mode).  The K bit value SHALL be identical
+594	      for all packets of the RTP stream.
+
+596	   Last (L) [1 bit]:
+597	      The L bit SHALL be set to 1 to indicate that a packet is the last
+598	      packet of a packetization unit.  The L bit SHALL be set to 0 for
+599	      all other packets.  As the end of the video frame also ends the
+600	      packet containing the last unit of the video frame, the L bit
+601	      SHALL be set to 1 whenever the M bit is set to 1.  In the
+602	      codestream packetization mode, the L bit and M bit get an
+603	      equivalent meaning, so they SHALL have identical values in each
+604	      packet.
+
+606	   Interlaced information (I) [2 bits]:
+607	      These two I bits are used to indicate how the JPEG XS frame is
+608	      scanned (progressive or interlaced).  In case of an interlaced
+609	      frame, they also indicate which JPEG XS picture segment the
+610	      payload is part of (first or second).
+
+612	      00: The payload is progressively scanned.
+
+614	      01: This value is reserved for future use.
+
+616	      10: The payload is part of the first JPEG XS picture segment of an
+617	      interlaced video frame.  The height specified in the included JPEG
+618	      XS codestream header is half of the height of the entire displayed
+619	      video frame.
+
+621	      11: The payload is part of the second JPEG XS picture segment of
+622	      an interlaced video frame.  The height specified in the included
+623	      JPEG XS codestream header is half of the height of the entire
+624	      displayed video frame.
+
+626	   F counter [5 bits]:
+627	      The Frame (F) counter identifies the video frame number modulo 32
+628	      to which a packet belongs.  Frame numbers SHALL increment by 1 for
+629	      each video frame transmitted.  The frame number, in addition to
+630	      the timestamp, may help the decoder manage its input buffer and
+631	      bring packets back into their natural order.  For interlaced
+632	      frames, both fields SHALL have the same F counter value.
+
+634	   Slice and Extended Packet (SEP) counter [11 bits]:
+635	      The SEP counter is used differently depending on the packetization
+636	      mode.
+
+638	      *  In the case of codestream packetization mode (K=0), this
+639	         counter resets whenever the Packet counter resets (see
+640	         Section 4.4) and increments by 1 whenever the Packet counter
+641	         overruns.
+
+643	      *  In the case of slice packetization mode (K=1), this counter
+644	         identifies the slice modulo 2047 to which the packet
+645	         contributes.  If the data belongs to the JPEG XS header
+646	         segment, this field SHALL have its maximal value, namely
+647	         2047=0x07ff.  Otherwise, it is the slice index modulo 2047.
+648	         Slice indices are counted from 0 (corresponding to the top of
+649	         the video frame).
+
+651	   P counter [11 bits]:
+652	      The Packet (P) counter identifies the packet number modulo 2048
+653	      within the current packetization unit.  It is set to 0 at the
+654	      start of the packetization unit and incremented by 1 for every
+655	      subsequent packet (if any) belonging to the same unit.
+656	      Practically, if codestream packetization mode is enabled, this
+657	      field counts the packets within a JPEG XS picture segment and is
+658	      extended by the SEP counter when it overruns.  If slice
+659	      packetization mode is enabled, this field counts the packets
+660	      within a slice or within the JPEG XS header segment.
+
+662	4.4.  Payload Data
+
+664	   The payload data of a JPEG XS RTP stream consists of a concatenation
+665	   of multiple JPEG XS frames, each consisting of one (for progressive
+666	   video) or two (for interlaced video) JPEG XS picture segments.
+667	   Within the RTP stream, all of the Video Support boxes and all of the
+668	   Color Specification boxes SHALL retain their respective layouts for
+669	   each JPEG XS picture segment across all JPEG XS frames, for the
+670	   entirety of the JPEG XS RTP stream.  Thus, each Video Support box in
+671	   the RTP stream SHALL define the same sub boxes, in the same order.
+672	   The effective values in the boxes are allowed to change under the
+673	   condition that their relative byte offsets SHALL NOT change.
+674	   Moreover, any changed value in the boxes SHOULD NOT violate any
+675	   restrictions imposed by the application layer.
+
+677	   Each JPEG XS frame is represented by one or more packetization
+678	   unit(s), as explained in Section 4.1.  Figure 6 depicts this layout
+679	   for a progressive video frame in the codestream packetization mode,
+680	   Figure 7 depicts this layout for an interlaced video frame in the
+681	   codestream packetization mode, Figure 8 depicts this layout for a
+682	   progressive video frame in the slice packetization mode, and Figure 9
+683	   depicts this layout for an interlaced video frame in the slice
+684	   packetization mode.  The Frame (F) counter value is not indicated
+685	   because the value is constant for all packetization units of a given
+686	   video frame.
+
+688	   +=====[ Packetization unit (PU) #1 ]====+
+689	   |           Video Support box           |  SEP counter=0
+690	   |  +---------------------------------+  |  P counter=0
+691	   |  :      Sub boxes of the VS box    :  |
+692	   |  +---------------------------------+  |
+693	   +- - - - - - - - - - - - - - - - - - - -+
+694	   |        Color Specification box        |
+695	   |  +---------------------------------+  |
+696	   |  :      Fields of the CS box       :  |
+697	   |  +---------------------------------+  |
+698	   +- - - - - - - - - - - - - - - - - - - -+
+699	   |          JPEG XS codestream           |
+700	   :             (part 1/q)                :  M=0, K=0, L=0, I=00
+701	   +---------------------------------------+
+702	   |          JPEG XS codestream           |  SEP counter=0
+703	   |             (part 2/q)                |  P counter=1
+704	   :                                       :  M=0, K=0, L=0, I=00
+705	   +---------------------------------------+
+706	   |          JPEG XS codestream           |  SEP counter=0
+707	   |             (part 3/q)                |  P counter=2
+708	   :                                       :  M=0, K=0, L=0, I=00
+709	   +---------------------------------------+
+710	   :                 ...                   :
+711	   +---------------------------------------+
+712	   |          JPEG XS codestream           |  SEP counter=1
+713	   |            (part 2049/q)              |  P counter=0
+714	   :                                       :  M=0, K=0, L=0, I=00
+715	   +---------------------------------------+
+716	   :                 ...                   :
+717	   +---------------------------------------+
+718	   |          JPEG XS codestream           |  SEP counter=(q-1) div 2048
+719	   |             (part q/q)                |  P counter=(q-1) mod 2048
+720	   :                                       :  M=1, K=0, L=1, I=00
+721	   +=======================================+
+
+723	         Figure 6: Example of JPEG XS Payload Data using Codestream
+724	              Packetization Mode with Progressive Video Frames
+
+726	   +=====[ Packetization unit (PU) #1 ]====+
+727	   |           Video Support box           |  SEP counter=0
+728	   +- - - - - - - - - - - - - - - - - - - -+  P counter=0
+729	   |        Color Specification box        |
+730	   +- - - - - - - - - - - - - - - - - - - -+
+731	   |     JPEG XS codestream (1st field)    |
+732	   :             (part 1/q)                :  M=0, K=0, L=0, I=10
+733	   +---------------------------------------+
+734	   |     JPEG XS codestream (1st field)    |  SEP counter=0
+735	   |             (part 2/q)                |  P counter=1
+736	   :                                       :  M=0, K=0, L=0, I=10
+737	   +---------------------------------------+
+738	   :                 ...                   :
+739	   +---------------------------------------+
+740	   |     JPEG XS codestream (1st field)    |  SEP counter=1
+741	   |            (part 2049/q)              |  P counter=0
+742	   :                                       :  M=0, K=0, L=0, I=10
+743	   +---------------------------------------+
+744	   :                 ...                   :
+745	   +---------------------------------------+
+746	   |     JPEG XS codestream (1st field)    |  SEP counter=(q-1) div 2048
+747	   |             (part q/q)                |  P counter=(q-1) mod 2048
+748	   :                                       :  M=1, K=0, L=1, I=10
+749	   +=====[ Packetization unit (PU) #2 ]====+
+750	   |           Video Support box           |  SEP counter=0
+751	   +- - - - - - - - - - - - - - - - - - - -+  P counter=0
+752	   |        Color Specification box        |
+753	   +- - - - - - - - - - - - - - - - - - - -+
+754	   |     JPEG XS codestream (2nd field)    |
+755	   |             (part 1/q)                |
+756	   :                                       :  M=0, K=0, L=0, I=11
+757	   +---------------------------------------+
+758	   |     JPEG XS codestream (2nd field)    |  SEP counter=0
+759	   |             (part 2/q)                |  P counter=1
+760	   :                                       :  M=0, K=0, L=0, I=11
+761	   +---------------------------------------+
+762	   :                 ...                   :
+763	   +---------------------------------------+
+764	   |     JPEG XS codestream (2nd field)    |  SEP counter=(q-1) div 2048
+765	   |             (part q/q)                |  P counter=(q-1) mod 2048
+766	   :                                       :  M=1, K=0, L=1, I=11
+767	   +=======================================+
+
+769	         Figure 7: Example of JPEG XS Payload Data using Codestream
+770	              Packetization Mode with Interlaced Video Frames
+
+772	   +===[ PU #1: JPEG XS Header segment ]===+
+773	   |           Video Support box           |  SEP counter=0x07FF
+774	   +- - - - - - - - - - - - - - - - - - - -+  P counter=0
+775	   |        Color Specification box        |
+776	   +- - - - - - - - - - - - - - - - - - - -+
+777	   |      JPEG XS codestream header        |
+778	   |  +---------------------------------+  |
+779	   |  :  Markers and marker segments    :  |
+780	   |  +---------------------------------+  |  M=0, T=0, K=1, L=1, I=00
+781	   +==========[ PU #2: Slice #1 ]==========+
+782	   |  +---------------------------------+  |  SEP counter=0
+783	   |  |        SLH or SLI Marker        |  |  P counter=0
+784	   |  +---------------------------------+  |
+785	   |  :       Entropy Coded Data        :  |
+786	   |  +---------------------------------+  |  M=0, T=0, K=1, L=1, I=00
+787	   +==========[ PU #3: Slice #2 ]==========+
+788	   |               Slice #2                |  SEP counter=1
+789	   |              (part 1/q)               |  P counter=0
+790	   :                                       :  M=0, T=0, K=1, L=0, I=00
+791	   +---------------------------------------+
+792	   |               Slice #2                |  SEP counter=1
+793	   |              (part 2/q)               |  P counter=1
+794	   :                                       :  M=0, T=0, K=1, L=0, I=00
+795	   +---------------------------------------+
+796	   :                 ...                   :
+797	   +---------------------------------------+
+798	   |               Slice #2                |  SEP counter=1
+799	   |              (part q/q)               |  P counter=q-1
+800	   :                                       :  M=0, T=0, K=1, L=1, I=00
+801	   +=======================================+
+802	   :                 ...                   :
+803	   +========[ PU #N: Slice #(N-1) ]========+
+804	   |             Slice #(N-1)              |  SEP counter=N-2
+805	   |              (part 1/r)               |  P counter=0
+806	   :                                       :  M=0, T=0, K=1, L=0, I=00
+807	   +---------------------------------------+
+808	   :                 ...                   :
+809	   +---------------------------------------+
+810	   |             Slice #(N-1)              |  SEP counter=N-2
+811	   |              (part r/r)               |  P counter=r-1
+812	   :             + EOC marker              :  M=1, T=0, K=1, L=1, I=00
+813	   +=======================================+
+
+815	           Figure 8: Example of JPEG XS Payload Data using Slice
+816	              Packetization Mode with Progressive Video Frames
+
+818	   +==[ PU #1: JPEG XS Header segment 1 ]==+
+819	   |           Video Support box           |  SEP counter=0x07FF
+820	   +- - - - - - - - - - - - - - - - - - - -+  P counter=0
+821	   |        Color Specification box        |
+822	   +- - - - - - - - - - - - - - - - - - - -+
+823	   |      JPEG XS codestream header 1      |
+824	   |  +---------------------------------+  |
+825	   |  :   Markers and marker segments   :  |
+826	   |  +---------------------------------+  |  M=0, T=0, K=1, L=1, I=10
+827	   +====[ PU #2: Slice #1 (1st field) ]====+
+828	   |  +---------------------------------+  |  SEP counter=0
+829	   |  |        SLH or SLI Marker        |  |  P counter=0
+830	   |  +---------------------------------+  |
+831	   |  :       Entropy Coded Data        :  |
+832	   |  +---------------------------------+  |  M=0, T=0, K=1, L=1, I=10
+833	   +====[ PU #3: Slice #2 (1st field) ]====+
+834	   |              Slice #2                 |  SEP counter=1
+835	   |             (part 1/q)                |  P counter=0
+836	   :                                       :  M=0, T=0, K=1, L=0, I=10
+837	   +---------------------------------------+
+838	   |              Slice #2                 |  SEP counter=1
+839	   |             (part 2/q)                |  P counter=1
+840	   :                                       :  M=0, T=0, K=1, L=0, I=10
+841	   +---------------------------------------+
+842	   :                 ...                   :
+843	   +---------------------------------------+
+844	   |              Slice #2                 |  SEP counter=1
+845	   |             (part q/q)                |  P counter=q-1
+846	   :                                       :  M=0, T=0, K=1, L=1, I=10
+847	   +=======================================+
+848	   :                 ...                   :
+849	   +==[ PU #N: Slice #(N-1) (1st field) ]==+
+850	   |            Slice #(N-1)               |  SEP counter=N-2
+851	   |             (part 1/r)                |  P counter=0
+852	   :                                       :  M=0, T=0, K=1, L=0, I=10
+853	   +---------------------------------------+
+854	   :                 ...                   :
+855	   +---------------------------------------+
+856	   |            Slice #(N-1)               |  SEP counter=N-2
+857	   |             (part r/r)                |  P counter=r-1
+858	   :            + EOC marker               :  M=1, T=0, K=1, L=1, I=10
+859	   +=======================================+
+860	   +=[ PU #N+1: JPEG XS Header segment 2 ]=+
+861	   |           Video Support box           |  SEP counter=0x07FF
+862	   +- - - - - - - - - - - - - - - - - - - -+  P counter=0
+863	   |        Color Specification box        |
+864	   +- - - - - - - - - - - - - - - - - - - -+
+865	   |       JPEG XS codestream header 2     |
+866	   |  +---------------------------------+  |
+867	   |  :  Markers and marker segments    :  |
+868	   |  +---------------------------------+  |  M=0, T=0, K=1, L=1, I=11
+869	   +===[ PU #N+2: Slice #1 (2nd field) ]===+
+870	   |  +---------------------------------+  |  SEP counter=0
+871	   |  |        SLH or SLI Marker        |  |  P counter=0
+872	   |  +---------------------------------+  |
+873	   |  :      Entropy Coded Data         :  |
+874	   |  +---------------------------------+  |  M=0, T=0, K=1, L=1, I=11
+875	   +===[ PU #N+3: Slice #2 (2nd field) ]===+
+876	   |               Slice #2                |  SEP counter=1
+877	   |              (part 1/s)               |  P counter=0
+878	   :                                       :  M=0, T=0, K=1, L=0, I=11
+879	   +---------------------------------------+
+880	   |               Slice #2                |  SEP counter=1
+881	   |              (part 2/s)               |  P counter=1
+882	   :                                       :  M=0, T=0, K=1, L=0, I=11
+883	   +---------------------------------------+
+884	   :                 ...                   :
+885	   +---------------------------------------+
+886	   |               Slice #2                |  SEP counter=1
+887	   |              (part s/s)               |  P counter=s-1
+888	   :                                       :  M=0, T=0, K=1, L=1, I=11
+889	   +=======================================+
+890	   :                 ...                   :
+891	   +==[ PU #2N: Slice #(N-1) (2nd field) ]=+
+892	   |             Slice #(N-1)              |  SEP counter=N-2
+893	   |              (part 1/t)               |  P counter=0
+894	   :                                       :  M=0, T=0, K=1, L=0, I=11
+895	   +---------------------------------------+
+896	   :                 ...                   :
+897	   +---------------------------------------+
+898	   |             Slice #(N-1)              |  SEP counter=N-2
+899	   |              (part t/t)               |  P counter=t-1
+900	   :             + EOC marker              :  M=1, T=0, K=1, L=1, I=11
+901	   +=======================================+
+
+903	           Figure 9: Example of JPEG XS Payload Data using Slice
+904	              Packetization Mode with Interlaced Video Frames
+
+906	5.  Traffic Shaping and Delivery Timing
+
+908	   In order to facilitate proper synchronization between senders and
+909	   receivers, it is RECOMMENDED to implement traffic shaping and
+910	   delivery timing in accordance with the Network Compatibility Model
+911	   compliance definitions specified in [SMPTE2110-21].  In such a case,
+912	   the session description SHOULD signal the compliance with the media
+913	   type parameter TP.  The actual applied traffic shaping and timing
+914	   delivery mechanism is outside the scope of this memo and does not
+915	   influence the payload packetization.
+
+917	6.  Congestion Control Considerations
+
+919	   Congestion control for RTP SHALL be used in accordance with [RFC3550]
+920	   and with any applicable RTP profile, e.g., RTP/AVP [RFC3551] or RTP/
+921	   AVPF [RFC4585].
+
+923	   While JPEG XS is mainly designed to be used in controlled network
+924	   environments, it can also be employed in best-effort network
+925	   environments, like the Internet.  However, if best-effort service is
+926	   being used, users of this payload format SHALL monitor packet loss to
+927	   ensure that the packet loss rate is within acceptable parameters.
+928	   Packet loss is considered acceptable if a TCP flow across the same
+929	   network path, and experiencing the same network conditions, would
+930	   achieve an average throughput, measured on a reasonable timescale,
+931	   that is not less than the RTP flow is achieving.  This condition can
+932	   be satisfied by implementing congestion control mechanisms, for
+933	   example by means of RTP Control Protocol (RTCP) Feedback for
+934	   Congestion Control [RFC8888], to allow adapting the transmission rate
+935	   (or the number of layers subscribed for a layered multicast session)
+936	   or by arranging for a receiver to leave the session if the loss rate
+937	   is unacceptably high.
+
+939	   Alternatively, this payload format may also be used in networks that
+940	   provide quality-of-service guarantees.  If enhanced service is being
+941	   used, receivers SHOULD monitor packet loss to ensure that the service
+942	   that was requested is actually being delivered.  If enhanced service
+943	   is not used, then users of this payload SHOULD assume a best-effort
+944	   service and behave accordingly.
+
+946	   In addition, [RFC8083] is an update to [RFC3550] that defines
+947	   criteria for when one is required to stop sending RTP Packet Streams
+948	   and which can be used for relevant applications.
+
+950	   Finally, [RFC8085] provides additional information on the best
+951	   practices for applying congestion control to UDP streams.
+
+953	7.  Payload Format Parameters
+
+955	   This section specifies the required and optional parameters of the
+956	   payload format and/or the RTP stream.  All parameters are
+957	   declarative, meaning that the information signaled by the parameters
+958	   is also present in the payload data, namely in the payload header
+959	   (see Section 4.3) or in the JPEG XS header segment.  When provided,
+960	   their respective values SHALL be consistent with the payload.
+
+962	7.1.  Media Type Registration
+
+964	   This registration is done using the template defined in [RFC6838] and
+965	   following [RFC4855].
+
+967	   The receiver SHALL ignore any unrecognized parameter.
+
+969	   Type name:
+970	      video
+
+972	   Subtype name:
+973	      jxsv
+
+975	   Required parameters:
+976	      rate:  The RTP timestamp clock rate.  Applications using this
+977	         payload format SHALL use a value of 90000.
+
+979	      packetmode:  This parameter specifies the configured packetization
+980	         mode as defined by the pacKetization mode (K) bit in the
+981	         payload header of Section 4.3.  This value SHALL be equal to
+982	         the K-bit value configured in the RTP stream (i.e., 0 for
+983	         codestream or 1 for slice).
+
+985	   Optional parameters:
+986	      transmode:  This parameter specifies the configured transmission
+987	         mode as defined by the Transmission mode (T) bit in the payload
+988	         header of Section 4.3.  If specified, this value SHALL be equal
+989	         to the T bit value configured in the RTP stream (i.e., 0 for
+990	         out-of-order-allowed or 1 for sequential-only).  If not
+991	         specified, a value 1 (sequential-only) SHALL be assumed and the
+992	         T bit SHALL be set to 1.
+
+994	      profile:  The JPEG XS profile [ISO21122-2] in use.  Any white
+995	         space Unicode character in the profile name SHALL be omitted.
+996	         Examples of valid profile names are 'Main444.12', 'High444.12',
+997	         'CHigh444.12', or 'TDC444.12'.
+
+999	      level:  The JPEG XS level [ISO21122-2] in use.  Any white space
+1000	         Unicode character in the level name SHALL be omitted.  Examples
+1001	         of valid levels are '2k-1' or '4k-2'.
+
+1003	      sublevel:  The JPEG XS sublevel [ISO21122-2] in use.  Any white
+1004	         space Unicode character in the sublevel name SHALL be omitted.
+1005	         Examples of valid sublevels are 'Sublev3bpp' or 'Sublev6bpp'.
+
+1007	      fbblevel:  The JPEG XS frame buffer level [ISO21122-2] in use.
+
+1009	         Any white space Unicode character in the fbblevel name SHALL be
+1010	         omitted.  Examples of valid frame buffer levels are
+1011	         'Fbblev3bpp' or 'Fbblev12bpp'.
+
+1013	      depth:  Determines the number of bits per sample.  This is an
+1014	         integer with typical values including 8, 10, 12, and 16.
+
+1016	      width:  Determines the number of pixels per line.  This is an
+1017	         integer between 1 and 32767, inclusive.
+
+1019	      height:  Determines the number of lines per video frame.  This is
+1020	         an integer between 1 and 32767, inclusive.
+
+1022	      exactframerate:  Signals the video frame rate in frames per
+1023	         second.  Integer frame rates SHALL be signaled as a single
+1024	         decimal number (e.g., "25") whilst non-integer frame rates
+1025	         SHALL be signaled as a ratio of two integer decimal numbers
+1026	         separated by a "forward-slash" character (e.g., "30000/1001"),
+1027	         utilizing the numerically smallest numerator value possible.
+
+1029	      interlace:  If this parameter name is present, it indicates that
+1030	         the video is interlaced, or that the video is Progressive
+1031	         segmented Frame (PsF).  If this parameter name is not present,
+1032	         the progressive video format SHALL be assumed.
+
+1034	      segmented:  If this parameter name is present, and the interlace
+1035	         parameter name is also present, then the video is a Progressive
+1036	         segmented Frame (PsF).  Signaling of this parameter without the
+1037	         interlace parameter is forbidden.
+
+1039	      sampling:  Specifies the color difference signal sub-sampling
+1040	         structure.  Valid values and their specification are the
+1041	         following:
+
+1043	         For signals utilizing the non-constant luminance Y'C'B C'R
+1044	         signal format of [BT601-7], [BT709-6], [BT2020-2], or
+1045	         [BT2100-2]:
+
+1047	         YCbCr-4:4:4  (4:4:4 sampling)
+
+1049	         YCbCr-4:2:2  (4:2:2 sampling)
+
+1051	         YCbCr-4:2:0  (4:2:0 sampling)
+
+1053	         For signals utilizing the constant luminance Y'C C'BC C'RC
+1054	         signal format of [BT2020-2]:
+
+1056	         CLYCbCr-4:4:4  (4:4:4 sampling)
+1057	         CLYCbCr-4:2:2  (4:2:2 sampling)
+
+1059	         CLYCbCr-4:2:0  (4:2:0 sampling)
+
+1061	         For signals utilizing the constant intensity I CT CP signal
+1062	         format of [BT2100-2]:
+
+1064	         ICtCp-4:4:4  (4:4:4 sampling)
+
+1066	         ICtCp-4:2:2  (4:2:2 sampling)
+
+1068	         ICtCp-4:2:0  (4:2:0 sampling)
+
+1070	         Signals utilizing the 4:4:4 R' G' B' or RGB signal format (such
+1071	         as that of [BT601-7], [BT709-6], [BT2020-2], [BT2100-2],
+1072	         [SMPTE2065-1], or [SMPTE2065-3]) SHALL use the following value
+1073	         for the Media Type Parameter "sampling":
+
+1075	         RGB  (RGB or R' G' B' samples)
+
+1077	         For signals utilizing the 4:4:4 X' Y' Z' signal format (such as
+1078	         defined in [SMPTE428-1]):
+
+1080	         XYZ  (X' Y' Z' samples)
+
+1082	         For single-component key signals (such as defined in
+1083	         [SMPTE157]):
+
+1085	         KEY  (Samples of the key signal)
+
+1087	         Signals utilizing a color sub-sampling other than what is
+1088	         defined here SHALL use the following value for the Media Type
+1089	         Parameter "sampling":
+
+1091	         UNSPECIFIED  (Sampling signaled by the payload)
+
+1093	      colorimetry:  Specifies the system colorimetry used by the video
+1094	         samples.  Valid values and their specification are the
+1095	         following:
+
+1097	         BT601-5:  [BT601-5].
+
+1099	         BT709-2:  [BT709-2].
+
+1101	         SMPTE240M:  [SMPTE240M].
+
+1103	         BT601:  [BT601-7].
+
+1105	         BT709:  [BT709-6].
+
+1107	         BT2020:  [BT2020-2].
+
+1109	         BT2100:  [BT2100-2], Table 2 titled "System colorimetry".
+
+1111	         ST2065-1:  Academy Color Encoding Specification (ACES)
+1112	            [SMPTE2065-1].
+
+1114	         ST2065-3:  Academy Density Exchange Encoding (ADX)
+1115	            [SMPTE2065-3].
+
+1117	         XYZ:  [ISO11664-1], section titled "1931 Observer".
+
+1119	         UNSPECIFIED:  Colorimetry SHALL either be signaled in the
+1120	            payload by the Color Specification box of [ISO21122-3], or
+1121	            be manually coordinated between sender and receiver.
+
+1123	         Signals utilizing the [BT2100-2] colorimetry SHOULD also signal
+1124	         the representational range using the optional parameter RANGE
+1125	         defined below.  Signals utilizing the UNSPECIFIED colorimetry
+1126	         might require manual coordination between the sender and the
+1127	         receiver.
+
+1129	      TCS:  Transfer Characteristic System.  This parameter specifies
+1130	         the transfer characteristic system of the video samples.  Valid
+1131	         values and their specification are the following:
+
+1133	         SDR:  Standard Dynamic Range video streams that utilize the
+1134	            Optical Electrical Transfer Function (OETF) of [BT709-6] or
+1135	            [BT2020-2].  Such streams SHALL be assumed to target the
+1136	            Electro-Optical Transfer Function (EOTF) specified in
+1137	            [BT1886-0].
+
+1139	         PQ:  High dynamic range video streams that utilize the
+1140	            Perceptual Quantization system of [BT2100-2].
+
+1142	         HLG:  High dynamic range video streams that utilize the Hybrid
+1143	            Log-Gamma system of [BT2100-2].
+
+1145	         UNSPECIFIED:  Video streams whose transfer characteristics
+1146	            SHALL either be signaled by the payload as specified in
+1147	            [ISO21122-3], or be manually coordinated between sender and
+1148	            receiver.
+
+1150	      RANGE:  This parameter SHOULD be used to signal the encoding range
+1151	         of the sample values within the stream.  When paired with
+1152	         [BT2100-2] colorimetry, this parameter has two allowed values,
+1153	         NARROW and FULL, corresponding to the ranges specified in TABLE
+1154	         9 of [BT2100-2].  In any other context, this parameter has
+1155	         three allowed values: NARROW, FULLPROTECT, and FULL, which
+1156	         correspond to the ranges specified in [SMPTE2077].  In the
+1157	         absence of this parameter, and for all but the UNSPECIFIED
+1158	         colorimetry, NARROW SHALL be the assumed value.  When paired
+1159	         with the UNSPECIFIED colorimetry, FULL SHALL be the default
+1160	         assumed value.
+
+1162	   Encoding considerations:
+1163	      This media type is framed in RTP and contains binary data; see
+1164	      Section 4.8 of [RFC6838].
+
+1166	   Security considerations:
+1167	      See the Security Considerations section of [RFCXXXX].
+
+1169	   Interoperability considerations:
+1170	      None
+
+1172	   Published specification:
+1173	      See the References section of [RFCXXXX]
+
+1175	   Applications that use this media type:
+1176	      Any application that transmits video over RTP (like SMPTE ST
+1177	      2110).
+
+1179	   Fragment identifier considerations:
+1180	      N/A
+
+1182	   Additional information:
+1183	      None
+
+1185	   Person & email address to contact for further information:
+1186	      T.  Bruylants rtp@intopix.com (mailto:rtp@intopix.com) and T.
+1187	      Richter jpeg-xs-techsupport@iis.fraunhofer.de (mailto:jpeg-xs-
+1188	      techsupport@iis.fraunhofer.de).
+
+1190	   Intended usage:
+1191	      COMMON
+
+1193	   Restrictions on usage:
+1194	      This media type depends on RTP framing; hence, it is only defined
+1195	      for transfer via RTP [RFC3550].
+
+1197	   Author:
+1198	      See the Authors' Addresses section of [RFCXXXX].
+
+1200	   Change controller:
+1201	      IETF Audio/Video Transport Working Group delegated from the IESG.
+
+1203	8.  SDP Parameters
+
+1205	   A mapping of the parameters into the Session Description Protocol
+1206	   (SDP) [RFC8866] is provided for applications that use SDP.
+
+1208	8.1.  Mapping of Payload Type Parameters to SDP
+
+1210	   The media type video/jxsv string is mapped to fields in the Session
+1211	   Description Protocol (SDP) [RFC8866] as follows:
+
+1213	   The media type ("video") goes in SDP "m=" as the media name.
+
+1215	   The media subtype ("jxsv") goes in SDP "a=rtpmap" as the encoding
+1216	   name, followed by a slash ("/") and the required parameter "rate"
+1217	   corresponding to the RTP timestamp clock rate (which for the payload
+1218	   format defined in this document SHALL be 90000).
+
+1220	   The required parameter "packetmode" and any of the additional
+1221	   optional parameters, as described in Section 7.1, go in the SDP media
+1222	   format description, being the "a=fmtp" attribute (Format Parameters),
+1223	   by copying them directly from the media type string as a semicolon-
+1224	   separated list of parameter=value pairs.
+
+1226	   All parameters of the media format SHALL correspond to the parameters
+1227	   of the payload.  In case of discrepancies between payload parameter
+1228	   values and SDP fields, the values from the payload data SHALL
+1229	   prevail.
+
+1231	   The receiver SHALL ignore any parameter that is not defined in
+1232	   Section 7.1.
+
+1234	   An example SDP mapping for JPEG XS video is as follows:
+
+1236	   m=video 30000 RTP/AVP 112
+1237	   a=rtpmap:112 jxsv/90000
+1238	   a=fmtp:112 packetmode=0;sampling=YCbCr-4:2:2;
+1239	               width=1920;height=1080;depth=10;
+1240	               colorimetry=BT709;TCS=SDR;RANGE=FULL;TP=2110TPNL
+
+1242	   In this example, a JPEG XS RTP stream is to be sent to UDP
+1243	   destination port 30000, with an RTP dynamic payload type of 112 and a
+1244	   media clock rate of 90000 Hz.  Note that the "a=fmtp:" line has been
+1245	   wrapped to fit this page and will be a single long line in the SDP
+1246	   file.  This example includes the TP parameter (as specified in
+1247	   Section 5).
+
+1249	8.2.  Usage with SDP Offer/Answer Model
+
+1251	   When JPEG XS is offered over RTP using SDP in an offer/answer model
+1252	   [RFC3264] for negotiation for unicast usage, the following
+1253	   limitations and rules apply:
+
+1255	   The "a=fmtp" attribute SHALL be present specifying the required
+1256	   parameter "packetmode" and MAY specify any of the optional
+1257	   parameters, as described in Section 7.1.
+
+1259	   All parameters in the "a=fmtp" attribute indicate sending
+1260	   capabilities (i.e., properties of the payload).
+
+1262	   An answerer of the SDP is required to support all parameters and
+1263	   values of the parameters provided by the offerer; otherwise, the
+1264	   answerer SHALL reject the session.  It falls on the offerer to use
+1265	   values that are expected to be supported by the answerer.  If the
+1266	   answerer accepts the session, it SHALL reply with the exact same
+1267	   parameter values in the "a=fmtp" attribute as they were initially
+1268	   offered.
+
+1270	   The same RTP payload type number used in the offer SHOULD be used in
+1271	   the answer, as specified in [RFC3264].
+
+1273	9.  IANA Considerations
+
+1275	   Because this document obsoletes [RFC9134], IANA is asked to change
+1276	   all registration information that references [RFC9134] to instead
+1277	   reference [RFCXXXX].  IANA is asked to update the media type
+1278	   registration "video/jxsv" as specified in Section 7.1 (see
+1279	   https://www.iana.org/assignments/media-types).
+
+1281	10.  Security Considerations
+
+1283	   RTP packets using the payload format defined in this memo are subject
+1284	   to the security considerations discussed in [RFC3550] and in any
+1285	   applicable RTP profile such as RTP/AVP [RFC3551], RTP/AVPF [RFC4585],
+1286	   RTP/SAVP [RFC3711], or RTP/SAVPF [RFC5124].  This implies that
+1287	   confidentiality of the media streams is achieved by encryption.
+
+1289	   However, as "Securing the RTP Framework: Why RTP Does Not Mandate a
+1290	   Single Media Security Solution" [RFC7202] discusses, it is not an RTP
+1291	   payload format's responsibility to discuss or mandate what solutions
+1292	   are used to meet the basic security goals like confidentiality,
+1293	   integrity, and source authenticity for RTP in general.  This
+1294	   responsibility lies on anyone using RTP in an application.  They can
+1295	   find guidance on available security mechanisms and important
+1296	   considerations in "Options for Securing RTP Sessions" [RFC7201].
+1297	   Applications SHOULD use one or more appropriate strong security
+1298	   mechanisms.
+
+1300	   Implementations of this RTP payload format SHALL ensure the decoder
+1301	   is robust against malicious or malformed payloads and ensure that
+1302	   they do not cause the decoder to overrun its allocated memory or
+1303	   otherwise misbehave.  An overrun in allocated memory could lead to
+1304	   arbitrary code execution by an attacker.  The same applies to the
+1305	   encoder, even though problems in encoders are typically rarer.
+
+1307	   This payload format and the JPEG XS encoding do not exhibit any
+1308	   substantial non-uniformity, either in output or in complexity to
+1309	   perform the decoding operation; thus, they are unlikely to pose a
+1310	   denial-of-service threat due to the receipt of pathological
+1311	   datagrams.
+
+1313	   This payload format and the JPEG XS encoding do not contain code that
+1314	   is executable.
+
+1316	   It is important to note that high-definition (HD) or ultra-high-
+1317	   definition (UHD) video that is encoded with JPEG XS can have
+1318	   significant bandwidth requirements (typically more than 1 Gbps for
+1319	   UHD video, especially if using high framerate).  This is sufficient
+1320	   to cause potential for denial of service if transmitted onto most
+1321	   currently available Internet paths.
+
+1323	11.  Operational Considerations
+
+1325	   This document is an update to [RFC9134] and has been designed to
+1326	   minimize operational impact on existing deployments.
+
+1328	   The RTP packetization, header formats, and overall payload structure
+1329	   remain unchanged compared to [RFC9134].  As a result, existing
+1330	   implementations compliant with [RFC9134] remain compatible with this
+1331	   specification and continue to interoperate without modification when
+1332	   operating in modes defined by [RFC9134].
+
+1334	   The primary changes introduced by this document are limited to
+1335	   support for new features defined in the third edition of the JPEG XS
+1336	   standard ([ISO21122-1], [ISO21122-2], and [ISO21122-3]), most notably
+1337	   the Temporal Differential Coding (TDC) mode.  These extensions are
+1338	   designed to be backward-compatible and do not affect the decoding of
+1339	   non-TDC streams.
+
+1341	   In particular:
+
+1343	   *  For TDC profiles, [ISO21122-1] relies on a specific slice header
+1344	      marker called SLI, in addition to the original SLH marker.  The
+1345	      SLI marker indicates that the slice encodes TDC-enabled content.
+1346	      This distinction is not directly relevant to this specification,
+1347	      and for the purposes of this RFC, both the SLH and SLI markers
+1348	      serve the same function: to define the boundaries of packetization
+1349	      units when using the Slice Packetization mode, as described in
+1350	      Section 4.1.  Yet, this document was updated to reflect the
+1351	      possibility for using either SLH and SLI markers.
+
+1353	   *  In addition to the level and sublevel, the TDC coding mode
+1354	      introduces an fbblevel in [ISO21122-2] that needs to be supported
+1355	      as an optional payload parameter.  A new parameter for signaling
+1356	      the fbblevel is defined in Section 7.
+
+1358	   *  This document now provides more clarifications and improved
+1359	      descriptions for correctly handling interlaced video.
+
+1361	   *  Section 3.2 provides a more detailed definition of a Slice to
+1362	      clarify that this RTP payload format supports the optional slice-
+1363	      based extension marker functionality defined in [ISO21122-1].
+
+1365	   *  The erratum of [RFC9134] concerning the RTP timestamp for
+1366	      interlaced video signals has been incorporated into this
+1367	      specification.
+
+1369	   As a consequence, deployment of this updated specification does not
+1370	   require an explicit or coordinated upgrade, and can be introduced
+1371	   incrementally.  Implementations that support the new features can
+1372	   negotiate their use via existing SDP mechanisms, while legacy
+1373	   implementations remain fully operational within their supported
+1374	   feature set.
+
+1376	   Overall, the design of this specification ensures a straightforward
+1377	   upgrade path, preserves interoperability with existing systems, and
+1378	   does not introduce additional operational complexity for
+1379	   configuration, debugging, or network management.
+
+1381	12.  RFC Editor Considerations
+
+1383	   Note to RFC Editor: This section may be removed after carrying out
+1384	   all the instructions of this section.
+
+1386	   [RFCXXXX] is to be replaced by the RFC number this specification
+1387	   receives when published.
+
+1389	13.  References
+
+1391	13.1.  Normative References
+
+1393	   [ISO21122-1]
+1394	              ISO/IEC, "Information technology - JPEG XS low-latency
+1395	              lightweight image coding system - Part 1: Core coding
+1396	              system", ISO/IEC IS 21122-1:2024, July 2024,
+1397	              <https://www.iso.org/standard/85247.html>.
+
+1399	   [ISO21122-2]
+1400	              ISO/IEC, "Information technology - JPEG XS low-latency
+1401	              lightweight image coding system - Part 2: Profiles and
+1402	              buffer models", ISO/IEC IS 21122-2:2024, August 2024,
+1403	              <https://www.iso.org/standard/85250.html>.
+
+1405	   [ISO21122-3]
+1406	              ISO/IEC, "Information technology - JPEG XS low-latency
+1407	              lightweight image coding system - Part 3: Transport and
+1408	              container formats", ISO/IEC IS 21122-3:2024, August 2024,
+1409	              <https://www.iso.org/standard/86420.html>.
+
+1411	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+1412	              Requirement Levels", BCP 14, RFC 2119,
+1413	              DOI 10.17487/RFC2119, March 1997,
+1414	              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+1416	   [RFC3264]  Rosenberg, J. and H. Schulzrinne, "An Offer/Answer Model
+1417	              with Session Description Protocol (SDP)", RFC 3264,
+1418	              DOI 10.17487/RFC3264, July 2002,
+1419	              <https://www.rfc-editor.org/rfc/rfc3264>.
+
+1421	   [RFC3550]  Schulzrinne, H., Casner, S., Frederick, R., and V.
+1422	              Jacobson, "RTP: A Transport Protocol for Real-Time
+1423	              Applications", STD 64, RFC 3550, DOI 10.17487/RFC3550,
+1424	              July 2003, <https://www.rfc-editor.org/rfc/rfc3550>.
+
+1426	   [RFC3551]  Schulzrinne, H. and S. Casner, "RTP Profile for Audio and
+1427	              Video Conferences with Minimal Control", STD 65, RFC 3551,
+1428	              DOI 10.17487/RFC3551, July 2003,
+1429	              <https://www.rfc-editor.org/rfc/rfc3551>.
+
+1431	   [RFC4855]  Casner, S., "Media Type Registration of RTP Payload
+1432	              Formats", RFC 4855, DOI 10.17487/RFC4855, February 2007,
+1433	              <https://www.rfc-editor.org/rfc/rfc4855>.
+
+1435	   [RFC6838]  Freed, N., Klensin, J., and T. Hansen, "Media Type
+1436	              Specifications and Registration Procedures", BCP 13,
+1437	              RFC 6838, DOI 10.17487/RFC6838, January 2013,
+1438	              <https://www.rfc-editor.org/rfc/rfc6838>.
+
+1440	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+1441	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+1442	              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+1444	   [RFC8866]  Begen, A., Kyzivat, P., Perkins, C., and M. Handley, "SDP:
+1445	              Session Description Protocol", RFC 8866,
+1446	              DOI 10.17487/RFC8866, January 2021,
+1447	              <https://www.rfc-editor.org/rfc/rfc8866>.
+
+1449	13.2.  Informative References
+
+1451	   [BT601-5]  ITU-R, "Studio encoding parameters of digital television
+1452	              for standard 4:3 and wide screen 16:9 aspect ratios",
+1453	              ITU-R Recommendation BT.601-5, October 1995,
+1454	              <https://www.itu.int/rec/R-REC-BT.601-5-199510-S/en>.
+
+1456	   [BT601-7]  ITU-R, "Studio encoding parameters of digital television
+1457	              for standard 4:3 and wide screen 16:9 aspect ratios",
+1458	              ITU-R Recommendation BT.601-7, March 2011,
+1459	              <https://www.itu.int/rec/R-REC-BT.601-7-201103-I/en>.
+
+1461	   [BT709-2]  ITU-R, "Parameter values for the HDTV standards for
+1462	              production and international programme exchange",
+1463	              ITU-R Recommendation BT.709-2, October 1995,
+1464	              <https://www.itu.int/rec/R-REC-BT.709-2-199510-S/en>.
+
+1466	   [BT709-6]  ITU-R, "Parameter values for the HDTV standards for
+1467	              production and international programme exchange",
+1468	              ITU-R Recommendation BT.709-6, June 2015,
+1469	              <https://www.itu.int/rec/R-REC-BT.709-6-201506-I/en>.
+
+1471	   [BT1886-0] ITU-R, "Reference electro-optical transfer function for
+1472	              flat panel displays used in HDTV studio production",
+1473	              ITU-R Recommendation BT.1886-0, March 2011,
+1474	              <https://www.itu.int/rec/R-REC-BT.1886-0-201103-I/en>.
+
+1476	   [BT2020-2] ITU-R, "Parameter values for ultra-high definition
+1477	              television systems for production and international
+1478	              programme exchange", ITU-R Recommendation BT.2020-2,
+1479	              October 2015,
+1480	              <https://www.itu.int/rec/R-REC-BT.2020-2-201510-I/en>.
+
+1482	   [BT2100-2] ITU-R, "Image parameter values for high dynamic range
+1483	              television for use in production and international
+1484	              programme exchange", ITU-R Recommendation BT.2100-2, July
+1485	              2018,
+1486	              <https://www.itu.int/rec/R-REC-BT.2100-2-201807-I/en>.
+
+1488	   [ISO11664-1]
+1489	              ISO/CIE, "Colorimetry - Part 1: CIE standard colorimetric
+1490	              observers", ISO/CIE IS 11664-1:2019, June 2019,
+1491	              <https://www.iso.org/standard/74164.html>.
+
+1493	   [RFC3711]  Baugher, M., McGrew, D., Naslund, M., Carrara, E., and K.
+1494	              Norrman, "The Secure Real-time Transport Protocol (SRTP)",
+1495	              RFC 3711, DOI 10.17487/RFC3711, March 2004,
+1496	              <https://www.rfc-editor.org/rfc/rfc3711>.
+
+1498	   [RFC4175]  Gharai, L. and C. Perkins, "RTP Payload Format for
+1499	              Uncompressed Video", RFC 4175, DOI 10.17487/RFC4175,
+1500	              September 2005, <https://www.rfc-editor.org/rfc/rfc4175>.
+
+1502	   [RFC4585]  Ott, J., Wenger, S., Sato, N., Burmeister, C., and J. Rey,
+1503	              "Extended RTP Profile for Real-time Transport Control
+1504	              Protocol (RTCP)-Based Feedback (RTP/AVPF)", RFC 4585,
+1505	              DOI 10.17487/RFC4585, July 2006,
+1506	              <https://www.rfc-editor.org/rfc/rfc4585>.
+
+1508	   [RFC5124]  Ott, J. and E. Carrara, "Extended Secure RTP Profile for
+1509	              Real-time Transport Control Protocol (RTCP)-Based Feedback
+1510	              (RTP/SAVPF)", RFC 5124, DOI 10.17487/RFC5124, February
+1511	              2008, <https://www.rfc-editor.org/rfc/rfc5124>.
+
+1513	   [RFC7201]  Westerlund, M. and C. Perkins, "Options for Securing RTP
+1514	              Sessions", RFC 7201, DOI 10.17487/RFC7201, April 2014,
+1515	              <https://www.rfc-editor.org/rfc/rfc7201>.
+
+1517	   [RFC7202]  Perkins, C. and M. Westerlund, "Securing the RTP
+1518	              Framework: Why RTP Does Not Mandate a Single Media
+1519	              Security Solution", RFC 7202, DOI 10.17487/RFC7202, April
+1520	              2014, <https://www.rfc-editor.org/rfc/rfc7202>.
+
+1522	   [RFC8083]  Perkins, C. and V. Singh, "Multimedia Congestion Control:
+1523	              Circuit Breakers for Unicast RTP Sessions", RFC 8083,
+1524	              DOI 10.17487/RFC8083, March 2017,
+1525	              <https://www.rfc-editor.org/rfc/rfc8083>.
+
+1527	   [RFC8085]  Eggert, L., Fairhurst, G., and G. Shepherd, "UDP Usage
+1528	              Guidelines", BCP 145, RFC 8085, DOI 10.17487/RFC8085,
+1529	              March 2017, <https://www.rfc-editor.org/rfc/rfc8085>.
+
+1531	   [RFC8888]  Sarker, Z., Perkins, C., Singh, V., and M. Ramalho, "RTP
+1532	              Control Protocol (RTCP) Feedback for Congestion Control",
+1533	              RFC 8888, DOI 10.17487/RFC8888, January 2021,
+1534	              <https://www.rfc-editor.org/rfc/rfc8888>.
+
+1536	   [RFC9134]  Bruylants, T., Descampe, A., Damman, C., and T. Richter,
+1537	              "RTP Payload Format for ISO/IEC 21122 (JPEG XS)",
+1538	              RFC 9134, DOI 10.17487/RFC9134, October 2021,
+1539	              <https://www.rfc-editor.org/rfc/rfc9134>.
+
+1541	   [SMPTE157] SMPTE, "SMPTE Recommended Practice - Key and Alpha
+1542	              Signals", SMPTE RP 157:2012, November 2012.
+
+1544	   [SMPTE240M]
+1545	              SMPTE, "SMPTE Standard - For Television - 1125-Line High-
+1546	              Definition Production Systems - Signal Parameters",
+1547	              SMPTE ST 240M:1999, DOI 10.5594/SMPTE.ST240.1999, November
+1548	              1999, <https://doi.org/10.5594/SMPTE.ST240.1999>.
+
+1550	   [SMPTE428-1]
+1551	              SMPTE, "SMPTE Standard - D-Cinema Distribution Master -
+1552	              Image Characteristics", SMPTE ST 428-1:2019,
+1553	              DOI 10.5594/SMPTE.ST428-1.2019, March 2019,
+1554	              <https://doi.org/10.5594/SMPTE.ST428-1.2019>.
+
+1556	   [SMPTE2065-1]
+1557	              SMPTE, "SMPTE Standard - Academy Color Encoding
+1558	              Specification (ACES)", SMPTE ST 2065-1:2021,
+1559	              DOI 10.5594/SMPTE.ST2065-1.2021, January 2021,
+1560	              <https://doi.org/10.5594/SMPTE.ST2065-1.2021>.
+
+1562	   [SMPTE2065-3]
+1563	              SMPTE, "SMPTE Standard - Academy Density Exchange Encoding
+1564	              (ADX) - Encoding Academy Printing Density (APD) Values",
+1565	              SMPTE ST 2065-3:2020, DOI 10.5594/SMPTE.ST2065-3.2020,
+1566	              November 2020,
+1567	              <https://doi.org/10.5594/SMPTE.ST2065-3.2020>.
+
+1569	   [SMPTE2077]
+1570	              SMPTE, "SMPTE Recommended Practice - Full-Range Image
+1571	              Mapping", SMPTE RP 2077:2013,
+1572	              DOI 10.5594/SMPTE.RP2077.2013, November 2013,
+1573	              <https://doi.org/10.5594/SMPTE.RP2077.2013>.
+
+1575	   [SMPTE2110-21]
+1576	              SMPTE, "SMPTE Standard - Professional Media Over Managed
+1577	              IP Networks: Traffic Shaping and Delivery Timing for
+1578	              Video", SMPTE ST 2110-21:2017,
+1579	              DOI 10.5594/SMPTE.ST2110-21.2017, November 2017,
+1580	              <https://doi.org/10.5594/SMPTE.ST2110-21.2017>.
+
+1582	Acknowledgements
+
+1584	   This document is a revision of [RFC9134].  As such the authors would
+1585	   like to thank the following people for their valuable contributions
+1586	   that made [RFC9134] and this document possible: Siegfried Foessel,
+1587	   Arnaud Germain, Jean-Baptiste Lorent, Sébastien Lugan, Gaël Rouvroy,
+1588	   and Alexandre Willème.
+
+1590	Authors' Addresses
+
+1592	   Tim Bruylants
+1593	   intoPIX S.A.
+1594	   Rue de Rodeuhaie 1
+1595	   B-1348 Louvain-la-Neuve
+1596	   Belgium
+1597	   Phone: +32 10 23 84 70
+1598	   Email: t.bruylants@intopix.com
+1599	   URI:   https://www.intopix.com/
+
+1601	   Thomas Richter
+1602	   Fraunhofer IIS
+1603	   Am Wolfsmantel 33
+1604	   D-91058 Erlangen
+1605	   Germany
+1606	   Phone: +49 9131 776 5126
+1607	   Email: thomas.richter@iis.fraunhofer.de
+1608	   URI:   https://www.iis.fraunhofer.de/
+
+1610	   Corentin Damman Geeroms
+1611	   intoPIX S.A.
+1612	   Rue de Rodeuhaie 1
+1613	   B-1348 Louvain-la-Neuve
+1614	   Belgium
+1615	   Phone: +32 10 23 84 70
+1616	   Email: c.damman@intopix.com
+1617	   URI:   https://www.intopix.com/
+1618	   Antonin Descampe
+1619	   Université Catholique de Louvain
+1620	   Ruelle de la Lanterne Magique, 14
+1621	   B-1348 Louvain-la-Neuve
+1622	   Belgium
+1623	   Phone: +32 10 47 27 87
+1624	   Email: antonin.descampe@uclouvain.be
+1625	   URI:   https://uclouvain.be/antonin.descampe
+
+
+
+
+
+
+
+
+
