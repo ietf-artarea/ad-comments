@@ -1,0 +1,843 @@
+idnits 2.17.1 
+
+draft-ietf-idr-rfc4360-bis-08.txt:
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     No nits found.
+--------------------------------------------------------------------------------
+
+
+2	IDR Working Group                                              S. Sangli
+3	Internet-Draft                                                       HPE
+4	Obsoletes: 4360 (if approved)                                N. Kao, Ed.
+5	Updates: 5701 (if approved)                       Individual Contributor
+6	Intended status: Standards Track                            11 June 2026
+7	Expires: 13 December 2026
+
+9	                   BGP Extended Communities Attribute
+10	                     draft-ietf-idr-rfc4360-bis-08
+
+12	Abstract
+
+14	   This document describes the "extended community" BGP-4 attribute.
+15	   This attribute provides a mechanism for labeling information carried
+16	   in BGP-4.  These labels can be used to control the distribution of
+17	   this information, or for other applications.
+
+19	   This document obsoletes RFC 4360.  This document also updates RFC
+20	   5701 by incorporating the operations section.
+
+22	Status of This Memo
+
+24	   This Internet-Draft is submitted in full conformance with the
+25	   provisions of BCP 78 and BCP 79.
+
+27	   Internet-Drafts are working documents of the Internet Engineering
+28	   Task Force (IETF).  Note that other groups may also distribute
+29	   working documents as Internet-Drafts.  The list of current Internet-
+30	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+32	   Internet-Drafts are draft documents valid for a maximum of six months
+33	   and may be updated, replaced, or obsoleted by other documents at any
+34	   time.  It is inappropriate to use Internet-Drafts as reference
+35	   material or to cite them other than as "work in progress."
+
+37	   This Internet-Draft will expire on 13 December 2026.
+
+39	Copyright Notice
+
+41	   Copyright (c) 2026 IETF Trust and the persons identified as the
+42	   document authors.  All rights reserved.
+
+44	   This document is subject to BCP 78 and the IETF Trust's Legal
+45	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+46	   license-info) in effect on the date of publication of this document.
+47	   Please review these documents carefully, as they describe your rights
+48	   and restrictions with respect to this document.  Code Components
+49	   extracted from this document must include Revised BSD License text as
+50	   described in Section 4.e of the Trust Legal Provisions and are
+51	   provided without warranty as described in the Revised BSD License.
+
+53	   This document may contain material from IETF Documents or IETF
+54	   Contributions published or made publicly available before November
+55	   10, 2008.  The person(s) controlling the copyright in some of this
+56	   material may not have granted the IETF Trust the right to allow
+57	   modifications of such material outside the IETF Standards Process.
+58	   Without obtaining an adequate license from the person(s) controlling
+59	   the copyright in such materials, this document may not be modified
+60	   outside the IETF Standards Process, and derivative works of it may
+61	   not be created outside the IETF Standards Process, except to format
+62	   it for publication as an RFC or to translate it into languages other
+63	   than English.
+
+65	Table of Contents
+
+67	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+68	     1.1.  Requirements Language . . . . . . . . . . . . . . . . . .   3
+69	   2.  BGP Extended Communities Attribute  . . . . . . . . . . . . .   3
+70	     2.1.  BGP Extended Community Attribute Encoding . . . . . . . .   3
+71	   3.  Defined BGP Extended Community Types  . . . . . . . . . . . .   5
+72	     3.1.  Two-Octet AS-Specific Extended Community  . . . . . . . .   5
+73	     3.2.  IPv4-Address-Specific Extended Community  . . . . . . . .   6
+74	     3.3.  Opaque Extended Community . . . . . . . . . . . . . . . .   6
+75	     3.4.  Notes about the AS-Specific Extended Community for 4-Octet
+76	           ASes  . . . . . . . . . . . . . . . . . . . . . . . . . .   7
+77	   4.  Route Target Community  . . . . . . . . . . . . . . . . . . .   7
+78	   5.  Route Origin Community  . . . . . . . . . . . . . . . . . . .   7
+79	   6.  Operations  . . . . . . . . . . . . . . . . . . . . . . . . .   8
+80	   7.  Error Handling  . . . . . . . . . . . . . . . . . . . . . . .   9
+81	   8.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   9
+82	   9.  Security Considerations . . . . . . . . . . . . . . . . . . .  12
+83	   10. Contributors  . . . . . . . . . . . . . . . . . . . . . . . .  14
+84	   11. Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  14
+85	   12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  14
+86	     12.1.  Normative References . . . . . . . . . . . . . . . . . .  14
+87	     12.2.  Informative References . . . . . . . . . . . . . . . . .  17
+88	   Appendix A.  Comparison with RFC4360  . . . . . . . . . . . . . .  17
+89	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  18
+
+91	1.  Introduction
+
+93	   The Extended Community Attribute provides a mechanism for labeling
+94	   information carried in BGP-4 [BGP-4].  It provides two important
+95	   enhancements over the existing BGP Community Attribute [RFC1997]:
+
+97	   *  An extended range, ensuring that communities can be assigned for a
+98	      plethora of uses, without fear of overlap.
+
+100	   *  The addition of a Type field provides structure for the community
+101	      space.
+
+103	   The addition of structure allows the usage of policy based on the
+104	   application for which the community value will be used.  For example,
+105	   one can filter out all communities of a particular type, or allow
+106	   only certain values for a particular type of community.  It also
+107	   allows one to specify whether a particular community is transitive or
+108	   non-transitive across an Autonomous System (AS) boundary.  Without
+109	   structure, this can only be accomplished by explicitly enumerating
+110	   all community values that will be denied or allowed and passed to BGP
+111	   speakers in neighboring ASes based on the transitive property.
+
+113	   This document obsoletes [RFC4360].  Section 6 of this document also
+114	   applies to [RFC5701] and effectively updates it.
+
+116	1.1.  Requirements Language
+
+118	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+119	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+120	   "OPTIONAL" in this document are to be interpreted as described in BCP
+121	   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+122	   capitals, as shown here.
+
+124	2.  BGP Extended Communities Attribute
+
+126	   The Extended Communities Attribute is a transitive optional BGP
+127	   attribute, with the Type Code 16.  The attribute consists of a set of
+128	   "extended communities".  All routes with the Extended Communities
+129	   attribute belong to the communities listed in the attribute.
+
+131	2.1.  BGP Extended Community Attribute Encoding
+
+133	   Each Extended Community is encoded as an 8-octet quantity inside
+134	   the BGP Extended Community Attribute, as follows:
+135	      - Type Field  : 1 or 2 octets
+136	      - Value Field : Remaining octets
+
+138	       0                   1                   2                   3
+139	       0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+140	      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+141	      |  Type high    |  Type low(*)  |                               |
+142	      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+          Value                |
+143	      |                                                               |
+144	      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+145	      (*) Present for Extended Types only, used for the Value field
+146	          otherwise.
+
+148	      Type Field:
+149	         Two classes of Type Field are introduced: Regular Type and
+150	         Extended Type.
+
+152	         The size of the Type Field for Regular Types is 1 octet, and
+153	         the size of the Type Field for Extended Types is 2 octets.
+
+155	         The value of the high-order octet of the Type Field determines
+156	         if an extended community is a Regular Type or an Extended Type.
+157	         The class of a type (Regular or Extended) is not encoded in the
+158	         structure of the type itself.  The class of a type is specified
+159	         in the document that defines the type and the IANA registry.
+
+161	         The high-order octet of the Type Field is as shown below:
+162	             0 1 2 3 4 5 6 7
+163	            +-+-+-+-+-+-+-+-+
+164	            |I|T|           |
+165	            +-+-+-+-+-+-+-+-+
+
+167	            I - IANA authority bit
+168	               Value 0:  IANA-assignable type using the "First Come
+169	                  First Serve" policy
+
+171	               Value 1:  Part of this Type Field space is for IANA
+172	                  assignable types using either the Standard Action or
+173	                  the Early IANA Allocation policy.  The rest of this
+174	                  Type Field space is for Experimental use.
+
+176	            T - Transitive bit
+177	               Value 0:  The community is transitive across ASes
+
+179	               Value 1:  The community is non-transitive across ASes
+
+181	            Remaining 6 bits:
+182	               Together with the I and T bit, indicate the Type of the
+183	               extended community.
+
+185	      Value Field:
+186	         The encoding of the Value Field is dependent on the "type" of
+187	         the community as specified by the Type Field.
+
+189	   Two extended communities are declared equal only when all 8 octets of
+190	   the community are equal.
+
+192	   The two members in the tuple <Type, Value> should be enumerated to
+193	   specify any community value.  The remaining octets of the community
+194	   are interpreted based on the value of the Type field.
+
+196	3.  Defined BGP Extended Community Types
+
+198	   This section introduces a few extended types and defines the format
+199	   of the Value Field for those types.  The types introduced here
+200	   provide "templates", where each template is identified by the high-
+201	   order octet of the extended community Type field, and the low-order
+202	   octet (sub-type) is used to indicate a particular type of extended
+203	   community.
+
+205	3.1.  Two-Octet AS-Specific Extended Community
+
+207	   This is an extended type with Type Field composed of 2 octets and
+208	   Value Field composed of 6 octets.
+
+210	    0                   1                   2                   3
+211	    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+212	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+213	   | 0x00 or 0x40  |   Sub-Type    |    Global Administrator       |
+214	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+215	   |                     Local Administrator                       |
+216	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+218	   The value of the high-order octet of this extended type is either
+219	   0x00 or 0x40.  The low-order octet of this extended type is used to
+220	   indicate sub-types.
+
+222	   The Value Field consists of two sub-fields:
+223	      Global Administrator sub-field: 2 octets
+224	         This sub-field contains an Autonomous System number assigned by
+225	         IANA.
+
+227	         For a non-mappable four-octet Autonomous System number
+228	         [RFC6793], the BGP speaker SHOULD fill AS_TRANS [RFC6793] in
+229	         this field.  This sub-field MAY contain an arbitrary value
+230	         chosen by the operator, provided it is allowed by the specific
+231	         extended community.
+
+233	      Local Administrator sub-field: 4 octets
+234	         The organization identified by Autonomous System number in the
+235	         Global Administrator sub-field can encode any information in
+236	         this sub-field.  The format and meaning of the value encoded in
+237	         this sub-field should be defined by the sub-type of the
+238	         community.
+
+240	3.2.  IPv4-Address-Specific Extended Community
+
+242	   This is an extended type with Type Field composed of 2 octets and
+243	   Value Field composed of 6 octets.
+
+245	    0                   1                   2                   3
+246	    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+247	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+248	   | 0x01 or 0x41  |   Sub-Type    |    Global Administrator       |
+249	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+250	   | Global Administrator (cont.)  |    Local Administrator        |
+251	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+253	   The value of the high-order octet of this extended type is either
+254	   0x01 or 0x41.  The low-order octet of this extended type is used to
+255	   indicate sub-types.
+
+257	   The Value field consists of two sub-fields:
+258	      Global Administrator sub-field: 4 octets
+259	         This sub-field contains an IPv4 unicast address assigned by one
+260	         of the Internet registries.
+
+262	      Local Administrator sub-field: 2 octets
+263	         The organization that has been assigned the IPv4 address in the
+264	         Global Administrator sub-field can encode any information in
+265	         this sub-field.  The format and meaning of the value encoded in
+266	         this sub-field should be defined by the sub-type of the
+267	         community.
+
+269	3.3.  Opaque Extended Community
+
+271	   This is an extended type with Type Field composed of 2 octets and
+272	   Value Field composed of 6 octets.
+
+274	    0                   1                   2                   3
+275	    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+276	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+277	   | 0x03 or 0x43  |   Sub-Type    |                Value          |
+278	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+279	   |                         Value (cont.)                         |
+280	   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+282	   The value of the high-order octet of this extended type is either
+283	   0x03 or 0x43.  The low-order octet of this extended type is used to
+284	   indicate sub-types.
+
+286	   This is a generic community of extended type.  The value of the sub-
+287	   type that should define the Value Field is to be assigned by IANA.
+
+289	3.4.  Notes about the AS-Specific Extended Community for 4-Octet ASes
+
+291	   A 4-Octet AS-Specific type of extended community is defined in
+292	   [RFC5668] and otherwise not covered in this document.
+
+294	4.  Route Target Community
+
+296	   The Route Target Community identifies one or more routers that may
+297	   receive a set of routes (that carry this Community) carried by BGP.
+298	   This is transitive across the Autonomous System boundary.
+
+300	   The Route Target Community is of an extended type.
+
+302	   The value of the high-order octet of the Type field for the Route
+303	   Target Community can be 0x00 (as defined in Section 3.1), 0x01 (as
+304	   defined in Section 3.2), or 0x02 (as defined in [RFC5668]).  The
+305	   value of the low-order octet of the Type field for this community is
+306	   0x02.
+
+308	   When the value of the high-order octet of the Type field is 0x00 or
+309	   0x02, the Local Administrator sub-field contains a number from a
+310	   numbering space that is administered by the organization to which the
+311	   Autonomous System number carried in the Global Administrator sub-
+312	   field has been assigned by an appropriate authority.
+
+314	   When the value of the high-order octet of the Type field is 0x01, the
+315	   Local Administrator sub-field contains a number from a numbering
+316	   space that is administered by the organization to which the IPv4
+317	   address carried in the Global Administrator sub-field has been
+318	   assigned by an appropriate authority.
+
+320	   One possible use of the Route Target Community is specified in
+321	   [RFC4364].
+
+323	5.  Route Origin Community
+
+325	   The Route Origin Community identifies one or more routers that inject
+326	   a set of routes (that carry this Community) into BGP.  This is
+327	   transitive across the Autonomous System boundary.
+
+329	   The Route Origin Community is of an extended type.
+
+331	   The value of the high-order octet of the Type field for the Route
+332	   Origin Community can be 0x00 (as defined in Section 3.1), 0x01 (as
+333	   defined in Section 3.2), or 0x02 (as defined in [RFC5668]).  The
+334	   value of the low-order octet of the Type field for this community is
+335	   0x03.
+
+337	   When the value of the high-order octet of the Type field is 0x00 or
+338	   0x02, the Local Administrator sub-field contains a number from a
+339	   numbering space that is administered by the organization to which the
+340	   Autonomous System number carried in the Global Administrator sub-
+341	   field has been assigned by an appropriate authority.
+
+343	   When the value of the high-order octet of the Type field is 0x01, the
+344	   Local Administrator sub-field contains a number from a numbering
+345	   space that is administered by the organization to which the IPv4
+346	   address carried in the Global Administrator sub-field has been
+347	   assigned by an appropriate authority.
+
+349	   One possible use of the Route Origin Community is specified in
+350	   [RFC4364].
+
+352	6.  Operations
+
+354	   This section also applies to [RFC5701].
+
+356	   A BGP speaker may use the Extended Communities attribute to control
+357	   which routing information it accepts or distributes to its peers.
+
+359	   The Extended Community attribute MUST NOT be used to modify the BGP
+360	   best path selection algorithm in a way that leads to forwarding
+361	   loops.
+
+363	   A BGP speaker receiving a route that doesn't have the Extended
+364	   Communities attribute MAY append this attribute to the route when
+365	   propagating it to its peers.
+
+367	   A BGP speaker receiving a route with the Extended Communities
+368	   attribute MAY modify this attribute according to the local policy.
+
+370	   By default if a range of routes is to be aggregated and the resultant
+371	   aggregate's path attributes do not carry the ATOMIC_AGGREGATE
+372	   attribute, then the resulting aggregate should have an Extended
+373	   Communities path attribute that contains the set union of all the
+374	   Extended Communities from all of the aggregated routes.  The default
+375	   behavior could be overridden via local configuration, in which case
+376	   handling the Extended Communities attribute in the presence of route
+377	   aggregation becomes a matter of the local policy of the BGP speaker
+378	   that performs the aggregation.
+
+380	   A route may carry both the BGP Communities attribute, as defined in
+381	   [RFC1997], and the Extended BGP Communities attribute.  In this case,
+382	   the BGP Communities attribute is handled as specified in [RFC1997],
+383	   and the Extended BGP Communities attribute is handled as specified in
+384	   this document.
+
+386	   Non-transitive extended communities MUST NOT be sent (originated or
+387	   propagated) across an Autonomous System boundary unless explicitly
+388	   configured to do so.  Non-transitive extended communities SHOULD NOT
+389	   be removed when advertising the route within the same BGP AS
+390	   Confederation (as defined in [RFC5065]).
+
+392	   By default, when a BGP speaker receives routes with non-transitive
+393	   extended communities across Autonomous System or Confederation
+394	   Member-AS boundaries, it SHOULD NOT remove these extended
+395	   communities.  The behavior MAY be configurable.  The BGP speaker
+396	   SHOULD also allow local policies to perform operations on these
+397	   extended communities, such as matching, deleting, and modifying.
+
+399	   For IPv6 address-specific use-cases, one may consider using IPv6-
+400	   Address-Specific BGP Extended Communities [RFC5701].
+
+402	7.  Error Handling
+
+404	   [RFC7606], Section 7.14, defines the error handling procedure for the
+405	   Extended Community attribute.
+
+407	8.  IANA Considerations
+
+409	   This document obsoletes [RFC4360], but it does not change the IANA
+410	   Considerations of [RFC7153] that updated [RFC4360] and created the
+411	   "Border Gateway Protocol (BGP) Extended Communities" [IANA-BGP-EC]
+412	   registry group along with the registries therein corresponding to the
+413	   specifications in this document.  Therefore, IANA should continue to
+414	   manage those registries as per [RFC7153].
+
+416	   However, IANA is requested to replace all references to [RFC4360]
+417	   with this document in the "BGP Path Attributes"
+418	   [IANA-BGP-PATH-ATTRIBUTES] registry, the "BGP Extended Communities"
+419	   [IANA-BGP-EC] registry group, and the "IPFIX Entities" [IANA-IPFIX]
+420	   registry group.
+
+422	   IANA is requested to list this document as an additional reference
+423	   for the following entries in the "BGP Transitive Extended Community
+424	   Types" registry [IANA-BGP-EC-TRANS]:
+
+426	     +=======+===========================================+===========+
+427	     | TYPE  | NAME                                      | REFERENCE |
+428	     | VALUE |                                           |           |
+429	     +=======+===========================================+===========+
+430	     | 0x00  | Transitive Two-Octet AS-Specific Extended | [RFC7153] |
+431	     |       | Community (Sub-Types are defined in the   | [this     |
+432	     |       | "Transitive Two-Octet AS-Specific         | document] |
+433	     |       | Extended Community Sub-Types" registry    |           |
+434	     |       | [IANA-BGP-EC-TRANS-TWO-OCTET-AS])         |           |
+435	     +-------+-------------------------------------------+-----------+
+436	     | 0x01  | Transitive IPv4-Address-Specific Extended | [RFC7153] |
+437	     |       | Community (Sub-Types are defined in the   | [this     |
+438	     |       | "Transitive IPv4-Address-Specific         | document] |
+439	     |       | Extended Community Sub-Types" registry    |           |
+440	     |       | [IANA-BGP-EC-TRANS-IPV4])                 |           |
+441	     +-------+-------------------------------------------+-----------+
+442	     | 0x03  | Transitive Opaque Extended Community      | [RFC7153] |
+443	     |       | (Sub-Types are defined in the "Transitive | [this     |
+444	     |       | Opaque Extended Community Sub-Types"      | document] |
+445	     |       | registry [IANA-BGP-EC-TRANS-OPAQUE])      |           |
+446	     +-------+-------------------------------------------+-----------+
+
+448	              Table 1: BGP Transitive Extended Community Types
+
+450	   IANA is requested to list this document as an additional reference
+451	   for the following entries in the "BGP Non-Transitive Extended
+452	   Community Types" registry [IANA-BGP-EC-NONTRANS] :
+
+454	   +=======+==============================================+===========+
+455	   | TYPE  | NAME                                         | REFERENCE |
+456	   | VALUE |                                              |           |
+457	   +=======+==============================================+===========+
+458	   | 0x40  | Non-Transitive Two-Octet AS-Specific         | [RFC7153] |
+459	   |       | Extended Community (Sub-Types are defined in | [this     |
+460	   |       | the "Non-Transitive Two-Octet AS-Specific    | document] |
+461	   |       | Extended Community Sub-Types" registry       |           |
+462	   |       | [IANA-BGP-EC-NONTRANS-TWO-OCTET-AS])         |           |
+463	   +-------+----------------------------------------------+-----------+
+464	   | 0x41  | Non-Transitive IPv4-Address-Specific         | [RFC7153] |
+465	   |       | Extended Community (Sub-Types are defined in | [this     |
+466	   |       | the "Non-Transitive IPv4-Address-Specific    | document] |
+467	   |       | Extended Community Sub-Types" registry       |           |
+468	   |       | [IANA-BGP-EC-NONTRANS-IPV4])                 |           |
+469	   +-------+----------------------------------------------+-----------+
+470	   | 0x43  | Non-Transitive Opaque Extended Community     | [RFC7153] |
+471	   |       | (Sub-Types are defined in the "Non-          | [this     |
+472	   |       | Transitive Opaque Extended Community Sub-    | document] |
+473	   |       | Types" registry                              |           |
+474	   |       | [IANA-BGP-EC-NONTRANS-OPAQUE])               |           |
+475	   +-------+----------------------------------------------+-----------+
+
+477	           Table 2: BGP Non-Transitive Extended Community Types
+
+479	   IANA is requested to list this document as an additional reference
+480	   for the following entries in the "Transitive Four-Octet AS-Specific
+481	   Extended Community Sub-Types" registry
+482	   [IANA-BGP-EC-TRANS-FOUR-OCTET-AS]:
+
+484	       +================+==============+===========================+
+485	       | SUB-TYPE VALUE | NAME         | REFERENCE                 |
+486	       +================+==============+===========================+
+487	       | 0x02           | Route Target | [RFC5668] [this document] |
+488	       +----------------+--------------+---------------------------+
+489	       | 0x03           | Route Origin | [RFC5668] [this document] |
+490	       +----------------+--------------+---------------------------+
+
+492	            Table 3: Transitive Four-Octet AS-Specific Extended
+493	                            Community Sub-Types
+
+495	   Furthermore, IANA is requested to add the note below to the following
+496	   registries under the "BGP Extended Communities" registry group:
+
+498	   *  BGP Transitive Extended Community Types [IANA-BGP-EC-TRANS]
+
+500	   *  BGP Non-Transitive Extended Community Types [IANA-BGP-EC-NONTRANS]
+501	   *  Transitive Two-Octet AS-Specific Extended Community Sub-Types
+502	      [IANA-BGP-EC-TRANS-TWO-OCTET-AS]
+
+504	   *  Non-Transitive Two-Octet AS-Specific Extended Community Sub-Types
+505	      [IANA-BGP-EC-NONTRANS-TWO-OCTET-AS]
+
+507	   *  Transitive Four-Octet AS-Specific Extended Community Sub-Types
+508	      [IANA-BGP-EC-TRANS-FOUR-OCTET-AS]
+
+510	   *  Non-Transitive Four-Octet AS-Specific Extended Community Sub-Types
+511	      [IANA-BGP-EC-NONTRANS-FOUR-OCTET-AS]
+
+513	   *  Transitive IPv4-Address-Specific Extended Community Sub-Types
+514	      [IANA-BGP-EC-TRANS-IPV4]
+
+516	   *  Non-Transitive IPv4-Address-Specific Extended Community Sub-Types
+517	      [IANA-BGP-EC-NONTRANS-IPV4]
+
+519	   *  Transitive Opaque Extended Community Sub-Types
+520	      [IANA-BGP-EC-TRANS-OPAQUE]
+
+522	   *  Non-Transitive Opaque Extended Community Sub-Types
+523	      [IANA-BGP-EC-NONTRANS-OPAQUE]
+
+525	   *  Transitive IPv6-Address-Specific Extended Community Types
+526	      [IANA-BGP-EC-TRANS-IPV6]
+
+528	   *  Non-Transitive IPv6-Address-Specific Extended Community Types
+529	      [IANA-BGP-EC-NONTRANS-IPV6]
+
+531	   "When an Extended Community requests allocation for a code point of
+532	   both transitive and non-transitive variants for the same type/sub-
+533	   type, it is recommended that the same value be assigned to them."
+
+535	9.  Security Considerations
+
+537	   The BGP Extended Communities provide a general mechanism for labeling
+538	   BGP routes and thus share security considerations similar to BGP
+539	   Communities [RFC1997] and BGP Large Communities [RFC8092].
+
+541	   Since any intermediate BGP speaker along the route propagation path
+542	   may have added, deleted, or altered the BGP Extended Communities
+543	   attribute, deployments relying on such an attribute carried in the
+544	   BGP Update message must trust every other BGP speaker in the path.
+545	   However, specifying the mechanism to provide such trust is beyond the
+546	   scope of this document.
+
+548	   The BGP Extended Communities attribute itself does not protect the
+549	   integrity of each extended community value.  The operator should be
+550	   aware that any BGP speaker along the path can alter the attribute
+551	   without notice.  Protecting the integrity of the handling of BGP
+552	   Extended Communities attribute in a manner consistent with the intent
+553	   of expressed BGP routing policies falls within the broader scope of
+554	   securing BGP and is therefore not addressed here.
+
+556	   Additionally, extended communities are used in several specialized
+557	   ways to implement or augment other BGP signaling mechanisms.  For
+558	   example, the route-target extended community, defined in this
+559	   document, is used to signal Layer 3 VPN membership.  In some
+560	   scenarios, these mechanisms are used to construct internal
+561	   infrastructure.  Therefore, these extended communities carry
+562	   information private to a specific administrative domain.  Leaking
+563	   such extended communities into other administrative domains poses
+564	   significant security risks.
+
+566	   To prevent information leakage or privacy breaches across different
+567	   administrative domains, proper filtering of the extended communities
+568	   should always be exercised:
+
+570	   *  Operators should filter transitive and non-transitive extended
+571	      communities at the boundary of different administrative domains on
+572	      both transmission and reception using appropriate routing
+573	      policies, since this prevents extended communities outside the
+574	      administrative domain from interacting inappropriately with the
+575	      operator's network.
+
+577	   *  Implementations should provide policy mechanisms to filter
+578	      extended communities based on type, and possibly sub-type, to
+579	      permit filtering the entire class of extended communities.
+580	      Implementations may also provide the flexibility to match or
+581	      inverse-match a set of extended communities for building permit/
+582	      deny lists.
+
+584	   *  Implementations that understand the internal format of a defined
+585	      extended community should provide per-community match capability.
+586	      Implementations that don't understand the internal format may
+587	      match against the value field opaquely.
+
+589	   *  Implementations should provide mechanisms to strip all extended
+590	      communities at the boundary of administrative domains.
+
+592	   *  Implementations may strip all extended communities by default
+593	      while providing knobs to modify the default behavior.
+
+595	10.  Contributors
+
+597	   Dan Tappan and Yakov Rekhter were the authors of [RFC4360] and,
+598	   therefore, are contributing authors of this document.
+
+600	11.  Acknowledgements
+
+602	   We wish to thank John Hawkinson, Jeffrey Haas, Bruno Rijsman, Bill
+603	   Fenner, and Alex Zinin for their suggestions and feedback on the
+604	   original [RFC4360].
+
+606	   We thank Yakov Rekhter and Alfred Hoenes for pointing out several
+607	   errors in [RFC4360].
+
+609	   We also wish to thank Bruno Decraene, Laurent Vanbever, and Pierre
+610	   Francois for pointing out inconsistencies regarding the procedures
+611	   for originating non-transitive extended communities in
+612	   [I-D.decraene-idr-rfc4360-clarification].
+
+614	   We also thank Jeffrey Haas, Robert Raszuk, Bruno Decraene, Linda
+615	   Dunbar, Yingzhen Qu, Jie Dong, Lizhen Qiang, Erik Auerswald, Aijun
+616	   Wang, John Scudder, and Job Snijders for their suggestions and
+617	   feedback on this document.
+
+619	12.  References
+
+621	12.1.  Normative References
+
+623	   [RFC1997]  Chandra, R., Traina, P., and T. Li, "BGP Communities
+624	              Attribute", RFC 1997, DOI 10.17487/RFC1997, August 1996,
+625	              <https://www.rfc-editor.org/info/rfc1997>.
+
+627	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+628	              Requirement Levels", BCP 14, RFC 2119,
+629	              DOI 10.17487/RFC2119, March 1997,
+630	              <https://www.rfc-editor.org/info/rfc2119>.
+
+632	   [BGP-4]    Rekhter, Y., Ed., Li, T., Ed., and S. Hares, Ed., "A
+633	              Border Gateway Protocol 4 (BGP-4)", RFC 4271,
+634	              DOI 10.17487/RFC4271, January 2006,
+635	              <https://www.rfc-editor.org/info/rfc4271>.
+
+637	   [RFC5065]  Traina, P., McPherson, D., and J. Scudder, "Autonomous
+638	              System Confederations for BGP", RFC 5065,
+639	              DOI 10.17487/RFC5065, August 2007,
+640	              <https://www.rfc-editor.org/info/rfc5065>.
+
+642	   [RFC5668]  Rekhter, Y., Sangli, S., and D. Tappan, "4-Octet AS
+643	              Specific BGP Extended Community", RFC 5668,
+644	              DOI 10.17487/RFC5668, October 2009,
+645	              <https://www.rfc-editor.org/info/rfc5668>.
+
+647	   [RFC5701]  Rekhter, Y., "IPv6 Address Specific BGP Extended Community
+648	              Attribute", RFC 5701, DOI 10.17487/RFC5701, November 2009,
+649	              <https://www.rfc-editor.org/info/rfc5701>.
+
+651	   [RFC6793]  Vohra, Q. and E. Chen, "BGP Support for Four-Octet
+652	              Autonomous System (AS) Number Space", RFC 6793,
+653	              DOI 10.17487/RFC6793, December 2012,
+654	              <https://www.rfc-editor.org/info/rfc6793>.
+
+656	   [RFC7153]  Rosen, E. and Y. Rekhter, "IANA Registries for BGP
+657	              Extended Communities", RFC 7153, DOI 10.17487/RFC7153,
+658	              March 2014, <https://www.rfc-editor.org/info/rfc7153>.
+
+660	   [RFC7606]  Chen, E., Ed., Scudder, J., Ed., Mohapatra, P., and K.
+661	              Patel, "Revised Error Handling for BGP UPDATE Messages",
+662	              RFC 7606, DOI 10.17487/RFC7606, August 2015,
+663	              <https://www.rfc-editor.org/info/rfc7606>.
+
+665	   [RFC8092]  Heitz, J., Ed., Snijders, J., Ed., Patel, K., Bagdonas,
+666	              I., and N. Hilliard, "BGP Large Communities Attribute",
+667	              RFC 8092, DOI 10.17487/RFC8092, February 2017,
+668	              <https://www.rfc-editor.org/info/rfc8092>.
+
+670	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+671	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+672	              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+674	   [IANA-BGP-PATH-ATTRIBUTES]
+675	              IANA, "BGP Path Attributes",
+676	              <https://www.iana.org/assignments/bgp-parameters/bgp-
+677	              parameters.xhtml#bgp-parameters-2>.
+
+679	   [IANA-BGP-EC]
+680	              IANA, "BGP Extended Communities",
+681	              <https://www.iana.org/assignments/bgp-extended-
+682	              communities/bgp-extended-communities.xhtml>.
+
+684	   [IANA-BGP-EC-TRANS]
+685	              IANA, "BGP Transitive Extended Community Types",
+686	              <https://www.iana.org/assignments/bgp-extended-
+687	              communities/bgp-extended-communities.xhtml#transitive>.
+
+689	   [IANA-BGP-EC-NONTRANS]
+690	              IANA, "BGP Non-Transitive Extended Community Types",
+691	              <https://www.iana.org/assignments/bgp-extended-
+692	              communities/bgp-extended-communities.xhtml#non-
+693	              transitive>.
+
+695	   [IANA-BGP-EC-TRANS-TWO-OCTET-AS]
+696	              IANA, "Transitive Two-Octet AS-Specific Extended Community
+697	              Sub-Types", <https://www.iana.org/assignments/bgp-
+698	              extended-communities/bgp-extended-communities.xhtml#trans-
+699	              two-octet-as>.
+
+701	   [IANA-BGP-EC-NONTRANS-TWO-OCTET-AS]
+702	              IANA, "Non-Transitive Two-Octet AS-Specific Extended
+703	              Community Sub-Types", <https://www.iana.org/assignments/
+704	              bgp-extended-communities/bgp-extended-
+705	              communities.xhtml#non-trans-two-octet-as>.
+
+707	   [IANA-BGP-EC-TRANS-IPV4]
+708	              IANA, "Transitive IPv4-Address-Specific Extended Community
+709	              Sub-Types", <https://www.iana.org/assignments/bgp-
+710	              extended-communities/bgp-extended-communities.xhtml#trans-
+711	              ipv4>.
+
+713	   [IANA-BGP-EC-NONTRANS-IPV4]
+714	              IANA, "Non-Transitive IPv4-Address-Specific Extended
+715	              Community Sub-Types", <https://www.iana.org/assignments/
+716	              bgp-extended-communities/bgp-extended-
+717	              communities.xhtml#non-trans-ipv4>.
+
+719	   [IANA-BGP-EC-TRANS-OPAQUE]
+720	              IANA, "Transitive Opaque Extended Community Sub-Types",
+721	              <https://www.iana.org/assignments/bgp-extended-
+722	              communities/bgp-extended-communities.xhtml#trans-opaque>.
+
+724	   [IANA-BGP-EC-NONTRANS-OPAQUE]
+725	              IANA, "Non-Transitive Opaque Extended Community Sub-
+726	              Types", <https://www.iana.org/assignments/bgp-extended-
+727	              communities/bgp-extended-communities.xhtml#non-trans-
+728	              opaque>.
+
+730	   [IANA-BGP-EC-TRANS-FOUR-OCTET-AS]
+731	              IANA, "Transitive Four-Octet AS-Specific Extended
+732	              Community Sub-Types", <https://www.iana.org/assignments/
+733	              bgp-extended-communities/bgp-extended-
+734	              communities.xhtml#trans-four-octet-as>.
+
+736	   [IANA-BGP-EC-NONTRANS-FOUR-OCTET-AS]
+737	              IANA, "Non-Transitive Four-Octet AS-Specific Extended
+738	              Community Sub-Types", <https://www.iana.org/assignments/
+739	              bgp-extended-communities/bgp-extended-
+740	              communities.xhtml#non-trans-four-octet-as>.
+
+742	   [IANA-IPFIX]
+743	              IANA, "IPFIX Entities",
+744	              <https://www.iana.org/assignments/ipfix/ipfix.xhtml>.
+
+746	   [IANA-BGP-EC-TRANS-IPV6]
+747	              IANA, "Transitive IPv6-Address-Specific Extended Community
+748	              Types", <https://www.iana.org/assignments/bgp-extended-
+749	              communities/bgp-extended-communities.xhtml#trans-ipv6>.
+
+751	   [IANA-BGP-EC-NONTRANS-IPV6]
+752	              IANA, "Non-Transitive IPv6-Address-Specific Extended
+753	              Community Types", <https://www.iana.org/assignments/bgp-
+754	              extended-communities/bgp-extended-communities.xhtml#non-
+755	              trans-ipv6>.
+
+757	12.2.  Informative References
+
+759	   [RFC4360]  Sangli, S., Tappan, D., and Y. Rekhter, "BGP Extended
+760	              Communities Attribute", RFC 4360, DOI 10.17487/RFC4360,
+761	              February 2006, <https://www.rfc-editor.org/info/rfc4360>.
+
+763	   [RFC4364]  Rosen, E. and Y. Rekhter, "BGP/MPLS IP Virtual Private
+764	              Networks (VPNs)", RFC 4364, DOI 10.17487/RFC4364, February
+765	              2006, <https://www.rfc-editor.org/info/rfc4364>.
+
+767	   [I-D.decraene-idr-rfc4360-clarification]
+768	              Decraene, B., Vanbever, L., and P. Francois, "RFC 4360
+769	              Clarification Request", Work in Progress, Internet-Draft,
+770	              draft-decraene-idr-rfc4360-clarification-00, 19 October
+771	              2009, <https://datatracker.ietf.org/doc/html/draft-
+772	              decraene-idr-rfc4360-clarification-00>.
+
+774	Appendix A.  Comparison with RFC4360
+
+776	   The encodings and definitions of the extended communities are
+777	   unchanged in this document.
+
+779	   Besides addressing known errata in [RFC4360], this document updates
+780	   the following:
+
+782	   *  Section 3 now includes references to the case for the 4-Octet
+783	      Autonomous System number.
+
+785	   *  Section 6 clarifies the operations of non-transitive extended
+786	      communities across Autonomous System or Confederation Member-AS
+787	      boundaries.
+
+789	   *  Section 7 is added to describe the error handling procedures.
+
+791	   *  Section 8 is updated to reflect the current IANA registry status.
+792	      The update splits the "BGP Extended Communities Type" registry
+793	      into transitive and non-transitive registries.  This section also
+794	      contains similar updates for the Sub-Types defined.
+
+796	   *  Section 9 is updated to reflect the current security practice.
+
+798	Authors' Addresses
+
+800	   Srihari Sangli
+801	   HPE
+802	   Mahadevapura, Bengaluru, KA 560048
+803	   India
+804	   Email: ssangli@juniper.net
+
+806	   Nat Kao (editor)
+807	   Individual Contributor
+808	   Email: pyxislx@gmail.com
+
+
+
+
+
+
+
+
+
