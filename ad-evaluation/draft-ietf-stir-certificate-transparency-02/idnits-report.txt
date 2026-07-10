@@ -1,0 +1,772 @@
+idnits 2.17.1 
+
+draft-ietf-stir-certificate-transparency-02.txt:
+-(3): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+  == There are 3 instances of lines with non-ascii characters in the document.
+
+
+  Checking nits according to https://www.ietf.org/id-info/checklist :
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Miscellaneous warnings:
+  ----------------------------------------------------------------------------
+
+  -- The document date (18 May 2026) is 53 days in the past.  Is this
+     intentional?
+
+
+  Checking references for intended status: Proposed Standard
+  ----------------------------------------------------------------------------
+
+     (See RFCs 3967 and 4897 for information about using normative references
+     to lower-maturity documents in RFCs)
+
+     No issues found here.
+
+     Summary: 0 errors (**), 0 flaws (~~), 1 warning (==), 1 comment (--).
+
+     Run idnits with the --verbose option for more detailed information about
+     the items above.
+
+--------------------------------------------------------------------------------
+
+
+2	Secure Telephone Identity Revisited                             C. Wendt
+3	Internet-Draft                                                  R. Śliwa
+4	Intended status: Standards Track                             Somos, Inc.
+5	Expires: 19 November 2026                                    A. Fenichel
+6	                                                              TransNexus
+7	                                                           V. A. Gaikwad
+8	                                                                  Twilio
+9	                                                             18 May 2026
+
+11	                      STI Certificate Transparency
+12	              draft-ietf-stir-certificate-transparency-02
+
+14	Abstract
+
+16	   This document describes a framework for the use of the Certificate
+17	   Transparency (CT) protocol for publicly logging the existence of
+18	   Secure Telephone Identity (STI) certificates as they are issued or
+19	   observed.  This allows any interested party that is part of the STI
+20	   eco-system to audit STI certification authority (CA) activity and
+21	   audit both the issuance of suspect certificates and the certificate
+22	   logs themselves.  The intent is for the establishment of a level of
+23	   trust in the STI eco-system that depends on the verification of
+24	   telephone numbers requiring and refusing to honor STI certificates
+25	   that do not appear in a established log.  This effectively
+26	   establishes the precedent that STI CAs must add all issued
+27	   certificates to the logs and thus establishes unique association of
+28	   STI certificates to an authorized provider or assignee of a telephone
+29	   number resource.  The primary role of CT in the STI ecosystem is for
+30	   verifiable trust in the avoidance of issuance of unauthorized
+31	   duplicate telephone number level delegate certificates or provider
+32	   level certificates.  This provides a robust auditable mechanism for
+33	   the detection of unauthorized creation of certificate credentials for
+34	   illegitimate spoofing of telephone numbers or service provider codes
+35	   (SPC).
+
+37	   The framework borrows the log structure and API model from RFC6962 to
+38	   enable public auditing and verifiability of certificate issuance.
+39	   While the foundational mechanisms for log operation, Merkle Tree
+40	   construction, and Signed Certificate Timestamps (SCTs) are aligned
+41	   with RFC6962, this document contextualizes their application in the
+42	   STIR eco-system, focusing on verifiable control over telephone number
+43	   or service provider code resources.
+
+45	About This Document
+
+47	   This note is to be removed before publishing as an RFC.
+
+49	   The latest revision of this draft can be found at
+50	   https://appliedbits.github.io/draft-ietf-stir-certificate-
+51	   transparency/draft-ietf-stir-certificate-transparency.html.  Status
+52	   information for this document may be found at
+53	   https://datatracker.ietf.org/doc/draft-ietf-stir-certificate-
+54	   transparency/.
+
+56	   Discussion of this document takes place on the Secure Telephone
+57	   Identity Revisited Working Group mailing list (mailto:stir@ietf.org),
+58	   which is archived at https://mailarchive.ietf.org/arch/browse/stir/.
+59	   Subscribe at https://www.ietf.org/mailman/listinfo/stir/.
+
+61	   Source for this draft and an issue tracker can be found at
+62	   https://github.com/appliedbits/draft-ietf-stir-certificate-
+63	   transparency.
+
+65	Status of This Memo
+
+67	   This Internet-Draft is submitted in full conformance with the
+68	   provisions of BCP 78 and BCP 79.
+
+70	   Internet-Drafts are working documents of the Internet Engineering
+71	   Task Force (IETF).  Note that other groups may also distribute
+72	   working documents as Internet-Drafts.  The list of current Internet-
+73	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+75	   Internet-Drafts are draft documents valid for a maximum of six months
+76	   and may be updated, replaced, or obsoleted by other documents at any
+77	   time.  It is inappropriate to use Internet-Drafts as reference
+78	   material or to cite them other than as "work in progress."
+
+80	   This Internet-Draft will expire on 19 November 2026.
+
+82	Copyright Notice
+
+84	   Copyright (c) 2026 IETF Trust and the persons identified as the
+85	   document authors.  All rights reserved.
+
+87	   This document is subject to BCP 78 and the IETF Trust's Legal
+88	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+89	   license-info) in effect on the date of publication of this document.
+90	   Please review these documents carefully, as they describe your rights
+91	   and restrictions with respect to this document.  Code Components
+92	   extracted from this document must include Revised BSD License text as
+93	   described in Section 4.e of the Trust Legal Provisions and are
+94	   provided without warranty as described in the Revised BSD License.
+
+96	Table of Contents
+
+98	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   4
+99	   2.  Conventions and Definitions . . . . . . . . . . . . . . . . .   5
+100	   3.  The Use of Certificate Transparency for STI Certificates  . .   5
+101	   4.  Terminology . . . . . . . . . . . . . . . . . . . . . . . . .   6
+102	     4.1.  Authentication Service (AS) . . . . . . . . . . . . . . .   6
+103	     4.2.  Certificate Transparency (CT) . . . . . . . . . . . . . .   6
+104	     4.3.  Delegate Certificate  . . . . . . . . . . . . . . . . . .   6
+105	     4.4.  Log . . . . . . . . . . . . . . . . . . . . . . . . . . .   6
+106	     4.5.  Merkle Tree . . . . . . . . . . . . . . . . . . . . . . .   7
+107	     4.6.  Precertificate  . . . . . . . . . . . . . . . . . . . . .   7
+108	     4.7.  Signed Certificate Timestamp (SCT)  . . . . . . . . . . .   7
+109	     4.8.  STI Certification Authority (STI-CA)  . . . . . . . . . .   7
+110	     4.9.  STI Subordinate Certification Authority (STI-SCA) . . . .   7
+111	     4.10. Signed Tree Head (STH)  . . . . . . . . . . . . . . . . .   7
+112	     4.11. TBSCertificate (To Be Signed Certificate) . . . . . . . .   8
+113	     4.12. Verification Service (VS) . . . . . . . . . . . . . . . .   8
+114	   5.  STI Certificate Transparency Framework  . . . . . . . . . . .   8
+115	     5.1.  Log Entries . . . . . . . . . . . . . . . . . . . . . . .   8
+116	     5.2.  Precertificate Submission . . . . . . . . . . . . . . . .   8
+117	     5.3.  Log Entry . . . . . . . . . . . . . . . . . . . . . . . .   9
+118	     5.4.  Signed Certificate Timestamp (SCT)  . . . . . . . . . . .   9
+119	     5.5.  Merkle Tree Structure . . . . . . . . . . . . . . . . . .   9
+120	     5.6.  Signed Tree Head (STH)  . . . . . . . . . . . . . . . . .   9
+121	   6.  STI-CT APIs . . . . . . . . . . . . . . . . . . . . . . . . .  10
+122	   7.  Clients . . . . . . . . . . . . . . . . . . . . . . . . . . .  10
+123	     7.1.  Submitters (STI-CA/STI-SCA) . . . . . . . . . . . . . . .  10
+124	     7.2.  Use of SCTs by Authentication and Verification
+125	           Services  . . . . . . . . . . . . . . . . . . . . . . . .  10
+126	       7.2.1.  Authentication Service Processing . . . . . . . . . .  10
+127	       7.2.2.  Verification Service Processing . . . . . . . . . . .  11
+128	       7.2.3.  Performance and Scalability Guidelines  . . . . . . .  11
+129	     7.3.  Monitor . . . . . . . . . . . . . . . . . . . . . . . . .  12
+130	       7.3.1.  Monitor Workflow  . . . . . . . . . . . . . . . . . .  12
+131	     7.4.  Auditor . . . . . . . . . . . . . . . . . . . . . . . . .  13
+132	       7.4.1.  Auditor Functions . . . . . . . . . . . . . . . . . .  13
+133	   8.  Relationship to RFC6962 . . . . . . . . . . . . . . . . . . .  13
+134	   9.  Security Considerations . . . . . . . . . . . . . . . . . . .  14
+135	   10. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  14
+136	   11. Normative References  . . . . . . . . . . . . . . . . . . . .  14
+137	   Acknowledgments . . . . . . . . . . . . . . . . . . . . . . . . .  15
+138	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  16
+
+140	1.  Introduction
+
+142	   Certificate Transparency (CT) aims to mitigate the problem of mis-
+143	   issued certificates by providing append-only logs of issued
+144	   certificates.  The logs do not themselves prevent mis-issuance, but
+145	   ensure that interested parties (particularly those named in
+146	   legitimate certificates or certificate chains) can detect such mis-
+147	   issuance.  [RFC6962] describes the core protocols and mechanisms for
+148	   use of CT for the purposes of public TLS server certificates
+149	   associated with a domain name as part of the public domain name
+150	   system (DNS).  This document describes a conceptually similar
+151	   framework that directly borrows concepts like transparency receipts
+152	   in the form of SCTs and how they are used in certificates and its
+153	   specific use as part of the larger STIR framework for call
+154	   authentication.  This framework is defined for the specific use with
+155	   both Secure Telephone Identity (STI) certificates [RFC8226] and
+156	   delegate certificates [RFC9060].
+
+158	   Telephone numbers (TNs) and their management and assignment by
+159	   telephone service providers and Responsible Organizations (RespOrgs)
+160	   for toll-free numbers share many similarities to the Domain Name
+161	   System (DNS) where there is a global uniqueness and established
+162	   association of telephone numbers to regulatory jurisdictions that
+163	   manage the allocation and assignment of telephone numbers under
+164	   country codes and a set of numeric digits for routing telephone calls
+165	   and messages over telephone networks.  STI Certificates use a
+166	   TNAuthList extension defined in [RFC8226] to specifically associate
+167	   either telephone service providers or telephone numbers to the
+168	   issuance of STI certificates and certificate change that are intended
+169	   to represent the authorized right to use a telephone number.  This
+170	   trusted association can be establish via mechanisms such as Authority
+171	   tokens for TNAuthList defined in [RFC9448].  Certificate transparency
+172	   and the concept of transparency is generally meant to provide a
+173	   publicly verifiable and auditable representation of the creation of
+174	   certificates in order to establish transparency and trust to
+175	   interested parties as part of a stir related eco-system.
+
+177	   There is three primary actors in the certificate transparency
+178	   framework.  There is the STI Certification Authorities (CAs) that
+179	   submit all certificates to be issued to one or more transparency
+180	   append-only log services.  The log services are network services that
+181	   implement the protocol operations for submissions of STI certificates
+182	   and subsequent queries.  They are hosted by interested parties in the
+183	   STI ecosystem and can accept certificate log submissions from any
+184	   other CA participant.  The second role is the monitors that play the
+185	   role of monitoring the CT logs to check for potential mis-issuance as
+186	   well as auditing of the log services.  This role can be played by any
+187	   STI ecosystem participant interested in the trust of the ecosystem or
+188	   the integrity of the telephone number or provider level certificates
+189	   produced in the eco-system.  CT provides a mechanism of a receipt or
+190	   Signed Certificate Timestamp (SCT) that is provided as a result of
+191	   submitting a certificate to the append-only log.  The third actor
+192	   role in the certificate transparency framework is the eco-system
+193	   participants that can send and receive receipt(s) or SCT(s) to prove
+194	   and validate that a certificate was submitted to a log(s) and
+195	   optionally query the log directly for further validation.
+
+197	   The details that follow in this document will detail the specific
+198	   protocols and framework for Certificate Transparency associated with
+199	   STI certificates.  Most of the details borrow many of the concepts of
+200	   certificate transparency defined in [RFC6962] used in web browser and
+201	   web PKI environments, but provides a specific framework designed for
+202	   STI certificates and their specific issuance and usage in a
+203	   telecommunications and telephone number dependent eco-system.
+
+205	   This general mechanism could also be used for transparently logging
+206	   other important stir related metadata associations perhaps via
+207	   JWTClaimConstraints defined in [RFC8226] and [RFC9118] or other ways
+208	   defined in potential future extensions of this document.
+
+210	2.  Conventions and Definitions
+
+212	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+213	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+214	   "OPTIONAL" in this document are to be interpreted as described in
+215	   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+216	   capitals, as shown here.
+
+218	3.  The Use of Certificate Transparency for STI Certificates
+
+220	   CT log(s) contains certificate chains, which can be submitted by any
+221	   CA authorized in a STIR eco-system.  It is expected that these CAs
+222	   will contribute all their newly issued certificates to one or more
+223	   logs.  Note, in [RFC6962] it is possible for certificate holders to
+224	   directly contribute their own certificate chains or interested third
+225	   parties, however because in stir eco-systems that generally consist
+226	   of entities that are authorized to be assigned telephone number
+227	   resources, this does not seem to be a likely scenario.  Generally,
+228	   many stir eco-systems have a controlled set of CAs that are
+229	   authorized to participate as valid trust anchors.  It is required
+230	   that each chain ends with a trust anchor that is accepted by the log
+231	   which would include those authorized trust anchors or a subset of
+232	   them.  When a chain is accepted by a log, a signed timestamp is
+233	   returned, which is later used to provide evidence to STIR
+234	   verification services (VS), defined in [RFC8224], that the chain has
+235	   been submitted.  A VS can thus require that all certificates they
+236	   accept as valid are accompanied by signed timestamps.
+
+238	   Those concerned about mis-issuance of STIR certificates can monitor
+239	   the logs, asking them regularly for all new entries, and can thus
+240	   check whether the service provider codes or telephone numbers for
+241	   which they are responsible have had certificates issued that they did
+242	   not expect.  What they do with this information, particularly when
+243	   they find that a mis-issuance has happened, is beyond the scope of
+244	   this document.  However, broadly speaking, because many existing STI
+245	   ecosystems have a connection to regulated and industry environments
+246	   that govern the issuance of STI certificates, they can invoke
+247	   existing mechanisms for dealing with issues such as mis-issued
+248	   certificates, such as working with the CA to get the certificate
+249	   revoked or with maintainers of trust anchor lists to get the CA
+250	   removed.
+
+252	4.  Terminology
+
+254	   This section defines key terms used throughout the STI-CT framework
+255	   to ensure clarity and consistency.
+
+257	4.1.  Authentication Service (AS)
+
+259	   A service defined in [RFC8224] that signs the identity of a telephone
+260	   call using Secure Telephone Identity (STI) certificates, ensuring the
+261	   authenticity of the caller information.  It ensures that STI
+262	   Certificates contain SCTs.
+
+264	4.2.  Certificate Transparency (CT)
+
+266	   A framework designed to provide an open and verifiable log of issued
+267	   certificates.  It aims to detect and prevent the misuse or mis-
+268	   issuance of certificates by maintaining append-only logs that can be
+269	   audited by any interested party.
+
+271	4.3.  Delegate Certificate
+
+273	   A type of STI certificate defined in [RFC9060] that associates a
+274	   specific telephone number or a range of telephone numbers with a
+275	   particular entity used to delegate the right to use these numbers.
+
+277	4.4.  Log
+
+279	   An append-only, cryptographically verifiable structure used in
+280	   Certificate Transparency to record pre-certificate entries.  Logs
+281	   accept submissions, generate Signed Certificate Timestamps (SCTs),
+282	   and maintain the integrity of the entries through a Merkle Tree
+283	   structure.
+
+285	4.5.  Merkle Tree
+
+287	   A cryptographic data structure used in logs to ensure the integrity
+288	   and consistency of the entries.  It is built by hashing individual
+289	   log entries and combining them into a single root hash that
+290	   represents the state of the entire log.
+
+292	4.6.  Precertificate
+
+294	   A certificate issued by an CA that is intended to be submitted to a
+295	   Certificate Transparency log before the final certificate is issued.
+296	   The pre-certificate includes a special extension (the poison
+297	   extension) that prevents it from being used as a valid certificate on
+298	   its own.
+
+300	4.7.  Signed Certificate Timestamp (SCT)
+
+302	   A data structure provided by a Certificate Transparency log in
+303	   response to a pre-certificate submission.  The SCT serves as a
+304	   promise from the log to include the submitted pre-certificate in the
+305	   log within a specified time frame (Maximum Merge Delay).  It is
+306	   included in the final certificate to prove that it has been logged.
+
+308	4.8.  STI Certification Authority (STI-CA)
+
+310	   An entity responsible for issuing STI certificates in the Secure
+311	   Telephone Identity ecosystem.  The CA can also issue pre-
+312	   certificates, which are submitted to CT logs before the final
+313	   certificate is issued.
+
+315	4.9.  STI Subordinate Certification Authority (STI-SCA)
+
+317	   An entity authorized by an CA to issue STI certificates under the
+318	   authority of the STI-CA.  The STI-SCA can also issue pre-certificates
+319	   for submission to CT logs.
+
+321	4.10.  Signed Tree Head (STH)
+
+323	   A cryptographically signed data structure that represents the current
+324	   state of a Certificate Transparency log.  It includes the root hash
+325	   of the Merkle Tree and the number of entries in the log, allowing
+326	   auditors to verify the integrity and consistency of the log.
+
+328	4.11.  TBSCertificate (To Be Signed Certificate)
+
+330	   A component of an X.509 certificate that contains all the information
+331	   about the certificate except the actual digital signature.  The
+332	   TBSCertificate includes fields such as the version, serial number,
+333	   issuer, validity period, subject, and the subject's public key
+334	   information.  This component is signed by the certificate authority
+335	   (CA) to create the final certificate.  In the context of Certificate
+336	   Transparency, the TBSCertificate of a pre-certificate is submitted to
+337	   the log for inclusion.
+
+339	4.12.  Verification Service (VS)
+
+341	   A service defined in [RFC8224] that verifies the authenticity of a
+342	   telephone call by checking the validity of the PASSporT token,
+343	   including verification that certificate contains valid SCTs.
+
+345	5.  STI Certificate Transparency Framework
+
+347	   This section describes the format and operational procedures for logs
+348	   in the STI Certificate Transparency (CT) framework.
+
+350	5.1.  Log Entries
+
+352	   Logs in the STI CT framework are append-only structures that store
+353	   entries in a Merkle Tree and use SHA-256 for data hashing.  The
+354	   entries consist of pre-certificates submitted by STI Certification
+355	   Authorities (STI-CAs) or Subordinate Certification Authorities (STI-
+356	   SCAs).  The log entries help ensure that all issued STI certificates
+357	   can be audited for legitimacy.
+
+359	5.2.  Precertificate Submission
+
+361	   An STI-CA/STI-SCA submits a pre-certificate to a log before the
+362	   actual STI certificate is issued.  The pre-certificate submission
+363	   must include all necessary intermediate certificates to validate the
+364	   chain up to an accepted root certificate.  The root certificate may
+365	   be omitted from the submission.
+
+367	   When a pre-certificate is submitted:
+
+369	   *  The log verifies the chain of the pre-certificate up to a trusted
+370	      root.
+
+372	   *  If valid, the log generates and returns a Signed Certificate
+373	      Timestamp (SCT) to the submitter.
+
+375	   *  The SCT serves as a promise from the log that the pre-certificate
+376	      will be included in the Merkle Tree within a defined Maximum Merge
+377	      Delay (MMD).
+
+379	   Logs must publish a list of accepted root certificates, which aligns
+380	   with those trusted in the STIR ecosystem.  The inclusion of SCTs in
+381	   the actual STI certificates is critical, as Verification Services
+382	   (VS) will only accept certificates that include valid SCTs.
+
+384	   Note: The data structures (e.g., LogEntry,
+385	   SignedCertificateTimestamp, TreeHeadSignature) in this section follow
+386	   the definitions provided in [RFC6962].
+
+388	5.3.  Log Entry
+
+390	   Logs may impose a limit on the length of the certificate chain they
+391	   will accept.  The log verifies the validity of the pre-certificate
+392	   chain up to an accepted root and, upon acceptance, stores the entire
+393	   chain for future auditing.
+
+395	5.4.  Signed Certificate Timestamp (SCT)
+
+397	   The SCT is included in the final STI certificate, and VS services
+398	   will check the presence and validity of SCTs to verify the legitimacy
+399	   of the certificate.
+
+401	5.5.  Merkle Tree Structure
+
+403	   Logs use a Merkle Tree structure, with each leaf corresponding to a
+404	   MerkleTreeLeaf entry.  The leaves are hashed to form the tree, which
+405	   is continuously updated as new entries are added.
+
+407	   The root hash of the Merkle Tree represents the state of the log at a
+408	   given time and can be used to verify the inclusion of specific
+409	   entries.
+
+411	5.6.  Signed Tree Head (STH)
+
+413	   The log periodically signs the root of the Merkle Tree, producing a
+414	   Signed Tree Head (STH), which ensures the integrity of the log over
+415	   time.
+
+417	   Logs must produce an STH within the Maximum Merge Delay (MMD) to
+418	   confirm that all SCTs issued have been incorporated into the Merkle
+419	   Tree.  Auditors and monitors can use the STH to verify that the log
+420	   is operating correctly and that no entries have been tampered with.
+
+422	6.  STI-CT APIs
+
+424	   STI-CT re-uses the REST endpoints defined in Section 4 of [RFC6962]
+425	   (the "/ct/v1/" namespace) with no semantic changes.  For operational
+426	   clarity it is RECOMMENDED deployments expose them under a path
+427	   /stict/v1/ but the request/response formats are compatible with
+428	   [RFC6962].
+
+430	7.  Clients
+
+432	   This section describes various roles clients of STI-CT perform.  Any
+433	   inconsistency detected by clients could serve as evidence that a log
+434	   has not behaved correctly, and the signatures on the data structures
+435	   prevent the log from denying any misbehavior.
+
+437	7.1.  Submitters (STI-CA/STI-SCA)
+
+439	   Submitters in the STI-CT framework are typically STI Certification
+440	   Authorities (STI-CAs) or Subordinate Certification Authorities (STI-
+441	   SCAs).  These entities submit pre-certificates to the log as
+442	   described in the APIs section.  The returned Signed Certificate
+443	   Timestamp (SCT) can then be used to construct the final STI
+444	   certificate, which includes one or more SCTs.
+
+446	7.2.  Use of SCTs by Authentication and Verification Services
+
+448	   This specification defines the STI eco-system rely exclusively on the
+449	   pre-certificate chain method defined in [RFC6962]; therefore every
+450	   Certificate issued for call signing MUST already carry one or more
+451	   embedded SCTs in the SignedCertificateTimestampList X.509 extension
+452	   at issuance time.
+
+454	   Because the SCT is delivered in-band with the Certificate, neither
+455	   the AS nor the VS perform any network round-trips to Certificate
+456	   Transparency (CT) logs on the call path.
+
+458	7.2.1.  Authentication Service Processing
+
+460	   1.  Optional local SCT validation - For each embedded SCT the AS MAY:
+
+462	       *  compute the hash of the TBSCertificate as defined in
+463	          Section 3.2 of [RFC6962] and verify the SCT signature with the
+464	          cached public key of the issuing CT log;
+
+466	       *  verify that now() >= SCT.timestamp advertised by that log.
+
+468	       *  Implementations SHOULD pre-compute and cache these checks at
+469	          certificate activation time so that per-call signing incurs
+470	          only an O(1) lookup.
+
+472	   2.  PASSporT construction - The PASSporT header and payload are
+473	       produced per [RFC8224] using the Certificate’s private key; the
+474	       Certificate (with its SCT list) is conveyed in the 'x5u' or 'x5c'
+475	       parameter.
+
+477	   3.  Optional Failure handling - If no SCT validates, the AS MAY treat
+478	       the Certificate as unusable and refuse to sign the call.
+
+480	7.2.2.  Verification Service Processing
+
+482	   Upon receipt of a SIP INVITE bearing an Identity header, the VS
+483	   performs the steps below, all of which are deliberately offline to
+484	   avoid adding call-path latency:
+
+486	   1.  Verify PASSporT signature with DC public key.
+
+488	   2.  Validate DC chain to an accepted STI trust anchor.
+
+490	   3.  For each embedded SCT:
+
+492	       *  Verify signature against cached log key.
+
+494	       *  Ensure now() >= SCT.timestamp *or* defer to asynchronous
+495	          auditor.
+
+497	   Implementations SHOULD cache certificates and validated SCT objects
+498	   for the lifetime of the certificates' notAfter field to amortize step
+499	   3 across many calls.
+
+501	7.2.3.  Performance and Scalability Guidelines
+
+503	   *  No synchronous log queries - Embedded SCTs guarantee log
+504	      commitment; therefore, AS/VS MUST NOT fetch proofs on the call
+505	      path.
+
+507	   *  Key caching - Log public keys are static and should be loaded at
+508	      process start-up; reload only on key-roll events signaled via CT
+509	      or operator policy.
+
+511	7.3.  Monitor
+
+513	   Monitors in the STI-CT framework play a crucial role in maintaining
+514	   the integrity and trust of the ecosystem.  They ensure that no
+515	   certificates are mis-issued, particularly concerning the TNAuthList
+516	   field, which lists the telephone numbers an entity is authorized to
+517	   use.
+
+519	7.3.1.  Monitor Workflow
+
+521	   1.  Initialize Monitor: Set up the Monitor to periodically query the
+522	       transparency logs for new entries.  The Monitor must be
+523	       configured with the base URL of each log it intends to monitor.
+524	       Configure the Monitor with a list of telephone numbers (TNs) and/
+525	       or associated SPC represented entities to track.
+
+527	   2.  Retrieve Latest STH: The Monitor retrieves the latest Signed Tree
+528	       Head (STH) from each log to determine the current state of the
+529	       log.
+
+531	       API Call: GET https://<log server>/stict/v1/get-sth
+
+533	   3.  Retrieve New Entries from Log: Using the STH, the Monitor
+534	       retrieves new entries from the log that have been added since the
+535	       last known state.
+
+537	       API Call: GET https://<log server>/stict/v1/get-
+538	       entries?start=last_known_index&end=current_sth_index
+
+540	   4.  Decode and Verify Certificates: Decode each retrieved certificate
+541	       and verify its validity using the provided certificate chain.
+542	       Extract the entity name and TNAuthList from the certificate.
+
+544	   5.  Check for Mis-issuance: Compare the TNAuthList and entity name
+545	       from the newly issued certificate with the Monitor's configured
+546	       list.  Alarm if a certificate is issued in the name of a
+547	       different entity for the same TNs.
+
+549	   6.  Alarm and Reporting: If a mis-issuance is detected, raise an
+550	       alarm and log the details for further investigation.  Notify
+551	       relevant stakeholders to rectify any confirmed mis-issuance.
+
+553	   7.  Maintain State and Continuity: Update the Monitor's last known
+554	       state with the current STH index to ensure continuity in
+555	       monitoring.
+
+557	   8.  STH Verification and Consistency Check: After retrieving a new
+558	       STH, verify the STH signature.  If not keeping all log entries,
+559	       fetch a consistency proof for the new STH with the previous STH
+560	       (GET https://<log server>/stict/v1/get-sth-consistency) and
+561	       verify it.  Go to Step 5 and repeat the process.
+
+563	7.4.  Auditor
+
+565	   Auditors are responsible for verifying the consistency and
+566	   correctness of the log, ensuring that the log behaves according to
+567	   the expected protocol.  Auditors can operate as standalone services
+568	   or as part of another client role, such as a monitor or an VS.
+
+570	7.4.1.  Auditor Functions
+
+572	   1.  STH Verification: Auditors can fetch STHs periodically and verify
+573	       their signatures to ensure the log is maintaining its integrity.
+
+575	       API Call: GET https://<log server>/stict/v1/get-sth
+
+577	   2.  Consistency Proof Verification: Auditors verify the consistency
+578	       of a log over time by requesting a consistency proof between two
+579	       STHs.
+
+581	       API Call: GET https://<log server>/stict/v1/get-sth-consistency
+
+583	   3.  Audit Proof Verification: A certificate accompanied by an SCT can
+584	       be verified against any STH dated after the SCT timestamp + the
+585	       Maximum Merge Delay by requesting a Merkle audit proof.
+
+587	       API Call: GET https://<log server>/stict/v1/get-proof-by-hash
+
+589	   4.  Cross-Checking Logs: Auditors can cross-check entries across
+590	       different logs by comparing SCTs and verifying that entries are
+591	       consistently logged across the ecosystem.
+
+593	   5.  Error and Inconsistency Detection: Any discrepancies or failures
+594	       in verification processes can be logged as evidence of potential
+595	       log misbehavior, and appropriate actions can be taken based on
+596	       the findings.
+
+598	8.  Relationship to RFC6962
+
+600	   This document profiles the Certificate Transparency (CT) protocol as
+601	   defined in [RFC6962] for use within the STIR eco-system.  All log
+602	   data structures (e.g., LogEntry, SignedCertificateTimestamp,
+603	   TreeHeadSignature) and API endpoints (e.g., add-pre-chain, get-sth,
+604	   get-entries, etc.) are adopted directly from [RFC6962].
+
+606	   The main differences are: - The expected certificate types are STI
+607	   certificates as defined in [RFC8226] and [RFC9060], with TNAuthList
+608	   extensions. - Submitters are limited to STI Certification Authorities
+609	   and Subordinate Certification Authorities. - Monitoring and auditing
+610	   are focused on detection of mis-issued telephone number or service
+611	   provider codes (SPCs). - The client roles (e.g., VS, AS) interact
+612	   with certificates and logs in ways specific to SIP call
+613	   authentication.
+
+615	9.  Security Considerations
+
+617	   As this specification follows the guidance of [RFC6962], it also
+618	   inherits the security considerations defined therein.
+
+620	   The use of Certificate Transparency (CT) within the STIR ecosystem
+621	   enhances accountability but also introduces operational and security
+622	   risks that must be managed.  Trust in the system depends on the
+623	   integrity of CT logs and therefore, logs should be operated by
+624	   reputable entities and monitored to detect mis-issuance or
+625	   inconsistent Signed Tree Heads (STHs).
+
+627	   Signed Certificate Timestamps (SCTs) should be verified by
+628	   Authentication Services (AS) before use for creating digital
+629	   signatures and by Verification Services (VS) using trusted log public
+630	   keys to prevent forgery or replay.  Key rotation and distribution
+631	   should be performed securely.
+
+633	   While CT does not prevent mis-issuance, it enables timely detection
+634	   and monitors should track Telephone Number (TN) and Service Provider
+635	   Code (SPC) associations and alert stakeholders if certificates are
+636	   issued outside of authorized ranges.
+
+638	   Because transparency may expose sensitive relationships between TNs
+639	   and entities, implementers should consider privacy implications and
+640	   minimize or redact logged data where appropriate.
+
+642	   CT logs and Certification Authorities (CAs) should implement
+643	   safeguards such as rate limiting, caching, and redundant storage to
+644	   mitigate denial-of-service risks and ensure availability.
+
+646	10.  IANA Considerations
+
+648	   None at this time.
+
+650	11.  Normative References
+
+652	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+653	              Requirement Levels", BCP 14, RFC 2119,
+654	              DOI 10.17487/RFC2119, March 1997,
+655	              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+657	   [RFC6962]  Laurie, B., Langley, A., and E. Kasper, "Certificate
+658	              Transparency", RFC 6962, DOI 10.17487/RFC6962, June 2013,
+659	              <https://www.rfc-editor.org/rfc/rfc6962>.
+
+661	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+662	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+663	              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+665	   [RFC8224]  Peterson, J., Jennings, C., Rescorla, E., and C. Wendt,
+666	              "Authenticated Identity Management in the Session
+667	              Initiation Protocol (SIP)", RFC 8224,
+668	              DOI 10.17487/RFC8224, February 2018,
+669	              <https://www.rfc-editor.org/rfc/rfc8224>.
+
+671	   [RFC8226]  Peterson, J. and S. Turner, "Secure Telephone Identity
+672	              Credentials: Certificates", RFC 8226,
+673	              DOI 10.17487/RFC8226, February 2018,
+674	              <https://www.rfc-editor.org/rfc/rfc8226>.
+
+676	   [RFC9060]  Peterson, J., "Secure Telephone Identity Revisited (STIR)
+677	              Certificate Delegation", RFC 9060, DOI 10.17487/RFC9060,
+678	              September 2021, <https://www.rfc-editor.org/rfc/rfc9060>.
+
+680	   [RFC9118]  Housley, R., "Enhanced JSON Web Token (JWT) Claim
+681	              Constraints for Secure Telephone Identity Revisited (STIR)
+682	              Certificates", RFC 9118, DOI 10.17487/RFC9118, August
+683	              2021, <https://www.rfc-editor.org/rfc/rfc9118>.
+
+685	   [RFC9448]  Wendt, C., Hancock, D., Barnes, M., and J. Peterson,
+686	              "TNAuthList Profile of Automated Certificate Management
+687	              Environment (ACME) Authority Token", RFC 9448,
+688	              DOI 10.17487/RFC9448, September 2023,
+689	              <https://www.rfc-editor.org/rfc/rfc9448>.
+
+691	Acknowledgments
+
+693	   The authors would like to thank the authors and contributors to the
+694	   protocols and ideas around Certificate Transparency [RFC6962] which
+695	   sets the basis for the STI eco-system to adopt in a very straight
+696	   forward way, providing trust and transparency in the telephone number
+697	   world.
+
+699	Authors' Addresses
+
+701	   Chris Wendt
+702	   Somos, Inc.
+703	   United States of America
+704	   Email: chris@appliedbits.com
+
+706	   Rob Śliwa
+707	   Somos, Inc.
+708	   United States of America
+709	   Email: robjsliwa@gmail.com
+
+711	   Alec Fenichel
+712	   TransNexus
+713	   United States of America
+714	   Email: alec.fenichel@transnexus.com
+
+716	   Vinit Anil Gaikwad
+717	   Twilio
+718	   United States of America
+719	   Email: vanilgaikwad@twilio.com
+
+
+
+
+
+
+
+
+
