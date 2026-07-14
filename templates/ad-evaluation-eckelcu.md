@@ -1,4 +1,4 @@
-# Charles Eckel, ART AD, AD evaluation for DRAFT 
+# Charles Eckel, ART AD, AD evaluation: DRAFT 
 CC @eckelcu
 
 * line numbers:

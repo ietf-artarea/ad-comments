@@ -1,4 +1,4 @@
-# Charles Eckel, ART AD, AD evaluation comments for draft-ietf-stir-8588bis-01 
+# Charles Eckel, ART AD, AD evaluation: draft-ietf-stir-8588bis-01 
 CC @eckelcu
 
 * line numbers:
