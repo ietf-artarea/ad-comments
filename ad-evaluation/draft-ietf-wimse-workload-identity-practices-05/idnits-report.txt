@@ -1,0 +1,1312 @@
+idnits 2.17.1 
+
+draft-ietf-wimse-workload-identity-practices-05.txt:
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/checklist :
+  ----------------------------------------------------------------------------
+
+  == There are 2 instances of lines with non-RFC6890-compliant IPv4 addresses
+     in the document.  If these are example addresses, they should be changed.
+
+
+  Miscellaneous warnings:
+  ----------------------------------------------------------------------------
+
+  -- The document date (30 June 2026) is 31 days in the past.  Is this
+     intentional?
+
+  -- Found something which looks like a code comment -- if you have code
+     sections in the document, please surround them with '<CODE BEGINS>' and
+     '<CODE ENDS>' lines.
+
+
+  Checking references for intended status: Informational
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+     Summary: 0 errors (**), 0 flaws (~~), 1 warning (==), 2 comments (--).
+
+     Run idnits with the --verbose option for more detailed information about
+     the items above.
+--------------------------------------------------------------------------------
+
+
+2	Workload Identity in Multi System Environments        A. Schwenkschuster
+3	Internet-Draft                                                     SPIRL
+4	Intended status: Informational                              Y. Rosomakho
+5	Expires: 1 January 2027                                          Zscaler
+6	                                                            30 June 2026
+
+8	                      Workload Identity Practices
+9	            draft-ietf-wimse-workload-identity-practices-05
+
+11	Abstract
+
+13	   This document describes industry practices for providing secure
+14	   identities to workloads in container orchestration, cloud platforms,
+15	   and other workload platforms.  It explains how workloads obtain
+16	   credentials for external authentication purposes, without managing
+17	   long-lived secrets directly.  It does not take into account the
+18	   standards work in progress for the WIMSE architecture and associated
+19	   protocols.
+
+21	Status of This Memo
+
+23	   This Internet-Draft is submitted in full conformance with the
+24	   provisions of BCP 78 and BCP 79.
+
+26	   Internet-Drafts are working documents of the Internet Engineering
+27	   Task Force (IETF).  Note that other groups may also distribute
+28	   working documents as Internet-Drafts.  The list of current Internet-
+29	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+31	   Internet-Drafts are draft documents valid for a maximum of six months
+32	   and may be updated, replaced, or obsoleted by other documents at any
+33	   time.  It is inappropriate to use Internet-Drafts as reference
+34	   material or to cite them other than as "work in progress."
+
+36	   This Internet-Draft will expire on 1 January 2027.
+
+38	Copyright Notice
+
+40	   Copyright (c) 2026 IETF Trust and the persons identified as the
+41	   document authors.  All rights reserved.
+
+43	   This document is subject to BCP 78 and the IETF Trust's Legal
+44	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+45	   license-info) in effect on the date of publication of this document.
+46	   Please review these documents carefully, as they describe your rights
+47	   and restrictions with respect to this document.  Code Components
+48	   extracted from this document must include Revised BSD License text as
+49	   described in Section 4.e of the Trust Legal Provisions and are
+50	   provided without warranty as described in the Revised BSD License.
+
+52	Table of Contents
+
+54	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
+55	   2.  Conventions and Definitions . . . . . . . . . . . . . . . . .   5
+56	   3.  Delivery Patterns . . . . . . . . . . . . . . . . . . . . . .   5
+57	     3.1.  Environment Variables . . . . . . . . . . . . . . . . . .   5
+58	     3.2.  Filesystem  . . . . . . . . . . . . . . . . . . . . . . .   6
+59	     3.3.  Local APIs  . . . . . . . . . . . . . . . . . . . . . . .   6
+60	   4.  Practices . . . . . . . . . . . . . . . . . . . . . . . . . .   6
+61	     4.1.  Kubernetes  . . . . . . . . . . . . . . . . . . . . . . .   7
+62	     4.2.  Secure Production Identity Framework For Everyone
+63	           (SPIFFE)  . . . . . . . . . . . . . . . . . . . . . . . .  10
+64	     4.3.  Cloud Providers . . . . . . . . . . . . . . . . . . . . .  13
+65	     4.4.  Continuous Integration and Deployment Systems . . . . . .  16
+66	     4.5.  Service Meshes  . . . . . . . . . . . . . . . . . . . . .  17
+67	   5.  Security Considerations . . . . . . . . . . . . . . . . . . .  18
+68	     5.1.  Credential Delivery . . . . . . . . . . . . . . . . . . .  18
+69	       5.1.1.  General Credentials Requirements  . . . . . . . . . .  18
+70	       5.1.2.  Environment Variables . . . . . . . . . . . . . . . .  19
+71	       5.1.3.  Filesystem  . . . . . . . . . . . . . . . . . . . . .  19
+72	       5.1.4.  Local APIs  . . . . . . . . . . . . . . . . . . . . .  19
+73	       5.1.5.  Application Interaction with Credential Sources . . .  20
+74	     5.2.  Token typing  . . . . . . . . . . . . . . . . . . . . . .  20
+75	     5.3.  Custom claims are important for context . . . . . . . . .  21
+76	     5.4.  Token lifetime  . . . . . . . . . . . . . . . . . . . . .  21
+77	     5.5.  Workload lifecycle and invalidation . . . . . . . . . . .  22
+78	     5.6.  Proof of possession . . . . . . . . . . . . . . . . . . .  22
+79	     5.7.  Audience  . . . . . . . . . . . . . . . . . . . . . . . .  22
+80	     5.8.  Multi-Tenancy Considerations  . . . . . . . . . . . . . .  23
+81	   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  23
+82	   7.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  23
+83	   8.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  23
+84	     8.1.  Normative References  . . . . . . . . . . . . . . . . . .  23
+85	     8.2.  Informative References  . . . . . . . . . . . . . . . . .  24
+86	   Appendix A.  Variations . . . . . . . . . . . . . . . . . . . . .  25
+87	     A.1.  Direct access to protected resources  . . . . . . . . . .  25
+88	     A.2.  Custom assertion flows  . . . . . . . . . . . . . . . . .  25
+89	   Appendix B.  Document History . . . . . . . . . . . . . . . . . .  25
+90	   Contributors  . . . . . . . . . . . . . . . . . . . . . . . . . .  28
+91	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  28
+
+93	1.  Introduction
+
+95	   Just like people, workloads need identifiers and associated
+96	   credentials to authenticate with other systems, such as databases,
+97	   web servers, or other workloads.  The challenge for workloads is to
+98	   obtain a credential that can be used to authenticate with these
+99	   resources without managing secrets directly, for instance, an OAuth
+100	   2.0 access token.
+
+102	   The common use of the OAuth 2.0 framework [OAUTH-FRAMEWORK] in this
+103	   context poses challenges, particularly in managing credentials.  To
+104	   address this, the industry has shifted to a federation-based approach
+105	   where credentials of the underlying workload platform are used to
+106	   authenticate to identity providers, which in turn, issue credentials
+107	   that grant access to resources.
+
+109	   Traditionally, workloads were provisioned with static client
+110	   credentials (e.g., passwords, API keys) and used the corresponding
+111	   flow as described in Section 1.3.4 of [OAUTH-FRAMEWORK] to retrieve
+112	   an OAuth 2.0 access token.  This model presents a number of security
+113	   and maintenance issues.  Secrets must be provisioned and rotated,
+114	   which requires either automation to be built, or periodic manual
+115	   effort.  Secrets may be stolen and used by attackers to impersonate
+116	   the workload.  Flows outside of the OAuth 2.0 framework (such as
+117	   direct API keys or HTTP basic authentication) suffer from the same
+118	   issues.
+
+120	   Instead of provisioning secret material to the workload, one solution
+121	   to this problem is to attest the workload by using its underlying
+122	   platform.  Many platforms provision workloads with a credential, such
+123	   as a JWT [JWT].  Cryptographically signed by the platform's issuer,
+124	   this credential attests the workload and its attributes.
+
+126	   Figure 1 illustrates a generic pattern that is seen across many
+127	   workload platforms, more concrete variations are found in Section 4.
+
+129	        +----------------------------------------------------------+
+130	        |                                        Workload Platform |
+131	        | +-----------------+                 +------------------+ |
+132	        | |                 |                 |                  | |
+133	        | |    Workload     |<--------------->|  Platform Issuer | |
+134	        | |                 |  1) push/pull   |                  | |
+135	        | +-----+-+------+--+     credentials +------------------+ |
+136	        |       | |      |                                         |
+137	        |       | |      |                                         |
+138	        |       | |      |                        +--------------+ |
+139	        |       | |      |    A) access           |              | |
+140	        |       | |      +----------------------->|   Resource   | |
+141	        |       | |                               |              | |
+142	        |       | |                               +--------------+ |
+143	        +-------+-+------------------------------------------------+
+144	                | |
+145	                | |                               +--------------+
+146	   B1) federate | |  B2) access                   |              |
+147	                | +------------------------------>|   Resource   |
+148	                v                                 |              |
+149	          +-------------------+                   +--------------+
+150	          |                   |
+151	          | Identity Provider |
+152	          |                   |
+153	          +-------------------+
+
+155	                Figure 1: Generic workload identity pattern
+
+157	   The figure outlines the following steps which are applicable in any
+158	   pattern.
+
+160	   *  1) The platform issues a credential to represent the workload
+161	      identity after verification of workload environment and
+162	      attributes.  The way this is achieved varies by platform, for
+163	      instance, the credential can be pushed to the workload or pulled
+164	      by the workload.  A workload may obtain multiple credentials from
+165	      the platform, each with its own audience and lifetime, tailored to
+166	      the specific resource or Identity Provider it needs to interact
+167	      with.  See Section 5.1.1 and Section 5.7 for more details and
+168	      security implications.
+
+170	   *  A) The credential can give the workload direct access to resources
+171	      within the platform or the platform itself, for example to perform
+172	      infrastructure operations.
+
+174	   *  B1) The workload uses a credential to federate to an Identity
+175	      Provider.  This step is optional and only needed when accessing
+176	      outside resources.  The Identity Provider validates the platform-
+177	      issued credential, and in return, issues a new credential, such as
+178	      an OAuth 2.0 access token, that the workload can use to access
+179	      resources in the Identity Provider's domain.
+
+181	   *  B2) Using the credential obtained at step B1, the workload
+182	      accesses resources outside of the platform.
+
+184	   Accessing different outside resources may require the workload to
+185	   repeat steps B1) and B2), federating to multiple Identity Providers.
+186	   It is also possible that step 1) needs to be repeated, for instance
+187	   in situations where the platform-issued credential is scoped to
+188	   accessing a certain resource or federating to a specific Identity
+189	   Provider.
+
+191	2.  Conventions and Definitions
+
+193	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+194	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+195	   "OPTIONAL" in this document are to be interpreted as described in
+196	   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+197	   capitals, as shown here.
+
+199	3.  Delivery Patterns
+
+201	   Credentials can be provisioned to the workload by different
+202	   mechanisms, each of which has its own advantages, challenges, and
+203	   security risks.  The following section highlights the pros and cons
+204	   of common solutions.  Security recommendations for these methods are
+205	   covered in Section 5.1.
+
+207	3.1.  Environment Variables
+
+209	   Injecting the credentials into the environment variables allows for
+210	   simple and fast deployments.  Applications can directly access them
+211	   through system-level mechanisms, e.g., through the env command in
+212	   Linux.  Note that environment variables are static in nature in that
+213	   they cannot be changed after application initialization.
+
+215	   This delivery pattern is generally discouraged for production
+216	   workload identity credentials, because environment variables are
+217	   frequently exposed through debugging, logging, process inspection,
+218	   and observability tooling.  Security considerations for this pattern
+219	   are discussed in Section 5.1.2.
+
+221	3.2.  Filesystem
+
+223	   Filesystem delivery allows both container secret injection and access
+224	   control.  Many solutions find the main benefit in the asynchronous
+225	   provisioning of the credentials to the workload.  This allows the
+226	   workload to run independently of the credentials update, and to
+227	   access them by reading the file.
+
+229	   Credential rotation requires a solution to detect soon-to-expire
+230	   secrets as a rotation trigger.  One practice is that the new secret
+231	   is renewed _before_ the old secret is invalidated.  For example, the
+232	   solution can choose to update the secret an hour before it is
+233	   invalidated.  This gives applications time to update without
+234	   downtime.
+
+236	   Because credentials are written to a shared filesystem, the solution
+237	   is responsible for ensuring atomicity when updating them.  Writes
+238	   SHOULD be performed in a way that prevents workloads from observing a
+239	   partially written file (for example by writing to a temporary file
+240	   and renaming it atomically).  Solutions SHOULD also perform a flush
+241	   operation immediately after the update to minimize the chance of race
+242	   conditions and ensure durability.
+
+244	3.3.  Local APIs
+
+246	   In this pattern, the workload obtains credentials by communicating
+247	   with a local API exposed by the credential issuer.  Implementations
+248	   commonly use UNIX domain sockets (e.g., SPIFFE), loopback interfaces,
+249	   or link-local "magic addresses" 169.254.169.254 commonly used for
+250	   cloud provider Instance Metadata Services as the transport mechanism.
+
+252	   Local APIs support re-provisioning of updated credentials, either on
+253	   demand or through persistent connections that enable the issuer to
+254	   push new credentials.  This enables the use of short-lived, narrowly
+255	   scoped credentials, improving security posture compared to long-lived
+256	   secrets.
+
+258	   The security of this approach relies heavily on network isolation to
+259	   prevent unauthorised access to the local API.  In addition, the
+260	   pattern requires client-side code that is specific to the exposed
+261	   API, which may introduce portability challenges across platforms and
+262	   providers.  Further security considerations for local APIs are
+263	   discussed in Section 5.1.4.
+
+265	4.  Practices
+
+267	   The following practices outline more concrete examples of platforms,
+268	   including their delivery patterns.
+
+270	4.1.  Kubernetes
+
+272	   In Kubernetes, machine identity is implemented through "service
+273	   accounts" [KubernetesServiceAccount].  Service accounts can be
+274	   explicitly created, or a default one is automatically assigned.
+275	   Service accounts use JSON Web Tokens ([JWT]) as their credential
+276	   format, with the Kubernetes Control Plane acting as the signer.
+
+278	   Service accounts serve multiple authentication purposes within the
+279	   Kubernetes ecosystem.  They are used to authenticate to Kubernetes
+280	   APIs, between different workloads and to access external resources.
+281	   This latter use case is particularly relevant for the purposes of
+282	   this document.
+
+284	   To programmatically use service accounts, workloads can:
+
+286	   *  Have the token "projected" into the file system of the workload.
+287	      This is similar to volume mounting in non-Kubernetes environments,
+288	      and is commonly referred to as "projected service account token".
+
+290	   *  Use the Token Request API [TokenRequestV1] of the control plane.
+291	      This option, however, requires an initial projected service
+292	      account token as a means of authentication.
+
+294	   Both options allow workloads to:
+
+296	   *  Specify a custom audience.  Possible audiences can be restricted
+297	      based on policy.
+
+299	   *  Specify a custom lifetime.  Maximum lifetime can be restricted by
+300	      policy.
+
+302	   *  Bind the token lifetime to an object lifecycle.  This allows the
+303	      token to be invalidated when the object is deleted.  For example,
+304	      this may happen when a Kubernetes Deployment is removed from the
+305	      server.  Note that invalidation is only detected when the Token
+306	      Review API [TokenReviewV1] of Kubernetes is used to validate the
+307	      token.
+
+309	   *  Obtain multiple tokens, each with its own customized audience and
+310	      lifetime.  For example, a workload may obtain one token audienced
+311	      for the Kubernetes API server, another for an internal service,
+312	      and yet another for federation with an external Identity Provider.
+313	      Tokens SHOULD have a minimal set of audiences; see Section 5.7 for
+314	      more details and security implications.
+
+316	   To validate service account tokens, Kubernetes allows workloads to:
+
+318	   *  Make use of the Token Review API [TokenReviewV1].  This API
+319	      introspects the token, makes sure it hasn't been invalidated and
+320	      returns the claims.
+
+322	   *  Mount the public keys used to sign the tokens into the file system
+323	      of the workload.  This allows workloads to validate a token's
+324	      signature without calling the Token Review API.
+
+326	   *  Optionally, a JSON Web Key Set [JWK] is exposed via a web server.
+327	      This allows the Service Account Token to be validated outside of
+328	      the cluster and access to the actual Kubernetes Control Plane API.
+
+330	            +-------------------------------------------------+
+331	            |                                     Kubernetes  |
+332	            |                      +--------------+           |
+333	            |        A1) access    |              |           |
+334	            |      +-------------->|  API Server  |           |
+335	            |      |               |              |           |
+336	            |      |               +--------------+           |
+337	            | +----+----+                  ^ 1) request token |
+338	            | |         | 2) schedule +----+----+             |
+339	            | |   Pod   |<------------+ Kubelet |             |
+340	            | |         |             +---------+             |
+341	            | +-+-+---+-+                                     |
+342	            |   | |   |                      +--------------+ |
+343	            |   | |   |   A2) access         |              | |
+344	            |   | |   +--------------------->|   Resource   | |
+345	            |   | |                          |              | |
+346	            |   | |                          +--------------+ |
+347	            |   | |                                           |
+348	            +---+-+-------------------------------------------+
+349	                | |
+350	                | |                          +--------------+
+351	   B1) federate | | B2) access               |              |
+352	                | +------------------------->|   Resource   |
+353	                v                            |              |
+354	              +---------------------+        +--------------+
+355	              |                     |
+356	              |  Identity Provider  |
+357	              |                     |
+358	              +---------------------+
+
+360	             Figure 2: Kubernetes workload identity in practice
+
+362	   The steps shown in Figure 2 are:
+
+364	   *  1) The kubelet is tasked to schedule a Pod. Based on
+365	      configuration, it requests one or more Service Account Tokens from
+366	      the Kubernetes API server, each scoped to its intended use, for
+367	      example with a distinct audience.
+
+369	   *  2) The kubelet starts the Pod and, based on the configuration of
+370	      the Pod, delivers the token(s) to the containers within the Pod.
+
+372	   Now, the Pod can use the tokens to:
+
+374	   *  A1) Access the Kubernetes Control Plane, using a token audienced
+375	      for the API server, considering it has access to it.
+
+377	   *  A2) Access other resources within the cluster, for instance, other
+378	      Pods, using a token audienced for the target resource.
+
+380	   *  B) Access resources outside of the cluster:
+
+382	   *  B1) The application within the Pod uses a Service Account Token
+383	      audienced for the external Identity Provider to federate to that
+384	      Identity Provider outside of the Kubernetes Cluster.  This token
+385	      SHOULD NOT be the same token used for steps A1 or A2.  The
+386	      Identity Provider validates the token and issues a new credential
+387	      to the workload, such as an OAuth 2.0 access token.
+
+389	   *  B2) Using the credential issued in step C1, the application within
+390	      the Pod accesses resources outside of the cluster.
+
+392	   As an example, the following JSON illustrates the claims contained in
+393	   a Kubernetes Service Account token.
+
+395	   {
+396	     "aud": [
+397	       # matches the requested audiences, or the API server's
+398	       # default audiences when none are explicitly requested
+399	       "https://kubernetes.default.svc"
+400	     ],
+401	     "exp": 1731613413,
+402	     "iat": 1700077413,
+403	     "iss":
+404	       # matches the first value passed to the
+405	       # --service-account-issuer flag
+406	       "https://kubernetes.default.svc",
+407	     "jti":
+408	       # ServiceAccountTokenJTI feature must be enabled
+409	       # for the claim to be present
+410	       "ea28ed49-2e11-4280-9ec5-bc3d1d84661a",
+411	     "kubernetes.io": {
+412	       "namespace": "my-namespace",
+413	       "node": {
+414	         # ServiceAccountTokenPodNodeInfo feature must be enabled
+415	         # for the API server to add this node reference claim
+416	         "name": "127.0.0.1",
+417	         "uid": "58456cb0-dd00-45ed-b797-5578fdceaced"
+418	       },
+419	       "pod": {
+420	         "name": "my-workload-69cbfb9798-jv9gn",
+421	         "uid": "778a530c-b3f4-47c0-9cd5-ab018fb64f33"
+422	       },
+423	       "serviceaccount": {
+424	         "name": "my-workload",
+425	         "uid": "a087d5a0-e1dd-43ec-93ac-f13d89cd13af"
+426	       },
+427	       "warnafter": 1700081020
+428	     },
+429	     "nbf": 1700077413,
+430	     "sub": "system:serviceaccount:my-namespace:my-workload"
+431	   }
+
+433	         Figure 3: Example Kubernetes Service Account Token claims
+
+435	4.2.  Secure Production Identity Framework For Everyone (SPIFFE)
+
+437	   The Secure Production Identity Framework For Everyone, also known as
+438	   SPIFFE [SPIFFE], is a Cloud Native Computing Foundation (CNCF)
+439	   project that defines a "Workload API" to deliver machine identity to
+440	   workloads.  Workloads can retrieve identity credentials in one of two
+441	   forms:
+
+443	   *  X509-SVID, a X.509 certificate containing the workload's SPIFFE ID
+444	      in the Subject Alternative Name (SAN) URI field, along with the
+445	      corresponding key pair.
+
+447	   *  JWT-SVID, a signed JWT containing the workload's SPIFFE ID in the
+448	      sub claim.  The Workload API does not require clients to
+449	      authenticate themselves.
+
+451	   Instead, the API implementation identifies workloads by collecting
+452	   contextual information from the environment, such as process
+453	   attributes, kernel metadata, or orchestrator-provided labels.  This
+454	   out-of-band identification allows workloads to obtain their identity
+455	   credentials without needing a pre-existing secret, avoiding the
+456	   bootstrapping problem of requiring a credential to obtain a
+457	   credential.
+
+459	   Workloads may request multiple JWT-SVIDs, each with a distinct
+460	   audience, to interact with different resources or Identity Providers.
+461	   As with all patterns in this document, it is best practice to use a
+462	   separate credential for each target; see Section 5.7 for details.
+
+464	   For validation, SPIFFE defines a "trust bundle" per trust domain.  A
+465	   trust bundle is a set of public keys encoded in JWK format [JWK] that
+466	   can be used to validate credentials.  For JWT-SVIDs, the bundle
+467	   contains signing keys identified by a use value of jwt-svid.  For
+468	   X509-SVIDs, the bundle contains CA certificates identified by a use
+469	   value of x509-svid.  Trust bundle contents can be retrieved from the
+470	   Workload API or from a dedicated SPIFFE Bundle Endpoint (see
+471	   [SPIFFE]).
+
+473	   The following figure illustrates how a workload can use its SPIFFE
+474	   identity to access a protected resource outside of the trust domain.
+475	   The example uses a JWT-SVID, but using an X509-SVID is also possible.
+
+477	         +--------------------------------------------------------+
+478	         |                                    SPIFFE Trust Domain |
+479	         |                                                        |
+480	         | +--------------+  1) Get JWT-SVID    +--------------+  |
+481	         | |              +-------------------->|    SPIFFE    |  |
+482	         | |   Workload   |                     | Workload API |  |
+483	         | |              |                     +--------------+  |
+484	         | +----+-+----+--+                                       |
+485	         |      | |    |                        +--------------+  |
+486	         |      | |    |     A) access          |              |  |
+487	         |      | |    +----------------------->|   Resource   |  |
+488	         |      | |                             |              |  |
+489	         |      | |                             +--------------+  |
+490	         +------+-+-----------------------------------------------+
+491	                | |
+492	                | |                             +--------------+
+493	   B1) federate | | B2) access                  |              |
+494	                | +---------------------------->|   Resource   |
+495	                v                               |              |
+496	          +---------------------+               +--------------+
+497	          |                     |
+498	          |  Identity Provider  |
+499	          |                     |
+500	          +---------------------+
+
+502	                   Figure 4: Workload identity in SPIFFE
+
+504	   The steps shown in Figure 4 are:
+
+506	   *  1) The workload requests one or more JWT-SVIDs from the SPIFFE
+507	      Workload API, each with a distinct audience matching its intended
+508	      use.
+
+510	   *  A) A JWT-SVID audienced for the target resource can be used to
+511	      directly access resources or other workloads within the same
+512	      SPIFFE Trust Domain.
+
+514	   *  B1) To access resources protected by other Identity Providers, the
+515	      workload uses a JWT-SVID audienced for the Identity Provider to
+516	      federate.  This SHOULD be a separate JWT-SVID from the one used in
+517	      step A).  The Identity Provider validates the JWT-SVID and issues
+518	      a new credential such as an OAuth 2.0 access token, to the
+519	      workload.
+
+521	   *  B2) Using the credential issued in step B1, the workload can
+522	      access resources outside of its trust domain.
+
+524	   Here are example claims for a JWT-SVID:
+
+526	   {
+527	     "aud": [
+528	       "external-authorization-server"
+529	     ],
+530	     "exp": 1729087175,
+531	     "iat": 1729086875,
+532	     "sub": "spiffe://example.org/myservice"
+533	   }
+
+535	4.3.  Cloud Providers
+
+537	   Workload forms in cloud platforms vary.  Historically, virtual
+538	   machines were the most common.  The introduction of containerization
+539	   brought hosted container environments or Kubernetes clusters.
+540	   Containers have evolved into serverless offerings.  Regardless of the
+541	   actual workload packaging, distribution, or runtime platform, all
+542	   these workloads need identities.
+
+544	   The biggest cloud providers have established the pattern of an
+545	   "Instance Metadata Endpoint".  Aside from allowing workloads to
+546	   retrieve metadata about themselves, it also allows them to receive
+547	   identity.  The credential types offered can vary, and JWTs are
+548	   commonly found across cloud providers.  The issued credential
+549	   provides proof to anyone it is being presented to that the workload
+550	   platform has attested the workload and it can be considered
+551	   authenticated.
+
+553	   Within a cloud provider, the issued credential can often directly be
+554	   used to access resources of any kind across the platform, making
+555	   integration between the services straightforward.  From the workload
+556	   perspective, no credential needs to be issued, provisioned, rotated
+557	   or revoked, as everything is handled internally by the platform.
+
+559	   This is not true for resources outside of the platform, such as on-
+560	   premise resources, generic web servers or other cloud provider
+561	   resources.  Here, the workload first needs to federate to the Secure
+562	   Token Service (STS) of the respective cloud, which is effectively an
+563	   Identity Provider.  The STS issues a new credential with which the
+564	   workload can then access resources.
+
+566	   This pattern also applies when accessing resources in the same cloud
+567	   but across different security boundaries (e.g., different account or
+568	   tenant).  The actual flows and implementations may vary in these
+569	   situations though.
+
+571	   When a workload needs to access both internal platform resources and
+572	   external resources, it SHOULD obtain separate credentials for each
+573	   purpose.  The credential used for internal platform access (step A)
+574	   SHOULD NOT be reused for federation to an external STS (step B1), as
+575	   these represent different trust and audience boundaries.  The
+576	   workload may need to contact the Instance Metadata Service multiple
+577	   times to obtain appropriately scoped credentials.
+
+579	       +-------------------------------------------------------------+
+580	       |                                                       Cloud |
+581	       |                                                             |
+582	       |                                      +-------------------+  |
+583	       |  +--------------+ 1) get credentials |                   |  |
+584	       |  |              +------------------->| Instance Metadata |  |
+585	       |  |   Workload   |                    |  Service/Endpoint |  |
+586	       |  |              |                    |                   |  |
+587	       |  +-----+-+----+-+                    +-------------------+  |
+588	       |        | |    |                                             |
+589	       |        | |    |                           +--------------+  |
+590	       |        | |    |     A) access             |              |  |
+591	       |        | |    +-------------------------->|   Resource   |  |
+592	       |        | |                                |              |  |
+593	       |        | |                                +--------------+  |
+594	       +--------+-+--------------------------------------------------+
+595	                | |
+596	   B1) federate | | B2) access
+597	                | |
+598	       +--------+-+--------------------------------------------------+
+599	       |        | |                      External (e.g. other cloud) |
+600	       |        | |                                                  |
+601	       |        | |                                +--------------+  |
+602	       |        | |                                |              |  |
+603	       |        | +------------------------------->|   Resource   |  |
+604	       |        v                                  |              |  |
+605	       |  +-----------------------------+          +--------------+  |
+606	       |  |                             |                            |
+607	       |  |  Secure Token Service (STS) |                            |
+608	       |  |                             |                            |
+609	       |  +-----------------------------+                            |
+610	       +-------------------------------------------------------------+
+
+612	              Figure 5: Workload identity in a cloud provider
+
+614	   The steps shown in Figure 5 are:
+
+616	   *  1) The workload retrieves one or more identity credentials from
+617	      the Instance Metadata Service or Endpoint.  This endpoint exposes
+618	      an API and is available at a well-known, but local-only location
+619	      such as 169.254.169.254.  Each credential SHOULD be scoped to its
+620	      intended use with a distinct audience.
+
+622	   When the workload needs to access a resource within the cloud (e.g.,
+623	   located in the same security boundary; protected by the same issuer
+624	   as the workload identity):
+
+626	   *  A) The workload directly accesses the protected resource with a
+627	      credential scoped for that resource, as issued in Step 1.
+
+629	   When the workload needs to access a resource outside of the cloud
+630	   (e.g., different cloud; same cloud, but different security boundary):
+
+632	   *  B1) The workload uses a separate cloud-issued credential,
+633	      audienced for the external STS, to federate to the Secure Token
+634	      Service of the other cloud/account.  This credential SHOULD NOT be
+635	      the same as the one used in step A).  The STS validates the
+636	      credential and issues a new credential, such as an access token to
+637	      the workload.
+
+639	   *  B2) Using the credential issued in step B1, the workload can
+640	      access the resource outside, assuming the credential has the
+641	      necessary permissions.
+
+643	   It is important to distinguish the credential obtained from the
+644	   Instance Metadata Service from a workload identity document commonly
+645	   used in attestation systems.  A workload identity document typically
+646	   represents attestation evidence that is evaluated by a relying party
+647	   or attestation service.  In contrast, some credentials issued by the
+648	   metadata service are already the result of such attestation and are
+649	   intended to be directly consumed by relying services for
+650	   authentication and authorization decisions.
+
+652	   In many cloud environments, the credential retrieved from the
+653	   metadata service is a bearer token.  Possession of such a token is
+654	   sufficient to use it, which introduces risks around token handling
+655	   and exposure.  Some providers mitigate this by constraining token
+656	   scope, lifetime, or audience, or by requiring additional proof-of-
+657	   possession mechanisms.  These mechanisms reduce the risk of token
+658	   replay or misuse if the token is exfiltrated.
+
+660	   Care must be taken to avoid using the same bearer credential across
+661	   different trust domains without appropriate controls.  While direct
+662	   use of the issued credential within the same cloud security boundary
+663	   is common, reusing that credential outside of its intended scope can
+664	   increase the risk of credential leakage.  The federation step via the
+665	   Secure Token Service (Step B1) serves as a boundary, allowing the
+666	   original credential to be exchanged for a new credential that is
+667	   scoped, audience-restricted, and appropriate for the target resource.
+
+669	4.4.  Continuous Integration and Deployment Systems
+
+671	   Continuous integration and deployment (CI-CD) systems allow their
+672	   pipelines (or workflows) to receive an identity at runtime.  It is a
+673	   common task to upload build outputs and other artifacts to external
+674	   resources.  For this, federation to external Identity Providers is
+675	   often necessary.
+
+677	   As with other platforms, CI-CD workloads may obtain multiple tokens
+678	   from the platform, each with a distinct audience for the specific
+679	   resource or Identity Provider it needs to interact with.
+
+681	       +-------------------------------------------------+
+682	       |    Continuous Integration / Deployment Platform |
+683	       |                                                 |
+684	       | +-----------------+             +------------+  |
+685	       | |                 | 1) schedule |            |  |
+686	       | |  Pipeline/Task  |<------------+  Platform  |  |
+687	       | |   (Workload)    |             |            |  |
+688	       | |                 |             +------------+  |
+689	       | +-----+-+---------+                             |
+690	       +--------+-+--------------------------------------+
+691	                | |
+692	                | |                    +--------------+
+693	   B1) federate | | B2) access         |              |
+694	                | +------------------->|   Resource   |
+695	                v                      |              |
+696	         +-------------------+         +--------------+
+697	         |                   |
+698	         | Identity Provider |
+699	         |                   |
+700	         +-------------------+
+
+702	        Figure 6: OAuth2 Assertion Flow in a continuous integration/
+703	                           deployment environment
+
+705	   The steps shown in Figure 6 are:
+
+707	   *  1) The CI-CD platform schedules a workload (pipeline or task).
+708	      Based on configuration, a Workload Identity is made available by
+709	      the platform.
+
+711	   *  B1) The workload uses the platform-issued credential to federate
+712	      to an Identity Provider, which validates the credential and issues
+713	      a new credential, such as an access token, for the workload.
+
+715	   *  B2) The workload uses the issued credential to access resources.
+716	      For instance, an artifact store to upload compiled binaries, or to
+717	      download libraries needed to resolve dependencies.  It is also
+718	      common to access actual infrastructure as resources to make
+719	      deployments or changes to it.
+
+721	   While token structure is vendor-specific, all tokens contain claims
+722	   carrying the basic context of the executed tasks, such as source code
+723	   management data such as git branch, initiation context and more.
+
+725	4.5.  Service Meshes
+
+727	   Service meshes provide infrastructure-level workload identity and
+728	   secure communication for applications through sidecar proxies
+729	   deployed alongside each workload.  In a service mesh, workload
+730	   identity is typically implemented using X.509 certificates issued by
+731	   the service mesh.  Service meshes handle identity credential
+732	   provisioning to sidecar proxies rather than directly to application
+733	   workloads.  The sidecar intercepts network traffic and handles
+734	   authentication transparently to the application code.
+
+736	                          +--------------+
+737	                          |              |
+738	                  +-------+ Service Mesh +--------+
+739	   1) issue       |       |              |        | 1) issue
+740	      identity    |       +--------------+        |    identity
+741	      and         |                               |    and
+742	      credentials |                               |    credentials
+743	                  v       3) communicate          v
+744	            +-----------+    on behalf of   +-----------+
+745	            |           |    workloads      |           |
+746	            |   Proxy   |<=================>|   Proxy   |
+747	            |           |                   |           |
+748	            +-----------+                   +-----------+
+749	                  ^                               ^
+750	                  | 2) delegate                   | 2) delegate
+751	                  |                               |
+752	            +-----+-----+                   +-----+-----+
+753	            |           |                   |           |
+754	            | Workload  |                   | Workload  |
+755	            |           |                   |           |
+756	            +-----------+                   +-----------+
+
+758	      Figure 7: Simple service mesh communication between 2 workloads
+
+760	   The steps shown in Figure 7 are:
+
+762	   *  1) The Service Mesh issues identity credentials to proxies.  For
+763	      X.509-based meshes, this consists of an X.509 certificate
+764	      containing the workload's identity along with the associated key
+765	      pair.
+
+767	   *  2) The proxies act on behalf of workloads that delegate their
+768	      communication to them.  In above figure each workload has its own
+769	      proxy that solely represents it and no other workload.
+
+771	   *  3) The proxies communicate with each other on behalf of the
+772	      workloads they represent.  This communication includes
+773	      authentication aspects, for instance mutual TLS using X.509
+774	      certificates.
+
+776	   In above pattern each workload has a specific sidecar.  An
+777	   alternative deployment is to share proxies between workloads.  This
+778	   often results in a single proxy on each node acting on behalf of all
+779	   workloads on the node.
+
+781	5.  Security Considerations
+
+783	   All security considerations in section 8 of [OAUTH-ASSERTION] apply.
+
+785	5.1.  Credential Delivery
+
+787	5.1.1.  General Credentials Requirements
+
+789	   Credentials SHOULD be scoped as narrowly as possible: each SHOULD
+790	   carry the smallest set of audiences that lets it serve its purpose.
+791	   A credential for direct access to a platform resource SHOULD be
+792	   scoped to that resource; a credential used to federate to an Identity
+793	   Provider SHOULD carry that Identity Provider as its sole audience.
+794	   See Section 5.7 for the rationale and for specific requirements on
+795	   the aud claim of JWT-based credentials.
+
+797	   As long as the workload platform supports issuance of multiple
+798	   credentials, a workload SHOULD obtain a distinct credential for each
+799	   resource or Identity Provider it interacts with.  In particular, the
+800	   credential used to federate to an Identity Provider SHOULD NOT be
+801	   used for direct platform access; reusing a credential across these
+802	   contexts conflates trust boundaries and increases the impact of a
+803	   compromise (see Section 5.7).
+
+805	5.1.2.  Environment Variables
+
+807	   Leveraging environment variables to provide credentials presents many
+808	   security limitations.  Environment variables have a wide set of use
+809	   cases and are observed by many components.  They are often captured
+810	   for monitoring, observability, debugging and logging purposes and
+811	   sent to components outside of the workload.  Access control is not
+812	   trivial and does not achieve the same security results as other
+813	   methods.  Additionally, environment variables may be spoofed or
+814	   altered by other processes running on the same host, making them an
+815	   unreliable transport for credentials in environments where process
+816	   isolation is not strictly enforced.
+
+818	   This approach should be limited to non-production cases where
+819	   convenience outweighs security considerations, and the provided
+820	   secrets are limited in validity or utility.  For example, an initial
+821	   secret might be used during the setup of the application.
+
+823	5.1.3.  Filesystem
+
+825	   *  1) Access control to the mounted file should be configured to
+826	      limit reads to authorized applications.  Linux supports solutions
+827	      such as DAC (uid and gid) or MAC (e.g., SELinux, AppArmor).
+
+829	   *  2) Mounted shared memory should be isolated from other host OS
+830	      paths and processes.  For example, on Linux this can be achieved
+831	      by using namespaces.
+
+833	5.1.4.  Local APIs
+
+835	   Local APIs often operate in clear-text such as unencrypted HTTP
+836	   without any confidentiality or integrity protection.  Privileged
+837	   component on the machine or in the infrastructure can be able to
+838	   eavesdrop on the connection and the credential within it.
+
+840	   Mitigating measures are required to mitigate a particular variant of
+841	   Server-Side Request Forgery attacks against local APIs.  For example,
+842	   requiring a specific header that cannot be controlled externally or
+843	   preventing the use of link-local IPs, including through redirects.
+844	   See Section 5.1.5 for details.
+
+846	   Adequate assurance that the identity represents the workload is
+847	   required to make sure unauthorized access is denied and credentials
+848	   are not issued to other parties when the Local API is
+849	   unauthenticated.  What constitutes adequate assurance depends on the
+850	   security requirements of the deployment.  Introspection of the
+851	   platform, like in SPIFFE or cloud providers, can be used to identify
+852	   workloads and grant access.  The more fine-grained and strict this
+853	   verification, the smaller the attack surface.  For instance, allowing
+854	   access by IP or other machine-global identifiers permits any process
+855	   to receive the identity, while including user ID or other process-
+856	   scoped identifiers prevents this broader access.
+
+858	   The potential for denial-of-service attacks against Local APIs need
+859	   to be taken into account and protective measures should be
+860	   implemented.  Depending on the platform these attacks can affect
+861	   other workloads and their ability to receive a platform credential.
+
+863	5.1.5.  Application Interaction with Credential Sources
+
+865	   Implementations MUST assume that application vulnerabilities can
+866	   expose workload credentials even when platform isolation is correctly
+867	   configured.  Attackers commonly exploit the workload itself to
+868	   retrieve credentials rather than accessing the credential service
+869	   directly.
+
+871	   For example, untrusted input may be used to manipulate file paths
+872	   when credentials are mounted on a filesystem, or to trigger requests
+873	   to local credential endpoints such as metadata or workload APIs (for
+874	   example via server-side request forgery).  Similarly, command
+875	   execution or unintended outbound requests may result in bearer tokens
+876	   or proof-of-possession key material being disclosed.
+
+878	   Workloads therefore MUST treat credential locations as sensitive
+879	   security boundaries.  Untrusted input MUST NOT influence how
+880	   credential files are accessed or how local credential APIs are
+881	   contacted.  Implementations SHOULD minimise which components can
+882	   access credentials and prefer proof-of-possession credentials over
+883	   bearer tokens where supported.  Failure to minimise credential access
+884	   increases the attack surface by allowing more code paths to interact
+885	   with sensitive material.  Failing to use proof-of-possession
+886	   credentials where available means that stolen bearer tokens can be
+887	   replayed by an attacker from any location.
+
+889	   These risks exist even when credential services are reachable only
+890	   locally, since compromise often occurs through application behaviour
+891	   rather than network access to the credential provider.
+
+893	5.2.  Token typing
+
+895	   Issuers SHOULD strongly type the issued tokens to workloads via the
+896	   JOSE typ header and Identity Providers accepting these tokens SHOULD
+897	   validate the value of it according to policy.  See Section 3.1 of
+898	   [JWT-BCP] for details on explicit typing.  Without explicit typing, a
+899	   token intended for one purpose (e.g., a refresh token or an identity
+900	   assertion) may be accepted in a context where a different token type
+901	   is expected, enabling cross-protocol or cross-context token confusion
+902	   attacks.
+
+904	   Issuers SHOULD use authorization-grant+jwt as a typ value according
+905	   to [OAUTH-JWT].  For broad support, JWT or JOSE MAY be used by
+906	   issuers and accepted by authorization servers but it is important to
+907	   highlight that a wide range of tokens, meant for all sorts of
+908	   purposes, use these values and would be accepted.  Using generic type
+909	   values such as JWT or JOSE is acceptable only when the deployment
+910	   cannot support more specific types, for instance due to limitations
+911	   in existing infrastructure or token libraries.  Even in such cases,
+912	   additional validation of token claims and context is essential to
+913	   mitigate confusion.
+
+915	5.3.  Custom claims are important for context
+
+917	   Some platform-issued credentials have custom claims that are vital
+918	   for context and are required to be validated.  For example, in a
+919	   continuous integration and deployment platform where a workload is
+920	   scheduled for a Git repository, the branch is crucial.  A "main"
+921	   branch may be protected and considered trusted to federate to
+922	   external authorization servers.  But other branches may not be
+923	   allowed to access protected resources.
+
+925	   Authorization servers that validate assertions SHOULD make use of
+926	   these claims.  Ignoring custom claims may result in overly permissive
+927	   authorization decisions, such as granting a credential issued for an
+928	   untrusted branch the same access as one issued for a protected
+929	   branch.  Platform issuers SHOULD allow differentiation based on the
+930	   subject claim alone, so that authorization policies can be expressed
+931	   without requiring deep knowledge of vendor-specific claim structures.
+
+933	5.4.  Token lifetime
+
+935	   Tokens SHOULD NOT exceed the lifetime of the workloads they
+936	   represent.  For example, a workload that has an expected lifetime of
+937	   one hour should not receive a token valid for two hours or more.  A
+938	   token that outlives its workload may continue to be accepted by
+939	   relying parties even after the workload (and its associated
+940	   authorization context) has ceased to exist, enabling unauthorized
+941	   access if the token is compromised.
+
+943	   Within the scope of this document, where a platform-issued credential
+944	   is used to authenticate to retrieve an access token for an external
+945	   authorization domain, short-lived credentials are recommended.
+946	   Short-lived credentials reduce the window during which a stolen
+947	   credential can be exploited and limit the need for explicit
+948	   revocation infrastructure.
+
+950	5.5.  Workload lifecycle and invalidation
+
+952	   Platform issuers SHOULD invalidate tokens when the workload stops,
+953	   pauses, or ceases to exist and SHOULD offer validators a mechanism to
+954	   query this status.  Without invalidation, tokens for terminated
+955	   workloads remain usable until their natural expiry, creating a window
+956	   for unauthorized use.  Without a status query mechanism, relying
+957	   parties have no way to detect that a workload has been removed and
+958	   must accept the token as is.  How these credentials are invalidated
+959	   and the status is queried varies and is not in scope of this
+960	   document.
+
+962	5.6.  Proof of possession
+
+964	   Identity credentials SHOULD be bound to workloads, and proof of
+965	   possession SHOULD be performed when these credentials are used.  This
+966	   mitigates token theft.  Without proof of possession, a bearer token
+967	   intercepted in transit (e.g., via a compromised log, a man-in-the-
+968	   middle, or SSRF) can be replayed by any party, from any location, for
+969	   the remaining lifetime of the token.  For X.509-based credentials,
+970	   proof of possession is inherent through the private key associated
+971	   with the certificate.  For JWT-based credentials, the JWT SHOULD be
+972	   key-bound with an adequate proof-of-key-possession mechanism.  Where
+973	   proof of possession is not supported by the platform or the relying
+974	   party, deployments SHOULD compensate with shorter token lifetimes,
+975	   stricter audience scoping, and additional network-level controls such
+976	   as IP allowlisting or mutual TLS.  This proof of possession applies
+977	   to both the platform credential and the access token of the external
+978	   authorization domains.
+
+980	5.7.  Audience
+
+982	   For issued credentials in the form of JWTs, they MUST be audienced
+983	   using the aud claim.  Each JWT SHOULD only carry a single audience.
+984	   Using multiple audiences in a single token means that any relying
+985	   party listed in the aud claim can present that token to any other
+986	   party listed in the same claim, potentially gaining unintended
+987	   access.  A single-audience token limits the blast radius if the token
+988	   is compromised or misused.  We RECOMMEND using URIs to specify
+989	   audiences.  See Section 3 of [OAUTH-RESOURCEINDICATORS] for more
+990	   details and security implications.
+
+992	   Some workload platforms provide credentials for interacting with
+993	   their own APIs (e.g., Kubernetes).  These credentials MUST NOT be
+994	   used beyond the platform API.  In the example of Kubernetes, a token
+995	   used for anything other than the Kubernetes API itself MUST NOT carry
+996	   the Kubernetes server in the aud claim.  Reusing a platform API token
+997	   for federation or resource access outside the platform conflates
+998	   trust boundaries: the token's audience includes the platform, so any
+999	   relying party that accepts it could impersonate the workload back to
+1000	   the platform.
+
+1002	5.8.  Multi-Tenancy Considerations
+
+1004	   In multi-tenant platforms, relying parties MUST carefully evaluate
+1005	   which attributes are considered trustworthy when making authorization
+1006	   decisions.  Access or federation MUST NOT be granted based solely on
+1007	   untrusted or easily forgeable attributes.  In particular, the issuer
+1008	   claim in such environments may not uniquely identify a trusted
+1009	   authority, since each tenant could be configured with the same issuer
+1010	   identifier.
+
+1012	   Relying parties SHOULD ensure that attributes used for authorization
+1013	   are bound to a trust domain under their control or validated by an
+1014	   entity with a clearly defined trust boundary.  Failing to do so may
+1015	   allow a malicious tenant to obtain credentials that are
+1016	   indistinguishable from those of a legitimate tenant, leading to
+1017	   cross-tenant privilege escalation or unauthorized access to shared
+1018	   resources.
+
+1020	6.  IANA Considerations
+
+1022	   This document does not require actions by IANA.
+
+1024	7.  Acknowledgements
+
+1026	   The authors and contributors would like to thank the following people
+1027	   for their feedback and contributions to this document (in no
+1028	   particular order): Dag Sneeggen, Ned Smith, Dean H.  Saxe, Yaron
+1029	   Sheffer, Andrii Deinega, Marcel Levy, Justin Richer, Pieter
+1030	   Kasselmann, Simon Canning, Evan Gilman, Joseph Salowey, Kathleen
+1031	   Moriarty and Flemming Andreasen.
+
+1033	8.  References
+
+1035	8.1.  Normative References
+
+1037	   [JWK]      Jones, M., "JSON Web Key (JWK)", RFC 7517,
+1038	              DOI 10.17487/RFC7517, May 2015,
+1039	              <https://www.rfc-editor.org/rfc/rfc7517>.
+
+1041	   [JWT]      Jones, M., Bradley, J., and N. Sakimura, "JSON Web Token
+1042	              (JWT)", RFC 7519, DOI 10.17487/RFC7519, May 2015,
+1043	              <https://www.rfc-editor.org/rfc/rfc7519>.
+
+1045	   [JWT-BCP]  Sheffer, Y., Hardt, D., and M. Jones, "JSON Web Token Best
+1046	              Current Practices", BCP 225, RFC 8725,
+1047	              DOI 10.17487/RFC8725, February 2020,
+1048	              <https://www.rfc-editor.org/rfc/rfc8725>.
+
+1050	   [OAUTH-ASSERTION]
+1051	              Campbell, B., Mortimore, C., Jones, M., and Y. Goland,
+1052	              "Assertion Framework for OAuth 2.0 Client Authentication
+1053	              and Authorization Grants", RFC 7521, DOI 10.17487/RFC7521,
+1054	              May 2015, <https://www.rfc-editor.org/rfc/rfc7521>.
+
+1056	   [OAUTH-FRAMEWORK]
+1057	              Hardt, D., Ed., "The OAuth 2.0 Authorization Framework",
+1058	              RFC 6749, DOI 10.17487/RFC6749, October 2012,
+1059	              <https://www.rfc-editor.org/rfc/rfc6749>.
+
+1061	   [OAUTH-JWT]
+1062	              Jones, M. B., Campbell, B., Mortimore, C., and F. Skokan,
+1063	              "Updates to OAuth 2.0 JSON Web Token (JWT) Client
+1064	              Authentication and Assertion-Based Authorization Grants",
+1065	              Work in Progress, Internet-Draft, draft-ietf-oauth-
+1066	              rfc7523bis-11, 28 April 2026,
+1067	              <https://datatracker.ietf.org/doc/html/draft-ietf-oauth-
+1068	              rfc7523bis-11>.
+
+1070	   [OAUTH-RESOURCEINDICATORS]
+1071	              Campbell, B., Bradley, J., and H. Tschofenig, "Resource
+1072	              Indicators for OAuth 2.0", RFC 8707, DOI 10.17487/RFC8707,
+1073	              February 2020, <https://www.rfc-editor.org/rfc/rfc8707>.
+
+1075	   [OAUTH-TOKENEXCHANGE]
+1076	              Jones, M., Nadalin, A., Campbell, B., Ed., Bradley, J.,
+1077	              and C. Mortimore, "OAuth 2.0 Token Exchange", RFC 8693,
+1078	              DOI 10.17487/RFC8693, January 2020,
+1079	              <https://www.rfc-editor.org/rfc/rfc8693>.
+
+1081	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+1082	              Requirement Levels", BCP 14, RFC 2119,
+1083	              DOI 10.17487/RFC2119, March 1997,
+1084	              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+1086	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+1087	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+1088	              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+1090	8.2.  Informative References
+
+1092	   [KubernetesServiceAccount]
+1093	              "Kubernetes Service Account", May 2024,
+1094	              <https://kubernetes.io/docs/concepts/security/service-
+1095	              accounts/>.
+
+1097	   [SPIFFE]   "Secure Production Identity Framework for Everyone
+1098	              (SPIFFE)", May 2023,
+1099	              <https://github.com/spiffe/spiffe/blob/main/standards/
+1100	              SPIFFE.md>.
+
+1102	   [TokenRequestV1]
+1103	              "Kubernetes Token Request API V1", August 2024,
+1104	              <https://kubernetes.io/docs/reference/kubernetes-api/
+1105	              authentication-resources/token-request-v1/>.
+
+1107	   [TokenReviewV1]
+1108	              "Kubernetes Token Review API V1", August 2024,
+1109	              <https://kubernetes.io/docs/reference/kubernetes-api/
+1110	              authentication-resources/token-review-v1/>.
+
+1112	Appendix A.  Variations
+
+1114	A.1.  Direct access to protected resources
+
+1116	   Resource servers that protect resources may choose to trust multiple
+1117	   authorization servers, including the one that issues the platform
+1118	   identities.  Instead of using the platform-issued identity to receive
+1119	   an access token of a different authorization domain, workloads can
+1120	   directly use the platform-issued identity to access a protected
+1121	   resource.
+
+1123	   In this case, technically, the protected resource and workload are
+1124	   part of the same authorization domain.
+
+1126	A.2.  Custom assertion flows
+
+1128	   While [OAUTH-ASSERTION] and [OAUTH-JWT] are the proposed standards
+1129	   for this pattern, some authorization servers use
+1130	   [OAUTH-TOKENEXCHANGE] or a custom API for the issuance of an access
+1131	   token based on existing platform identity credentials.  These
+1132	   patterns are not recommended and prevent interoperability.
+
+1134	Appendix B.  Document History
+
+1136	   [[ To be removed from the final specification ]]
+
+1138	   -04
+1139	   *  Address review feedback from Kathleen Moriarty and Joe Salowey
+
+1141	   *  Expand introduction: explain the workload identity bootstrapping
+1142	      problem and the limitations of static credentials
+
+1144	   *  Expand SPIFFE section: trust bundles, JWT-SVID vs X509-SVID types,
+1145	      and Workload API identification
+
+1147	   *  Explicitly discuss obtaining multiple tokens with distinct
+1148	      audiences across all platform patterns
+
+1150	   *  Add "Application Interaction with Credential Sources" section
+1151	      covering SSRF and path traversal risks
+
+1153	   *  Update reference formatting
+
+1155	   *  Editorial improvements and updated acknowledgements
+
+1157	   -03
+
+1159	   *  Add service-mesh section
+
+1161	   *  Add multi-tenancy considerations
+
+1163	   *  Add atomicity and flushing requirements to filesystem section
+
+1165	   *  Make it clear that invalidation is a matter of querying the status
+
+1167	   *  Rework local api section & security considerations
+
+1169	   *  Refer to RFC7517 in SPIFFE and add clarity on key distribution
+
+1171	   *  Editorial changes
+
+1173	   -02
+
+1175	   *  Updated structure, bringing concrete examples back into the main
+1176	      text.
+
+1178	   *  Use more generic "federation" term instead of RFC 7523 specifics.
+
+1180	   *  Overall editorial improvements.
+
+1182	   *  Fix reference of Kubernetes Token Request API
+
+1184	   *  Prefer the term "document" over "specification".
+
+1186	   *  Update contributor and acknowledgements sections.
+
+1188	   *  Remove section about OIDC as it is too specific to a certain
+1189	      implementation.
+
+1191	   *  Rewrite abstract to better reflect the current content of the
+1192	      document.
+
+1194	   -01
+
+1196	   *  Add credential delivery mechanisms
+
+1198	   *  Highlight relationship to other WIMSE work
+
+1200	   *  Add details about token typing and relation to OpenID Connect
+
+1202	   *  Add security considerations for audience
+
+1204	   -00
+
+1206	   *  Rename draft with no content changes.
+
+1208	   *  Set Arndt to Editor role.
+
+1210	   *[as draft-wimse-workload-identity-bcp]*
+
+1212	   -02
+
+1214	   *  Move scope from Kubernetes to generic workload identity platform
+
+1216	   *  Add various patterns to appendix
+
+1218	      -  Kubernetes
+
+1220	      -  Cloud providers
+
+1222	      -  SPIFFE
+
+1224	      -  CI/CD
+
+1226	   *  Add some security considerations
+
+1228	   *  Update title
+
+1230	   -01
+
+1232	   *  Editorial updates
+
+1234	   -00
+1235	   *  Adopted by the WIMSE WG
+
+1237	Contributors
+
+1239	   Benedikt Hofmann
+1240	   Siemens
+1241	   Email: hofmann.benedikt@siemens.com
+
+1243	   Hannes Tschofenig
+1244	   Siemens
+1245	   Email: hannes.tschofenig@gmx.net
+
+1247	   Edoardo Giordano
+1248	   Nokia
+1249	   Email: edoardo.giordano@nokia.com
+
+1251	Authors' Addresses
+
+1253	   Arndt Schwenkschuster
+1254	   SPIRL
+1255	   Email: arndts.ietf@gmail.com
+
+1257	   Yaroslav Rosomakho
+1258	   Zscaler
+1259	   Email: yrosomakho@zscaler.com
+
+
+
+
+
+
+
+
+
