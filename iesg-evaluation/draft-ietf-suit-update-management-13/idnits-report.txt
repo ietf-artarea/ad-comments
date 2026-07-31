@@ -1,0 +1,1285 @@
+idnits 2.17.1 
+
+draft-ietf-suit-update-management-13.txt:
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+  == There is 1 instance of lines with non-ascii characters in the document.
+
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     Summary: 0 errors (**), 0 flaws (~~), 1 warning (==), 0 comments (--).
+
+--------------------------------------------------------------------------------
+
+
+2	SUIT                                                            B. Moran
+3	Internet-Draft                                               Arm Limited
+4	Intended status: Standards Track                             K. Takayama
+5	Expires: 4 January 2027                                  SECOM CO., LTD.
+6	                                                             3 July 2026
+
+8	Update Management Extensions for Software Updates for Internet of Things
+9	                            (SUIT) Manifests
+10	                  draft-ietf-suit-update-management-13
+
+12	Abstract
+
+14	   This specification describes extensions to the SUIT manifest format.
+15	   These extensions allow an update author, update distributor or device
+16	   operator to more precisely control the distribution and installation
+17	   of updates to devices.  These extensions also provide a mechanism to
+18	   inform a management system of Software Identifier and Software Bill
+19	   Of Materials information about an updated device.
+
+21	Status of This Memo
+
+23	   This Internet-Draft is submitted in full conformance with the
+24	   provisions of BCP 78 and BCP 79.
+
+26	   Internet-Drafts are working documents of the Internet Engineering
+27	   Task Force (IETF).  Note that other groups may also distribute
+28	   working documents as Internet-Drafts.  The list of current Internet-
+29	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+31	   Internet-Drafts are draft documents valid for a maximum of six months
+32	   and may be updated, replaced, or obsoleted by other documents at any
+33	   time.  It is inappropriate to use Internet-Drafts as reference
+34	   material or to cite them other than as "work in progress."
+
+36	   This Internet-Draft will expire on 4 January 2027.
+
+38	Copyright Notice
+
+40	   Copyright (c) 2026 IETF Trust and the persons identified as the
+41	   document authors.  All rights reserved.
+
+43	   This document is subject to BCP 78 and the IETF Trust's Legal
+44	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+45	   license-info) in effect on the date of publication of this document.
+46	   Please review these documents carefully, as they describe your rights
+47	   and restrictions with respect to this document.  Code Components
+48	   extracted from this document must include Revised BSD License text as
+49	   described in Section 4.e of the Trust Legal Provisions and are
+50	   provided without warranty as described in the Revised BSD License.
+
+52	Table of Contents
+
+54	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
+55	   2.  Conventions and Terminology . . . . . . . . . . . . . . . . .   3
+56	   3.  Extension Metadata  . . . . . . . . . . . . . . . . . . . . .   4
+57	     3.1.  suit-set-version  . . . . . . . . . . . . . . . . . . . .   4
+58	     3.2.  suit-coswid . . . . . . . . . . . . . . . . . . . . . . .   4
+59	     3.3.  suit-text-version-required  . . . . . . . . . . . . . . .   5
+60	     3.4.  suit-text-current-version . . . . . . . . . . . . . . . .   6
+61	   4.  Extension Parameters  . . . . . . . . . . . . . . . . . . . .   7
+62	     4.1.  suit-parameter-use-before . . . . . . . . . . . . . . . .   7
+63	     4.2.  suit-parameter-minimum-battery  . . . . . . . . . . . . .   7
+64	     4.3.  suit-parameter-update-priority  . . . . . . . . . . . . .   8
+65	     4.4.  suit-parameter-version  . . . . . . . . . . . . . . . . .   8
+66	       4.4.1.  suit-parameter-version Semantic Versioning encoding
+67	               guidelines  . . . . . . . . . . . . . . . . . . . . .   9
+68	     4.5.  suit-parameter-wait-info  . . . . . . . . . . . . . . . .  10
+69	     4.6.  suit-parameter-component-metadata . . . . . . . . . . . .  12
+70	       4.6.1.  Creator . . . . . . . . . . . . . . . . . . . . . . .  13
+71	       4.6.2.  Creation & Modification Time  . . . . . . . . . . . .  13
+72	       4.6.3.  Component Default Permissions . . . . . . . . . . . .  13
+73	       4.6.4.  User, Role, Group permissions . . . . . . . . . . . .  14
+74	       4.6.5.  File Type . . . . . . . . . . . . . . . . . . . . . .  14
+75	   5.  Extension Commands  . . . . . . . . . . . . . . . . . . . . .  16
+76	     5.1.  suit-condition-use-before . . . . . . . . . . . . . . . .  17
+77	     5.2.  suit-condition-image-not-match  . . . . . . . . . . . . .  18
+78	     5.3.  suit-condition-minimum-battery  . . . . . . . . . . . . .  18
+79	     5.4.  suit-condition-update-authorized  . . . . . . . . . . . .  18
+80	     5.5.  suit-condition-version  . . . . . . . . . . . . . . . . .  18
+81	     5.6.  suit-directive-wait . . . . . . . . . . . . . . . . . . .  18
+82	     5.7.  suit-directive-override-multiple  . . . . . . . . . . . .  19
+83	     5.8.  suit-directive-copy-params  . . . . . . . . . . . . . . .  20
+84	   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  20
+85	     6.1.  SUIT Envelope Elements  . . . . . . . . . . . . . . . . .  20
+86	     6.2.  SUIT Manifest Elements  . . . . . . . . . . . . . . . . .  20
+87	     6.3.  SUIT Commands . . . . . . . . . . . . . . . . . . . . . .  21
+88	     6.4.  SUIT Parameters . . . . . . . . . . . . . . . . . . . . .  21
+89	     6.5.  SUIT Component Text Values  . . . . . . . . . . . . . . .  22
+90	   7.  Security Considerations . . . . . . . . . . . . . . . . . . .  22
+91	   8.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  22
+92	     8.1.  Normative References  . . . . . . . . . . . . . . . . . .  23
+93	     8.2.  Informative References  . . . . . . . . . . . . . . . . .  23
+94	   Appendix A.  Full CDDL  . . . . . . . . . . . . . . . . . . . . .  24
+95	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  28
+
+97	1.  Introduction
+
+99	   Full management of software updates for unattended, connected devices
+100	   requires a cooperation between the update author(s) and management,
+101	   distribution, policy enforcement, and auditing systems.  This
+102	   specification provides the extensions to the SUIT manifest
+103	   [I-D.ietf-suit-manifest] that enable an author to coordinate with
+104	   these other systems.  These extensions enable authors to instruct
+105	   devices to examine update priority, local update authorisation,
+106	   update lifetime, and system properties.  They also enable devices to
+107	   report and distributors to collect Software Bill of Materials (SBOM)
+108	   information.
+
+110	   Extensions in this specification are OPTIONAL to implement and
+111	   OPTIONAL to include in manifests.  A Recipient that encounters a
+112	   command or parameter it does not implement MUST reject the manifest
+113	   as defined in [I-D.ietf-suit-manifest] Section 8.4.2, ensuring that
+114	   update behaviour is never ambiguous.  Conversely, when a deployment
+115	   relies on update-management behaviour defined here, the manifest
+116	   author MUST ensure that targeted recipients advertise support for the
+117	   required extensions (for example via enablement policy or capability
+118	   negotiation) before shipping such manifests so that required commands
+119	   will be honoured rather than rejected.
+
+121	2.  Conventions and Terminology
+
+123	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+124	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+125	   "OPTIONAL" in this document are to be interpreted as described in
+126	   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+127	   capitals, as shown here.
+
+129	   This draft makes use of terminology defined in [RFC9019] and
+130	   [I-D.ietf-suit-manifest].
+
+132	   This document uses semantic versioning terminology from [semver],
+133	   including major, minor, patch, pre-release, and build metadata.  The
+134	   machine-readable version encoding defined in Section 4.4 is a
+135	   constrained integer encoding based on that terminology: it encodes
+136	   release versions as one to three non-negative integers, supports only
+137	   the pre-release classes defined in Section 4.4, and excludes build
+138	   metadata from machine-readable comparisons.
+
+140	3.  Extension Metadata
+
+142	   Some additional metadata makes management of SUIT updates easier:
+
+144	   *  A semantic version number for the update represented by the
+145	      manifest
+
+147	   *  Concise Software Identifiers (CoSWID) [RFC9393]
+
+149	   *  Text descriptions of requirements
+
+151	   *  Text description of the current versions of components
+
+153	3.1.  suit-set-version
+
+155	   This metadata encodes a semantic version for the component set that
+156	   the manifest updates, including any dependencies.  This enables
+157	   version comparisons to be performed on manifests.  Non-manifest
+158	   images encode their versions independently of the manifest.
+
+160	   Manifest Authors SHOULD encode suit-set-version whenever the release
+161	   can be represented by the constrained version encoding defined in
+162	   Section 4.4 so that Recipients can compare manifests
+163	   deterministically.  Deployments that cannot supply such a version
+164	   without loss of fidelity MUST omit suit-set-version and convey any
+165	   human-facing numbering via suit-text-current-version (Section 3.4).
+166	   Because suit-set-version is a machine-readable parameter for
+167	   determining compatibility and build metadata is ignored for semantic-
+168	   version precedence, build metadata MUST NOT be included.
+
+170	   The composition of suit-set-version is the same as suit-parameter-
+171	   version (Section 4.4).
+
+173	   If build metadata is desired, the manifest author MAY include it via
+174	   suit-text-current-version (Section 3.4).
+
+176	3.2.  suit-coswid
+
+178	   A CoSWID can enable Software Bill of Materials (SBOM) use-cases.
+179	   Tightly coupling update and attestation ensures that verification
+180	   infrastructure always knows what software to expect on each device.
+
+182	   suit-coswid is a member of the suit-manifest.  It contains a Concise
+183	   Software Identifier (CoSWID) as defined in [RFC9393].  This element
+184	   SHOULD be made severable so that it can be discarded by the Recipient
+185	   or an intermediary if it is not used by the Recipient while
+186	   preserving the manifest signature.  Implementations that cannot
+187	   support severable elements MAY include suit-coswid non-severably, but
+188	   MUST ensure that Recipients can still process the manifest.
+
+190	   suit-coswid is RECOMMENDED to implement and RECOMMENDED to include in
+191	   manifests because management systems commonly need a durable software
+192	   identity after update installation.  CoSWID and related Software Bill
+193	   of Materials metadata can support inventory, vulnerability
+194	   management, compliance checks, and reconciliation between the
+195	   installed update state and management-system records.  This
+196	   recommendation is scoped to the operational and security value of
+197	   identifying installed software; it does not imply that the presence
+198	   of SBOM metadata proves that the software is free of vulnerabilities
+199	   or policy issues.  Other extension metadata is not generally
+200	   RECOMMENDED unless required by deployment policy or by a SUIT
+201	   profile.
+
+203	   Recipients that do not use suit-coswid are not required to interpret
+204	   the CoSWID content.  When suit-coswid is severable, such Recipients
+205	   or intermediaries can discard it without invalidating the manifest
+206	   signature.  When suit-coswid is not severable, a Recipient MUST NOT
+207	   fail solely because a well-formed, policy-permitted suit-coswid field
+208	   is present.
+
+210	   Recipients that use or validate suit-coswid MAY still fail or reject
+211	   the manifest when the suit-coswid field or its digest is malformed,
+212	   when local policy rejects the metadata, when processing would exhaust
+213	   available resources, when validation of processed CoSWID metadata
+214	   fails, or when a manifest relies on unsupported critical behaviour.
+215	   These requirements do not imply that every Recipient implements
+216	   CoSWID processing.
+
+218	3.3.  suit-text-version-required
+
+220	   suit-text-version-required is used to represent a version-based
+221	   dependency on suit-parameter-version as described in Section 4.4 and
+222	   Section 5.5.  When a Manifest Author needs to communicate such a
+223	   dependency to operators, the author SHOULD populate the suit-text map
+224	   with a SUIT_Component_Identifier key for the dependency component,
+225	   and place in the corresponding map a suit-text-version-required key
+226	   with a free text expression that is representative of the version
+227	   constraints placed on the dependency so that field personnel can
+228	   validate compliance.  Deployments that provide operator guidance
+229	   exclusively through other channels MAY omit this field.  This text
+230	   SHOULD be expressive enough that a device operator can be expected to
+231	   understand the dependency; predefined tokens MAY be used when
+232	   supporting documentation ensures equivalent clarity.  Expressions in
+233	   this field MUST be encoded as UTF-8 text limited to printable
+234	   characters (Unicode general categories L, N, P, or Zs) and SHOULD use
+235	   simple relational operators (for example >, >=, <, <=, =) so that
+236	   automated tooling can perform lint checks.  Implementations that
+237	   render this text SHOULD escape or filter it to prevent markup or
+238	   control-code injection.  This is a free text field and there are no
+239	   additional specific formatting rules beyond the requirements above.
+
+241	   By way of example only, to express a dependency on a component "['x',
+242	   'y']", where the intended version is any v1.x later than v1.2.5, but
+243	   not v2.0 or above, the author would add the following structure to
+244	   the suit-text element.  Note that this text is in cbor-diag notation.
+
+246	   ['x','y'] : {
+247	       7 : ">=1.2.5,<2"
+248	   }
+
+250	3.4.  suit-text-current-version
+
+252	   suit-text-current-version is used to provide human-readable version
+253	   information equivalent to suit-set-version (Section 3.1).  This
+254	   metadata MAY have a version listed for each or any component.  The
+255	   Manifest Processor MUST NOT consume this version; it is for human
+256	   readability only.
+
+258	   To describe a version, a Manifest Author SHOULD populate the suit-
+259	   text map with a SUIT_Component_Identifier key for the dependency
+260	   component, and place in the corresponding map a suit-text-current-
+261	   version key with a free text version that is representative of the
+262	   version of the component so that operators can reconcile machine and
+263	   human-readable records.  Deployments that provide human-facing
+264	   version information through other configuration channels MAY omit
+265	   this text.  This text SHOULD be expressive enough that a device
+266	   operator can be expected to understand the version; environments that
+267	   rely on catalog identifiers MAY use those identifiers when supporting
+268	   documentation provides the necessary context.  Values in this field
+269	   MUST be encoded as UTF-8 text limited to printable characters, and
+270	   implementations MUST treat suit-set-version and suit-parameter-
+271	   version as authoritative when a discrepancy exists.  Recipients MUST
+272	   NOT interpret this text as executable code or markup and MUST treat
+273	   it as display-only information.  Implementations that render this
+274	   text SHOULD sanitize, escape, or otherwise filter it before
+275	   presentation.  This is a free text field and there are no additional
+276	   specific formatting rules beyond the requirements above.
+
+278	   It is RECOMMENDED that the Manifest Author use a Semantic Version
+279	   ([semver]) in the free-text field to keep human-readable and machine-
+280	   readable versions aligned.  Unlike suit-set-version (Section 3.1),
+281	   the full semantic version specification can be used.
+
+283	4.  Extension Parameters
+
+285	   Several parameters are needed to define the behaviour of the commands
+286	   specified in Extension Commands (Section 5).  These parameters follow
+287	   the same considerations as defined in Section 8.4.8 of
+288	   [I-D.ietf-suit-manifest].
+
+290	   +=================+===================================+=============+
+291	   | Name            | CDDL Structure                    | Reference   |
+292	   +=================+===================================+=============+
+293	   | Use Before      | suit-parameter-use-before         | Section 4.1 |
+294	   +-----------------+-----------------------------------+-------------+
+295	   | Minimum         | suit-parameter-minimum-battery    | Section 4.2 |
+296	   | Battery         |                                   |             |
+297	   +-----------------+-----------------------------------+-------------+
+298	   | Update          | suit-parameter-update-priority    | Section 4.3 |
+299	   | Priority        |                                   |             |
+300	   +-----------------+-----------------------------------+-------------+
+301	   | Version         | suit-parameter-version            | Section 4.4 |
+302	   +-----------------+-----------------------------------+-------------+
+303	   | Wait Info       | suit-parameter-wait-info          | Section 4.5 |
+304	   +-----------------+-----------------------------------+-------------+
+305	   | Component       | suit-parameter-component-metadata | Section 4.6 |
+306	   | Metadata        |                                   |             |
+307	   +-----------------+-----------------------------------+-------------+
+
+309	                                  Table 1
+
+311	4.1.  suit-parameter-use-before
+
+313	   An expiry date for the use of the manifest encoded as the non-
+314	   negative integer number of seconds since 1970-01-01.  Implementations
+315	   that use this parameter MUST use a 64-bit internal representation of
+316	   the integer.  Used with Section 5.1.
+
+318	4.2.  suit-parameter-minimum-battery
+
+320	   This parameter sets the minimum battery level in mWh.  This parameter
+321	   is encoded as a non-negative integer.  Used with suit-condition-
+322	   minimum-battery (Section 5.3).
+
+324	4.3.  suit-parameter-update-priority
+
+326	   This parameter sets the priority of the update.  This parameter is
+327	   encoded as an integer.  It is used along with suit-condition-update-
+328	   authorized (Section 5.4) to ask an application for permission to
+329	   initiate an update.  This does not constitute a privilege inversion
+330	   because an explicit request for authorization has been provided by
+331	   the Update Authority in the form of the suit-condition-update-
+332	   authorized command.
+
+334	   Numerically smaller values indicate higher update priority.
+335	   Recipients and applications that compare suit-parameter-update-
+336	   priority values MUST use this ordering.  Local policy MAY assign
+337	   deployment-specific meanings to particular values or ranges.  For
+338	   example, critical reliability and vulnerability fixes might be given
+339	   negative numbers, while bug fixes might be given small positive
+340	   numbers, and feature additions might be given larger positive
+341	   numbers, which allows an application to make an informed decision
+342	   about whether and when to allow an update to proceed.
+
+344	4.4.  suit-parameter-version
+
+346	   Indicates allowable versions for the specified component.  One
+347	   version comparison can be made with each suit-parameter-version.
+348	   This parameter is compared with the version asserted by the current
+349	   component when suit-condition-version (Section 5.5) is invoked.  The
+350	   current component can assert the current version in many ways,
+351	   including storage in a parameter storage database, in a metadata
+352	   object, or in a known location within the component itself.
+
+354	   Each suit-parameter-version contains a comparison operator and a
+355	   version, according to the following CDDL:
+
+357	   SUIT_Parameter_Version_Match = [
+358	       suit-condition-version-comparison-type:
+359	           SUIT_Condition_Version_Comparison_Types,
+360	       suit-condition-version-comparison-value:
+361	           SUIT_Condition_Version_Comparison_Value
+362	   ]
+
+364	   The comparison type can be:
+
+366	   *  Greater.
+
+368	   *  Greater or Equal.
+
+370	   *  Equal.
+
+372	   *  Lesser or Equal.
+
+374	   *  Lesser.
+
+376	   The version comparison value is encoded as a CBOR list of integers.
+377	   Comparisons are done on each integer in sequence.  Comparison stops
+378	   after all integers in the list defined by the manifest have been
+379	   consumed OR after an non-equal comparison has occurred.  For example,
+380	   if the manifest defines a comparison, "Equal [1]", then this will
+381	   match all version sequences starting with 1.  If a manifest defines
+382	   both "Greater or Equal [1,0]" and "Lesser [1,10]", then it will match
+383	   versions 1.0.x up to, but not including 1.10.
+
+385	4.4.1.  suit-parameter-version Semantic Versioning encoding guidelines
+
+387	   The encoded versions use the constrained semantic-versioning encoding
+388	   summarized in Section 2.  Manifest Authors SHOULD keep their encoding
+389	   aligned with semantic versioning so that Recipients can compare
+390	   versions deterministically; if another numbering scheme is required,
+391	   the sequence of integers encoded here MUST still preserve release
+392	   ordering (for example, [2025,12,6] for a calendar-based release).
+
+394	   Versions are composed of:
+
+396	   1.  A release version encoded as a sequence of 1 to 3 non-negative
+397	       integers (allowing zero values)
+
+399	   2.  An optional pre-release indicator encoded as a negative integer,
+400	       followed by zero or more non-negative integers
+
+402	   Semantic Versioning permits arbitrary pre-release identifiers and
+403	   build metadata.  This specification only defines encodings for alpha,
+404	   beta, and release-candidate pre-release classes.  Because suit-
+405	   parameter-version exists solely to enable the Manifest Processor to
+406	   make a decision about version compatibility, and because build
+407	   metadata is ignored for semantic-version precedence, build metadata
+408	   MUST NOT be included.
+
+410	   In semantic versioning terminology:
+
+412	   1.  The first integer represents the major number.  This indicates
+413	       breaking changes to the component.
+
+415	   2.  The second integer represents the minor number.  This is
+416	       typically reserved for new features or large, non-breaking
+417	       changes.
+
+419	   3.  The third integer is the patch version.  This is typically
+420	       reserved for bug fixes.
+
+422	   The pre-release indicator MUST NOT appear as element 0.  The pre-
+423	   release indicator is encoded as:
+
+425	   *  -1: Release Candidate (RC)
+
+427	   *  -2: Beta
+
+429	   *  -3: Alpha
+
+431	   This allows these releases to compare correctly with final releases.
+432	   For example, Version 2.0, RC1 is lower than Version 2.0.0 and higher
+433	   than any Version 1.x.  By encoding RC as -1, this works correctly:
+434	   [2,0,-1,1] compares as lower than [2,0,0].  Similarly, beta (-2) is
+435	   lower than RC and alpha (-3) is lower than RC.
+
+437	   Pre-release identifiers other than alpha, beta, and release candidate
+438	   cannot be represented directly in this encoding.  Deployments that
+439	   need other identifiers MUST either map them to one of the defined
+440	   classes while preserving the intended ordering or omit the machine-
+441	   readable version field and convey the identifier as suit-text-
+442	   current-version (Section 3.4).
+
+444	   For example:
+
+446	   *  1.2.3 = [1,2,3].
+
+448	   *  1.2-rc.3 = [1,2,-1,3].
+
+450	   *  1.2-beta = [1,2,-2].
+
+452	   *  1.2-alpha = [1,2,-3].
+
+454	   *  1.2.3-alpha.4 = [1,2,3,-3,4].
+
+456	4.5.  suit-parameter-wait-info
+
+458	   suit-directive-wait (Section 5.6) directs the manifest processor to
+459	   pause until a specified event occurs.  The suit-parameter-wait-info
+460	   encodes the parameters needed for the directive.
+
+462	   The exact implementation of the pause is implementation-defined.  For
+463	   example, this could be done by blocking on a semaphore, registering
+464	   an event handler and suspending the manifest processor, polling for a
+465	   notification, or aborting the update entirely, then restarting when a
+466	   notification is received.
+
+468	   suit-parameter-wait-info is encoded as a map of wait events.  All
+469	   wait events MUST be satisfied before the Manifest Processor
+470	   continues.  The wait events currently defined are described in the
+471	   following table.
+
+473	      +======================+==========+==========================+
+474	      | Name                 | Encoding | Description              |
+475	      +======================+==========+==========================+
+476	      | suit-wait-event-     | int      | Same as suit-parameter-  |
+477	      | authorization        |          | update-priority          |
+478	      +----------------------+----------+--------------------------+
+479	      | suit-wait-event-     | int      | Wait until power state   |
+480	      | power                |          |                          |
+481	      +----------------------+----------+--------------------------+
+482	      | suit-wait-event-     | int      | Wait until network state |
+483	      | network              |          |                          |
+484	      +----------------------+----------+--------------------------+
+485	      | suit-wait-event-     | See      | Wait for other device to |
+486	      | other-device-version | below    | match version            |
+487	      +----------------------+----------+--------------------------+
+488	      | suit-wait-event-time | uint     | Wait until time (seconds |
+489	      |                      |          | since 1970-01-01)        |
+490	      +----------------------+----------+--------------------------+
+491	      | suit-wait-event-     | uint     | Wait until seconds since |
+492	      | time-of-day          |          | 00:00:00 Local Time      |
+493	      +----------------------+----------+--------------------------+
+494	      | suit-wait-event-     | uint     | Wait until seconds since |
+495	      | time-of-day-utc      |          | 00:00:00 UTC             |
+496	      +----------------------+----------+--------------------------+
+497	      | suit-wait-event-day- | uint     | Wait until days since    |
+498	      | of-week              |          | Sunday Local Time        |
+499	      +----------------------+----------+--------------------------+
+500	      | suit-wait-event-day- | uint     | Wait until days since    |
+501	      | of-week-utc          |          | Sunday UTC               |
+502	      +----------------------+----------+--------------------------+
+
+504	                                 Table 2
+
+506	   Local Time means the Recipient's configured local civil time zone at
+507	   the time the wait event is evaluated, including any daylight-saving-
+508	   time rules available to the Recipient.  If the local time zone
+509	   changes while a Recipient is waiting, the Recipient reevaluates the
+510	   wait event using the updated time-zone configuration.  During
+511	   daylight-saving-time transitions, a skipped local time is treated as
+512	   satisfied at the first representable local time after the skipped
+513	   interval, and a repeated local time is satisfied at its first
+514	   occurrence.  Recipients that do not have configured local-time and
+515	   daylight-saving-time information MUST treat local-time wait events as
+516	   unsupported.  Manifest Authors SHOULD use the UTC wait events when a
+517	   deployment does not have a common local-time policy.
+
+519	   suit-wait-event-other-device-version reuses the encoding of
+520	   SUIT_Parameter_Version_Match.  It is encoded as a sequence that
+521	   contains an implementation-defined bstr identifier for the other
+522	   device, and a list of one or more SUIT_Parameter_Version_Match.  For
+523	   interoperable use, the deployment profile or management system MUST
+524	   define the namespace and byte-string encoding of other-device
+525	   identifiers, the mechanism by which the Recipient obtains the
+526	   referenced device's version, and the version encoding used by that
+527	   referenced device.  A Recipient MUST treat suit-wait-event-other-
+528	   device-version as unsupported unless those deployment-specific
+529	   definitions are available.
+
+531	4.6.  suit-parameter-component-metadata
+
+533	   In some instances, a system needs to know the file metadata for a
+534	   component.  This metadata can include:
+
+536	   *  creator
+
+538	   *  creation time
+
+540	   *  modification time
+
+542	   *  default permissions (rwx)
+
+544	   *  a map of user/permission pairs
+
+546	   *  a map of role/permission pairs
+
+548	   *  a map of group/permission pairs
+
+550	   *  file type
+551	   Unless otherwise stated, all string values in this structure MUST be
+552	   encoded as UTF-8 without control characters (Unicode general
+553	   categories Cc or Cf) and SHOULD be limited to human-readable
+554	   identifiers such as names or POSIX-style paths.  Binary values
+555	   conveyed via bstr MUST be well-formed for the consuming platform (for
+556	   example, a UUID or permissions bitmap) and MUST NOT exceed the
+557	   minimum length required to represent the value canonically.
+
+559	   Component metadata is applied at time of fetch, copy, or write; see
+560	   [I-D.ietf-suit-manifest], Sections 8.4.10.4, 8.4.10.5, and 8.4.10.6.
+561	   Therefore, the component metadata parameter MUST be set in advance of
+562	   the component being fetched, copied into, or written.
+
+564	4.6.1.  Creator
+
+566	   Sometimes, management of file systems requires that the creator of
+567	   each file is correctly recorded.  Because the default creator of
+568	   files will be the update agent, this can obscure the actual creator
+569	   of each file.  The Creator metadata element allows overriding the
+570	   default behaviour and setting the correct creator.
+
+572	   The creator is defined as follows:
+
+574	   SUIT_meta_actor_id = UUID_Tagged / bstr / tstr / int
+575	   UUID_Tagged = #6.37(bstr)
+
+577	   The actor ID can be whatever is most appropriate for any given
+578	   system.  For example, the actor ID might be a string (e.g.,
+579	   username), integer (e.g., POSIX userid), or UUID (e.g., TEEP TA
+580	   UUID).
+
+582	4.6.2.  Creation & Modification Time
+
+584	   The creation and modification times are defined by CBOR time types.
+585	   These are defined in [RFC8949], Section 3.4.2.  The CBOR tag is
+586	   REQUIRED when either creation or modification time are provided.
+
+588	   suit-meta-modification-time => #6.1(uint)
+589	   suit-meta-creation-time => #6.1(uint)
+
+591	4.6.3.  Component Default Permissions
+
+593	   Typical permissions management systems require read, write, and
+594	   execute permissions that are applied to all users who do not have
+595	   their own explicit permissions.  These are the default permissions
+596	   for the current component.  Default permissions are described by the
+597	   following CDDL:
+
+599	   SUIT_meta_permissions = uint .bits SUIT_meta_permission_bits
+600	   SUIT_meta_permission_bits = &(
+601	       write_attr_ex: 13,
+602	       read_attr_ex: 12,
+603	       sync: 11,
+604	       delete: 10,
+605	       recurse_delete: 9,
+606	       write_attr: 8,
+607	       change_owner: 7,
+608	       change_perm: 6,
+609	       read_perm: 5,
+610	       read_attr: 4,
+611	       createdir_append: 3,
+612	       list_read: 2,
+613	       create_write: 1,
+614	       traverse_exec: 0,
+615	       * $$SUIT_meta_permission_bits_extensions
+616	   )
+
+618	4.6.4.  User, Role, Group permissions
+
+620	   Many filesystems have users and groups.  Additionally some have
+621	   roles.  Actors that have these associations can have specific
+622	   permissions associated with them for each component.  Each of these
+623	   sets of permissions is defined the same way: with a map of actor
+624	   identifiers to permissions.
+
+626	   SUIT_meta_permission_map = {
+627	       + SUIT_meta_actor_id => SUIT_meta_permissions
+628	   }
+
+630	   The SUIT_meta_actor_id is the same as defined for Creator,
+631	   Section 4.6.1.
+
+633	4.6.5.  File Type
+
+635	   File Type typically identifies whether a file is a directory, regular
+636	   file, or symbolic link.  If not specified, File Type defaults to
+637	   regular file.
+
+639	   This enables specific management operations for SUIT command
+640	   sequences:
+
+642	   *  To create a directory
+
+644	      -  Set the Component Index to the Component Identifier of the
+645	         directory to be created
+
+647	      -  Set the Component metadata, including the file type for
+648	         directory
+
+650	      -  Set suit-parameter-content to an empty bstr
+
+652	      -  Invoke suit-directive-write
+
+654	   *  To create a symbolic link
+
+656	      -  Set the Component Index to the Component Identifier of the link
+657	         to be created
+
+659	      -  Set the Component metadata, including the file type for
+660	         symbolic link
+
+662	      -  Set suit-parameter-content to the link target
+
+664	      -  Invoke suit-directive-write
+
+666	   For example, the following Payload Fetch & Install sequences will
+667	   create a new /usr/local/bin directory, download https://cdn.example/
+668	   example3.bin into a new file: /usr/local/bin/example3, then create a
+669	   symlink at /usr/bin/example that points to /usr/local/bin/example3.
+
+671	   *  Common has components for:
+
+673	      -  /usr/bin/example
+
+675	      -  /usr/local/bin
+
+677	      -  /usr/local/bin/example3
+
+679	   *  Payload fetch:
+
+681	      -  set component index = 1
+
+683	      -  set parameters:
+
+685	         o  content = h''
+
+687	         o  metadata = {file-type: directory}
+
+689	      -  write
+
+691	      -  set component index = 2
+
+693	      -  set URI = "https://cdn.example/example3.bin"
+694	      -  fetch
+
+696	      -  condition image digest
+
+698	   *  Install:
+
+700	      -  set component index = 0
+
+702	      -  set parameters:
+
+704	         o  content = "/usr/local/bin/example3"
+
+706	         o  metadata = {file-type: symlink}
+
+708	      -  write
+
+710	5.  Extension Commands
+
+712	   The following table defines the semantics of the commands defined in
+713	   this specification in the same way as in the Abstract Machine
+714	   Description, Section 6.4, of [I-D.ietf-suit-manifest].
+
+716	   All commands defined in this specification are OPTIONAL to implement.
+717	   A Recipient that encounters a command it does not implement MUST
+718	   reject the manifest as defined in [I-D.ietf-suit-manifest]
+719	   Section 8.4.2, ensuring that update behaviour is never ambiguous.
+
+721	     +=============+=================+===============================+
+722	     | Command     | CDDL Identifier | Semantic of the Operation     |
+723	     | Name        |                 |                               |
+724	     +=============+=================+===============================+
+725	     | Use Before  | suit-condition- | assert(now() <                |
+726	     |             | use-before      | current.params[use-before])   |
+727	     +-------------+-----------------+-------------------------------+
+728	     | Check Image | suit-condition- | assert(not binary-            |
+729	     | Not Match   | image-not-match | match(digest(current),        |
+730	     |             |                 | current.params[digest]))      |
+731	     +-------------+-----------------+-------------------------------+
+732	     | Check       | suit-condition- | assert(battery >=             |
+733	     | Minimum     | minimum-battery | current.params[minimum-       |
+734	     | Battery     |                 | battery])                     |
+735	     +-------------+-----------------+-------------------------------+
+736	     | Check       | suit-condition- | assert( isAuthorized(         |
+737	     | Update      | update-         | current.params[priority]))    |
+738	     | Authorized  | authorized      |                               |
+739	     +-------------+-----------------+-------------------------------+
+740	     | Check       | suit-condition- | assert(version_check(current, |
+741	     | Version     | version         | current.params[version]))     |
+742	     +-------------+-----------------+-------------------------------+
+743	     | Wait For    | suit-directive- | until event(arg), wait        |
+744	     | Event       | wait            |                               |
+745	     +-------------+-----------------+-------------------------------+
+746	     | Override    | suit-directive- | components[i].params[k] := v  |
+747	     | Multiple    | override-       | for-each k,v in d for-each    |
+748	     |             | multiple        | i,d in arg                    |
+749	     +-------------+-----------------+-------------------------------+
+750	     | Copy Params | suit-directive- | current.params[k] =           |
+751	     |             | copy-params     | components[i].params[k] for k |
+752	     |             |                 | in l for i,l in arg           |
+753	     +-------------+-----------------+-------------------------------+
+
+755	                                  Table 3
+
+757	5.1.  suit-condition-use-before
+
+759	   Verify that the current time is BEFORE the specified time. suit-
+760	   condition-use-before is used to specify the last time at which an
+761	   update is to be installed.  The recipient evaluates the current time
+762	   against the suit-parameter-use-before parameter (Section 4.1), which
+763	   MUST have already been set as a parameter, encoded as seconds after
+764	   1970-01-01 00:00:00 UTC.  Timestamp conditions MUST be evaluated in
+765	   64 bits, regardless of encoded CBOR size. suit-condition-use-before
+766	   is OPTIONAL to implement.
+
+768	5.2.  suit-condition-image-not-match
+
+770	   Verify that the current component does not match the suit-parameter-
+771	   image-digest (Section 8.4.8.6 of [I-D.ietf-suit-manifest]).  If no
+772	   digest is specified, the condition fails. suit-condition-image-not-
+773	   match is OPTIONAL to implement.
+
+775	5.3.  suit-condition-minimum-battery
+
+777	   suit-condition-minimum-battery provides a mechanism to test a
+778	   Recipient's battery level before installing an update.  This
+779	   condition is primarily for use in primary-cell applications, where a
+780	   primary cell is a single-use, non-rechargeable battery and energy
+781	   budgeting is therefore a one-way operation.  For batteries that are
+782	   charged, suit-directive-wait is more appropriate, since it defines a
+783	   "wait" until the battery level is sufficient to install the update.
+784	   suit-condition-minimum-battery is specified in mWh. suit-condition-
+785	   minimum-battery is OPTIONAL to implement. suit-condition-minimum-
+786	   battery consumes suit-parameter-minimum-battery (Section 4.2).
+
+788	5.4.  suit-condition-update-authorized
+
+790	   Request authorization from the application and fail if not
+791	   authorized.  This can allow a user to decline an update. suit-
+792	   parameter-update-priority (Section 4.3) provides an integer priority
+793	   level that the application can use to determine whether or not to
+794	   authorize the update.  Smaller integer values indicate higher
+795	   priority; deployment policy defines the action taken for a given
+796	   priority. suit-condition-update-authorized is OPTIONAL to implement.
+
+798	5.5.  suit-condition-version
+
+800	   suit-condition-version allows comparing versions of firmware.
+801	   Verifying image digests is preferred to version checks because
+802	   digests are more precise. suit-condition-version examines a
+803	   component's version against the version info specified in suit-
+804	   parameter-version (Section 4.4).
+
+806	5.6.  suit-directive-wait
+
+808	   suit-directive-wait directs the manifest processor to pause until a
+809	   specified event occurs.  Some possible events include:
+
+811	   1.  Authorization
+
+813	   2.  External power
+
+815	   3.  Network availability
+816	   4.  Other device firmware version
+
+818	   5.  Time
+
+820	   6.  Time of day
+
+822	   7.  Day of week
+
+824	5.7.  suit-directive-override-multiple
+
+826	   This directive enables setting parameters for multiple components at
+827	   the same time.  This allows a small reduction in encoding overhead:
+
+829	   *  without override-multiple, the encoding for each component
+830	      consists of:
+
+832	      -  set-component-index (2 bytes)
+
+834	      -  override-parameters (1 byte + parameter map)
+
+836	   *  with override-multiple, the encoding for each component consists
+837	      of:
+
+839	      -  the component index key (1 byte)
+
+841	      -  the parameter map
+
+843	   Override-multiple requires the command (1-2 bytes) and one additional
+844	   map to hold the parameter sets (1 byte).  For one component, there is
+845	   no savings.  For multiple components, there is an encoding savings of
+846	   2 bytes per component.
+
+848	   Implementations can structure code so that override-multiple follows
+849	   a code-path nearly identical to set-component-index + override-
+850	   parameters.
+
+852	   This command is purely an encoding alias for set-component-index and
+853	   override-parameters.  The component index is set to the last
+854	   component listed in the override-multiple argument when override-
+855	   multiple completes.
+
+857	   The following CDDL defines the argument for suit-directive-override-
+858	   multiple:
+
+860	   CDDL SUIT_Override_Mult_Arg = { + uint => {+ $$SUIT_Parameters} }
+
+862	5.8.  suit-directive-copy-params
+
+864	   suit-directive-copy-params enables a manifest author to specify one
+865	   or more components to copy parameters from, and a list of parameters
+866	   to copy from each specified source component.
+
+868	   The behaviour is exactly the same as override parameters, but with
+869	   parameter values defined in existing components.  Parameters are only
+870	   copied between identical keys (no copying from URI to digest, for
+871	   example).
+
+873	   For each entry in the map, the manifest processor sets the source
+874	   component to be the component identified by the index contained in
+875	   the map key.  For each parameter identified in the copy list, the
+876	   manifest processor copies the parameter from the source component to
+877	   the current component.
+
+879	   The following CDDL defines the argument for suit-directive-copy-
+880	   params:
+
+882	   CDDL SUIT_Directive_Copy_Params = { + uint => [+ int] }
+
+884	6.  IANA Considerations
+
+886	   IANA is requested to allocate the commands, parameters, and metadata
+887	   values shown in the following tables.
+
+889	6.1.  SUIT Envelope Elements
+
+891	                     +=======+========+=============+
+892	                     | Label | Name   | Reference   |
+893	                     +=======+========+=============+
+894	                     | 14    | CoSWID | Section 3.2 |
+895	                     +-------+--------+-------------+
+
+897	                                 Table 4
+
+899	6.2.  SUIT Manifest Elements
+
+901	                   +=======+=============+=============+
+902	                   | Label | Name        | Reference   |
+903	                   +=======+=============+=============+
+904	                   | 6     | Set Version | Section 3.1 |
+905	                   +-------+-------------+-------------+
+906	                   | 14    | CoSWID      | Section 3.2 |
+907	                   +-------+-------------+-------------+
+
+909	                                  Table 5
+
+911	6.3.  SUIT Commands
+
+913	                +=======+===================+=============+
+914	                | Label | Name              | Reference   |
+915	                +=======+===================+=============+
+916	                | 4     | Use Before        | Section 5.1 |
+917	                +-------+-------------------+-------------+
+918	                | 25    | Image Not Match   | Section 5.2 |
+919	                +-------+-------------------+-------------+
+920	                | 26    | Minimum Battery   | Section 5.3 |
+921	                +-------+-------------------+-------------+
+922	                | 27    | Update Authorized | Section 5.4 |
+923	                +-------+-------------------+-------------+
+924	                | 28    | Version           | Section 5.5 |
+925	                +-------+-------------------+-------------+
+926	                | 29    | Wait For Event    | Section 5.6 |
+927	                +-------+-------------------+-------------+
+928	                | 34    | Override Multiple | Section 5.7 |
+929	                +-------+-------------------+-------------+
+930	                | 35    | Copy Params       | Section 5.8 |
+931	                +-------+-------------------+-------------+
+
+933	                                  Table 6
+
+935	6.4.  SUIT Parameters
+
+937	               +=======+====================+=============+
+938	               | Label | Name               | Reference   |
+939	               +=======+====================+=============+
+940	               | 4     | Use Before         | Section 4.1 |
+941	               +-------+--------------------+-------------+
+942	               | 26    | Minimum Battery    | Section 4.2 |
+943	               +-------+--------------------+-------------+
+944	               | 27    | Update Priority    | Section 4.3 |
+945	               +-------+--------------------+-------------+
+946	               | 28    | Version            | Section 4.4 |
+947	               +-------+--------------------+-------------+
+948	               | 29    | Wait Info          | Section 4.5 |
+949	               +-------+--------------------+-------------+
+950	               | 30    | Component Metadata | Section 4.6 |
+951	               +-------+--------------------+-------------+
+
+953	                                 Table 7
+
+955	6.5.  SUIT Component Text Values
+
+957	           +=======+============================+=============+
+958	           | Label | Name                       | Reference   |
+959	           +=======+============================+=============+
+960	           | 7     | Component Version Required | Section 3.3 |
+961	           +-------+----------------------------+-------------+
+962	           | 8     | Current Version            | Section 3.4 |
+963	           +-------+----------------------------+-------------+
+
+965	                                 Table 8
+
+967	7.  Security Considerations
+
+969	   This document extends the SUIT manifest specification.  The
+970	   extensions defined here are optional and do not make support for
+971	   update-management extensions mandatory for implementations of the
+972	   base SUIT manifest specification.  A detailed security treatment can
+973	   be found in the architecture [RFC9019] and in the information model
+974	   [RFC9124] documents.
+
+976	   The free-text fields introduced in Sections Section 3.3 and
+977	   Section 3.4 are intended solely for human consumption.  Recipients
+978	   MUST treat those values as untrusted input: they MUST NOT evaluate
+979	   the text, execute embedded markup, or override machine-readable
+980	   decisions derived from suit-set-version or suit-parameter-version.
+981	   Implementations SHOULD bound the length of displayed text to mitigate
+982	   interface flooding and log injection.
+
+984	   The suit-coswid element can expose detailed software identity and
+985	   SBOM information.  Such information can help authorized operators
+986	   assess inventory, vulnerability exposure, and compliance, but the
+987	   same information can also help an attacker or unauthorized observer
+988	   quickly identify software components and versions on a device.
+989	   Deployments SHOULD treat manifests containing suit-coswid as
+990	   sensitive metadata, limit access to authorized parties, and consider
+991	   using severable suit-coswid content so that intermediaries and
+992	   Recipients that do not need this metadata can discard it without
+993	   invalidating the manifest signature.
+
+995	   Component metadata (Section 4.6) can expose operator identifiers,
+996	   file paths, or other locally meaningful strings.  Deployments SHOULD
+997	   validate these values against local policy before applying them, and
+998	   MUST handle missing or malformed metadata defensively so that the
+999	   update agent does not escalate privileges or disclose sensitive
+1000	   information inadvertently.
+
+1002	8.  References
+1003	8.1.  Normative References
+
+1005	   [I-D.ietf-suit-manifest]
+1006	              Moran, B., Tschofenig, H., Birkholz, H., Zandberg, K., and
+1007	              O. Rønningstad, "A Concise Binary Object Representation
+1008	              (CBOR)-based Serialization Format for the Software Updates
+1009	              for Internet of Things (SUIT) Manifest", Work in Progress,
+1010	              Internet-Draft, draft-ietf-suit-manifest-37, 18 June 2026,
+1011	              <https://datatracker.ietf.org/doc/html/draft-ietf-suit-
+1012	              manifest-37>.
+
+1014	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+1015	              Requirement Levels", BCP 14, RFC 2119,
+1016	              DOI 10.17487/RFC2119, March 1997,
+1017	              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+1019	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+1020	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+1021	              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+1023	   [RFC8949]  Bormann, C. and P. Hoffman, "Concise Binary Object
+1024	              Representation (CBOR)", STD 94, RFC 8949,
+1025	              DOI 10.17487/RFC8949, December 2020,
+1026	              <https://www.rfc-editor.org/rfc/rfc8949>.
+
+1028	   [RFC9393]  Birkholz, H., Fitzgerald-McKay, J., Schmidt, C., and D.
+1029	              Waltermire, "Concise Software Identification Tags",
+1030	              RFC 9393, DOI 10.17487/RFC9393, June 2023,
+1031	              <https://www.rfc-editor.org/rfc/rfc9393>.
+
+1033	8.2.  Informative References
+
+1035	   [RFC9019]  Moran, B., Tschofenig, H., Brown, D., and M. Meriac, "A
+1036	              Firmware Update Architecture for Internet of Things",
+1037	              RFC 9019, DOI 10.17487/RFC9019, April 2021,
+1038	              <https://www.rfc-editor.org/rfc/rfc9019>.
+
+1040	   [RFC9124]  Moran, B., Tschofenig, H., and H. Birkholz, "A Manifest
+1041	              Information Model for Firmware Updates in Internet of
+1042	              Things (IoT) Devices", RFC 9124, DOI 10.17487/RFC9124,
+1043	              January 2022, <https://www.rfc-editor.org/rfc/rfc9124>.
+
+1045	   [semver]   "Semantic Versioning 2.0.0", 18 June 2013,
+1046	              <https://semver.org>.
+
+1048	Appendix A.  Full CDDL
+
+1050	   To be valid, the following CDDL MUST be appended to the SUIT Manifest
+1051	   CDDL.  The SUIT CDDL is defined in Appendix A of
+1052	   [I-D.ietf-suit-manifest].
+
+1054	   $$unseverable-manifest-member-extensions //= (
+1055	       suit-set-version =>
+1056	           bstr .cbor SUIT_Condition_Version_Comparison_Value
+1057	   )
+1058	   $$SUIT_severable-members-extensions //= (
+1059	       suit-coswid => bstr .cbor concise-swid-tag)
+
+1061	   $$severable-manifest-members-choice-extensions //= (
+1062	       suit-coswid => bstr .cbor concise-swid-tag / SUIT_Digest
+1063	   )
+
+1065	   SUIT_Condition //= (
+1066	       suit-condition-image-not-match,   SUIT_Rep_Policy)
+1067	   SUIT_Condition //= (
+1068	       suit-condition-use-before,        SUIT_Rep_Policy)
+1069	   SUIT_Condition //= (
+1070	       suit-condition-minimum-battery,   SUIT_Rep_Policy)
+1071	   SUIT_Condition //= (
+1072	       suit-condition-update-authorized, SUIT_Rep_Policy)
+1073	   SUIT_Condition //= (
+1074	       suit-condition-version,           SUIT_Rep_Policy)
+
+1076	   SUIT_Directive //= (
+1077	       suit-directive-wait,              SUIT_Rep_Policy)
+
+1079	   SUIT_Directive //= (
+1080	       suit-directive-override-multiple, SUIT_Override_Mult_Arg)
+1081	   SUIT_Directive //=(
+1082	       suit-directive-copy-params,       SUIT_Directive_Copy_Params)
+
+1084	   SUIT_Override_Mult_Arg = {
+1085	       + uint => {+ $$SUIT_Parameters}
+1086	   }
+1087	   SUIT_Directive_Copy_Params = {
+1088	       + uint => [+ int]
+1089	   }
+
+1091	   SUIT_Wait_Event = { + SUIT_Wait_Events }
+
+1093	   SUIT_Wait_Events //= (suit-wait-event-authorization => int)
+1094	   SUIT_Wait_Events //= (suit-wait-event-power => int)
+1095	   SUIT_Wait_Events //= (suit-wait-event-network => int)
+1096	   SUIT_Wait_Events //= (suit-wait-event-other-device-version
+1097	       => SUIT_Wait_Event_Argument_Other_Device_Version)
+1098	   SUIT_Wait_Events //= (suit-wait-event-time => uint); Timestamp
+1099	   SUIT_Wait_Events //= (suit-wait-event-time-of-day
+1100	       => uint); Time of Day (seconds since 00:00:00)
+1101	   SUIT_Wait_Events //= (suit-wait-event-day-of-week
+1102	       => uint); Days since Sunday
+1103	   SUIT_Wait_Events //= (suit-wait-event-time-of-day-utc
+1104	       => uint); Time of Day UTC (seconds since 00:00:00)
+1105	   SUIT_Wait_Events //= (suit-wait-event-day-of-week-utc
+1106	       => uint); Days since Sunday UTC
+
+1108	   SUIT_Wait_Event_Argument_Other_Device_Version = [
+1109	       other-device: bstr,
+1110	       other-device-version: [ + SUIT_Parameter_Version_Match ]
+1111	   ]
+
+1113	   $$SUIT_Parameters //= (suit-parameter-use-before => uint)
+1114	   $$SUIT_Parameters //= (suit-parameter-minimum-battery => uint)
+1115	   $$SUIT_Parameters //= (suit-parameter-update-priority => int)
+1116	   $$SUIT_Parameters //= (suit-parameter-version =>
+1117	       bstr .cbor SUIT_Parameter_Version_Match)
+1118	   $$SUIT_Parameters //= (suit-parameter-wait-info =>
+1119	       bstr .cbor SUIT_Wait_Event)
+1120	   $$SUIT_Parameters //= (suit-parameter-component-metadata =>
+1121	       bstr .cbor SUIT_Component_Metadata)
+
+1123	   SUIT_Parameter_Version_Match = [
+1124	       suit-condition-version-comparison-type:
+1125	           SUIT_Condition_Version_Comparison_Types,
+1126	       suit-condition-version-comparison-value:
+1127	           SUIT_Condition_Version_Comparison_Value
+1128	   ]
+1129	   SUIT_Condition_Version_Comparison_Types /=
+1130	       suit-condition-version-comparison-greater
+1131	   SUIT_Condition_Version_Comparison_Types /=
+1132	       suit-condition-version-comparison-greater-equal
+1133	   SUIT_Condition_Version_Comparison_Types /=
+1134	       suit-condition-version-comparison-equal
+1135	   SUIT_Condition_Version_Comparison_Types /=
+1136	       suit-condition-version-comparison-lesser-equal
+1137	   SUIT_Condition_Version_Comparison_Types /=
+1138	       suit-condition-version-comparison-lesser
+
+1140	   suit-condition-version-comparison-greater = 1
+1141	   suit-condition-version-comparison-greater-equal = 2
+1142	   suit-condition-version-comparison-equal = 3
+1143	   suit-condition-version-comparison-lesser-equal = 4
+1144	   suit-condition-version-comparison-lesser = 5
+
+1146	   SUIT_Condition_Version_Comparison_Value = [+int]
+
+1148	   SUIT_Component_Metadata = {
+1149	       ? suit-meta-default-permissions => SUIT_meta_permissions,
+1150	       ? suit-meta-user-permissions => SUIT_meta_permission_map,
+1151	       ? suit-meta-group-permissions => SUIT_meta_permission_map,
+1152	       ? suit-meta-role-permissions => SUIT_meta_permission_map,
+1153	       ? suit-meta-file-type => SUIT_Filetype,
+1154	       ? suit-meta-modification-time => #6.1(uint),
+1155	       ? suit-meta-creation-time => #6.1(uint),
+1156	       ? suit-meta-creator => SUIT_meta_actor_id,
+1157	       * $$SUIT_Component_Metadata_Extensions
+1158	   }
+
+1160	   suit-meta-default-permissions = 1
+1161	   suit-meta-user-permissions = 2
+1162	   suit-meta-group-permissions = 3
+1163	   suit-meta-role-permissions = 4
+1164	   suit-meta-file-type = 5
+1165	   suit-meta-modification-time = 6
+1166	   suit-meta-creation-time = 7
+1167	   suit-meta-creator = 8
+
+1169	   SUIT_meta_permissions = uint .bits SUIT_meta_permission_bits
+1170	   SUIT_meta_permission_bits = &(
+1171	       write_attr_ex: 13,
+1172	       read_attr_ex: 12,
+1173	       sync: 11,
+1174	       delete: 10,
+1175	       recurse_delete: 9,
+1176	       write_attr: 8,
+1177	       change_owner: 7,
+1178	       change_perm: 6,
+1179	       read_perm: 5,
+1180	       read_attr: 4,
+1181	       createdir_append: 3,
+1182	       list_read: 2,
+1183	       create_write: 1,
+1184	       traverse_exec: 0,
+1185	       * $$SUIT_meta_permission_bits_extensions
+1186	   )
+
+1188	   SUIT_meta_permission_map = {
+1189	       + SUIT_meta_actor_id => SUIT_meta_permissions
+
+1191	   }
+
+1193	   SUIT_meta_actor_id = UUID_Tagged / bstr / tstr / int
+1194	   UUID_Tagged = #6.37(bstr)
+
+1196	   SUIT_Filetype /= suit-filetype-regular
+1197	   SUIT_Filetype /= suit-filetype-directory
+1198	   SUIT_Filetype /= suit-filetype-symlink
+
+1200	   suit-filetype-regular = 1
+1201	   suit-filetype-directory = 2
+1202	   suit-filetype-symlink = 3
+
+1204	   $$suit-text-component-key-extensions //= (
+1205	       suit-text-version-required => tstr)
+1206	   $$suit-text-component-key-extensions //= (
+1207	       suit-text-current-version => tstr)
+
+1209	   suit-set-version = 6
+1210	   suit-coswid = 14
+1211	   suit-condition-use-before        = 4
+1212	   suit-condition-image-not-match          = 25
+1213	   suit-condition-minimum-battery          = 26
+1214	   suit-condition-update-authorized        = 27
+1215	   suit-condition-version                  = 28
+
+1217	   suit-directive-wait                     = 29
+1218	   suit-directive-override-multiple        = 34
+1219	   suit-directive-copy-params              = 35
+
+1221	   suit-wait-event-authorization        = 1
+1222	   suit-wait-event-power                = 2
+1223	   suit-wait-event-network              = 3
+1224	   suit-wait-event-other-device-version = 4
+1225	   suit-wait-event-time                 = 5
+1226	   suit-wait-event-time-of-day          = 6
+1227	   suit-wait-event-day-of-week          = 7
+1228	   suit-wait-event-time-of-day-utc      = 8
+1229	   suit-wait-event-day-of-week-utc      = 9
+
+1231	   suit-parameter-use-before         = 4
+1232	   suit-parameter-minimum-battery    = 26
+1233	   suit-parameter-update-priority    = 27
+1234	   suit-parameter-version            = 28
+1235	   suit-parameter-wait-info          = 29
+1236	   suit-parameter-component-metadata = 30
+1237	   suit-text-version-required      = 7
+1238	   suit-text-current-version       = 8
+
+1240	Authors' Addresses
+
+1242	   Brendan Moran
+1243	   Arm Limited
+1244	   Email: Brendan.Moran.ietf@gmail.com
+
+1246	   Ken Takayama
+1247	   SECOM CO., LTD.
+1248	   Email: ken.takayama.ietf@gmail.com
+
+
+
+
+
+
+
+
+
