@@ -1,0 +1,842 @@
+idnits 2.17.1 
+
+draft-ietf-masque-connect-udp-listen-14.txt:
+-(635): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+  == There are 5 instances of lines with non-ascii characters in the document.
+
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     Summary: 0 errors (**), 0 flaws (~~), 1 warning (==), 0 comments (--).
+
+--------------------------------------------------------------------------------
+
+
+2	MASQUE                                                       D. Schinazi
+3	Internet-Draft                                                  A. Singh
+4	Intended status: Standards Track                              Google LLC
+5	Expires: 5 February 2027                                   4 August 2026
+
+7	                       Proxying Bound UDP in HTTP
+8	                draft-ietf-masque-connect-udp-listen-14
+
+10	Abstract
+
+12	   The mechanism defined in "Proxying UDP in HTTP" (RFC 9298) only
+13	   allows each UDP proxying request to transmit to a specific host and
+14	   port.  This is well suited for UDP client-server protocols such as
+15	   HTTP/3, but is not sufficient for some UDP peer-to-peer protocols
+16	   like WebRTC.  This document defines an extension to that mechanism
+17	   that enables such use cases.
+
+19	About This Document
+
+21	   This note is to be removed before publishing as an RFC.
+
+23	   The latest revision of this draft can be found at https://ietf-wg-
+24	   masque.github.io/draft-ietf-masque-connect-udp-listen/draft-ietf-
+25	   masque-connect-udp-listen.html.  Status information for this document
+26	   may be found at https://datatracker.ietf.org/doc/draft-ietf-masque-
+27	   connect-udp-listen/.
+
+29	   Discussion of this document takes place on the MASQUE Working Group
+30	   mailing list (mailto:masque@ietf.org), which is archived at
+31	   https://mailarchive.ietf.org/arch/browse/masque/.  Subscribe at
+32	   https://www.ietf.org/mailman/listinfo/masque/.
+
+34	   Source for this draft and an issue tracker can be found at
+35	   https://github.com/ietf-wg-masque/draft-ietf-masque-connect-udp-
+36	   listen.
+
+38	Status of This Memo
+
+40	   This Internet-Draft is submitted in full conformance with the
+41	   provisions of BCP 78 and BCP 79.
+
+43	   Internet-Drafts are working documents of the Internet Engineering
+44	   Task Force (IETF).  Note that other groups may also distribute
+45	   working documents as Internet-Drafts.  The list of current Internet-
+46	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+48	   Internet-Drafts are draft documents valid for a maximum of six months
+49	   and may be updated, replaced, or obsoleted by other documents at any
+50	   time.  It is inappropriate to use Internet-Drafts as reference
+51	   material or to cite them other than as "work in progress."
+
+53	   This Internet-Draft will expire on 5 February 2027.
+
+55	Copyright Notice
+
+57	   Copyright (c) 2026 IETF Trust and the persons identified as the
+58	   document authors.  All rights reserved.
+
+60	   This document is subject to BCP 78 and the IETF Trust's Legal
+61	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+62	   license-info) in effect on the date of publication of this document.
+63	   Please review these documents carefully, as they describe your rights
+64	   and restrictions with respect to this document.  Code Components
+65	   extracted from this document must include Revised BSD License text as
+66	   described in Section 4.e of the Trust Legal Provisions and are
+67	   provided without warranty as described in the Revised BSD License.
+
+69	Table of Contents
+
+71	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
+72	     1.1.  Conventions and Definitions . . . . . . . . . . . . . . .   3
+73	   2.  Bound UDP Proxying Mechanism  . . . . . . . . . . . . . . . .   3
+74	   3.  Context Identifiers . . . . . . . . . . . . . . . . . . . . .   4
+75	     3.1.  The COMPRESSION_ASSIGN capsule  . . . . . . . . . . . . .   5
+76	     3.2.  The COMPRESSION_ACK capsule . . . . . . . . . . . . . . .   6
+77	     3.3.  The COMPRESSION_CLOSE capsule . . . . . . . . . . . . . .   7
+78	   4.  Uncompressed Operation  . . . . . . . . . . . . . . . . . . .   8
+79	   5.  Compressed Operation  . . . . . . . . . . . . . . . . . . . .   9
+80	   6.  The Connect-UDP-Bind Header Field . . . . . . . . . . . . . .   9
+81	   7.  The Proxy-Public-Address Response Header Field  . . . . . . .   9
+82	   8.  Proxy Behavior  . . . . . . . . . . . . . . . . . . . . . . .  10
+83	     8.1.  Restricting IPs . . . . . . . . . . . . . . . . . . . . .  10
+84	   9.  Security Considerations . . . . . . . . . . . . . . . . . . .  11
+85	   10. Operational Considerations  . . . . . . . . . . . . . . . . .  11
+86	   11. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  12
+87	     11.1.  HTTP Fields  . . . . . . . . . . . . . . . . . . . . . .  12
+88	     11.2.  Capsules . . . . . . . . . . . . . . . . . . . . . . . .  12
+89	   12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  13
+90	     12.1.  Normative References . . . . . . . . . . . . . . . . . .  13
+91	     12.2.  Informative References . . . . . . . . . . . . . . . . .  14
+92	   Appendix A.  Example  . . . . . . . . . . . . . . . . . . . . . .  15
+93	   Appendix B.  Comparison with CONNECT-IP . . . . . . . . . . . . .  17
+94	   Acknowledgments . . . . . . . . . . . . . . . . . . . . . . . . .  17
+95	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  17
+
+97	1.  Introduction
+
+99	   The mechanism to proxy UDP in HTTP [CONNECT-UDP] allows creating
+100	   tunnels for communicating UDP payloads [UDP] to a fixed host and
+101	   port; this enables proxying of HTTP/3 connections, since they run
+102	   over UDP.  Similarly, the HTTP CONNECT method (see Section 9.3.6 of
+103	   [HTTP]) allows proxying HTTP/1.x and HTTP/2, which run over TCP.
+104	   Combining both allows proxying the majority of a Web browser's HTTP
+105	   traffic.  However, WebRTC [WebRTC] relies on Interactive Connectivity
+106	   Establishment (ICE; see [ICE]) to provide connectivity between two
+107	   Web browsers, and ICE relies on the ability to send and receive UDP
+108	   packets to multiple hosts.  While in theory it might be possible to
+109	   accomplish this using multiple UDP proxying HTTP requests, HTTP
+110	   semantics [HTTP] do not guarantee that distinct requests will be
+111	   handled by the same server.  This can lead to the UDP packets being
+112	   sent from distinct IP addresses, thereby preventing ICE from
+113	   operating correctly.  Consequently, UDP proxying requests cannot
+114	   enable WebRTC connectivity between peers.
+
+116	   This document describes an extension to UDP Proxying in HTTP that
+117	   allows sending and receiving UDP payloads to multiple hosts within
+118	   the scope of a single UDP proxying HTTP request.
+
+120	1.1.  Conventions and Definitions
+
+122	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+123	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+124	   "OPTIONAL" in this document are to be interpreted as described in
+125	   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+126	   capitals, as shown here.
+
+128	   This document uses terminology from [CONNECT-UDP] and notational
+129	   conventions from [QUIC].  This document uses the terms Boolean, List,
+130	   and String from Section 3 of [STRUCTURED-FIELDS] to specify syntax
+131	   and parsing.  This document uses Augmented Backus-Naur Form (ABNF)
+132	   and parsing/serialization behaviors from [ABNF].
+
+134	2.  Bound UDP Proxying Mechanism
+
+136	   In unextended UDP proxying requests (i.e., requests that use the
+137	   mechanism defined in [CONNECT-UDP] without the extension defined in
+138	   this document), the target host is encoded in the HTTP request path
+139	   or query.  For bound UDP proxying (i.e., the mechanism defined in
+140	   this document), the target is either conveyed in each HTTP Datagram
+141	   (see Section 4), or registered via capsules and then compressed (see
+142	   Sections 3 and 5).
+
+144	   When performing URI Template Expansion of the UDP proxying template
+145	   (see Section 3 of [CONNECT-UDP]), the client follows the same
+146	   template as unextended UDP proxying and sets the "target_host" and
+147	   the "target_port" variables to one of its targets.  It adds the
+148	   Connect-UDP-Bind header field as specified in Section 6 to request
+149	   bind.  If the proxy supports bound UDP proxying, it returns the
+150	   Connect-UDP-Bind response header field value set to true.
+
+152	   When "target_host" and "target_port" are set to a valid target (i.e.,
+153	   they follow the requirements in Section 3 of [CONNECT-UDP]), the
+154	   client is requesting bound UDP proxying but would accept fallback to
+155	   unextended UDP proxying to that target.  If the client does not have
+156	   a specific target, or if it wants bound UDP proxying without
+157	   fallback, it sets both the "target_host" and the "target_port"
+158	   variables to the '*' character (ASCII character 0x2A).  Note that the
+159	   '*' character MUST be percent-encoded before sending, per
+160	   Section 3.2.2 of [TEMPLATE].
+
+162	   If only one of the "target_host" and the "target_port" variables is
+163	   set to the '*' character, the request is malformed.  The recipient of
+164	   such a malformed request MUST respond with an error and SHOULD use
+165	   the 400 (Bad Request) status code.
+
+167	3.  Context Identifiers
+
+169	   As with unextended UDP proxying, the semantics of HTTP Datagrams are
+170	   conveyed by Context IDs (see Section 4 of [CONNECT-UDP]).  Endpoints
+171	   first allocate a new Context ID (per [CONNECT-UDP], clients allocate
+172	   even Context IDs while proxies allocate odd ones), and then use the
+173	   COMPRESSION_ASSIGN capsule (see Section 3.1) to convey the semantics
+174	   of the new Context ID to their peer.  This process is known as
+175	   registering the Context ID.
+
+177	   Each Context ID can have either compressed or uncompressed semantics.
+178	   The uncompressed variant encodes the target IP address and port into
+179	   each HTTP Datagram.  Conversely, the compressed variant exchanges the
+180	   target IP address and port once in the capsule during registration,
+181	   and then relies on shared state to map from the Context ID to the IP
+182	   address and port.
+
+184	   Context ID 0 was reserved by unextended UDP proxying to represent UDP
+185	   payloads sent to and from the "target_host" and "target_port" from
+186	   the URI template.  When the mechanism from this document is in use:
+
+188	   *  if the "target_host" and "target_port" variables are set to '*',
+189	      then Context ID 0 MUST NOT be used in HTTP Datagrams.  If one is
+190	      received, the recipient MUST abort the request stream.
+
+192	   *  otherwise, HTTP Datagrams with Context ID 0 have the same
+193	      semantics as in unextended UDP proxying.
+
+195	3.1.  The COMPRESSION_ASSIGN capsule
+
+197	   The Compression Assign capsule (capsule type 0x11) is used to
+198	   register the semantics of a Context ID.  It has the following format:
+
+200	   COMPRESSION_ASSIGN Capsule {
+201	     Type (i) = 0x11,
+202	     Length (i),
+203	     Context ID (i),
+204	     IP Version (8),
+205	     [IP Address (32..128)],
+206	     [UDP Port (16)],
+207	   }
+
+209	                Figure 1: Compression Assign Capsule Format
+
+211	   It contains the following fields:
+
+213	   IP Version:  The IP Version of the following IP Address field.  MUST
+214	      be 0, 4 or 6.  Setting this to zero indicates that this capsule
+215	      registers an uncompressed Context ID.  Otherwise, the capsule
+216	      registers a compressed Context ID for the IP address and UDP port
+217	      it carries.
+
+219	   IP Address:  The IP Address of this context.  This field is omitted
+220	      if the IP Version field is set to 0.  Otherwise, it has a length
+221	      of 32 bits when the corresponding IP Version field value is 4, and
+222	      128 when the IP Version is 6.
+
+224	   UDP Port:  The UDP Port of this context, in network byte order.  This
+225	      field is omitted if the IP Version field is set to 0.
+
+227	   When an endpoint receives a COMPRESSION_ASSIGN capsule, it MUST
+228	   either accept or reject the corresponding registration:
+
+230	   *  if it accepts the registration, first the receiver MUST save the
+231	      mapping from Context ID to address and port (or save the fact that
+232	      this Context ID is uncompressed).  Second, the receiver MUST
+233	      return a COMPRESSION_ACK capsule with the Context ID set to the
+234	      one from the received COMPRESSION_ASSIGN capsule back to its peer,
+235	      indicating it has accepted the registration.
+
+237	   *  if it rejects the registration, the receiver MUST respond by
+238	      sending a COMPRESSION_CLOSE capsule with the Context ID set to the
+239	      one from the received COMPRESSION_ASSIGN capsule.
+
+241	   As mandated in Section 4 of [CONNECT-UDP], clients can only allocate
+242	   even Context IDs, while proxies can only allocate odd ones.  Since
+243	   the value 0 was reserved by unextended UDP proxying, the Context ID
+244	   value of COMPRESSION_ASSIGN can never be zero.
+
+246	   Endpoints MUST NOT send two COMPRESSION_ASSIGN capsules with the same
+247	   Context ID.  If a recipient detects a repeated Context ID, it MUST
+248	   treat the capsule as malformed.  Receipt of a malformed capsule MUST
+249	   be treated as an error processing the Capsule Protocol, as defined in
+250	   Section 3.3 of [HTTP-DGRAM].
+
+252	   If the uncompressed Context ID is closed, the proxy MUST NOT open new
+253	   compressed Context IDs.  Allowing the proxy to do so would permit
+254	   traffic from source tuples not selected by the client, defeating the
+255	   IP restriction described in Section 8.1.  Note that compressed
+256	   Context IDs that were established prior to the closing of the
+257	   uncompressed Context ID are not impacted.
+
+259	   Only one Context ID can be used per (IP address, port) tuple.
+260	   Endpoints MUST NOT register a Context ID for a tuple for which there
+261	   is already an existing Context ID.  This can however happen if both
+262	   endpoints register Context IDs simultaneously for the same tuple
+263	   before learning that the peer also opened one.  If an endpoint
+264	   detects that both it and its peer have opened a Context ID for the
+265	   same tuple, the endpoint MUST close the Context ID that was opened by
+266	   the proxy.  If an endpoint receives a COMPRESSION_ASSIGN capsule
+267	   whose tuple matches another open Context ID that was opened by its
+268	   peer, it MUST treat the capsule as malformed.
+
+270	   Endpoints MAY pre-emptively use Context IDs not yet acknowledged by
+271	   the peer via COMPRESSION_ACK, knowing that those HTTP Datagrams can
+272	   be dropped if they arrive before the corresponding COMPRESSION_ASSIGN
+273	   capsule, or if the peer rejects the registration.
+
+275	3.2.  The COMPRESSION_ACK capsule
+
+277	   The Compression Acknowledgment capsule (capsule type 0x12) serves to
+278	   confirm registration of a Context ID that was received via a
+279	   COMPRESSION_ASSIGN capsule.
+
+281	   COMPRESSION_ACK Capsule {
+282	     Type (i) = 0x12,
+283	     Length (i),
+284	     Context ID (i),
+285	   }
+
+287	            Figure 2: Compression Acknowledgment Capsule Format
+
+289	   An endpoint can only send a COMPRESSION_ACK capsule if it received a
+290	   COMPRESSION_ASSIGN capsule with the same Context ID.  If an endpoint
+291	   receives a COMPRESSION_ACK capsule for a Context ID it did not
+292	   attempt to register via COMPRESSION_ASSIGN, that capsule is
+293	   considered malformed.
+
+295	3.3.  The COMPRESSION_CLOSE capsule
+
+297	   The Compression Close capsule (capsule type 0x13) serves two
+298	   purposes.  It can be sent as a direct response to a received
+299	   COMPRESSION_ASSIGN capsule, to indicate that the registration was
+300	   rejected.  It can also be sent later to indicate the closure of a
+301	   previously assigned registration.
+
+303	   COMPRESSION_CLOSE Capsule {
+304	     Type (i) = 0x13,
+305	     Length (i),
+306	     Context ID (i),
+307	   }
+
+309	                 Figure 3: Compression Close Capsule Format
+
+311	   Once an endpoint has either sent or received a COMPRESSION_CLOSE for
+312	   a given Context ID, it MUST NOT send any further datagrams with that
+313	   Context ID.  (Note that, due to reordering, an endpoint can receive
+314	   datagrams with a Context ID that has previously been closed; these
+315	   MUST be discarded silently.)
+
+317	   Since the value 0 was reserved by unextended UDP proxying, a
+318	   COMPRESSION_CLOSE capsule with Context ID set to zero is malformed.
+
+320	   Endpoints MAY close any Context ID regardless of which endpoint
+321	   registered it.  This is useful for example, when a mapping is unused
+322	   for a long time.  Another potential use is restricting some targets
+323	   (see Section 8.1).
+
+325	   Once a registration is closed, endpoints can instead use an
+326	   uncompressed Context ID to exchange UDP payloads for the given
+327	   target, if such a Context has been registered (see Section 4).
+
+329	   Once a Context ID has been closed, that ID cannot be reused; see
+330	   Section 4 of [CONNECT-UDP].
+
+332	4.  Uncompressed Operation
+
+334	   If the client wishes to send or receive uncompressed datagrams, it
+335	   MUST first send a COMPRESSION_ASSIGN capsule (see Figure 1) to the
+336	   proxy with the IP Version set to zero.  This registers the Context ID
+337	   as having uncompressed semantics: all HTTP Datagrams with this
+338	   Context ID have the following format:
+
+340	   Uncompressed Bound UDP Proxying Payload {
+341	     IP Version (8),
+342	     IP Address (32..128),
+343	     UDP Port (16),
+344	     UDP Payload (..),
+345	   }
+
+347	       Figure 4: Uncompressed Bound UDP Proxying HTTP Datagram Format
+
+349	   It contains the following fields:
+
+351	   IP Version:  The IP Version of the following IP Address field.  MUST
+352	      be 4 or 6.
+
+354	   IP Address:  The IP Address of this proxied UDP packet.  When sent
+355	      from client to proxy, this is the target host to which the proxy
+356	      will send this UDP payload.  When sent from proxy to client, this
+357	      represents the source IP address of the UDP packet received by the
+358	      proxy.  This field has a length of 32 bits when the corresponding
+359	      IP Version field value is 4, and 128 when the IP Version is 6.
+
+361	   UDP Port:  The UDP Port of this proxied UDP packet in network byte
+362	      order.  When sent from client to proxy, this is the target port to
+363	      which the proxy will send this UDP payload.  When sent from proxy
+364	      to client, this represents the source UDP port of the UDP packet
+365	      received by the proxy.
+
+367	   UDP Payload:  The unmodified UDP Payload of this proxied UDP packet
+368	      (referred to as "data octets" in [UDP]).
+
+370	   A client MUST NOT open an uncompressed Context ID if one is already
+371	   open.  If a server receives a request to open an uncompressed Context
+372	   ID and it already has one open, then the server MUST treat the second
+373	   capsule as malformed.  Note that it's possible for the client to
+374	   close the uncompressed Context ID and reopen it later with a
+375	   different Context ID, as long as there aren't two uncompressed
+376	   Context IDs open at the same time.  Only the client can request
+377	   uncompressed Context IDs.  If a client receives a COMPRESSION_ASSIGN
+378	   capsule with the IP Version set to 0, it MUST treat it as malformed.
+
+380	5.  Compressed Operation
+
+382	   Endpoints MAY choose to compress the IP address and port information
+383	   per datagram for a given target using Context IDs.  This is
+384	   accomplished by registering a compressed Context ID using the
+385	   COMPRESSION_ASSIGN capsule (see Figure 1).
+
+387	   If the Context ID in an HTTP Datagram matches one previously
+388	   registered for compressed operation, the rest of the HTTP Datagram
+389	   represents the UDP payload:
+
+391	   Compressed Bound UDP Proxying Payload {
+392	     UDP Payload (..),
+393	   }
+
+395	        Figure 5: Compressed Bound UDP Proxying HTTP Datagram Format
+
+397	   It contains the following field:
+
+399	   UDP Payload:  The unmodified UDP Payload of this proxied UDP packet
+400	      (referred to as "data octets" in [UDP]).
+
+402	6.  The Connect-UDP-Bind Header Field
+
+404	   The "Connect-UDP-Bind" header field’s value is a Boolean Structured
+405	   Field set to true.  Clients and proxy both indicate support for this
+406	   extension by sending the Connect-UDP-Bind header field with a value
+407	   of ?1.  Once an endpoint has both sent and received the Connect-UDP-
+408	   Bind header field set to true, this extension is enabled.  Any other
+409	   value type MUST be handled as if the field were not present by the
+410	   recipients (for example, if this field is defined multiple times, its
+411	   type becomes a List and therefore is to be ignored).  This document
+412	   does not define any parameters for the Connect-UDP-Bind header field
+413	   value, but future documents might define parameters.  Receivers MUST
+414	   ignore unknown parameters.
+
+416	7.  The Proxy-Public-Address Response Header Field
+
+418	   Upon accepting the request, the proxy MUST select at least one public
+419	   IP address to bind.  The proxy MAY assign more addresses.  For each
+420	   selected address, it MUST select an open port to bind to this
+421	   request.  From then and until the tunnel is closed, the proxy SHALL
+422	   send packets received on these (IP address, port) tuples to the
+423	   client.  The proxy MUST communicate the selected addresses and ports
+424	   to the client using the "Proxy-Public-Address" header field.  The
+425	   header field is a List.  Each member of the List is a String,
+426	   comprised of the ip-port tuple.  The format of the String is defined
+427	   using IP-literal, IPv4address, and port from Section 3.2 of [URI].
+
+429	   ip-port-tuple = DQUOTE ( IP-literal / IPv4address ) ":" port DQUOTE
+
+431	                       Figure 6: Proxy Address Format
+
+433	   When a single (IP address, port) tuple is provided in the Proxy-
+434	   Public-Address field, the proxy MUST use the same public IP address
+435	   and port for the lifetime of the tunnel.  When multiple tuples are
+436	   provided, maintaining address stability per address family for the
+437	   duration of the tunnel is RECOMMENDED.
+
+439	   Note that since the addresses are conveyed in HTTP response headers,
+440	   a subsequent change of addresses on the proxy cannot be conveyed to
+441	   the client.
+
+443	   If the proxy only shares IP addresses from a single address family,
+444	   that indicates that the proxy only supports that family.  The client
+445	   SHOULD NOT attempt to register compressed Context IDs or send
+446	   uncompressed datagrams intended for targets whose IP address families
+447	   were not indicated via the IP addresses listed in the Proxy-Public-
+448	   Address header field, as the proxy will drop those datagrams and
+449	   reject those registrations.
+
+451	8.  Proxy Behavior
+
+453	   After accepting the bound UDP proxying request, the proxy uses an
+454	   assigned IP address and port to transmit UDP payloads received from
+455	   the client to the target IP Address and UDP Port specified in each
+456	   HTTP Datagram received from the client.  The proxy uses the same
+457	   ports to listen for UDP packets from any authorized target and
+458	   forwards them to the client by encapsulating them in HTTP Datagrams,
+459	   using the corresponding Context ID.
+
+461	   If the proxy receives UDP payloads that don't correspond to any
+462	   registration (i.e., no compression for the given target was ever
+463	   established and there is no uncompressed registration), the proxy
+464	   will either drop the datagram or temporarily buffer it (see Section 5
+465	   of [CONNECT-UDP]).
+
+467	8.1.  Restricting IPs
+
+469	   If a client does not wish to receive datagrams from unknown senders,
+470	   it can close the uncompressed Context ID (or not open it in the first
+471	   place).  In that scenario, the proxy effectively acts as a firewall
+472	   against unwanted or unknown IPs.
+
+474	9.  Security Considerations
+
+476	   The security considerations described in Section 7 of [CONNECT-UDP]
+477	   also apply here.  Since Traversal Using Relays around NAT (TURN) can
+478	   be run over this mechanism, implementors will benefit from reviewing
+479	   the security considerations in Section 21 of [TURN].
+
+481	   Since unextended UDP proxying requests carry the target as part of
+482	   the request, the proxy can protect against unauthorized targets by
+483	   rejecting requests before creating the tunnel, and communicate the
+484	   rejection reason in response header fields.  The uncompressed Context
+485	   ID allows transporting datagrams to and from any target.  Clients
+486	   that keep the uncompressed Context ID open need to be able to receive
+487	   from all targets.  If the UDP proxy were to reject unextended UDP
+488	   proxying requests to some targets (as recommended in Section 7 of
+489	   [CONNECT-UDP]), then for bound UDP proxying requests where the
+490	   uncompressed Context ID is open, the UDP proxy needs to perform
+491	   checks on the target of each uncompressed Context ID datagram it
+492	   receives.  Similarly, the UDP proxy needs to perform checks on the IP
+493	   address and port of received COMPRESSION_ASSIGN capsules and reject
+494	   the registration of compressed Context IDs to disallowed targets.
+
+496	   When an endpoint accepts the registration of a Context ID, it will
+497	   need to store it in memory.  To prevent unbounded memory growth,
+498	   endpoints MUST place a limit on how many Context IDs can be open
+499	   simultaneously and reject registrations beyond the limit.
+
+501	   Note that if the compression response (COMPRESSION_ACK or
+502	   COMPRESSION_CLOSE) cannot be immediately sent due to flow or
+503	   congestion control, an upper limit on how many compression responses
+504	   the endpoint is willing to buffer MUST be set to prevent memory
+505	   exhaustion.  The proxy MUST abort the request stream if this limit is
+506	   reached.
+
+508	10.  Operational Considerations
+
+510	   When moving traffic between uncompressed and compressed Context IDs,
+511	   the effective MTU will change.  This can hinder Datagram
+512	   Packetization Layer PMTU Discovery (DPLPMTUD) between the client and
+513	   the target [DPLPMTUD].  To avoid that, if an endpoint intends to use
+514	   compression, it SHOULD request it as early as possible.
+
+516	   Since this mechanism effectively allows clients to share the IP
+517	   address of the proxy, implementers may wish to review [IP-SHARING].
+
+519	11.  IANA Considerations
+
+521	11.1.  HTTP Fields
+
+523	   This document requests IANA to register the following new items in
+524	   the "Hypertext Transfer Protocol (HTTP) Field Name Registry" registry
+525	   maintained at <https://www.iana.org/assignments/http-fields>:
+
+527	                +======================+=================+
+528	                | Field Name           | Structured Type |
+529	                +======================+=================+
+530	                | Connect-UDP-Bind     | Item            |
+531	                +----------------------+-----------------+
+532	                | Proxy-Public-Address | List            |
+533	                +----------------------+-----------------+
+
+535	                           Table 1: New Fields
+
+537	   All of these new entries use the following values for these fields:
+
+539	   Status:  provisional (permanent if this document is approved)
+540	   Reference:  This document
+541	   Comments:  None
+
+543	11.2.  Capsules
+
+545	   This document requests IANA to register the following new items to
+546	   the "HTTP Capsule Types" registry maintained at
+547	   <https://www.iana.org/assignments/masque>:
+
+549	                      +=======+====================+
+550	                      | Value | Capsule Type       |
+551	                      +=======+====================+
+552	                      | 0x11  | COMPRESSION_ASSIGN |
+553	                      +-------+--------------------+
+554	                      | 0x12  | COMPRESSION_ACK    |
+555	                      +-------+--------------------+
+556	                      | 0x13  | COMPRESSION_CLOSE  |
+557	                      +-------+--------------------+
+
+559	                          Table 2: New Capsules
+
+561	   All of these new entries use the following values for these fields:
+
+563	   Status:  provisional (permanent if this document is approved)
+564	   Reference:  This document
+565	   Change Controller:  IETF
+566	   Contact:  MASQUE Working Group masque@ietf.org
+567	      (mailto:masque@ietf.org)
+568	   Notes:  None
+
+570	12.  References
+
+572	12.1.  Normative References
+
+574	   [ABNF]     Crocker, D., Ed. and P. Overell, "Augmented BNF for Syntax
+575	              Specifications: ABNF", STD 68, RFC 5234,
+576	              DOI 10.17487/RFC5234, January 2008,
+577	              <https://www.rfc-editor.org/rfc/rfc5234>.
+
+579	   [CONNECT-UDP]
+580	              Schinazi, D., "Proxying UDP in HTTP", RFC 9298,
+581	              DOI 10.17487/RFC9298, August 2022,
+582	              <https://www.rfc-editor.org/rfc/rfc9298>.
+
+584	   [HTTP]     Fielding, R., Ed., Nottingham, M., Ed., and J. Reschke,
+585	              Ed., "HTTP Semantics", STD 97, RFC 9110,
+586	              DOI 10.17487/RFC9110, June 2022,
+587	              <https://www.rfc-editor.org/rfc/rfc9110>.
+
+589	   [HTTP-DGRAM]
+590	              Schinazi, D. and L. Pardue, "HTTP Datagrams and the
+591	              Capsule Protocol", RFC 9297, DOI 10.17487/RFC9297, August
+592	              2022, <https://www.rfc-editor.org/rfc/rfc9297>.
+
+594	   [QUIC]     Iyengar, J., Ed. and M. Thomson, Ed., "QUIC: A UDP-Based
+595	              Multiplexed and Secure Transport", RFC 9000,
+596	              DOI 10.17487/RFC9000, May 2021,
+597	              <https://www.rfc-editor.org/rfc/rfc9000>.
+
+599	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+600	              Requirement Levels", BCP 14, RFC 2119,
+601	              DOI 10.17487/RFC2119, March 1997,
+602	              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+604	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+605	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+606	              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+608	   [STRUCTURED-FIELDS]
+609	              Nottingham, M. and P. Kamp, "Structured Field Values for
+610	              HTTP", RFC 9651, DOI 10.17487/RFC9651, September 2024,
+611	              <https://www.rfc-editor.org/rfc/rfc9651>.
+
+613	   [TEMPLATE] Gregorio, J., Fielding, R., Hadley, M., Nottingham, M.,
+614	              and D. Orchard, "URI Template", RFC 6570,
+615	              DOI 10.17487/RFC6570, March 2012,
+616	              <https://www.rfc-editor.org/rfc/rfc6570>.
+
+618	   [UDP]      Postel, J., "User Datagram Protocol", STD 6, RFC 768,
+619	              DOI 10.17487/RFC768, August 1980,
+620	              <https://www.rfc-editor.org/rfc/rfc768>.
+
+622	   [URI]      Berners-Lee, T., Fielding, R., and L. Masinter, "Uniform
+623	              Resource Identifier (URI): Generic Syntax", STD 66,
+624	              RFC 3986, DOI 10.17487/RFC3986, January 2005,
+625	              <https://www.rfc-editor.org/rfc/rfc3986>.
+
+627	12.2.  Informative References
+
+629	   [CONNECT-IP]
+630	              Pauly, T., Ed., Schinazi, D., Chernyakhovsky, A.,
+631	              Kühlewind, M., and M. Westerlund, "Proxying IP in HTTP",
+632	              RFC 9484, DOI 10.17487/RFC9484, October 2023,
+633	              <https://www.rfc-editor.org/rfc/rfc9484>.
+
+635	   [DPLPMTUD] Fairhurst, G., Jones, T., Tüxen, M., Rüngeler, I., and T.
+636	              Völker, "Packetization Layer Path MTU Discovery for
+637	              Datagram Transports", RFC 8899, DOI 10.17487/RFC8899,
+638	              September 2020, <https://www.rfc-editor.org/rfc/rfc8899>.
+
+640	   [ICE]      Keranen, A., Holmberg, C., and J. Rosenberg, "Interactive
+641	              Connectivity Establishment (ICE): A Protocol for Network
+642	              Address Translator (NAT) Traversal", RFC 8445,
+643	              DOI 10.17487/RFC8445, July 2018,
+644	              <https://www.rfc-editor.org/rfc/rfc8445>.
+
+646	   [IP-SHARING]
+647	              Ford, M., Ed., Boucadair, M., Durand, A., Levis, P., and
+648	              P. Roberts, "Issues with IP Address Sharing", RFC 6269,
+649	              DOI 10.17487/RFC6269, June 2011,
+650	              <https://www.rfc-editor.org/rfc/rfc6269>.
+
+652	   [TURN]     Reddy, T., Ed., Johnston, A., Ed., Matthews, P., and J.
+653	              Rosenberg, "Traversal Using Relays around NAT (TURN):
+654	              Relay Extensions to Session Traversal Utilities for NAT
+655	              (STUN)", RFC 8656, DOI 10.17487/RFC8656, February 2020,
+656	              <https://www.rfc-editor.org/rfc/rfc8656>.
+
+658	   [WebRTC]   "WebRTC", W3C Recommendation, 26 January 2021,
+659	              <https://www.w3.org/TR/webrtc/>.
+
+661	Appendix A.  Example
+
+663	   In the example below, the client is configured with URI Template
+664	   "https://example.org/.well-known/masque/
+665	   udp/{target_host}/{target_port}/" and listens for traffic on the
+666	   proxy, eventually decides that it no longer wants to listen for
+667	   connections from new targets, and limits its communication with only
+668	   203.0.113.11:60000 and no other UDP target.
+
+670	   Client                                             Server
+
+672	   STREAM(44): HEADERS            -------->
+673	     :method = CONNECT
+674	     :protocol = connect-udp
+675	     :scheme = https
+676	     :path = /.well-known/masque/udp/%2A/%2A/
+677	     :authority = proxy.example.org
+678	     connect-udp-bind = ?1
+679	     capsule-protocol = ?1
+
+681	              <--------  STREAM(44): HEADERS
+682	                           :status = 200
+683	                           connect-udp-bind = ?1
+684	                           capsule-protocol = ?1
+685	                           proxy-public-address = "192.0.2.45:54321",  \
+686	                                              "[2001:db8::1234]:54321"
+
+688	  // Register Context ID 2 to be used for uncompressed UDP payloads
+689	  // to/from any target.
+
+691	   CAPSULE                       -------->
+692	     Type = COMPRESSION_ASSIGN
+693	     Context ID = 2
+694	     IP Version = 0
+
+696	  // Proxy confirms registration.
+
+698	              <-------- CAPSULE
+699	                          Type = COMPRESSION_ACK
+700	                          Context ID = 2
+
+702	  // Target talks to Client using the uncompressed Context ID.
+
+704	              <--------  DATAGRAM
+705	                           Quarter Stream ID = 11
+706	                           Context ID = 2
+707	                           IP Version = 4
+708	                           IP Address = 192.0.2.42
+709	                           UDP Port = 50000
+710	                           UDP Payload = Encapsulated UDP Payload
+
+712	  // Client responds on the same uncompressed Context ID.
+
+714	   DATAGRAM                       -------->
+715	     Quarter Stream ID = 11
+716	     Context ID = 2
+717	     IP Version = 4
+718	     IP Address = 192.0.2.42
+719	     UDP Port = 50000
+720	     UDP Payload = Encapsulated UDP Payload
+
+722	  // Another target talks to Client using the uncompressed Context ID.
+
+724	              <--------  DATAGRAM
+725	                           Quarter Stream ID = 11
+726	                           Context ID = 2
+727	                           IP Version = 4
+728	                           IP Address = 203.0.113.11
+729	                           UDP Port = 60000
+730	                           UDP Payload = Encapsulated UDP Payload
+
+732	  // Client responds on the same uncompressed Context ID.
+
+734	   DATAGRAM                       -------->
+735	     Quarter Stream ID = 11
+736	     Context ID = 2
+737	     IP Version = 4
+738	     IP Address = 203.0.113.11
+739	     UDP Port = 60000
+740	     UDP Payload = Encapsulated UDP Payload
+
+742	  // Register 203.0.113.11:60000 to compress it in the future.
+
+744	   CAPSULE                       -------->
+745	     Type = COMPRESSION_ASSIGN
+746	     Context ID = 4
+747	     IP Version = 4
+748	     IP Address = 203.0.113.11
+749	     UDP Port = 60000
+
+751	  // Proxy confirms registration.
+
+753	              <-------- CAPSULE
+754	                          Type = COMPRESSION_ACK
+755	                          Context ID = 4
+
+757	  // Omit IP address and port for future packets intended for
+758	  // 203.0.113.11:60000 hereon.
+
+760	   DATAGRAM                       -------->
+761	     Context ID = 4
+762	     UDP Payload = Encapsulated UDP Payload
+
+764	              <--------  DATAGRAM
+765	                          Context ID = 4
+766	                          UDP Payload = Encapsulated UDP Payload
+
+768	  // Request packets without a corresponding compressed Context
+769	  // to be dropped by closing the uncompressed Context ID.
+
+771	   CAPSULE                       -------->
+772	     Type = COMPRESSION_CLOSE
+773	     Context ID = 2
+
+775	  // Context ID 4 = 203.0.113.11:60000 traffic is accepted,
+776	  // and other traffic is dropped at the proxy.
+
+778	Appendix B.  Comparison with CONNECT-IP
+
+780	   While the use cases described in Section 1 could be supported using
+781	   IP proxying in HTTP [CONNECT-IP], it would require that every HTTP
+782	   Datagram carries a complete IP header.  This would lead to both
+783	   inefficiencies in the wire encoding and reduction in available
+784	   Maximum Transmission Unit (MTU).  Furthermore, Web browsers would
+785	   need to support IPv4 and IPv6 header generation, parsing, validation
+786	   and error handling.
+
+788	Acknowledgments
+
+790	   This proposal is the result of many conversations with MASQUE working
+791	   group participants.  In particular, the authors would like to thank
+792	   Alejandro Sedeño, Ben Schwartz, Ines Robles, Lucas Pardue, Mike
+793	   Bishop, Magnus Westerlund, Marius Kleidl, Mark Nottingham, Marten
+794	   Seemann, Tommy Pauly, and Yaroslav Rosomakho for their reviews.
+
+796	Authors' Addresses
+
+798	   David Schinazi
+799	   Google LLC
+800	   Email: dschinazi.ietf@gmail.com
+
+802	   Abhi Singh
+803	   Google LLC
+804	   Email: abhisinghietf@gmail.com
+
+
+
+
+
+
+
+
+
