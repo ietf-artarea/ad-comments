@@ -1,0 +1,489 @@
+idnits 2.17.1 
+
+draft-ietf-stir-certificates-shortlived-06.txt:
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     No nits found.
+
+--------------------------------------------------------------------------------
+
+
+2	Network Working Group                                        J. Peterson
+3	Internet-Draft                                                TransUnion
+4	Intended status: Standards Track                             6 July 2026
+5	Expires: 7 January 2027
+
+7	         Short-Lived Certificates for Secure Telephone Identity
+8	               draft-ietf-stir-certificates-shortlived-06
+
+10	Abstract
+
+12	   When certificates are used as credentials to attest the assignment of
+13	   ownership of telephone numbers, some mechanism is required to provide
+14	   certificate freshness.  This document specifies short-lived
+15	   certificates as a means of guaranteeing certificate freshness for
+16	   secure telephone identity (STIR), potentially relying on the
+17	   Automated Certificate Management Environment (ACME) or similar
+18	   mechanisms to allow signers to acquire certificates as needed.
+
+20	Status of This Memo
+
+22	   This Internet-Draft is submitted in full conformance with the
+23	   provisions of BCP 78 and BCP 79.
+
+25	   Internet-Drafts are working documents of the Internet Engineering
+26	   Task Force (IETF).  Note that other groups may also distribute
+27	   working documents as Internet-Drafts.  The list of current Internet-
+28	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+30	   Internet-Drafts are draft documents valid for a maximum of six months
+31	   and may be updated, replaced, or obsoleted by other documents at any
+32	   time.  It is inappropriate to use Internet-Drafts as reference
+33	   material or to cite them other than as "work in progress."
+
+35	   This Internet-Draft will expire on 7 January 2027.
+
+37	Copyright Notice
+
+39	   Copyright (c) 2026 IETF Trust and the persons identified as the
+40	   document authors.  All rights reserved.
+
+42	   This document is subject to BCP 78 and the IETF Trust's Legal
+43	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+44	   license-info) in effect on the date of publication of this document.
+45	   Please review these documents carefully, as they describe your rights
+46	   and restrictions with respect to this document.  Code Components
+47	   extracted from this document must include Revised BSD License text as
+48	   described in Section 4.e of the Trust Legal Provisions and are
+49	   provided without warranty as described in the Revised BSD License.
+
+51	Table of Contents
+
+53	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+54	   2.  Terminology . . . . . . . . . . . . . . . . . . . . . . . . .   3
+55	   3.  Short-lived certificates for STIR . . . . . . . . . . . . . .   3
+56	   4.  Certificate conveyance with 'x5c' . . . . . . . . . . . . . .   5
+57	   5.  Certificate Acquisition with ACME . . . . . . . . . . . . . .   7
+58	   6.  Ooperational Considerations . . . . . . . . . . . . . . . . .   8
+59	   7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   8
+60	   8.  Privacy Considerations  . . . . . . . . . . . . . . . . . . .   8
+61	   9.  Security Considerations . . . . . . . . . . . . . . . . . . .   9
+62	   10. Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .   9
+63	   11. References  . . . . . . . . . . . . . . . . . . . . . . . . .   9
+64	     11.1.  Normative References . . . . . . . . . . . . . . . . . .   9
+65	     11.2.  Informative References . . . . . . . . . . . . . . . . .  11
+66	   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  11
+
+68	1.  Introduction
+
+70	   The STIR problem statement [RFC7340] discusses many attacks on the
+71	   telephone network that are enabled by impersonation, including
+72	   various forms of robocalling, voicemail hacking, and swatting.  One
+73	   of the most important components of a system to prevent impersonation
+74	   is the implementation of credentials that identify the parties who
+75	   control telephone numbers.  The STIR certificates [RFC8226]
+76	   specification describes a credential system based on [X.509] version
+77	   3 certificates in accordance with [RFC5280] for that purpose.  Those
+78	   credentials can then be used by STIR authentication services
+79	   [RFC8224] to sign PASSporT objects [RFC8225] carried in a SIP
+80	   [RFC3261] request.
+
+82	   The STIR certificates document specifies an extension to X.509 that
+83	   defines a Telephony Number (TN) Authorization List that may be
+84	   included by certification authorities in certificates.  This
+85	   extension provides additional information that relying parties can
+86	   use when validating transactions with the certificate: either in the
+87	   form of Service Provider Codes (SPCs) or telephone numbers.
+88	   Telephone numbers or number ranges are used in delegate STIR
+89	   certificates [RFC9060].  When a SIP request arrives at a terminating
+90	   administrative domain, for example, the calling number attested by
+91	   the SIP request can be compared to the TN Authorization List of the
+92	   delegate certificate that signed the request to determine if the
+93	   caller is authorized to use that calling number in SIP.
+
+95	   No specific recommendation is made in the STIR certificates document
+96	   for a means of determining the freshness of certificates with a TN
+97	   Authorization List.  This document specifies how short-lived
+98	   certificates could be used as a means of preserving that freshness.
+99	   Short-lived certificates also have a number of other desirable
+100	   properties that fulfill important operational requirements for
+101	   network operators.  A mechanism such as the Automated Certificate
+102	   Management Environment (ACME) [RFC8555] could be leveraged to manage
+103	   these short-lived certificates, as well as various web-based
+104	   interfaces or other out-of-band mechanisms.  The interaction of STIR
+105	   with ACME has already been explored in [RFC9448], so it provides a
+106	   potentially attractive way of delivering short-lived certificates.
+
+108	   As the use of short-lived certificates described below involves a
+109	   certificate chain included by-value in the PASSporT header, this
+110	   document specifies the use of "x5c" in the PASSporT header when
+111	   short-lived certificates are present.
+
+113	2.  Terminology
+
+115	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+116	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+117	   "OPTIONAL" in this document are to be interpreted as described in BCP
+118	   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+119	   capitals, as shown here.
+
+121	3.  Short-lived certificates for STIR
+
+123	   While there is no easy definition of what constitutes a "short-lived"
+124	   certificate, the term typically refers to certificates that are valid
+125	   only for days or even hours, as opposed to the months or years common
+126	   in traditional public key infrastructures.  When the private keying
+127	   material associated with a certificate with an expiry of months or
+128	   years is compromised by an adversary, relying parties must review
+129	   certificate revocation lists (CRLs) or access real-time status
+130	   information with protocols such as OCSP to learn that the certificate
+131	   has been revoked.  Short-lived certificates offer an alternative
+132	   where, if compromised, certificates will shortly expire anyway, so
+133	   CRLs and OCSP are less meaningful.  Such certificates cannot be
+134	   cached for a long term by relying parties, minimizing their value to
+135	   attackers.
+
+137	   One of the additional benefits of using short-lived certificates is
+138	   that they do not require relying parties to perform any certificate
+139	   freshness check.  The trade-off is that the signer must acquire new
+140	   certificates frequently, so the cost of round-trip times to the
+141	   certification authority is paid on the signer's side rather than the
+142	   verifier's side; however, in environments where many parties may rely
+143	   on a single certificate, or at least where a single certificate will
+144	   be used to sign many transactions during its short lifetime, the
+145	   overall architecture will incur fewer round-trip times to the
+146	   certification authority and thus less processing delay.
+
+148	   In the STIR context, the TN Authorization List defined in [RFC8226]
+149	   adds a new wrinkle to the behavior of short-lived certificates,
+150	   especially when the TN Authorization List is populated with telephone
+151	   numbers or number ranges instead of Service Provider Codes (SPCs).  A
+152	   subject may have authority over multiple telephone numbers, but a
+153	   particular short-lived certificate issued to that subject could
+154	   attest the authority over all, some, or just one of those telephone
+155	   numbers.  Short-lived certificates permit a more on-demand
+156	   certification process, where subjects acquire certificates as needed,
+157	   potentially in reaction to calls being placed.  A STIR authentication
+158	   service could even acquire a new certificate on a per-call basis that
+159	   can only sign for the calling party number of the call in question,
+160	   as it would expire immediately thereafter.  At the other end of the
+161	   spectrum, a large enterprise service provider could acquire a
+162	   certificate valid for millions of numbers, but expire the certificate
+163	   after a very short duration - on the order of hours - to reduce the
+164	   risk that the certificate would be compromised.
+
+166	   This inherent flexibility in the short-lived certificate architecture
+167	   would also permit authentication services to implement very narrow
+168	   policies for certificate usage.  A large service provider who wanted
+169	   to avoid revealing which phone numbers they controlled, for example,
+170	   could provide no information in the certificate that signs a call
+171	   other than just the single telephone number that corresponds to the
+172	   calling party's number.  How frequently the service provider feels
+173	   that they need to expire that certificate and acquire a new one is
+174	   entirely a matter of local policy.  This makes it much harder for
+175	   entities monitoring signatures over calls to guess who owns which
+176	   numbers, and provides a much more complicated threat surface for
+177	   attackers trying to compromise the service.
+
+179	4.  Certificate conveyance with 'x5c'
+
+181	   In order to reduce the burden on verification services, an
+182	   authentication service could also piggyback a short-lived certificate
+183	   onto the PASSporT, so that no network lookup and consequent round-
+184	   trip delay would be required on the terminating side to acquire the
+185	   new certificate.  In particular, the poor cacheability of short-lived
+186	   certificates may require frequent fetches of certificates via the
+187	   "x5u" PASSporT header element when relying parties validate
+188	   PASSporTs.
+
+190	   As an optimization, this specification specifies the conveyance of
+191	   the certificate chain for a short-lived certificate via the "x5c" JWS
+192	   header element ([RFC7515] Section 4.1.6).  The "x5c" element contains
+193	   a base64 encoded PEM representation of the certificate chain.  STIR
+194	   Verification service implementations compliant with this
+195	   specification MUST support the "x5c" element; authentication services
+196	   MUST use the "x5c" format for PASSporTs signed by certificates with a
+197	   valid lifetime shorter than one week.  The presence of x5c creates
+198	   PASSporT objects that are considerably larger than typical RFC8225
+199	   tokens, and the longer the certificate chain, the larger the PASSporT
+200	   header will be.  But provided the certificate chain leads to a
+201	   trusted certification authority, "x5c" precludes the need for a
+202	   round-trip time before validation at the STIR verification service.
+203	   The root certificate SHOULD NOT be included in the chain, though it
+204	   may be required in some deployment environments.
+
+206	   An example PASSporT header with an "x5c" element with three
+207	   certificates (including the root) in its chain might look as follows:
+
+209	  { "typ":"passport",
+210	    "ppt":"div",
+211	    "alg":"ES256",
+212	    "x5c":
+213	        ["MIICkTCCAjigAwIBAgIUb689vcv/kTP7N6J7Gz9YZU21WT4wCgYIKoZIzj0EAwIw
+214	        SzELMAkGA1UEBhMCVVMxFjAUBgNVBAoMDUFjbWUgQ0EsIEluYy4xJDAiBgNVBAMM
+215	        G0FjbWUgU0hBS0VOIEludGVybWVkaWF0ZSBDQTAeFw0yNDA3MDgxNDI4MjVaFw0y
+216	        NDA3MDkxNDI4MjVaMFUxCzAJBgNVBAYTAlVTMR4wHAYDVQQKDBVBY21lIEVudGVy
+217	        cHJpc2UsIEluYy4xJjAkBgNVBAMMHVNIQUtFTiBUTi1BdXRobi1MaXN0IEJ5IFZh
+218	        bHVlMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEuxmGGgRklHe0GyGbgANc4182
+219	        z3y6LdJ9Xp0r6xWspI/K3msUWD3ijxA5iYEKUBLofBMbwHiDS4CfMldTHUuMFqOB
+220	        7zCB7DAMBgNVHRMBAf8EAjAAMB0GA1UdDgQWBBTbmpeh0wHlpxvtJlVbI6mD+idq
+221	        cjAfBgNVHSMEGDAWgBTNsw0NkoZNWYL1bn2vwna5gwp0szAOBgNVHQ8BAf8EBAMC
+222	        B4AwNAYIKwYBBQUHAQEEKDAmMCQGA1UdH4YdaHR0cHM6Ly9zdGlwYS5hY21lLWNh
+223	        LmNvbS9jcmwwVgYIKwYBBQUHARoESjBIoRMwERYLMTcwMzU1NTIwMDACAgPoog0W
+224	        CzE3MDM1NTUxMjM0oRMwERYLMTU3MTU1NTMwMDACAgfQog0WCzE1NzE1NTUyMzQ1
+225	        MAoGCCqGSM49BAMCA0cAMEQCIFzV0EyHdMXStqzROJkL6CO06+6FuFYZGIod9iMw
+226	        Yyr2AiAmEK1smeSAdoFYG5WTIGfjB13xAWn7EQH0SDkqOKKBwA==",
+227	        "MIICKjCCAdGgAwIBAgIUPV/XdduqC44On5FKIjmcqwWO1JkwCgYIKoZIzj0EAwIw
+228	        QzELMAkGA1UEBhMCVVMxFjAUBgNVBAoMDUFjbWUgQ0EsIEluYy4xHDAaBgNVBAMM
+229	        E0FjbWUgU0hBS0VOIFJvb3QgQ0EwHhcNMjQwNzA4MTQyODI1WhcNMzQwNzA5MTQy
+230	        ODI1WjBLMQswCQYDVQQGEwJVUzEWMBQGA1UECgwNQWNtZSBDQSwgSW5jLjEkMCIG
+231	        A1UEAwwbQWNtZSBTSEFLRU4gSW50ZXJtZWRpYXRlIENBMFkwEwYHKoZIzj0CAQYI
+232	        KoZIzj0DAQcDQgAE0wypYKOwsS8JU0Ahx4niuirUv0M9v01vUDHiSfFzWbeAlbK/
+233	        hWlVYHADeFoRC7cIldDJ3iupafdxVgQggPp+/aOBmjCBlzAPBgNVHRMBAf8EBTAD
+234	        AQH/MB0GA1UdDgQWBBTNsw0NkoZNWYL1bn2vwna5gwp0szAfBgNVHSMEGDAWgBRL
+235	        Uq0usIR/TU27Y5vNN94V7xKnzTAOBgNVHQ8BAf8EBAMCAQYwNAYIKwYBBQUHAQEE
+236	        KDAmMCQGA1UdH4YdaHR0cHM6Ly9zdGlwYS5hY21lLWNhLmNvbS9jcmwwCgYIKoZI
+237	        zj0EAwIDRwAwRAIgUoAbid+kGFQWdQnLpJGwc4c4JoYohenmm3y2duOBN58CIEDm
+238	        nWAQfT1HWvZt2M6q0nOopZLwrt/9LzkBJqomRgzr",
+239	        "MIIB6zCCAZGgAwIBAgIUGEca/xMNdZbTZUP8DsxrnbR246AwCgYIKoZIzj0EAwIw
+240	        QzELMAkGA1UEBhMCVVMxFjAUBgNVBAoMDUFjbWUgQ0EsIEluYy4xHDAaBgNVBAMM
+241	        E0FjbWUgU0hBS0VOIFJvb3QgQ0EwHhcNMjIwNTA3MDQ1ODIyWhcNNDIwNTA3MDQ1
+242	        ODIyWjBDMQswCQYDVQQGEwJVUzEWMBQGA1UECgwNQWNtZSBDQSwgSW5jLjEcMBoG
+243	        A1UEAwwTQWNtZSBTSEFLRU4gUm9vdCBDQTBZMBMGByqGSM49AgEGCCqGSM49AwEH
+244	        A0IABL7UD1CBpsNNq0EzDa90JUQV9etsUe8YOyOXpFB/9A8ahDj6HAJxuZJigSCG
+245	        dG6npehdHMeDHzHsPHMLy22qH6OjYzBhMB0GA1UdDgQWBBRLUq0usIR/TU27Y5vN
+246	        N94V7xKnzTAfBgNVHSMEGDAWgBRLUq0usIR/TU27Y5vNN94V7xKnzTAPBgNVHRMB
+247	        Af8EBTADAQH/MA4GA1UdDwEB/wQEAwIBBjAKBggqhkjOPQQDAgNIADBFAiEA+U9j
+248	        0vQpHOx4nF+jytmr/bpotH001R09zZiywozSydwCIE6hI66JwnmqRKeJ9OeTNyM5
+249	        asC7YWEm3bQqgukw/uEs"]
+250	 }
+
+252	   [RFC8224] provides a way of pointing to a certificate in a MIME body
+253	   associated with the SIP request, but for out-of-band uses of STIR,
+254	   having the certificate embedded in the PASSporT itself is a superior
+255	   option.  Note that for backward compatibility reasons,
+256	   implementations MAY include both "x5u" and "x5c" in the payload
+257	   header, but the two URIs MUST indicate the same certification chain.
+
+259	5.  Certificate Acquisition with ACME
+
+261	   One of the primary challenges facing short-lived certificates is
+262	   building an operational system that allows signers to acquire new
+263	   certificates and put them to immediate use.  ACME [RFC8555] is
+264	   designed for exactly this purpose.  After a client registers with an
+265	   ACME server, and the authority of the client for the names in
+266	   question is established (through means such as [RFC9448]), the client
+267	   can at any time apply for a certificate to be issued by sending an
+268	   appropriate JSON request to the server.  That request will contain a
+269	   CSR [RFC2986] indicating the intended scope of authority as well the
+270	   validity interval of the certificate in question.  Ultimately, this
+271	   will enable the client to download the certificate from a certificate
+272	   URL designated by the server.
+
+274	   ACME is based on the concept that clients establish accounts at an
+275	   ACME server, and that through challenges, the server learns which
+276	   identifiers it will issue for certificates requested for an account.
+277	   Any given certificate issued for an account can be for just one of
+278	   those identifiers, or potentially for more: this is determined by the
+279	   CSR that an ACME client creates for a particular order.  Thus, a
+280	   service provider with authority for millions of identifiers - that
+281	   is, millions of telephone numbers - could create a CSR for an ACME
+282	   order that requests a certificate only associated with one of those
+283	   telephone numbers if it so desired.  The same would be true of
+284	   certificates based on Service Provider Codes (SPCs) as described in
+285	   [RFC8226]: a service provider might have just one SPC or perhaps
+286	   many.  ACME thus provides flexibility to clients requesting
+287	   certificates to determine how much of their authority they want to
+288	   invest in any given certificate.
+
+290	   [RFC9448] uses the Authority Token Challenge (ATC) framework of
+291	   [RFC9447] to generate tokens that are provided to the CA in response
+292	   to ACME challenges.  For a usage with short-term certificates, it may
+293	   make sense for the ATC tokens to have a relatively long expiry, so
+294	   that the ACME client does not have to constantly return to the Token
+295	   Authority for new tokens.  This could potentially be used with the
+296	   ACME STAR [RFC8739] mechanism as well.
+
+298	6.  Ooperational Considerations
+
+300	   Short-lived certificates shift the cost of certificate freshness from
+301	   the verification side to the authentication service, which makes the
+302	   reachability of the certification authority and its ACME interface
+303	   operationally critical to call signing.  Operators SHOULD renew
+304	   certificates in advance of expiry with enough lead time to absorb CA
+305	   latency and transient failures, recognizing that the shorter the
+306	   certificate lifetime, the tighter that renewal margin becomes.
+307	   Operators should stagger renewals and apply backoff on failure rather
+308	   than retry aggressively against a busy CA, and the ACME STAR
+309	   mechanism [RFC8739] can remove the client from the synchronous
+310	   acquisition path by pre-issuing renewed certificates.  Useful signals
+311	   to monitor include renewal success rate and lead-time margin, ACME
+312	   error rates, and the rate of verification failures attributable to
+313	   expired certificates, which indicates a renewal pipeline falling
+314	   behind.
+
+316	   Conveying the certificate chain in "x5c" trades a network round-trip
+317	   for increased message size: the chain travels in every PASSporT,
+318	   enlarging the SIP Identity header by roughly the size of the chain.
+319	   This is a deliberate exchange of originating-side overhead for the
+320	   elimination of call-time fetches on the terminating side, but
+321	   operators should be aware that larger headers can interact poorly
+322	   with SIP transport, including fragmentation over UDP and
+323	   intermediaries that impose header-size limits.  The size cost is
+324	   minimized by keeping the TNAuthorizationList as small as the
+325	   deployment allows, keeping certificate chains short, and omitting the
+326	   root certificate from the chain where deployment conditions permit.
+
+328	7.  IANA Considerations
+
+330	   This document contains no actions for the IANA.
+
+332	8.  Privacy Considerations
+
+334	   Short-lived certificates provide attractive privacy properties when
+335	   compared to real-time status protocols like OCSP, which require
+336	   relying parties to perform a network query that can reveal a great
+337	   deal about the source and destination of communications.  For STIR,
+338	   these problems are compounded by the presence of the TN Authorization
+339	   List extension to certificates.  Short-lived certificates can
+340	   minimize the data that needs to appear in the TN Authorization List,
+341	   and consequently reduce the amount of information about the caller
+342	   leaked by certificate usage to an amount equal to what is leaked by
+343	   the call signaling itself.
+
+345	9.  Security Considerations
+
+347	   For further information on certificate security and practices, see
+348	   [RFC5280], in particular its Security Considerations.
+349	   Implementations should note the Security Considerations of [RFC8226]
+350	   for guidance on STIR certificate usage.  The Security Considerations
+351	   of [RFC8555] are relevant to the use of ACME to acquire short-lived
+352	   certificates, as are those of [RFC8739].
+
+354	10.  Acknowledgments
+
+356	   Stephen Farrell, Jack Rickard, Simon Castle, Chris Wendt, Alec
+357	   Feichnel, Eric Rescorla and Ning Zhang provided key input to this
+358	   document.
+
+360	11.  References
+
+362	11.1.  Normative References
+
+364	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+365	              Requirement Levels", BCP 14, RFC 2119,
+366	              DOI 10.17487/RFC2119, March 1997,
+367	              <https://www.rfc-editor.org/info/rfc2119>.
+
+369	   [RFC2986]  Nystrom, M. and B. Kaliski, "PKCS #10: Certification
+370	              Request Syntax Specification Version 1.7", RFC 2986,
+371	              DOI 10.17487/RFC2986, November 2000,
+372	              <https://www.rfc-editor.org/info/rfc2986>.
+
+374	   [RFC3261]  Rosenberg, J., Schulzrinne, H., Camarillo, G., Johnston,
+375	              A., Peterson, J., Sparks, R., Handley, M., and E.
+376	              Schooler, "SIP: Session Initiation Protocol", RFC 3261,
+377	              DOI 10.17487/RFC3261, July 2002,
+378	              <https://www.rfc-editor.org/info/rfc3261>.
+
+380	   [RFC5280]  Cooper, D., Santesson, S., Farrell, S., Boeyen, S.,
+381	              Housley, R., and W. Polk, "Internet X.509 Public Key
+382	              Infrastructure Certificate and Certificate Revocation List
+383	              (CRL) Profile", RFC 5280, DOI 10.17487/RFC5280, May 2008,
+384	              <https://www.rfc-editor.org/info/rfc5280>.
+
+386	   [RFC7515]  Jones, M., Bradley, J., and N. Sakimura, "JSON Web
+387	              Signature (JWS)", RFC 7515, DOI 10.17487/RFC7515, May
+388	              2015, <https://www.rfc-editor.org/info/rfc7515>.
+
+390	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+391	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+392	              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+394	   [RFC8224]  Peterson, J., Jennings, C., Rescorla, E., and C. Wendt,
+395	              "Authenticated Identity Management in the Session
+396	              Initiation Protocol (SIP)", RFC 8224,
+397	              DOI 10.17487/RFC8224, February 2018,
+398	              <https://www.rfc-editor.org/info/rfc8224>.
+
+400	   [RFC8225]  Wendt, C. and J. Peterson, "PASSporT: Personal Assertion
+401	              Token", RFC 8225, DOI 10.17487/RFC8225, February 2018,
+402	              <https://www.rfc-editor.org/info/rfc8225>.
+
+404	   [RFC8226]  Peterson, J. and S. Turner, "Secure Telephone Identity
+405	              Credentials: Certificates", RFC 8226,
+406	              DOI 10.17487/RFC8226, February 2018,
+407	              <https://www.rfc-editor.org/info/rfc8226>.
+
+409	   [RFC8555]  Barnes, R., Hoffman-Andrews, J., McCarney, D., and J.
+410	              Kasten, "Automatic Certificate Management Environment
+411	              (ACME)", RFC 8555, DOI 10.17487/RFC8555, March 2019,
+412	              <https://www.rfc-editor.org/info/rfc8555>.
+
+414	   [RFC8739]  Sheffer, Y., Lopez, D., Gonzalez de Dios, O., Pastor
+415	              Perales, A., and T. Fossati, "Support for Short-Term,
+416	              Automatically Renewed (STAR) Certificates in the Automated
+417	              Certificate Management Environment (ACME)", RFC 8739,
+418	              DOI 10.17487/RFC8739, March 2020,
+419	              <https://www.rfc-editor.org/info/rfc8739>.
+
+421	   [RFC9060]  Peterson, J., "Secure Telephone Identity Revisited (STIR)
+422	              Certificate Delegation", RFC 9060, DOI 10.17487/RFC9060,
+423	              September 2021, <https://www.rfc-editor.org/info/rfc9060>.
+
+425	   [RFC9447]  Peterson, J., Barnes, M., Hancock, D., and C. Wendt,
+426	              "Automated Certificate Management Environment (ACME)
+427	              Challenges Using an Authority Token", RFC 9447,
+428	              DOI 10.17487/RFC9447, September 2023,
+429	              <https://www.rfc-editor.org/info/rfc9447>.
+
+431	   [RFC9448]  Wendt, C., Hancock, D., Barnes, M., and J. Peterson,
+432	              "TNAuthList Profile of Automated Certificate Management
+433	              Environment (ACME) Authority Token", RFC 9448,
+434	              DOI 10.17487/RFC9448, September 2023,
+435	              <https://www.rfc-editor.org/info/rfc9448>.
+
+437	   [X.509]    ITU-T Recommendation X.509 (10/2012) | ISO/IEC 9594-8,
+438	              "Information technology - Open Systems Interconnection -
+439	              The Directory: Public-key and attribute certificate
+440	              frameworks", 2012.
+
+442	11.2.  Informative References
+
+444	   [RFC7340]  Peterson, J., Schulzrinne, H., and H. Tschofenig, "Secure
+445	              Telephone Identity Problem Statement and Requirements",
+446	              RFC 7340, DOI 10.17487/RFC7340, September 2014,
+447	              <https://www.rfc-editor.org/info/rfc7340>.
+
+449	Author's Address
+
+451	   Jon Peterson
+452	   TransUnion
+453	   Email: jon.peterson@transunion.com
+
+
+
+
+
+
+
+
+
