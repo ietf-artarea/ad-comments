@@ -21,6 +21,7 @@ a DISCUSS ballot is just a request to have a discussion on the following topics.
 
 ### normative language in operational considerations
 
+```
 303	   operationally critical to call signing.  Operators SHOULD renew
 304	   certificates in advance of expiry with enough lead time to absorb CA
 305	   latency and transient failures, recognizing that the shorter the
@@ -29,6 +30,7 @@ a DISCUSS ballot is just a request to have a discussion on the following topics.
 308	   than retry aggressively against a busy CA, and the ACME STAR
 309	   mechanism [RFC8739] can remove the client from the synchronous
 310	   acquisition path by pre-issuing renewed certificates.  Useful signals
+```
 
 I support Andy's DISCUSS on the "SHOULD" in line 303.
 
