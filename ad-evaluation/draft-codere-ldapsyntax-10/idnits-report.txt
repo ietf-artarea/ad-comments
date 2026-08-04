@@ -1,0 +1,1673 @@
+idnits 2.17.1 
+
+draft-codere-ldapsyntax-10.txt:
+-(2): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+  == There are 3 instances of lines with non-ascii characters in the document.
+
+
+  Checking nits according to https://www.ietf.org/id-info/checklist :
+  ----------------------------------------------------------------------------
+
+  ** There are 14 instances of too long lines in the document, the longest
+     one being 29 characters in excess of 72.
+
+
+  Miscellaneous warnings:
+  ----------------------------------------------------------------------------
+
+  -- The document date (15 March 2026) is 121 days in the past.  Is this
+     intentional?
+
+
+  Checking references for intended status: Proposed Standard
+  ----------------------------------------------------------------------------
+
+     (See RFCs 3967 and 4897 for information about using normative references
+     to lower-maturity documents in RFCs)
+
+  == Missing Reference: '-' is mentioned on line 234, but not defined
+
+  == Missing Reference: '0-9' is mentioned on line 234, but not defined
+
+  == Missing Reference: 'E' is mentioned on line 234, but not defined
+
+  == Missing Reference: 'Z' is mentioned on line 1059, but not defined
+
+  == Unused Reference: 'ITU.X500.2019' is defined on line 1577, but no
+     explicit reference was found in the text
+
+  -- Possible downref: Non-RFC (?) normative reference: ref. 'ITU.X520.2019'
+
+  -- Possible downref: Non-RFC (?) normative reference: ref. 'Unicode'
+
+
+     Summary: 1 error (**), 0 flaws (~~), 6 warnings (==), 3 comments (--).
+
+     Run idnits with the --verbose option for more detailed information about
+     the items above.
+
+--------------------------------------------------------------------------------
+
+
+2	Internet Engineering Task Force                        C. E. Codère, Ed.
+3	Internet-Draft                                            Optima SC Inc.
+4	Intended status: Standards Track                           15 March 2026
+5	Expires: 16 September 2026
+
+7	   Lightweight Directory Access Protocol (LDAP): Additional Syntaxes
+8	                       draft-codere-ldapsyntax-10
+
+10	Abstract
+
+12	   This document registers additional syntax definitions for use in
+13	   Lightweight Directory Access Protocol (LDAP) directory and Directory
+14	   services series X.500.  This includes widely used datatypes and
+15	   syntaxes.
+
+17	Status of This Memo
+
+19	   This Internet-Draft is submitted in full conformance with the
+20	   provisions of BCP 78 and BCP 79.
+
+22	   Internet-Drafts are working documents of the Internet Engineering
+23	   Task Force (IETF).  Note that other groups may also distribute
+24	   working documents as Internet-Drafts.  The list of current Internet-
+25	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+27	   Internet-Drafts are draft documents valid for a maximum of six months
+28	   and may be updated, replaced, or obsoleted by other documents at any
+29	   time.  It is inappropriate to use Internet-Drafts as reference
+30	   material or to cite them other than as "work in progress."
+
+32	   This Internet-Draft will expire on 16 September 2026.
+
+34	Copyright Notice
+
+36	   Copyright (c) 2026 IETF Trust and the persons identified as the
+37	   document authors.  All rights reserved.
+
+39	   This document is subject to BCP 78 and the IETF Trust's Legal
+40	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+41	   license-info) in effect on the date of publication of this document.
+42	   Please review these documents carefully, as they describe your rights
+43	   and restrictions with respect to this document.  Code Components
+44	   extracted from this document must include Revised BSD License text as
+45	   described in Section 4.e of the Trust Legal Provisions and are
+46	   provided without warranty as described in the Revised BSD License.
+
+48	Table of Contents
+
+50	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
+51	     1.1.  Conventions . . . . . . . . . . . . . . . . . . . . . . .   3
+52	   2.  Syntaxes  . . . . . . . . . . . . . . . . . . . . . . . . . .   3
+53	     2.1.  ASN.1 Syntax Definitions  . . . . . . . . . . . . . . . .   3
+54	       2.1.1.  Date  . . . . . . . . . . . . . . . . . . . . . . . .   3
+55	       2.1.2.  Date-Time . . . . . . . . . . . . . . . . . . . . . .   4
+56	       2.1.3.  Duration  . . . . . . . . . . . . . . . . . . . . . .   4
+57	       2.1.4.  Real  . . . . . . . . . . . . . . . . . . . . . . . .   5
+58	       2.1.5.  Time Of Day . . . . . . . . . . . . . . . . . . . . .   6
+59	       2.1.6.  Visible String  . . . . . . . . . . . . . . . . . . .   6
+60	     2.2.  Constrained ASN.1 Syntax Definitions  . . . . . . . . . .   7
+61	       2.2.1.  Float32 . . . . . . . . . . . . . . . . . . . . . . .   7
+62	       2.2.2.  Float64 . . . . . . . . . . . . . . . . . . . . . . .   8
+63	       2.2.3.  UInt8 . . . . . . . . . . . . . . . . . . . . . . . .   8
+64	       2.2.4.  UInt16  . . . . . . . . . . . . . . . . . . . . . . .   9
+65	       2.2.5.  UInt32  . . . . . . . . . . . . . . . . . . . . . . .   9
+66	       2.2.6.  UInt64  . . . . . . . . . . . . . . . . . . . . . . .   9
+67	       2.2.7.  Int8  . . . . . . . . . . . . . . . . . . . . . . . .  10
+68	       2.2.8.  Int16 . . . . . . . . . . . . . . . . . . . . . . . .  10
+69	       2.2.9.  Int32 . . . . . . . . . . . . . . . . . . . . . . . .  11
+70	       2.2.10. Int64 . . . . . . . . . . . . . . . . . . . . . . . .  11
+71	       2.2.11. Percentage  . . . . . . . . . . . . . . . . . . . . .  11
+72	     2.3.  Other Syntax Definitions  . . . . . . . . . . . . . . . .  12
+73	       2.3.1.  Language  . . . . . . . . . . . . . . . . . . . . . .  12
+74	       2.3.2.  Media type  . . . . . . . . . . . . . . . . . . . . .  13
+75	       2.3.3.  OpenDate  . . . . . . . . . . . . . . . . . . . . . .  13
+76	       2.3.4.  URI . . . . . . . . . . . . . . . . . . . . . . . . .  14
+77	       2.3.5.  NCName  . . . . . . . . . . . . . . . . . . . . . . .  15
+78	       2.3.6.  Qualified Name  . . . . . . . . . . . . . . . . . . .  15
+79	       2.3.7.  Text  . . . . . . . . . . . . . . . . . . . . . . . .  16
+80	       2.3.8.  Normalized String . . . . . . . . . . . . . . . . . .  18
+81	       2.3.9.  Token . . . . . . . . . . . . . . . . . . . . . . . .  20
+82	       2.3.10. Time Of Day with Timezone . . . . . . . . . . . . . .  22
+83	   3.  Matching rules  . . . . . . . . . . . . . . . . . . . . . . .  23
+84	     3.1.  uriMatch  . . . . . . . . . . . . . . . . . . . . . . . .  23
+85	     3.2.  openDateMatch . . . . . . . . . . . . . . . . . . . . . .  24
+86	     3.3.  openDateOrderingMatch . . . . . . . . . . . . . . . . . .  25
+87	     3.4.  timeMatch . . . . . . . . . . . . . . . . . . . . . . . .  25
+88	     3.5.  timeOrderingMatch . . . . . . . . . . . . . . . . . . . .  25
+89	     3.6.  timeWithTZMatch . . . . . . . . . . . . . . . . . . . . .  26
+90	     3.7.  timeWithTZOrderingMatch . . . . . . . . . . . . . . . . .  26
+91	     3.8.  realMatch . . . . . . . . . . . . . . . . . . . . . . . .  27
+92	     3.9.  realOrderingMatch . . . . . . . . . . . . . . . . . . . .  27
+93	     3.10. durationMatch . . . . . . . . . . . . . . . . . . . . . .  28
+94	   4.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  28
+95	     4.1.  Syntax registration . . . . . . . . . . . . . . . . . . .  28
+96	     4.2.  Object Identifier Descriptors registration  . . . . . . .  30
+97	   5.  Security Considerations . . . . . . . . . . . . . . . . . . .  31
+98	     5.1.  Text, Normalized String and Token . . . . . . . . . . . .  31
+99	   6.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  32
+100	     6.1.  Normative References  . . . . . . . . . . . . . . . . . .  32
+101	     6.2.  Informative References  . . . . . . . . . . . . . . . . .  33
+102	   Acknowledgements  . . . . . . . . . . . . . . . . . . . . . . . .  34
+103	   Contributors  . . . . . . . . . . . . . . . . . . . . . . . . . .  34
+104	   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  34
+
+106	1.  Introduction
+
+108	   The Lightweight Directory Access Protocol (LDAP) directory defines
+109	   several data types which specify the syntax definitions of
+110	   attributes.  These are identified by ASN.1 OBJECT IDENTIFIER types.
+111	   Furthermore, these syntax definitions can be used to uniquely
+112	   identify data types as character representations in other
+113	   applications.  Some widely used syntax specifications are missing
+114	   from the initial LDAP specification.  This document provides
+115	   additional syntax definitions that have been registered and may be
+116	   used by application providers.
+
+118	1.1.  Conventions
+
+120	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+121	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+122	   "OPTIONAL" in this document are to be interpreted as described in BCP
+123	   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+124	   capitals, as shown here.
+
+126	   Some of the syntax definitions are defined according to the regular
+127	   expressions defined in [RFC9485].
+
+129	2.  Syntaxes
+
+131	   The following additional syntaxes and their associated descriptions
+132	   and OBJECT IDENTIFIER types are defined.
+
+134	2.1.  ASN.1 Syntax Definitions
+
+136	   The following additional syntaxes are defined and are based on
+137	   [ASN.1].
+
+139	2.1.1.  Date
+
+141	   The Date type represents a date in the Gregorian calendar.  It is
+142	   defined as a useful TIME type in [ASN.1] and conforms to the extended
+143	   format syntax of a calendar date as defined in [ISO.8601.2004].
+
+145	   A Date value SHALL be written using the following syntax: YYYY-MM-DD
+146	   where YYYY represents a year between 1582 and 9999, MM the month
+147	   value from 01 to 12 and DD a day in the month from 01 to 31.
+
+149	   Examples:
+
+151	   *  9999-02-25
+
+153	   *  1583-01-31
+
+155	   The LDAP definition for the Date syntax is:
+
+157	   *  ( 1.3.6.1.4.1.61799.5.40.31 DESC 'Date' )
+
+159	   This syntax corresponds to the DATE ASN.1 type from [ASN.1].
+
+161	2.1.2.  Date-Time
+
+163	   The Date-time type represents a date and local time using a 24 hour
+164	   clock.  It is defined as a useful TIME type in [ASN.1] and conforms
+165	   to the extended format syntax of a date and time without any timezone
+166	   specifier as defined in [ISO.8601.2004].
+
+168	   A Date-Time value SHALL be written using the following syntax: YYYY-
+169	   MM-DDThh:mm:ss where YYYY represents a year between 1582 and 9999, MM
+170	   the month value from 01 to 12, DD a day in the month from 01 to 31,
+171	   hh the hour from 00 to 24, mm the minute from 00 to 59, and ss the
+172	   seconds with allowed values of 00 to 60 where 60 represents a leap
+173	   second.
+
+175	   Examples:
+
+177	   *  1583-01-01T00:59:59
+
+179	   *  1975-01-19T23:45:34
+
+181	   The LDAP definition for the Date-Time syntax is:
+
+183	   *  ( 1.3.6.1.4.1.61799.5.40.33 DESC 'Date-Time' )
+
+185	   This syntax corresponds to the DATE-TIME ASN.1 type from [ASN.1].
+
+187	2.1.3.  Duration
+
+189	   The Duration type represents an elapsed time with a resolution of up
+190	   to a fractions of seconds.  It is defined as a useful TIME type in
+191	   [ASN.1] and conforms to a subset of the extended format syntax of a
+192	   time interval by duration as defined in [ISO.8601.2004].
+
+194	   A duration syntax value SHALL conform to the following regular
+195	   expression, and additionally at least one component designator and
+196	   its associated valueSHALL be present (i.e., the strings "P" and "PT"
+197	   are not valid Duration values):
+
+199	   P([0-9]+Y)?([0-9]+M)?([0-9]+D)?(T([0-9]+H)?([0-9]+M)?([0-9]+(\.[0-9]{1,3})?S)?)?
+
+201	   If the number of years, months, days, hours, minutes, or seconds in
+202	   any expression equals zero, the number and its corresponding
+203	   designator MAY be omitted.  However, at least one number and its
+204	   designator SHALL be present.
+
+206	   Examples:
+
+208	   *  P29M0D -- 29 months, 0 days to an accuracy of 1 day.
+
+210	   *  P29MT0S -- 29 months, 0 days, 0 hours, 0 minutes, 0 seconds, to an
+211	      accuracy of 1 second.
+
+213	   *  PT3445.5S -- 3445.5 seconds
+
+215	   The LDAP definition for the Duration syntax is:
+
+217	   *  ( 1.3.6.1.4.1.61799.5.40.34 DESC 'Duration' )
+
+219	   This syntax corresponds to a very strict subset of the DURATION ASN.1
+220	   type from [ASN.1], in that the order of parameters need to be
+221	   respected and fractional values SHALL only apply to the seconds
+222	   designation and when present, are limited up to 3 digits (millisecond
+223	   precision).
+
+225	2.1.4.  Real
+
+227	   The Real type represents the computational approximations to the
+228	   mathematical "real number".  The format for the Real is as defined in
+229	   Section 21 of [ASN.1].
+
+231	   A Real syntax value SHALL conform to the following regular
+232	   expression:
+
+234	   ([-]?[0-9]+(\.[0-9]+)?([E][-]?[0-9]+)?)|PLUS-INFINITY|MINUS-INFINITY|NOT-A-NUMBER
+
+236	   Examples:
+
+238	   *  3.14159
+
+240	   *  MINUS-INFINITY
+241	   *  0
+
+243	   *  -5.3E4 -- Equal to -53000
+
+245	   *  5E3 -- 5000
+
+247	   The LDAP definition for the Real syntax is:
+
+249	   *  ( 1.3.6.1.4.1.61799.5.40.9 DESC 'Real' )
+
+251	   This syntax corresponds to a subset of the REAL ASN.1 type from
+252	   [ASN.1] where the sequence syntax is not allowed, the values are
+253	   limited to base ten, where a digit before the decimal point is
+254	   required, where only the character 'E' is allowed to specify the
+255	   exponent, where the preceding optional "+" sign is prohibited in both
+256	   the mantissa and the exponent, and where leading zeros in the integer
+257	   part SHALL NOT be present unless the integer part is "0".
+
+259	2.1.5.  Time Of Day
+
+261	   The Time Of Day type represents a local time using a 24 hour clock.
+262	   It is defined as a useful TIME type in [ASN.1] and conforms to the
+263	   extended format syntax of a local time as defined in [ISO.8601.2004].
+
+265	   A Time Of Day value SHALL be written using the following syntax:
+266	   hh:mm:ss where hh represents the hour from 00 to 24, mm represents
+267	   the minute from 00 to 59, and ss represents the seconds with allowed
+268	   values of 00 to 60 where 60 represents a leap second.
+
+270	   Examples for Time Of Day:
+
+272	   *  00:59:59
+
+274	   *  01:45:54
+
+276	   The LDAP definition for the Time Of Day syntax is:
+
+278	   *  ( 1.3.6.1.4.1.61799.5.40.32 DESC 'Time Of Day' )
+
+280	   This syntax corresponds to the TIME-OF-DAY ASN.1 type from [ASN.1].
+
+282	2.1.6.  Visible String
+
+284	   The Visible String type represents a character repertoire that
+285	   contains the printable ASCII character set (in the Unicode range
+286	   U+0020 to U+007E).  It is defined in [ASN.1].
+
+288	   This syntax value SHALL conform to the following regular expression:
+
+290	   [0-9A-Za-z !"#$%&'()*+,\-./:;<=>?@\[\\\]^_`{|}~]*
+
+292	   Examples:
+
+294	   *  hello world
+
+296	   *  (x+y)=z
+
+298	   The LDAP definition for the Visible String syntax is:
+
+300	   *  ( 1.3.6.1.4.1.61799.5.40.26 DESC 'Visible String' )
+
+302	   This syntax corresponds to the VisibleString ASN.1 type from [ASN.1].
+
+304	2.2.  Constrained ASN.1 Syntax Definitions
+
+306	   The following additional syntaxes are defined as constraints of basic
+307	   ASN.1 types that may be used to be more precise in encoding and input
+308	   validation.
+
+310	2.2.1.  Float32
+
+312	   The Float32 type represents a real number which fits in the range of
+313	   a [IEEE_754_2019] single precision floating point value.
+
+315	   The Float32 syntax follows the base 10 syntax of the real type (See
+316	   Section 2.1.4) with a constrained range.  For equality matching
+317	   purposes, negative zero SHALL be considered equal to positive zero
+318	   and NOT-A-NUMBER SHALL NOT be considered equal to any value,
+319	   including itself.
+
+321	   Examples:
+
+323	   *  3.14159 -- value will be rounded to the nearest representable
+324	      value
+
+326	   *  MINUS-INFINITY
+
+328	   *  -5.3E4 -- Equal to -53000
+
+330	   The LDAP definition for the Float32 type syntax is:
+
+332	   *  ( 1.3.6.1.4.1.61799.5.40.9.4 DESC 'Float32' )
+
+334	   This syntax corresponds to the following ASN.1 type from [ASN.1]:
+
+336	   Float32 ::= REAL (WITH COMPONENTS {
+337	     mantissa (-16777215..16777215),
+338	     base (2),
+339	     exponent (-149..104) })
+
+341	2.2.2.  Float64
+
+343	   The Float64 type represents a real number which fits in the range of
+344	   a [IEEE_754_2019] double precision floating point value.
+
+346	   The Float64 syntax follows the base 10 syntax of the real type (See
+347	   Section 2.1.4) with a constrained range.  For equality matching
+348	   purposes, negative zero SHALL be considered equal to positive zero
+349	   and NOT-A-NUMBER SHALL NOT be considered equal to any value,
+350	   including itself.
+
+352	   Examples:
+
+354	   *  3.1415926535897932 -- value will be rounded to the nearest
+355	      representable value
+
+357	   *  NOT-A-NUMBER
+
+359	   *  -5.3E4 -- Equal to -53000
+
+361	   The LDAP definition for the Float64 type syntax is:
+
+363	   *  ( 1.3.6.1.4.1.61799.5.40.9.8 DESC 'Float64' )
+
+365	   This syntax corresponds to the following ASN.1 type from [ASN.1]:
+
+367	   Float64 ::= REAL (WITH COMPONENTS {
+368	    mantissa (-9007199254740991..9007199254740991),
+369	    base (2),
+370	    exponent (-1074..971) })
+
+372	2.2.3.  UInt8
+
+374	   The UInt8 type represents an unsigned integer value within the range
+375	   0 to 255 inclusive.
+
+377	   Examples:
+
+379	   *  0
+
+381	   *  34
+
+383	   The LDAP definition for the UInt8 type syntax is:
+
+385	   *  ( 1.3.6.1.4.1.61799.5.40.2.21 DESC 'UInt8' )
+
+387	   This syntax corresponds to the following ASN.1 type from [ASN.1]:
+
+389	   UInt8 ::= INTEGER(0..255)
+
+391	2.2.4.  UInt16
+
+393	   The UInt16 type represents an unsigned integer value within the range
+394	   0 to 65535 inclusive.
+
+396	   Examples:
+
+398	   *  0
+
+400	   *  64991
+
+402	   The LDAP definition for the UInt16 type syntax is:
+
+404	   *  ( 1.3.6.1.4.1.61799.5.40.2.22 DESC 'UInt16' )
+
+406	   This syntax corresponds to the following ASN.1 type from [ASN.1]:
+
+408	   UInt16 ::= INTEGER(0..65535)
+
+410	2.2.5.  UInt32
+
+412	   The UInt32 type represents an unsigned integer value within the range
+413	   0 to 4294967295 inclusive.
+
+415	   Examples:
+
+417	   *  0
+
+419	   *  40000000
+
+421	   The LDAP definition for the UInt32 type syntax is:
+
+423	   *  ( 1.3.6.1.4.1.61799.5.40.2.24 DESC 'UInt32' )
+
+425	   This syntax corresponds to the following ASN.1 type from [ASN.1]:
+
+427	   UInt32 ::= INTEGER(0..4294967295)
+
+429	2.2.6.  UInt64
+
+431	   The UInt64 type represents an unsigned integer value within the range
+432	   0 to 18446744073709551615 inclusive.
+
+434	   Examples:
+
+436	   *  0
+
+438	   *  844674407370955
+
+440	   The LDAP definition for the UInt64 type syntax is:
+
+442	   *  ( 1.3.6.1.4.1.61799.5.40.2.28 DESC 'UInt64' )
+
+444	   This syntax corresponds to the following ASN.1 type from [ASN.1]:
+
+446	   UInt64 ::= INTEGER(0..18446744073709551615)
+
+448	2.2.7.  Int8
+
+450	   The Int8 type represents a signed integer value within the range -128
+451	   to 127 inclusive.
+
+453	   Examples:
+
+455	   *  0
+
+457	   *  -123
+
+459	   The LDAP definition for the Int8 type syntax is:
+
+461	   *  ( 1.3.6.1.4.1.61799.5.40.2.1 DESC 'Int8' )
+
+463	   This syntax corresponds to the following ASN.1 type from [ASN.1]:
+
+465	   Int8 ::= INTEGER(-128..127)
+
+467	2.2.8.  Int16
+
+469	   The Int16 type represents a signed integer value within the range
+470	   -32768 to 32767 inclusive.
+
+472	   Examples:
+
+474	   *  15667
+
+476	   *  -32000
+
+478	   The LDAP definition for the Int16 type syntax is:
+
+480	   *  ( 1.3.6.1.4.1.61799.5.40.2.2 DESC 'Int16' )
+481	   This syntax corresponds to the following ASN.1 type from [ASN.1]:
+
+483	   Int16 ::= INTEGER(-32768 .. 32767)
+
+485	2.2.9.  Int32
+
+487	   The Int32 type represents a signed integer value within the range
+488	   -2147483648 to 2147483647 inclusive.
+
+490	   Examples:
+
+492	   *  15667
+
+494	   *  -3200000
+
+496	   The LDAP definition for the Int32 type syntax is:
+
+498	   *  ( 1.3.6.1.4.1.61799.5.40.2.4 DESC 'Int32' )
+
+500	   This syntax corresponds to the following ASN.1 type from [ASN.1]:
+
+502	   Int32 ::= INTEGER(-2147483648..2147483647)
+
+504	2.2.10.  Int64
+
+506	   The Int64 type represents a signed integer value within the range
+507	   -9223372036854775808 to 9223372036854775807 inclusive.
+
+509	   Examples:
+
+511	   *  -2337203685477580
+
+513	   *  3372036854775807
+
+515	   The LDAP definition for the Int64 type syntax is:
+
+517	   *  ( 1.3.6.1.4.1.61799.5.40.2.8 DESC 'Int64' )
+
+519	   This syntax corresponds to the following ASN.1 type from [ASN.1]:
+
+521	   Int64 ::= INTEGER(-9223372036854775808..9223372036854775807)
+
+523	2.2.11.  Percentage
+
+525	   The Percentage type represents a percentage value, that is an
+526	   unsigned integer in the range 0 to 100 inclusive.
+
+528	   Examples:
+
+530	   *  0
+
+532	   *  99
+
+534	   The LDAP definition for the Percentage type syntax is:
+
+536	   *  ( 1.3.6.1.4.1.61799.5.40.2.20 DESC 'Percentage' )
+
+538	   This syntax corresponds to the following ASN.1 type from [ASN.1]:
+
+540	   Percentage ::= INTEGER(0..100)
+
+542	2.3.  Other Syntax Definitions
+
+544	   The following additional syntaxes are defined and are based on IETF
+545	   RFC's, or other international standards.
+
+547	2.3.1.  Language
+
+549	   A language provides a representation of a spoken or written language
+550	   as well as an optional region and other specifiers.  The exact syntax
+551	   allowed is defined in Section 2 of [RFC5646].
+
+553	   A Language syntax value SHALL conform to the following regular
+554	   expression:
+
+556	   ([a-zA-Z]{2,8}|x-[a-zA-Z0-9]{1,8})(-[a-zA-Z0-9]{1,8})*
+
+558	   The regular expression provides a structural check only.  Conformance
+559	   to the full syntax defined in [RFC5646] is additionally required.
+
+561	   Examples:
+
+563	   *  en
+
+565	   *  fr-CA
+
+567	   The LDAP definition for the Language syntax is:
+
+569	   *  ( 1.3.6.1.4.1.61799.5.40.19.1 DESC 'Language' )
+
+571	   This syntax corresponds to the following ASN.1 type from [ASN.1]:
+
+573	   Language ::= PrintableString (PATTERN "([a-zA-Z]#(2,8)|x-[a-zA-Z0-9]#(1,8))(-[a-zA-Z0-9]#(1,8))*")
+574	     -- ISO 639 code minimally
+
+576	2.3.2.  Media type
+
+578	   The Media Type syntax identifies values that represent an IANA
+579	   registered Media type [IANAREG].  The format for the MIME Media type
+580	   is defined in Section 4.2 of [RFC6838].
+
+582	   This syntax value SHALL conform to the following regular expression:
+
+584	   [A-Za-z0-9]([A-Za-z0-9!#$&^_.+-]){0,126}/[A-Za-z0-9]([A-Za-z0-9!#$&^_.+-]){0,126}
+
+586	   Examples:
+
+588	   *  text/xhtml
+
+590	   *  application/alto-costmap+json
+
+592	   The LDAP definition for the MIME Media type syntax is:
+
+594	   *  ( 1.3.6.1.4.1.61799.5.40.26.5 DESC 'Media Type' )
+
+596	   This syntax corresponds to the following ASN.1 type from
+597	   [ITU.X520.2019]:
+
+599	   MediaType ::= VisibleString (SIZE(3..255))
+
+601	2.3.3.  OpenDate
+
+603	   An OpenDate represents either part of a Date or a Date and Time in
+604	   extended format as specified in ISO 8601.  The exact syntax allowed
+605	   is defined by W3C Date and Time formats [W3C.NOTE-datetime-19980827]
+606	   with a 3 digit fraction.  The time component, when present, always
+607	   contains timezone information.
+
+609	   Examples:
+
+611	   *  2034
+
+613	   *  1975-01
+
+615	   *  1975-01-19
+
+617	   *  1975-01-19T19:20+01:00
+
+619	   *  1975-01-19T19:20:30+01:00
+
+621	   *  1975-01-19T19:20:30.451+01:00
+
+623	   *  1975-01-19T18:20Z
+624	   *  1975-01-19T18:20:30Z
+
+626	   *  1975-01-19T18:20:30.451Z
+
+628	   The LDAP definition for the OpenDate syntax is:
+
+630	   *  ( 1.3.6.1.4.1.61799.5.40.14.1 DESC 'OpenDate' )
+
+632	   This syntax corresponds to a subset of the TIME ASN.1 type from
+633	   [ASN.1] with the specified configuration:
+
+635	   OpenDate ::=  TIME((SETTINGS "Basic=Date Date=Y Year=Basic")|
+636	    (SETTINGS "Basic=Date Date=YM Year=Basic")|
+637	    (SETTINGS "Basic=Date Date=YMD Year=Basic")|
+638	    (SETTINGS "Basic=Date-Time Date=YMD Year=Basic Time=HM Local-or-UTC=LD")|
+639	    (SETTINGS "Basic=Date-Time Date=YMD Year=Basic Time=HMS Local-or-UTC=LD")|
+640	    (SETTINGS "Basic=Date-Time Date=YMD Year=Basic Time=HMSF3 Local-or-UTC=LD")|
+641	    (SETTINGS "Basic=Date-Time Date=YMD Year=Basic Time=HM Local-or-UTC=Z")|
+642	    (SETTINGS "Basic=Date-Time Date=YMD Year=Basic Time=HMS Local-or-UTC=Z")|
+643	    (SETTINGS "Basic=Date-Time Date=YMD Year=Basic Time=HMSF3 Local-or-UTC=Z"))
+
+645	2.3.4.  URI
+
+647	   The URI syntax type identifies values that are referenced by a
+648	   Uniform Resource Identifier (URI).  The format and encoding for the
+649	   URI is as defined in [RFC3986].  Even if relative URIs are allowed,
+650	   it is RECOMMENDED they not be used unless the context of use is
+651	   known.
+
+653	   Examples:
+
+655	   *  http://www.example.com/my/picture.jpg
+
+657	   *  ldap://ldap.example.com/cn=babs%20jensen
+
+659	   The LDAP definition for the URI syntax is:
+
+661	   *  ( 1.3.6.1.4.1.61799.5.40.26.4 DESC 'URI' )
+
+663	   This syntax corresponds to the following ASN.1 type from
+664	   [ITU.X520.2019]:
+
+666	   URI ::= VisibleString (SIZE (1..ub-uri-length)) -- ub-uri-length MUST be at least 2000
+
+668	   The value of ub-uri-length (an integer) is implementation defined but
+669	   MUST be at least 2000 characters.
+
+671	2.3.5.  NCName
+
+673	   The NCName syntax type should be used to identify values that
+674	   represent identifiers and local attribute names.  A name is a subset
+675	   of the NCName definition in [W3C.xml-names11].
+
+677	   This syntax value SHALL conform to the following regular expression:
+
+679	   [\p{L}\p{Nl}_][\p{L}\p{Nl}\p{Nd}._-]*
+
+681	   Examples:
+
+683	   *  MyID
+
+685	   *  attribute.0.subdivision
+
+687	   The LDAP definition for the NCName type syntax is:
+
+689	   *  ( 1.3.6.1.4.1.61799.5.40.12.6 DESC 'NCName' )
+
+691	   This syntax corresponds to the following ASN.1 type from
+692	   [ITU.X520.2019]:
+
+694	   -- NOTE: This type does not capture the
+695	   -- structural constraints on permitted characters and start characters.
+696	   -- The regular expression is the normative definition of valid values
+697	   NCName ::= UnboundedDirectoryString
+
+699	2.3.6.  Qualified Name
+
+701	   The Qualified Name syntax type identifies values that represent
+702	   identifiers and attribute names using namespaces.  This is a subset
+703	   of the QName definition in [W3C.xml-names11].
+
+705	   This syntax value SHALL conform to the following regular expression:
+
+707	   [\p{L}\p{Nl}_][\p{L}\p{Nl}\p{Nd}._-]*(:[\p{L}\p{Nl}_][\p{L}\p{Nl}\p{Nd}._-]*)?
+
+709	   Examples:
+
+711	   *  MyID
+
+713	   *  attribute.0:subdivision
+
+715	   The LDAP definition for the QualifiedName type syntax is:
+
+717	   *  ( 1.3.6.1.4.1.61799.5.40.12.7 DESC 'QualifiedName' )
+718	   This syntax corresponds to the following ASN.1 type from
+719	   [ITU.X520.2019]:
+
+721	   -- NOTE: This type does not capture the
+722	   -- structural constraints on permitted characters and start characters.
+723	   -- The regular expression is the normative definition of valid values
+724	   QualifiedName ::= UnboundedDirectoryString
+
+726	2.3.7.  Text
+
+728	   The Text type represents a Unicode string with a restricted character
+729	   repertoire.  A Text string value MUST NOT contain any code point that
+730	   has any of the following properties, as defined in the Unicode
+731	   Character Database [Unicode]:
+
+733	   *  General_Category of Cc (Control), with the exception of U+0009
+734	      (CHARACTER TABULATION), U+000A (LINE FEED), and U+000D (CARRIAGE
+735	      RETURN), which are permitted;
+
+737	   *  General_Category of Cs (Surrogate);
+
+739	   *  General_Category of Co (Private_Use);
+
+741	   *  Noncharacter_Code_Point, as defined in PropList.txt of the Unicode
+742	      Character Database.  This is a fixed set of 66 code points:
+743	      U+FDD0..U+FDEF and U+nFFFE..U+nFFFF (where n ranges from 0 to 10
+744	      in hexadecimal).
+
+746	   See Section 5 for security considerations regarding the handling,
+747	   display, and comparison of values containing format characters or
+748	   bidirectional controls.
+
+750	   Examples:
+
+752	   *  Hello world
+
+754	   *  Ceci est une phrase qui est encore plus longue que la précédente
+
+756	   The LDAP definition for the Text type syntax is:
+
+758	   *  ( 1.3.6.1.4.1.61799.5.40.12.3 DESC 'Text' )
+
+760	   This syntax corresponds to the following ASN.1 type from
+761	   [ITU.X520.2019]:
+
+763	     Text ::= CHOICE {
+764	       printableString  PrintableString,
+765	       bmpString        BMPString
+766	         (FROM(
+767	           {0, 0, 0, 9}   .. {0, 0, 0, 10}   | -- U+0009..U+000A
+768	           {0, 0, 0, 13}  .. {0, 0, 0, 13}   | -- U+000D
+769	           {0, 0, 0, 32}  .. {0, 0, 0, 126}  | -- U+0020..U+007E
+770	           {0, 0, 0, 160} .. {0, 0, 215, 255} | -- U+00A0..U+D7FF
+771	           {0, 0, 249, 0} .. {0, 0, 253, 207} | -- U+F900..U+FDCF
+772	           {0, 0, 253, 240} .. {0, 0, 255, 253} -- U+FDF0..U+FFFD
+773	         )),
+774	       universalString  UniversalString
+775	         (FROM(
+776	           {0, 0, 0, 9}   .. {0, 0, 0, 10}   | -- U+0009..U+000A
+777	           {0, 0, 0, 13}  .. {0, 0, 0, 13}   | -- U+000D
+778	           {0, 0, 0, 32}  .. {0, 0, 0, 126}  | -- U+0020..U+007E
+779	           {0, 0, 0, 160} .. {0, 0, 215, 255} | -- U+00A0..U+D7FF
+780	           {0, 0, 249, 0} .. {0, 0, 253, 207} | -- U+F900..U+FDCF
+781	           {0, 0, 253, 240} .. {0, 0, 255, 253} | -- U+FDF0..U+FFFD
+782	           {0, 1, 0, 0}   .. {0, 1, 255, 253} | -- U+10000..U+1FFFD
+783	           {0, 2, 0, 0}   .. {0, 2, 255, 253} | -- U+20000..U+2FFFD
+784	           {0, 3, 0, 0}   .. {0, 3, 255, 253} | -- U+30000..U+3FFFD
+785	           {0, 4, 0, 0}   .. {0, 4, 255, 253} | -- U+40000..U+4FFFD
+786	           {0, 5, 0, 0}   .. {0, 5, 255, 253} | -- U+50000..U+5FFFD
+787	           {0, 6, 0, 0}   .. {0, 6, 255, 253} | -- U+60000..U+6FFFD
+788	           {0, 7, 0, 0}   .. {0, 7, 255, 253} | -- U+70000..U+7FFFD
+789	           {0, 8, 0, 0}   .. {0, 8, 255, 253} | -- U+80000..U+8FFFD
+790	           {0, 9, 0, 0}   .. {0, 9, 255, 253} | -- U+90000..U+9FFFD
+791	           {0, 10, 0, 0}  .. {0, 10, 255, 253} | -- U+A0000..U+AFFFD
+792	           {0, 11, 0, 0}  .. {0, 11, 255, 253} | -- U+B0000..U+BFFFD
+793	           {0, 12, 0, 0}  .. {0, 12, 255, 253} | -- U+C0000..U+CFFFD
+794	           {0, 13, 0, 0}  .. {0, 13, 255, 253} | -- U+D0000..U+DFFFD
+795	           {0, 14, 0, 0}  .. {0, 14, 255, 253}  -- U+E0000..U+EFFFD
+796	         )),
+797	       utf8String       UTF8String
+798	         (FROM(
+799	           {0, 0, 0, 9}   .. {0, 0, 0, 10}   | -- U+0009..U+000A
+800	           {0, 0, 0, 13}  .. {0, 0, 0, 13}   | -- U+000D
+801	           {0, 0, 0, 32}  .. {0, 0, 0, 126}  | -- U+0020..U+007E
+802	           {0, 0, 0, 160} .. {0, 0, 215, 255} | -- U+00A0..U+D7FF
+803	           {0, 0, 249, 0} .. {0, 0, 253, 207} | -- U+F900..U+FDCF
+804	           {0, 0, 253, 240} .. {0, 0, 255, 253} | -- U+FDF0..U+FFFD
+805	           {0, 1, 0, 0}   .. {0, 1, 255, 253} | -- U+10000..U+1FFFD
+806	           {0, 2, 0, 0}   .. {0, 2, 255, 253} | -- U+20000..U+2FFFD
+807	           {0, 3, 0, 0}   .. {0, 3, 255, 253} | -- U+30000..U+3FFFD
+808	           {0, 4, 0, 0}   .. {0, 4, 255, 253} | -- U+40000..U+4FFFD
+809	           {0, 5, 0, 0}   .. {0, 5, 255, 253} | -- U+50000..U+5FFFD
+810	           {0, 6, 0, 0}   .. {0, 6, 255, 253} | -- U+60000..U+6FFFD
+811	           {0, 7, 0, 0}   .. {0, 7, 255, 253} | -- U+70000..U+7FFFD
+812	           {0, 8, 0, 0}   .. {0, 8, 255, 253} | -- U+80000..U+8FFFD
+813	           {0, 9, 0, 0}   .. {0, 9, 255, 253} | -- U+90000..U+9FFFD
+814	           {0, 10, 0, 0}  .. {0, 10, 255, 253} | -- U+A0000..U+AFFFD
+815	           {0, 11, 0, 0}  .. {0, 11, 255, 253} | -- U+B0000..U+BFFFD
+816	           {0, 12, 0, 0}  .. {0, 12, 255, 253} | -- U+C0000..U+CFFFD
+817	           {0, 13, 0, 0}  .. {0, 13, 255, 253} | -- U+D0000..U+DFFFD
+818	           {0, 14, 0, 0}  .. {0, 14, 255, 253}  -- U+E0000..U+EFFFD
+819	         ))
+820	     }
+
+822	2.3.8.  Normalized String
+
+824	   The Normalized String type represents a whitespace-normalized Unicode
+825	   string.  A Normalized String value SHALL conform to all the
+826	   restrictions of the Text type (Section 2.3.7), with the following
+827	   additional constraints:
+
+829	   Prior to validation, the following code points SHALL be mapped to
+830	   U+0020 (SPACE):
+
+832	   *  U+0009 (CHARACTER TABULATION), U+000A (LINE FEED), and U+000D
+833	      (CARRIAGE RETURN);
+
+835	   *  Code points with General_Category Zs (Space_Separator) other than
+836	      U+0020 (SPACE);
+
+838	   *  Code points with General_Category Zl (Line_Separator) or Zp
+839	      (Paragraph_Separator).
+
+841	   The canonical form of a Normalized String contains only U+0020 SPACE
+842	   as a whitespace character.  All other Unicode scalar values permitted
+843	   by the Text type are permitted.
+
+845	   See Section 5 for security considerations regarding the handling,
+846	   display, and comparison of values containing format characters or
+847	   bidirectional controls.
+
+849	   Examples:
+
+851	   *  Paragraph start with some leading spaces.
+
+853	   *  This is some other text with spaces.
+
+855	   The LDAP definition for the Normalized String syntax is:
+
+857	   *  ( 1.3.6.1.4.1.61799.5.40.12.4 DESC 'Normalized String' )
+858	   This syntax corresponds to the following ASN.1 type definition:
+
+860	     NormalizedString ::= CHOICE {
+861	       printableString  PrintableString,
+862	       bmpString        BMPString
+863	         (FROM(
+864	           {0, 0, 0, 32}  .. {0, 0, 0, 126}  |  -- U+0020..U+007E
+865	           {0, 0, 0, 161} .. {0, 0, 22, 127} |  -- U+00A1..U+167F
+866	           {0, 0, 22, 129} .. {0, 0, 31, 255} | -- U+1681..U+1FFF
+867	           {0, 0, 32, 11} .. {0, 0, 32, 39}  |  -- U+200B..U+2027
+868	           {0, 0, 32, 42} .. {0, 0, 32, 46}  |  -- U+202A..U+202E
+869	           {0, 0, 32, 48} .. {0, 0, 32, 94}  |  -- U+2030..U+205E
+870	           {0, 0, 32, 96} .. {0, 0, 47, 255} |  -- U+2060..U+2FFF
+871	           {0, 0, 48, 1}  .. {0, 0, 215, 255} | -- U+3001..U+D7FF
+872	           {0, 0, 249, 0} .. {0, 0, 253, 207} | -- U+F900..U+FDCF
+873	           {0, 0, 253, 240} .. {0, 0, 255, 253} -- U+FDF0..U+FFFD
+874	         )),
+875	       universalString  UniversalString
+876	         (FROM(
+877	           {0, 0, 0, 32}  .. {0, 0, 0, 126}  |  -- U+0020..U+007E
+878	           {0, 0, 0, 161} .. {0, 0, 22, 127} |  -- U+00A1..U+167F
+879	           {0, 0, 22, 129} .. {0, 0, 31, 255} | -- U+1681..U+1FFF
+880	           {0, 0, 32, 11} .. {0, 0, 32, 39}  |  -- U+200B..U+2027
+881	           {0, 0, 32, 42} .. {0, 0, 32, 46}  |  -- U+202A..U+202E
+882	           {0, 0, 32, 48} .. {0, 0, 32, 94}  |  -- U+2030..U+205E
+883	           {0, 0, 32, 96} .. {0, 0, 47, 255} |  -- U+2060..U+2FFF
+884	           {0, 0, 48, 1}  .. {0, 0, 215, 255} | -- U+3001..U+D7FF
+885	           {0, 0, 249, 0} .. {0, 0, 253, 207} | -- U+F900..U+FDCF
+886	           {0, 0, 253, 240} .. {0, 0, 255, 253} | -- U+FDF0..U+FFFD
+887	           {0, 1, 0, 0}   .. {0, 1, 255, 253} | -- U+10000..U+1FFFD
+888	           {0, 2, 0, 0}   .. {0, 2, 255, 253} | -- U+20000..U+2FFFD
+889	           {0, 3, 0, 0}   .. {0, 3, 255, 253} | -- U+30000..U+3FFFD
+890	           {0, 4, 0, 0}   .. {0, 4, 255, 253} | -- U+40000..U+4FFFD
+891	           {0, 5, 0, 0}   .. {0, 5, 255, 253} | -- U+50000..U+5FFFD
+892	           {0, 6, 0, 0}   .. {0, 6, 255, 253} | -- U+60000..U+6FFFD
+893	           {0, 7, 0, 0}   .. {0, 7, 255, 253} | -- U+70000..U+7FFFD
+894	           {0, 8, 0, 0}   .. {0, 8, 255, 253} | -- U+80000..U+8FFFD
+895	           {0, 9, 0, 0}   .. {0, 9, 255, 253} | -- U+90000..U+9FFFD
+896	           {0, 10, 0, 0}  .. {0, 10, 255, 253} | -- U+A0000..U+AFFFD
+897	           {0, 11, 0, 0}  .. {0, 11, 255, 253} | -- U+B0000..U+BFFFD
+898	           {0, 12, 0, 0}  .. {0, 12, 255, 253} | -- U+C0000..U+CFFFD
+899	           {0, 13, 0, 0}  .. {0, 13, 255, 253} | -- U+D0000..U+DFFFD
+900	           {0, 14, 0, 0}  .. {0, 14, 255, 253}  -- U+E0000..U+EFFFD
+901	         )),
+902	       utf8String       UTF8String
+903	         (FROM(
+904	           {0, 0, 0, 32}  .. {0, 0, 0, 126}  |  -- U+0020..U+007E
+905	           {0, 0, 0, 161} .. {0, 0, 22, 127} |  -- U+00A1..U+167F
+906	           {0, 0, 22, 129} .. {0, 0, 31, 255} | -- U+1681..U+1FFF
+907	           {0, 0, 32, 11} .. {0, 0, 32, 39}  |  -- U+200B..U+2027
+908	           {0, 0, 32, 42} .. {0, 0, 32, 46}  |  -- U+202A..U+202E
+909	           {0, 0, 32, 48} .. {0, 0, 32, 94}  |  -- U+2030..U+205E
+910	           {0, 0, 32, 96} .. {0, 0, 47, 255} |  -- U+2060..U+2FFF
+911	           {0, 0, 48, 1}  .. {0, 0, 215, 255} | -- U+3001..U+D7FF
+912	           {0, 0, 249, 0} .. {0, 0, 253, 207} | -- U+F900..U+FDCF
+913	           {0, 0, 253, 240} .. {0, 0, 255, 253} | -- U+FDF0..U+FFFD
+914	           {0, 1, 0, 0}   .. {0, 1, 255, 253} | -- U+10000..U+1FFFD
+915	           {0, 2, 0, 0}   .. {0, 2, 255, 253} | -- U+20000..U+2FFFD
+916	           {0, 3, 0, 0}   .. {0, 3, 255, 253} | -- U+30000..U+3FFFD
+917	           {0, 4, 0, 0}   .. {0, 4, 255, 253} | -- U+40000..U+4FFFD
+918	           {0, 5, 0, 0}   .. {0, 5, 255, 253} | -- U+50000..U+5FFFD
+919	           {0, 6, 0, 0}   .. {0, 6, 255, 253} | -- U+60000..U+6FFFD
+920	           {0, 7, 0, 0}   .. {0, 7, 255, 253} | -- U+70000..U+7FFFD
+921	           {0, 8, 0, 0}   .. {0, 8, 255, 253} | -- U+80000..U+8FFFD
+922	           {0, 9, 0, 0}   .. {0, 9, 255, 253} | -- U+90000..U+9FFFD
+923	           {0, 10, 0, 0}  .. {0, 10, 255, 253} | -- U+A0000..U+AFFFD
+924	           {0, 11, 0, 0}  .. {0, 11, 255, 253} | -- U+B0000..U+BFFFD
+925	           {0, 12, 0, 0}  .. {0, 12, 255, 253} | -- U+C0000..U+CFFFD
+926	           {0, 13, 0, 0}  .. {0, 13, 255, 253} | -- U+D0000..U+DFFFD
+927	           {0, 14, 0, 0}  .. {0, 14, 255, 253}  -- U+E0000..U+EFFFD
+928	         ))
+929	     }
+
+931	2.3.9.  Token
+
+933	   The Token type represents a whitespace-normalized Unicode string.  A
+934	   Token value SHALL conform to all the restrictions of the Normalized
+935	   String type (Section 2.3.8), with the following additional
+936	   constraints:
+
+938	   *  No leading and trailing U+0020 SPACE characters.
+
+940	   *  No consecutive U+0020 SPACE characters.
+
+942	   This is similar to the Token datatype in [W3C.xmlschema11-2].
+
+944	   The resulting canonical form is either the empty string, or a string
+945	   that does not begin or end with U+0020 SPACE and contains no
+946	   consecutive U+0020 SPACE characters.
+
+948	   See Section 5 for security considerations regarding the handling,
+949	   display, and comparison of values containing format characters or
+950	   bidirectional controls.
+
+952	   Examples:
+
+954	   *  This is a token with spaces.
+
+956	   *  _Token_
+
+958	   The LDAP definition for the Token type syntax is:
+
+960	   *  ( 1.3.6.1.4.1.61799.5.40.12.5 DESC 'Token' )
+
+962	   This syntax corresponds to the following ASN.1 type from [ASN.1] :
+
+964	     Token ::= CHOICE {
+965	       printableString  PrintableString
+966	         (PATTERN "([^ ]+( [^ ]+)*)?"),
+967	       bmpString        BMPString
+968	         (FROM(
+969	           {0, 0, 0, 32}  .. {0, 0, 0, 126}  |  -- U+0020..U+007E
+970	           {0, 0, 0, 161} .. {0, 0, 22, 127} |  -- U+00A1..U+167F
+971	           {0, 0, 22, 129} .. {0, 0, 31, 255} | -- U+1681..U+1FFF
+972	           {0, 0, 32, 11} .. {0, 0, 32, 39}  |  -- U+200B..U+2027
+973	           {0, 0, 32, 42} .. {0, 0, 32, 46}  |  -- U+202A..U+202E
+974	           {0, 0, 32, 48} .. {0, 0, 32, 94}  |  -- U+2030..U+205E
+975	           {0, 0, 32, 96} .. {0, 0, 47, 255} |  -- U+2060..U+2FFF
+976	           {0, 0, 48, 1}  .. {0, 0, 215, 255} | -- U+3001..U+D7FF
+977	           {0, 0, 249, 0} .. {0, 0, 253, 207} | -- U+F900..U+FDCF
+978	           {0, 0, 253, 240} .. {0, 0, 255, 253} -- U+FDF0..U+FFFD
+979	         ))
+980	         (PATTERN "([^ ]+( [^ ]+)*)?"),
+981	       universalString  UniversalString
+982	         (FROM(
+983	           {0, 0, 0, 32}  .. {0, 0, 0, 126}  |  -- U+0020..U+007E
+984	           {0, 0, 0, 161} .. {0, 0, 22, 127} |  -- U+00A1..U+167F
+985	           {0, 0, 22, 129} .. {0, 0, 31, 255} | -- U+1681..U+1FFF
+986	           {0, 0, 32, 11} .. {0, 0, 32, 39}  |  -- U+200B..U+2027
+987	           {0, 0, 32, 42} .. {0, 0, 32, 46}  |  -- U+202A..U+202E
+988	           {0, 0, 32, 48} .. {0, 0, 32, 94}  |  -- U+2030..U+205E
+989	           {0, 0, 32, 96} .. {0, 0, 47, 255} |  -- U+2060..U+2FFF
+990	           {0, 0, 48, 1}  .. {0, 0, 215, 255} | -- U+3001..U+D7FF
+991	           {0, 0, 249, 0} .. {0, 0, 253, 207} | -- U+F900..U+FDCF
+992	           {0, 0, 253, 240} .. {0, 0, 255, 253} | -- U+FDF0..U+FFFD
+993	           {0, 1, 0, 0}   .. {0, 1, 255, 253} | -- U+10000..U+1FFFD
+994	           {0, 2, 0, 0}   .. {0, 2, 255, 253} | -- U+20000..U+2FFFD
+995	           {0, 3, 0, 0}   .. {0, 3, 255, 253} | -- U+30000..U+3FFFD
+996	           {0, 4, 0, 0}   .. {0, 4, 255, 253} | -- U+40000..U+4FFFD
+997	           {0, 5, 0, 0}   .. {0, 5, 255, 253} | -- U+50000..U+5FFFD
+998	           {0, 6, 0, 0}   .. {0, 6, 255, 253} | -- U+60000..U+6FFFD
+999	           {0, 7, 0, 0}   .. {0, 7, 255, 253} | -- U+70000..U+7FFFD
+1000	           {0, 8, 0, 0}   .. {0, 8, 255, 253} | -- U+80000..U+8FFFD
+1001	           {0, 9, 0, 0}   .. {0, 9, 255, 253} | -- U+90000..U+9FFFD
+1002	           {0, 10, 0, 0}  .. {0, 10, 255, 253} | -- U+A0000..U+AFFFD
+1003	           {0, 11, 0, 0}  .. {0, 11, 255, 253} | -- U+B0000..U+BFFFD
+1004	           {0, 12, 0, 0}  .. {0, 12, 255, 253} | -- U+C0000..U+CFFFD
+1005	           {0, 13, 0, 0}  .. {0, 13, 255, 253} | -- U+D0000..U+DFFFD
+1006	           {0, 14, 0, 0}  .. {0, 14, 255, 253}  -- U+E0000..U+EFFFD
+1007	         ))
+1008	         (PATTERN "([^ ]+( [^ ]+)*)?"),
+1009	       utf8String       UTF8String
+1010	         (FROM(
+1011	           {0, 0, 0, 32}  .. {0, 0, 0, 126}  |  -- U+0020..U+007E
+1012	           {0, 0, 0, 161} .. {0, 0, 22, 127} |  -- U+00A1..U+167F
+1013	           {0, 0, 22, 129} .. {0, 0, 31, 255} | -- U+1681..U+1FFF
+1014	           {0, 0, 32, 11} .. {0, 0, 32, 39}  |  -- U+200B..U+2027
+1015	           {0, 0, 32, 42} .. {0, 0, 32, 46}  |  -- U+202A..U+202E
+1016	           {0, 0, 32, 48} .. {0, 0, 32, 94}  |  -- U+2030..U+205E
+1017	           {0, 0, 32, 96} .. {0, 0, 47, 255} |  -- U+2060..U+2FFF
+1018	           {0, 0, 48, 1}  .. {0, 0, 215, 255} | -- U+3001..U+D7FF
+1019	           {0, 0, 249, 0} .. {0, 0, 253, 207} | -- U+F900..U+FDCF
+1020	           {0, 0, 253, 240} .. {0, 0, 255, 253} | -- U+FDF0..U+FFFD
+1021	           {0, 1, 0, 0}   .. {0, 1, 255, 253} | -- U+10000..U+1FFFD
+1022	           {0, 2, 0, 0}   .. {0, 2, 255, 253} | -- U+20000..U+2FFFD
+1023	           {0, 3, 0, 0}   .. {0, 3, 255, 253} | -- U+30000..U+3FFFD
+1024	           {0, 4, 0, 0}   .. {0, 4, 255, 253} | -- U+40000..U+4FFFD
+1025	           {0, 5, 0, 0}   .. {0, 5, 255, 253} | -- U+50000..U+5FFFD
+1026	           {0, 6, 0, 0}   .. {0, 6, 255, 253} | -- U+60000..U+6FFFD
+1027	           {0, 7, 0, 0}   .. {0, 7, 255, 253} | -- U+70000..U+7FFFD
+1028	           {0, 8, 0, 0}   .. {0, 8, 255, 253} | -- U+80000..U+8FFFD
+1029	           {0, 9, 0, 0}   .. {0, 9, 255, 253} | -- U+90000..U+9FFFD
+1030	           {0, 10, 0, 0}  .. {0, 10, 255, 253} | -- U+A0000..U+AFFFD
+1031	           {0, 11, 0, 0}  .. {0, 11, 255, 253} | -- U+B0000..U+BFFFD
+1032	           {0, 12, 0, 0}  .. {0, 12, 255, 253} | -- U+C0000..U+CFFFD
+1033	           {0, 13, 0, 0}  .. {0, 13, 255, 253} | -- U+D0000..U+DFFFD
+1034	           {0, 14, 0, 0}  .. {0, 14, 255, 253}  -- U+E0000..U+EFFFD
+1035	         ))
+1036	         (PATTERN "([^ ]+( [^ ]+)*)?")
+1037	     }
+
+1039	2.3.10.  Time Of Day with Timezone
+
+1041	   The Time Of Day with Timezone syntax type represents a time with
+1042	   explicit timezone information using a 24 hour clock.  It is defined
+1043	   as a TIME type in [ASN.1] and conforms to the extended format syntax
+1044	   of a time either represented as a local time followed by a UTC offset
+1045	   or as a UTC time indicated by the 'Z' designator, as defined in
+1046	   [ISO.8601.2004].
+
+1048	   A Time Of Day with Timezone value SHALL be written using the
+1049	   following syntax: hh:mm:ss where hh represents the hour from 00 to
+1050	   24, mm represents the minute from 00 to 59, and ss represents the
+1051	   seconds with allowed values of 00 to 60 where 60 represents a leap
+1052	   second followed by a timezone indicator.
+
+1054	   The timezone indicator is in the form +hh:mm where hh represents the
+1055	   number of hours and mm the number of minutes if the local time is
+1056	   ahead of or equal to UTC time.  The timezone indicator is -hh:mm if
+1057	   the local time is behind UTC time.  If the time represents an UTC
+1058	   time, the time shall be followed without space, by the timezone UTC
+1059	   designator [Z].  This standard supports time differences in the range
+1060	   –15 hours to +15 hours to align with [ASN.1].
+
+1062	   Examples:
+
+1064	   *  00:59:59Z
+
+1066	   *  01:45:54-01:00
+
+1068	   The LDAP definition for the Time Of Day with Timezone syntax is:
+
+1070	   *  ( 1.3.6.1.4.1.61799.5.40.35 DESC 'Time Of Day with Timezone' )
+
+1072	   This syntax corresponds to a subset of the TIME ASN.1 type from
+1073	   [ASN.1] with the specified configuration:
+
+1075	   Time-with-timezone ::=
+1076	     TIME((SETTINGS "Basic=Time Time=HMS Local-or-UTC=LD")|
+1077	          (SETTINGS "Basic=Time Time=HMS Local-or-UTC=Z"))
+
+1079	3.  Matching rules
+
+1081	   This section defines matching rules for syntaxes that require
+1082	   comparison semantics beyond simple string matching.  Syntaxes not
+1083	   listed here use existing matching rules from [RFC4517]: integer types
+1084	   (Int8, Int16, Int32, Int64, UInt8, UInt16, UInt32, UInt64,
+1085	   Percentage) use integerMatch and integerOrderingMatch; string types
+1086	   (Text, Normalized String, Token, Visible String, NCName, Qualified
+1087	   Name) use caseExactMatch; Language and Media Type use
+1088	   caseIgnoreMatch; and Date and Date-Time use caseExactMatch and
+1089	   caseExactOrderingMatch.
+
+1091	3.1.  uriMatch
+
+1093	   The uriMatch rule compares for equality a presented value with an
+1094	   attribute value of type URI (Section 2.3.4).
+
+1096	   The comparison is done using syntax-based normalization as defined in
+1097	   Section 6.2.2 of [RFC3986].
+
+1099	   The LDAP definition for the uriMatch rule is:
+
+1101	   *  ( 1.3.6.1.4.1.61799.5.13.26.4 NAME 'uriMatch' SYNTAX
+1102	      1.3.6.1.4.1.61799.5.40.26.4 )
+
+1104	   The rule returns TRUE if the attribute value represents the same URI
+1105	   as the presented value.
+
+1107	3.2.  openDateMatch
+
+1109	   The openDateMatch rule compares for equality a presented value with
+1110	   an attribute value of type OpenDate (Section 2.3.3).
+
+1112	   For comparison purposes, OpenDate values SHALL first be normalized to
+1113	   a full date-time in UTC timezone using the following rules:
+
+1115	   1.  If the month component is absent it is assumed to be one.
+
+1117	   2.  If the day component is absent it is assumed to be one.
+
+1119	   3.  If the hours component is absent it is assumed to be zero.
+
+1121	   4.  If the minutes component is absent it is assumed to be zero.
+
+1123	   5.  If the seconds component is absent it is assumed to be zero.
+
+1125	   6.  If the decimal fraction component is absent it is assumed to be
+1126	       zero.
+
+1128	   7.  If a timezone is present the date and time is normalized to the
+1129	       UTC timezone.
+
+1131	   8.  If no timezone is present it is assumed, by convention, to be in
+1132	       the UTC timezone.
+
+1134	   9.  If the time component indicates a value of 24:00:00 it is
+1135	       replaced by 00:00:00 and the day is incremented by one.
+
+1137	   This normalization procedure is inspired by, but not identical to,
+1138	   the implicit timezone and value comparison rules defined in
+1139	   Section 9.4 of [W3C.xpath-functions-31].  After normalization, values
+1140	   are compared chronologically.
+
+1142	   The LDAP definition for the openDateMatch rule is:
+
+1144	   *  ( 1.3.6.1.4.1.61799.5.13.14.1 NAME 'openDateMatch' SYNTAX
+1145	      1.3.6.1.4.1.61799.5.40.14.1 )
+
+1147	   The rule returns TRUE if the attribute value represents the same
+1148	   OpenDate as the presented value.
+
+1150	3.3.  openDateOrderingMatch
+
+1152	   The openDateOrderingMatch rule compares the ordering a presented
+1153	   value with an attribute value of type OpenDate (Section 2.3.3).
+
+1155	   Values are first normalized using the algorithm in Section 3.2.  The
+1156	   normalized values are then compared chronologically.
+
+1158	   The LDAP definition for the openDateOrderingMatch rule is:
+
+1160	   *  ( 1.3.6.1.4.1.61799.5.13.14.1.1 NAME 'openDateOrderingMatch'
+1161	      SYNTAX 1.3.6.1.4.1.61799.5.40.14.1 )
+
+1163	   The rule returns TRUE if the attribute value represents an OpenDate
+1164	   which is earlier than the presented OpenDate.
+
+1166	3.4.  timeMatch
+
+1168	   The timeMatch rule compares for equality a presented value with an
+1169	   attribute value of type Time Of Day (Section 2.1.5).
+
+1171	   Values are compared component by component (hours, minutes, seconds)
+1172	   in order of significance.  A time value of 24:00:00 is considered end
+1173	   of day, and is therefore not equal to 00:00:00.
+
+1175	   The LDAP definition for the timeMatch rule is:
+
+1177	   *  ( 1.3.6.1.4.1.61799.5.13.32 NAME 'timeMatch' SYNTAX
+1178	      1.3.6.1.4.1.61799.5.40.32 )
+
+1180	   The rule returns TRUE if the attribute value represents the same Time
+1181	   Of Day as the presented value.
+
+1183	3.5.  timeOrderingMatch
+
+1185	   The timeOrderingMatch rule compares the ordering of a presented value
+1186	   with an attribute value of type Time Of Day (Section 2.1.5).
+
+1188	   Values are compared component by component (hours, minutes, seconds)
+1189	   in order of significance.  A time value of 24:00:00 is considered end
+1190	   of day, and is therefore greater than 00:00:00.
+
+1192	   The LDAP definition for the timeOrderingMatch rule is:
+
+1194	   *  ( 1.3.6.1.4.1.61799.5.13.32.1 NAME 'timeOrderingMatch' SYNTAX
+1195	      1.3.6.1.4.1.61799.5.40.32 )
+
+1197	   The rule returns TRUE if the attribute value represents a Time Of Day
+1198	   which is earlier than the presented Time Of Day.
+
+1200	3.6.  timeWithTZMatch
+
+1202	   The timeWithTZMatch rule compares for equality a presented value with
+1203	   an attribute value of type Time Of Day with Timezone
+1204	   (Section 2.3.10).
+
+1206	   Before comparison, both values are normalized to UTC.  During
+1207	   normalization, a time value of 24:00:00 is replaced with 00:00:00.
+1208	   After normalization, values are equal if and only if their hours,
+1209	   minutes and seconds components are identical.
+
+1211	   The LDAP definition for the timeWithTZMatch rule is:
+
+1213	   *  ( 1.3.6.1.4.1.61799.5.13.35 NAME 'timeWithTZMatch' SYNTAX
+1214	      1.3.6.1.4.1.61799.5.40.35 )
+
+1216	   The rule returns TRUE if the attribute value represents the same Time
+1217	   Of Day with Timezone as the presented value.
+
+1219	3.7.  timeWithTZOrderingMatch
+
+1221	   The timeWithTZOrderingMatch rule compares the ordering of a presented
+1222	   value with an attribute value of type Time Of Day with Timezone
+1223	   (Section 2.3.10).
+
+1225	   Before comparison, both values are normalized to UTC.  During
+1226	   normalization, a time value of 24:00:00 is replaced with 00:00:00.
+1227	   After normalization, values are compared component by component
+1228	   (hours, minutes, seconds) in order of significance.
+
+1230	   The LDAP definition for the timeWithTZOrderingMatch rule is:
+
+1232	   *  ( 1.3.6.1.4.1.61799.5.13.35.1 NAME 'timeWithTZOrderingMatch'
+1233	      SYNTAX 1.3.6.1.4.1.61799.5.40.35 )
+
+1235	   The rule returns TRUE if the attribute value represents a Time Of Day
+1236	   with Timezone which is earlier than the presented Time Of Day with
+1237	   Timezone.
+
+1239	3.8.  realMatch
+
+1241	   The realMatch rule compares for equality a presented value with an
+1242	   attribute value of type Real (Section 2.1.4).
+
+1244	   This matching rule also applies to the Float32 and Float64 syntaxes,
+1245	   which are constrained subsets of the Real syntax.
+
+1247	   Values are compared by their mathematical value.  NOT-A-NUMBER is not
+1248	   equal to any value, including itself.  Negative zero is equal to
+1249	   positive zero.  MINUS-INFINITY is equal only to itself, and PLUS-
+1250	   INFINITY is equal only to itself.
+
+1252	   The LDAP definition for the realMatch rule is:
+
+1254	   *  ( 1.3.6.1.4.1.61799.5.13.9 NAME 'realMatch' SYNTAX
+1255	      1.3.6.1.4.1.61799.5.40.9 )
+
+1257	   The rule returns TRUE if the attribute value represents the same Real
+1258	   value as the presented value.
+
+1260	3.9.  realOrderingMatch
+
+1262	   The realOrderingMatch rule compares the ordering of a presented value
+1263	   with an attribute value of type Real (Section 2.1.4).
+
+1265	   This matching rule also applies to the Float32 and Float64 syntaxes,
+1266	   which are constrained subsets of the Real syntax.
+
+1268	   MINUS-INFINITY is less than all finite values and PLUS-INFINITY is
+1269	   greater than all finite values.  Negative zero is equal to positive
+1270	   zero for ordering purposes.  NOT-A-NUMBER is greater than all other
+1271	   values, including PLUS-INFINITY.  All NOT-A-NUMBER values are
+1272	   considered equal for ordering purposes.
+
+1274	   Note: IEEE-754 [IEEE_754_2019] arithmetic comparison leaves NOT-
+1275	   A-NUMBER unordered with respect to all values.  This rule instead
+1276	   assigns NOT-A-NUMBER a conventional position to ensure a total
+1277	   ordering, which is required for consistent indexing, sorting, and
+1278	   evaluation of inequality filters by directory implementations.
+
+1280	   The LDAP definition for the realOrderingMatch rule is:
+
+1282	   *  ( 1.3.6.1.4.1.61799.5.13.9.1 NAME 'realOrderingMatch' SYNTAX
+1283	      1.3.6.1.4.1.61799.5.40.9 )
+
+1285	   The rule returns TRUE if the attribute value is less than the
+1286	   presented value.
+
+1288	3.10.  durationMatch
+
+1290	   The durationMatch rule compares for equality a presented value with
+1291	   an attribute value of type Duration (Section 2.1.3).
+
+1293	   Two duration values are equal if and only if they represent the same
+1294	   total number of months and the same total number of milliseconds,
+1295	   where:
+
+1297	   *  Total months is (years x 12) + months.
+
+1299	   *  Total milliseconds is (days x 86400000) + (hours x 3600000) +
+1300	      (minutes x 60000) + (seconds x 1000) + milliseconds.
+
+1302	   Note that month components and day-time components are compared
+1303	   independently and are never converted into each other.  Consequently,
+1304	   a duration such as P1M (one month) is never equal to P30D (thirty
+1305	   days), even though they may represent the same elapsed time for
+1306	   certain dates.  This behavior is intentional and consistent with the
+1307	   abstract definition of duration.
+
+1309	   Implementations SHOULD use integer arithmetic for these computations
+1310	   to avoid floating-point precision issues.
+
+1312	   The LDAP definition for the durationMatch rule is:
+
+1314	   *  ( 1.3.6.1.4.1.61799.5.13.34 NAME 'durationMatch' SYNTAX
+1315	      1.3.6.1.4.1.61799.5.40.34 )
+
+1317	   The rule returns TRUE if the attribute value represents the same
+1318	   duration as the presented value.
+
+1320	4.  IANA Considerations
+
+1322	   IANA is requested to assign the LDAP values [RFC4520] specified in
+1323	   this document to https://www.iana.org/assignments/ldap-parameters/
+1324	   ldap-parameters.xhtml.
+
+1326	4.1.  Syntax registration
+
+1328	   Subject:  Request for LDAP Syntax Registration
+
+1330	   Object Identifier:  See table below
+
+1332	   Description:  List of additional useful LDAP syntaxes
+
+1334	   Person & email address to contact for further information:
+1335	      carl.codere@optimasc.com
+
+1337	   Specification/Reference: [ RFC-to-be ]
+
+1339	   Author/Change Controller/Owner:  IESG
+
+1341	   Comments:  See table for list of additional syntaxes
+
+1343	        +=============================+===========================+
+1344	        | Object Identifier           | Syntax                    |
+1345	        +=============================+===========================+
+1346	        | 1.3.6.1.4.1.61799.5.40.31   | Date                      |
+1347	        +-----------------------------+---------------------------+
+1348	        | 1.3.6.1.4.1.61799.5.40.33   | Date-Time                 |
+1349	        +-----------------------------+---------------------------+
+1350	        | 1.3.6.1.4.1.61799.5.40.34   | Duration                  |
+1351	        +-----------------------------+---------------------------+
+1352	        | 1.3.6.1.4.1.61799.5.40.9.4  | Float32                   |
+1353	        +-----------------------------+---------------------------+
+1354	        | 1.3.6.1.4.1.61799.5.40.9.8  | Float64                   |
+1355	        +-----------------------------+---------------------------+
+1356	        | 1.3.6.1.4.1.61799.5.40.2.1  | Int8                      |
+1357	        +-----------------------------+---------------------------+
+1358	        | 1.3.6.1.4.1.61799.5.40.2.2  | Int16                     |
+1359	        +-----------------------------+---------------------------+
+1360	        | 1.3.6.1.4.1.61799.5.40.2.4  | Int32                     |
+1361	        +-----------------------------+---------------------------+
+1362	        | 1.3.6.1.4.1.61799.5.40.2.8  | Int64                     |
+1363	        +-----------------------------+---------------------------+
+1364	        | 1.3.6.1.4.1.61799.5.40.19.1 | Language                  |
+1365	        +-----------------------------+---------------------------+
+1366	        | 1.3.6.1.4.1.61799.5.40.12.6 | NCName                    |
+1367	        +-----------------------------+---------------------------+
+1368	        | 1.3.6.1.4.1.61799.5.40.12.4 | Normalized String         |
+1369	        +-----------------------------+---------------------------+
+1370	        | 1.3.6.1.4.1.61799.5.40.26.5 | Media Type                |
+1371	        +-----------------------------+---------------------------+
+1372	        | 1.3.6.1.4.1.61799.5.40.14.1 | OpenDate                  |
+1373	        +-----------------------------+---------------------------+
+1374	        | 1.3.6.1.4.1.61799.5.40.2.20 | Percentage                |
+1375	        +-----------------------------+---------------------------+
+1376	        | 1.3.6.1.4.1.61799.5.40.12.7 | QualifiedName             |
+1377	        +-----------------------------+---------------------------+
+1378	        | 1.3.6.1.4.1.61799.5.40.9    | Real                      |
+1379	        +-----------------------------+---------------------------+
+1380	        | 1.3.6.1.4.1.61799.5.40.12.3 | Text                      |
+1381	        +-----------------------------+---------------------------+
+1382	        | 1.3.6.1.4.1.61799.5.40.12.5 | Token                     |
+1383	        +-----------------------------+---------------------------+
+1384	        | 1.3.6.1.4.1.61799.5.40.32   | Time Of Day               |
+1385	        +-----------------------------+---------------------------+
+1386	        | 1.3.6.1.4.1.61799.5.40.35   | Time Of Day with Timezone |
+1387	        +-----------------------------+---------------------------+
+1388	        | 1.3.6.1.4.1.61799.5.40.2.21 | UInt8                     |
+1389	        +-----------------------------+---------------------------+
+1390	        | 1.3.6.1.4.1.61799.5.40.2.22 | UInt16                    |
+1391	        +-----------------------------+---------------------------+
+1392	        | 1.3.6.1.4.1.61799.5.40.2.24 | UInt32                    |
+1393	        +-----------------------------+---------------------------+
+1394	        | 1.3.6.1.4.1.61799.5.40.2.28 | UInt64                    |
+1395	        +-----------------------------+---------------------------+
+1396	        | 1.3.6.1.4.1.61799.5.40.26.4 | URI                       |
+1397	        +-----------------------------+---------------------------+
+1398	        | 1.3.6.1.4.1.61799.5.40.26   | Visible String            |
+1399	        +-----------------------------+---------------------------+
+
+1401	                 Table 1: List of additional LDAP syntaxes
+
+1403	4.2.  Object Identifier Descriptors registration
+
+1405	   Subject:  Request for LDAP Descriptor Registration
+
+1407	   Descriptor (short name):  See table below
+
+1409	   Object Identifier:  See table below
+
+1411	   Usage:  matching rule
+
+1413	   Person & email address to contact for further information:
+1414	      carl.codere@optimasc.com
+
+1416	   Specification/Reference: [ RFC-to-be ]
+
+1418	   Author/Change Controller/Owner:  IESG
+
+1420	   Comments:  See table for list of additional matching rules
+1421	        +=========================+===============================+
+1422	        | Name                    | OID                           |
+1423	        +=========================+===============================+
+1424	        | durationMatch           | 1.3.6.1.4.1.61799.5.13.34     |
+1425	        +-------------------------+-------------------------------+
+1426	        | openDateMatch           | 1.3.6.1.4.1.61799.5.13.14.1   |
+1427	        +-------------------------+-------------------------------+
+1428	        | openDateOrderingMatch   | 1.3.6.1.4.1.61799.5.13.14.1.1 |
+1429	        +-------------------------+-------------------------------+
+1430	        | realMatch               | 1.3.6.1.4.1.61799.5.13.9      |
+1431	        +-------------------------+-------------------------------+
+1432	        | realOrderingMatch       | 1.3.6.1.4.1.61799.5.13.9.1    |
+1433	        +-------------------------+-------------------------------+
+1434	        | timeMatch               | 1.3.6.1.4.1.61799.5.13.32     |
+1435	        +-------------------------+-------------------------------+
+1436	        | timeOrderingMatch       | 1.3.6.1.4.1.61799.5.13.32.1   |
+1437	        +-------------------------+-------------------------------+
+1438	        | timeWithTZMatch         | 1.3.6.1.4.1.61799.5.13.35     |
+1439	        +-------------------------+-------------------------------+
+1440	        | timeWithTZOrderingMatch | 1.3.6.1.4.1.61799.5.13.35.1   |
+1441	        +-------------------------+-------------------------------+
+1442	        | uriMatch                | 1.3.6.1.4.1.61799.5.13.26.4   |
+1443	        +-------------------------+-------------------------------+
+
+1445	            Table 2: List of additional descriptor registrations
+
+1447	5.  Security Considerations
+
+1449	   When interpreting security-sensitive fields (in particular, fields
+1450	   used to grant or deny access), implementations MUST ensure that any
+1451	   matching rule comparisons are done on the underlying abstract value,
+1452	   regardless of the particular encoding used.
+
+1454	5.1.  Text, Normalized String and Token
+
+1456	   The Text, Normalized String, and Token syntaxes have been defined for
+1457	   general textual information.  For this reason, and for forward
+1458	   compatibility with future versions of the Unicode Standard, the
+1459	   prohibited code points have been kept to a minimum.
+
+1461	   These syntaxes permit Unicode format characters (General_Category Cf)
+1462	   because they are required for the correct representation of text in
+1463	   several scripts.  However, some format characters may pose security
+1464	   risks when values are displayed or compared without appropriate
+1465	   normalization.  Applications MAY impose additional restrictions on
+1466	   permitted code points as a matter of local policy.
+
+1468	   These syntaxes SHOULD NOT be used for security-sensitive attributes
+1469	   such as identifiers, group names, or access control labels.  The
+1470	   NCName (Section 2.3.5) or Qualified Name (Section 2.3.6) syntaxes
+1471	   SHOULD be used for such purposes instead.
+
+1473	   Text, Normalized String, and Token values SHOULD be matched and
+1474	   compared according to specific comparison rules, such as those
+1475	   defined in [RFC4518] or the PRECIS OpaqueString profile ([RFC8265]).
+
+1477	6.  References
+
+1479	6.1.  Normative References
+
+1481	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+1482	              Requirement Levels", BCP 14, RFC 2119,
+1483	              DOI 10.17487/RFC2119, March 1997,
+1484	              <https://www.rfc-editor.org/info/rfc2119>.
+
+1486	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+1487	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+1488	              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+1490	   [RFC9485]  Bormann, C. and T. Bray, "I-Regexp: An Interoperable
+1491	              Regular Expression Format", RFC 9485,
+1492	              DOI 10.17487/RFC9485, October 2023,
+1493	              <https://www.rfc-editor.org/info/rfc9485>.
+
+1495	   [RFC6838]  Freed, N., Klensin, J., and T. Hansen, "Media Type
+1496	              Specifications and Registration Procedures", BCP 13,
+1497	              RFC 6838, DOI 10.17487/RFC6838, January 2013,
+1498	              <https://www.rfc-editor.org/info/rfc6838>.
+
+1500	   [RFC5646]  Phillips, A., Ed. and M. Davis, Ed., "Tags for Identifying
+1501	              Languages", BCP 47, RFC 5646, DOI 10.17487/RFC5646,
+1502	              September 2009, <https://www.rfc-editor.org/info/rfc5646>.
+
+1504	   [RFC3986]  Berners-Lee, T., Fielding, R., and L. Masinter, "Uniform
+1505	              Resource Identifier (URI): Generic Syntax", STD 66,
+1506	              RFC 3986, DOI 10.17487/RFC3986, January 2005,
+1507	              <https://www.rfc-editor.org/info/rfc3986>.
+
+1509	   [IEEE_754_2019]
+1510	              IEEE, "IEEE Standard for Floating-Point Arithmetic",
+1511	              IEEE IEEE 754-2019, DOI 10.1109/IEEESTD.2019.8766229, 18
+1512	              July 2019, <https://ieeexplore.ieee.org/document/8766229>.
+
+1514	   [RFC4520]  Zeilenga, K., "Internet Assigned Numbers Authority (IANA)
+1515	              Considerations for the Lightweight Directory Access
+1516	              Protocol (LDAP)", BCP 64, RFC 4520, DOI 10.17487/RFC4520,
+1517	              June 2006, <https://www.rfc-editor.org/info/rfc4520>.
+
+1519	   [W3C.NOTE-datetime-19980827]
+1520	              Wicksteed, C., Ed. and M. Wolf, Ed., "Date and Time
+1521	              Formats", W3C NOTE NOTE-datetime-19980827, W3C NOTE-
+1522	              datetime-19980827, 27 August 1998,
+1523	              <http://www.w3.org/TR/1998/NOTE-datetime-19980827>.
+
+1525	   [W3C.xml-names11]
+1526	              "Namespaces in XML 1.1 (Second Edition)", W3C REC xml-
+1527	              names11, W3C xml-names11,
+1528	              <https://www.w3.org/TR/xml-names11/>.
+
+1530	   [W3C.xmlschema11-2]
+1531	              "W3C XML Schema Definition Language (XSD) 1.1 Part 2:
+1532	              Datatypes", W3C REC xmlschema11-2, W3C xmlschema11-2,
+1533	              <https://www.w3.org/TR/xmlschema11-2/>.
+
+1535	   [ASN.1]    International Telecommunication Union, "Abstract Syntax
+1536	              Notation One (ASN.1): Specification of basic notation",
+1537	              ITU-T Recommendation X.680, February 2021.
+
+1539	   [ISO.8601.2004]
+1540	              International Organization for Standardization, "Data
+1541	              elements and interchange formats - Information interchange
+1542	              - Representation of dates and times", ISO Standard 8601,
+1543	              December 2004.
+
+1545	   [ITU.X520.2019]
+1546	              International Telecommunications Union, "Information
+1547	              Technology - Open Systems Interconnection - The Directory:
+1548	              Selected attribute types", ITU-T Recommendation X.520,
+1549	              ISO Standard 9594-7, October 2019.
+
+1551	   [Unicode]  The Unicode Consortium, "The Unicode Standard",
+1552	              <http://www.unicode.org/versions/latest/>.
+
+1554	6.2.  Informative References
+
+1556	   [RFC4517]  Legg, S., Ed., "Lightweight Directory Access Protocol
+1557	              (LDAP): Syntaxes and Matching Rules", RFC 4517,
+1558	              DOI 10.17487/RFC4517, June 2006,
+1559	              <https://www.rfc-editor.org/info/rfc4517>.
+
+1561	   [RFC4518]  Zeilenga, K., "Lightweight Directory Access Protocol
+1562	              (LDAP): Internationalized String Preparation", RFC 4518,
+1563	              DOI 10.17487/RFC4518, June 2006,
+1564	              <https://www.rfc-editor.org/info/rfc4518>.
+
+1566	   [RFC8265]  Saint-Andre, P. and A. Melnikov, "Preparation,
+1567	              Enforcement, and Comparison of Internationalized Strings
+1568	              Representing Usernames and Passwords", RFC 8265,
+1569	              DOI 10.17487/RFC8265, October 2017,
+1570	              <https://www.rfc-editor.org/info/rfc8265>.
+
+1572	   [W3C.xpath-functions-31]
+1573	              "XPath and XQuery Functions and Operators 3.1", W3C REC
+1574	              xpath-functions-31, W3C xpath-functions-31,
+1575	              <https://www.w3.org/TR/xpath-functions-31/>.
+
+1577	   [ITU.X500.2019]
+1578	              International Telecommunications Union, "Information
+1579	              Technology - Open Systems Interconnection - The Directory:
+1580	              Overview of Concepts, Models and Services",
+1581	              ITU-T Recommendation X.500, ISO Standard 9594-1, October
+1582	              2019.
+
+1584	   [IANAREG]  IANA, "Media Types", <https://www.iana.org/assignments/
+1585	              media-types/media-types.xhtml>.
+
+1587	Acknowledgements
+
+1589	   This document was sponsored by Andy Newton of the IETF ART group.
+
+1591	   Sean Turner acted as a shepherd for this document to help it become a
+1592	   proposed standard.
+
+1594	Contributors
+
+1596	   This document was reviewed and improved with the help of Howard Chu.
+
+1598	Author's Address
+
+1600	   Carl Eric Codere (editor)
+1601	   Optima SC Inc.
+1602	   Canada
+1603	   Email: carl.codere@optimasc.com
+1604	   URI:   http://www.optimasc.com
+
+
+
+
+
+
+
+
+
