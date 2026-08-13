@@ -1,0 +1,1162 @@
+idnits 2.17.1 
+
+draft-ietf-oauth-rfc8725bis-09.txt:
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+  == There are 2 instances of lines with non-ascii characters in the document.
+
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     Summary: 0 errors (**), 0 flaws (~~), 1 warning (==), 0 comments (--).
+
+--------------------------------------------------------------------------------
+
+
+2	Web Authorization Protocol                                    Y. Sheffer
+3	Internet-Draft                                               Independent
+4	Obsoletes: 8725 (if approved)                                   D. Hardt
+5	Updates: 7519 (if approved)
+6	Intended status: Best Current Practice                          M. Jones
+7	Expires: 12 February 2027                         Self-Issued Consulting
+8	                                                          11 August 2026
+
+10	                 JSON Web Token Best Current Practices
+11	                     draft-ietf-oauth-rfc8725bis-09
+
+13	Abstract
+
+15	   JSON Web Tokens, also known as JWTs, are URL-safe JSON-based security
+16	   tokens that contain a set of claims that can be signed and/or
+17	   encrypted.  JWTs are being widely used and deployed as a simple
+18	   security token format in numerous protocols and applications, both in
+19	   the area of digital identity and in other application areas.  This
+20	   Best Current Practices (BCP) specification updates RFC 7519 to
+21	   provide actionable guidance leading to secure implementation and
+22	   deployment of JWTs.
+
+24	   This BCP specification furthermore obsoletes the existing JWT BCP
+25	   specification RFC 8725 to provide additional actionable guidance
+26	   covering threats and attacks that have been discovered since RFC 8725
+27	   was published.
+
+29	About This Document
+
+31	   This note is to be removed before publishing as an RFC.
+
+33	   Status information for this document may be found at
+34	   https://datatracker.ietf.org/doc/draft-ietf-oauth-rfc8725bis/.
+
+36	   Discussion of this document takes place on the Web Authorization
+37	   Protocol Working Group mailing list (mailto:oauth@ietf.org), which is
+38	   archived at https://mailarchive.ietf.org/arch/browse/oauth/.
+39	   Subscribe at https://www.ietf.org/mailman/listinfo/oauth/.
+
+41	   Source for this draft and an issue tracker can be found at
+42	   https://github.com/oauth-wg/draft-ietf-oauth-rfc8725bis.
+
+44	Status of This Memo
+
+46	   This Internet-Draft is submitted in full conformance with the
+47	   provisions of BCP 78 and BCP 79.
+
+49	   Internet-Drafts are working documents of the Internet Engineering
+50	   Task Force (IETF).  Note that other groups may also distribute
+51	   working documents as Internet-Drafts.  The list of current Internet-
+52	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+54	   Internet-Drafts are draft documents valid for a maximum of six months
+55	   and may be updated, replaced, or obsoleted by other documents at any
+56	   time.  It is inappropriate to use Internet-Drafts as reference
+57	   material or to cite them other than as "work in progress."
+
+59	   This Internet-Draft will expire on 12 February 2027.
+
+61	Copyright Notice
+
+63	   Copyright (c) 2026 IETF Trust and the persons identified as the
+64	   document authors.  All rights reserved.
+
+66	   This document is subject to BCP 78 and the IETF Trust's Legal
+67	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+68	   license-info) in effect on the date of publication of this document.
+69	   Please review these documents carefully, as they describe your rights
+70	   and restrictions with respect to this document.  Code Components
+71	   extracted from this document must include Revised BSD License text as
+72	   described in Section 4.e of the Trust Legal Provisions and are
+73	   provided without warranty as described in the Revised BSD License.
+
+75	Table of Contents
+
+77	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   4
+78	     1.1.  Target Audience . . . . . . . . . . . . . . . . . . . . .   5
+79	     1.2.  Conventions Used in this Document . . . . . . . . . . . .   5
+80	   2.  Threats and Vulnerabilities . . . . . . . . . . . . . . . . .   5
+81	     2.1.  Weak Signatures and Insufficient Signature Validation . .   5
+82	     2.2.  Weak Symmetric Keys . . . . . . . . . . . . . . . . . . .   6
+83	     2.3.  Incorrect Use and Composition of Encryption and
+84	            Signature  . . . . . . . . . . . . . . . . . . . . . . .   6
+85	     2.4.  Plaintext Leakage through Analysis of Ciphertext
+86	            Length . . . . . . . . . . . . . . . . . . . . . . . . .   6
+87	     2.5.  Insecure Use of Elliptic Curve Encryption . . . . . . . .   7
+88	     2.6.  Multiplicity of JSON Encodings  . . . . . . . . . . . . .   7
+89	     2.7.  Substitution Attacks  . . . . . . . . . . . . . . . . . .   7
+90	     2.8.  Cross-JWT Confusion . . . . . . . . . . . . . . . . . . .   8
+91	     2.9.  Indirect Attacks on the Server  . . . . . . . . . . . . .   8
+92	     2.10. Computation Cost of Unreasonable Number of Hash
+93	            Iterations . . . . . . . . . . . . . . . . . . . . . . .   8
+94	     2.11. Algorithm Verification Code Not Defensively Written . . .   8
+95	     2.12. JWE Decompression Bomb Attack . . . . . . . . . . . . . .   9
+96	     2.13. JWT Format Confusion  . . . . . . . . . . . . . . . . . .   9
+
+98	   3.  Best Practices  . . . . . . . . . . . . . . . . . . . . . . .   9
+99	     3.1.  Perform Algorithm Verification  . . . . . . . . . . . . .   9
+100	     3.2.  Use Appropriate Algorithms  . . . . . . . . . . . . . . .  10
+101	     3.3.  Validate All Cryptographic Operations . . . . . . . . . .  11
+102	     3.4.  Validate Cryptographic Inputs . . . . . . . . . . . . . .  12
+103	     3.5.  Ensure Cryptographic Keys Have Sufficient Entropy . . . .  12
+104	     3.6.  Avoid Compression of Encryption Inputs  . . . . . . . . .  12
+105	     3.7.  Use UTF-8 . . . . . . . . . . . . . . . . . . . . . . . .  12
+106	     3.8.  Validate Issuer and Subject . . . . . . . . . . . . . . .  13
+107	     3.9.  Use and Validate Audience . . . . . . . . . . . . . . . .  13
+108	     3.10. Carefully Evaluate Received Claims  . . . . . . . . . . .  13
+109	     3.11. Use Explicit Typing . . . . . . . . . . . . . . . . . . .  14
+110	     3.12. Use Mutually Exclusive Validation Rules for Different Kinds
+111	            of JWTs  . . . . . . . . . . . . . . . . . . . . . . . .  16
+112	     3.13. Limit Hash Iteration Count  . . . . . . . . . . . . . . .  17
+113	     3.14. Check JWT Format Type . . . . . . . . . . . . . . . . . .  17
+114	     3.15. Limit JWE Decompression Size  . . . . . . . . . . . . . .  17
+115	   4.  Security Considerations . . . . . . . . . . . . . . . . . . .  17
+116	   5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  17
+117	   6.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  17
+118	     6.1.  Acknowledgements for RFC 8725 . . . . . . . . . . . . . .  17
+119	     6.2.  Acknowledgements for [[ this specification ]] . . . . . .  18
+120	   7.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  18
+121	     7.1.  Normative References  . . . . . . . . . . . . . . . . . .  18
+122	     7.2.  Informative References  . . . . . . . . . . . . . . . . .  19
+123	   Appendix A.  Changes from RFC 8725  . . . . . . . . . . . . . . .  22
+124	   Appendix B.  Document History . . . . . . . . . . . . . . . . . .  23
+125	     B.1.  draft-ietf-oauth-rfc8725bis-09  . . . . . . . . . . . . .  23
+126	     B.2.  draft-ietf-oauth-rfc8725bis-08  . . . . . . . . . . . . .  23
+127	     B.3.  draft-ietf-oauth-rfc8725bis-07  . . . . . . . . . . . . .  23
+128	     B.4.  draft-ietf-oauth-rfc8725bis-06  . . . . . . . . . . . . .  23
+129	     B.5.  draft-ietf-oauth-rfc8725bis-05  . . . . . . . . . . . . .  24
+130	     B.6.  draft-ietf-oauth-rfc8725bis-04  . . . . . . . . . . . . .  24
+131	     B.7.  draft-ietf-oauth-rfc8725bis-03  . . . . . . . . . . . . .  24
+132	     B.8.  draft-ietf-oauth-rfc8725bis-02  . . . . . . . . . . . . .  24
+133	     B.9.  draft-ietf-oauth-rfc8725bis-01  . . . . . . . . . . . . .  24
+134	     B.10. draft-ietf-oauth-rfc8725bis-00  . . . . . . . . . . . . .  24
+135	     B.11. draft-sheffer-oauth-rfc8725bis-02 . . . . . . . . . . . .  24
+136	     B.12. draft-sheffer-oauth-rfc8725bis-01 . . . . . . . . . . . .  24
+137	     B.13. draft-sheffer-oauth-rfc8725bis-00 . . . . . . . . . . . .  25
+138	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  25
+
+140	1.  Introduction
+
+142	   JSON Web Tokens, also known as JWTs [RFC7519], are URL-safe JSON-
+143	   based security tokens that contain a set of claims that can be signed
+144	   and/or encrypted.  The JWT specification has seen rapid adoption
+145	   because it encapsulates security-relevant information in one easy-to-
+146	   protect location, and because it is easy to implement using widely
+147	   available tools.  One application area in which JWTs are commonly
+148	   used is representing authorization information, such as OAuth 2.0
+149	   access tokens [RFC9068], and identity information, such as OpenID
+150	   Connect ID Tokens [OpenID.Core].  The details of these uses are
+151	   application- and deployment-specific.
+
+153	   Since the JWT specification was published, there have been several
+154	   widely published attacks on implementations and deployments.  Such
+155	   attacks are the result of under-specified security mechanisms, as
+156	   well as incomplete implementations and incorrect usage by
+157	   applications.
+
+159	   The goal of this document is to facilitate secure implementation and
+160	   deployment of JWTs.  Many of the recommendations in this document are
+161	   about implementation and use of the cryptographic mechanisms
+162	   underlying JWTs that are defined by JSON Web Signature (JWS)
+163	   [RFC7515], JSON Web Encryption (JWE) [RFC7516], and JSON Web
+164	   Algorithms (JWA) [RFC7518].  Others are about use of the JWT claims
+165	   themselves.
+
+167	   These are intended to be minimum recommendations for the use of JWTs
+168	   in the vast majority of implementation and deployment scenarios.
+169	   Other specifications that reference this document can have stricter
+170	   requirements related to one or more aspects of the format, based on
+171	   their particular circumstances; when that is the case, implementers
+172	   are advised to adhere to those stricter requirements.  Furthermore,
+173	   this document provides a floor, not a ceiling, so stronger options
+174	   are always allowed (e.g., depending on differing evaluations of the
+175	   importance of cryptographic strength vs. computational load).
+
+177	   Community knowledge about the strength of various algorithms and
+178	   feasible attacks can change quickly, and experience shows that a Best
+179	   Current Practice (BCP) document about security is a point-in-time
+180	   statement.  Readers are advised to seek out any errata or updates
+181	   that apply to this document.
+
+183	   This document obsoletes [RFC8725].  In addition to retaining the
+184	   guidance from that BCP, it adds recommendations addressing attacks
+185	   and vulnerabilities discovered since its publication; Appendix A
+186	   summarizes those additions.  This document also updates [RFC7519] by
+187	   tightening claim and "typ" usage and validation (especially audience,
+188	   issuer/subject, and explicit typing), and by restricting how
+189	   Unsecured JWTs (alg value "none") are used.
+
+191	1.1.  Target Audience
+
+193	   The intended audiences of this document are:
+
+195	   *  Implementers of JWT libraries (and the JWS and JWE libraries used
+196	      by those libraries),
+
+198	   *  Implementers of code that uses such libraries (to the extent that
+199	      some mechanisms may not be provided by libraries, or until they
+200	      are), and
+
+202	   *  Developers of specifications that rely on JWTs, both inside and
+203	      outside the IETF.
+
+205	1.2.  Conventions Used in this Document
+
+207	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+208	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+209	   "OPTIONAL" in this document are to be interpreted as described in
+210	   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+211	   capitals, as shown here.
+
+213	2.  Threats and Vulnerabilities
+
+215	   This section lists some known and possible problems with JWT
+216	   implementations and deployments.  Each problem description is
+217	   followed by references to one or more mitigations to those problems.
+
+219	2.1.  Weak Signatures and Insufficient Signature Validation
+
+221	   Signed JSON Web Tokens carry an explicit indication of the signing
+222	   algorithm, in the form of the "alg" Header Parameter, to facilitate
+223	   cryptographic agility.  This, in conjunction with design flaws in
+224	   some libraries and applications, has led to several attacks:
+
+226	   *  The algorithm can be changed to "none" by an attacker, and some
+227	      libraries would trust this value and "validate" the JWT without
+228	      checking any signature.
+
+230	   *  An "RS256" (RSA, 2048 bit) parameter value can be changed into
+231	      "HS256" (HMAC, SHA-256), and some libraries would try to validate
+232	      the signature using HMAC-SHA256 and using the RSA public key as
+233	      the HMAC shared secret (see [McLean] and [CVE-2015-9235]).
+
+235	   For mitigations, see Sections 3.1 and 3.2.
+
+237	2.2.  Weak Symmetric Keys
+
+239	   In addition, some applications use a keyed Message Authentication
+240	   Code (MAC) algorithm, such as "HS256", to sign tokens but supply a
+241	   weak symmetric key with insufficient entropy (such as a human-
+242	   memorable password).  Such keys are vulnerable to offline brute-force
+243	   or dictionary attacks once an attacker gets hold of such a token
+244	   [Langkemper][JWT-Cracker].
+
+246	   For mitigations, see Section 3.5.
+
+248	2.3.  Incorrect Use and Composition of Encryption and Signature
+
+250	   Most authentication use cases only require a simple signed JWT as
+251	   their token.  However, verifiers don't always check that the received
+252	   JWT is a JWS (a signed JWT) as opposed to a JWE (a JWT with encrypted
+253	   structure).  This can result in vulnerabilities when the verifier's
+254	   library does not distinguish between successful decryption and
+255	   successful signature validation [CVE-2023-51774].
+
+257	   In the more complicated use cases where confidentiality is required,
+258	   some libraries that decrypt a JWE-encrypted JWT to obtain a JWS-
+259	   signed object do not always validate the internal signature.
+
+261	   For mitigations, see Section 3.3.
+
+263	2.4.  Plaintext Leakage through Analysis of Ciphertext Length
+
+265	   Many encryption algorithms leak information about the length of the
+266	   plaintext, with a varying amount of leakage depending on the
+267	   algorithm and mode of operation.  JWEs are vulnerable to this
+268	   leakage.  This problem is exacerbated when the plaintext is initially
+269	   compressed, because the length of the compressed plaintext and, thus,
+270	   the ciphertext depends not only on the length of the original
+271	   plaintext but also on its content.  Compression attacks are
+272	   particularly powerful when there is attacker-controlled data in the
+273	   same compression space as secret data, which is the case for some
+274	   attacks on HTTPS.
+
+276	   See [Kelsey] for general background on compression and encryption and
+277	   [Alawatugoda] for a specific example of attacks on HTTP cookies.
+
+279	   For mitigations, see Section 3.6.
+
+281	2.5.  Insecure Use of Elliptic Curve Encryption
+
+283	   Per [Sanso], several JavaScript Object Signing and Encryption (JOSE)
+284	   libraries fail to validate their inputs correctly when performing
+285	   elliptic curve key agreement (the "ECDH-ES" algorithm).  An attacker
+286	   that is able to send JWEs of its choosing that use invalid curve
+287	   points and observe the cleartext outputs resulting from decryption
+288	   with the invalid curve points can use this vulnerability to recover
+289	   the recipient's private key.
+
+291	   For mitigations, see Section 3.4.
+
+293	2.6.  Multiplicity of JSON Encodings
+
+295	   Previous versions of the JSON format, such as the obsoleted
+296	   [RFC7159], allowed several different character encodings: UTF-8, UTF-
+297	   16, and UTF-32.  This is not the case anymore, with the latest
+298	   standard [RFC8259] only allowing UTF-8 except for internal use within
+299	   a "closed ecosystem".  This ambiguity, where older implementations
+300	   and those used within closed environments may generate non-standard
+301	   encodings, may result in the JWT being misinterpreted by its
+302	   recipient.  This, in turn, could be used by a malicious sender to
+303	   bypass the recipient's validation checks.
+
+305	   For mitigations, see Section 3.7.
+
+307	2.7.  Substitution Attacks
+
+309	   There are attacks in which one recipient will be given a JWT that was
+310	   intended for it and will attempt to use it at a different recipient
+311	   for which that JWT was not intended.  For instance, if an OAuth 2.0
+312	   [RFC6749] access token is legitimately presented to an OAuth 2.0
+313	   protected resource for which it is intended, that protected resource
+314	   might then present that same access token to a different protected
+315	   resource for which the access token is not intended, in an attempt to
+316	   gain access.  If such situations are not caught, this can result in
+317	   the attacker gaining access to resources that it is not entitled to
+318	   access.
+
+320	   For mitigations, see Sections 3.8 and 3.9.
+
+322	2.8.  Cross-JWT Confusion
+
+324	   As JWTs are used by more protocols in diverse ways, it becomes
+325	   increasingly important to prevent JWT tokens that have been issued
+326	   for one purpose being used for another.  Note that this is a specific
+327	   type of substitution attack.  If the JWT could be used in an
+328	   application context in which it could be confused with other kinds of
+329	   JWTs, then mitigations can be employed to prevent these substitution
+330	   attacks.
+
+332	   For mitigations, see Sections 3.8, 3.9, 3.11, and 3.12.
+
+334	2.9.  Indirect Attacks on the Server
+
+336	   Various JWT claims are used by the recipient to perform lookup
+337	   operations, such as database and Lightweight Directory Access
+338	   Protocol (LDAP) searches.  Others include URLs that are similarly
+339	   looked up by the server.  Any of these claims can be used by an
+340	   attacker as vectors for injection attacks or server-side request
+341	   forgery (SSRF) attacks.
+
+343	   For mitigations, see Section 3.10.
+
+345	2.10.  Computation Cost of Unreasonable Number of Hash Iterations
+
+347	   The p2c (PBES2 Count) header parameter for the PBES2 encryption
+348	   algorithms specifies the number of iterative hash computations to be
+349	   performed.  Attackers can use a very large count, thereby imposing an
+350	   unreasonable computational burden on recipients.
+
+352	   For mitigations, see Section 3.13.
+
+354	2.11.  Algorithm Verification Code Not Defensively Written
+
+356	   Some JWT implementations included a list of disallowed algorithm
+357	   names, e.g., do not use "none".  These same applications
+358	   misinterpreted the JOSE specifications when parsing the token,
+359	   reading algorithm values as if they were case-insensitive.  The end
+360	   result was that an attacker could change the "alg" value to "noNE"
+361	   and bypass the security check.
+
+363	   For mitigations, see Section 3.1.
+
+365	2.12.  JWE Decompression Bomb Attack
+
+367	   JWE supports the optional compression of the plaintext prior to
+368	   encryption via the "zip" header parameter as defined in [RFC7516]
+369	   Section 4.1.3.  Upon decryption, recipients are expected to
+370	   decompress the payload before further processing.  However, if the
+371	   recipient does not enforce limits on the size of the decompressed
+372	   output, an attacker can craft a malicious JWE with a highly
+373	   compressed, arbitrarily large payload.  This can cause excessive
+374	   resource consumption (CPU, memory), resulting in Denial of Service
+375	   (DoS).
+
+377	   For mitigation, see Section 3.15.
+
+379	2.13.  JWT Format Confusion
+
+381	   Some JWS implementations support both the Compact and JSON
+382	   Serializations.  While JWTs must use the Compact Serialization
+383	   (Section 1 of [RFC7519]), if an application by mistake verifies a JWT
+384	   using the JSON Serialization but extracts claims by parsing it as a
+385	   JWT using the Compact Serialization (e.g., via string splitting), an
+386	   attacker can craft a valid JSON JWS with a forged payload.  This
+387	   mismatch in format handling can lead to authentication bypass or
+388	   impersonation.
+
+390	   For mitigations, see Section 3.14.
+
+392	3.  Best Practices
+
+394	   The best practices listed below should be applied by practitioners to
+395	   mitigate the threats listed in the preceding section.
+
+397	3.1.  Perform Algorithm Verification
+
+399	   Libraries MUST provide a mechanism that enables developers to
+400	   explicitly restrict the set of algorithms permitted for use and MUST
+401	   NOT employ any algorithms outside this configured set when performing
+402	   cryptographic operations.
+
+404	   The library MUST verify that the algorithm specified in the "alg" or
+405	   "enc" header parameter is consistent with the algorithm associated
+406	   with the key identified by the corresponding identifier (e.g., "kid")
+407	   during key lookup.
+
+409	   When a recipient receives a JWT signed by a particular issuer, it
+410	   MUST determine which algorithms are permitted for itself and that
+411	   issuer and ensure that the received JWT complies with those
+412	   requirements.  It MUST likewise validate that the algorithms used by
+413	   encrypted JWTs are among those supported by the intended recipient.
+
+415	   In accordance with established cryptographic best practices, each key
+416	   MUST be used with exactly one algorithm.  Compliance with this
+417	   requirement MUST be enforced and validated at the time the
+418	   cryptographic operation is executed.
+
+420	   As a best practice, libraries should opt for defensive security
+421	   policies to cope with potential issues in the underlying
+422	   infrastructure, such as the JSON parser.  In particular, libraries
+423	   should use allowlists for critical parameters such as "alg" instead
+424	   of blocklists, because blocklists cannot anticipate every unsafe or
+425	   misspelled value an attacker might use.
+
+427	3.2.  Use Appropriate Algorithms
+
+429	   As Section 5.2 of [RFC7515] says, "it is an application decision
+430	   which algorithms may be used in a given context.  Even if a JWS can
+431	   be successfully validated, unless the algorithm(s) used in the JWS
+432	   are acceptable to the application, it SHOULD consider the JWS to be
+433	   invalid."
+
+435	   Therefore, applications MUST only allow the use of cryptographically
+436	   current algorithms that meet the security requirements of the
+437	   application.  This set will vary over time as new algorithms are
+438	   introduced and existing algorithms are deprecated due to discovered
+439	   cryptographic weaknesses.  Applications MUST therefore be designed to
+440	   enable cryptographic agility.
+
+442	   The "none" algorithm should only be used when the JWT is
+443	   cryptographically protected by other means.  JWTs using "none" are
+444	   often used in application contexts in which the content is optionally
+445	   signed.  The URL-safe claims representation and processing in this
+446	   context can be the same in both the signed and unsigned cases.
+
+448	   The "none" algorithm is deprecated by
+449	   [I-D.ietf-jose-deprecate-none-rsa15].  JWT libraries MUST NOT
+450	   generate JWTs using "none" unless explicitly requested to do so by
+451	   the caller.  Similarly, JWT libraries MUST NOT consume JWTs using
+452	   "none" unless explicitly allowed by the caller.
+
+454	   Applications SHOULD follow these algorithm-specific recommendations,
+455	   because deviating from them may re-enable known attacks on the listed
+456	   algorithms unless an application-specific threat analysis shows the
+457	   risk is acceptable:
+
+459	   *  Deprecate all RSA-PKCS1 v1.5 encryption algorithms (Section 7.2 of
+460	      [RFC8017]), as specified in [I-D.ietf-jose-deprecate-none-rsa15],
+461	      preferring RSAES-OAEP (Section 7.1 of [RFC8017]).
+
+463	   *  Elliptic Curve Digital Signature Algorithm (ECDSA) signatures
+464	      [ANSI-X962-2005] require a unique random value for every message
+465	      that is signed.  If even just a few bits of the random value are
+466	      predictable across multiple messages, then the security of the
+467	      signature scheme may be compromised.  In the worst case, the
+468	      private key may be recoverable by an attacker.  To counter these
+469	      attacks, JWT libraries SHOULD implement ECDSA using the
+470	      deterministic approach defined in [RFC6979], unless this is not
+471	      reasonably implementable.  This approach is completely compatible
+472	      with existing ECDSA verifiers and so can be implemented without
+473	      new algorithm identifiers being required.
+
+475	   Readers are advised that [RFC9864] defines fully-specified JOSE
+476	   algorithm identifiers and deprecates polymorphic identifiers such as
+477	   "EdDSA".  New deployments SHOULD prefer fully-specified algorithm
+478	   identifiers (for example, "Ed25519" rather than "EdDSA") when
+479	   negotiating and configuring algorithms, unless backward compatibility
+480	   requires use of the older polymorphic identifiers.
+
+482	3.3.  Validate All Cryptographic Operations
+
+484	   All cryptographic operations used in the JWT MUST be validated and
+485	   the entire JWT MUST be rejected if any of them fail to validate.
+486	   This is true of JWTs with a single set of Header Parameters.  If an
+487	   implementation supports Nested JWTs, as defined in Section 2 of
+488	   [RFC7519], then both the outer and inner operations MUST be validated
+489	   using the keys and algorithms supplied by the application.
+
+491	   Libraries MUST allow the recipient to distinguish between Unsecured
+492	   JWTs, signed JWTs (JWSes), encrypted JWTs (JWEs), and signed and
+493	   encrypted JWTs (Nested JWTs).  This allows recipients to easily apply
+494	   policies that only accept appropriate JWTs for the application
+495	   context.  Note that authentication use cases typically require the
+496	   use of signed JWTs.
+
+498	3.4.  Validate Cryptographic Inputs
+
+500	   Some cryptographic operations, such as Elliptic Curve Diffie-Hellman
+501	   key agreement ("ECDH-ES"), take inputs that may contain invalid
+502	   values.  This includes points not on the specified elliptic curve or
+503	   other invalid points (e.g., Section 7.1 of [Valenta]).  The JWS/JWE
+504	   library MUST validate these inputs before using them or use
+505	   underlying cryptographic libraries that do so (or both).
+
+507	   Elliptic Curve Diffie-Hellman Ephemeral Static (ECDH-ES) ephemeral
+508	   public key (epk) inputs should be validated according to the
+509	   recipient's chosen elliptic curve.  For the NIST prime-order curves
+510	   P-256, P-384, and P-521, validation MUST be performed according to
+511	   Section 5.6.2.3.4 (ECC Partial Public-Key Validation Routine) of
+512	   "Recommendation for Pair-Wise Key-Establishment Schemes Using
+513	   Discrete Logarithm Cryptography" [nist-sp-800-56a-r3].  If the
+514	   "X25519" or "X448" [RFC8037] algorithms are used, then the security
+515	   considerations in [RFC8037] apply.
+
+517	3.5.  Ensure Cryptographic Keys Have Sufficient Entropy
+
+519	   The Key Entropy and Random Values advice in Section 10.1 of
+520	   [RFC7515], the Password Considerations in Section 8.8 of [RFC7518],
+521	   and PBKDF2 as specified in [RFC8018] MUST be followed.  In
+522	   particular, human-memorizable passwords MUST NOT be directly used as
+523	   the key to a keyed-MAC algorithm such as "HS256".  Moreover,
+524	   passwords should only be used to perform key encryption, rather than
+525	   content encryption, as described in Section 4.8 of [RFC7518].  Note
+526	   that even when used for key encryption, password-based encryption is
+527	   still subject to brute-force attacks.
+
+529	3.6.  Avoid Compression of Encryption Inputs
+
+531	   Compression of data SHOULD NOT be used when creating a JWE, because
+532	   such compressed data often reveals information about the plaintext,
+533	   as described in [Kelsey], unless this risk is outside the applicable
+534	   threat model.
+
+536	3.7.  Use UTF-8
+
+538	   [RFC7515], [RFC7516], and [RFC7519] all specify that UTF-8 be used
+539	   for encoding and decoding JSON used in Header Parameters and JWT
+540	   Claims Sets.  This is also in line with the latest JSON specification
+541	   [RFC8259].  Implementations and applications MUST do this and not use
+542	   or allow the use of other Unicode encodings for these purposes.
+
+544	3.8.  Validate Issuer and Subject
+
+546	   When a JWT contains an "iss" (issuer) claim, the application MUST
+547	   validate that the cryptographic keys used for the cryptographic
+548	   operations in the JWT belong to the issuer.  If they do not, the
+549	   application MUST reject the JWT.
+
+551	   The means of determining the keys owned by an issuer is application-
+552	   specific.  As one example, OAuth 2.0 authorization server "issuer"
+553	   values [RFC8414] are "https" URLs that reference a JSON metadata
+554	   document that contains a "jwks_uri" value that is an "https" URL from
+555	   which the issuer's keys are retrieved as a JWK Set [RFC7517].  This
+556	   same mechanism is used by OpenID Connect [OpenID.Core].  Other
+557	   applications may use different means of binding keys to issuers.
+
+559	   Similarly, when the JWT contains a "sub" (subject) claim, the
+560	   application MUST validate that the subject value corresponds to a
+561	   valid subject and/or issuer-subject pair at the application.  This
+562	   may include confirming that the issuer is trusted by the application.
+563	   In the OAuth context, Section 4.15 of [RFC9700] discusses the
+564	   possibility of confusing user identifier and client ID values.  If
+565	   the issuer, subject, or the pair are invalid, the application MUST
+566	   reject the JWT.
+
+568	3.9.  Use and Validate Audience
+
+570	   If the same issuer can issue JWTs that are intended for use by more
+571	   than one relying party or application, or may do so in the future,
+572	   the JWT MUST contain an "aud" (audience) claim that can be used to
+573	   determine whether the JWT is being used by an intended party or was
+574	   substituted by an attacker.
+
+576	   In such cases, the relying party or application MUST validate the
+577	   audience value, and if no audience value is present or none of the
+578	   values are associated with the recipient, it MUST reject the JWT.
+
+580	3.10.  Carefully Evaluate Received Claims
+
+582	   Treat claim values as being potentially attacker-provided input.
+
+584	   The "kid" (key ID) header is used by the relying application to
+585	   perform key lookup.  Applications MUST ensure that this does not
+586	   create SQL or LDAP injection vulnerabilities by validating and/or
+587	   sanitizing the received value.
+
+589	   Similarly, uncritically following a "jku" (JWK set URL) or "x5u"
+590	   (X.509 URL) header, which may contain an arbitrary URL, could result
+591	   in server-side request forgery (SSRF) attacks.  Applications SHOULD
+592	   protect against such attacks, e.g., by matching the URL to an
+593	   allowlist of permitted locations and ensuring no cookies are sent in
+594	   the GET request, unless there are no local resources to protect
+595	   (e.g., a hosted sandbox).
+
+597	   When such an allowlist is not available, the authorization server
+598	   MUST check what a hostname resolves to and avoid making a request if
+599	   it resolves to a loopback or local IP address, because otherwise an
+600	   attacker-chosen URL can cause the server to fetch arbitrary content
+601	   from within the security domain.  An example of this is when
+602	   "attacker.example.com/etc/passwd" is used as the "jwks_uri" value and
+603	   there is a DNS entry for "attacker.example.com" that resolves to
+604	   "127.0.0.1" or other local IP address values.
+
+606	3.11.  Use Explicit Typing
+
+608	   When two different uses of JWTs share a common set of claims, one
+609	   kind of JWT can be confused for another.  If a particular kind of JWT
+610	   is subject to such confusion, that JWT can include an explicit JWT
+611	   type value, and the validation rules can specify checking the type.
+612	   This mechanism can prevent such confusion.  Explicit JWT typing is
+613	   accomplished by using the "typ" Header Parameter.  For instance, the
+614	   [RFC8417] specification uses the "application/secevent+jwt" media
+615	   type to perform explicit typing of Security Event Tokens (SETs).
+
+617	   An example of an ad-hoc means of preventing confusion between
+618	   different kinds of JWTs is the requirement in Logout Tokens
+619	   [OpenID.Backchannel] prohibiting the inclusion of a "nonce" claim so
+620	   that Logout Tokens will fail the validation rules for ID Tokens
+621	   [OpenID.Core].  The use of explicit typing avoids the need for
+622	   employing such ad-hoc mechanisms when the validation rules for both
+623	   kinds of JWTs include validating the "typ" values and the acceptable
+624	   "typ" values for the two kinds of JWTs are distinct.
+
+626	   Per Section 4.1.9 of [RFC7515], the "typ" Header Parameter declares
+627	   the media type of the complete JWS.  To keep header values compact,
+628	   producers are RECOMMENDED to omit the "application/" prefix from
+629	   "typ" when no other "/" appears in the media type, as specified in
+630	   that section, unless application requirements or interoperability
+631	   needs call for including the prefix; recipients using the media type
+632	   value MUST treat a "typ" value with no "/" as if "application/" were
+633	   prepended.  When explicit typing is employed:
+
+635	   *  Implementations SHOULD register the full media type name
+636	      "application/example+jwt", where "example" identifies the specific
+637	      kind of JWT.
+
+639	   *  Implementations SHOULD set the corresponding "typ" value to
+640	      "example+jwt".
+
+642	   These recommendations apply unless the JWT cannot be confused with
+643	   other kinds of JWTs in its application context, in which case the
+644	   media type and "typ" pairing MAY be omitted.
+
+646	   Distinct types make cross-JWT substitution harder when validators
+647	   check "typ".  Misapplying the prefix rule in Section 4.1.9 of
+648	   [RFC7515] can cause validators to reject otherwise valid tokens or
+649	   accept the wrong type.
+
+651	   For example, for Security Event Tokens (SETs) [RFC8417], the media
+652	   type is "application/secevent+jwt" and the "typ" value should be
+653	   "secevent+jwt", because SETs are often issued in contexts where they
+654	   could otherwise be mistaken for other kinds of JWTs.
+
+656	   When applying explicit typing to a Nested JWT, the "typ" Header
+657	   Parameter containing the explicit type value MUST be present in the
+658	   inner JWT of the Nested JWT (the JWT whose payload is the JWT Claims
+659	   Set).  In some cases, the same "typ" Header Parameter value will be
+660	   present in the outer JWT as well, to explicitly type the entire
+661	   Nested JWT.
+
+663	   Note that the use of explicit typing may not achieve disambiguation
+664	   from existing kinds of JWTs, as the validation rules for kinds of
+665	   JWTs defined before the guidance on explicit typing in [RFC8725] was
+666	   available often do not use the "typ" Header Parameter value.
+
+668	   Also, note that attempting to retrofit mandatory explicit typing into
+669	   the validation rules for existing kinds of JWTs not already using it
+670	   would be a breaking change; if a legacy implementation creates a JWT
+671	   without the explicit type and an updated implementation receiving it
+672	   requires the explicit type, the JWT will be rejected.  The
+673	   implementations will not interoperate.  However, retrofitting a rule
+674	   that if the JWT contains a "typ" value, then it MUST be the expected
+675	   explicit type, is not a breaking change.
+
+677	   Another consideration for existing kinds of JWTs is that the use of a
+678	   "typ" value of "JWT", as originally recommended in Section 5.1 of
+679	   [RFC7519], does not constitute effective explicit typing.
+
+681	   Explicit typing is RECOMMENDED for new uses of JWTs, because without
+682	   it, mutually exclusive validation rules are harder to enforce and
+683	   cross-JWT confusion becomes more likely.
+
+685	3.12.  Use Mutually Exclusive Validation Rules for Different Kinds of
+686	       JWTs
+
+688	   Each application of JWTs defines a profile specifying the required
+689	   and optional JWT claims and the validation rules associated with
+690	   them.  If more than one kind of JWT can be issued by the same issuer,
+691	   the validation rules for those JWTs MUST be written such that they
+692	   are mutually exclusive, rejecting JWTs of the wrong kind.
+
+694	   To prevent substitution of JWTs from one context into another,
+695	   application developers may employ a number of strategies:
+
+697	   *  Use explicit typing for different kinds of JWTs.  Then the
+698	      distinct "typ" values can be used to differentiate between the
+699	      different kinds of JWTs.
+
+701	   *  Use different sets of required claims or different required claim
+702	      values.  Then the validation rules for one kind of JWT will reject
+703	      those with different claims or values.
+
+705	   *  Use different sets of required Header Parameters or different
+706	      required Header Parameter values.  Then the validation rules for
+707	      one kind of JWT will reject those with different Header Parameters
+708	      or values.
+
+710	   *  Use different keys for different kinds of JWTs.  Then the keys
+711	      used to validate one kind of JWT will fail to validate other kinds
+712	      of JWTs.
+
+714	   *  Use different "aud" values for different uses of JWTs from the
+715	      same issuer.  Then audience validation will reject JWTs
+716	      substituted into inappropriate contexts.
+
+718	   *  Use different issuers for different kinds of JWTs.  Then the
+719	      distinct "iss" values can be used to segregate the different kinds
+720	      of JWTs.
+
+722	   Given the broad diversity of JWT usage and applications, the best
+723	   combination of types, required claims, values, Header Parameters, key
+724	   usages, and issuers to differentiate among different kinds of JWTs
+725	   will, in general, be application-specific.  As discussed in
+726	   Section 3.11, for new JWT applications, the use of explicit typing is
+727	   RECOMMENDED.
+
+729	3.13.  Limit Hash Iteration Count
+
+731	   Implementations are RECOMMENDED to set a reasonable upper limit on
+732	   the number of hash iterations that can be performed when validating
+733	   encrypted content using PBES2 encryption algorithms, so as to prevent
+734	   attackers from imposing an unreasonable computational burden on
+735	   recipients.  As an example, [OWASP-Password-Storage] recommends
+736	   600,000 iterations (at time of publishing) when using HMAC-SHA-256 in
+737	   a FIPS-140 context.  Rejecting inputs with a p2c (PBES2 Count) value
+738	   larger than twice that figure is RECOMMENDED, unless threat analysis
+739	   on the recipient side results in accepting a larger number of
+740	   iterations.
+
+742	3.14.  Check JWT Format Type
+
+744	   Implementations MUST confirm the JWT is in a legal format while
+745	   parsing it.  Legal JWTs, being dot-concatenated base64url strings,
+746	   contain only the ASCII characters for letters, numbers, dash,
+747	   underscore, and period.  Content with any other characters -
+748	   especially braces and quotation marks - is not a JWT and MUST be
+749	   rejected.
+
+751	3.15.  Limit JWE Decompression Size
+
+753	   Implementations are RECOMMENDED to set a reasonable upper limit on
+754	   the decompressed size of a JWE, because without such a limit,
+755	   decompression can impose an unreasonable memory or CPU burden on
+756	   recipients.  Deployed JOSE libraries commonly use limits on the order
+757	   of a few hundred kilobytes, e.g., 250 KB in one implementation.
+
+759	4.  Security Considerations
+
+761	   This entire document is about security considerations when
+762	   implementing and deploying JSON Web Tokens.
+
+764	5.  IANA Considerations
+
+766	   This document has no IANA actions.
+
+768	6.  Acknowledgements
+
+770	6.1.  Acknowledgements for RFC 8725
+
+772	   The following acknowledgements from [RFC8725], the text of which is
+773	   incorporated into this specification, are retained.
+
+775	   Thanks to Antonio Sanso for bringing the "ECDH-ES" invalid point
+776	   attack to the attention of JWE and JWT implementers.  Tim McLean
+777	   published the RSA/HMAC confusion attack [McLean].  Thanks to Nat
+778	   Sakimura for advocating the use of explicit typing.  Thanks to Neil
+779	   Madden for his numerous comments, and to Carsten Bormann, Brian
+780	   Campbell, Brian Carpenter, Alissa Cooper, Roman Danyliw, Ben Kaduk,
+781	   Mirja Kühlewind, Barry Leiba, Dan Moore, Eric Rescorla, Adam Roach,
+782	   Martin Vigoureux, and Éric Vyncke for their reviews.
+
+784	6.2.  Acknowledgements for [[ this specification ]]
+
+786	   We would like to thank Mike Bishop, Brian Campbell, Jianjun Chen, Deb
+787	   Cooley, Dan Moore, Aaron Parecki, Filip Skokan, Ketan Talaulikar, Tom
+788	   Tervoort, Enze Wang, and Jesse Yang for their contributions to the
+789	   new content in this specification.
+
+791	7.  References
+
+793	7.1.  Normative References
+
+795	   [I-D.ietf-jose-deprecate-none-rsa15]
+796	              Madden, N., "JOSE: Deprecate 'none' and 'RSA1_5'", Work in
+797	              Progress, Internet-Draft, draft-ietf-jose-deprecate-none-
+798	              rsa15-05, 23 June 2026,
+799	              <https://datatracker.ietf.org/doc/html/draft-ietf-jose-
+800	              deprecate-none-rsa15-05>.
+
+802	   [nist-sp-800-56a-r3]
+803	              Barker, E., Chen, L., Roginsky, A., Vassilev, A., and R.
+804	              Davis, "Recommendation for pair-wise key-establishment
+805	              schemes using discrete logarithm cryptography", National
+806	              Institute of Standards and Technology,
+807	              DOI 10.6028/nist.sp.800-56ar3, April 2018,
+808	              <https://doi.org/10.6028/nist.sp.800-56ar3>.
+
+810	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+811	              Requirement Levels", BCP 14, RFC 2119,
+812	              DOI 10.17487/RFC2119, March 1997,
+813	              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+815	   [RFC6979]  Pornin, T., "Deterministic Usage of the Digital Signature
+816	              Algorithm (DSA) and Elliptic Curve Digital Signature
+817	              Algorithm (ECDSA)", RFC 6979, DOI 10.17487/RFC6979, August
+818	              2013, <https://www.rfc-editor.org/rfc/rfc6979>.
+
+820	   [RFC7515]  Jones, M., Bradley, J., and N. Sakimura, "JSON Web
+821	              Signature (JWS)", RFC 7515, DOI 10.17487/RFC7515, May
+822	              2015, <https://www.rfc-editor.org/rfc/rfc7515>.
+
+824	   [RFC7516]  Jones, M. and J. Hildebrand, "JSON Web Encryption (JWE)",
+825	              RFC 7516, DOI 10.17487/RFC7516, May 2015,
+826	              <https://www.rfc-editor.org/rfc/rfc7516>.
+
+828	   [RFC7518]  Jones, M., "JSON Web Algorithms (JWA)", RFC 7518,
+829	              DOI 10.17487/RFC7518, May 2015,
+830	              <https://www.rfc-editor.org/rfc/rfc7518>.
+
+832	   [RFC7519]  Jones, M., Bradley, J., and N. Sakimura, "JSON Web Token
+833	              (JWT)", RFC 7519, DOI 10.17487/RFC7519, May 2015,
+834	              <https://www.rfc-editor.org/rfc/rfc7519>.
+
+836	   [RFC8017]  Moriarty, K., Ed., Kaliski, B., Jonsson, J., and A. Rusch,
+837	              "PKCS #1: RSA Cryptography Specifications Version 2.2",
+838	              RFC 8017, DOI 10.17487/RFC8017, November 2016,
+839	              <https://www.rfc-editor.org/rfc/rfc8017>.
+
+841	   [RFC8018]  Moriarty, K., Ed., Kaliski, B., and A. Rusch, "PKCS #5:
+842	              Password-Based Cryptography Specification Version 2.1",
+843	              RFC 8018, DOI 10.17487/RFC8018, January 2017,
+844	              <https://www.rfc-editor.org/rfc/rfc8018>.
+
+846	   [RFC8037]  Liusvaara, I., "CFRG Elliptic Curve Diffie-Hellman (ECDH)
+847	              and Signatures in JSON Object Signing and Encryption
+848	              (JOSE)", RFC 8037, DOI 10.17487/RFC8037, January 2017,
+849	              <https://www.rfc-editor.org/rfc/rfc8037>.
+
+851	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+852	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+853	              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+855	   [RFC8259]  Bray, T., Ed., "The JavaScript Object Notation (JSON) Data
+856	              Interchange Format", STD 90, RFC 8259,
+857	              DOI 10.17487/RFC8259, December 2017,
+858	              <https://www.rfc-editor.org/rfc/rfc8259>.
+
+860	7.2.  Informative References
+
+862	   [Alawatugoda]
+863	              Alawatugoda, J., Stebila, D., and C. Boyd, "Protecting
+864	              Encrypted Cookies from Compression Side-Channel Attacks",
+865	              Springer Berlin Heidelberg, Lecture Notes in Computer
+866	              Science pp. 86-106, DOI 10.1007/978-3-662-47854-7_6,
+867	              ISBN ["9783662478530", "9783662478547"], 2015,
+868	              <https://doi.org/10.1007/978-3-662-47854-7_6>.
+
+870	   [ANSI-X962-2005]
+871	              American National Standards Institute, "Public Key
+872	              Cryptography for the Financial Services Industry: the
+873	              Elliptic Curve Digital Signature Algorithm (ECDSA)",
+874	              November 2005.
+
+876	   [CVE-2015-9235]
+877	              NIST, "CVE-2015-9235 Detail", National Vulnerability
+878	              Database, May 2018,
+879	              <https://nvd.nist.gov/vuln/detail/CVE-2015-9235>.
+
+881	   [CVE-2023-51774]
+882	              NIST, "CVE-2023-51774 Detail", National Vulnerability
+883	              Database, February 2024,
+884	              <https://nvd.nist.gov/vuln/detail/CVE-2023-51774>.
+
+886	   [JWT-Cracker]
+887	              Rius, B., "JWT Cracker",
+888	              <https://github.com/brendan-rius/c-jwt-cracker>.
+
+890	   [Kelsey]   Kelsey, J., "Compression and Information Leakage of
+891	              Plaintext", Springer Berlin Heidelberg, Lecture Notes in
+892	              Computer Science pp. 263-276,
+893	              DOI 10.1007/3-540-45661-9_21, ISBN ["9783540440093",
+894	              "9783540456612"], 2002,
+895	              <https://doi.org/10.1007/3-540-45661-9_21>.
+
+897	   [Langkemper]
+898	              Langkemper, S., "Attacking JWT authentication", September
+899	              2016, <https://www.sjoerdlangkemper.nl/2016/09/28/
+900	              attacking-jwt-authentication/>.
+
+902	   [McLean]   McLean, T., "Critical vulnerabilities in JSON Web Token
+903	              libraries", March 2015, <https://auth0.com/blog/critical-
+904	              vulnerabilities-in-json-web-token-libraries/>.
+
+906	   [OpenID.Backchannel]
+907	              Jones, M. and J. Bradley, "OpenID Connect Back-Channel
+908	              Logout 1.0 incorporating errata set 1", December 2023,
+909	              <https://openid.net/specs/openid-connect-backchannel-
+910	              1_0.html>.
+
+912	   [OpenID.Core]
+913	              Sakimura, N., Bradley, J., Jones, M., de Medeiros, B., and
+914	              C. Mortimore, "OpenID Connect Core 1.0 incorporating
+915	              errata set 2", December 2023,
+916	              <https://openid.net/specs/openid-connect-core-1_0.html>.
+
+918	   [OWASP-Password-Storage]
+919	              OWASP, "Password Storage Cheat Sheet", OWASP Cheat Sheet
+920	              Series , 2025,
+921	              <https://cheatsheetseries.owasp.org/cheatsheets/
+922	              Password_Storage_Cheat_Sheet.html>.
+
+924	   [RFC6749]  Hardt, D., Ed., "The OAuth 2.0 Authorization Framework",
+925	              RFC 6749, DOI 10.17487/RFC6749, October 2012,
+926	              <https://www.rfc-editor.org/rfc/rfc6749>.
+
+928	   [RFC7159]  Bray, T., Ed., "The JavaScript Object Notation (JSON) Data
+929	              Interchange Format", RFC 7159, DOI 10.17487/RFC7159, March
+930	              2014, <https://www.rfc-editor.org/rfc/rfc7159>.
+
+932	   [RFC7517]  Jones, M., "JSON Web Key (JWK)", RFC 7517,
+933	              DOI 10.17487/RFC7517, May 2015,
+934	              <https://www.rfc-editor.org/rfc/rfc7517>.
+
+936	   [RFC8414]  Jones, M., Sakimura, N., and J. Bradley, "OAuth 2.0
+937	              Authorization Server Metadata", RFC 8414,
+938	              DOI 10.17487/RFC8414, June 2018,
+939	              <https://www.rfc-editor.org/rfc/rfc8414>.
+
+941	   [RFC8417]  Hunt, P., Ed., Jones, M., Denniss, W., and M. Ansari,
+942	              "Security Event Token (SET)", RFC 8417,
+943	              DOI 10.17487/RFC8417, July 2018,
+944	              <https://www.rfc-editor.org/rfc/rfc8417>.
+
+946	   [RFC8725]  Sheffer, Y., Hardt, D., and M. Jones, "JSON Web Token Best
+947	              Current Practices", BCP 225, RFC 8725,
+948	              DOI 10.17487/RFC8725, February 2020,
+949	              <https://www.rfc-editor.org/rfc/rfc8725>.
+
+951	   [RFC9068]  Bertocci, V., "JSON Web Token (JWT) Profile for OAuth 2.0
+952	              Access Tokens", RFC 9068, DOI 10.17487/RFC9068, October
+953	              2021, <https://www.rfc-editor.org/rfc/rfc9068>.
+
+955	   [RFC9700]  Lodderstedt, T., Bradley, J., Labunets, A., and D. Fett,
+956	              "Best Current Practice for OAuth 2.0 Security", BCP 240,
+957	              RFC 9700, DOI 10.17487/RFC9700, January 2025,
+958	              <https://www.rfc-editor.org/rfc/rfc9700>.
+
+960	   [RFC9864]  Jones, M.B. and O. Steele, "Fully-Specified Algorithms for
+961	              JSON Object Signing and Encryption (JOSE) and CBOR Object
+962	              Signing and Encryption (COSE)", RFC 9864,
+963	              DOI 10.17487/RFC9864, October 2025,
+964	              <https://www.rfc-editor.org/rfc/rfc9864>.
+
+966	   [Sanso]    Sanso, A., "Critical Vulnerability in JSON Web
+967	              Encryption", March 2017, <https://auth0.com/blog/critical-
+968	              vulnerability-in-json-web-encryption/>.
+
+970	   [Valenta]  Valenta, L., Sullivan, N., Sanso, A., and N. Heninger, "In
+971	              search of CurveSwap: Measuring elliptic curve
+972	              implementations in the wild", March 2018,
+973	              <https://ia.cr/2018/298>.
+
+975	Appendix A.  Changes from RFC 8725
+
+977	   This document obsoletes RFC 8725 and provides several significant
+978	   improvements and additions:
+
+980	   1.  Algorithm Verification: Added defensive checking to address
+981	       incorrect reading of alg values as being case-insensitive
+982	       (Section 2.11 and Section 3.1).
+
+984	   2.  Encryption-Signature Confusion: Added mitigation for attacks
+985	       where verifiers don't distinguish between successful decryption
+986	       and successful signature validation (Section 2.3 and
+987	       Section 3.3).
+
+989	   3.  PBES2 Count Limits: Added requirements to reject unreasonably
+990	       large p2c (PBES2 Count) values to prevent DoS attacks
+991	       (Section 2.10 and Section 3.13).
+
+993	   4.  JWT Format Confusion: Added mitigation for JWT serialization
+994	       format confusion attacks (Section 2.13 and Section 3.14).
+
+996	   5.  Compression DoS: Added mitigation for DoS attacks resulting from
+997	       abuse of compression in JWE (Section 2.12 and Section 3.15).
+
+999	   6.  Explicit Typing: Expanded the guidance on explicit typing by
+1000	       defining recommended typ and media type conventions, recipient
+1001	       processing rules, and deployment guidance for new and existing
+1002	       JWT types (Section 3.11 and Section 3.12).
+
+1004	   7.  Untrusted Header Parameters and SSRF: Added guidance on treating
+1005	       kid, jku, and x5u as potentially attacker-controlled input,
+1006	       including SSRF mitigations and DNS resolution checks when
+1007	       processing untrusted URLs (Section 3.10).
+
+1009	   8.  Normatively references [I-D.ietf-jose-deprecate-none-rsa15],
+1010	       makes the text requiring application opt-in to use JWTs with
+1011	       algorithm "none" a "MUST", and states that the RSA-PKCS1 v1.5
+1012	       algorithms are deprecated.
+
+1014	Appendix B.  Document History
+
+1016	   [[Note to RFC Editor: please remove before publication.]]
+
+1018	B.1.  draft-ietf-oauth-rfc8725bis-09
+
+1020	   *  Clarified that the JWE decompression size limit is a ballpark
+1021	      drawn from deployed libraries (IESG review).
+
+1023	   *  IESG nits: replaced "blindly" and added a missing comma after
+1024	      "However".
+
+1026	B.2.  draft-ietf-oauth-rfc8725bis-08
+
+1028	   *  Clarified that Nested JWT validation applies when Nested JWTs are
+1029	      supported (SECDIR review).
+
+1031	   *  Applied IESG ballot comments by Ketan Talaulikar (Introduction
+1032	      relationships, Compact Serialization and typ prefix citations).
+
+1034	   *  Updated Appendix A (Changes from RFC 8725) with complete bullets
+1035	      and section references.
+
+1037	   *  Added an informative mention of fully-specified JOSE algorithm
+1038	      identifiers ([RFC9864]).
+
+1040	   *  Made the [I-D.ietf-jose-deprecate-none-rsa15] reference normative
+1041	      and rewrote the text on "alg":"none" and RSA-PKCS1 v1.5
+1042	      accordingly.
+
+1044	   *  Corrected section reference and itemized list syntax and removed
+1045	      extraneous spaces in the source.
+
+1047	   *  Applied spelling and grammar corrections.
+
+1049	B.3.  draft-ietf-oauth-rfc8725bis-07
+
+1051	   *  Applied ARTART review suggestions for SHOULD language in Sections
+1052	      3.1, 3.2, 3.6, and 3.10.
+
+1054	   *  Applied ARTART review suggestions regarding explicit typing
+1055	      (Section 3.11).
+
+1057	B.4.  draft-ietf-oauth-rfc8725bis-06
+
+1059	   *  AD review follow-up: Promoted selected lowercase must/should
+1060	      guidance to normative MUST language.
+
+1062	B.5.  draft-ietf-oauth-rfc8725bis-05
+
+1064	   *  Applied suggestions by responsible AD Deb Cooley.
+
+1066	B.6.  draft-ietf-oauth-rfc8725bis-04
+
+1068	   *  Applied suggestions by document shepherd Hannes Tschofenig.
+
+1070	B.7.  draft-ietf-oauth-rfc8725bis-03
+
+1072	   *  Described relationship between explicit typing and kinds of JWTs
+1073	      not already employing it.
+
+1075	B.8.  draft-ietf-oauth-rfc8725bis-02
+
+1077	   *  Incorporated Aaron Parecki's review suggestions.
+
+1079	   *  Acknowledged contributors to the new content in this
+1080	      specification.
+
+1082	B.9.  draft-ietf-oauth-rfc8725bis-01
+
+1084	   *  Applied editorial suggestions by Dan Moore.
+
+1086	   *  Described changes relative to RFC 8725.
+
+1088	B.10.  draft-ietf-oauth-rfc8725bis-00
+
+1090	   *  Draft adopted, no textual changes
+
+1092	B.11.  draft-sheffer-oauth-rfc8725bis-02
+
+1094	   *  Obsoletes RFC 8725 and updates RFC 7519.
+
+1096	B.12.  draft-sheffer-oauth-rfc8725bis-01
+
+1098	   *  Mitigate encryption-signature confusion.
+
+1100	   *  Reject unreasonably large p2c (PBES2 Count) values.
+
+1102	   *  Defensive checking to address incorrect reading of alg values as
+1103	      being case-insensitive.
+
+1105	   *  Mitigate DoS attacks resulting from abuse of compression.
+
+1107	   *  Mitigate JWT serialization format confusion.
+
+1109	B.13.  draft-sheffer-oauth-rfc8725bis-00
+
+1111	   *  Initial version, text is identical to RFC 8725.
+
+1113	Authors' Addresses
+
+1115	   Yaron Sheffer
+1116	   Independent
+1117	   Email: yaronf.ietf@gmail.com
+
+1119	   Dick Hardt
+1120	   Email: dick.hardt@gmail.com
+
+1122	   Michael B. Jones
+1123	   Self-Issued Consulting
+1124	   Email: michael_b_jones@hotmail.com
+1125	   URI:   https://self-issued.info/
+
+
+
+
+
+
+
+
+
