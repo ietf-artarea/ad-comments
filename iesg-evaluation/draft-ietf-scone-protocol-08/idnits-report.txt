@@ -1,0 +1,1361 @@
+idnits 2.17.1 
+
+draft-ietf-scone-protocol-08.txt:
+-(6): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(1246): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+  == There are 7 instances of lines with non-ascii characters in the document.
+
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     Summary: 0 errors (**), 0 flaws (~~), 1 warning (==), 0 comments (--).
+
+--------------------------------------------------------------------------------
+
+
+2	SCONE                                                         M. Thomson
+3	Internet-Draft                                                   Mozilla
+4	Intended status: Standards Track                              C. Huitema
+5	Expires: 13 March 2027                              Private Octopus Inc.
+6	                                                        奥 一穂 (K. Oku)
+7	                                                                  Fastly
+8	                                                                M. Joras
+9	                                                                    Meta
+10	                                                                M. Ihlar
+11	                                                                Ericsson
+12	                                                        9 September 2026
+
+14	     Standard Communication with Network Elements (SCONE) Protocol
+15	                      draft-ietf-scone-protocol-08
+
+17	Abstract
+
+19	   This document describes a protocol where on-path network elements can
+20	   communicate their perspective on the maximum sustainable throughput
+21	   for QUIC flows to endpoints.  This throughput advice suggests an
+22	   upper bound on long-term average throughput, independent of and
+23	   complementary to real-time congestion control signals.
+
+25	About This Document
+
+27	   This note is to be removed before publishing as an RFC.
+
+29	   The latest revision of this draft can be found at https://ietf-wg-
+30	   scone.github.io/scone/draft-ietf-scone-protocol.html.  Status
+31	   information for this document may be found at
+32	   https://datatracker.ietf.org/doc/draft-ietf-scone-protocol/.
+
+34	   Discussion of this document takes place on the SCONE Working Group
+35	   mailing list (mailto:scone@ietf.org), which is archived at
+36	   https://mailarchive.ietf.org/arch/browse/scone/.  Subscribe at
+37	   https://www.ietf.org/mailman/listinfo/scone/.
+
+39	   Source for this draft and an issue tracker can be found at
+40	   https://github.com/ietf-wg-scone/scone.
+
+42	Status of This Memo
+
+44	   This Internet-Draft is submitted in full conformance with the
+45	   provisions of BCP 78 and BCP 79.
+
+47	   Internet-Drafts are working documents of the Internet Engineering
+48	   Task Force (IETF).  Note that other groups may also distribute
+49	   working documents as Internet-Drafts.  The list of current Internet-
+50	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+52	   Internet-Drafts are draft documents valid for a maximum of six months
+53	   and may be updated, replaced, or obsoleted by other documents at any
+54	   time.  It is inappropriate to use Internet-Drafts as reference
+55	   material or to cite them other than as "work in progress."
+
+57	   This Internet-Draft will expire on 13 March 2027.
+
+59	Copyright Notice
+
+61	   Copyright (c) 2026 IETF Trust and the persons identified as the
+62	   document authors.  All rights reserved.
+
+64	   This document is subject to BCP 78 and the IETF Trust's Legal
+65	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+66	   license-info) in effect on the date of publication of this document.
+67	   Please review these documents carefully, as they describe your rights
+68	   and restrictions with respect to this document.  Code Components
+69	   extracted from this document must include Revised BSD License text as
+70	   described in Section 4.e of the Trust Legal Provisions and are
+71	   provided without warranty as described in the Revised BSD License.
+
+73	Table of Contents
+
+75	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
+76	   2.  Overview  . . . . . . . . . . . . . . . . . . . . . . . . . .   4
+77	   3.  Applicability . . . . . . . . . . . . . . . . . . . . . . . .   5
+78	     3.1.  Independent of Congestion Signals . . . . . . . . . . . .   5
+79	     3.2.  Unspecified Scope . . . . . . . . . . . . . . . . . . . .   6
+80	     3.3.  Per-Flow Signal . . . . . . . . . . . . . . . . . . . . .   7
+81	     3.4.  Unidirectional Signal . . . . . . . . . . . . . . . . . .   7
+82	     3.5.  Advisory Signal . . . . . . . . . . . . . . . . . . . . .   8
+83	     3.6.  Application Use of Advice . . . . . . . . . . . . . . . .   8
+84	   4.  Conventions and Definitions . . . . . . . . . . . . . . . . .   9
+85	   5.  SCONE Packet  . . . . . . . . . . . . . . . . . . . . . . . .   9
+86	     5.1.  Rate Signals  . . . . . . . . . . . . . . . . . . . . . .  10
+87	     5.2.  Monitoring Period . . . . . . . . . . . . . . . . . . . .  12
+88	     5.3.  Endpoint Processing of SCONE Packets  . . . . . . . . . .  13
+89	     5.4.  Following Throughput Advice . . . . . . . . . . . . . . .  14
+90	   6.  Negotiating SCONE . . . . . . . . . . . . . . . . . . . . . .  14
+91	     6.1.  Indicating Support on New Flows . . . . . . . . . . . . .  15
+92	     6.2.  Limitations of Indication . . . . . . . . . . . . . . . .  16
+93	     6.3.  Indications for Migrated Flows  . . . . . . . . . . . . .  16
+94	     6.4.  Avoiding Ossification When Reading the Indicator  . . . .  16
+
+96	   7.  Network Deployment  . . . . . . . . . . . . . . . . . . . . .  17
+97	     7.1.  Applying Throughput Advice Signals  . . . . . . . . . . .  17
+98	       7.1.1.  When To Avoid Updating Throughput Advice  . . . . . .  17
+99	       7.1.2.  Ensuring Throughput Advice Availability . . . . . . .  18
+100	     7.2.  Monitoring Flows  . . . . . . . . . . . . . . . . . . . .  18
+101	       7.2.1.  Deployment of Monitoring Functions  . . . . . . . . .  19
+102	       7.2.2.  Flows That Exceed Throughput Advice . . . . . . . . .  19
+103	   8.  Endpoint Usage  . . . . . . . . . . . . . . . . . . . . . . .  20
+104	     8.1.  Providing Opportunities to Apply Throughput Advice
+105	           Signals . . . . . . . . . . . . . . . . . . . . . . . . .  20
+106	     8.2.  Feedback To Sender About Signals  . . . . . . . . . . . .  21
+107	   9.  Security Considerations . . . . . . . . . . . . . . . . . . .  22
+108	     9.1.  Off-Path Adversaries  . . . . . . . . . . . . . . . . . .  22
+109	     9.2.  Fake SCONE Packets  . . . . . . . . . . . . . . . . . . .  23
+110	     9.3.  Damage to Other Protocols . . . . . . . . . . . . . . . .  24
+111	   10. Privacy Considerations  . . . . . . . . . . . . . . . . . . .  24
+112	     10.1.  Passive Attacks  . . . . . . . . . . . . . . . . . . . .  25
+113	     10.2.  Active Attacks . . . . . . . . . . . . . . . . . . . . .  25
+114	   11. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  26
+115	     11.1.  SCONE Versions . . . . . . . . . . . . . . . . . . . . .  26
+116	     11.2.  scone_supported Transport Parameter  . . . . . . . . . .  27
+117	   12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  27
+118	     12.1.  Normative References . . . . . . . . . . . . . . . . . .  27
+119	     12.2.  Informative References . . . . . . . . . . . . . . . . .  28
+120	   Acknowledgments . . . . . . . . . . . . . . . . . . . . . . . . .  29
+121	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  29
+
+123	1.  Introduction
+
+125	   Many networks have known, concrete rate limits, or apply these limits
+126	   by policy to constrain data rates.  This is often done without any
+127	   ability to indicate rate limits to applications.  The result can be
+128	   that application performance is degraded, because throughput limits
+129	   can manifest in ways that are incompatible with the rate estimation
+130	   or congestion control algorithms used at endpoints.
+
+132	   Having the network indicate what throughput limits apply, in a way
+133	   that is accessible to endpoints, allows applications to use this
+134	   information when adapting their send rate.
+
+136	   The Standard Communication with Network Elements (SCONE) protocol is
+137	   negotiated by QUIC endpoints.  SCONE provides a means for a network
+138	   to signal its present best estimate for maximum sustainable
+139	   throughput, or throughput advice, associated with the flows of UDP
+140	   datagrams that QUIC exchanges.
+
+142	   Any network function that is able to update the content of UDP
+143	   datagrams qualifies as a network element that can use SCONE packets
+144	   to provide throughput advice to QUIC endpoints.
+
+146	   Networks with rate limits can use SCONE to send throughput advice to
+147	   cooperating endpoints to limit overall network usage.  Where
+148	   congestion control signals -- such as Explicit Congestion
+149	   Notification (ECN) [ECN], delays and loss -- operate on a time scale
+150	   of a round trip time, throughput advice operates over a much longer
+151	   period.
+
+153	   This has benefits in some networks as endpoints can adapt network
+154	   usage to better suit network conditions.  For example, radio networks
+155	   and battery-powered devices perform better with short, bursty
+156	   exchanges, rather than constant transmission at a fixed rate.
+
+158	   For endpoints, SCONE throughput advice makes network policies
+159	   visible, which can reduce wasteful probing beyond those limits.
+
+161	2.  Overview
+
+163	   QUIC endpoints can negotiate the use of SCONE by including a
+164	   transport parameter (Section 6) in the QUIC handshake.  Endpoints
+165	   then occasionally send SCONE packets, which are always coalesced with
+166	   ordinary QUIC packets that they send.
+
+168	   Networks that have rate limiting policies, or known throughput
+169	   constraints, can detect flows that include SCONE packets.  The
+170	   network, via an on-path network element, can indicate a maximum
+171	   sustainable throughput by modifying the SCONE packet as it transits
+172	   the network element.
+
+174	   The propagation of SCONE packets, including the throughput advice
+175	   that is update by a network element, is shown in Figure 1.
+
+177	   +--------+       +---------+      +----------+
+178	   |  QUIC  |       | Network |      |   QUIC   |
+179	   | Sender |       | Element |      | Receiver |
+180	   +---+----+       +----+----+      +----+-----+
+181	       |                 |                |
+182	       +--- SCONE(?) --->|  SCONE(advice) |
+183	       |    +QUIC        +---- +QUIC ---->|
+184	       |                 |                |  Validate QUIC packet
+185	       |                 |                |  and record advice
+186	       |                 |                |
+
+188	                   Figure 1: Propagation of SCONE signal
+
+190	   QUIC endpoints that receive modified SCONE packets observe the
+191	   indicated version, process the QUIC packet, and then record the
+192	   indicated rate.
+
+194	   Throughput advice only applies to the direction and path for which it
+195	   is received.  A connection that migrates or uses multipath [QUIC-MP]
+196	   cannot assume that throughput advice from one path applies to new
+197	   paths.  Advice for the client-to-server direction and the server-to-
+198	   client direction of each path are independent, and are expected to be
+199	   different, for reasons including asymmetric link capacity and path
+200	   diversity.  Applications can use SCONE in either or both directions
+201	   of each path at the discretion of endpoints.
+
+203	3.  Applicability
+
+205	   This protocol can provide throughput advice only for QUIC flows where
+206	   endpoints send SCONE packets (Section 5).
+
+208	   The operation of the SCONE protocol depends on network elements that
+209	   are able to modify packets as they are forwarded.  This provides
+210	   endpoints strong evidence that the network element has the power to
+211	   apply a rate limiting policy; though see Section 9 for potential
+212	   limitations on this.
+
+214	   The throughput advice that this protocol carries is independent of
+215	   congestion signals, limited to a single path and UDP packet flow,
+216	   unidirectional, and strictly advisory.
+
+218	   A companion document [SCONE-MAN] addresses applicability,
+219	   operational, and deployment considerations in more detail.
+
+221	3.1.  Independent of Congestion Signals
+
+223	   SCONE throughput advice is not a substitute for congestion feedback
+224	   or congestion control.  They are complementary.  Congestion signals,
+225	   such as acknowledgments or ECN markings [ECN][WHY-ECN], provide real-
+226	   time information on loss and delay for a network path, whereas SCONE
+227	   throughput advice operates over a much longer period.
+
+229	   A congestion controller needs to detect changed conditions and change
+230	   sending behavior more quickly than SCONE allows.  Congestion signals
+231	   can indicate a throughput limit that is different from the signaled
+232	   throughput advice.
+
+234	   Endpoints cannot assume that the rate indicated in throughput advice
+235	   is achievable if congestion signals indicate otherwise.  Congestion
+236	   could be experienced at a different point on the network path than
+237	   the network element that signals throughput advice.  Therefore,
+238	   endpoints need to respect the send rate constraints that are set by a
+239	   congestion controller.
+
+241	   Networks can use SCONE to communicate throughput advice for reasons
+242	   other than rate limiting policies.  For example, a network element in
+243	   an access network could provide reduced throughput advice to guide
+244	   application use of network capacity during periods of unusually high
+245	   usage.
+
+247	   Throughput advice can indicate temporary increases in available
+248	   capacity or temporarily reduced capacity.  This includes persistent
+249	   overuse, equipment faults, or other transient issues.  Providing
+250	   advice is applicable if increases or reductions are expected to last
+251	   for more than one monitoring period; see Section 5.2.
+
+253	3.2.  Unspecified Scope
+
+255	   Just because a network element can set throughput advice, that does
+256	   not prove that the flow can achieve that rate.  Nor is it a
+257	   commitment to providing that throughput.  It is a hint that exceeding
+258	   that rate is unlikely to be successful, from the perspective of a
+259	   specific network element.
+
+261	   A signal that is sent for a specific flow could apply to a collection
+262	   of flows, rather than a single flow.  The scope of the flows that are
+263	   included is not carried in the signal.
+
+265	   For instance, policy limits might apply at a network subscription
+266	   level, such that multiple flows receive the same signal and combined
+267	   usage contributes to the shared limit.
+
+269	   Endpoints can therefore be more confident in the throughput signal as
+270	   an indication of the maximum achievable throughput than as any
+271	   indication of expected throughput.  In addition to endpoints
+272	   respecting congestion signals (see Section 3.1), networks might need
+273	   to monitor and enforce policies, even where applications attempt to
+274	   follow advice (see Section 7.2.2).
+
+276	   The advised throughput will likely only be achievable when the
+277	   application is the only entity consuming bandwidth in the scope that
+278	   the advice applies to.  In the presence of multiple flows, achievable
+279	   throughput could be lower than what is indicated by the advice, with
+280	   throughput determined by a congestion controller.
+
+282	   This implies that signals can most usefully be applied to a downlink
+283	   flow in access networks, close to an endpoint.  In that case,
+284	   capacity is less likely to be split between multiple active flows.
+
+286	3.3.  Per-Flow Signal
+
+288	   The same address tuple (IP version, source and destination IP
+289	   addresses and UDP ports) might be used for multiple QUIC connections.
+290	   A single signal might be lost or only reach a single application
+291	   endpoint.  Network elements can apply SCONE throughput advice to all
+292	   QUIC connections that include SCONE packets to ensure that advice is
+293	   received by all application endpoints.
+
+295	   The signaled advice applies to the flow of packets on the same
+296	   address tuple for the duration of the current monitoring period,
+297	   unless it is updated earlier or the flow ends; see Section 5.2 for
+298	   details on the monitoring period.
+
+300	   Rate limiting policies often apply on the level of a device or
+301	   subscription, but endpoints cannot assume that this is the case.  A
+302	   separate signal can be sent for each flow.
+
+304	   When network elements provide throughput advice to a QUIC flow that
+305	   encapsulates tunneled flows (such as [CONNECT-UDP]) they can only
+306	   provide the advice to the outermost flow.  Endpoints can apply the
+307	   throughput advice to packets in flows that are subsequently
+308	   encapsulated, but following that advice can have privacy
+309	   implications; see Section 10.2.
+
+311	3.4.  Unidirectional Signal
+
+313	   Throughput advice is signaled with SCONE packets that are transmitted
+314	   as part of the flow that the advice applies to.  Carrying signals in
+315	   the affected flow, in the same way that ECN signals are conveyed,
+316	   ensures that there is no ambiguity about what flow is affected.
+317	   However, this means that the endpoint that receives throughput advice
+318	   is not the endpoint that needs to adapt its sending behavior.
+
+320	   A receiving endpoint might need to communicate the value it receives
+321	   to the sending peer in order to ensure that the limit is respected.
+322	   This document does not define how that communication occurs as this
+323	   is specific to the application in use.
+
+325	3.5.  Advisory Signal
+
+327	   Throughput advice indicates what one part of the network expects to
+328	   be achievable for flows that transit that portion of the network.  It
+329	   is possible that very different throughput is achievable -- either
+330	   higher or lower than the advice -- as determined by congestion
+331	   control.  Endpoints that receive this signal therefore need to treat
+332	   the information as advisory.
+
+334	   The fact that an endpoint requests throughput advice does not
+335	   necessarily mean that it will adhere to advice; in some cases, the
+336	   endpoint cannot.  For example, a flow could initially be used to
+337	   serve video chunks, with the client selecting chunks of different
+338	   bitrates based on received advice, but later switch to a bulk
+339	   download that cannot be similarly controlled.  Composite flows from
+340	   multiple applications, such as tunneled flows, might only have a
+341	   subset of the involved applications that are capable of handling
+342	   SCONE signals.  Therefore, when a network element detects that
+343	   throughput exceeds the advertised throughput advice, it might apply
+344	   rate limiting.
+
+346	   Network conditions and rate-limit policies can change in ways that
+347	   make previously signaled advice obsolete.  For example, routing
+348	   changes can cause a flow to move to a different network path.  There
+349	   are no guarantees that updated advice will be sent at such events.
+
+351	3.6.  Application Use of Advice
+
+353	   Applications that choose to follow throughput advice do so in the way
+354	   that best suits their needs.
+
+356	   The most obvious way to follow throughput advice is to inform the
+357	   sending peer of the advice so that the peer can adjust sending rates
+358	   as necessary.  This document does not provide specific guidance on
+359	   how applications might adapt their use of network capacity in
+360	   response to advice.
+
+362	   Some applications offer options for rate control that can offer
+363	   improved performance when following advice.  For instance, real-time
+364	   and streaming video applications can often dynamically adapt their
+365	   network usage.  Typical HTTP Live Streaming [HLS] or Dynamic Adaptive
+366	   Streaming over HTTP [DASH] clients are provided with manifests that
+367	   allow them to adjust the bitrate and quality of media segments based
+368	   on available network capacity.  Low priority bulk transfer
+369	   applications, such as software updates, might also choose to follow
+370	   advice.
+
+372	   Following throughput advice could reduce the impact of an application
+373	   on other network users, reserves capacity for high-priority
+374	   activities, and could avoid potential enforcement action by the
+375	   network; see Section 7.2.2.
+
+377	4.  Conventions and Definitions
+
+379	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+380	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+381	   "OPTIONAL" in this document are to be interpreted as described in
+382	   BCP 14 [BCP14] when, and only when, they appear in all capitals, as
+383	   shown here.
+
+385	   In SCONE:
+
+387	   *  a "network element" is any device in the network that can produce
+388	      throughput advice.
+
+390	   *  "Throughput advice" refers the information communicated to
+391	      endpoints by network elements in the form of a rate signal; see
+392	      Section 5.1.
+
+394	   *  A "monitoring period" is the time over which rate signals apply;
+395	      see Section 5.2.
+
+397	5.  SCONE Packet
+
+399	   A SCONE packet is a QUIC long header packet that follows the QUIC
+400	   invariants; see Section 5.1 of [INVARIANTS].
+
+402	   Figure 2 shows the format of the SCONE packet using the conventions
+403	   from Section 4 of [INVARIANTS].
+
+405	   SCONE Packet {
+406	     Header Form (1) = 1,
+407	     Reserved (1),
+408	     Rate Signal High Bits (6),
+409	     Version (32) = 0x6f7dc0fd or 0xef7dc0fd,
+410	     Destination Connection ID Length (8),
+411	     Destination Connection ID (0..2040),
+412	     Source Connection ID Length (8),
+413	     Source Connection ID (0..2040),
+414	   }
+
+416	                       Figure 2: SCONE Packet Format
+
+418	   The most significant bit (0x80) of the packet indicates that this is
+419	   a QUIC long header packet.  The next bit (0x40) is reserved and can
+420	   be set according to [QUIC-BIT].
+
+422	   The Rate Signal High Bits field consists of the low six bits (0x3f)
+423	   of the first byte.  Together with the most significant bit of the
+424	   Version field, this forms the 7-bit Rate Signal.  Values for the Rate
+425	   Signal are described in Section 5.1.
+
+427	   The Version field contains either 0x6f7dc0fd or 0xef7dc0fd.  The only
+428	   difference between these two values is the most significant bit,
+429	   which also contributes to the Rate Signal.  All other bits are
+430	   identical, which facilitates detection and modification of SCONE
+431	   packets.
+
+433	   This packet includes a Destination Connection ID field that is set to
+434	   the same value as other packets in the same datagram; see
+435	   Section 12.2 of [QUIC].
+
+437	   The Source Connection ID field is set to match the Source Connection
+438	   ID field of any packet that follows.  If the next packet in the
+439	   datagram does not have a Source Connection ID field, which is the
+440	   case for packets with a short header (Section 5.2 of [INVARIANTS]),
+441	   the Source Connection ID field MUST be empty and the Source
+442	   Connection ID Length field MUST be 0.
+
+444	   SCONE packets MUST be coalesced with other QUIC packets (see
+445	   Section 12.2 of [QUIC]) and MUST be included as the first packet in a
+446	   datagram.  This is primarily to simplify the process of updating
+447	   throughput advice in network elements.  This is also necessary in
+448	   many cases for QUIC versions 1 and 2 because packets with a short
+449	   header cannot precede any other packets.
+
+451	   A sender MUST NOT include more than one SCONE packet in a datagram.
+
+453	5.1.  Rate Signals
+
+455	   A Rate Signal is a 7-bit unsigned integer (0-127).  The high six bits
+456	   are the Rate Signal High Bits, and the least significant bit is the
+457	   most significant bit of the Version field.
+
+459	   When sent by a QUIC endpoint, the Rate Signal is set to 127.
+460	   Receiving a value of 127 indicates that throughput advice is unknown,
+461	   either because network elements on the path are not providing advice
+462	   or they do not support SCONE.  All other values (0 through 126)
+463	   represent the ceiling of rates advised by the network element(s) on
+464	   the path.
+
+466	   Throughput advice follows a logarithmic scale defined as:
+
+468	   *  Base rate (b_min) = 100 kbit/s (100,000 bits per second)
+
+470	   *  Bitrate at value n = b_min * 10^(n/20)
+
+472	   where n is an integer between 0 and 126 represented by the Rate
+473	   Signal.
+
+475	   Table 1 lists some of the values for signals and the corresponding
+476	   bitrate for each.
+
+478	                      +==============+=============+
+479	                      | Bitrate      | Rate Signal |
+480	                      +==============+=============+
+481	                      | 100 kbit/s   | 0           |
+482	                      +--------------+-------------+
+483	                      | 112 kbit/s   | 1           |
+484	                      +--------------+-------------+
+485	                      | 126 kbit/s   | 2           |
+486	                      +--------------+-------------+
+487	                      | 141 kbit/s   | 3           |
+488	                      +--------------+-------------+
+489	                      | 1 Mbit/s     | 20          |
+490	                      +--------------+-------------+
+491	                      | 1.12 Mbit/s  | 21          |
+492	                      +--------------+-------------+
+493	                      | 10 Mbit/s    | 40          |
+494	                      +--------------+-------------+
+495	                      | 11.2 Mbit/s  | 41          |
+496	                      +--------------+-------------+
+497	                      | 100 Mbit/s   | 60          |
+498	                      +--------------+-------------+
+499	                      | 112 Mbit/s   | 61          |
+500	                      +--------------+-------------+
+501	                      | 1 Gbit/s     | 80          |
+502	                      +--------------+-------------+
+503	                      | 1.12 Gbit/s  | 81          |
+504	                      +--------------+-------------+
+505	                      | 10 Gbit/s    | 100         |
+506	                      +--------------+-------------+
+507	                      | 11.2 Gbit/s  | 101         |
+508	                      +--------------+-------------+
+509	                      | 100 Gbit/s   | 120         |
+510	                      +--------------+-------------+
+511	                      | 112 Gbit/s   | 121         |
+512	                      +--------------+-------------+
+513	                      | 199.5 Gbit/s | 126         |
+514	                      +--------------+-------------+
+515	                      | Unknown      | 127         |
+516	                      +--------------+-------------+
+
+518	                        Table 1: Examples of SCONE
+519	                        signals and corresponding
+520	                                  rates
+
+522	5.2.  Monitoring Period
+
+524	   The time over which throughput advice applies is defined to be a
+525	   period of 67 seconds.
+
+527	   Protocol participants can use a different period, depending on their
+528	   role.  Senders can limit their send rate over any time period up to
+529	   67 seconds.  Network elements can monitor and apply limits to send
+530	   rates using time period of at least 67 seconds.
+
+532	   The choice of 67 seconds is a compromise between competing interests.
+533	   Longer periods allow applications more flexibility in terms of how to
+534	   allocate bandwidth over time.  Shorter periods allow networks to
+535	   administer policies more tightly.  A shorter period also allows
+536	   applications to increase send rates sooner when rates increase.
+
+538	   The choice of 67 seconds, as a prime number, also helps avoid
+539	   synchronization with other periodic effects that are commonly
+540	   measured in whole seconds.  This includes segment length or key frame
+541	   intervals in video applications, but also includes timers for Network
+542	   Address Translation (NAT) devices; see Section 4.3 of [RFC4787].  Any
+543	   repeating phenomenon at a 67 second interval is therefore unlikely to
+544	   be due to other periodic effects.
+
+546	5.3.  Endpoint Processing of SCONE Packets
+
+548	   Processing a SCONE packet involves reading the value from the Rate
+549	   Signal field.  However, throughput advice MUST be ignored unless
+550	   another packet from the same datagram is successfully processed.
+551	   Therefore, a SCONE packet always needs to be coalesced with other
+552	   QUIC packets.
+
+554	   A SCONE packet is defined by the use of the long header bit (0x80 in
+555	   the first byte) and the SCONE protocol version (0x6f7dc0fd or
+556	   0xef7dc0fd in the next four bytes).  The 7-bit Rate Signal can be
+557	   extracted by combining the low 6 bits of the first byte with the most
+558	   significant bit of the version field.  A SCONE packet MUST be
+559	   discarded if the Destination Connection ID is not consistent with
+560	   those coalesced packets, as specified in Section 5.  Similarly, if
+561	   the Source Connection ID is inconsistent, the SCONE packet MAY be
+562	   discarded.
+
+564	   When discarding a SCONE packet due to inconsistent Connection IDs,
+565	   endpoints MAY also discard the QUIC packets that were coalesced into
+566	   the same datagram.
+
+568	   A receiver MAY discard a datagram that contains more than one SCONE
+569	   packet.  A receiver MUST discard a SCONE packet if the rate signal is
+570	   unknown (127).
+
+572	   If a connection uses multiple Differentiated Services Code Point
+573	   (DSCP) markings [RFC2474], the throughput advice that is received on
+574	   datagrams with one marking might not apply to datagrams that have
+575	   different markings.
+
+577	5.4.  Following Throughput Advice
+
+579	   Endpoints that receive throughput advice can advise their peer of the
+580	   limit so that the peer might limit the amount of data it sends over
+581	   any monitoring period (Section 5.2).  Alternatively, the endpoint
+582	   might change its own behavior to effect a similar outcome indirectly,
+583	   which might use flow control or changes to request patterns.
+
+585	   An endpoint that receives throughput advice might receive multiple
+586	   different values.  If advice is applied by applications, applications
+587	   MUST apply the lowest throughput advice received during any
+588	   monitoring period; see Section 5.2.
+
+590	   After a monitoring period (Section 5.2) without receiving any
+591	   throughput advice, the previous advice expires.  Endpoints can remove
+592	   any constraints that resulted from the expired throughput advice.
+593	   This does not mean that there are no limits, either in policy or due
+594	   to network conditions, only that these limits are now unknown.  Other
+595	   constraints on usage will still apply, which necessarily includes
+596	   congestion control and might include other, application-specific
+597	   constraints.
+
+599	   Allowing advice to expire ensures that changes in routing do not
+600	   cause stale advice to persist indefinitely when network elements on a
+601	   new path do not provide advice.
+
+603	   This approach ensures that network elements are able to reduce the
+604	   frequency with which they send updated signals to as low as once per
+605	   monitoring period.  However, applying signals at a low frequency
+606	   risks endpoints discarding throughput advice if no SCONE packet is
+607	   available for providing updated advice (Section 7.1), or packets
+608	   carrying advice are lost.  Sending the signal multiple times per
+609	   monitoring period increases the likelihood that the signal is
+610	   received.
+
+612	6.  Negotiating SCONE
+
+614	   A QUIC endpoint indicates that it is able to receive SCONE packets by
+615	   including the scone_supported transport parameter (0x219e).
+
+617	   Each endpoint independently indicates willingness to receive SCONE
+618	   packets.  An endpoint that does not include the scone_supported
+619	   transport parameter can send SCONE packets if their peer includes the
+620	   transport parameter.
+
+622	   The scone_supported transport parameter MUST be empty.  Receiving a
+623	   non-zero length scone_supported transport parameter MUST be treated
+624	   as a connection error of type TRANSPORT_PARAMETER_ERROR; see
+625	   Section 20.1 of [QUIC].
+
+627	   This transport parameter is valid for QUIC versions 1 [QUIC] and 2
+628	   [QUICv2] and any other version that recognizes the versions,
+629	   transport parameters, and frame types registries established in
+630	   Sections 22.2, 22.3, and 22.4 of [QUIC].
+
+632	   Endpoints MUST NOT remember whether the scone_supported transport
+633	   parameter was present on the previous connection when using 0-RTT;
+634	   see Section 7.4.1 of [QUIC].  That is, SCONE packets cannot be sent
+635	   on a connection until the transport parameter is received.
+
+637	6.1.  Indicating Support on New Flows
+
+639	   All new flows that are initiated by a client that supports SCONE MUST
+640	   include bytes with values 0xc8 and 0x13 as the last two bytes of the
+641	   payload of the UDP datagrams that commence a new flow, if the
+642	   protocol permits the inclusion of data after packets.
+
+644	   For example, in QUIC version 1, these datagrams contain QUIC packets
+645	   with a long header (Section 17.2 of [QUIC]).  The UDP datagrams sent
+646	   by a client can contain: one or more QUIC version 1 Initial packets,
+647	   zero or more 0-RTT packets, padding or other data that is discarded
+648	   on receipt, and the indication bytes (0xc8, 0x13) as the final bytes
+649	   of the UDP payload.
+
+651	   The SCONE indication bytes MUST be sent in every datagram until the
+652	   client receives any datagram from the server, at which point the
+653	   client can reasonably expect that the indication was received.
+
+655	   A client that uses a QUIC version that sends length-delimited packets
+656	   during the handshake, which includes QUIC versions 1 [QUIC] and 2
+657	   [QUICv2], can include an indicator of SCONE support outside of the
+658	   QUIC packets at the end of datagrams that start a flow.  The
+659	   handshakes of these protocols ensures that the indication can be
+660	   included in every datagram the client sends until it receives a
+661	   response -- of any kind -- from the server.
+
+663	6.2.  Limitations of Indication
+
+665	   This indication does not mean that SCONE signals will be respected,
+666	   only that the client is able to negotiate SCONE.  A server might not
+667	   support SCONE and either endpoint might choose not to send SCONE
+668	   packets.  Finally, applications might be unable to apply throughput
+669	   advice or choose to ignore it.
+
+671	   There is a non-negligible risk of collision with other protocols or
+672	   even QUIC usage without SCONE indications.  The indicator is just two
+673	   bytes, which could be sent by chance on non-SCONE flows.  This means
+674	   that the indication alone is not sufficient to indicate that a flow
+675	   is QUIC with the potential for SCONE support.
+
+677	   Despite these limitations, having an indication might allow network
+678	   elements to change their starting posture with respect to their
+679	   enforcement of their rate limit policies.
+
+681	6.3.  Indications for Migrated Flows
+
+683	   In QUIC version 1 and 2, the two byte indicator (Section 6.1) cannot
+684	   be used on migration to a new path.
+
+686	   Sending a SCONE packet for the first few packets on a new path gives
+687	   network elements on that path the ability to recognize the flow as
+688	   being able to receive throughput advice.  The SCONE packet also gives
+689	   the network element an opportunity to provide throughput advice for
+690	   the new flow.
+
+692	   To enable this indication, even if an endpoint would not otherwise
+693	   send SCONE packets, endpoints can send a SCONE packet any time they
+694	   send a QUIC PATH_CHALLENGE or PATH_RESPONSE frame.  This applies to
+695	   both client and server endpoints, but only if the peer has sent the
+696	   transport parameter; see Section 6.
+
+698	6.4.  Avoiding Ossification When Reading the Indicator
+
+700	   A network element could classify all 5-tuples where the first
+701	   observed UDP datagram ends in the indicator bytes as potential SCONE.
+702	   A network element MAY apply further criteria to further reduce the
+703	   set of flows that are identified as potentially supporting SCONE,
+704	   reducing the likelihood of false positives.  However, it SHOULD NOT
+705	   apply criteria that reduce the ability of new QUIC versions to employ
+706	   SCONE.  SCONE operates independently of any specific QUIC version, so
+707	   any criteria should consult the QUIC version invariants in
+708	   [INVARIANTS].
+
+710	7.  Network Deployment
+
+712	   QUIC endpoints can enable the use of the SCONE protocol by sending
+713	   SCONE packets (Section 5).  Network elements can then update the Rate
+714	   Signal field (Section 7.1) according to their policies.
+
+716	7.1.  Applying Throughput Advice Signals
+
+718	   A network element detects a SCONE packet by observing that a packet
+719	   has a QUIC long header and one of the SCONE protocol versions
+720	   (0x6f7dc0fd or 0xef7dc0fd).
+
+722	   A network element then conditionally replaces the most significant
+723	   bit of the Version field and the Rate Signal High Bits field with
+724	   values of its choosing.
+
+726	   A network element might receive a packet that already includes a rate
+727	   signal.  The network element replaces the rate signal if it wishes to
+728	   signal a lower value for throughput advice; otherwise, the original
+729	   values are retained, preserving the signal from the network element
+730	   with the lower policy.  A network element MUST NOT replace a rate
+731	   signal with a higher or unknown value.
+
+733	   The following pseudocode indicates how a network element might detect
+734	   a SCONE packet and replace the existing rate signal (packet_signal)
+735	   with a new rate signal (target_signal) that encodes the throughput
+736	   advice of this network element.
+
+738	   is_long = packet[0] & 0x80 == 0x80
+739	   packet_version = ntohl(packet[1..5])
+740	   if is_long and (packet_version & 0x7fffffff) == SCONE_VERSION_BITS:
+741	     packet_signal = ((packet[0] & 0x3f) << 1) | (packet_version >> 31)
+742	     if target_signal < packet_signal:
+743	       packet[0] = (packet[0] & 0xc0) | (target_signal >> 1)
+744	       packet[1] = (packet[1] & 0x7f) | ((target_signal & 1) << 7)
+
+746	   Once the throughput advice is updated, the network element updates
+747	   the UDP checksum for the datagram; see [RFC1141].
+
+749	7.1.1.  When To Avoid Updating Throughput Advice
+
+751	   A network element MUST NOT alter datagrams to add SCONE packets or
+752	   synthesize datagrams that contain SCONE packets.  The latter will not
+753	   be accepted and the former, even if they do not exceed the path MTU
+754	   as a result, can be detected by applications and could be ignored.
+755	   This document does not define a mechanism to support detection, but
+756	   one might be added in future.
+
+758	   Network elements MUST only update the content of datagrams on a given
+759	   address tuple a few times each monitoring period.  Network elements
+760	   MAY update more often immediately after a change in their throughput
+761	   advice, to reduce the reaction time from senders.  If too many
+762	   datagrams are altered, that could interfere with UDP protocols that
+763	   are not QUIC; see Section 9.3.
+
+765	7.1.2.  Ensuring Throughput Advice Availability
+
+767	   To avoid throughput advice expiring, a network element needs to
+768	   ensure that it updates throughput advice in SCONE packets with no
+769	   more than a monitoring period (Section 5.2) between each update.
+770	   Because this depends on the availability of SCONE packets and packet
+771	   loss can cause signals to be missed, network elements might need to
+772	   update more often.  Ideally, network elements update advice in SCONE
+773	   packets at least twice per monitoring period, to match endpoint
+774	   behavior (see Section 8.1).
+
+776	   At the start of a flow, network elements are encouraged to update the
+777	   rate signal of the first few SCONE packets it observes so that
+778	   endpoints can obtain throughput advice early.
+
+780	   Senders that send a SCONE packet or network elements that update
+781	   SCONE packets every 20–30 seconds are likely sufficient to ensure
+782	   that throughput advice is not lost.  To reduce the risk of
+783	   synchronization across multiple senders, which could cause network
+784	   elements to miss updates, senders can include a small random delay.
+
+786	7.2.  Monitoring Flows
+
+788	   Providing throughput advice is optional for any network.  A network
+789	   that updates SCONE packets to provide throughput advice might, also
+790	   optionally, choose to monitor flows to determine whether applications
+791	   are following advice.
+
+793	   This section outlines a method that a network element could use to
+794	   determine whether a flow exceeds the value from provided throughput
+795	   advice.  Network deployments that choose to monitor are free to
+796	   follow any monitoring regime that suits their needs.
+
+798	   This documented approach to monitoring is largely illustrative; there
+799	   is no interoperability impact from choosing an alternative approach.
+800	   However, monitoring any more strictly than the following could mean
+801	   that an application might be incorrectly classified as not following
+802	   advice.  A looser monitoring approach, such as monitoring over a
+803	   longer time window than the monitoring period (67s) or using a higher
+804	   rate than is signaled, has no risk of incorrect classification.
+
+806	   When a network changes the throughput advice it intends to provide,
+807	   applications need time to adjust their sending behavior.  As a
+808	   result, any monitoring needs to allow time for SCONE packets to be
+809	   updated, for those packets to be received by endpoints, and for
+810	   applications to adapt.
+
+812	   A network element can then monitor affected flows to determine
+813	   whether the provided throughput advice was followed.
+
+815	   The simplest monitoring approach bases monitoring on the maximum
+816	   value that the network element was configured to apply to SCONE
+817	   packets during the preceding two monitoring periods.  This allows an
+818	   additional monitoring period to compensate for additional delays as
+819	   SCONE packets are not delivered reliably.  Relative to an additional
+820	   monitoring period, other delays in propagating throughput advice are
+821	   expected to be negligible.  If the network element cannot update the
+822	   throughput advice in every SCONE packet (or can only do so
+823	   periodically), a longer period might be used.
+
+825	7.2.1.  Deployment of Monitoring Functions
+
+827	   Any monitoring and policy enforcement could be implemented in
+828	   different network elements than the ones that signal throughput
+829	   advice.  This enables more flexible allocation of responsibilities
+830	   between nodes in the same administrative domain.
+
+832	   SCONE packets can cross administrative boundaries, which means that
+833	   network elements might observe throughput advice on SCONE packets
+834	   that have transited other networks.  A network element MUST NOT
+835	   enforce throughput limits based on throughput advice that is observed
+836	   in SCONE packets received from other entities.  Any enforcement
+837	   action needs to be the result of configuration or other authorized
+838	   administrative action, not unauthenticated network signals.  Unlike
+839	   endpoints, network elements do not have the capability to validate
+840	   other QUIC packets contained in the same datagram; see Section 9.2.
+
+842	7.2.2.  Flows That Exceed Throughput Advice
+
+844	   A network could deploy policy enforcement that drops or delays
+845	   packets to ensure that applications do not exceed throughput limits
+846	   set in policy.
+
+848	   SCONE allows networks to provide advice to applications, so that
+849	   there is less need to enforce throughput limits on flows.  Strict
+850	   enforcement through dropping or delaying packets can be inefficient
+851	   and lead to poor application performance.
+
+853	   Some applications will not support SCONE.  Other applications either
+854	   will not or cannot follow throughput advice.
+
+856	   Networks can monitor flows to determine if applications follow
+857	   advice; see Section 7.2.  A network could choose to either disable or
+858	   loosen policy enforcement for flows where SCONE is active, but re-
+859	   enable or tighten enforcement if monitoring indicates that throughput
+860	   advice is not being respected.
+
+862	8.  Endpoint Usage
+
+864	   The SCONE protocol defines two versions (0x6f7dc0fd and 0xef7dc0fd)
+865	   that combined carry throughput advice that covers a range of bitrates
+866	   between 100 kbit/s and 199.5 Gbit/s.
+
+868	8.1.  Providing Opportunities to Apply Throughput Advice Signals
+
+870	   Endpoints that wish to offer network elements the option to provide
+871	   throughput advice signals can send SCONE packets at any time.  This
+872	   is a decision that a sender makes when constructing datagrams.
+
+874	   As specified in Section 5, endpoints include a SCONE packet as the
+875	   first packet in a datagram, coalesced with additional packets.
+
+877	   Upon confirmation that the peer is willing to receive SCONE packets,
+878	   an endpoint SHOULD include SCONE packets in the first few UDP
+879	   datagrams that it sends.  Doing so increases the likelihood of
+880	   eliciting early throughput advice from network elements, allowing
+881	   applications to apply that advice from the early stages of the data
+882	   transfer.
+
+884	   After that, endpoints that seek to receive throughput advice on a
+885	   flow MUST send a SCONE packet at least twice each monitoring period;
+886	   see Section 5.2.
+
+888	   Sending SCONE packets more often might be necessary to:
+
+890	   Avoid missing advice:  If SCONE packets are not sent, updated, and
+891	      received for an entire monitoring period, an application might
+892	      assume that no throughput advice is being provided.
+
+894	   Reduce latency:  The time between SCONE packets determines the
+895	      maximum delay between changes in throughput advice and when that
+896	      advice can be received and acted upon.
+
+898	   A sender can track the receipt of the coalesced QUIC packet and send
+899	   another SCONE packet when loss is detected.  However, it is likely
+900	   simpler to send SCONE packets more often.
+
+902	   Sending a SCONE packet every 20–30 seconds is likely sufficient to
+903	   ensure that throughput advice is not lost, though endpoints might
+904	   send a packet every few seconds to improve responsiveness.  This
+905	   period could be determined by how quickly an application is able to
+906	   respond to a change in throughput advice.
+
+908	   For example, a streaming application that fetches video segments that
+909	   are 5 seconds in length might send SCONE packets on a similar
+910	   cadence.  A real-time conferencing application might send more often.
+911	   In either case, the length of the monitoring period (Section 5.2)
+912	   limits how fast any application can react.
+
+914	   Though sending SCONE packets more than once each round trip time
+915	   might help reduce exposure to packet loss, it is better to spread
+916	   updates over time rather than to send multiple SCONE packets in less
+917	   frequent bursts.
+
+919	   The main cost associated with sending SCONE packets is the reduction
+920	   in available space in datagrams for application data.
+
+922	   A network element that wishes to signal updated throughput advice
+923	   waits for the next SCONE packet in the desired direction; see
+924	   Section 7.1.
+
+926	8.2.  Feedback To Sender About Signals
+
+928	   Information about throughout advice is intended for the sending
+929	   application.  Any signal from network elements can be propagated to
+930	   the receiving application using an implementation-defined mechanism.
+
+932	   This document does not define a means for indicating what was
+933	   received.  The expectation is that any signal is propagated to the
+934	   application for handling, rather than being handled automatically by
+935	   the transport layer.  How a receiving application communicates
+936	   throughput advice to a sending application will depend on the
+937	   application in use.
+
+939	   Different applications can choose different approaches.  For example,
+940	   in an application where a receiver drives rate adaptation, it might
+941	   not be necessary to define additional signaling.
+
+943	   A sender can use any acknowledgment mechanism provided by the QUIC
+944	   version in use to learn whether datagrams containing SCONE packets
+945	   were likely received.  This might help inform whether to send
+946	   additional SCONE packets in the event that a datagram is lost.  For
+947	   instance, if a UDP datagram carrying both a SCONE packet and an ack-
+948	   eliciting QUIC packet is acknowledged, the sender knows the SCONE
+949	   packet was also received.  However, rather than relying solely on
+950	   transport-layer acknowledgments, an application-layer mechanism might
+951	   better indicate what has been received and acted upon.
+
+953	   SCONE packets could be stripped from datagrams in the network, which
+954	   cannot be reliably detected.  This could result in a sender falsely
+955	   believing that no network element applied throughput advice.  Senders
+956	   will therefore proceed as though there was no advice.
+
+958	9.  Security Considerations
+
+960	   SCONE throughput advice is not authenticated.  Throughput advice
+961	   might be incorrectly set in order to encourage endpoints to behave in
+962	   ways that are not in their interests.  Endpoints can ignore limits,
+963	   though that can have consequences; see Section 7.2.2.  The congestion
+964	   controller employed by a sender provides real-time information about
+965	   the rate at which the network path is delivering data.
+
+967	   Similarly, if there is a strong need to ensure that throughput advice
+968	   is respected, network elements cannot assume that the signaled advice
+969	   will be respected by endpoints.
+
+971	9.1.  Off-Path Adversaries
+
+973	   The modification of packets provides endpoints proof that a network
+974	   element is in a position to drop datagrams and could apply a rate
+975	   limit policy.  Section 8.1 states that endpoints only accept signals
+976	   if the datagram contains a packet that it accepts to prevent an off-
+977	   path attacker from inserting spurious throughput advice.
+
+979	   Some off-path attackers could be able to both observe traffic and
+980	   inject packets.  Attackers with such capabilities could observe
+981	   packets sent by an endpoint, create datagrams coalescing an arbitrary
+982	   SCONE packet and the observed packet, and send these datagrams such
+983	   that they arrive at the peer endpoint before the original packet.
+984	   Spoofed packets that seek to advertise a higher limit than might
+985	   otherwise be permitted also need to bypass any rate limiters.  The
+986	   attacker will thus get arbitrary SCONE packets accepted by the peer,
+987	   with the result being that the endpoint receives a false or
+988	   misleading rate limit.
+
+990	   The recipient of throughput advice therefore cannot guarantee that
+991	   the signal was not generated by an on-path network element.
+
+993	   The capabilities required of an off-path attacker are substantially
+994	   similar to those of on path elements.  An off-path attacker can
+995	   generate throughput advice that will be accepted by an endpoint if it
+996	   has the ability to damage packets in a way that could be able to
+997	   affect throughput capacity of the flow.  The one exception is an off-
+998	   path attacker that is only capable of generating spoofed copies of
+999	   packets with modified throughput rates that reach endpoints ahead of
+1000	   the original.
+
+1002	9.2.  Fake SCONE Packets
+
+1004	   Attackers that can inject packets could compose arbitrary "SCONE-
+1005	   like" packets by selecting a pair of IP addresses and ports, an
+1006	   arbitrary rate signal, a valid SCONE version number, an arbitrary
+1007	   "destination connection ID", and an arbitrary "source connection ID".
+1008	   A coalesced "1RTT" packet will start with a plausible first octet,
+1009	   and continue with the selected destination connection ID followed by
+1010	   a sufficiently long series of random bytes, mimicking the content of
+1011	   an encrypted packet.
+
+1013	   Endpoints will reject such packets because they do not contain valid
+1014	   QUIC packets, but network elements cannot detect this.  All the
+1015	   network elements between the injection point and the destination will
+1016	   have to process these packets.
+
+1018	   Attackers could send a high volume of these "fake" SCONE packets in a
+1019	   denial of service (DOS) attempt against network elements.  The attack
+1020	   will force the intermediaries to process the fake packets.  If
+1021	   network elements are keeping state for ongoing SCONE flows, this
+1022	   might exhaust memory resources.  The mitigation is the same as for
+1023	   other distributed DOS attacks: limit the rate of SCONE packets that a
+1024	   network element is willing to process; possibly, implement logic to
+1025	   distinguish valid SCONE packets from fake packets; or, use generic
+1026	   protection against Distributed DOS attacks.
+
+1028	   Attackers could also try to craft the fake SCONE packets in ways that
+1029	   trigger a processing error at network elements.  For example, they
+1030	   might pick connection identifiers of arbitrary length.  Network
+1031	   elements can mitigate these attacks with an implementation that fully
+1032	   conforms to the specification of Section 5.
+
+1034	9.3.  Damage to Other Protocols
+
+1036	   Network elements that update SCONE packet fields might do that for
+1037	   datagrams exchanged in other protocols.  If the first five bytes of
+1038	   the datagram match the QUIC long header byte and SCONE version, the
+1039	   network element might modify the signal, resulting in damage to those
+1040	   protocols.
+
+1042	   The most serious damage occurs when every datagram matches and is
+1043	   subsequently modified, because that could mean that the protocol is
+1044	   effectively unable to operate end-to-end.
+
+1046	   To avoid unrecoverable damage to non-QUIC protocols, network elements
+1047	   only update a limited number of datagrams in each monitoring period;
+1048	   see Section 7.1.
+
+1050	   In addition, some heuristics might be used to detect SCONE-compatible
+1051	   QUIC flows.  This includes identification of a QUIC handshake on the
+1052	   flow, the presence of indications (Section 6.1), or other heuristics.
+1053	   If these heuristics indicate a non-QUIC flow, the safest option is
+1054	   for network elements to disable updating of datagrams.
+
+1056	10.  Privacy Considerations
+
+1058	   The focus of this analysis is the extent to which observing SCONE
+1059	   packets could be used to gain information about endpoints.  This
+1060	   might be leaking details of how applications using QUIC operate or
+1061	   leaks of endpoint identity when using additional privacy protection,
+1062	   such as a VPN.
+
+1064	   Any network element that can observe the content of that packet can
+1065	   read the throughput advice that was applied.  Any signal is visible
+1066	   on the path, from the point at which it is applied to the point at
+1067	   which it is consumed at an endpoint.  On path elements can also alter
+1068	   the SCONE signal to try trigger specific reactions and gain further
+1069	   knowledge.
+
+1071	   In the general case of a client connected to a server through the
+1072	   Internet, SCONE does not provide much advantage to attackers.  The
+1073	   identities of the clients and servers are already visible through
+1074	   their IP addresses.  Traffic analysis tools already provide more
+1075	   information than the throughput advice set by SCONE.
+
+1077	   There are two avenues of attack that require more analysis:
+
+1079	   *  that the passive observation of SCONE packets might help identify
+1080	      or distinguish endpoints; and
+
+1082	   *  that active manipulation of SCONE signals might help reveal the
+1083	      identity of endpoints that are otherwise hidden behind VPNs or
+1084	      proxies.
+
+1086	10.1.  Passive Attacks
+
+1088	   If only a few clients and server pairs negotiate the usage of SCONE,
+1089	   the occasional observation of SCONE packets will "stick out".  That
+1090	   observation could be combined with observation of timing and volume
+1091	   of traffic to help identify the endpoint or categorize the
+1092	   application that they are using.
+
+1094	   A variation of this issue occurs if SCONE is widely implemented, but
+1095	   only used in some specific circumstances.  In that case, observation
+1096	   of SCONE packets reveals information about the state of the endpoint.
+
+1098	   If multiple servers are accessed through the same front facing
+1099	   server, Encrypted Client Hello (ECH) can prevent outside parties from
+1100	   identifying which specific server a client is using.  However, if
+1101	   only a few of these servers use SCONE, any SCONE packets will help
+1102	   identify which specific server a client is using.
+
+1104	   This issue will be mitigated if SCONE becomes widely implemented, and
+1105	   if the usage of SCONE is not limited to the type of applications that
+1106	   make active use of the signal.
+
+1108	   QUIC implementations are therefore encouraged to make the feature
+1109	   available unconditionally.  Endpoints might send SCONE packets
+1110	   whenever a peer can accept them.
+
+1112	10.2.  Active Attacks
+
+1114	   Suppose a configuration in which multiple clients use a VPN or proxy
+1115	   service to access the same server.  The attacker sees the IP
+1116	   addresses in the packets behind VPN and proxy and also between the
+1117	   users and the VPN, but it does not know which VPN address corresponds
+1118	   to what user address.
+
+1120	   Suppose now that the attacker selects a flow on the link between the
+1121	   VPN/proxy and server.  The attacker applies throughput advice to
+1122	   SCONE packets in that flow.  The attacker chooses a bandwidth that is
+1123	   lower than the "natural" bandwidth of the connection.  A reduction in
+1124	   the rate of flows between client and VPN/proxy might allow the
+1125	   attacker to link the altered flow to the client.
+
+1127	   +--------+
+1128	   | Client |------.
+1129	   +--------+       \      +-------+
+1130	                     '---->|       |            +--------+
+1131	   +--------+              |  VPN  |<==========>|        |
+1132	   | Client |------------->|   /   |<==========>| Server |
+1133	   +--------+              | Proxy |<==========>|        |
+1134	                     .---->|       |     ^      +--------+
+1135	   +--------+       /      +-------+     |
+1136	   | Client |======'                     |
+1137	   +--------+      ^           Apply throughput advice signal
+1138	                    \
+1139	                     \
+1140	                  Observe change
+
+1142	           Figure 3: Client identification attack on VPN or proxy
+
+1144	   An attacker that can manipulate SCONE headers might cause an
+1145	   observable change in sending behavior; see Figure 3.  Though clients
+1146	   that use a VPN or proxy might choose to disable SCONE, removing SCONE
+1147	   signals is of little help against this form of attack.  Lost or ECN-
+1148	   marked packets are likely to produce a congestion control response,
+1149	   which are alternative methods available to an attacker seeking to
+1150	   match flows.
+
+1152	   An effective, but wasteful, defense is to provide cover traffic
+1153	   between the client and intermediary to mask changes in sending rate
+1154	   on tunneled flows.
+
+1156	11.  IANA Considerations
+
+1158	   This document registers new QUIC versions (Section 11.1) and a QUIC
+1159	   transport parameter (Section 11.2).
+
+1161	11.1.  SCONE Versions
+
+1163	   This document registers the following entries to the "QUIC Versions"
+1164	   registry maintained at https://www.iana.org/assignments/quic
+1165	   (https://www.iana.org/assignments/quic), following the guidance from
+1166	   Section 22.2 of [QUIC].
+
+1168	   Value:  0x6f7dc0fd
+1169	   Status:  permanent
+1170	   Specification:  This document
+1171	   Change Controller:  IETF (iesg@ietf.org)
+1172	   Contact:  QUIC Working Group (quic@ietf.org)
+1173	   Notes:  SCONE Protocol - Even Signal Values
+1174	   Value:  0xef7dc0fd
+1175	   Status:  permanent
+1176	   Specification:  This document
+1177	   Change Controller:  IETF (iesg@ietf.org)
+1178	   Contact:  QUIC Working Group (quic@ietf.org)
+1179	   Notes:  SCONE Protocol - Odd Signal Values
+
+1181	11.2.  scone_supported Transport Parameter
+
+1183	   This document registers the scone_supported transport parameter in
+1184	   the "QUIC Transport Parameters" registry maintained at
+1185	   https://www.iana.org/assignments/quic
+1186	   (https://www.iana.org/assignments/quic), following the guidance from
+1187	   Section 22.3 of [QUIC].
+
+1189	   Value:  0x219e
+1190	   Parameter Name:  scone_supported
+1191	   Status:  Permanent
+1192	   Specification:  This document
+1193	   Date:  This date
+1194	   Change Controller:  IETF (iesg@ietf.org)
+1195	   Contact:  QUIC Working Group (quic@ietf.org)
+1196	   Notes:  (none)
+
+1198	12.  References
+
+1200	12.1.  Normative References
+
+1202	   [BCP14]    Best Current Practice 14,
+1203	              <https://www.rfc-editor.org/info/bcp14>.
+1204	              At the time of writing, this BCP comprises the following:
+
+1206	              Bradner, S., "Key words for use in RFCs to Indicate
+1207	              Requirement Levels", BCP 14, RFC 2119,
+1208	              DOI 10.17487/RFC2119, March 1997,
+1209	              <https://www.rfc-editor.org/info/rfc2119>.
+
+1211	              Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+1212	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+1213	              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+1215	   [INVARIANTS]
+1216	              Thomson, M., "Version-Independent Properties of QUIC",
+1217	              RFC 8999, DOI 10.17487/RFC8999, May 2021,
+1218	              <https://www.rfc-editor.org/rfc/rfc8999>.
+
+1220	   [QUIC]     Iyengar, J., Ed. and M. Thomson, Ed., "QUIC: A UDP-Based
+1221	              Multiplexed and Secure Transport", RFC 9000,
+1222	              DOI 10.17487/RFC9000, May 2021,
+1223	              <https://www.rfc-editor.org/rfc/rfc9000>.
+
+1225	   [QUIC-BIT] Thomson, M., "Greasing the QUIC Bit", RFC 9287,
+1226	              DOI 10.17487/RFC9287, August 2022,
+1227	              <https://www.rfc-editor.org/rfc/rfc9287>.
+
+1229	   [QUICv2]   Duke, M., "QUIC Version 2", RFC 9369,
+1230	              DOI 10.17487/RFC9369, May 2023,
+1231	              <https://www.rfc-editor.org/rfc/rfc9369>.
+
+1233	   [RFC2474]  Nichols, K., Blake, S., Baker, F., and D. Black,
+1234	              "Definition of the Differentiated Services Field (DS
+1235	              Field) in the IPv4 and IPv6 Headers", RFC 2474,
+1236	              DOI 10.17487/RFC2474, December 1998,
+1237	              <https://www.rfc-editor.org/rfc/rfc2474>.
+
+1239	12.2.  Informative References
+
+1241	   [CONNECT-UDP]
+1242	              Schinazi, D., "Proxying UDP in HTTP", RFC 9298,
+1243	              DOI 10.17487/RFC9298, August 2022,
+1244	              <https://www.rfc-editor.org/rfc/rfc9298>.
+
+1246	   [DASH]     "Information technology — Dynamic adaptive streaming over
+1247	              HTTP (DASH) — Part 1: Media presentation description and
+1248	              segment formats", ISO/IEC 23009-1:2022, August 2022,
+1249	              <https://www.iso.org/standard/83314.html>.
+
+1251	   [ECN]      Ramakrishnan, K., Floyd, S., and D. Black, "The Addition
+1252	              of Explicit Congestion Notification (ECN) to IP",
+1253	              RFC 3168, DOI 10.17487/RFC3168, September 2001,
+1254	              <https://www.rfc-editor.org/rfc/rfc3168>.
+
+1256	   [HLS]      Pantos, R., Ed. and W. May, "HTTP Live Streaming",
+1257	              RFC 8216, DOI 10.17487/RFC8216, August 2017,
+1258	              <https://www.rfc-editor.org/rfc/rfc8216>.
+
+1260	   [QUIC-MP]  Liu, Y., Ma, Y., De Coninck, Q., Bonaventure, O., Huitema,
+1261	              C., and M. Kühlewind, "Managing multiple paths for a QUIC
+1262	              connection", Work in Progress, Internet-Draft, draft-ietf-
+1263	              quic-multipath-21, 17 March 2026,
+1264	              <https://datatracker.ietf.org/doc/html/draft-ietf-quic-
+1265	              multipath-21>.
+
+1267	   [RFC1141]  Mallory, T. and A. Kullberg, "Incremental updating of the
+1268	              Internet checksum", RFC 1141, DOI 10.17487/RFC1141,
+1269	              January 1990, <https://www.rfc-editor.org/rfc/rfc1141>.
+
+1271	   [RFC4787]  Audet, F., Ed. and C. Jennings, "Network Address
+1272	              Translation (NAT) Behavioral Requirements for Unicast
+1273	              UDP", BCP 127, RFC 4787, DOI 10.17487/RFC4787, January
+1274	              2007, <https://www.rfc-editor.org/rfc/rfc4787>.
+
+1276	   [SCONE-MAN]
+1277	              Mishra, S., Sarker, Z., Tomar, A., and K. Abbas,
+1278	              "Applicability & Manageability Considerations for SCONE",
+1279	              Work in Progress, Internet-Draft, draft-ietf-scone-
+1280	              applicability-manageability-02, 20 June 2026,
+1281	              <https://datatracker.ietf.org/doc/html/draft-ietf-scone-
+1282	              applicability-manageability-02>.
+
+1284	   [WHY-ECN]  Fairhurst, G. and M. Welzl, "The Benefits of Using
+1285	              Explicit Congestion Notification (ECN)", RFC 8087,
+1286	              DOI 10.17487/RFC8087, March 2017,
+1287	              <https://www.rfc-editor.org/rfc/rfc8087>.
+
+1289	Acknowledgments
+
+1291	   Jana Iyengar made significant contributions to the original TRAIN
+1292	   specification that forms the basis for a large part of this document.
+1293	   The following people also contributed significantly to the
+1294	   development of the protocol: Alan Frindell, Gorry Fairhurst, Kevin
+1295	   Smith, Martin Duke, and Zaheduzzaman Sarker.
+
+1297	Authors' Addresses
+
+1299	   Martin Thomson
+1300	   Mozilla
+1301	   Email: mt@lowentropy.net
+
+1303	   Christian Huitema
+1304	   Private Octopus Inc.
+1305	   Email: huitema@huitema.net
+
+1307	   Kazuho Oku
+1308	   Fastly
+1309	   Email: kazuhooku@gmail.com
+
+1311	   Additional contact information:
+
+1313	      奥 一穂
+1314	      Fastly
+
+1316	   Matt Joras
+1317	   Meta
+1318	   Email: matt.joras@gmail.com
+
+1320	   Marcus Ihlar
+1321	   Ericsson
+1322	   Email: marcus.ihlar@ericsson.com
+
+
+
+
+
+
+
+
+
