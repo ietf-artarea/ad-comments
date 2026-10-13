@@ -1,0 +1,223 @@
+# SATP-architecture Shepherd Write-Up
+
+As required by [<a href="/doc/rfc4858/">RFC 4858</a>](<a href="https://www.rfc-editor.org/rfc/rfc4858.txt">https://www.rfc-editor.org/rfc/rfc4858.txt</a>) and
+requested by the SATP WG, this is the shepherd write-up of SATP-architecture
+document using the most current template I found at
+[here](<a href="https://datatracker.ietf.org/doc/shepherdwriteup-template/individual">https://datatracker.ietf.org/doc/shepherdwriteup-template/individual</a>).
+
+## Document History
+1. Does the working group (WG) consensus represent the strong concurrence of a
+few individuals, with others being silent, or did it reach broad agreement?
+
+This document has been discussed in nearly all SATP sessions at past IETF
+meetings. On February 4, 2025, the chairs called on the working group to
+review the document and submit feedback. For the SATP-architecture
+document, the following responses were received:
+
+* 2 reviews with suggested changes (Hadarker and Willman)
+* 23 reviews with explicit support.
+
+Before that, there are
+[4](<a href="https://github.com/ietf-satp/draft-ietf-satp-architecture/pulls?q=is%3Apr+is%3Aclosed">https://github.com/ietf-satp/draft-ietf-satp-architecture/pulls?q=is%3Apr+is%3Aclosed</a>)
+closed PRs related to reviews and fixes; yet 2 people are involved. Maybe
+there&#x27;s more off-github.
+
+2. Was there controversy about particular points, or were there decisions where
+the consensus was particularly rough?
+
+No. The consensus within the working group on this document was reached
+unroughly.
+
+3. Has anyone threatened an appeal or otherwise indicated extreme discontent? If
+so, please summarize the areas of conflict in separate email messages to the
+responsible Area Director. (It should be in a separate email because this
+questionnaire is publicly available.)
+
+None noticed.
+
+4. For protocol documents, are there existing implementations of the contents of
+the document? Have a significant number of potential implementers indicated
+plans to implement? Are any existing implementations reported somewhere,
+either in the document itself (as <a href="/doc/rfc7942/">RFC 7942</a> recommends) or elsewhere
+(where)?
+
+One of the main editor&#x27;s affiliation -- IBM, has a [Hyperledger Cacti
+implementation](<a href="https://hyperledger-cacti.github.io/cacti/">https://hyperledger-cacti.github.io/cacti/</a>). One of the
+other instance is the Quant Network.
+
+## Additional Reviews
+
+5. Do the contents of this document closely interact with technologies in other
+IETF working groups or external organizations, and would it therefore benefit
+from their review? Have those reviews occurred? If yes, describe which
+reviews took place.
+
+Since the document defines a new architecture, an SEC directorate early
+review is requested, and the
+[result](<a href="https://datatracker.ietf.org/doc/review-ietf-satp-architecture-05-secdir-early-orman-2024-07-14/">https://datatracker.ietf.org/doc/review-ietf-satp-architecture-05-secdir-early-orman-2024-07-14/</a>)
+is NOT READY.
+
+He explicitly mentioned a few problems/questions:
+
+* The reviewer interprets that banking is the main use case. In which case,
+he is not sure if the architecture is secure enough for implementing
+finance-level systems. * The reviewer is concerned of
+double-spending/transfer problem that may be caused by possible attacks. In
+other words, he is not sure if the crash recovery mechanism guarantees
+asset transfer atomicity. * The reviewer is not clear about address
+discoverability issues-- &quot;Are the transaction originator and the
+beneficiary be required to have addresses in the same ASN as their
+respective gateways? Is the gateway required to have an address in the same
+ASN as the rest of transaction processing network?&quot; * The reviewer is not
+clear about the verifiability issues--  if the &quot;cryptographic proofs that
+an asset has been burned or minted&quot; be necessary and should not be out of
+scope of this document? How to ensure that an &quot;authorized third party&quot; can
+carry out a verification of the transfer? * Should the liveness and
+third-party verification be part of desirable properties?
+
+There are no known reviews from other WGs.
+
+6. Describe how the document meets any required formal expert review criteria,
+such as the MIB Doctor, YANG Doctor, media type, and URI type reviews.
+
+At April 15, Wes provided a
+[review](<a href="https://mailarchive.ietf.org/arch/msg/sat/jGHdIP2s9e1OboQnvvWxonp2fjs/">https://mailarchive.ietf.org/arch/msg/sat/jGHdIP2s9e1OboQnvvWxonp2fjs/</a>).
+He mentioned the document should not rely much on legal bindings-- the
+protocol should stand on its own technically. These &quot;legal&quot; related
+references should be removed.
+
+7. If the document contains a YANG module, has the final version of the module
+been checked with any of the recommended validation tools for syntax and
+formatting validation? If there are any resulting errors or warnings, what is
+the justification for not fixing them at this time? Does the YANG module
+comply with the Network Management Datastore Architecture (NMDA) as specified
+in <a href="/doc/rfc8342/">RFC 8342</a>?
+
+The document does not contain a YANG module.
+
+8. Describe reviews and automated checks performed to validate sections of the
+final version of the document written in a formal language, such as XML code,
+BNF rules, MIB definitions, CBOR&#x27;s CDDL, etc.
+
+The shepherd does not find related automated checks in the document
+homepage, as they usually being provided in the &quot;additional resources&quot; in
+the document homepage.
+
+## Document Shepherd Checks
+9. Based on the shepherd&#x27;s review of the document, is it their opinion that this
+document is needed, clearly written, complete, correctly designed, and ready
+to be handed off to the responsible Area Director?
+
+According to the SEC early review, some security considerations should be
+presented more straightforwardly to deliver security guaratees.
+
+10. Several IETF Areas have assembled lists of common issues that their
+reviewers encounter. For which areas have such issues been identified
+and addressed? For which does this still need to happen in subsequent
+reviews?
+
+11. What type of RFC publication is being requested on the IETF stream (Best
+Current Practice, Proposed Standard, Internet Standard,
+Informational, Experimental or Historic)? Why is this the proper type
+of RFC? Do all Datatracker state attributes correctly reflect this intent?
+
+Informational. Because it is an architectural framework.
+
+12. Have reasonable efforts been made to remind all authors of the intellectual
+property rights (IPR) disclosure obligations described in <a href="/doc/bcp79/">BCP 79</a>? To
+the best of your knowledge, have all required disclosures been filed? If
+not, explain why. If yes, summarize any relevant discussion, including links
+to publicly-available messages when applicable.
+
+No.
+The shepherd searched the email archive with keywords like &quot;IPR&quot;,
+&quot;disclosure&quot;, &quot;patent&quot;, none came out. It seems the chairs didn&#x27;t call for
+IPR disclosure.
+
+13. Has each author, editor, and contributor shown their willingness to be
+listed as such? If the total number of authors and editors on the front page
+is greater than five, please provide a justification.
+
+No issue discovered.
+
+14. Document any remaining I-D nits in this document. Simply running the idnits
+tool is not enough; please review the &quot;Content Guidelines&quot; on
+<a href="http://authors.ietf.org">authors.ietf.org</a>. (Also note that the current idnits tool generates
+some incorrect warnings; a rewrite is underway.)
+
+Summary: 1 error (**), 0 flaws (~~), 13 warnings (==), 1 comment (--).
+
+The noteable error is listed as follows:
+** There are 4 instances of too long lines in the document, the
+longest one
+being 1 character in excess of 72.
+
+It is recommended to clear the warnings as well.
+
+Link to the nits page:
+<a href="https://author-tools.ietf.org/api/idnits?url=https://www.ietf.org/archive/id/draft-ietf-satp-architecture-08.txt">https://author-tools.ietf.org/api/idnits?url=https://www.ietf.org/archive/id/draft-ietf-satp-architecture-08.txt</a>
+
+You can also find the latest nits page at the &quot;Nits&quot; button in the document
+page.
+
+15. Should any informative references be normative or vice-versa? See the IESG
+Statement on Normative and Informative References.
+
+This should be informative?
+
+[NIST]     Yaga, D., Mell, P., Roby, N., and K. Scarfone, &quot;NIST
+Blockchain Technology Overview (NISTR-8202)&quot;, October
+2018, &lt;<a href="https://doi.org/10.6028/NIST.IR.8202&gt;">https://doi.org/10.6028/NIST.IR.8202&gt;</a>.
+
+16. List any normative references that are not freely available to anyone. Did
+the community have sufficient access to review any such normative
+references?
+
+ISO standards are not freely available. 2 ISO standard are referenced.
+
+The authors also references 6 ACM/IEEE/... academic papers, which could
+require membership to acquire.
+
+The following reference links are bad:
+[ITIN]     ITSA, &quot;International Token Identification Number.&quot;, July 2023,
+&lt;<a href="https://my.itsa.global/what-we-do&gt;">https://my.itsa.global/what-we-do&gt;</a>.
+
+The following reference should be fixed:
+[DLVIEW]   Ramakrishna, V., Pandit, V., Nishad, S., Narayanam, K.,
+and D. Vinayagamurthy, &quot;Views and View Addresses for
+Blockchain/DLT Interoperability, IETF Draft&quot;, November
+2021.
+
+17. Are there any normative downward references (see <a href="/doc/rfc3967/">RFC 3967</a> and BCP 1)  that
+are not already listed in the DOWNREF registry? If so, list them.
+
+18. Are there normative references to documents that are not ready to be
+submitted to the IESG for publication or are otherwise in an unclear state?
+If so, what is the plan for their completion?
+
+<a href="/doc/draft-belchior-satp-gateway-recovery/02/">draft-belchior-satp-gateway-recovery-02</a> is referenced. Plan for completion
+is unknown.
+
+19. Will publication of this document change the status of any existing RFCs? If
+so, does the Datatracker metadata correctly reflect this and are those RFCs
+listed on the title page, in the abstract, and discussed in the
+introduction? If not, explain why and point to the part of the document
+where the relationship of this document to these other RFCs is discussed.
+
+No.
+
+20. Describe the document shepherd&#x27;s review of the IANA considerations section,
+especially with regard to its consistency with the body of the document.
+Confirm that all aspects of the document requiring IANA assignments are
+associated with the appropriate reservations in IANA registries. Confirm
+that any referenced IANA registries have been clearly identified. Confirm
+that each newly created IANA registry specifies its initial contents,
+allocations procedures, and a reasonable name (see <a href="/doc/rfc8126/">RFC 8126</a>).
+
+-changes at 25.08.06: The authors explicitly stated that no IANA
+consideration is needed. (this is cleared)
+
+21. List any new IANA registries that require Designated Expert Review for
+future allocations. Are the instructions to the Designated Expert clear?
+Please include suggestions of designated experts, if appropriate.
+
