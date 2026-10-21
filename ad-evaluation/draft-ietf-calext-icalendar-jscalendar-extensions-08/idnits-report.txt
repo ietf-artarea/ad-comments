@@ -1,0 +1,550 @@
+idnits 2.17.1 
+
+draft-ietf-calext-icalendar-jscalendar-extensions-08.txt:
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+  == There is 1 instance of lines with non-ascii characters in the document.
+
+
+  Checking nits according to https://www.ietf.org/id-info/checklist :
+  ----------------------------------------------------------------------------
+
+  ** There is 1 instance of too long lines in the document, the longest one
+     being 7 characters in excess of 72.
+
+  -- The draft header indicates that this document updates RFC9073, but the
+     abstract doesn't seem to directly say this.  It does mention RFC9073
+     though, so this could be OK.
+
+  -- The draft header indicates that this document updates RFC7986, but the
+     abstract doesn't seem to directly say this.  It does mention RFC7986
+     though, so this could be OK.
+
+
+  Miscellaneous warnings:
+  ----------------------------------------------------------------------------
+
+     (Using the creation date from RFC5545, updated by this document, for
+     RFC5378 checks: 2005-10-26)
+
+  -- The document seems to lack a disclaimer for pre-RFC5378 work, but may
+     have content which was first submitted before 10 November 2008.  If you
+     have contacted all the original authors and they are all willing to grant
+     the BCP78 rights to the IETF Trust, then this is fine, and you can ignore
+     this comment.  If not, you may need to add the pre-RFC5378 disclaimer. 
+     (See the Legal Provisions document at
+     https://trustee.ietf.org/license-info for more information.)
+
+  -- The document date (17 September 2026) is 13 days in the past.  Is this
+     intentional?
+
+
+  Checking references for intended status: Proposed Standard
+  ----------------------------------------------------------------------------
+
+     (See RFCs 3967 and 4897 for information about using normative references
+     to lower-maturity documents in RFCs)
+
+  -- Possible downref: Non-RFC (?) normative reference: ref. 'CSS3'
+
+  == Outdated reference: A later version (-28) exists of
+     draft-ietf-calext-jscalendar-icalendar-26
+
+  == Outdated reference: A later version (-29) exists of
+     draft-ietf-jmap-calendars-28
+
+
+     Summary: 1 error (**), 0 flaws (~~), 3 warnings (==), 5 comments (--).
+
+     Run idnits with the --verbose option for more detailed information about
+     the items above.
+
+--------------------------------------------------------------------------------
+
+
+2	calext                                                       R. Stepanek
+3	Internet-Draft                                                  Fastmail
+4	Updates: 5545, 7986, 9073 (if approved)                17 September 2026
+5	Intended status: Standards Track
+6	Expires: 21 March 2027
+
+8	               iCalendar Format Extensions for JSCalendar
+9	          draft-ietf-calext-icalendar-jscalendar-extensions-08
+
+11	Abstract
+
+13	   This document defines a set of new elements for iCalendar and extends
+14	   the use of existing ones.  Their main purpose is to extend the
+15	   semantics of iCalendar with elements defined in JSCalendar, but the
+16	   new definitions also aim to be useful within just the iCalendar
+17	   format.  This document updates RFC 5545 ("iCalendar") and its
+18	   extension documents RFC 7986 and RFC 9073.
+
+20	Status of This Memo
+
+22	   This Internet-Draft is submitted in full conformance with the
+23	   provisions of BCP 78 and BCP 79.
+
+25	   Internet-Drafts are working documents of the Internet Engineering
+26	   Task Force (IETF).  Note that other groups may also distribute
+27	   working documents as Internet-Drafts.  The list of current Internet-
+28	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+30	   Internet-Drafts are draft documents valid for a maximum of six months
+31	   and may be updated, replaced, or obsoleted by other documents at any
+32	   time.  It is inappropriate to use Internet-Drafts as reference
+33	   material or to cite them other than as "work in progress."
+
+35	   This Internet-Draft will expire on 21 March 2027.
+
+37	Copyright Notice
+
+39	   Copyright (c) 2026 IETF Trust and the persons identified as the
+40	   document authors.  All rights reserved.
+
+42	   This document is subject to BCP 78 and the IETF Trust's Legal
+43	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+44	   license-info) in effect on the date of publication of this document.
+45	   Please review these documents carefully, as they describe your rights
+46	   and restrictions with respect to this document.  Code Components
+47	   extracted from this document must include Revised BSD License text as
+48	   described in Section 4.e of the Trust Legal Provisions and are
+49	   provided without warranty as described in the Revised BSD License.
+
+51	Table of Contents
+
+53	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+54	     1.1.  Notational Conventions  . . . . . . . . . . . . . . . . .   3
+55	     1.2.  ABNF Notations  . . . . . . . . . . . . . . . . . . . . .   3
+56	   2.  Updated Properties  . . . . . . . . . . . . . . . . . . . . .   3
+57	     2.1.  GEO Property  . . . . . . . . . . . . . . . . . . . . . .   3
+58	     2.2.  COLOR Property  . . . . . . . . . . . . . . . . . . . . .   4
+59	   3.  Updated Components  . . . . . . . . . . . . . . . . . . . . .   5
+60	     3.1.  VLOCATION component . . . . . . . . . . . . . . . . . . .   5
+61	   4.  New Properties  . . . . . . . . . . . . . . . . . . . . . . .   5
+62	     4.1.  COORDINATES Property  . . . . . . . . . . . . . . . . . .   5
+63	     4.2.  SHOW-WITHOUT-TIME Property  . . . . . . . . . . . . . . .   6
+64	   5.  New Values  . . . . . . . . . . . . . . . . . . . . . . . . .   8
+65	     5.1.  OWNER Participation Role  . . . . . . . . . . . . . . . .   8
+66	   6.  Security Considerations . . . . . . . . . . . . . . . . . . .   8
+67	   7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   8
+68	     7.1.  Changes to the "Components" registry  . . . . . . . . . .   8
+69	     7.2.  Changes to the "Properties" registry  . . . . . . . . . .   9
+70	     7.3.  Changes to the "Participation Roles" registry . . . . . .   9
+71	   8.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   9
+72	     8.1.  Normative References  . . . . . . . . . . . . . . . . . .   9
+73	     8.2.  Informative References  . . . . . . . . . . . . . . . . .  10
+74	   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  11
+
+76	1.  Introduction
+
+78	   The JSCalendar [I-D.ietf-calext-jscalendarbis] format aims to be an
+79	   alternative to the iCalendar [RFC5545] format for representation of
+80	   calendaring data.  It introduces new semantics that are not covered
+81	   in the current definition of iCalendar and its various extensions.
+82	   Converting calendaring data between the two formats is defined in
+83	   [I-D.ietf-calext-jscalendar-icalendar] with the goal of not losing
+84	   any semantics during conversion.  To achieve this, this document
+85	   defines new iCalendar elements and extends existing definitions.  To
+86	   do so, it follows the recommendations for introducing new iCalendar
+87	   elements as specified in Section 3 of [RFC7986].  This document
+88	   updates the definitions of the GEO property [RFC5545]
+89	   (Section 3.8.1.6), the COLOR property [RFC7986] (Section 5.9) and the
+90	   VLOCATION component [RFC9073] (Section 7.2).
+
+92	1.1.  Notational Conventions
+
+94	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+95	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+96	   "OPTIONAL" in this document are to be interpreted as described in BCP
+97	   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+98	   capitals, as shown here.
+
+100	1.2.  ABNF Notations
+
+102	   The ABNF definitions in this document use the notations of [RFC5234].
+103	   ABNF rules not defined in this document are defined in either
+104	   [RFC5234] (such as the ABNF for CRLF, WSP, DQUOTE, VCHAR, ALPHA, and
+105	   DIGIT) or [RFC5545].
+
+107	2.  Updated Properties
+
+109	2.1.  GEO Property
+
+111	   This specification deprecates the "GEO" property and introduces the
+112	   "COORDINATES" (Section 4.1) property to replace it.  Implementations
+113	   SHOULD NOT use the "GEO" property to represent spatial coordinates.
+114	   Instead, they SHOULD specify the "COORDINATES" property in a
+115	   "VLOCATION" component [RFC9073] (Section 7.2).  They MAY additionally
+116	   specify a "GEO" property in a "VEVENT" or "VTODO" component, in which
+117	   case its "DERIVED" parameter [RFC9073] (Section 5.3) MUST have value
+118	   "TRUE".
+
+120	   The remainder of this section documents the rationale for deprecating
+121	   the "GEO" property:
+
+123	   The "GEO" property definition dates back to 1998, a time at which
+124	   multiple internet protocols and data formats incorporated spatial
+125	   coordinates in slightly different formats, making interoperability
+126	   difficult.  This got addressed in 2010 in [RFC5870], which introduced
+127	   a Uniform Resource Identifier (URI) for geographic locations.  The
+128	   'geo' URI scheme not only improves interoperability but also allows
+129	   for richer information than the "GEO" property value, e.g. it
+130	   supports specifying the location altitude and the spatial uncertainty
+131	   of the coordinates.
+
+133	   Alternatively to deprecating, this specification could have updated
+134	   the "GEO" property to allow its property value type to be URI.  This
+135	   turned out to not interoperate, as implementations tended to reject
+136	   such iCalendar data as invalid.  This was regardless if the "GEO"
+137	   property was specified in a "VEVENT" component, or if it was
+138	   specified in iCalendar components that were unsupported by the
+139	   implementation (e.g. an implementation that was unaware of the
+140	   "VLOCATION" component still rejected the "GEO" property with value
+141	   type URI in that component as invalid).  Introducing a new property
+142	   turned out to better interoperate with such systems.
+
+144	2.2.  COLOR Property
+
+146	   This specification modifies the definition of the "COLOR" property,
+147	   it allows its value to be a named color or a numeric color.  The
+148	   following definitions replace the definitions of the "COLOR"
+149	   property, originally specified in Section 5.9 of [RFC7986] from which
+150	   the definitions for "Description", "Format Definition" and "Example"
+151	   differ.
+
+153	   Property Name:  COLOR
+
+155	   Purpose:  This property specifies a color used for displaying the
+156	      calendar, event, todo, or journal data.
+
+158	   Value Type:  TEXT
+
+160	   Property Parameters:  IANA and non-standard property parameters can
+161	      be specified on this property.
+
+163	   Conformance:  This property can be specified once in an iCalendar
+164	      object or in "VEVENT", "VTODO", or "VJOURNAL" calendar components.
+
+166	   Description:  This property specifies a color that clients MAY use
+167	      when presenting the relevant data to a user.  Typically, this
+168	      would appear as the "background" color of events or tasks.  The
+169	      value is a color name taken from the set of names defined in
+170	      Section 4.3 of [CSS3] or an RGB value in six-digit hexadecimal
+171	      notation, as defined in Section 4.2.1 of [CSS3].  Values are case-
+172	      insensitive.
+
+174	   Format Definition:  This property is defined by the following
+175	      notation:
+
+177	      color       = "COLOR" colorparam ":" text CRLF
+178	                    ; Value is CSS3 color name or CSS3 six-digit RGB hex value.
+
+180	      colorparam     = *(";" other-param)
+
+182	   Example:  The following are examples of this property:
+
+184	      COLOR:turquoise
+185	      COLOR:#40E0D0
+
+187	      COLOR:#ffd755
+
+189	3.  Updated Components
+
+191	3.1.  VLOCATION component
+
+193	   This document updates the definition of the "VLOCATION" component.
+194	   It allows to specify the newly defined "COORDINATES" property
+195	   (Section 4.1) at most once in a "VLOCATION" component.  It appends
+196	   the following to the "Format Definition" of the "VLOCATION"
+197	   component, defined in Section 7.2 of [RFC9073]:
+
+199	   locprop /= *(
+200	               ;
+201	               ; The following is OPTIONAL
+202	               ; but MUST NOT occur more than once.
+203	               ;
+204	               coord
+205	               ;
+206	               )
+
+208	   The "coord" ABNF is defined in Section 4.1.
+
+210	4.  New Properties
+
+212	4.1.  COORDINATES Property
+
+214	   Property Name:  COORDINATES
+
+216	   Purpose:  To represent a geographic location using the protocol-
+217	      independent, extensible "geo" URI scheme.
+
+219	   Value Type:  URI -- no default
+
+221	   Property Parameters:  IANA and non-standard parameters MAY be
+222	      specified on this property.
+
+224	   Conformance:  This property can be specified in a "VLOCATION"
+225	      calendar component.
+
+227	   Description:  This property represents spatial (geographic)
+228	      coordinates.  In contrast to the the "GEO" property, this property
+229	      allows to represent not only latitude and longitude but also
+230	      altitude of a location.  In addition, it supports to indicate the
+231	      uncertainty of the coordinates, is interoperable with other
+232	      internet standards making use of spatial information, and is
+233	      extensible, such as for use with other coordinate reference
+234	      systems.  The property value MUST a URI in the "geo" URI scheme,
+235	      as defined in [RFC5870] and updates.
+
+237	   Format Definition:
+238	      coord       = "COORDINATES" coordparam ":" uri CRLF
+
+240	      coordparam  = *(
+241	                     ;
+242	                     ; The following is REQUIRED,
+243	                     ; but MUST NOT occur more than once.
+244	                     ;
+245	                     (";" "VALUE" "=" "URI") /
+246	                     ;
+247	                     ; The following is OPTIONAL,
+248	                     ; and MAY occur more than once.
+249	                     ;
+250	                     (";" other-param)
+251	                     ;
+252	                     )
+
+254	   Example:  The following is an example of this property:
+
+256	      COORDINATES;VALUE=URI:geo:48.198634,16.371648;crs=wgs84;u=40
+
+258	4.2.  SHOW-WITHOUT-TIME Property
+
+260	   Property Name:  SHOW-WITHOUT-TIME
+
+262	   Purpose:  To indicate that the exact time span is not important when
+263	      displaying this calendar object.
+
+265	   Value Type:  BOOLEAN -- no default
+
+267	   Property Parameters:  IANA and non-standard parameters can be
+268	      specified on this property.
+
+270	   Conformance:  This property can be specified in a "VEVENT" or "VTODO"
+271	      calendar component.
+
+273	   Description:  This indicates that the exact time span is not
+274	      important to display when rendering this calendar object.  An
+275	      example of this is an event that occurs over a full or almost full
+276	      day, but in contrast to a DATE value is limited to a specific time
+277	      zone or business hours.  While the time component is important for
+278	      free-busy calculations and checking for scheduling clashes,
+279	      calendars may choose to display it as an all-day event, or display
+280	      the object separately to other objects to enhance the user's view
+281	      of their schedule.
+
+283	      This property only is for presentation purposes, it does not have
+284	      any impact on the temporal span or value type of a calendar
+285	      object.
+
+287	      This property MAY be specified on VEVENT components where the
+288	      DTSTART property is of type DATE-TIME, or in VTODO components
+289	      where either the DTSTART or DUE property is specified and has type
+290	      DATE-TIME.  In all other cases it MUST NOT be set.  If this
+291	      property is set, its property value MUST be "TRUE", e.g. it MUST
+292	      be omitted rather than having value "FALSE".
+
+294	      Implementations that are unaware of the "SHOW-WITHOUT-TIME"
+295	      property might inadvertently preserve this property when changing
+296	      a calendar object's temporal type from DATE-TIME to DATE.
+297	      Implementations SHOULD therefore ignore rather than reject the
+298	      incorrectly specified SHOW-WITHOUT-TIME property.  They MUST NOT
+299	      preserve the ill-specified property in the calendaring data.
+
+301	   Format Definition:
+302	      showwt      = "SHOW-WITHOUT-TIME" showwtparam ":" "TRUE" CRLF
+
+304	      showwtparam = *(
+305	                     ;
+306	                     ; The following is REQUIRED,
+307	                     ; but MUST NOT occur more than once.
+308	                     ;
+309	                     (";" "VALUE" "=" "BOOLEAN") /
+310	                     ;
+311	                     ; The following is OPTIONAL,
+312	                     ; and MAY occur more than once.
+313	                     ;
+314	                     (";" other-param)
+315	                     ;
+316	                     )
+
+318	   Example:
+319	      SHOW-WITHOUT-TIME;VALUE=BOOLEAN:TRUE
+
+321	5.  New Values
+
+323	5.1.  OWNER Participation Role
+
+325	   Value:  OWNER
+
+327	   Purpose:  This participation role indicates that the calendar user is
+328	      an owner of the calendar object.  This signifies they can make
+329	      changes that affect all calendar users participating in this
+330	      calendar object (for example, rescheduling the calendar object,
+331	      adding and removing attendees and roles).  The presence of this
+332	      role is only indicative; its semantics are subject to the
+333	      calendaring exchange protocol being used.  See
+334	      [I-D.ietf-jmap-calendars] for an example of making use of this
+335	      role.
+
+337	   Conformance:  This value can be used with the "ROLE" parameter.
+
+339	   Example(s):
+340	      ATTENDEE;ROLE=OWNER;RSVP=TRUE:mailto:jsmith@example.com
+
+342	6.  Security Considerations
+
+344	   This specification extends [RFC5545].  The same security
+345	   considerations as outlined in Section 7 of [RFC5545] apply.
+
+347	   The OWNER participation role (Section 5.1) is indicative only: its
+348	   presence in an iCalendar object does not by itself grant any
+349	   authorization.  Implementations MUST NOT grant a calendar user the
+350	   ability to make changes to a calendar object based solely on the
+351	   presence of this role; authorization is determined by the calendaring
+352	   exchange protocol in use.  In the context of JMAP Calendars
+353	   [I-D.ietf-jmap-calendars], this role is equivalent to the "owner"
+354	   role of the Participant object.  Its semantics in the context of
+355	   other calendaring exchange protocols, such as CalDAV [RFC4791], are
+356	   not defined by this document.
+
+358	7.  IANA Considerations
+
+360	   IANA will update the "iCalendar Element Registries" as follows.
+
+362	7.1.  Changes to the "Components" registry
+
+364	   IANA will update the entry of the "VLOCATION" component: it will add
+365	   Section 3.1 of this document to the References.
+
+367	7.2.  Changes to the "Properties" registry
+
+369	   IANA will change the entry for the "GEO" property: it will set the
+370	   Status from "Current" to "Deprecated" and add Section 2.1 of this
+371	   document to the References.
+
+373	   IANA will change the entry for the "COLOR" property: it will add
+374	   Section 2.2 of this document to the References.
+
+376	   IANA will add the following entries:
+
+378	   Property  COORDINATES
+379	   Status  Current
+380	   Reference  Section 4.1
+
+382	   Property  SHOW-WITHOUT-TIME
+383	   Status  Current
+384	   Reference  Section 4.2
+
+386	7.3.  Changes to the "Participation Roles" registry
+
+388	   IANA will add the following entry:
+
+390	   Role Type  OWNER
+391	   Status  Current
+392	   Reference  Section 5.1
+
+394	8.  References
+
+396	8.1.  Normative References
+
+398	   [CSS3]     Çelik, T., Lilley, C., and L. Baron, "CSS Color Module
+399	              Level 3", W3C Recommendation, January 2022,
+400	              <https://www.w3.org/TR/css-color-3/>.
+
+402	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+403	              Requirement Levels", BCP 14, RFC 2119,
+404	              DOI 10.17487/RFC2119, March 1997,
+405	              <https://www.rfc-editor.org/info/rfc2119>.
+
+407	   [RFC5234]  Crocker, D., Ed. and P. Overell, "Augmented BNF for Syntax
+408	              Specifications: ABNF", STD 68, RFC 5234,
+409	              DOI 10.17487/RFC5234, January 2008,
+410	              <https://www.rfc-editor.org/info/rfc5234>.
+
+412	   [RFC5545]  Desruisseaux, B., Ed., "Internet Calendaring and
+413	              Scheduling Core Object Specification (iCalendar)",
+414	              RFC 5545, DOI 10.17487/RFC5545, September 2009,
+415	              <https://www.rfc-editor.org/info/rfc5545>.
+
+417	   [RFC5870]  Mayrhofer, A. and C. Spanring, "A Uniform Resource
+418	              Identifier for Geographic Locations ('geo' URI)",
+419	              RFC 5870, DOI 10.17487/RFC5870, June 2010,
+420	              <https://www.rfc-editor.org/info/rfc5870>.
+
+422	   [RFC7986]  Daboo, C., "New Properties for iCalendar", RFC 7986,
+423	              DOI 10.17487/RFC7986, October 2016,
+424	              <https://www.rfc-editor.org/info/rfc7986>.
+
+426	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+427	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+428	              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+430	   [RFC9073]  Douglass, M., "Event Publishing Extensions to iCalendar",
+431	              RFC 9073, DOI 10.17487/RFC9073, August 2021,
+432	              <https://www.rfc-editor.org/info/rfc9073>.
+
+434	8.2.  Informative References
+
+436	   [I-D.ietf-calext-jscalendar-icalendar]
+437	              Stepanek, R., "JSCalendar: Converting from and to
+438	              iCalendar", Work in Progress, Internet-Draft, draft-ietf-
+439	              calext-jscalendar-icalendar-26, 2 September 2026,
+440	              <https://datatracker.ietf.org/doc/html/draft-ietf-calext-
+441	              jscalendar-icalendar-26>.
+
+443	   [I-D.ietf-calext-jscalendarbis]
+444	              Jenkins, N. and R. Stepanek, "JSCalendar 2.0: A JSON
+445	              Representation of Calendar Data", Work in Progress,
+446	              Internet-Draft, draft-ietf-calext-jscalendarbis-20, 14
+447	              September 2026, <https://datatracker.ietf.org/doc/html/
+448	              draft-ietf-calext-jscalendarbis-20>.
+
+450	   [I-D.ietf-jmap-calendars]
+451	              Jenkins, N. and M. Douglass, "JSON Meta Application
+452	              Protocol (JMAP) for Calendars", Work in Progress,
+453	              Internet-Draft, draft-ietf-jmap-calendars-28, 12 August
+454	              2026, <https://datatracker.ietf.org/doc/html/draft-ietf-
+455	              jmap-calendars-28>.
+
+457	   [RFC4791]  Daboo, C., Desruisseaux, B., and L. Dusseault,
+458	              "Calendaring Extensions to WebDAV (CalDAV)", RFC 4791,
+459	              DOI 10.17487/RFC4791, March 2007,
+460	              <https://www.rfc-editor.org/info/rfc4791>.
+
+462	Author's Address
+
+464	   Robert Stepanek
+465	   Fastmail
+466	   PO Box 234
+467	   Collins St. West
+468	   Melbourne VIC 8007
+469	   Australia
+470	   Email: rsto@fastmailteam.com
+
+
+
+
+
+
+
+
+

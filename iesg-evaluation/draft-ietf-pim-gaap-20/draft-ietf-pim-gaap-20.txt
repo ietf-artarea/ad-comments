@@ -1,0 +1,1624 @@
+
+
+
+
+Network Working Group                                       D. Farinacci
+Internet-Draft                                               lispers.net
+Intended status: Experimental                                 M. McBride
+Expires: 15 February 2027                                      Futurewei
+                                                          14 August 2026
+
+
+                Group Address Allocation Protocol (GAAP)
+                         draft-ietf-pim-gaap-20
+
+Abstract
+
+   This document describes a design for a lightweight decentralized
+   multicast group address allocation protocol (named GAAP and
+   pronounced "gap" as in "mind the gap").  The base allocation protocol
+   requires no centralized service and minimal configuration, although
+   deployments using encryption or administrative scoping may require
+   configuration.  The protocol runs among group participants which need
+   a unique group address to send and receive multicast packets.
+   Tailored for IPv4 and IPv6 networks, this design offers a simple,
+   lightweight option rather than extending an existing protocol.
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 15 February 2027.
+
+Copyright Notice
+
+   Copyright (c) 2026 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+
+
+
+Farinacci & McBride     Expires 15 February 2027                [Page 1]
+
+Internet-Draft  Group Address Allocation Protocol (GAAP)     August 2026
+
+
+   and restrictions with respect to this document.  Code Components
+   extracted from this document must include Revised BSD License text as
+   described in Section 4.e of the Trust Legal Provisions and are
+   provided without warranty as described in the Revised BSD License.
+
+Table of Contents
+
+   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
+   2.  Definition of Terms . . . . . . . . . . . . . . . . . . . . .   3
+   3.  Overview of Protocol Operation  . . . . . . . . . . . . . . .   5
+   4.  GAAP Message Format . . . . . . . . . . . . . . . . . . . . .   6
+   5.  GAAP API  . . . . . . . . . . . . . . . . . . . . . . . . . .   8
+     5.1.  gaap.init() . . . . . . . . . . . . . . . . . . . . . . .   9
+     5.2.  gaap.allocate() . . . . . . . . . . . . . . . . . . . . .   9
+     5.3.  gaap.release()  . . . . . . . . . . . . . . . . . . . . .   9
+     5.4.  gaap.close()  . . . . . . . . . . . . . . . . . . . . . .  10
+   6.  Detailed Protocol Operation . . . . . . . . . . . . . . . . .  10
+     6.1.  Allocating Group Addresses  . . . . . . . . . . . . . . .  11
+     6.2.  Claiming Group Addresses  . . . . . . . . . . . . . . . .  12
+     6.3.  Partition Repair  . . . . . . . . . . . . . . . . . . . .  13
+     6.4.  Releasing Group Addresses . . . . . . . . . . . . . . . .  14
+   7.  Operational Considerations  . . . . . . . . . . . . . . . . .  14
+   8.  Security Considerations . . . . . . . . . . . . . . . . . . .  17
+   9.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  19
+     9.1.  GAAP UDP Port Numbers . . . . . . . . . . . . . . . . . .  19
+     9.2.  GAAP Protocol Multicast Addresses . . . . . . . . . . . .  19
+     9.3.  GAAP Multicast Group Allocation Ranges  . . . . . . . . .  20
+   10. References  . . . . . . . . . . . . . . . . . . . . . . . . .  20
+     10.1.  Normative References . . . . . . . . . . . . . . . . . .  20
+     10.2.  Informative References . . . . . . . . . . . . . . . . .  22
+   Appendix A.  Acknowledgments  . . . . . . . . . . . . . . . . . .  23
+   Appendix B.  Document Change Log  . . . . . . . . . . . . . . . .  23
+     B.1.  Changes to draft-ietf-pim-gaap-20 . . . . . . . . . . . .  23
+     B.2.  Changes to draft-ietf-pim-gaap-19 . . . . . . . . . . . .  24
+     B.3.  Changes to draft-ietf-pim-gaap-18 . . . . . . . . . . . .  24
+     B.4.  Changes to draft-ietf-pim-gaap-17 . . . . . . . . . . . .  24
+     B.5.  Changes to draft-ietf-pim-gaap-16 . . . . . . . . . . . .  24
+     B.6.  Changes to draft-ietf-pim-gaap-15 . . . . . . . . . . . .  25
+     B.7.  Changes to draft-ietf-pim-gaap-14 . . . . . . . . . . . .  25
+     B.8.  Changes to draft-ietf-pim-gaap-13 . . . . . . . . . . . .  25
+     B.9.  Changes to draft-ietf-pim-gaap-12 . . . . . . . . . . . .  25
+     B.10. Changes to draft-ietf-pim-gaap-11 . . . . . . . . . . . .  25
+     B.11. Changes to draft-ietf-pim-gaap-10 . . . . . . . . . . . .  26
+     B.12. Changes to draft-ietf-pim-gaap-09 . . . . . . . . . . . .  26
+     B.13. Changes to draft-ietf-pim-gaap-08 . . . . . . . . . . . .  26
+     B.14. Changes to draft-ietf-pim-gaap-07 . . . . . . . . . . . .  26
+     B.15. Changes to draft-ietf-pim-gaap-06 . . . . . . . . . . . .  26
+     B.16. Changes to draft-ietf-pim-gaap-05 . . . . . . . . . . . .  27
+
+
+
+Farinacci & McBride     Expires 15 February 2027                [Page 2]
+
+Internet-Draft  Group Address Allocation Protocol (GAAP)     August 2026
+
+
+     B.17. Changes to draft-ietf-pim-gaap-04 . . . . . . . . . . . .  27
+     B.18. Changes to draft-ietf-pim-gaap-03 . . . . . . . . . . . .  27
+     B.19. Changes to draft-ietf-pim-gaap-02 . . . . . . . . . . . .  27
+     B.20. Changes to draft-ietf-pim-gaap-01 . . . . . . . . . . . .  27
+     B.21. Changes to draft-ietf-pim-gaap-00 . . . . . . . . . . . .  27
+     B.22. Changes to draft-farinacci-pim-gaap-06  . . . . . . . . .  27
+     B.23. Changes to draft-farinacci-pim-gaap-05  . . . . . . . . .  28
+     B.24. Changes to draft-farinacci-pim-gaap-04  . . . . . . . . .  28
+     B.25. Changes to draft-farinacci-pim-gaap-03  . . . . . . . . .  28
+     B.26. Changes to draft-farinacci-pim-gaap-02  . . . . . . . . .  28
+     B.27. Changes to draft-farinacci-pim-gaap-01  . . . . . . . . .  28
+     B.28. Changes to draft-farinacci-pim-gaap-00  . . . . . . . . .  28
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  29
+
+1.  Introduction
+
+   The Group Address Allocation Protocol (GAAP) is a decentralized
+   multicast protocol used by participating applications which send and
+   receive packets to/from a multicast group.  The protocol is
+   relatively lightweight, runs with minimized messaging and state so
+   that it can run within a library a multicast application compiles
+   into its executable binary.
+
+   GAAP is a possible solution to the issues described in problem
+   statement [RFC10019].
+
+   Other approaches to multicast group allocation have been proposed in
+   the past, they include SAP [RFC2974], SDP [RFC4566], mDNS [RFC6762],
+   MADCAP [RFC2730], MASC [RFC2909], and IPv6 Allocation Guidelines
+   [RFC3307].  However, depending on the specific mechanism, these
+   approaches can require global scope (adding latency), explicit
+   configuration, reliance on a single subnet, or a centralized or semi-
+   centralized service; not every limitation applies to every mechanism
+   listed.
+
+   This document will describe the protocol operation, protocol message
+   formats, the API definition, and how multicast applications use the
+   API.
+
+
+2.  Definition of Terms
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+   "OPTIONAL" in this document are to be interpreted as described in BCP
+   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+   capitals, as shown here.
+
+
+
+
+Farinacci & McBride     Expires 15 February 2027                [Page 3]
+
+Internet-Draft  Group Address Allocation Protocol (GAAP)     August 2026
+
+
+   Group Name:  is an ASCII string used by applications so they can
+      rendezvous on the same group address.  The application is started
+      using this group name parameter.  Applications can use multiple
+      group names if they have requirements to use multiple group
+      addresses.
+
+   Group Address:  is an IPv4 multicast group address [RFC1112] not from
+      the Local Network Control Block [RFC5771] unless explicitly
+      assigned for GAAP protocol operation, or an IPv6 multicast group
+      address [RFC4291].  The application allocation range is TBD1/10
+      for IPv4 and TBD2/32 for IPv6.
+
+   GAAP Group Address:  is an IANA assigned group address the GAAP
+      protocol itself sends Claim messages to (see Section 9, "GAAP
+      Protocol Multicast Addresses").  This is distinct from the GAAP
+      Multicast Group Allocation Range that IANA assigns for
+      applications to derive their own group addresses from (see
+      Section 9, "GAAP Multicast Group Allocation Ranges"); the GAAP
+      Group Address MUST NOT be allocated from that range.
+
+   Hash Function:  is a cryptographic hash function which takes the
+      group name as input and produces a hash value as output.  The GAAP
+      protocol uses SHA-256 [RFC6234].
+
+   Acceptable Group Hash List:  There are 4 hashed values regarded as
+      "acceptable" for a group name.  They are calculated using the
+      SHA-256 hash function on 1 of 4 character strings: "<group-name>",
+      "<group-name>+1", "<group-name>+2", or "<group-name>+3".  These 4
+      hashes are the only candidate group addresses a GAAP node will
+      ever try for a given group name; a GAAP node MUST NOT run the hash
+      on any other strings for this group name.  See Section 6 for the
+      behavior when all 4 candidate addresses collide.
+
+   Hashed Value:  is the output of a SHA-256 [RFC6234] hash function
+      where the low order 32-bits are used to produce a network layer
+      multicast group address that is unique among the group names in
+      use.  This network-layer uniqueness is what GAAP's collision
+      detection targets; it is a separate goal from avoiding Layer-2 MAC
+      aliasing, which depends on the address family (23 bits for IPv4
+      [RFC1112], 32 bits for IPv6 [RFC2464]) and is not itself
+      guaranteed by GAAP for IPv4.
+
+   Collided Group Address:  a network layer group address where one
+
+
+
+
+
+
+
+
+Farinacci & McBride     Expires 15 February 2027                [Page 4]
+
+Internet-Draft  Group Address Allocation Protocol (GAAP)     August 2026
+
+
+      group address allocated by GAAP is the same as another group
+      address allocated by GAAP for a different group name (the low-
+      order 32 bits for IPv6, or the bits available within the assigned
+      GAAP IPv4 allocation range for IPv4).  See the Hashed Value
+      definition above regarding the separate Layer-2 MAC aliasing
+      concern.
+
+   Claim Message:  a GAAP protocol message that allocates a unique group
+      address and claims it among other GAAP nodes on the network.
+
+3.  Overview of Protocol Operation
+
+   This section will describe the high-level functionality of the GAAP
+   protocol.  Each application runs the GAAP protocol by using the API
+   defined in Section 5.
+
+   *  An application is started with a group name.
+
+   *  The group name is used to create a random allocated group address.
+
+   *  A timestamp is taken when the group address is created.
+
+   *  A Claim message, see Section 4, is sent with group name, group
+      address, and timestamp to determine if the group address has been
+      claimed by any other GAAP nodes.
+
+   *  The GAAP node waits one periodic Claim interval (see Section 6,
+      roughly 1 minute) after sending its initial Claim message.  If no
+      colliding Claim message is received from another GAAP node within
+      that window, the application can start using the group address.
+
+   *  If a colliding Claim message is sent in response within that
+      window, a collision has occurred and the GAAP node MUST allocate
+      another group address and send a Claim message for the new group
+      address.
+
+   *  Claim messages are sent periodically.  They are sent by a single
+      node using a delay-timer suppression mechanism similar to IGMP
+      [RFC1112].  See Section 6 for details.
+
+   *  GAAP nodes are not required to cache information from Claim
+      messages.
+
+   *  GAAP is designed to be decentralized and stateless.  The nodes
+      that participate in the GAAP protocol are responsible for
+      allocating and claiming group addresses.  No other entities are
+      needed.
+
+
+
+
+Farinacci & McBride     Expires 15 February 2027                [Page 5]
+
+Internet-Draft  Group Address Allocation Protocol (GAAP)     August 2026
+
+
+4.  GAAP Message Format
+
+   At this time, there is a single message called the Claim message with
+   type value 1.  Type value of 0 is reserved.  Claim messages are sent
+   to the GAAP Group Address (see Section 2), a well-known multicast
+   address allocated by IANA (see Section 9), distinct from the
+   addresses GAAP allocates for applications.  The Claim message is sent
+   in a UDP checksummed packet where the source port is ephemeral and
+   chosen by the sender and the destination port is a well-known port
+   allocated by IANA.  GAAP can work behind NAT and firewall devices as
+   long as the GAAP destination port is permitted through filters.
+
+     0                   1                   2                   3
+     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |Type=1 |              Reserved                 | Record Count  |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                       0xAAAAAAAA Marker                       |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                  IPv4 Multicast Group Address                 | \
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+  \
+    |                                                               |    R
+    |                        IPv6 Multicast                         |    e
+    |                         Group Address                         |    c
+    |                                                               |    o
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+    r
+    |                          Timestamp                            |    d
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+   /
+    |                          Group Name ...                       |  /
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ /
+    |                             ...                               |/
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+                     Figure 1: GAAP Claim Message
+
+   Packet field descriptions:
+
+      Type=1:  Claim Message
+
+      Reserved:  MUST be set to zero by the sender and ignored by the
+         receiver.
+
+      Record Count:  The number of records in this Claim message.  See
+         "Record field descriptions" below for the maximum permitted
+         value and malformed-message handling.
+
+      Marker:  The fixed bit pattern of 0xAAAAAAAA is required to be set
+
+
+
+
+Farinacci & McBride     Expires 15 February 2027                [Page 6]
+
+Internet-Draft  Group Address Allocation Protocol (GAAP)     August 2026
+
+
+         by the sender.  The receiver verifies the marker to be
+         0xAAAAAAAA.  If it is not, the packet is dropped.  The Marker
+         field is used to indicate to a receiver that the packet may be
+         encrypted.  See Section 8 for details on encrypting GAAP
+         messages.  When encryption is used, the Type, Reserved, and
+         Record Count fields, together with the Marker field itself,
+         remain in cleartext so the receiver can identify the packet as
+         GAAP and detect the encrypted condition before attempting
+         decryption; the record data that follows the Marker (addresses,
+         Timestamp, and Group Name) is encrypted.
+
+   Record field descriptions:
+
+      IPv4 Multicast Group Address:  a 32-bit multicast address in
+         network byte order [RFC1112].  If all bits are set to 0, there
+         is no IPv4 address being allocated and claimed.
+
+      IPv6 Multicast Group Address:  a 128-bit multicast address in
+         network byte order [RFC4291].  If all bits are set to 0, there
+         is no IPv6 address being allocated and claimed.
+
+      Address Field Usage:  The IPv4 and IPv6 address fields are fixed
+         length (4 bytes and 16 bytes) and their positions in the
+         message are well known.  Either or both address fields may be
+         populated, consistent with the group address types being
+         claimed.  If only one address type is used, the unused address
+         field MUST be set to 0 by the sender and ignored by the
+         receiver.  If both address fields are set to 0, the message is
+         invalid and MUST be discarded.
+
+      Timestamp:  A 32-bit unsigned integer counting seconds since the
+         Unix epoch, 1970-01-01T00:00:00Z, in the sender's clock,
+         ignoring leap seconds.  The timestamp is intended to provide a
+         relative ordering between competing claims rather than
+         represent absolute time.
+
+      Timestamp comparison:  Timestamps are compared using serial number
+         arithmetic [RFC1982] so that a single wraparound of the 32-bit
+         counter (in the year 2106) does not by itself cause incorrect
+         ordering.  If two competing Claim messages for a Collided Group
+         Address carry the same Timestamp value, the tie is broken by
+         the lower value of the IPv4 or IPv6 source address (as
+         applicable) of the Claim message; the node with the lower
+         source address wins the collision.  GAAP nodes are not required
+         to have synchronized clocks, but SHOULD use a monotonic or NTP-
+         disciplined source for the Timestamp where available.  A
+         Timestamp that appears to be more than a small, locally
+         configured skew allowance ahead of the receiver's own clock
+
+
+
+Farinacci & McBride     Expires 15 February 2027                [Page 7]
+
+Internet-Draft  Group Address Allocation Protocol (GAAP)     August 2026
+
+
+         SHOULD be treated with the same tie-breaking rule as an equal
+         timestamp rather than assumed to win outright, since it may
+         result from a misconfigured or unsynchronized clock (including
+         a clock that has not yet been set after boot, which typically
+         reads a value far in the past or at zero).  See Section 8 for
+         how a Timestamp used to gain tie-breaking priority in bad faith
+         is handled.
+
+      Group Name:  A variable length group name the multicast
+         application uses.  It is in ASCII format [RFC0020].  The string
+         is terminated with a null character.  Since the Group Name is
+         variable length, subsequent records may not occur on a long- or
+         short-word boundary.  The string MUST NOT exceed 255 octets in
+         length (not including the null terminator).
+
+      Multi-record parsing:  Each record consists of the fixed-length
+         IPv4 and IPv6 address fields, the fixed-length Timestamp field,
+         followed by the variable-length null-terminated Group Name.  A
+         receiver locates the next record, if any, immediately after the
+         null terminator of the current record's Group Name; no padding
+         or alignment is inserted between records.  A zero-length Group
+         Name (a single null byte) is syntactically valid but MUST be
+         ignored by the receiver, since GAAP does not define a meaning
+         for an empty group name.  Duplicate records for the same group
+         name and group address within one Claim message are valid and
+         MUST be treated as a single claim.  The maximum Group Name
+         length is 255 octets, not including the null terminator, and
+         the maximum Record Count is 255.  Receivers MUST ensure that a
+         null terminator for each record's Group Name is present within
+         the bounds of the received packet, and that the number of
+         records actually present matches Record Count; otherwise the
+         message is malformed and MUST be discarded without further
+         processing.
+
+5.  GAAP API
+
+   The GAAP API has the following API calls a multicast application will
+   use.  A multicast application imports the library before using it in
+   its code logic.  This section documents a python library.  The
+   following API is illustrative and shows one possible application
+   interface; it is not a normative part of the GAAP protocol
+   specification.  Implementations are free to expose different
+   programming interfaces as long as the on-the-wire protocol defined in
+   Section 4 is followed.
+
+
+
+
+
+
+
+Farinacci & McBride     Expires 15 February 2027                [Page 8]
+
+Internet-Draft  Group Address Allocation Protocol (GAAP)     August 2026
+
+
+5.1.  gaap.init()
+
+   gaap.init() is used to initialize the GAAP API with an application
+   callback function.  The callback function is called when a group
+   address has changed (due to collision) for a group name the
+   application allocated.
+
+   <CODE BEGINS>
+           import gaap
+
+           status = gaap.init(app_callback_func)
+           if (status == False):
+               print("error")
+               exit(1)
+           #endif
+
+           def app_callback_func(group_name, group_address)
+               print("Group name {} changed to group address {}". \
+                   format((group_name, group_address))
+           #enddef
+   <CODE ENDS>
+
+5.2.  gaap.allocate()
+
+   gaap.allocate() is used when the application needs a group address to
+   send or receive on.
+
+   <CODE BEGINS>
+           import gaap
+
+           group_name = "my-audio-group"
+
+           group_address = gaap.allocate(group_name)
+           if (group_address == None):
+               print("error")
+               exit(1)
+           #endif
+
+           print("Name {} allocated address {}".format(group_name, group_address))
+   <CODE ENDS>
+
+5.3.  gaap.release()
+
+   gaap.release() is used when an application is finished using a group
+   address.
+
+
+
+
+
+
+Farinacci & McBride     Expires 15 February 2027                [Page 9]
+
+Internet-Draft  Group Address Allocation Protocol (GAAP)     August 2026
+
+
+   <CODE BEGINS>
+           import gaap
+
+           group_address = gaap.allocate("my-audio-group")
+
+           status = gaap.release(group_address)
+           if (status == False):
+               print("error")
+               exit(1)
+           #endif
+
+           print("Released address {}".format(group_address))
+   <CODE ENDS>
+
+5.4.  gaap.close()
+
+   gaap.close() is used when an application is finished using the GAAP
+   protocol.
+
+   <CODE BEGINS>
+           import gaap
+
+           #
+           # Initialize the GAAP API with no callback function. Return if errored.
+           #
+           if (gaap.init() == False):
+               print("error")
+               exit(1)
+           #endif
+
+           #
+           # Do multicast work by allocating, sending, and receiving group addresses.
+           #
+           ...
+
+           #
+           # Application shutting down. No longer need to run GAAP on local node.
+           #
+           gaap.close()
+   <CODE ENDS>
+
+6.  Detailed Protocol Operation
+
+
+
+
+
+
+
+
+
+Farinacci & McBride     Expires 15 February 2027               [Page 10]
+
+Internet-Draft  Group Address Allocation Protocol (GAAP)     August 2026
+
+
+6.1.  Allocating Group Addresses
+
+   When an application needs a group address it provides the GAAP API
+   with a group name, the group name is used as input to a SHA-256 hash
+   function [RFC6234].  Initially, when no group address collision is
+   detected the group name is passed as a string to the hash function
+   and the low-order bits are used for a group address.  The address is
+   constructed so that it always falls within the GAAP IPv4 or IPv6
+   allocation range assigned by IANA (see Section 9, "GAAP Multicast
+   Group Allocation Ranges"), and never outside it.  The following
+   pseudo-code illustrates the functionality, where GAAP_V4_BASE and
+   GAAP_V4_MASK are derived from the IANA-assigned GAAP IPv4 /10
+   allocation (GAAP_V4_MASK selects the 22 host bits within that /10),
+   and GAAP_V6_BASE and GAAP_V6_MASK are derived from the IANA-assigned
+   GAAP IPv6 /32 allocation:
+
+           hash = sha256(group_name)
+           low_bits = hash & 0xffffffff
+           if (v4):
+               # GAAP_V4_BASE/GAAP_V4_MASK are derived from the
+               # IANA-assigned GAAP IPv4 /10 allocation (TBD1/10),
+               # e.g. GAAP_V4_MASK = 0x003fffff for a /10.
+               group_address = GAAP_V4_BASE | (low_bits & GAAP_V4_MASK)
+           #endif
+           if (v6):
+               # GAAP_V6_BASE/GAAP_V6_MASK are derived from the
+               # IANA-assigned GAAP IPv6 /32 allocation (TBD2/32).
+               group_address = GAAP_V6_BASE | (low_bits & GAAP_V6_MASK)
+           #endif
+           return(group_address)
+
+   For IPv6, the resulting 128-bit group address is a multicast address
+   per [RFC4291] with the flags and scope bits fixed by the IANA-
+   assigned GAAP_V6_BASE (see Section 9) and the 32-bit Group ID placed
+   in the low-order 32 bits, matching the low-order 32 bits produced by
+   the hash.  No other bits of the address vary.
+
+   When the hash function is used to resolve a collision, the following
+   pseudo-code will illustrate how 3 more attempts are used to find a
+   unique group address:
+
+
+
+
+
+
+
+
+
+
+
+Farinacci & McBride     Expires 15 February 2027               [Page 11]
+
+Internet-Draft  Group Address Allocation Protocol (GAAP)     August 2026
+
+
+           for append in ["+1", "+2", "+3"]:
+               hash = sha256(group_name + append)
+               group_address = make_group_from_hash(hash)
+               collision = send_claim(group_address)
+               if (collision == False): return(group_address)
+           #endfor
+           # All 4 candidate addresses (see "Acceptable Group Hash
+           # List" in Section 2) collided. gaap.allocate() returns
+           # an error to the calling application; the application
+           # MAY retry later or select a different group name.
+           return(None)
+
+   If all 4 candidate addresses for a group name collide, the GAAP API
+   returns an error to the application, as shown above.  GAAP does not
+   define automatic retry behavior in this case, since retrying with the
+   same group name would deterministically produce the same 4 candidate
+   addresses.  Note that a GAAP node receiving a Claim message for the
+   same group name and the same group address it is already claiming is
+   not a collision, per the Definition of Terms; two independent
+   partitions using the same group name are therefore expected to
+   converge on the same address once they can communicate.
+
+   When a group address collision is detected by 2 GAAP nodes, the node
+   with the earliest timestamp for the group address creation wins the
+   collision and keeps using the address.  The node with a later
+   timestamp has the responsibility to allocate a new group address to
+   prevent the collision.
+
+6.2.  Claiming Group Addresses
+
+   When a group address is allocated by a GAAP node, it will build and
+   send a Claim message.  Included in the Claim message is the group
+   name, group address, and timestamp.  If the group address collides
+   with other GAAP nodes already using the address, one of the nodes
+   will send a Claim message to notify the colliding node that it needs
+   to allocate a new group address.
+
+   Collisions can occur two ways, the first is when multiple group names
+   produce the same hash, the second is when different hashes are
+   produced but when truncated to fit into a group address format, those
+   bits are the same.
+
+   A collision is defined to be the same group address allocated to 2
+   different group names.  So if a GAAP node is claiming a group address
+   for its group name and a Claim is received with the same group name
+   with the same group address, it is not a collision.  It is simply a
+   peer group participant claiming the group address you both agree to
+   be using.
+
+
+
+Farinacci & McBride     Expires 15 February 2027               [Page 12]
+
+Internet-Draft  Group Address Allocation Protocol (GAAP)     August 2026
+
+
+   Each GAAP node will periodically send Claim messages for all group
+   names for the applications running on the node.  It will do this in a
+   multi-record Claim message.  The periodic Claim message is sent by
+   setting a periodic timer to a random value in the range 60 to 66
+   seconds (a base of 1 minute, plus jitter of 0 to 10% of 1 minute).
+   When the timer expires, a Claim message is sent.  Suppression is per
+   group address: receivers of a Claim message for a given group address
+   who have their own timer running for that same group address reset
+   that timer, thereby suppressing sending their own Claim message for
+   it; timers for other group addresses the node is claiming are
+   unaffected.  This allows only a single GAAP node that is using the
+   group address to keep claiming the group is still in use.
+
+   A new GAAP node may come up after a group address collision has
+   already been resolved by other nodes using a later entry in the
+   Acceptable Group Hash List.  It will send a Claim message for the
+   first group hash from the Acceptable Group Hash List, since it has no
+   way to know a prior collision occurred.  Any one existing node
+   already using a later hash in the list for that group name responds
+   with its own Claim message, sent immediately rather than waiting for
+   its periodic timer, carrying the group address it is already using
+   and its (earlier) Timestamp; if more than one existing node responds,
+   the new node processes the first valid response it receives and MAY
+   discard duplicates.  On receiving that triggered Claim, the new GAAP
+   node MUST yield, since the existing node's Timestamp is earlier, and
+   switch to using the same group address the existing node is claiming
+   rather than allocating a new one; the new node's own Claim for the
+   first hash is then withdrawn implicitly by no longer being refreshed.
+   If the triggered Claim is lost in transit, the new node continues to
+   periodically re-claim the first hash; the existing node will observe
+   the unsuppressed Claim on its own next periodic timer expiry (or
+   trigger again immediately on receipt of the new node's repeated
+   Claim) and retransmit its response, so the state converges without a
+   bound on the number of retries.
+
+6.3.  Partition Repair
+
+   There will be network outage situations where all GAAP nodes may not
+   receive Claim messages.  During a partition, duplicate group
+   addresses may be allocated and used by nodes on each side of the
+   partition.  During this condition, multicast nodes can operate
+   normally and there is no conflict until the partition heals.  When
+   the partition heals, duplicate group addresses will be detected and
+   fixed.  The group address with the earliest Timestamp is used to
+   determine who keeps the collided group address, using the same
+   comparison and tie-breaking rule defined in Section 4 for equal or
+   skewed Timestamps.  All others will have to rehash a new group
+   address and have the applications start using the new address
+
+
+
+Farinacci & McBride     Expires 15 February 2027               [Page 13]
+
+Internet-Draft  Group Address Allocation Protocol (GAAP)     August 2026
+
+
+   (meaning senders will send to the new group address and receivers
+   will leave the collided group and join the new group).
+
+6.4.  Releasing Group Addresses
+
+   When applications are no longer sending to a group address or not
+   joined to a group address, they can inform the GAAP API to release
+   the group.  Release is purely a local action: no GAAP release message
+   is sent on the wire.  When this happens, the GAAP protocol stops
+   claiming the group address in periodic messages and will not respond
+   to a Claim for this address for a different group name.  It is
+   important for receiver applications to leave the group before
+   releasing the group address.  If more than one local application on
+   the same node uses the same group name (and therefore the same group
+   address), the GAAP implementation MUST track this locally and
+   continue claiming the group address on behalf of the remaining
+   applications until the last local application using that group name
+   has released it.
+
+7.  Operational Considerations
+
+   This section summarizes operational considerations for GAAP
+   deployment.
+
+   GAAP is published as Experimental because decentralized hash-based
+   multicast group address allocation has not been deployed.  The
+   experiment aims to determine whether the collision detection and
+   resolution mechanisms defined in this document are sufficient for
+   practical deployments and what collision rates occur in networks of
+   varying scale.  The experiment is considered complete when
+   operational experience demonstrates the protocol is suitable for
+   Standards Track or when fundamental limitations are identified that
+   require a revision.
+
+   Group name selection is application deployment specific and may be
+   driven by configuration, applications, or provisioning systems.
+   Operators should define policies to avoid administrative conflicts.
+
+   GAAP is expected to co-exist with other multicast address allocation
+   mechanisms.  Deployments should ensure that GAAP operates within
+   defined address ranges to avoid conflicts with non-GAAP assigned
+   multicast addresses.  Operators should also be aware that, due to
+   Layer-2 multicast address mapping, multiple IPv4 multicast addresses,
+   allocated by different multicast allocation procedures, may map to
+   the same ethernet multicast MAC address, which may result in hosts
+   receiving multicast traffic for groups to which they did not
+   explicitly subscribe.
+
+
+
+
+Farinacci & McBride     Expires 15 February 2027               [Page 14]
+
+Internet-Draft  Group Address Allocation Protocol (GAAP)     August 2026
+
+
+   GAAP is intended for zeroconf and unmanaged or loosely managed
+   deployment scenarios, such as those described in [RFC10019], where
+   applications need a group address without relying on centralized
+   configuration or provisioning.  GAAP's decentralized, periodic Claim-
+   based model is not intended as a general replacement for existing
+   address allocation mechanisms in traditionally managed networks.
+   Networks that already have a centralized or administratively assigned
+   multicast address allocation scheme in place do not need to deploy
+   GAAP alongside it.  GAAP is expected to operate within a single
+   administrative domain and this document does not define behavior for
+   GAAP Claim messages crossing administrative domain boundaries.
+
+   GAAP does not require receivers to be GAAP aware.  However, all nodes
+   allocating multicast addresses for the same application or group name
+   are expected to use GAAP in order for collision detection to operate
+   correctly.  GAAP allocated groups and non GAAP allocated groups may
+   co-exist in the same network when used by different applications or
+   services.  Deployment within a coordinated administrative domain is
+   recommended to avoid conflicts between allocation methods.
+
+   GAAP defines a method for deriving multicast addresses from group
+   names and detecting address allocation conflicts.  Applications use
+   the derived multicast addresses for communication.  A group name is
+   intended to be shared by, and only by, the participants of a single
+   application or session that need to rendezvous on the same group
+   address; deployments are responsible for keeping group names unique
+   across unrelated applications within their administrative domain, for
+   example through a naming convention.  GAAP's collision detection
+   mechanism handles the case where two unrelated group names happen to
+   hash to the same address, but it cannot detect or prevent two
+   unrelated applications from being deliberately or accidentally
+   configured with the same group name.  The creation, distribution and
+   discovery of group names are application specific functions and are
+   outside the scope of this document.
+
+   GAAP is stateless in the sense that no node is required to persist
+   claim information across restarts, and no node needs to keep a
+   complete table of every group name and address in use by other nodes
+   in order for the protocol to function; each node only needs to track
+   the group names and addresses its own local applications have
+   allocated.  The soft state a GAAP node does keep locally (its own
+   allocations and their periodic timers) is rebuilt from scratch on
+   restart via a new round of Claim messages.  Implementations should
+   provide mechanisms for operators to observe this local active-claim
+   state and to clear or reset it for operational purposes.
+
+
+
+
+
+
+Farinacci & McBride     Expires 15 February 2027               [Page 15]
+
+Internet-Draft  Group Address Allocation Protocol (GAAP)     August 2026
+
+
+   Deployments should include protections against spoofed claims using
+   appropriate authentication mechanisms, though specific methods are
+   outside the scope of this document.
+
+   Implementations may limit the number of records per message and
+   should perform basic validation, including detection of duplicate
+   multicast address claims.
+
+   While strict time synchronization is not required, loosely
+   synchronized clocks are recommended to ensure consistent timer
+   behavior.
+
+   GAAP implementations are expected to follow the UDP usage guidelines
+   in [RFC8085].  A sender SHOULD keep a multi-record Claim message
+   small enough to avoid IP fragmentation on the path, and SHOULD limit
+   the total UDP payload of a Claim message to 1232 octets so that it
+   fits within the 1280-octet IPv6 minimum MTU without fragmentation
+   (this bounds the number of records per message well below the maximum
+   Record Count of 255 when Group Names are long); the UDP checksum MUST
+   be enabled and verified, and a receiver MUST validate the Marker and
+   message length (the received UDP payload length as reported by the
+   UDP header) before further processing a packet, discarding malformed
+   packets as described in Section 4.  The periodic and jittered Claim
+   timer described in Section 6 already bounds the sending rate of a
+   well-behaved node; implementations SHOULD additionally rate-limit
+   processing of received Claim messages per source to bound the cost of
+   handling a misbehaving or malicious sender (see also Section 8).
+   Because GAAP messages are small requests that do not trigger a
+   disproportionately large response, and Claim messages are sent to a
+   multicast group rather than reflected to a spoofed unicast target,
+   GAAP is not expected to be useful as a reflection or amplification
+   vector; implementations SHOULD nonetheless avoid generating a
+   response larger than the triggering message.  GAAP Claim messages,
+   whether for the well-known GAAP Group Address or for application
+   group addresses, are intended for delivery within the scope implied
+   by the multicast group address used (see Section 9) and
+   implementations SHOULD set the IPv4 TTL or IPv6 Hop Limit
+   consistently with that scope rather than defaulting to a large value.
+
+   The scalability of periodic Claim traffic has not yet been measured
+   for deployments with large numbers of GAAP nodes claiming the same
+   group name.  Operators of such deployments should monitor Claim
+   traffic volume and tune deployment-specific parameters as needed;
+   this is expected to be an area of active investigation as operational
+   experience with this experimental protocol accumulates.
+
+
+
+
+
+
+Farinacci & McBride     Expires 15 February 2027               [Page 16]
+
+Internet-Draft  Group Address Allocation Protocol (GAAP)     August 2026
+
+
+   GAAP requires the underlying network to support IP multicast group
+   membership (IGMP/MLD) and ASM-capable multicast routing/forwarding
+   (e.g., PIM-SM) for delivery of Claim messages.  Applications using
+   GAAP-allocated addresses will typically also rely on ASM delivery for
+   their own traffic, though an application with a single known source
+   could in principle use PIM-SSM for its own data plane once its
+   address has been allocated and claimed via GAAP.  In IPv4 deployments
+   using PIM-SM, the Rendezvous Point(s) serving the GAAP Group Address
+   and the GAAP IPv4 allocation range need to be configured to support
+   the full range described in Section 9, since a GAAP node may allocate
+   any address within it.
+
+   This document does not define GAAP-specific behavior for inter-AS
+   multicast delivery (e.g., use of the RPF Vector [RFC5496]) or for
+   delivery over a Multicast VPN [RFC6513] [RFC6514].  GAAP relies
+   entirely on the underlying multicast routing and forwarding
+   infrastructure for delivery of both Claim messages and application
+   traffic.  No GAAP-specific considerations beyond normal multicast
+   deployment practice are known for these environments.
+
+8.  Security Considerations
+
+   It is suggested that the GAAP protocol run over an encrypted
+   multicast channel, particularly on networks where GAAP traffic could
+   be observed or injected by untrusted parties.  This document does not
+   define a mandatory-to-implement encryption mechanism.  Deployments
+   that enable encryption need to agree out of band on a common
+   mechanism and key management procedure, which could be difficult in
+   embedded devices with different configurations.  The message Marker
+   is always sent in cleartext as 0xAAAAAAAA (see Section 4) and is used
+   by the receiver to identify the packet as GAAP before determining
+   whether the following record data is encrypted.  If the receiver has
+   a shared key configured and the decrypted record data is not well-
+   formed, or the receiver has no shared key or the wrong shared key for
+   an encrypted message, the message MUST be dropped.
+
+   An open-source GAAP implementation exists where ChaCha20 [RFC7539] is
+   used to encrypt GAAP messages.  Deployments choosing an encryption
+   mechanism SHOULD prefer an Authenticated Encryption with Associated
+   Data (AEAD) construction such as ChaCha20-Poly1305 [RFC8439], which
+   additionally authenticates the message, over ChaCha20 alone.  The
+   implementation's key management procedure is a simple shared key that
+   is configured with the application.
+
+   Deployments enabling encryption MUST use a mechanism that provides
+   both confidentiality and integrity, such as an AEAD construction
+   (e.g., ChaCha20-Poly1305); using ChaCha20 without a message
+   authentication code is NOT RECOMMENDED, since the Marker functions
+
+
+
+Farinacci & McBride     Expires 15 February 2027               [Page 17]
+
+Internet-Draft  Group Address Allocation Protocol (GAAP)     August 2026
+
+
+   only as a format check and not as an integrity check.
+   Implementations MUST ensure nonce uniqueness per key across all
+   senders sharing that key.  A receiver configured with a shared key
+   MUST reject an unencrypted Claim message rather than process it, to
+   prevent downgrade to the unauthenticated base mode.  This document
+   does not specify a nonce construction or associated data binding
+   scheme, these are implementation and deployment responsibilities when
+   encryption is enabled.
+
+   Dynamic rekeying mechanisms are outside the scope of this document.
+   However, GAAP can operate with external key management systems,
+   including automated or Dynamic Key Management (DKM) solutions.  In
+   the absence of such mechanisms, keys may be provisioned manually.
+
+   The base (unauthenticated, unencrypted) mode of GAAP offers no
+   protection against an on-network attacker and is suitable only for
+   deployment within a trusted domain where all participants are assumed
+   non-malicious.  When GAAP is deployed with out-of-band pre-shared
+   keys and encryption, an attacker without the shared key cannot forge,
+   replay-with-modification or selectively spoof Claim messages.  This
+   substantially mitigates the denial-of-allocation, timestamp-spoofing
+   and bad-actor-list-poisoning threats.  This does not protect against
+   an authorized, keyed participant that behaves maliciously.
+
+   Encryption alone does not protect against a legitimate, keyed GAAP
+   node behaving badly.  The message validation, per-source rate
+   limiting, and duplicate-detection guidance in Section 7 apply
+   regardless of whether encryption is in use, and the following attack
+   threats may exist with possible mitigation techniques:
+
+   *  Even when an encrypted channel is used, a bad actor could be
+      claiming a group address not derived from one of the group name
+      inputs used for the Acceptable Group Hash List (see Definition of
+      Terms section).  Cooperating nodes should ignore such messages and
+      not try to send Claim messages to correct the bad actor node.
+      Note that a bad actor can spoof the source address of another
+      node's Claim message, so source-address based mitigations are
+      best-effort.  Implementations SHOULD bound the size of the bad-
+      actor list and treat entries as advisory hints rather than
+      authoritative state, since source addresses in Claim messages can
+      be spoofed.
+
+   *  A bad actor could send an invalid timestamp giving it tie-breaking
+      priority when a group address collision occurs.  If the group
+      address has been prior claimed by another node with a timestamp
+      earlier than the invalid timestamp, cooperating nodes should put
+      the bad actor node on a bad-actor list and ignore future messages
+      from it.  A Timestamp that appears to be more than a small,
+
+
+
+Farinacci & McBride     Expires 15 February 2027               [Page 18]
+
+Internet-Draft  Group Address Allocation Protocol (GAAP)     August 2026
+
+
+      locally configured skew allowance ahead of, or behind, the
+      receiver's own clock SHOULD be treated with the same tie-breaking
+      rule as an equal timestamp rather than assumed to win or lose
+      outright, since it may result from a misconfigured or
+      unsynchronized clock, including a clock that has not yet been set
+      after boot, which typically reads a value far in the past or at
+      zero and would otherwise win every collision it is party to.
+
+   *  A bad actor could send messages too often and is not adhering to
+      the random delay or periodic timer procedures in this document.
+      When this occurs, cooperating nodes should start ignoring messages
+      from the bad actor node and not reset or cancel timers, or send
+      triggered Claim messages
+
+9.  IANA Considerations
+
+   IANA is requested to make the following assignments in existing
+   registries:
+
+9.1.  GAAP UDP Port Numbers
+
+   IANA will create one UDP port number for the GAAP protocol,
+   registered per the Service Name and Transport Protocol Port Number
+   Registry guidance in [RFC6335]:
+
+   +=======+======+=========+==============+========+=======+=========+
+   |Service|Port  |Transport| Description  |Assignee|Contact|Reference|
+   |Name   |Number|Protocol |              |        |       |         |
+   +=======+======+=========+==============+========+=======+=========+
+   |gaap   |TBD   |udp      | GAAP Control |IESG    |IETF   |draft-   |
+   |       |      |         | Packets      |        |Chair  |ietf-pim-|
+   |       |      |         |              |        |       |gaap     |
+   +-------+------+---------+--------------+--------+-------+---------+
+
+                                 Table 1
+
+9.2.  GAAP Protocol Multicast Addresses
+
+   IANA will create one multicast address from the IPv4 Internetwork
+   Control Block 224.0.1.x [RFC5771] and one multicast address from the
+   IPv6 Variable Scope Multicast Addresses Block FF0X::TBD for the
+   operation of the GAAP protocol.  The registry description field
+   should indicate "GAAP".  GAAP control messages sent to these
+   addresses are intended to reach all GAAP nodes within an
+   administrative domain rather than being confined to a single link;
+   consistent with that, the IPv4 address comes from the Internetwork
+   Control Block rather than the Local Network Control Block, and
+   implementations MUST use an admin-local or organization-local IPv6
+
+
+
+Farinacci & McBride     Expires 15 February 2027               [Page 19]
+
+Internet-Draft  Group Address Allocation Protocol (GAAP)     August 2026
+
+
+   scope (not link-local scope) when selecting the scope value X for the
+   IPv6 address, so that control messages can be forwarded beyond a
+   single link when the deployment requires it.
+
+9.3.  GAAP Multicast Group Allocation Ranges
+
+   IANA will create two multicast address ranges for the GAAP protocol
+   to allocate application-use addresses from.  For IPv4, a /10 block in
+   a new registry range is requested.  The size follows from the hash-
+   based allocation model in Section 6: a larger host portion within the
+   block, combined with the up to 4 candidate addresses per group name
+   (see "Acceptable Group Hash List" in Section 2), keeps collisions
+   infrequent enough that a GAAP node rarely needs to fall back past its
+   first candidate address.  As the draft has previously noted, because
+   a /10 is nonetheless a large portion of the IPv4 multicast space,
+   this size warrants specific attention from IETF and IANA before
+   allocation, and the WG welcomes further discussion of the appropriate
+   block size, including analysis of collision probability at expected
+   deployment scales.  For IPv6, a /32 block in a new registry range is
+   being requested, sized to match the 32-bit Group ID used directly in
+   the hash-based derivation in Section 6; the larger IPv6 multicast
+   address space makes collision probability far less of a concern than
+   for IPv4.  This allocation MUST come from the Dynamic Multicast Group
+   IDs registry defined in
+   [I-D.ietf-pim-updt-ipv6-dyn-mcast-addr-grp-id], and publication of
+   this document as an RFC is dependent on that registry existing; see
+   the Normative References.
+
+           Registry Name: GAAP IPv4 Allocation Range
+           Registration Procedure: IETF Review
+
+           Registry Name: GAAP IPv6 Allocation Range
+           Registration Procedure: IETF Review
+
+   For IPv6 multicast addresses, the GAAP application allocation range
+   should be in the new "Dynamic Multicast Group IDs" registry requested
+   by [I-D.ietf-pim-updt-ipv6-dyn-mcast-addr-grp-id].  This new registry
+   requests the division of the 32-bit group ID range 0xA0000000 through
+   0xAFFFFFFF.  The GAAP allocation range should come out of this 32-bit
+   range.
+
+10.  References
+
+10.1.  Normative References
+
+   [I-D.ietf-pim-updt-ipv6-dyn-mcast-addr-grp-id]
+              Karstens, N., Farinacci, D., and M. McBride, "Updates to
+              Dynamic IPv6 Multicast Address Group IDs", Work in
+
+
+
+Farinacci & McBride     Expires 15 February 2027               [Page 20]
+
+Internet-Draft  Group Address Allocation Protocol (GAAP)     August 2026
+
+
+              Progress, Internet-Draft, draft-ietf-pim-updt-ipv6-dyn-
+              mcast-addr-grp-id-13, 10 March 2026,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-pim-
+              updt-ipv6-dyn-mcast-addr-grp-id-13>.
+
+   [RFC0020]  Cerf, V., "ASCII format for network interchange", STD 80,
+              RFC 20, DOI 10.17487/RFC20, October 1969,
+              <https://www.rfc-editor.org/info/rfc20>.
+
+   [RFC1112]  Deering, S., "Host extensions for IP multicasting", STD 5,
+              RFC 1112, DOI 10.17487/RFC1112, August 1989,
+              <https://www.rfc-editor.org/info/rfc1112>.
+
+   [RFC1982]  Elz, R. and R. Bush, "Serial Number Arithmetic", RFC 1982,
+              DOI 10.17487/RFC1982, August 1996,
+              <https://www.rfc-editor.org/info/rfc1982>.
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/info/rfc2119>.
+
+   [RFC4291]  Hinden, R. and S. Deering, "IP Version 6 Addressing
+              Architecture", RFC 4291, DOI 10.17487/RFC4291, February
+              2006, <https://www.rfc-editor.org/info/rfc4291>.
+
+   [RFC5771]  Cotton, M., Vegoda, L., and D. Meyer, "IANA Guidelines for
+              IPv4 Multicast Address Assignments", BCP 51, RFC 5771,
+              DOI 10.17487/RFC5771, March 2010,
+              <https://www.rfc-editor.org/info/rfc5771>.
+
+   [RFC6234]  Eastlake 3rd, D. and T. Hansen, "US Secure Hash Algorithms
+              (SHA and SHA-based HMAC and HKDF)", RFC 6234,
+              DOI 10.17487/RFC6234, May 2011,
+              <https://www.rfc-editor.org/info/rfc6234>.
+
+   [RFC6335]  Cotton, M., Eggert, L., Touch, J., Westerlund, M., and S.
+              Cheshire, "Internet Assigned Numbers Authority (IANA)
+              Procedures for the Management of the Service Name and
+              Transport Protocol Port Number Registry", BCP 165,
+              RFC 6335, DOI 10.17487/RFC6335, August 2011,
+              <https://www.rfc-editor.org/info/rfc6335>.
+
+   [RFC8085]  Eggert, L., Fairhurst, G., and G. Shepherd, "UDP Usage
+              Guidelines", BCP 145, RFC 8085, DOI 10.17487/RFC8085,
+              March 2017, <https://www.rfc-editor.org/info/rfc8085>.
+
+
+
+
+
+Farinacci & McBride     Expires 15 February 2027               [Page 21]
+
+Internet-Draft  Group Address Allocation Protocol (GAAP)     August 2026
+
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+10.2.  Informative References
+
+   [I-D.ietf-pim-zeroconf-mcast-addr-alloc-ps]
+              Karstens, N., Farinacci, D., and M. McBride, "Zeroconf
+              Multicast Address Allocation Problem Statement and
+              Requirements", Work in Progress, Internet-Draft, draft-
+              ietf-pim-zeroconf-mcast-addr-alloc-ps-13, 17 February
+              2026, <https://datatracker.ietf.org/doc/html/draft-ietf-
+              pim-zeroconf-mcast-addr-alloc-ps-13>.
+
+   [RFC2464]  Crawford, M., "Transmission of IPv6 Packets over Ethernet
+              Networks", RFC 2464, DOI 10.17487/RFC2464, December 1998,
+              <https://www.rfc-editor.org/info/rfc2464>.
+
+   [RFC2730]  Hanna, S., Patel, B., and M. Shah, "Multicast Address
+              Dynamic Client Allocation Protocol (MADCAP)", RFC 2730,
+              DOI 10.17487/RFC2730, December 1999,
+              <https://www.rfc-editor.org/info/rfc2730>.
+
+   [RFC2909]  Radoslavov, P., Estrin, D., Govindan, R., Handley, M.,
+              Kumar, S., and D. Thaler, "The Multicast Address-Set Claim
+              (MASC) Protocol", RFC 2909, DOI 10.17487/RFC2909,
+              September 2000, <https://www.rfc-editor.org/info/rfc2909>.
+
+   [RFC2974]  Handley, M., Perkins, C., and E. Whelan, "Session
+              Announcement Protocol", RFC 2974, DOI 10.17487/RFC2974,
+              October 2000, <https://www.rfc-editor.org/info/rfc2974>.
+
+   [RFC3307]  Haberman, B., "Allocation Guidelines for IPv6 Multicast
+              Addresses", RFC 3307, DOI 10.17487/RFC3307, September
+              2002, <https://www.rfc-editor.org/info/rfc3307>.
+
+   [RFC4566]  Handley, M., Jacobson, V., and C. Perkins, "SDP: Session
+              Description Protocol", RFC 4566, DOI 10.17487/RFC4566,
+              July 2006, <https://www.rfc-editor.org/info/rfc4566>.
+
+   [RFC5496]  Wijnands, IJ., Boers, A., and E. Rosen, "The Reverse Path
+              Forwarding (RPF) Vector TLV", RFC 5496,
+              DOI 10.17487/RFC5496, March 2009,
+              <https://www.rfc-editor.org/info/rfc5496>.
+
+   [RFC6513]  Rosen, E., Ed. and R. Aggarwal, Ed., "Multicast in MPLS/
+              BGP IP VPNs", RFC 6513, DOI 10.17487/RFC6513, February
+              2012, <https://www.rfc-editor.org/info/rfc6513>.
+
+
+
+Farinacci & McBride     Expires 15 February 2027               [Page 22]
+
+Internet-Draft  Group Address Allocation Protocol (GAAP)     August 2026
+
+
+   [RFC6514]  Aggarwal, R., Rosen, E., Morin, T., and Y. Rekhter, "BGP
+              Encodings and Procedures for Multicast in MPLS/BGP IP
+              VPNs", RFC 6514, DOI 10.17487/RFC6514, February 2012,
+              <https://www.rfc-editor.org/info/rfc6514>.
+
+   [RFC6762]  Cheshire, S. and M. Krochmal, "Multicast DNS", RFC 6762,
+              DOI 10.17487/RFC6762, February 2013,
+              <https://www.rfc-editor.org/info/rfc6762>.
+
+   [RFC7539]  Nir, Y. and A. Langley, "ChaCha20 and Poly1305 for IETF
+              Protocols", RFC 7539, DOI 10.17487/RFC7539, May 2015,
+              <https://www.rfc-editor.org/info/rfc7539>.
+
+   [RFC8439]  Nir, Y. and A. Langley, "ChaCha20 and Poly1305 for IETF
+              Protocols", RFC 8439, DOI 10.17487/RFC8439, June 2018,
+              <https://www.rfc-editor.org/info/rfc8439>.
+
+   [RFC10019] Karstens, N., Farinacci, D., and M. McBride, "Zeroconf
+              Multicast Address Allocation Problem Statement and
+              Requirements", RFC 10019, DOI 10.17487/RFC10019, July
+              2026, <https://www.rfc-editor.org/info/rfc10019>.
+
+Appendix A.  Acknowledgments
+
+   The authors would like to thank the following people for their
+   motivation to start this draft.  They include Chris Hopps, Acee
+   Lindem, David Lamparter, Jeff Tantsura, Nate Karstens, and Lenny
+   Giuliano.  And thank you to Gunter Van de Velde for the extensive
+   review prior to publication.
+
+Appendix B.  Document Change Log
+
+   Note to the RFC Editor: please remove this appendix before
+   publication as an RFC.
+
+B.1.  Changes to draft-ietf-pim-gaap-20
+
+   *  Submitted August 2026.
+
+   *  Rewrote parts of the Security Considerations section per secdir by
+      Tim Hollebeek.  Also included a new deployment paragraph per Bo
+      Wu's review.
+
+   *  Changes made by Mike.
+
+
+
+
+
+
+
+Farinacci & McBride     Expires 15 February 2027               [Page 23]
+
+Internet-Draft  Group Address Allocation Protocol (GAAP)     August 2026
+
+
+B.2.  Changes to draft-ietf-pim-gaap-19
+
+   *  Submitted August 2026.
+
+   *  Addressed many comments from Tommy, Sasha and Bo Wu as part of the
+      tsvart, rtgdir and opsdir last call reviews.
+
+   *  Changes made by Mike.
+
+B.3.  Changes to draft-ietf-pim-gaap-18
+
+   *  Submitted July 2026.
+
+   *  Addressed review comments from Gunter Van de Velde.  Major
+      changes: aligned the IPv4 address pseudocode with the requested
+      /10 allocation; clarified that GAAP's collision detection is
+      network-layer only; softened the encryption interoperability claim
+      and recommended ChaCha20-Poly1305 [RFC8439] as a stronger
+      alternative; made the dependency on draft-ietf-pim-updt-ipv6-dyn-
+      mcast-addr-grp-id normative; added UDP usage guidance per RFC8085.
+      Minor clarifications: distinguished the GAAP protocol address from
+      the application allocation range; defined multi-record parsing
+      rules and a Timestamp comparison/tie-breaking rule; removed the
+      RFC8536 timestamp reference; marked the GAAP API as illustrative;
+      fully specified the IPv6 address format; clarified the claim/
+      response wait window, per-group-address suppression, and the new-
+      node collision state machine; clarified that address release is
+      local-only; clarified group-name uniqueness scope and GAAP's soft-
+      state model; and aligned the IANA UDP port and multicast address
+      requests with RFC6335 and RFC5771 guidance.
+
+   *  Changes made by Mike.
+
+B.4.  Changes to draft-ietf-pim-gaap-17
+
+   *  Submitted June 2026.
+
+   *  Addressed comments from Stig clarifying IANA requests, adding a
+      paragraph on why GAAP is Experimental and wrapping code in CODE
+      BEGINS/ENDS.
+
+   *  Changes made by Mike.
+
+B.5.  Changes to draft-ietf-pim-gaap-16
+
+   *  Submitted June 2026.
+
+
+
+
+
+Farinacci & McBride     Expires 15 February 2027               [Page 24]
+
+Internet-Draft  Group Address Allocation Protocol (GAAP)     August 2026
+
+
+   *  Addressed comments from Stig involving adding a boilerplate, new
+      normative references and changing a few musts to MUST.
+
+   *  Changes made by Mike.
+
+B.6.  Changes to draft-ietf-pim-gaap-15
+
+   *  Submitted April 2026.
+
+   *  Addressed comments from the IntDir review by Sheng Jiang.
+
+   *  Changes made by Mike.
+
+B.7.  Changes to draft-ietf-pim-gaap-14
+
+   *  Submitted April 2026.
+
+   *  Clarified statements in the Operational Considerations section.
+
+   *  Changes made by Mike.
+
+B.8.  Changes to draft-ietf-pim-gaap-13
+
+   *  Submitted April 2026.
+
+   *  Created a new Operational Considerations section to reflect
+      comments from Med.
+
+   *  Changes made by Mike.
+
+B.9.  Changes to draft-ietf-pim-gaap-12
+
+   *  Submitted March 2026.
+
+   *  Made changes to reflect Sandy comments about clarifying how
+      multiple group names could cause collisions as well as clarifying
+      text about encryption.
+
+   *  Changes made by Dino.
+
+B.10.  Changes to draft-ietf-pim-gaap-11
+
+   *  Submitted March 2026.
+
+   *  Change IANA request for an IPv4 multicast block from /8 to /10.
+
+   *  Changes made by Dino.
+
+
+
+
+Farinacci & McBride     Expires 15 February 2027               [Page 25]
+
+Internet-Draft  Group Address Allocation Protocol (GAAP)     August 2026
+
+
+B.11.  Changes to draft-ietf-pim-gaap-10
+
+   *  Submitted February 2026.
+
+   *  Incorporated suggestion from Toerless Eckert to add paragraph
+      discussing SAP and SDP approaches to multicast group allocation in
+      the Introduction section.
+
+   *  Added references to RFC2974 (SAP) and RFC4566 (SDP).
+
+   *  Changes made by Dino.
+
+B.12.  Changes to draft-ietf-pim-gaap-09
+
+   *  Submitted February 2026.
+
+   *  Be more clear about variable length group names and how subsequent
+      records may not be aligned.
+
+   *  Changes made by Dino.
+
+B.13.  Changes to draft-ietf-pim-gaap-08
+
+   *  Submitted February 2026.
+
+   *  Incorporated WG review comments from Stig Venaas on GAAP Group
+      Address definition, Timestamp field documentation, encryption
+      interoperability requirements, and IANA allocation discussion.
+
+   *  Changes made by Dino.
+
+B.14.  Changes to draft-ietf-pim-gaap-07
+
+   *  Submitted January 2026.
+
+   *  Change draft name in IANA considerations section to point to the
+      IETF draft name and not the individual contribution draft name.
+
+   *  Changes made by Dino.
+
+B.15.  Changes to draft-ietf-pim-gaap-06
+
+   *  Submitted September 2025.
+
+   *  Dino fixes Kasten reference.
+
+
+
+
+
+
+Farinacci & McBride     Expires 15 February 2027               [Page 26]
+
+Internet-Draft  Group Address Allocation Protocol (GAAP)     August 2026
+
+
+B.16.  Changes to draft-ietf-pim-gaap-05
+
+   *  Submitted September 2025.
+
+   *  Mike adds one-liner to abstract.
+
+B.17.  Changes to draft-ietf-pim-gaap-04
+
+   *  Submitted August 2025.
+
+   *  Fix some typos in the GAAP API section.
+
+B.18.  Changes to draft-ietf-pim-gaap-03
+
+   *  Submitted February 2025.
+
+   *  Fix some typos in the GAAP API section.
+
+   *  Update references and docuemnt timer.
+
+B.19.  Changes to draft-ietf-pim-gaap-02
+
+   *  Submitted September 2024.
+
+   *  Update references and docuemnt timer.
+
+B.20.  Changes to draft-ietf-pim-gaap-01
+
+   *  Submitted April 2024.
+
+   *  Update references and docuemnt timer.
+
+B.21.  Changes to draft-ietf-pim-gaap-00
+
+   *  Submitted October 2023.
+
+   *  Made draft-farinacci-pim-gaap-06 into WG document per PIM WG
+      consensus.
+
+B.22.  Changes to draft-farinacci-pim-gaap-06
+
+   *  Submitted September 2023.
+
+   *  Fix Nate last name misspelling.
+
+   *  Add reference to [I-D.ietf-pim-zeroconf-mcast-addr-alloc-ps] to
+      intro section.
+
+
+
+
+Farinacci & McBride     Expires 15 February 2027               [Page 27]
+
+Internet-Draft  Group Address Allocation Protocol (GAAP)     August 2026
+
+
+   *  In the IANA Considerations, add IPv6 allocation for GAAP in the
+      0xA0000000-0xAFFFFFFF range, as suggested by Nate.
+
+B.23.  Changes to draft-farinacci-pim-gaap-05
+
+   *  Submitted August 2023.
+
+   *  Update IANA Considerations section to have IPv6 GAAP application
+      allocations come from the registry that
+      [I-D.ietf-pim-updt-ipv6-dyn-mcast-addr-grp-id] is creating.
+
+B.24.  Changes to draft-farinacci-pim-gaap-04
+
+   *  Submitted April 2023.
+
+   *  Added specific text recommended by IANA in the IANA Considerations
+      section.
+
+B.25.  Changes to draft-farinacci-pim-gaap-03
+
+   *  Submitted April 2023.
+
+   *  Changes to reflect comments from PIM and MBONED WG meetings.
+
+   *  Put IANA Considerations requests in standard request format.
+
+B.26.  Changes to draft-farinacci-pim-gaap-02
+
+   *  Submitted March 2023.
+
+   *  Fix typos and grammer.
+
+B.27.  Changes to draft-farinacci-pim-gaap-01
+
+   *  Submitted February 2023.
+
+   *  Updated spec to reflect implementation.
+
+   *  Add Marker in message format.
+
+   *  Add definition for the Acceptable Group Hash List.
+
+   *  Discuss security threats and possible mitigation methods.
+
+B.28.  Changes to draft-farinacci-pim-gaap-00
+
+   *  Initial posting November 2022.
+
+
+
+
+Farinacci & McBride     Expires 15 February 2027               [Page 28]
+
+Internet-Draft  Group Address Allocation Protocol (GAAP)     August 2026
+
+
+Authors' Addresses
+
+   Dino Farinacci
+   lispers.net
+   San Jose, CA
+   United States of America
+   Email: farinacci@gmail.com
+
+
+   Mike McBride
+   Futurewei
+   Santa Clara, CA
+   United States of America
+   Email: mmcbride7@gmail.com
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Farinacci & McBride     Expires 15 February 2027               [Page 29]

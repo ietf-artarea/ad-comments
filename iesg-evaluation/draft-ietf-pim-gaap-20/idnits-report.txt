@@ -1,0 +1,1359 @@
+idnits 2.17.1 
+
+draft-ietf-pim-gaap-20.txt:
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     No nits found.
+
+--------------------------------------------------------------------------------
+
+
+2	Network Working Group                                       D. Farinacci
+3	Internet-Draft                                               lispers.net
+4	Intended status: Experimental                                 M. McBride
+5	Expires: 15 February 2027                                      Futurewei
+6	                                                          14 August 2026
+
+8	                Group Address Allocation Protocol (GAAP)
+9	                         draft-ietf-pim-gaap-20
+
+11	Abstract
+
+13	   This document describes a design for a lightweight decentralized
+14	   multicast group address allocation protocol (named GAAP and
+15	   pronounced "gap" as in "mind the gap").  The base allocation protocol
+16	   requires no centralized service and minimal configuration, although
+17	   deployments using encryption or administrative scoping may require
+18	   configuration.  The protocol runs among group participants which need
+19	   a unique group address to send and receive multicast packets.
+20	   Tailored for IPv4 and IPv6 networks, this design offers a simple,
+21	   lightweight option rather than extending an existing protocol.
+
+23	Status of This Memo
+
+25	   This Internet-Draft is submitted in full conformance with the
+26	   provisions of BCP 78 and BCP 79.
+
+28	   Internet-Drafts are working documents of the Internet Engineering
+29	   Task Force (IETF).  Note that other groups may also distribute
+30	   working documents as Internet-Drafts.  The list of current Internet-
+31	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+33	   Internet-Drafts are draft documents valid for a maximum of six months
+34	   and may be updated, replaced, or obsoleted by other documents at any
+35	   time.  It is inappropriate to use Internet-Drafts as reference
+36	   material or to cite them other than as "work in progress."
+
+38	   This Internet-Draft will expire on 15 February 2027.
+
+40	Copyright Notice
+
+42	   Copyright (c) 2026 IETF Trust and the persons identified as the
+43	   document authors.  All rights reserved.
+
+45	   This document is subject to BCP 78 and the IETF Trust's Legal
+46	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+47	   license-info) in effect on the date of publication of this document.
+48	   Please review these documents carefully, as they describe your rights
+49	   and restrictions with respect to this document.  Code Components
+50	   extracted from this document must include Revised BSD License text as
+51	   described in Section 4.e of the Trust Legal Provisions and are
+52	   provided without warranty as described in the Revised BSD License.
+
+54	Table of Contents
+
+56	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
+57	   2.  Definition of Terms . . . . . . . . . . . . . . . . . . . . .   3
+58	   3.  Overview of Protocol Operation  . . . . . . . . . . . . . . .   5
+59	   4.  GAAP Message Format . . . . . . . . . . . . . . . . . . . . .   6
+60	   5.  GAAP API  . . . . . . . . . . . . . . . . . . . . . . . . . .   8
+61	     5.1.  gaap.init() . . . . . . . . . . . . . . . . . . . . . . .   9
+62	     5.2.  gaap.allocate() . . . . . . . . . . . . . . . . . . . . .   9
+63	     5.3.  gaap.release()  . . . . . . . . . . . . . . . . . . . . .   9
+64	     5.4.  gaap.close()  . . . . . . . . . . . . . . . . . . . . . .  10
+65	   6.  Detailed Protocol Operation . . . . . . . . . . . . . . . . .  10
+66	     6.1.  Allocating Group Addresses  . . . . . . . . . . . . . . .  11
+67	     6.2.  Claiming Group Addresses  . . . . . . . . . . . . . . . .  12
+68	     6.3.  Partition Repair  . . . . . . . . . . . . . . . . . . . .  13
+69	     6.4.  Releasing Group Addresses . . . . . . . . . . . . . . . .  14
+70	   7.  Operational Considerations  . . . . . . . . . . . . . . . . .  14
+71	   8.  Security Considerations . . . . . . . . . . . . . . . . . . .  17
+72	   9.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  19
+73	     9.1.  GAAP UDP Port Numbers . . . . . . . . . . . . . . . . . .  19
+74	     9.2.  GAAP Protocol Multicast Addresses . . . . . . . . . . . .  19
+75	     9.3.  GAAP Multicast Group Allocation Ranges  . . . . . . . . .  20
+76	   10. References  . . . . . . . . . . . . . . . . . . . . . . . . .  20
+77	     10.1.  Normative References . . . . . . . . . . . . . . . . . .  20
+78	     10.2.  Informative References . . . . . . . . . . . . . . . . .  22
+79	   Appendix A.  Acknowledgments  . . . . . . . . . . . . . . . . . .  23
+80	   Appendix B.  Document Change Log  . . . . . . . . . . . . . . . .  23
+81	     B.1.  Changes to draft-ietf-pim-gaap-20 . . . . . . . . . . . .  23
+82	     B.2.  Changes to draft-ietf-pim-gaap-19 . . . . . . . . . . . .  24
+83	     B.3.  Changes to draft-ietf-pim-gaap-18 . . . . . . . . . . . .  24
+84	     B.4.  Changes to draft-ietf-pim-gaap-17 . . . . . . . . . . . .  24
+85	     B.5.  Changes to draft-ietf-pim-gaap-16 . . . . . . . . . . . .  24
+86	     B.6.  Changes to draft-ietf-pim-gaap-15 . . . . . . . . . . . .  25
+87	     B.7.  Changes to draft-ietf-pim-gaap-14 . . . . . . . . . . . .  25
+88	     B.8.  Changes to draft-ietf-pim-gaap-13 . . . . . . . . . . . .  25
+89	     B.9.  Changes to draft-ietf-pim-gaap-12 . . . . . . . . . . . .  25
+90	     B.10. Changes to draft-ietf-pim-gaap-11 . . . . . . . . . . . .  25
+91	     B.11. Changes to draft-ietf-pim-gaap-10 . . . . . . . . . . . .  26
+92	     B.12. Changes to draft-ietf-pim-gaap-09 . . . . . . . . . . . .  26
+93	     B.13. Changes to draft-ietf-pim-gaap-08 . . . . . . . . . . . .  26
+94	     B.14. Changes to draft-ietf-pim-gaap-07 . . . . . . . . . . . .  26
+95	     B.15. Changes to draft-ietf-pim-gaap-06 . . . . . . . . . . . .  26
+96	     B.16. Changes to draft-ietf-pim-gaap-05 . . . . . . . . . . . .  27
+97	     B.17. Changes to draft-ietf-pim-gaap-04 . . . . . . . . . . . .  27
+98	     B.18. Changes to draft-ietf-pim-gaap-03 . . . . . . . . . . . .  27
+99	     B.19. Changes to draft-ietf-pim-gaap-02 . . . . . . . . . . . .  27
+100	     B.20. Changes to draft-ietf-pim-gaap-01 . . . . . . . . . . . .  27
+101	     B.21. Changes to draft-ietf-pim-gaap-00 . . . . . . . . . . . .  27
+102	     B.22. Changes to draft-farinacci-pim-gaap-06  . . . . . . . . .  27
+103	     B.23. Changes to draft-farinacci-pim-gaap-05  . . . . . . . . .  28
+104	     B.24. Changes to draft-farinacci-pim-gaap-04  . . . . . . . . .  28
+105	     B.25. Changes to draft-farinacci-pim-gaap-03  . . . . . . . . .  28
+106	     B.26. Changes to draft-farinacci-pim-gaap-02  . . . . . . . . .  28
+107	     B.27. Changes to draft-farinacci-pim-gaap-01  . . . . . . . . .  28
+108	     B.28. Changes to draft-farinacci-pim-gaap-00  . . . . . . . . .  28
+109	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  29
+
+111	1.  Introduction
+
+113	   The Group Address Allocation Protocol (GAAP) is a decentralized
+114	   multicast protocol used by participating applications which send and
+115	   receive packets to/from a multicast group.  The protocol is
+116	   relatively lightweight, runs with minimized messaging and state so
+117	   that it can run within a library a multicast application compiles
+118	   into its executable binary.
+
+120	   GAAP is a possible solution to the issues described in problem
+121	   statement [RFC10019].
+
+123	   Other approaches to multicast group allocation have been proposed in
+124	   the past, they include SAP [RFC2974], SDP [RFC4566], mDNS [RFC6762],
+125	   MADCAP [RFC2730], MASC [RFC2909], and IPv6 Allocation Guidelines
+126	   [RFC3307].  However, depending on the specific mechanism, these
+127	   approaches can require global scope (adding latency), explicit
+128	   configuration, reliance on a single subnet, or a centralized or semi-
+129	   centralized service; not every limitation applies to every mechanism
+130	   listed.
+
+132	   This document will describe the protocol operation, protocol message
+133	   formats, the API definition, and how multicast applications use the
+134	   API.
+
+136	2.  Definition of Terms
+
+138	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+139	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+140	   "OPTIONAL" in this document are to be interpreted as described in BCP
+141	   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+142	   capitals, as shown here.
+
+144	   Group Name:  is an ASCII string used by applications so they can
+145	      rendezvous on the same group address.  The application is started
+146	      using this group name parameter.  Applications can use multiple
+147	      group names if they have requirements to use multiple group
+148	      addresses.
+
+150	   Group Address:  is an IPv4 multicast group address [RFC1112] not from
+151	      the Local Network Control Block [RFC5771] unless explicitly
+152	      assigned for GAAP protocol operation, or an IPv6 multicast group
+153	      address [RFC4291].  The application allocation range is TBD1/10
+154	      for IPv4 and TBD2/32 for IPv6.
+
+156	   GAAP Group Address:  is an IANA assigned group address the GAAP
+157	      protocol itself sends Claim messages to (see Section 9, "GAAP
+158	      Protocol Multicast Addresses").  This is distinct from the GAAP
+159	      Multicast Group Allocation Range that IANA assigns for
+160	      applications to derive their own group addresses from (see
+161	      Section 9, "GAAP Multicast Group Allocation Ranges"); the GAAP
+162	      Group Address MUST NOT be allocated from that range.
+
+164	   Hash Function:  is a cryptographic hash function which takes the
+165	      group name as input and produces a hash value as output.  The GAAP
+166	      protocol uses SHA-256 [RFC6234].
+
+168	   Acceptable Group Hash List:  There are 4 hashed values regarded as
+169	      "acceptable" for a group name.  They are calculated using the
+170	      SHA-256 hash function on 1 of 4 character strings: "<group-name>",
+171	      "<group-name>+1", "<group-name>+2", or "<group-name>+3".  These 4
+172	      hashes are the only candidate group addresses a GAAP node will
+173	      ever try for a given group name; a GAAP node MUST NOT run the hash
+174	      on any other strings for this group name.  See Section 6 for the
+175	      behavior when all 4 candidate addresses collide.
+
+177	   Hashed Value:  is the output of a SHA-256 [RFC6234] hash function
+178	      where the low order 32-bits are used to produce a network layer
+179	      multicast group address that is unique among the group names in
+180	      use.  This network-layer uniqueness is what GAAP's collision
+181	      detection targets; it is a separate goal from avoiding Layer-2 MAC
+182	      aliasing, which depends on the address family (23 bits for IPv4
+183	      [RFC1112], 32 bits for IPv6 [RFC2464]) and is not itself
+184	      guaranteed by GAAP for IPv4.
+
+186	   Collided Group Address:  a network layer group address where one
+187	      group address allocated by GAAP is the same as another group
+188	      address allocated by GAAP for a different group name (the low-
+189	      order 32 bits for IPv6, or the bits available within the assigned
+190	      GAAP IPv4 allocation range for IPv4).  See the Hashed Value
+191	      definition above regarding the separate Layer-2 MAC aliasing
+192	      concern.
+
+194	   Claim Message:  a GAAP protocol message that allocates a unique group
+195	      address and claims it among other GAAP nodes on the network.
+
+197	3.  Overview of Protocol Operation
+
+199	   This section will describe the high-level functionality of the GAAP
+200	   protocol.  Each application runs the GAAP protocol by using the API
+201	   defined in Section 5.
+
+203	   *  An application is started with a group name.
+
+205	   *  The group name is used to create a random allocated group address.
+
+207	   *  A timestamp is taken when the group address is created.
+
+209	   *  A Claim message, see Section 4, is sent with group name, group
+210	      address, and timestamp to determine if the group address has been
+211	      claimed by any other GAAP nodes.
+
+213	   *  The GAAP node waits one periodic Claim interval (see Section 6,
+214	      roughly 1 minute) after sending its initial Claim message.  If no
+215	      colliding Claim message is received from another GAAP node within
+216	      that window, the application can start using the group address.
+
+218	   *  If a colliding Claim message is sent in response within that
+219	      window, a collision has occurred and the GAAP node MUST allocate
+220	      another group address and send a Claim message for the new group
+221	      address.
+
+223	   *  Claim messages are sent periodically.  They are sent by a single
+224	      node using a delay-timer suppression mechanism similar to IGMP
+225	      [RFC1112].  See Section 6 for details.
+
+227	   *  GAAP nodes are not required to cache information from Claim
+228	      messages.
+
+230	   *  GAAP is designed to be decentralized and stateless.  The nodes
+231	      that participate in the GAAP protocol are responsible for
+232	      allocating and claiming group addresses.  No other entities are
+233	      needed.
+
+235	4.  GAAP Message Format
+
+237	   At this time, there is a single message called the Claim message with
+238	   type value 1.  Type value of 0 is reserved.  Claim messages are sent
+239	   to the GAAP Group Address (see Section 2), a well-known multicast
+240	   address allocated by IANA (see Section 9), distinct from the
+241	   addresses GAAP allocates for applications.  The Claim message is sent
+242	   in a UDP checksummed packet where the source port is ephemeral and
+243	   chosen by the sender and the destination port is a well-known port
+244	   allocated by IANA.  GAAP can work behind NAT and firewall devices as
+245	   long as the GAAP destination port is permitted through filters.
+
+247	     0                   1                   2                   3
+248	     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+249	    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+250	    |Type=1 |              Reserved                 | Record Count  |
+251	    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+252	    |                       0xAAAAAAAA Marker                       |
+253	    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+254	    |                  IPv4 Multicast Group Address                 | \
+255	    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+  \
+256	    |                                                               |    R
+257	    |                        IPv6 Multicast                         |    e
+258	    |                         Group Address                         |    c
+259	    |                                                               |    o
+260	    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+    r
+261	    |                          Timestamp                            |    d
+262	    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+   /
+263	    |                          Group Name ...                       |  /
+264	    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ /
+265	    |                             ...                               |/
+266	    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+268	                     Figure 1: GAAP Claim Message
+
+270	   Packet field descriptions:
+
+272	      Type=1:  Claim Message
+
+274	      Reserved:  MUST be set to zero by the sender and ignored by the
+275	         receiver.
+
+277	      Record Count:  The number of records in this Claim message.  See
+278	         "Record field descriptions" below for the maximum permitted
+279	         value and malformed-message handling.
+
+281	      Marker:  The fixed bit pattern of 0xAAAAAAAA is required to be set
+282	         by the sender.  The receiver verifies the marker to be
+283	         0xAAAAAAAA.  If it is not, the packet is dropped.  The Marker
+284	         field is used to indicate to a receiver that the packet may be
+285	         encrypted.  See Section 8 for details on encrypting GAAP
+286	         messages.  When encryption is used, the Type, Reserved, and
+287	         Record Count fields, together with the Marker field itself,
+288	         remain in cleartext so the receiver can identify the packet as
+289	         GAAP and detect the encrypted condition before attempting
+290	         decryption; the record data that follows the Marker (addresses,
+291	         Timestamp, and Group Name) is encrypted.
+
+293	   Record field descriptions:
+
+295	      IPv4 Multicast Group Address:  a 32-bit multicast address in
+296	         network byte order [RFC1112].  If all bits are set to 0, there
+297	         is no IPv4 address being allocated and claimed.
+
+299	      IPv6 Multicast Group Address:  a 128-bit multicast address in
+300	         network byte order [RFC4291].  If all bits are set to 0, there
+301	         is no IPv6 address being allocated and claimed.
+
+303	      Address Field Usage:  The IPv4 and IPv6 address fields are fixed
+304	         length (4 bytes and 16 bytes) and their positions in the
+305	         message are well known.  Either or both address fields may be
+306	         populated, consistent with the group address types being
+307	         claimed.  If only one address type is used, the unused address
+308	         field MUST be set to 0 by the sender and ignored by the
+309	         receiver.  If both address fields are set to 0, the message is
+310	         invalid and MUST be discarded.
+
+312	      Timestamp:  A 32-bit unsigned integer counting seconds since the
+313	         Unix epoch, 1970-01-01T00:00:00Z, in the sender's clock,
+314	         ignoring leap seconds.  The timestamp is intended to provide a
+315	         relative ordering between competing claims rather than
+316	         represent absolute time.
+
+318	      Timestamp comparison:  Timestamps are compared using serial number
+319	         arithmetic [RFC1982] so that a single wraparound of the 32-bit
+320	         counter (in the year 2106) does not by itself cause incorrect
+321	         ordering.  If two competing Claim messages for a Collided Group
+322	         Address carry the same Timestamp value, the tie is broken by
+323	         the lower value of the IPv4 or IPv6 source address (as
+324	         applicable) of the Claim message; the node with the lower
+325	         source address wins the collision.  GAAP nodes are not required
+326	         to have synchronized clocks, but SHOULD use a monotonic or NTP-
+327	         disciplined source for the Timestamp where available.  A
+328	         Timestamp that appears to be more than a small, locally
+329	         configured skew allowance ahead of the receiver's own clock
+330	         SHOULD be treated with the same tie-breaking rule as an equal
+331	         timestamp rather than assumed to win outright, since it may
+332	         result from a misconfigured or unsynchronized clock (including
+333	         a clock that has not yet been set after boot, which typically
+334	         reads a value far in the past or at zero).  See Section 8 for
+335	         how a Timestamp used to gain tie-breaking priority in bad faith
+336	         is handled.
+
+338	      Group Name:  A variable length group name the multicast
+339	         application uses.  It is in ASCII format [RFC0020].  The string
+340	         is terminated with a null character.  Since the Group Name is
+341	         variable length, subsequent records may not occur on a long- or
+342	         short-word boundary.  The string MUST NOT exceed 255 octets in
+343	         length (not including the null terminator).
+
+345	      Multi-record parsing:  Each record consists of the fixed-length
+346	         IPv4 and IPv6 address fields, the fixed-length Timestamp field,
+347	         followed by the variable-length null-terminated Group Name.  A
+348	         receiver locates the next record, if any, immediately after the
+349	         null terminator of the current record's Group Name; no padding
+350	         or alignment is inserted between records.  A zero-length Group
+351	         Name (a single null byte) is syntactically valid but MUST be
+352	         ignored by the receiver, since GAAP does not define a meaning
+353	         for an empty group name.  Duplicate records for the same group
+354	         name and group address within one Claim message are valid and
+355	         MUST be treated as a single claim.  The maximum Group Name
+356	         length is 255 octets, not including the null terminator, and
+357	         the maximum Record Count is 255.  Receivers MUST ensure that a
+358	         null terminator for each record's Group Name is present within
+359	         the bounds of the received packet, and that the number of
+360	         records actually present matches Record Count; otherwise the
+361	         message is malformed and MUST be discarded without further
+362	         processing.
+
+364	5.  GAAP API
+
+366	   The GAAP API has the following API calls a multicast application will
+367	   use.  A multicast application imports the library before using it in
+368	   its code logic.  This section documents a python library.  The
+369	   following API is illustrative and shows one possible application
+370	   interface; it is not a normative part of the GAAP protocol
+371	   specification.  Implementations are free to expose different
+372	   programming interfaces as long as the on-the-wire protocol defined in
+373	   Section 4 is followed.
+
+375	5.1.  gaap.init()
+
+377	   gaap.init() is used to initialize the GAAP API with an application
+378	   callback function.  The callback function is called when a group
+379	   address has changed (due to collision) for a group name the
+380	   application allocated.
+
+382	   <CODE BEGINS>
+383	           import gaap
+
+385	           status = gaap.init(app_callback_func)
+386	           if (status == False):
+387	               print("error")
+388	               exit(1)
+389	           #endif
+
+391	           def app_callback_func(group_name, group_address)
+392	               print("Group name {} changed to group address {}". \
+393	                   format((group_name, group_address))
+394	           #enddef
+395	   <CODE ENDS>
+
+397	5.2.  gaap.allocate()
+
+399	   gaap.allocate() is used when the application needs a group address to
+400	   send or receive on.
+
+402	   <CODE BEGINS>
+403	           import gaap
+
+405	           group_name = "my-audio-group"
+
+407	           group_address = gaap.allocate(group_name)
+408	           if (group_address == None):
+409	               print("error")
+410	               exit(1)
+411	           #endif
+
+413	           print("Name {} allocated address {}".format(group_name, group_address))
+414	   <CODE ENDS>
+
+416	5.3.  gaap.release()
+
+418	   gaap.release() is used when an application is finished using a group
+419	   address.
+
+421	   <CODE BEGINS>
+422	           import gaap
+
+424	           group_address = gaap.allocate("my-audio-group")
+
+426	           status = gaap.release(group_address)
+427	           if (status == False):
+428	               print("error")
+429	               exit(1)
+430	           #endif
+
+432	           print("Released address {}".format(group_address))
+433	   <CODE ENDS>
+
+435	5.4.  gaap.close()
+
+437	   gaap.close() is used when an application is finished using the GAAP
+438	   protocol.
+
+440	   <CODE BEGINS>
+441	           import gaap
+
+443	           #
+444	           # Initialize the GAAP API with no callback function. Return if errored.
+445	           #
+446	           if (gaap.init() == False):
+447	               print("error")
+448	               exit(1)
+449	           #endif
+
+451	           #
+452	           # Do multicast work by allocating, sending, and receiving group addresses.
+453	           #
+454	           ...
+
+456	           #
+457	           # Application shutting down. No longer need to run GAAP on local node.
+458	           #
+459	           gaap.close()
+460	   <CODE ENDS>
+
+462	6.  Detailed Protocol Operation
+463	6.1.  Allocating Group Addresses
+
+465	   When an application needs a group address it provides the GAAP API
+466	   with a group name, the group name is used as input to a SHA-256 hash
+467	   function [RFC6234].  Initially, when no group address collision is
+468	   detected the group name is passed as a string to the hash function
+469	   and the low-order bits are used for a group address.  The address is
+470	   constructed so that it always falls within the GAAP IPv4 or IPv6
+471	   allocation range assigned by IANA (see Section 9, "GAAP Multicast
+472	   Group Allocation Ranges"), and never outside it.  The following
+473	   pseudo-code illustrates the functionality, where GAAP_V4_BASE and
+474	   GAAP_V4_MASK are derived from the IANA-assigned GAAP IPv4 /10
+475	   allocation (GAAP_V4_MASK selects the 22 host bits within that /10),
+476	   and GAAP_V6_BASE and GAAP_V6_MASK are derived from the IANA-assigned
+477	   GAAP IPv6 /32 allocation:
+
+479	           hash = sha256(group_name)
+480	           low_bits = hash & 0xffffffff
+481	           if (v4):
+482	               # GAAP_V4_BASE/GAAP_V4_MASK are derived from the
+483	               # IANA-assigned GAAP IPv4 /10 allocation (TBD1/10),
+484	               # e.g. GAAP_V4_MASK = 0x003fffff for a /10.
+485	               group_address = GAAP_V4_BASE | (low_bits & GAAP_V4_MASK)
+486	           #endif
+487	           if (v6):
+488	               # GAAP_V6_BASE/GAAP_V6_MASK are derived from the
+489	               # IANA-assigned GAAP IPv6 /32 allocation (TBD2/32).
+490	               group_address = GAAP_V6_BASE | (low_bits & GAAP_V6_MASK)
+491	           #endif
+492	           return(group_address)
+
+494	   For IPv6, the resulting 128-bit group address is a multicast address
+495	   per [RFC4291] with the flags and scope bits fixed by the IANA-
+496	   assigned GAAP_V6_BASE (see Section 9) and the 32-bit Group ID placed
+497	   in the low-order 32 bits, matching the low-order 32 bits produced by
+498	   the hash.  No other bits of the address vary.
+
+500	   When the hash function is used to resolve a collision, the following
+501	   pseudo-code will illustrate how 3 more attempts are used to find a
+502	   unique group address:
+
+504	           for append in ["+1", "+2", "+3"]:
+505	               hash = sha256(group_name + append)
+506	               group_address = make_group_from_hash(hash)
+507	               collision = send_claim(group_address)
+508	               if (collision == False): return(group_address)
+509	           #endfor
+510	           # All 4 candidate addresses (see "Acceptable Group Hash
+511	           # List" in Section 2) collided. gaap.allocate() returns
+512	           # an error to the calling application; the application
+513	           # MAY retry later or select a different group name.
+514	           return(None)
+
+516	   If all 4 candidate addresses for a group name collide, the GAAP API
+517	   returns an error to the application, as shown above.  GAAP does not
+518	   define automatic retry behavior in this case, since retrying with the
+519	   same group name would deterministically produce the same 4 candidate
+520	   addresses.  Note that a GAAP node receiving a Claim message for the
+521	   same group name and the same group address it is already claiming is
+522	   not a collision, per the Definition of Terms; two independent
+523	   partitions using the same group name are therefore expected to
+524	   converge on the same address once they can communicate.
+
+526	   When a group address collision is detected by 2 GAAP nodes, the node
+527	   with the earliest timestamp for the group address creation wins the
+528	   collision and keeps using the address.  The node with a later
+529	   timestamp has the responsibility to allocate a new group address to
+530	   prevent the collision.
+
+532	6.2.  Claiming Group Addresses
+
+534	   When a group address is allocated by a GAAP node, it will build and
+535	   send a Claim message.  Included in the Claim message is the group
+536	   name, group address, and timestamp.  If the group address collides
+537	   with other GAAP nodes already using the address, one of the nodes
+538	   will send a Claim message to notify the colliding node that it needs
+539	   to allocate a new group address.
+
+541	   Collisions can occur two ways, the first is when multiple group names
+542	   produce the same hash, the second is when different hashes are
+543	   produced but when truncated to fit into a group address format, those
+544	   bits are the same.
+
+546	   A collision is defined to be the same group address allocated to 2
+547	   different group names.  So if a GAAP node is claiming a group address
+548	   for its group name and a Claim is received with the same group name
+549	   with the same group address, it is not a collision.  It is simply a
+550	   peer group participant claiming the group address you both agree to
+551	   be using.
+
+553	   Each GAAP node will periodically send Claim messages for all group
+554	   names for the applications running on the node.  It will do this in a
+555	   multi-record Claim message.  The periodic Claim message is sent by
+556	   setting a periodic timer to a random value in the range 60 to 66
+557	   seconds (a base of 1 minute, plus jitter of 0 to 10% of 1 minute).
+558	   When the timer expires, a Claim message is sent.  Suppression is per
+559	   group address: receivers of a Claim message for a given group address
+560	   who have their own timer running for that same group address reset
+561	   that timer, thereby suppressing sending their own Claim message for
+562	   it; timers for other group addresses the node is claiming are
+563	   unaffected.  This allows only a single GAAP node that is using the
+564	   group address to keep claiming the group is still in use.
+
+566	   A new GAAP node may come up after a group address collision has
+567	   already been resolved by other nodes using a later entry in the
+568	   Acceptable Group Hash List.  It will send a Claim message for the
+569	   first group hash from the Acceptable Group Hash List, since it has no
+570	   way to know a prior collision occurred.  Any one existing node
+571	   already using a later hash in the list for that group name responds
+572	   with its own Claim message, sent immediately rather than waiting for
+573	   its periodic timer, carrying the group address it is already using
+574	   and its (earlier) Timestamp; if more than one existing node responds,
+575	   the new node processes the first valid response it receives and MAY
+576	   discard duplicates.  On receiving that triggered Claim, the new GAAP
+577	   node MUST yield, since the existing node's Timestamp is earlier, and
+578	   switch to using the same group address the existing node is claiming
+579	   rather than allocating a new one; the new node's own Claim for the
+580	   first hash is then withdrawn implicitly by no longer being refreshed.
+581	   If the triggered Claim is lost in transit, the new node continues to
+582	   periodically re-claim the first hash; the existing node will observe
+583	   the unsuppressed Claim on its own next periodic timer expiry (or
+584	   trigger again immediately on receipt of the new node's repeated
+585	   Claim) and retransmit its response, so the state converges without a
+586	   bound on the number of retries.
+
+588	6.3.  Partition Repair
+
+590	   There will be network outage situations where all GAAP nodes may not
+591	   receive Claim messages.  During a partition, duplicate group
+592	   addresses may be allocated and used by nodes on each side of the
+593	   partition.  During this condition, multicast nodes can operate
+594	   normally and there is no conflict until the partition heals.  When
+595	   the partition heals, duplicate group addresses will be detected and
+596	   fixed.  The group address with the earliest Timestamp is used to
+597	   determine who keeps the collided group address, using the same
+598	   comparison and tie-breaking rule defined in Section 4 for equal or
+599	   skewed Timestamps.  All others will have to rehash a new group
+600	   address and have the applications start using the new address
+601	   (meaning senders will send to the new group address and receivers
+602	   will leave the collided group and join the new group).
+
+604	6.4.  Releasing Group Addresses
+
+606	   When applications are no longer sending to a group address or not
+607	   joined to a group address, they can inform the GAAP API to release
+608	   the group.  Release is purely a local action: no GAAP release message
+609	   is sent on the wire.  When this happens, the GAAP protocol stops
+610	   claiming the group address in periodic messages and will not respond
+611	   to a Claim for this address for a different group name.  It is
+612	   important for receiver applications to leave the group before
+613	   releasing the group address.  If more than one local application on
+614	   the same node uses the same group name (and therefore the same group
+615	   address), the GAAP implementation MUST track this locally and
+616	   continue claiming the group address on behalf of the remaining
+617	   applications until the last local application using that group name
+618	   has released it.
+
+620	7.  Operational Considerations
+
+622	   This section summarizes operational considerations for GAAP
+623	   deployment.
+
+625	   GAAP is published as Experimental because decentralized hash-based
+626	   multicast group address allocation has not been deployed.  The
+627	   experiment aims to determine whether the collision detection and
+628	   resolution mechanisms defined in this document are sufficient for
+629	   practical deployments and what collision rates occur in networks of
+630	   varying scale.  The experiment is considered complete when
+631	   operational experience demonstrates the protocol is suitable for
+632	   Standards Track or when fundamental limitations are identified that
+633	   require a revision.
+
+635	   Group name selection is application deployment specific and may be
+636	   driven by configuration, applications, or provisioning systems.
+637	   Operators should define policies to avoid administrative conflicts.
+
+639	   GAAP is expected to co-exist with other multicast address allocation
+640	   mechanisms.  Deployments should ensure that GAAP operates within
+641	   defined address ranges to avoid conflicts with non-GAAP assigned
+642	   multicast addresses.  Operators should also be aware that, due to
+643	   Layer-2 multicast address mapping, multiple IPv4 multicast addresses,
+644	   allocated by different multicast allocation procedures, may map to
+645	   the same ethernet multicast MAC address, which may result in hosts
+646	   receiving multicast traffic for groups to which they did not
+647	   explicitly subscribe.
+
+649	   GAAP is intended for zeroconf and unmanaged or loosely managed
+650	   deployment scenarios, such as those described in [RFC10019], where
+651	   applications need a group address without relying on centralized
+652	   configuration or provisioning.  GAAP's decentralized, periodic Claim-
+653	   based model is not intended as a general replacement for existing
+654	   address allocation mechanisms in traditionally managed networks.
+655	   Networks that already have a centralized or administratively assigned
+656	   multicast address allocation scheme in place do not need to deploy
+657	   GAAP alongside it.  GAAP is expected to operate within a single
+658	   administrative domain and this document does not define behavior for
+659	   GAAP Claim messages crossing administrative domain boundaries.
+
+661	   GAAP does not require receivers to be GAAP aware.  However, all nodes
+662	   allocating multicast addresses for the same application or group name
+663	   are expected to use GAAP in order for collision detection to operate
+664	   correctly.  GAAP allocated groups and non GAAP allocated groups may
+665	   co-exist in the same network when used by different applications or
+666	   services.  Deployment within a coordinated administrative domain is
+667	   recommended to avoid conflicts between allocation methods.
+
+669	   GAAP defines a method for deriving multicast addresses from group
+670	   names and detecting address allocation conflicts.  Applications use
+671	   the derived multicast addresses for communication.  A group name is
+672	   intended to be shared by, and only by, the participants of a single
+673	   application or session that need to rendezvous on the same group
+674	   address; deployments are responsible for keeping group names unique
+675	   across unrelated applications within their administrative domain, for
+676	   example through a naming convention.  GAAP's collision detection
+677	   mechanism handles the case where two unrelated group names happen to
+678	   hash to the same address, but it cannot detect or prevent two
+679	   unrelated applications from being deliberately or accidentally
+680	   configured with the same group name.  The creation, distribution and
+681	   discovery of group names are application specific functions and are
+682	   outside the scope of this document.
+
+684	   GAAP is stateless in the sense that no node is required to persist
+685	   claim information across restarts, and no node needs to keep a
+686	   complete table of every group name and address in use by other nodes
+687	   in order for the protocol to function; each node only needs to track
+688	   the group names and addresses its own local applications have
+689	   allocated.  The soft state a GAAP node does keep locally (its own
+690	   allocations and their periodic timers) is rebuilt from scratch on
+691	   restart via a new round of Claim messages.  Implementations should
+692	   provide mechanisms for operators to observe this local active-claim
+693	   state and to clear or reset it for operational purposes.
+
+695	   Deployments should include protections against spoofed claims using
+696	   appropriate authentication mechanisms, though specific methods are
+697	   outside the scope of this document.
+
+699	   Implementations may limit the number of records per message and
+700	   should perform basic validation, including detection of duplicate
+701	   multicast address claims.
+
+703	   While strict time synchronization is not required, loosely
+704	   synchronized clocks are recommended to ensure consistent timer
+705	   behavior.
+
+707	   GAAP implementations are expected to follow the UDP usage guidelines
+708	   in [RFC8085].  A sender SHOULD keep a multi-record Claim message
+709	   small enough to avoid IP fragmentation on the path, and SHOULD limit
+710	   the total UDP payload of a Claim message to 1232 octets so that it
+711	   fits within the 1280-octet IPv6 minimum MTU without fragmentation
+712	   (this bounds the number of records per message well below the maximum
+713	   Record Count of 255 when Group Names are long); the UDP checksum MUST
+714	   be enabled and verified, and a receiver MUST validate the Marker and
+715	   message length (the received UDP payload length as reported by the
+716	   UDP header) before further processing a packet, discarding malformed
+717	   packets as described in Section 4.  The periodic and jittered Claim
+718	   timer described in Section 6 already bounds the sending rate of a
+719	   well-behaved node; implementations SHOULD additionally rate-limit
+720	   processing of received Claim messages per source to bound the cost of
+721	   handling a misbehaving or malicious sender (see also Section 8).
+722	   Because GAAP messages are small requests that do not trigger a
+723	   disproportionately large response, and Claim messages are sent to a
+724	   multicast group rather than reflected to a spoofed unicast target,
+725	   GAAP is not expected to be useful as a reflection or amplification
+726	   vector; implementations SHOULD nonetheless avoid generating a
+727	   response larger than the triggering message.  GAAP Claim messages,
+728	   whether for the well-known GAAP Group Address or for application
+729	   group addresses, are intended for delivery within the scope implied
+730	   by the multicast group address used (see Section 9) and
+731	   implementations SHOULD set the IPv4 TTL or IPv6 Hop Limit
+732	   consistently with that scope rather than defaulting to a large value.
+
+734	   The scalability of periodic Claim traffic has not yet been measured
+735	   for deployments with large numbers of GAAP nodes claiming the same
+736	   group name.  Operators of such deployments should monitor Claim
+737	   traffic volume and tune deployment-specific parameters as needed;
+738	   this is expected to be an area of active investigation as operational
+739	   experience with this experimental protocol accumulates.
+
+741	   GAAP requires the underlying network to support IP multicast group
+742	   membership (IGMP/MLD) and ASM-capable multicast routing/forwarding
+743	   (e.g., PIM-SM) for delivery of Claim messages.  Applications using
+744	   GAAP-allocated addresses will typically also rely on ASM delivery for
+745	   their own traffic, though an application with a single known source
+746	   could in principle use PIM-SSM for its own data plane once its
+747	   address has been allocated and claimed via GAAP.  In IPv4 deployments
+748	   using PIM-SM, the Rendezvous Point(s) serving the GAAP Group Address
+749	   and the GAAP IPv4 allocation range need to be configured to support
+750	   the full range described in Section 9, since a GAAP node may allocate
+751	   any address within it.
+
+753	   This document does not define GAAP-specific behavior for inter-AS
+754	   multicast delivery (e.g., use of the RPF Vector [RFC5496]) or for
+755	   delivery over a Multicast VPN [RFC6513] [RFC6514].  GAAP relies
+756	   entirely on the underlying multicast routing and forwarding
+757	   infrastructure for delivery of both Claim messages and application
+758	   traffic.  No GAAP-specific considerations beyond normal multicast
+759	   deployment practice are known for these environments.
+
+761	8.  Security Considerations
+
+763	   It is suggested that the GAAP protocol run over an encrypted
+764	   multicast channel, particularly on networks where GAAP traffic could
+765	   be observed or injected by untrusted parties.  This document does not
+766	   define a mandatory-to-implement encryption mechanism.  Deployments
+767	   that enable encryption need to agree out of band on a common
+768	   mechanism and key management procedure, which could be difficult in
+769	   embedded devices with different configurations.  The message Marker
+770	   is always sent in cleartext as 0xAAAAAAAA (see Section 4) and is used
+771	   by the receiver to identify the packet as GAAP before determining
+772	   whether the following record data is encrypted.  If the receiver has
+773	   a shared key configured and the decrypted record data is not well-
+774	   formed, or the receiver has no shared key or the wrong shared key for
+775	   an encrypted message, the message MUST be dropped.
+
+777	   An open-source GAAP implementation exists where ChaCha20 [RFC7539] is
+778	   used to encrypt GAAP messages.  Deployments choosing an encryption
+779	   mechanism SHOULD prefer an Authenticated Encryption with Associated
+780	   Data (AEAD) construction such as ChaCha20-Poly1305 [RFC8439], which
+781	   additionally authenticates the message, over ChaCha20 alone.  The
+782	   implementation's key management procedure is a simple shared key that
+783	   is configured with the application.
+
+785	   Deployments enabling encryption MUST use a mechanism that provides
+786	   both confidentiality and integrity, such as an AEAD construction
+787	   (e.g., ChaCha20-Poly1305); using ChaCha20 without a message
+788	   authentication code is NOT RECOMMENDED, since the Marker functions
+789	   only as a format check and not as an integrity check.
+790	   Implementations MUST ensure nonce uniqueness per key across all
+791	   senders sharing that key.  A receiver configured with a shared key
+792	   MUST reject an unencrypted Claim message rather than process it, to
+793	   prevent downgrade to the unauthenticated base mode.  This document
+794	   does not specify a nonce construction or associated data binding
+795	   scheme, these are implementation and deployment responsibilities when
+796	   encryption is enabled.
+
+798	   Dynamic rekeying mechanisms are outside the scope of this document.
+799	   However, GAAP can operate with external key management systems,
+800	   including automated or Dynamic Key Management (DKM) solutions.  In
+801	   the absence of such mechanisms, keys may be provisioned manually.
+
+803	   The base (unauthenticated, unencrypted) mode of GAAP offers no
+804	   protection against an on-network attacker and is suitable only for
+805	   deployment within a trusted domain where all participants are assumed
+806	   non-malicious.  When GAAP is deployed with out-of-band pre-shared
+807	   keys and encryption, an attacker without the shared key cannot forge,
+808	   replay-with-modification or selectively spoof Claim messages.  This
+809	   substantially mitigates the denial-of-allocation, timestamp-spoofing
+810	   and bad-actor-list-poisoning threats.  This does not protect against
+811	   an authorized, keyed participant that behaves maliciously.
+
+813	   Encryption alone does not protect against a legitimate, keyed GAAP
+814	   node behaving badly.  The message validation, per-source rate
+815	   limiting, and duplicate-detection guidance in Section 7 apply
+816	   regardless of whether encryption is in use, and the following attack
+817	   threats may exist with possible mitigation techniques:
+
+819	   *  Even when an encrypted channel is used, a bad actor could be
+820	      claiming a group address not derived from one of the group name
+821	      inputs used for the Acceptable Group Hash List (see Definition of
+822	      Terms section).  Cooperating nodes should ignore such messages and
+823	      not try to send Claim messages to correct the bad actor node.
+824	      Note that a bad actor can spoof the source address of another
+825	      node's Claim message, so source-address based mitigations are
+826	      best-effort.  Implementations SHOULD bound the size of the bad-
+827	      actor list and treat entries as advisory hints rather than
+828	      authoritative state, since source addresses in Claim messages can
+829	      be spoofed.
+
+831	   *  A bad actor could send an invalid timestamp giving it tie-breaking
+832	      priority when a group address collision occurs.  If the group
+833	      address has been prior claimed by another node with a timestamp
+834	      earlier than the invalid timestamp, cooperating nodes should put
+835	      the bad actor node on a bad-actor list and ignore future messages
+836	      from it.  A Timestamp that appears to be more than a small,
+837	      locally configured skew allowance ahead of, or behind, the
+838	      receiver's own clock SHOULD be treated with the same tie-breaking
+839	      rule as an equal timestamp rather than assumed to win or lose
+840	      outright, since it may result from a misconfigured or
+841	      unsynchronized clock, including a clock that has not yet been set
+842	      after boot, which typically reads a value far in the past or at
+843	      zero and would otherwise win every collision it is party to.
+
+845	   *  A bad actor could send messages too often and is not adhering to
+846	      the random delay or periodic timer procedures in this document.
+847	      When this occurs, cooperating nodes should start ignoring messages
+848	      from the bad actor node and not reset or cancel timers, or send
+849	      triggered Claim messages
+
+851	9.  IANA Considerations
+
+853	   IANA is requested to make the following assignments in existing
+854	   registries:
+
+856	9.1.  GAAP UDP Port Numbers
+
+858	   IANA will create one UDP port number for the GAAP protocol,
+859	   registered per the Service Name and Transport Protocol Port Number
+860	   Registry guidance in [RFC6335]:
+
+862	   +=======+======+=========+==============+========+=======+=========+
+863	   |Service|Port  |Transport| Description  |Assignee|Contact|Reference|
+864	   |Name   |Number|Protocol |              |        |       |         |
+865	   +=======+======+=========+==============+========+=======+=========+
+866	   |gaap   |TBD   |udp      | GAAP Control |IESG    |IETF   |draft-   |
+867	   |       |      |         | Packets      |        |Chair  |ietf-pim-|
+868	   |       |      |         |              |        |       |gaap     |
+869	   +-------+------+---------+--------------+--------+-------+---------+
+
+871	                                 Table 1
+
+873	9.2.  GAAP Protocol Multicast Addresses
+
+875	   IANA will create one multicast address from the IPv4 Internetwork
+876	   Control Block 224.0.1.x [RFC5771] and one multicast address from the
+877	   IPv6 Variable Scope Multicast Addresses Block FF0X::TBD for the
+878	   operation of the GAAP protocol.  The registry description field
+879	   should indicate "GAAP".  GAAP control messages sent to these
+880	   addresses are intended to reach all GAAP nodes within an
+881	   administrative domain rather than being confined to a single link;
+882	   consistent with that, the IPv4 address comes from the Internetwork
+883	   Control Block rather than the Local Network Control Block, and
+884	   implementations MUST use an admin-local or organization-local IPv6
+885	   scope (not link-local scope) when selecting the scope value X for the
+886	   IPv6 address, so that control messages can be forwarded beyond a
+887	   single link when the deployment requires it.
+
+889	9.3.  GAAP Multicast Group Allocation Ranges
+
+891	   IANA will create two multicast address ranges for the GAAP protocol
+892	   to allocate application-use addresses from.  For IPv4, a /10 block in
+893	   a new registry range is requested.  The size follows from the hash-
+894	   based allocation model in Section 6: a larger host portion within the
+895	   block, combined with the up to 4 candidate addresses per group name
+896	   (see "Acceptable Group Hash List" in Section 2), keeps collisions
+897	   infrequent enough that a GAAP node rarely needs to fall back past its
+898	   first candidate address.  As the draft has previously noted, because
+899	   a /10 is nonetheless a large portion of the IPv4 multicast space,
+900	   this size warrants specific attention from IETF and IANA before
+901	   allocation, and the WG welcomes further discussion of the appropriate
+902	   block size, including analysis of collision probability at expected
+903	   deployment scales.  For IPv6, a /32 block in a new registry range is
+904	   being requested, sized to match the 32-bit Group ID used directly in
+905	   the hash-based derivation in Section 6; the larger IPv6 multicast
+906	   address space makes collision probability far less of a concern than
+907	   for IPv4.  This allocation MUST come from the Dynamic Multicast Group
+908	   IDs registry defined in
+909	   [I-D.ietf-pim-updt-ipv6-dyn-mcast-addr-grp-id], and publication of
+910	   this document as an RFC is dependent on that registry existing; see
+911	   the Normative References.
+
+913	           Registry Name: GAAP IPv4 Allocation Range
+914	           Registration Procedure: IETF Review
+
+916	           Registry Name: GAAP IPv6 Allocation Range
+917	           Registration Procedure: IETF Review
+
+919	   For IPv6 multicast addresses, the GAAP application allocation range
+920	   should be in the new "Dynamic Multicast Group IDs" registry requested
+921	   by [I-D.ietf-pim-updt-ipv6-dyn-mcast-addr-grp-id].  This new registry
+922	   requests the division of the 32-bit group ID range 0xA0000000 through
+923	   0xAFFFFFFF.  The GAAP allocation range should come out of this 32-bit
+924	   range.
+
+926	10.  References
+
+928	10.1.  Normative References
+
+930	   [I-D.ietf-pim-updt-ipv6-dyn-mcast-addr-grp-id]
+931	              Karstens, N., Farinacci, D., and M. McBride, "Updates to
+932	              Dynamic IPv6 Multicast Address Group IDs", Work in
+933	              Progress, Internet-Draft, draft-ietf-pim-updt-ipv6-dyn-
+934	              mcast-addr-grp-id-13, 10 March 2026,
+935	              <https://datatracker.ietf.org/doc/html/draft-ietf-pim-
+936	              updt-ipv6-dyn-mcast-addr-grp-id-13>.
+
+938	   [RFC0020]  Cerf, V., "ASCII format for network interchange", STD 80,
+939	              RFC 20, DOI 10.17487/RFC20, October 1969,
+940	              <https://www.rfc-editor.org/info/rfc20>.
+
+942	   [RFC1112]  Deering, S., "Host extensions for IP multicasting", STD 5,
+943	              RFC 1112, DOI 10.17487/RFC1112, August 1989,
+944	              <https://www.rfc-editor.org/info/rfc1112>.
+
+946	   [RFC1982]  Elz, R. and R. Bush, "Serial Number Arithmetic", RFC 1982,
+947	              DOI 10.17487/RFC1982, August 1996,
+948	              <https://www.rfc-editor.org/info/rfc1982>.
+
+950	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+951	              Requirement Levels", BCP 14, RFC 2119,
+952	              DOI 10.17487/RFC2119, March 1997,
+953	              <https://www.rfc-editor.org/info/rfc2119>.
+
+955	   [RFC4291]  Hinden, R. and S. Deering, "IP Version 6 Addressing
+956	              Architecture", RFC 4291, DOI 10.17487/RFC4291, February
+957	              2006, <https://www.rfc-editor.org/info/rfc4291>.
+
+959	   [RFC5771]  Cotton, M., Vegoda, L., and D. Meyer, "IANA Guidelines for
+960	              IPv4 Multicast Address Assignments", BCP 51, RFC 5771,
+961	              DOI 10.17487/RFC5771, March 2010,
+962	              <https://www.rfc-editor.org/info/rfc5771>.
+
+964	   [RFC6234]  Eastlake 3rd, D. and T. Hansen, "US Secure Hash Algorithms
+965	              (SHA and SHA-based HMAC and HKDF)", RFC 6234,
+966	              DOI 10.17487/RFC6234, May 2011,
+967	              <https://www.rfc-editor.org/info/rfc6234>.
+
+969	   [RFC6335]  Cotton, M., Eggert, L., Touch, J., Westerlund, M., and S.
+970	              Cheshire, "Internet Assigned Numbers Authority (IANA)
+971	              Procedures for the Management of the Service Name and
+972	              Transport Protocol Port Number Registry", BCP 165,
+973	              RFC 6335, DOI 10.17487/RFC6335, August 2011,
+974	              <https://www.rfc-editor.org/info/rfc6335>.
+
+976	   [RFC8085]  Eggert, L., Fairhurst, G., and G. Shepherd, "UDP Usage
+977	              Guidelines", BCP 145, RFC 8085, DOI 10.17487/RFC8085,
+978	              March 2017, <https://www.rfc-editor.org/info/rfc8085>.
+
+980	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+981	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+982	              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+984	10.2.  Informative References
+
+986	   [I-D.ietf-pim-zeroconf-mcast-addr-alloc-ps]
+987	              Karstens, N., Farinacci, D., and M. McBride, "Zeroconf
+988	              Multicast Address Allocation Problem Statement and
+989	              Requirements", Work in Progress, Internet-Draft, draft-
+990	              ietf-pim-zeroconf-mcast-addr-alloc-ps-13, 17 February
+991	              2026, <https://datatracker.ietf.org/doc/html/draft-ietf-
+992	              pim-zeroconf-mcast-addr-alloc-ps-13>.
+
+994	   [RFC2464]  Crawford, M., "Transmission of IPv6 Packets over Ethernet
+995	              Networks", RFC 2464, DOI 10.17487/RFC2464, December 1998,
+996	              <https://www.rfc-editor.org/info/rfc2464>.
+
+998	   [RFC2730]  Hanna, S., Patel, B., and M. Shah, "Multicast Address
+999	              Dynamic Client Allocation Protocol (MADCAP)", RFC 2730,
+1000	              DOI 10.17487/RFC2730, December 1999,
+1001	              <https://www.rfc-editor.org/info/rfc2730>.
+
+1003	   [RFC2909]  Radoslavov, P., Estrin, D., Govindan, R., Handley, M.,
+1004	              Kumar, S., and D. Thaler, "The Multicast Address-Set Claim
+1005	              (MASC) Protocol", RFC 2909, DOI 10.17487/RFC2909,
+1006	              September 2000, <https://www.rfc-editor.org/info/rfc2909>.
+
+1008	   [RFC2974]  Handley, M., Perkins, C., and E. Whelan, "Session
+1009	              Announcement Protocol", RFC 2974, DOI 10.17487/RFC2974,
+1010	              October 2000, <https://www.rfc-editor.org/info/rfc2974>.
+
+1012	   [RFC3307]  Haberman, B., "Allocation Guidelines for IPv6 Multicast
+1013	              Addresses", RFC 3307, DOI 10.17487/RFC3307, September
+1014	              2002, <https://www.rfc-editor.org/info/rfc3307>.
+
+1016	   [RFC4566]  Handley, M., Jacobson, V., and C. Perkins, "SDP: Session
+1017	              Description Protocol", RFC 4566, DOI 10.17487/RFC4566,
+1018	              July 2006, <https://www.rfc-editor.org/info/rfc4566>.
+
+1020	   [RFC5496]  Wijnands, IJ., Boers, A., and E. Rosen, "The Reverse Path
+1021	              Forwarding (RPF) Vector TLV", RFC 5496,
+1022	              DOI 10.17487/RFC5496, March 2009,
+1023	              <https://www.rfc-editor.org/info/rfc5496>.
+
+1025	   [RFC6513]  Rosen, E., Ed. and R. Aggarwal, Ed., "Multicast in MPLS/
+1026	              BGP IP VPNs", RFC 6513, DOI 10.17487/RFC6513, February
+1027	              2012, <https://www.rfc-editor.org/info/rfc6513>.
+
+1029	   [RFC6514]  Aggarwal, R., Rosen, E., Morin, T., and Y. Rekhter, "BGP
+1030	              Encodings and Procedures for Multicast in MPLS/BGP IP
+1031	              VPNs", RFC 6514, DOI 10.17487/RFC6514, February 2012,
+1032	              <https://www.rfc-editor.org/info/rfc6514>.
+
+1034	   [RFC6762]  Cheshire, S. and M. Krochmal, "Multicast DNS", RFC 6762,
+1035	              DOI 10.17487/RFC6762, February 2013,
+1036	              <https://www.rfc-editor.org/info/rfc6762>.
+
+1038	   [RFC7539]  Nir, Y. and A. Langley, "ChaCha20 and Poly1305 for IETF
+1039	              Protocols", RFC 7539, DOI 10.17487/RFC7539, May 2015,
+1040	              <https://www.rfc-editor.org/info/rfc7539>.
+
+1042	   [RFC8439]  Nir, Y. and A. Langley, "ChaCha20 and Poly1305 for IETF
+1043	              Protocols", RFC 8439, DOI 10.17487/RFC8439, June 2018,
+1044	              <https://www.rfc-editor.org/info/rfc8439>.
+
+1046	   [RFC10019] Karstens, N., Farinacci, D., and M. McBride, "Zeroconf
+1047	              Multicast Address Allocation Problem Statement and
+1048	              Requirements", RFC 10019, DOI 10.17487/RFC10019, July
+1049	              2026, <https://www.rfc-editor.org/info/rfc10019>.
+
+1051	Appendix A.  Acknowledgments
+
+1053	   The authors would like to thank the following people for their
+1054	   motivation to start this draft.  They include Chris Hopps, Acee
+1055	   Lindem, David Lamparter, Jeff Tantsura, Nate Karstens, and Lenny
+1056	   Giuliano.  And thank you to Gunter Van de Velde for the extensive
+1057	   review prior to publication.
+
+1059	Appendix B.  Document Change Log
+
+1061	   Note to the RFC Editor: please remove this appendix before
+1062	   publication as an RFC.
+
+1064	B.1.  Changes to draft-ietf-pim-gaap-20
+
+1066	   *  Submitted August 2026.
+
+1068	   *  Rewrote parts of the Security Considerations section per secdir by
+1069	      Tim Hollebeek.  Also included a new deployment paragraph per Bo
+1070	      Wu's review.
+
+1072	   *  Changes made by Mike.
+
+1074	B.2.  Changes to draft-ietf-pim-gaap-19
+
+1076	   *  Submitted August 2026.
+
+1078	   *  Addressed many comments from Tommy, Sasha and Bo Wu as part of the
+1079	      tsvart, rtgdir and opsdir last call reviews.
+
+1081	   *  Changes made by Mike.
+
+1083	B.3.  Changes to draft-ietf-pim-gaap-18
+
+1085	   *  Submitted July 2026.
+
+1087	   *  Addressed review comments from Gunter Van de Velde.  Major
+1088	      changes: aligned the IPv4 address pseudocode with the requested
+1089	      /10 allocation; clarified that GAAP's collision detection is
+1090	      network-layer only; softened the encryption interoperability claim
+1091	      and recommended ChaCha20-Poly1305 [RFC8439] as a stronger
+1092	      alternative; made the dependency on draft-ietf-pim-updt-ipv6-dyn-
+1093	      mcast-addr-grp-id normative; added UDP usage guidance per RFC8085.
+1094	      Minor clarifications: distinguished the GAAP protocol address from
+1095	      the application allocation range; defined multi-record parsing
+1096	      rules and a Timestamp comparison/tie-breaking rule; removed the
+1097	      RFC8536 timestamp reference; marked the GAAP API as illustrative;
+1098	      fully specified the IPv6 address format; clarified the claim/
+1099	      response wait window, per-group-address suppression, and the new-
+1100	      node collision state machine; clarified that address release is
+1101	      local-only; clarified group-name uniqueness scope and GAAP's soft-
+1102	      state model; and aligned the IANA UDP port and multicast address
+1103	      requests with RFC6335 and RFC5771 guidance.
+
+1105	   *  Changes made by Mike.
+
+1107	B.4.  Changes to draft-ietf-pim-gaap-17
+
+1109	   *  Submitted June 2026.
+
+1111	   *  Addressed comments from Stig clarifying IANA requests, adding a
+1112	      paragraph on why GAAP is Experimental and wrapping code in CODE
+1113	      BEGINS/ENDS.
+
+1115	   *  Changes made by Mike.
+
+1117	B.5.  Changes to draft-ietf-pim-gaap-16
+
+1119	   *  Submitted June 2026.
+
+1121	   *  Addressed comments from Stig involving adding a boilerplate, new
+1122	      normative references and changing a few musts to MUST.
+
+1124	   *  Changes made by Mike.
+
+1126	B.6.  Changes to draft-ietf-pim-gaap-15
+
+1128	   *  Submitted April 2026.
+
+1130	   *  Addressed comments from the IntDir review by Sheng Jiang.
+
+1132	   *  Changes made by Mike.
+
+1134	B.7.  Changes to draft-ietf-pim-gaap-14
+
+1136	   *  Submitted April 2026.
+
+1138	   *  Clarified statements in the Operational Considerations section.
+
+1140	   *  Changes made by Mike.
+
+1142	B.8.  Changes to draft-ietf-pim-gaap-13
+
+1144	   *  Submitted April 2026.
+
+1146	   *  Created a new Operational Considerations section to reflect
+1147	      comments from Med.
+
+1149	   *  Changes made by Mike.
+
+1151	B.9.  Changes to draft-ietf-pim-gaap-12
+
+1153	   *  Submitted March 2026.
+
+1155	   *  Made changes to reflect Sandy comments about clarifying how
+1156	      multiple group names could cause collisions as well as clarifying
+1157	      text about encryption.
+
+1159	   *  Changes made by Dino.
+
+1161	B.10.  Changes to draft-ietf-pim-gaap-11
+
+1163	   *  Submitted March 2026.
+
+1165	   *  Change IANA request for an IPv4 multicast block from /8 to /10.
+
+1167	   *  Changes made by Dino.
+
+1169	B.11.  Changes to draft-ietf-pim-gaap-10
+
+1171	   *  Submitted February 2026.
+
+1173	   *  Incorporated suggestion from Toerless Eckert to add paragraph
+1174	      discussing SAP and SDP approaches to multicast group allocation in
+1175	      the Introduction section.
+
+1177	   *  Added references to RFC2974 (SAP) and RFC4566 (SDP).
+
+1179	   *  Changes made by Dino.
+
+1181	B.12.  Changes to draft-ietf-pim-gaap-09
+
+1183	   *  Submitted February 2026.
+
+1185	   *  Be more clear about variable length group names and how subsequent
+1186	      records may not be aligned.
+
+1188	   *  Changes made by Dino.
+
+1190	B.13.  Changes to draft-ietf-pim-gaap-08
+
+1192	   *  Submitted February 2026.
+
+1194	   *  Incorporated WG review comments from Stig Venaas on GAAP Group
+1195	      Address definition, Timestamp field documentation, encryption
+1196	      interoperability requirements, and IANA allocation discussion.
+
+1198	   *  Changes made by Dino.
+
+1200	B.14.  Changes to draft-ietf-pim-gaap-07
+
+1202	   *  Submitted January 2026.
+
+1204	   *  Change draft name in IANA considerations section to point to the
+1205	      IETF draft name and not the individual contribution draft name.
+
+1207	   *  Changes made by Dino.
+
+1209	B.15.  Changes to draft-ietf-pim-gaap-06
+
+1211	   *  Submitted September 2025.
+
+1213	   *  Dino fixes Kasten reference.
+
+1215	B.16.  Changes to draft-ietf-pim-gaap-05
+
+1217	   *  Submitted September 2025.
+
+1219	   *  Mike adds one-liner to abstract.
+
+1221	B.17.  Changes to draft-ietf-pim-gaap-04
+
+1223	   *  Submitted August 2025.
+
+1225	   *  Fix some typos in the GAAP API section.
+
+1227	B.18.  Changes to draft-ietf-pim-gaap-03
+
+1229	   *  Submitted February 2025.
+
+1231	   *  Fix some typos in the GAAP API section.
+
+1233	   *  Update references and docuemnt timer.
+
+1235	B.19.  Changes to draft-ietf-pim-gaap-02
+
+1237	   *  Submitted September 2024.
+
+1239	   *  Update references and docuemnt timer.
+
+1241	B.20.  Changes to draft-ietf-pim-gaap-01
+
+1243	   *  Submitted April 2024.
+
+1245	   *  Update references and docuemnt timer.
+
+1247	B.21.  Changes to draft-ietf-pim-gaap-00
+
+1249	   *  Submitted October 2023.
+
+1251	   *  Made draft-farinacci-pim-gaap-06 into WG document per PIM WG
+1252	      consensus.
+
+1254	B.22.  Changes to draft-farinacci-pim-gaap-06
+
+1256	   *  Submitted September 2023.
+
+1258	   *  Fix Nate last name misspelling.
+
+1260	   *  Add reference to [I-D.ietf-pim-zeroconf-mcast-addr-alloc-ps] to
+1261	      intro section.
+
+1263	   *  In the IANA Considerations, add IPv6 allocation for GAAP in the
+1264	      0xA0000000-0xAFFFFFFF range, as suggested by Nate.
+
+1266	B.23.  Changes to draft-farinacci-pim-gaap-05
+
+1268	   *  Submitted August 2023.
+
+1270	   *  Update IANA Considerations section to have IPv6 GAAP application
+1271	      allocations come from the registry that
+1272	      [I-D.ietf-pim-updt-ipv6-dyn-mcast-addr-grp-id] is creating.
+
+1274	B.24.  Changes to draft-farinacci-pim-gaap-04
+
+1276	   *  Submitted April 2023.
+
+1278	   *  Added specific text recommended by IANA in the IANA Considerations
+1279	      section.
+
+1281	B.25.  Changes to draft-farinacci-pim-gaap-03
+
+1283	   *  Submitted April 2023.
+
+1285	   *  Changes to reflect comments from PIM and MBONED WG meetings.
+
+1287	   *  Put IANA Considerations requests in standard request format.
+
+1289	B.26.  Changes to draft-farinacci-pim-gaap-02
+
+1291	   *  Submitted March 2023.
+
+1293	   *  Fix typos and grammer.
+
+1295	B.27.  Changes to draft-farinacci-pim-gaap-01
+
+1297	   *  Submitted February 2023.
+
+1299	   *  Updated spec to reflect implementation.
+
+1301	   *  Add Marker in message format.
+
+1303	   *  Add definition for the Acceptable Group Hash List.
+
+1305	   *  Discuss security threats and possible mitigation methods.
+
+1307	B.28.  Changes to draft-farinacci-pim-gaap-00
+
+1309	   *  Initial posting November 2022.
+
+1311	Authors' Addresses
+
+1313	   Dino Farinacci
+1314	   lispers.net
+1315	   San Jose, CA
+1316	   United States of America
+1317	   Email: farinacci@gmail.com
+
+1319	   Mike McBride
+1320	   Futurewei
+1321	   Santa Clara, CA
+1322	   United States of America
+1323	   Email: mmcbride7@gmail.com
+
+
+
+
+
+
+
+
+
