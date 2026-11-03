@@ -1,0 +1,2627 @@
+idnits 2.17.1 
+
+draft-ietf-cbor-serialization-12.txt:
+-(241): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(260): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(548): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(811): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(1006): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(1188): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(1206): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(1208): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(1287): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(1617): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(1786): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(2025): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+-(2072): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+  == There are 36 instances of lines with non-ascii characters in the
+     document.
+
+
+  Checking nits according to https://www.ietf.org/id-info/checklist :
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Miscellaneous warnings:
+  ----------------------------------------------------------------------------
+
+  -- The document date (30 October 2026) is 4 days in the past.  Is this
+     intentional?
+
+  -- Found something which looks like a code comment -- if you have code
+     sections in the document, please surround them with '<CODE BEGINS>' and
+     '<CODE ENDS>' lines.
+
+
+  Checking references for intended status: Proposed Standard
+  ----------------------------------------------------------------------------
+
+     (See RFCs 3967 and 4897 for information about using normative references
+     to lower-maturity documents in RFCs)
+
+  -- Looks like a reference, but probably isn't: '1' on line 279
+
+  -- Looks like a reference, but probably isn't: '2' on line 279
+
+  -- Possible downref: Non-RFC (?) normative reference: ref. 'IEEE754'
+
+  -- Obsolete informational reference (is this intentional?): RFC 7049
+     (Obsoleted by RFC 8949)
+
+
+     Summary: 0 errors (**), 0 flaws (~~), 1 warning (==), 6 comments (--).
+
+     Run idnits with the --verbose option for more detailed information about
+     the items above.
+
+--------------------------------------------------------------------------------
+
+
+2	CBOR                                                        L. Lundblade
+3	Internet-Draft                                       Security Theory LLC
+4	Updates: 8949 (if approved)                              30 October 2026
+5	Intended status: Standards Track
+6	Expires: 3 May 2027
+
+8	                   CBOR Serialization and Determinism
+9	                    draft-ietf-cbor-serialization-12
+
+11	Abstract
+
+13	   RFC 8949 defines CBOR, a standard for serializing data types such as
+14	   integers, strings, and arrays into encoded bytes.  CBOR serialization
+15	   is flexible, allowing data types to be encoded in multiple ways to
+16	   accommodate deployment in constrained environments.  This document
+17	   normatively defines one particular serialization, called "preferred-
+18	   plus serialization," that is suitable for the majority of CBOR-based
+19	   protocols.  Protocol designers and implementers who choose it need
+20	   not understand or specify serialization details themselves.  This
+21	   document also normatively defines a deterministic serialization.
+22	   These serializations are largely compatible with those widely
+23	   implemented by the CBOR community.
+
+25	   This document updates RFC 8949 with a new rule that limits how new
+26	   tag definitions can affect the CBOR data model.
+
+28	   This document provides clarifications to RFC 8949 regarding bignums
+29	   and floating-point NaN handling, along with general background
+30	   information on serialization, determinism, and CBOR byte-string
+31	   wrapping.
+
+33	About This Document
+
+35	   This note is to be removed before publishing as an RFC.
+
+37	   Status information for this document may be found at
+38	   https://datatracker.ietf.org/doc/draft-ietf-cbor-serialization/.
+
+40	   Discussion of this document takes place on the CBOR Working Group
+41	   mailing list (mailto:cbor@ietf.org), which is archived at
+42	   https://mailarchive.ietf.org/arch/browse/cbor/.  Subscribe at
+43	   https://www.ietf.org/mailman/listinfo/cbor/.
+
+45	   Source for this draft and an issue tracker can be found at
+46	   https://github.com/cbor-wg/draft-ietf-cbor-serialization.
+
+48	Status of This Memo
+
+50	   This Internet-Draft is submitted in full conformance with the
+51	   provisions of BCP 78 and BCP 79.
+
+53	   Internet-Drafts are working documents of the Internet Engineering
+54	   Task Force (IETF).  Note that other groups may also distribute
+55	   working documents as Internet-Drafts.  The list of current Internet-
+56	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+58	   Internet-Drafts are draft documents valid for a maximum of six months
+59	   and may be updated, replaced, or obsoleted by other documents at any
+60	   time.  It is inappropriate to use Internet-Drafts as reference
+61	   material or to cite them other than as "work in progress."
+
+63	   This Internet-Draft will expire on 3 May 2027.
+
+65	Copyright Notice
+
+67	   Copyright (c) 2026 IETF Trust and the persons identified as the
+68	   document authors.  All rights reserved.
+
+70	   This document is subject to BCP 78 and the IETF Trust's Legal
+71	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+72	   license-info) in effect on the date of publication of this document.
+73	   Please review these documents carefully, as they describe your rights
+74	   and restrictions with respect to this document.  Code Components
+75	   extracted from this document must include Revised BSD License text as
+76	   described in Section 4.e of the Trust Legal Provisions and are
+77	   provided without warranty as described in the Revised BSD License.
+
+79	Table of Contents
+
+81	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   4
+82	     1.1.  Information Model, Data Model and Serialization . . . . .   4
+83	     1.2.  Flexible Serialization  . . . . . . . . . . . . . . . . .   5
+84	       1.2.1.  Interoperability  . . . . . . . . . . . . . . . . . .   6
+85	       1.2.2.  Determinism . . . . . . . . . . . . . . . . . . . . .   7
+86	     1.3.  Unspecified Serialization . . . . . . . . . . . . . . . .   7
+87	     1.4.  Relation to RFC 8949  . . . . . . . . . . . . . . . . . .   8
+88	       1.4.1.  Serialization . . . . . . . . . . . . . . . . . . . .   8
+89	       1.4.2.  Tags and Data Models  . . . . . . . . . . . . . . . .   8
+90	     1.5.  Conventions and Definitions . . . . . . . . . . . . . . .   8
+91	   2.  Recommendations Summary . . . . . . . . . . . . . . . . . . .   8
+92	     2.1.  Protocol Specifications . . . . . . . . . . . . . . . . .   8
+93	       2.1.1.  Framework Protocols . . . . . . . . . . . . . . . . .   9
+94	       2.1.2.  End-to-End Protocols  . . . . . . . . . . . . . . . .   9
+95	     2.2.  Libraries . . . . . . . . . . . . . . . . . . . . . . . .  10
+96	       2.2.1.  CBOR Libraries  . . . . . . . . . . . . . . . . . . .  10
+97	       2.2.2.  Libraries for Framework Protocols . . . . . . . . . .  11
+98	       2.2.3.  Libraries for End-to-End Protocols  . . . . . . . . .  11
+99	   3.  General Serialization . . . . . . . . . . . . . . . . . . . .  12
+100	     3.1.  Default Serialization . . . . . . . . . . . . . . . . . .  12
+101	     3.2.  When To Use General Serialization . . . . . . . . . . . .  13
+102	   4.  Preferred-Plus Serialization  . . . . . . . . . . . . . . . .  13
+103	     4.1.  Encoder Requirements  . . . . . . . . . . . . . . . . . .  14
+104	     4.2.  Decoder Requirements  . . . . . . . . . . . . . . . . . .  15
+105	     4.3.  When to use preferred-plus serialization  . . . . . . . .  16
+106	     4.4.  Relation To Preferred Serialization . . . . . . . . . . .  17
+107	   5.  Deterministic Serialization . . . . . . . . . . . . . . . . .  18
+108	     5.1.  Encoder Requirements  . . . . . . . . . . . . . . . . . .  18
+109	     5.2.  Decoder Requirements  . . . . . . . . . . . . . . . . . .  18
+110	     5.3.  When to use Deterministic Serialization . . . . . . . . .  18
+111	       5.3.1.  Not Commonly Needed for Hashing and Signing . . . . .  18
+112	       5.3.2.  Decoding Deterministic Serialization and Relation to
+113	               Preferred-Plus Serialization  . . . . . . . . . . . .  19
+114	     5.4.  Map Ordering  . . . . . . . . . . . . . . . . . . . . . .  19
+115	       5.4.1.  Ordering at the Serialization Layer . . . . . . . . .  19
+116	       5.4.2.  Ordering at the Data Model Layer  . . . . . . . . . .  20
+117	   6.  Special Serializations  . . . . . . . . . . . . . . . . . . .  20
+118	   7.  New Tag Data Model Rule . . . . . . . . . . . . . . . . . . .  21
+119	   8.  CDDL Serialization Control Operator . . . . . . . . . . . . .  22
+120	   9.  Security Considerations . . . . . . . . . . . . . . . . . . .  22
+121	     9.1.  Covert Channel  . . . . . . . . . . . . . . . . . . . . .  22
+122	   10. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  23
+123	   11. References  . . . . . . . . . . . . . . . . . . . . . . . . .  24
+124	     11.1.  Normative References . . . . . . . . . . . . . . . . . .  24
+125	     11.2.  Informative References . . . . . . . . . . . . . . . . .  24
+126	   Appendix A.  Specifying a Fully Deterministic Protocol  . . . . .  26
+127	     A.1.  Protocol Data Definition  . . . . . . . . . . . . . . . .  26
+128	     A.2.  Text Strings and Unicode  . . . . . . . . . . . . . . . .  27
+129	     A.3.  CBOR Tags . . . . . . . . . . . . . . . . . . . . . . . .  27
+130	   Appendix B.  IEEE 754 NaN . . . . . . . . . . . . . . . . . . . .  27
+131	     B.1.  Basics  . . . . . . . . . . . . . . . . . . . . . . . . .  27
+132	     B.2.  Implementation Support for Non-Trivial NaNs . . . . . . .  28
+133	     B.3.  Use and Non-use for Non-Trivial NaNs  . . . . . . . . . .  29
+134	     B.4.  Clarification of RFC 8949 . . . . . . . . . . . . . . . .  30
+135	     B.5.  Divergence from RFC 8949  . . . . . . . . . . . . . . . .  31
+136	     B.6.  Recommendations for Use of Non-Trivial NaNs . . . . . . .  32
+137	   Appendix C.  Code for Encoding Preferred-Plus Floating-Point
+138	           Values  . . . . . . . . . . . . . . . . . . . . . . . . .  32
+139	   Appendix D.  Bignums and the CBOR Data Model  . . . . . . . . . .  36
+140	   Appendix E.  CDDL for Bignums . . . . . . . . . . . . . . . . . .  37
+141	   Appendix F.  Bignum Implementation Strategies . . . . . . . . . .  37
+142	   Appendix G.  Serialization Checking . . . . . . . . . . . . . . .  38
+143	     G.1.  Serialization Checking Use Cases  . . . . . . . . . . . .  38
+144	     G.2.  Bignum Leading Zero Exception . . . . . . . . . . . . . .  39
+145	   Appendix H.  CBOR Byte String Wrapping  . . . . . . . . . . . . .  40
+146	     H.1.  Purpose . . . . . . . . . . . . . . . . . . . . . . . . .  40
+147	     H.2.  Wrapping Recommendations  . . . . . . . . . . . . . . . .  40
+148	     H.3.  CBOR Library Implementation Suggestion  . . . . . . . . .  41
+149	   Appendix I.  Signing and Hashing Encoded CBOR . . . . . . . . . .  41
+150	   Appendix J.  Serialization for COSE . . . . . . . . . . . . . . .  42
+151	     J.1.  COSE Payload Serialization  . . . . . . . . . . . . . . .  43
+152	     J.2.  COSE Sig_structure  . . . . . . . . . . . . . . . . . . .  43
+153	     J.3.  The Encoded Message . . . . . . . . . . . . . . . . . . .  44
+154	   Appendix K.  Examples . . . . . . . . . . . . . . . . . . . . . .  45
+155	     K.1.  Use for Testing . . . . . . . . . . . . . . . . . . . . .  45
+156	       K.1.1.  Encode Test . . . . . . . . . . . . . . . . . . . . .  46
+157	       K.1.2.  Decode Test . . . . . . . . . . . . . . . . . . . . .  46
+158	       K.1.3.  Checking Decoder Test . . . . . . . . . . . . . . . .  46
+159	       K.1.4.  Non-Checking Decoder Test . . . . . . . . . . . . . .  47
+160	     K.2.  Example Data Items  . . . . . . . . . . . . . . . . . . .  47
+161	   Contributors  . . . . . . . . . . . . . . . . . . . . . . . . . .  56
+162	   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  56
+
+164	1.  Introduction
+
+166	1.1.  Information Model, Data Model and Serialization
+
+168	   To understand CBOR serialization and determinism, it's helpful to
+169	   distinguish between the general concepts of an information model, a
+170	   data model, and serialization.  These are broad concepts that can be
+171	   applied to other serialization schemes like JSON and ASN.1.
+
+173	   +================+=============+===================+================+
+174	   |                | Information | Data Model        | Serialization  |
+175	   |                | Model       |                   |                |
+176	   +================+=============+===================+================+
+177	   | Abstraction    | Top level;  | Realization of    | Actual bytes   |
+178	   | Level          | conceptual  | information in    | encoded for    |
+179	   |                |             | data structures   | transmission   |
+180	   |                |             | and data types    |                |
+181	   +----------------+-------------+-------------------+----------------+
+182	   | Example        | The         | A floating-       | Encoded CBOR   |
+183	   |                | temperature | point number      | of a floating- |
+184	   |                | of          | representing      | point number   |
+185	   |                | something   | the temperature   |                |
+186	   +----------------+-------------+-------------------+----------------+
+187	   | Standards      | e.g., [UML] | CDDL [RFC8610]    | CBOR [RFC8949] |
+188	   +----------------+-------------+-------------------+----------------+
+189	   | Implementation | n/a         | API input to      | Encoded CBOR   |
+190	   | Representation |             | CBOR encoder      | in memory or   |
+191	   |                |             | library, output   | for            |
+192	   |                |             | from CBOR         | transmission   |
+193	   |                |             | decoder library   |                |
+194	   +----------------+-------------+-------------------+----------------+
+
+196	          Table 1: Information Model, Data Model and Serialization
+
+198	   CBOR doesn't provide facilities for information models.  They are
+199	   mentioned here for completeness and context.
+
+201	   CBOR defines a palette of basic types, including the usual integers,
+202	   floating-point numbers, strings, arrays, and maps.  Extended types
+203	   may be constructed from these basic types.  These basic and extended
+204	   types are used to construct the data model of a CBOR protocol.  While
+205	   not required, CDDL may be used to describe the data model of a
+206	   protocol.
+
+208	   The types in the data model are serialized per [RFC8949] to create
+209	   encoded CBOR.
+
+211	1.2.  Flexible Serialization
+
+213	   CBOR intentionally allows multiple valid serializations of the same
+214	   data item.  For example, the array [1, 2] can be serialized in more
+215	   than one way:
+
+217	     +===================+==========================+===============+
+218	     | Type              | Description              | Encoded Bytes |
+219	     +===================+==========================+===============+
+220	     | Definite-length   | The array length (2) is  | 0x820102      |
+221	     |                   | encoded at the beginning |               |
+222	     +-------------------+--------------------------+---------------+
+223	     | Indefinite-length | The array is terminated  | 0x9f0102ff    |
+224	     |                   | by the break byte (0xff) |               |
+225	     +-------------------+--------------------------+---------------+
+
+227	          Table 2: [1, 2] definite-length and indefinite-length
+228	                              serializations
+
+230	   Similar flexibility exists for most other CBOR data types.
+
+232	   This flexibility is deliberate: CBOR is designed to allow encodings
+233	   to be selected according to the constraints and requirements of a
+234	   particular environment.  For example, indefinite-length serialization
+235	   is suited for streaming large arrays in constrained environments,
+236	   where the total length is not known in advance.  Conversely,
+237	   definite-length serialization makes it easier to decode small arrays
+238	   in constrained environments.  (CBOR is not unique in this regard;
+239	   compare ASN.1's BER encoding rules.)
+
+241	   Crucially, CBOR allows — and even expects — that some implementations
+242	   will not support all serialization variants.  JSON also permits
+243	   variation (1, 1.0, and 0.1e1 represent the same number), but expects
+244	   every parser to handle all of it, since the variation is there for
+245	   human readability rather than for ease of implementation in
+246	   constrained environments.
+
+248	   However, CBOR's flexibility introduces two challenges:
+249	   interoperability and determinism.
+
+251	1.2.1.  Interoperability
+
+253	   The interoperability challenge arises because partial implementations
+254	   are both permitted and expected.  For example, an encoder may produce
+255	   an indefinite-length array that is sent to a decoder that supports
+256	   only definite-length arrays.  Both this encoder and decoder are
+257	   allowed by [RFC8949].
+
+259	   Decoders in particular often support only a subset of serialization
+260	   forms — whether because they operate in constrained environments, or
+261	   because a full general-purpose decoder is substantially more work to
+262	   implement, especially in languages like C and Rust that lack built-in
+263	   dynamic arrays, maps, and strings.
+
+265	   From many years of CBOR deployment, we know that some serialization
+266	   variants like indefinite-lengths are not commonly used.  This makes
+267	   it both feasible and beneficial to define a common serialization
+268	   suitable for general use.
+
+270	   Protocol specifications can reference this serialization; library
+271	   implementations can prioritize support for it.
+
+273	   Section 4 defines that serialization: preferred-plus serialization.
+
+275	1.2.2.  Determinism
+
+277	   The determinism challenge arises because there are multiple ways to
+278	   serialize the same data item.  The example serialization of the array
+279	   [1,2] above shows this.  This is a problem in some protocols that
+280	   hash or sign encoded CBOR.
+
+282	   Many approaches to deterministic serialization are possible, each
+283	   optimized for different environmental constraints or application
+284	   requirements.  However, as noted above, some serialization variants
+285	   like indefinite-lengths are not commonly used.  It is therefore
+286	   practical to define a single deterministic serialization suitable for
+287	   general use.
+
+289	   Protocol specifications can reference this serialization instead of
+290	   defining their own deterministic encoding rules; library
+291	   implementations can prioritize support for it.
+
+293	   Section 5 defines that serialization: deterministic serialization.
+
+295	1.3.  Unspecified Serialization
+
+297	   Many CBOR-based protocols, such as CWT [RFC8392], state no
+298	   serialization requirements, which leaves open what an implementation
+299	   needs to support.  Is a CWT decoder required to accept indefinite-
+300	   length items, for example?
+
+302	   One interpretation of [RFC8949] is that, absent any specification, a
+303	   decoder is expected to accept every serialization variant, so that it
+304	   can decode anything it receives.  [RFC8949] defines this full set of
+305	   variants without naming it; this document introduces the name
+306	   "general serialization" for it in Section 3.
+
+308	   In practice, however, decoders for CWT and other CBOR-based protocols
+309	   often omit support for indefinite lengths and other variations
+310	   because of the added complexity, and encoders accordingly avoid them.
+311	   An encoder emitting indefinite lengths would still be fully
+312	   conforming, yet could fail against such a decoder.  This practice has
+313	   rarely caused problems, but it means interoperability rests on
+314	   convention rather than on the specifications themselves.  Section 2
+315	   addresses this.
+
+317	1.4.  Relation to RFC 8949
+
+319	1.4.1.  Serialization
+
+321	   This document defines new serializations rather than updating those
+322	   in [RFC8949].  This approach enables the serialization requirements
+323	   to be expressed directly in normative [RFC2119] language and to be
+324	   defined entirely in this document.  This approach provides clarity
+325	   and simplicity for implementers and the CBOR community over the long
+326	   term.
+
+328	   The serializations defined here are formally new, but they differ
+329	   little in practice from what CBOR libraries already implement.  For
+330	   example, the shortest-length argument encoding described in
+331	   Section 4.1 of [RFC8949] is widely implemented for both encoding and
+332	   decoding, and is the same as that required by the serializations
+333	   defined here.  See Section 4.4.
+
+335	1.4.2.  Tags and Data Models
+
+337	   This document updates [RFC8949] in one way: it limits how new tag
+338	   definitions can affect data models.  The definitions of tags 2 and 3
+339	   (bignums) in Section 3.4.3 of [RFC8949] modifies the integer type in
+340	   the CBOR basic generic data model; this is allowed as a one-time
+341	   exception.  The new rule preserves data model definitions against
+342	   later modification by unrelated tag definitions, which might
+343	   undermine their semantics and upset their previous use.
+
+345	1.5.  Conventions and Definitions
+
+347	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+348	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+349	   "OPTIONAL" in this document are to be interpreted as described in
+350	   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+351	   capitals, as shown here.
+
+353	2.  Recommendations Summary
+
+355	2.1.  Protocol Specifications
+356	2.1.1.  Framework Protocols
+
+358	   Framework protocols are those that offer options and alternatives,
+359	   with interoperability depending on the sender and receiver making
+360	   compatible choices.  These protocols sometimes make use of profiles
+361	   to define interoperability requirements for specific uses.  Framework
+362	   protocols are sometimes described as toolbox or building-block
+363	   protocols, reflecting their role as collections of reusable
+364	   mechanisms rather than end-to-end protocols.  CWT, COSE, EAT, and
+365	   CBOR itself are examples of framework protocols.
+
+367	   It is RECOMMENDED that new CBOR-based framework protocols not impose
+368	   serialization requirements and include a statement such as:
+
+370	      This protocol intentionally specifies no serialization
+371	      requirements so that serialization can be adapted to individual
+372	      environments.  End-to-end protocols (or profiles) that use this
+373	      protocol are expected to specify serialization.
+
+375	   It is RECOMMENDED that extant framework protocols that are silent
+376	   about serialization (e.g., CWT) be interpreted as if they contained
+377	   this statement.
+
+379	   Alternatively, new CBOR-based framework protocols MAY impose
+380	   serialization requirements.  For example, if a protocol is never
+381	   expected to be deployed in constrained environments where map sorting
+382	   is too expensive, it may mandate deterministic serialization for all
+383	   implementations in order to eliminate all serialization variability.
+
+385	   One scenario in particular calls for deterministic serialization in a
+386	   framework protocol: a design in which the parties independently
+387	   construct and serialize the data to be hashed or signed, rather than
+388	   transmitting those exact bytes.  See Section 5.3.  For such a design
+389	   to function correctly, the framework protocol must require
+390	   deterministic serialization, possibly only for a subset of the
+391	   protocol.  COSE is an example, elaborated upon in Appendix J.
+
+393	2.1.2.  End-to-End Protocols
+
+395	   End-to-end protocols are specified such that interoperability is
+396	   assured when they are implemented in accordance with their
+397	   specification.  When such a protocol includes optional features, they
+398	   are typically selected through real-time negotiation.  Such protocols
+399	   often have formal interoperability compliance programs or organize
+400	   multi-vendor interop testing events.  TLS, HTTP, and FIDO are
+401	   examples of end-to-end protocols.
+
+403	   New end-to-end protocols MUST define a serialization strategy that
+404	   ensures the sender and receiver use interoperable serialization.
+
+406	   The strategy most highly RECOMMENDED is to normatively require
+407	   preferred-plus serialization — conformance with Section 4.1 and
+408	   Section 4.2.  If a protocol does not need to be deployed where map
+409	   sorting is too expensive, requiring deterministic serialization —
+410	   conformance with Section 5.1 and Section 5.2 — is also RECOMMENDED.
+
+412	   An end-to-end protocol MAY instead define its own specialized
+413	   serialization (see Section 6).  In such cases, it MUST explicitly
+414	   specify the permitted serialization behaviors necessary to ensure
+415	   interoperability.  For example, if a sender is permitted to use
+416	   indefinite-length serialization, the protocol MUST require that
+417	   receivers be capable of decoding indefinite-length items.
+
+419	   As with framework protocols, deterministic serialization may be
+420	   required for parts of the protocol using hashing or signing.  See
+421	   Section 5.3.
+
+423	   An end-to-end protocol that gives no serialization requirements is
+424	   ambiguous.  For such extant protocols, use of preferred-plus
+425	   serialization is RECOMMENDED unless existing deployments of that
+426	   protocol have established a different practice.
+
+428	2.2.  Libraries
+
+430	   For the following sections on libraries, implementing preferred-plus
+431	   serialization means making Section 4.1 the default or primary
+432	   behavior for encoding and fulfilling Section 4.2 for decoding.
+433	   Similarly, implementing deterministic serialization means making
+434	   Section 5.1 the default or primary behavior for encoding and
+435	   fulfilling Section 5.2 for decoding.
+
+437	2.2.1.  CBOR Libraries
+
+439	   It is RECOMMENDED that CBOR libraries implement preferred-plus
+440	   serialization.
+
+442	   Preferred-plus serialization is recommended because it is suitable
+443	   for the majority of CBOR-based protocols.  Also, in practice,
+444	   preferred-plus serialization is equivalent to preferred serialization
+445	   (Section 4.1 of [RFC8949]) for most use cases.
+
+447	   It is also RECOMMENDED that CBOR libraries offer deterministic
+448	   serialization either as a selectable option or as the default, as
+449	   some protocols (for example, COSE) require it.  Relative to
+450	   preferred-plus serialization, the only additional requirement for
+451	   deterministic serialization is that encoded maps be sorted.  This
+452	   recommendation is stronger for environments in which map sorting is
+453	   easy to implement (for example, Python, Go, and Ruby).
+
+455	   Deterministic serialization requirements are a superset of those for
+456	   preferred-plus; a CBOR library that implements only deterministic
+457	   serialization therefore satisfies the recommendation for preferred-
+458	   plus serialization.
+
+460	   A CBOR library MAY also implement some or all aspects of general
+461	   serialization (see Section 3) thereby enabling support for protocols
+462	   that use specialized serializations (see Section 6).
+
+464	2.2.2.  Libraries for Framework Protocols
+
+466	   When a framework protocol specification does not mandate a specific
+467	   serialization, it is RECOMMENDED that a library for it implement
+468	   preferred-plus serialization.  For example, CWT does not mandate a
+469	   serialization, so it is recommended that libraries implementing them
+470	   use preferred-plus serialization.  Alternatively, a framework
+471	   protocol library may implement only deterministic serialization if
+472	   this aligns with its deployment environment and design goals.
+
+474	   When a framework protocol mandates serialization requirements,
+475	   conforming libraries follow them.  For instance, small parts of COSE
+476	   require deterministic serialization to function correctly.  See
+477	   Appendix J, which shows how COSE requires deterministic serialization
+478	   for some parts and, as a framework protocol should, leaves others
+479	   unconstrained.
+
+481	2.2.3.  Libraries for End-to-End Protocols
+
+483	   End-to-end protocols are expected to state serialization requirements
+484	   to ensure interoperability.  Libraries for end-to-end protocols are
+485	   expected to adhere to them.
+
+487	   If an end-to-end protocol specification does not state serialization
+488	   requirements, it is RECOMMENDED that the library implement preferred-
+489	   plus serialization, unless existing deployments of that protocol have
+490	   established a different practice (see Section 2.1.2).
+
+492	3.  General Serialization
+
+494	   This section assigns the name "general serialization" to the complete
+495	   set of encodings standardized in Section 3 of [RFC8949].  [RFC8949]
+496	   does not name this set, though it alludes to it in passing as
+497	   "variant-tolerant decoding".  Any serialization, whether defined in
+498	   this document or elsewhere, permits only encodings drawn from this
+499	   set.  General serialization is therefore a superset of them all.  It
+500	   is described as follows:
+
+502	   *  CBOR arguments of any length (for example, the integer 0 may be
+503	      encoded as 0x00, 0x1800, 0x190000, and so on).
+
+505	   *  Floating-point values encoded at any length (for example, 0.0 can
+506	      be encoded as half-, single-, or double-precision).
+
+508	   *  Both definite- and indefinite-length strings, arrays, and maps.
+
+510	   *  Maps with keys in any order.
+
+512	   *  Bignum representation of values that are also representable using
+513	      major types 0 and 1 (for example, 0 can be encoded as the bignum
+514	      0xc24100).
+
+516	   A decoder claiming to support general serialization MUST accept and
+517	   decode all the various encodings for the data types it supports.
+
+519	3.1.  Default Serialization
+
+521	   [RFC8949] does not explicitly specify default encoding or decoding
+522	   requirements.  Nothing in it says what a CBOR library needs to
+523	   support, or what an implementation of a protocol that gives no
+524	   serialization requirements needs to do.
+
+526	   Some readers take [RFC8949] to imply that a decoder has to support
+527	   general serialization and that an encoder is free to use any variant.
+528	   This document does not adopt that interpretation, and many
+529	   implementers have not either.  For example, CWT and COSE decoders
+530	   typically do not support indefinite lengths, and their encoders do
+531	   not produce them.
+
+533	   This document therefore does not treat general serialization, or any
+534	   other serialization, as a default.  Section 2.1 describes how
+535	   protocol specifications are expected to address serialization,
+536	   including how to interpret framework and end-to-end protocols that
+537	   are silent about it.
+
+539	3.2.  When To Use General Serialization
+
+541	   General serialization is rarely necessary, and support for it is not
+542	   universal.  Preferred-plus serialization (Section 4) is compact and
+543	   supports the full CBOR data model (except non-trivial NaNs; see
+544	   Appendix B.1), satisfying the vast majority of CBOR use cases.
+
+546	   The main scenario where general serialization is warranted is a
+547	   protocol that has to accommodate highly constrained encoders, at the
+548	   cost of requiring decoders — assumed to be unconstrained — to support
+549	   every possible serialization option.
+
+551	   A protocol that requires general serialization needs to state so
+552	   explicitly; see Section {EndToEndProtocols}.
+
+554	   See also special serializations (Section 6), which enable
+555	   optimization and efficiency for specific use cases without requiring
+556	   full general serialization support in the decoder.
+
+558	   CBOR libraries may nonetheless wish to support general serialization,
+559	   as a complete set of serialization forms, to be useful to a broader
+560	   range of protocols.
+
+562	4.  Preferred-Plus Serialization
+
+564	   This section defines a serialization named "preferred-plus
+565	   serialization."
+
+567	   Preferred-plus serialization specifies how each data type is encoded.
+568	   Like the rest of CBOR, it does not specify which data types an
+569	   implementation supports, nor which range of values it supports for a
+570	   given type.  An implementation is free to support as much or as
+571	   little of CBOR as its protocol requires; preferred-plus constrains
+572	   only the encoding of what it does support.
+
+574	   For example, a very small CBOR library might support only the
+575	   integers 0 to 10 and arrays of length 0 to 10.  Preferred-plus allows
+576	   this, but requires that those arrays be definite-length and that,
+577	   over this range, the integer value and the array length each be
+578	   encoded in the initial byte.
+
+580	   Similarly, preferred-plus places no requirement on the range or
+581	   precision of floating-point values, but requires that each value it
+582	   does encode be encoded in exactly one way — for example,
+583	   5.9604644775390625E-8 is always encoded as a half-precision
+584	   subnormal.
+
+586	   Many protocols use only some data types, and only part of the range
+587	   of those they use.  Implementers need to ensure that the library they
+588	   use supports the data types, ranges, and precision their protocol
+589	   requires, and that its encoding and decoding meet the requirements in
+590	   this section.  A library intended for general use will typically
+591	   support most or all data types and values.
+
+593	4.1.  Encoder Requirements
+
+595	   1.  The shortest form of the CBOR argument (see Section 3 of
+596	       [RFC8949]) MUST be used.  This does not apply when the CBOR item
+597	       is a floating-point value.  The following describes how an
+598	       argument in each range is encoded. "ai" is the additional
+599	       information, the low-order 5 bits of the initial byte.
+
+601	       *  0..23 is encoded in the same byte as the major type.
+
+603	       *  24..255 is encoded with one additional byte (ai = 0x18).
+
+605	       *  256..65535 is encoded with two additional bytes (ai = 0x19).
+
+607	       *  65536..4294967295 is encoded with four additional bytes (ai =
+608	          0x1a).
+
+610	       *  4294967296..18446744073709551615 is encoded with eight
+611	          additional bytes (ai = 0x1b).
+
+613	   2.  Definite-length encoding MUST be used for text and byte strings.
+
+615	   3.  Definite-length encoding MUST be used for maps and arrays.
+
+617	   4.  Floating-point:
+
+619	       *  Values MUST be encoded in the shortest of double, single, or
+620	          half-precision that represents the value exactly.  For
+621	          example, 0.0 can always be reduced to half-precision so it
+622	          MUST be encoded as 0xf90000.  For another example, 0.1 would
+623	          lose precision if not encoded as double-precision so it MUST
+624	          be encoded as 0xfb3fb999999999999a.  Subnormal numbers MUST be
+625	          used where they give the shortest exact encoding.
+
+627	       *  Encoders MUST NOT output any NaN other than the half-precision
+628	          NaN 0xf97e00 (sign bit clear, most significant significand bit
+629	          set, all remaining significand bits clear).  When a signaling
+630	          NaN, a NaN with a non-zero payload, or a NaN with the sign bit
+631	          set is presented to an application or library for encoding,
+632	          the encoder MUST either reject it or encode it as 0xf97e00.
+633	          Consequently, the floating-point values that can be encoded
+634	          are the finite numbers, positive and negative infinity, and
+635	          one NaN.
+
+637	       *  Aside from the requirement allowing only the half-precision
+638	          quiet NaN, these are the same floating-point requirements as
+639	          Section 4.1 of [RFC8949] and also as Section 4.2.1 of
+640	          [RFC8949].
+
+642	       *  Note that this implies that most preferred-plus
+643	          implementations have to support encoding as single and half-
+644	          precision.  Specifically, if the numbers presented for
+645	          encoding are double-precision, then conversion to single and
+646	          half-precision is required.  If the numbers presented for
+647	          encoding are only single-precision, then conversion to half-
+648	          precision is required.
+
+650	   5.  Bignums (tags 2 and 3):
+
+652	       *  Leading zeros MUST NOT be encoded.
+
+654	       *  If a value can be encoded using major type 0 or 1, then it
+655	          MUST be encoded with major type 0 or 1, never as a bignum.
+
+657	4.2.  Decoder Requirements
+
+659	   If a decoder claims to support preferred-plus serialization it MUST
+660	   meet these requirements for the data types and ranges it has chosen
+661	   to support.  A preferred-plus decoder MAY accept non-preferred-plus
+662	   input.  See Appendix G.  A decoder SHOULD support the same types and
+663	   ranges as its corresponding encoder, if it has one.
+
+665	   1.  The shortest-form argument MUST be accepted for all major types.
+
+667	   2.  If arrays or maps are accepted, definite-length arrays or maps
+668	       MUST be accepted.
+
+670	   3.  If text or byte strings are accepted, definite-length text or
+671	       byte strings MUST be accepted.
+
+673	   4.  If floating-point numbers are accepted, the following apply:
+
+675	       *  If the range of double-precision is supported, finite double-,
+676	          single-, and half-precision values MUST be accepted.
+
+678	       *  If the range of single-precision is supported, finite single-
+679	          and half-precision values MUST be accepted.
+
+681	       *  Half-precision NaN (0xf97e00), Infinity (0xf97c00), and
+682	          -Infinity (0xf9fc00) MUST be accepted.  These are the only
+683	          forms of these values a preferred-plus encoder can produce, so
+684	          accepting their single- and double-precision forms is allowed,
+685	          but not required.
+
+687	       *  No requirement is made on how a decoded floating-point value
+688	          is represented to the layer(s) above the decoder; conversion
+689	          from double, single, or half-precision into that
+690	          representation may be necessary.
+
+692	   5.  If bignums (tags 2 and 3) are accepted, the following apply.
+693	       (This is a maximally permissive acceptance mode, adopted to
+694	       compensate for ambiguity in Section 3.4.3 of [RFC8949].)
+
+696	       *  Bignums described in Section 3.4.3 of [RFC8949] MUST be
+697	          accepted.  This includes:
+
+699	          -  Leading zeros MUST be ignored.
+
+701	       *  For full interoperability, an empty byte string MUST be
+702	          accepted and treated as the value 0 for a positive bignum and
+703	          the value -1 for a negative bignum.
+
+705	   See Appendix D and Appendix F for further background on bignums,
+706	   Appendix E for the CDDL specification, and Appendix G for overrides
+707	   to the above decoding rules for serialization-checking decoders.
+
+709	4.3.  When to use preferred-plus serialization
+
+711	   Preferred-plus is the recommended choice for most protocols.  It can
+712	   serialize all CBOR data types and value ranges (except non-trivial
+713	   NaNs), encodes compactly, is straightforward to implement, and is
+714	   widely supported by CBOR libraries.  It provides strong serialization
+715	   interoperability because (1) decoders are required to accept all
+716	   encodings that a preferred-plus encoder is permitted to produce, and
+717	   (2) the requirements are formally specified.
+
+719	   Choose a different serialization only when you have a specific need:
+720	   deterministic serialization when determinism is required, a special
+721	   serialization with indefinite lengths when streaming is required, or
+722	   another special serialization for capabilities beyond what preferred-
+723	   plus provides (see Section 6).  Note that preferred-plus is
+724	   equivalent to the deterministic serialization of Section 5 when maps
+725	   are not in use.
+
+727	4.4.  Relation To Preferred Serialization
+
+729	   Preferred-plus serialization is defined to be the long-term
+730	   replacement for preferred serialization (Section 4.1 of [RFC8949]).
+
+732	   The differences are:
+
+734	   *  Encoders use only definite lengths; this is a requirement, not a
+735	      preference.
+
+737	   *  Encoders emit only the half-precision quiet NaN.
+
+739	   *  Decoders ignore leading zeros in bignums and accept the empty byte
+740	      string as zero.
+
+742	   These differences are unlikely to affect real-world implementations
+743	   and many implementations are already close to conforming.
+
+745	   Section 3 of [RFC8949] states that in preferred serialization the use
+746	   of definite-length encoding is a "preference", not a requirement.
+747	   Technically that means preferred serialization decoders must support
+748	   indefinite lengths, but in reality many do not.  Indefinite lengths,
+749	   particularly for strings, are often not supported because they are
+750	   more complex to implement than other parts of CBOR.  Because of this,
+751	   the implementation of most CBOR protocols use only definite lengths.
+
+753	   Further, much of the CBOR community didn't notice the use of the word
+754	   "preference" and realize its implications for decoder
+755	   implementations.  It was somewhat assumed that preferred
+756	   serialization didn't allow indefinite lengths.  That preferred
+757	   serialization decoders are technically required to support indefinite
+758	   lengths wasn't noticed by many implementers until several years after
+759	   the publication of [RFC8949].
+
+761	   Briefly stated, the reason that the divergence on NaNs is not of
+762	   consequence in the real world, is that their non-trivial forms are
+763	   used extremely rarely and support for them in programming
+764	   environments and CBOR libraries is unreliable.  See Appendix B.5 for
+765	   a detailed discussion.
+
+767	   Thus preferred-plus serialization is largely interchangeable with
+768	   preferred serialization in the real world.
+
+770	5.  Deterministic Serialization
+
+772	   This section defines a serialization named "deterministic
+773	   serialization"
+
+775	   Deterministic serialization is the same as described in Section 4.2.1
+776	   of [RFC8949] except for the encoding of floating-point NaNs.  See
+777	   Section 4 and Appendix B for details on, and the rationale for NaN
+778	   encoding.
+
+780	   Note that in deterministic serialization, any bignum that can be
+781	   represented as an integer must be encoded as an integer.  This rule
+782	   is inherited from preferred-plus serialization (Section 4), just as
+783	   Section 4.2.1 of [RFC8949] inherits this requirement from preferred
+784	   serialization.
+
+786	   See also Appendix A for considerations involved in designing a
+787	   deterministic protocol that extend beyond serialization.
+
+789	5.1.  Encoder Requirements
+
+791	   1.  All of preferred-plus serialization defined in Section 4.1 MUST
+792	       be used.
+
+794	   2.  If a map is encoded, the items in it MUST be sorted in the
+795	       bytewise lexicographic order of their deterministic encodings of
+796	       the map keys.  (Note that this is the same as the sorting in
+797	       Section 4.2.1 of [RFC8949] and not the same as Section 3.9 of
+798	       [RFC7049] / Section 4.2.3 of [RFC8949].)
+
+800	5.2.  Decoder Requirements
+
+802	   1.  Decoders MUST meet the decoder requirements described in
+803	       Section 4.2.  That is, deterministic encoding imposes no
+804	       requirements over and above the requirements for decoding
+805	       preferred-plus serialization.
+
+807	5.3.  When to use Deterministic Serialization
+
+809	5.3.1.  Not Commonly Needed for Hashing and Signing
+
+811	   Most applications do not require deterministic encoding — even those
+812	   that employ signing or hashing to authenticate or protect the
+813	   integrity of data.  For example, the payload of a COSE_Sign message
+814	   (See [RFC9052]) does not need to be encoded deterministically because
+815	   it is transmitted with the message.  The recipient receives the exact
+816	   same bytes that were signed.
+
+818	   Deterministic encoding becomes necessary only when the protected data
+819	   is not transmitted as the exact bytes that are used for authenticity
+820	   or integrity verification.  In such cases, both the sender and the
+821	   receiver must independently construct the exact same sequence of
+822	   bytes.  To guarantee this, the encoding must eliminate all
+823	   variability and ambiguity.  The Sig_structure, defined in Section 4.4
+824	   of [RFC9052], is an example of this requirement.  Such designs are
+825	   often chosen to reduce data size, preserve privacy, or meet other
+826	   design constraints.
+
+828	   See the more detailed, COSE-based example in Appendix J.
+
+830	5.3.2.  Decoding Deterministic Serialization and Relation to Preferred-
+831	        Plus Serialization
+
+833	   The only difference between preferred-plus and deterministic
+834	   serialization is that in deterministic serialization, maps are
+835	   required to be sorted by their keys.  Preferred-plus serialization
+836	   exists as a separate mode solely because map sorting can be too
+837	   expensive in some constrained environments.
+
+839	   Preferred-plus is deterministic if no maps are encoded.
+
+841	   The decoders are identical (except for a checking decoder for
+842	   deterministic serialization).
+
+844	   However, note that deterministic serialization is never a substitute
+845	   for general serialization where use cases may require indefinite
+846	   lengths, separate bignums from integers in the data model, or need
+847	   non-trivial NaNs.
+
+849	5.4.  Map Ordering
+
+851	   Map ordering in the serialization layer is only to provide
+852	   determinism and is entirely orthogonal to map ordering at the data
+853	   model and application layer.
+
+855	5.4.1.  Ordering at the Serialization Layer
+
+857	   For maps to be encoded deterministically, two independent entities
+858	   must encode them exactly the same.  The only way to do this for maps
+859	   is to sort each map's key-value pairs by key.  Thus, for
+860	   deterministic encoding, maps are sorted.
+
+862	   While not stated explicitly in [RFC8949], it does imply that map
+863	   decoding must never depend on map ordering.  All CBOR map decoding
+864	   must succeed regardless of the map order.
+
+866	   There is one exception to this: checking decoders (see Appendix G)
+867	   for deterministic or other serializations that order maps.  Their
+868	   purpose is to make sure the received CBOR is encoded exactly as
+869	   specified.  A checking decoder for deterministic serialization
+870	   therefore rejects unordered maps.
+
+872	5.4.2.  Ordering at the Data Model Layer
+
+874	   Essentially there is no map ordering at the data model layer;
+875	   applications and implementations can not rely on it.
+
+877	   The CBOR data model for maps clearly indicates that they are not
+878	   ordered (see Section 5.6 of [RFC8949]).  This is the same as for JSON
+879	   objects.
+
+881	   Some programming environments, like the Go programming language,
+882	   provide no ordering guarantees for maps.  A CBOR decoder is under no
+883	   obligation to present a map in the order it was received.  Even if a
+884	   map is deterministically encoded, it may not be presented at the
+885	   application layer in map key order.
+
+887	   A particular CBOR library or a particular programming environment may
+888	   present sorted maps to the CBOR application if it wishes, but this is
+889	   a feature of the library or programming environment only; protocols
+890	   or system designs can not expect it at the application layer, even
+891	   when deterministic serialization is required.
+
+893	6.  Special Serializations
+
+895	   When needed, protocols may define special serializations beyond the
+896	   three described above.  The main capabilities they enable are:
+
+898	   *  Streaming encoding of text strings, byte strings, arrays, and maps
+899	      using indefinite lengths, for use when the encoded item(s) exceeds
+900	      the memory available on the encoding device.
+
+902	   *  Fixed-size integer encoding, allowing values to be copied directly
+903	      to and from hardware registers.  CBOR is simple enough that
+904	      encoders and decoders for some protocols can be implemented
+905	      entirely in hardware.
+
+907	   *  Fixed-width floating-point encoding, relieving the encoder from
+908	      performing floating-point reduction to the shortest representable
+909	      form.
+
+911	   *  In-place length updates for strings, arrays, and maps, by encoding
+912	      their lengths in a fixed number of bits.  For example, if a string
+913	      length is always encoded in 32 bits, increasing its length from
+914	      2^16-1 to 2^16 requires only overwriting the length field rather
+915	      than shifting all 2^16 bytes of content.
+
+917	   *  Transmission of non-trivial NaN floating-point values (see
+918	      Appendix B).
+
+920	   *  Use of a bignum for shorter encoding of 33- to 56-bit integers (a
+921	      40-bit value with implied tag takes 6 bytes rather than 9).
+
+923	   *  Deterministic serialization with any or all of the above.
+
+925	   All of these except determinism are also available with general
+926	   serialization, but a targeted special serialization will usually be
+927	   substantially easier to implement.
+
+929	   A recommended approach is to define a special serialization as
+930	   preferred-plus or deterministic serialization with additional
+931	   constraints or extensions.  For example, a protocol requiring
+932	   deterministic streaming of maps and arrays could be specified as:
+
+934	      Deterministic serialization MUST be used, except that maps and
+935	         arrays MUST be encoded with indefinite lengths.  Strings retain
+936	         definite-length encoding, and map ordering MUST follow the
+937	         rules of deterministic serialization.
+
+939	7.  New Tag Data Model Rule
+
+941	   Section 2 of [RFC8949] states that each new CBOR tag definition
+942	   introduces a new and distinct data type.  In contrast, the
+943	   definitions of Tags 2 and 3 (bignums) in Section 3.4.3 of [RFC8949]
+944	   do not introduce a separate data type; instead, they attach directly
+945	   to the integer type and extend its numeric range.  As a result, the
+946	   generic data model’s integer type is modified rather than augmented
+947	   with a new, independent type (see Appendix D).
+
+949	   This document establishes a new rule that prohibits future tag
+950	   definitions from having such effects:
+
+952	   All future CBOR tag definitions MUST NOT incorporate, modify, or
+953	   otherwise affect any data types other than the type defined by the
+954	   tag itself.  A set of tags MAY affect each other, provided that all
+955	   defining authorities for those tags explicitly agree.
+
+957	   Tags 2 and 3 are exempt from this rule, as they were defined prior to
+958	   the establishment of this requirement.
+
+960	8.  CDDL Serialization Control Operator
+
+962	   The ".serial" control operator specifies the serialization of any
+963	   type in CDDL, including the serialization of the top-level data item
+964	   or byte-string-wrapped sub-parts.
+
+966	   The controller (the right-hand side) is a text string and MUST be
+967	   either "prefp" or "dtrm", specifying preferred-plus (Section 4) or
+968	   deterministic (Section 5) serialization, respectively.
+
+970	   The scope of .serial extends recursively through nested arrays, maps,
+971	   and tag content, but does not extend into byte strings or other data
+972	   items that happen to contain encoded CBOR.  Every instance of
+973	   embedded CBOR that requires specific serialization must specify it
+974	   explicitly.  See also Appendix H.
+
+976	   For example, the following specifies that a message or protocol
+977	   described by "stuff" is deterministically serialized and wrapped in a
+978	   byte string:
+
+980	   stuff = ...
+981	   deterministic-stuff = stuff .serial "dtrm"
+982	   wrapped-deterministic-stuff = #6.24(bytes .cbor deterministic-stuff)
+
+984	   For another example, the first lines of a CDDL document as follows
+985	   specify that "my-protocol" be serialized with preferred-plus.
+
+987	   my-prefp-protocol = my-protocol .serial "prefp"
+988	   my-protocol = ...
+
+990	   As with filtering control operators such as .size, .serial
+991	   constraints intersect when nested, whether through direct nesting or
+992	   because a type with its own .serial appears within the scope of
+993	   another.  Since deterministic serialization is a subset of preferred-
+994	   plus, wherever both apply the effective requirement is deterministic,
+995	   regardless of which one is outermost.
+
+997	   New controller values for new serializations are possible but are
+998	   highly discouraged.  Standards action is required to add them.
+
+1000	9.  Security Considerations
+
+1002	   The security considerations in Section 10 of [RFC8949] apply.
+
+1004	9.1.  Covert Channel
+
+1006	   CBOR’s serialization variants can be used as a covert channel [LAM73]
+1007	   to steganographically exfiltrate data.
+
+1009	   For example, a CBOR argument (such as an integer encoding or a string
+1010	   length) can be encoded in up to five different ways (e.g., the value
+1011	   1 can be encoded as 0x01, 0x1801, 0x190001, 0x1A00000001, or
+1012	   0x1B0000000000000001).  This variability can be used to encode about
+1013	   2 hidden bits per argument.  Since every CBOR item carries an
+1014	   argument, even moderately complex protocols may accumulate sufficient
+1015	   bits to exfiltrate sensitive material (e.g., cryptographic keys) or
+1016	   to generate persistent identifiers for tracking users or devices.
+
+1018	   Techniques that may be used to establish a covert channel include:
+
+1020	   *  Varying the encoding of CBOR arguments (as above)
+
+1022	   *  Varying the encoding of floating-point values (half-, single-, or
+1023	      double-precision)
+
+1025	   *  Representing text or byte strings as indefinite-length encodings,
+1026	      and encoding information in the segmentation structure (e.g.,
+1027	      segment lengths or insertion of empty segments)
+
+1029	   *  Encoding data within NaN payloads
+
+1031	   *  Manipulating the ordering of map entries
+
+1033	   *  Varying the Unicode representation of text strings
+
+1035	   These channels are covert because some CBOR decoders accept all such
+1036	   representations without raising errors or warnings.
+
+1038	   The primary safeguard is to ensure the CBOR encoding library used is
+1039	   trustworthy and does not exfiltrate data.
+
+1041	   Checking for preferred-plus or deterministic serialization as
+1042	   described in Appendix G can reveal unexpected variation, and so
+1043	   expose an attack, but cannot prevent one.
+
+1045	10.  IANA Considerations
+
+1047	   // RFC Editor: please replace RFCXXXX with the RFC number of this RFC
+1048	   // and remove this note.
+
+1050	   This document requests IANA to register the ".serial" control
+1051	   operator into the registry "CDDL Control Operators" of the
+1052	   [IANA.cddl] registry group.
+
+1054	   IANA is requested to add a reference to Section 7 to the CBOR tag
+1055	   registry [IANA.cbor-tags].
+
+1057	11.  References
+
+1059	11.1.  Normative References
+
+1061	   [IANA.cbor-tags]
+1062	              IANA, "Concise Binary Object Representation (CBOR) Tags",
+1063	              <https://www.iana.org/assignments/cbor-tags>.
+
+1065	   [IANA.cddl]
+1066	              IANA, "Concise Data Definition Language (CDDL)",
+1067	              <https://www.iana.org/assignments/cddl>.
+
+1069	   [IEEE754]  IEEE, "IEEE Standard for Floating-Point Arithmetic", IEEE
+1070	              Std 754-2019, DOI 10.1109/IEEESTD.2019.8766229,
+1071	              <https://ieeexplore.ieee.org/document/8766229>.
+
+1073	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+1074	              Requirement Levels", BCP 14, RFC 2119,
+1075	              DOI 10.17487/RFC2119, March 1997,
+1076	              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+1078	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+1079	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+1080	              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+1082	   [RFC8610]  Birkholz, H., Vigano, C., and C. Bormann, "Concise Data
+1083	              Definition Language (CDDL): A Notational Convention to
+1084	              Express Concise Binary Object Representation (CBOR) and
+1085	              JSON Data Structures", RFC 8610, DOI 10.17487/RFC8610,
+1086	              June 2019, <https://www.rfc-editor.org/rfc/rfc8610>.
+
+1088	   [RFC8949]  Bormann, C. and P. Hoffman, "Concise Binary Object
+1089	              Representation (CBOR)", STD 94, RFC 8949,
+1090	              DOI 10.17487/RFC8949, December 2020,
+1091	              <https://www.rfc-editor.org/rfc/rfc8949>.
+
+1093	11.2.  Informative References
+
+1095	   [CTAP2]    W3C, "Client To Authenticator Protocol v2",
+1096	              <https://fidoalliance.org/specs/fido-v2.0-ps-20190130/
+1097	              fido-client-to-authenticator-protocol-v2.0-ps-
+1098	              20190130.html>.
+
+1100	   [Examples-Repo]
+1101	              IETF CBOR WG, "draft-ietf-cbor-serialization",
+1102	              <https://github.com/cbor-wg/draft-ietf-cbor-
+1103	              serialization/tree/main/examples>.
+
+1105	   [I-D.mcnally-deterministic-cbor]
+1106	              McNally, W., Allen, C., Bormann, C., and L. Lundblade,
+1107	              "dCBOR: Deterministic CBOR", Work in Progress, Internet-
+1108	              Draft, draft-mcnally-deterministic-cbor-18, 10 August
+1109	              2026, <https://datatracker.ietf.org/doc/html/draft-
+1110	              mcnally-deterministic-cbor-18>.
+
+1112	   [LAM73]    Lampson, B., "A note on the confinement problem",
+1113	              Association for Computing Machinery (ACM), Communications
+1114	              of the ACM vol. 16, no. 10, pp. 613-615,
+1115	              DOI 10.1145/362375.362389, October 1973,
+1116	              <https://doi.org/10.1145/362375.362389>.
+
+1118	   [NaNBoxing]
+1119	              Nystrom, R., "Crafting Interpreters", July 2021,
+1120	              <https://craftinginterpreters.com/optimization.html#nan-
+1121	              boxing>.
+
+1123	   [RFC7049]  Bormann, C. and P. Hoffman, "Concise Binary Object
+1124	              Representation (CBOR)", RFC 7049, DOI 10.17487/RFC7049,
+1125	              October 2013, <https://www.rfc-editor.org/rfc/rfc7049>.
+
+1127	   [RFC8392]  Jones, M., Wahlstroem, E., Erdtman, S., and H. Tschofenig,
+1128	              "CBOR Web Token (CWT)", RFC 8392, DOI 10.17487/RFC8392,
+1129	              May 2018, <https://www.rfc-editor.org/rfc/rfc8392>.
+
+1131	   [RFC9052]  Schaad, J., "CBOR Object Signing and Encryption (COSE):
+1132	              Structures and Process", STD 96, RFC 9052,
+1133	              DOI 10.17487/RFC9052, August 2022,
+1134	              <https://www.rfc-editor.org/rfc/rfc9052>.
+
+1136	   [RFC9413]  Thomson, M. and D. Schinazi, "Maintaining Robust
+1137	              Protocols", RFC 9413, DOI 10.17487/RFC9413, June 2023,
+1138	              <https://www.rfc-editor.org/rfc/rfc9413>.
+
+1140	   [UML]      "OMG Unified Modeling Language (OMG UML) Version 2.5.1",
+1141	              December 2017, <https://www.omg.org/spec/UML/2.5.1/PDF>.
+
+1143	   [UNICODE-NORM]
+1144	              Whistler, K., "Unicode Normalization Forms", Unicode
+1145	              Standard Annex #15, 30 July 2025,
+1146	              <https://www.unicode.org/reports/tr15/>.
+
+1148	Appendix A.  Specifying a Fully Deterministic Protocol
+
+1150	   While deterministic serialization (Section 5) is sufficient to make
+1151	   most protocols fully deterministic, it is not sufficient for all.
+1152	   This appendix describes some issues that may need further
+1153	   requirements.  Note that these issues occur for parts of the protocol
+1154	   that the sender and receiver construct independently.  See
+1155	   Section 5.3.
+
+1157	A.1.  Protocol Data Definition
+
+1159	   For a protocol to be deterministic, its definition at the data model
+1160	   layer must be deterministic.
+
+1162	   Here’s an example definition:
+
+1164	      At the sender’s convenience, the birth date MAY be encoded
+1165	         either as an integer epoch date or string date.  The receiver
+1166	         MUST decode both formats.
+
+1168	   While this definition is interoperable, it lacks determinism.  The
+1169	   definition leaves a choice open, just as CBOR leaves encoding choices
+1170	   open when deterministic serialization is not required.
+
+1172	   To make this example definition deterministic, specify one date
+1173	   format and prohibit the other.
+
+1175	   A more interesting source of variability is CBOR's variety of number
+1176	   types.  For instance, the number 2 can be represented as an integer,
+1177	   float, bignum, decimal fraction and others defined by tags in the
+1178	   CBOR tag registry.  Most protocol designs will just specify one
+1179	   number type to use, and that will give determinism, but here’s an
+1180	   example specification that doesn’t:
+
+1182	      At the sender’s convenience, the fluid level measurement MAY be
+1183	         encoded as an integer or a floating-point number.  This allows
+1184	         for minimal encoding size while supporting a large range.  The
+1185	         receiver MUST be able to accept both integers and floating-
+1186	         point numbers for the measurement.
+
+1188	   Again, this ensures interoperability but not determinism — identical
+1189	   fluid level measurements can be represented in more than one way.
+1190	   Determinism can be achieved by allowing only floating-point, though
+1191	   that doesn’t minimize encoding size.
+
+1193	   A better solution requires the fluid level always be encoded using
+1194	   the smallest representation.  For example, a fluid level of 2 is
+1195	   always encoded as an integer, never as a floating-point number; and a
+1196	   level of 2.000001 is always encoded as a floating-point number so as
+1197	   not to lose precision.  See the numeric reduction defined by
+1198	   [I-D.mcnally-deterministic-cbor].
+
+1200	A.2.  Text Strings and Unicode
+
+1202	   CBOR's text string type (major type 3) carries UTF-8, which is itself
+1203	   unambiguous.  Unicode is not: the same text may be written as
+1204	   different sequences of code points, since a character with a
+1205	   diacritic can appear either precomposed or as a base character plus
+1206	   combining marks. "é" is either U+00E9 or U+0065 plus U+0301.  As with
+1207	   the number types above, a deterministic protocol must choose one
+1208	   representation — typically by requiring a Unicode normalization form
+1209	   like Unicode Normalization Form C (NFC) [UNICODE-NORM].
+
+1211	A.3.  CBOR Tags
+
+1213	   Some tags allow their content to be represented in more than one way.
+1214	   For example, the epoch date (tag 1) allows either integer or
+1215	   floating-point representation.  A deterministic protocol using tags
+1216	   should examine each tag's definition for such variability and define
+1217	   a deterministic rule for selecting among the alternatives it finds.
+
+1219	Appendix B.  IEEE 754 NaN
+
+1221	   This section provides background information on [IEEE754] NaN (Not a
+1222	   Number) and its use in CBOR.
+
+1224	B.1.  Basics
+
+1226	   [IEEE754] defines the most widely used representation for floating-
+1227	   point numbers.  It includes special values for infinity and NaN (Not
+1228	   a Number).  NaN is designed to represent the result of invalid
+1229	   operations, such as the square root of a negative number.
+
+1231	   A NaN is not a single value the way positive infinity is.  It has a
+1232	   sign bit and a trailing significand field — 10 bits in half
+1233	   precision, 23 in single, 52 in double — whose use is not formally
+1234	   defined.  The design intent is that these bits distinguish NaN types
+1235	   and hold diagnostic detail about a local computation.
+
+1237	   IEEE 754 formally defines the notions of quiet and signaling NaN, but
+1238	   the bit pattern distinguishing them is only a recommendation,
+1239	   directed at CPU designers:
+
+1241	   *  A quiet NaN has the most significant significand bit set.
+
+1243	   *  A signaling NaN has that bit clear and at least one other
+1244	      significand bit set, to distinguish it from infinity.
+
+1246	   *  Either can have a non-zero payload, which is the bits other than
+1247	      the most significant significand bit.
+
+1249	   *  No recommendation is made for the sign bit.
+
+1251	   This recommendation is not universally followed (e.g., PA-RISC and
+1252	   pre-R6 MIPS).
+
+1254	   An arithmetic operation on a signaling NaN raises the invalid
+1255	   operation exception and does not preserve it, whereas quiet NaNs are
+1256	   usually propagated with the payload intact.  Implementations vary,
+1257	   but this makes quiet NaNs usable for application-defined purposes in
+1258	   a way signaling NaNs are not.
+
+1260	   For this discussion, a non-trivial NaN is a signaling NaN, a NaN with
+1261	   a non-zero payload, or a NaN with the sign bit set, as the host
+1262	   represents it.  A trivial NaN is one that passively indicates that
+1263	   the value is not a number, and nothing more.
+
+1265	B.2.  Implementation Support for Non-Trivial NaNs
+
+1267	   This section discusses the extent of programming language and CPU
+1268	   support for NaN payloads.
+
+1270	   Although [IEEE754] has existed for decades, support for manipulating
+1271	   non-trivial NaNs has historically been limited and inconsistent.
+1272	   Some key points:
+
+1274	   *  Programming languages:
+
+1276	      -  The programming languages C, C++, Java, JavaScript, Python and
+1277	         Rust do not provide APIs to set or extract NaN payloads.
+
+1279	      -  IEEE 754 is over thirty years old, enough time for support to
+1280	         be added if there was need.
+
+1282	   *  CPU hardware:
+
+1284	      -  CPUs use the distinction between signaling and quiet NaNs to
+1285	         determine whether to raise exceptions.
+
+1287	      -  A non-trivial NaN matching the CPU’s signaling NaN pattern may
+1288	         either trigger an exception or be converted into a quiet NaN.
+
+1290	      -  Instructions converting between single and double precision
+1291	         sometimes discard or alter NaN payloads.
+
+1293	   As a result, applications that rely on non-trivial NaNs generally
+1294	   cannot depend on CPU instructions, floating-point libraries, or
+1295	   programming environments.  Instead, they usually need their own
+1296	   software implementation of IEEE 754 to encode and decode the full bit
+1297	   patterns to reliably process non-trivial NaNs.
+
+1299	B.3.  Use and Non-use for Non-Trivial NaNs
+
+1301	   Non-trivial NaNs, excluding signaling NaNs, are not produced by
+1302	   standard floating-point operations.  They are typically created at
+1303	   the application level, where software may take advantage of unused
+1304	   bits in the NaN payload.  Such uses are rare and unusual, but they do
+1305	   exist.
+
+1307	   One example is the R programming language, which is designed for
+1308	   statistical computing and therefore operates heavily on numeric data.
+1309	   R uses NaN payloads to distinguish various error or missing-data
+1310	   conditions beyond standard computational exceptions such as division
+1311	   by zero.
+
+1313	   Another example is NaNboxing (see [NaNBoxing]), a technique used by
+1314	   some language runtimes — such as certain JavaScript engines — to
+1315	   efficiently represent multiple data types within a single 64-bit word
+1316	   by storing type tags or pointers in the NaN payload.  (CBOR can
+1317	   represent such payloads, but NaNboxed pointers are generally not
+1318	   meaningful or portable across machines, and therefore are usually
+1319	   unsuitable for network transmission or file storage.)
+
+1321	   CBOR’s NaN-payload support can be leveraged if data from these
+1322	   systems must be transmitted over a network or written to persistent
+1323	   storage.
+
+1325	   A designer of a new protocol that makes extensive use of floating-
+1326	   point values might be tempted to use NaN payloads to encode out-of-
+1327	   band information such as error conditions.  For example, NaN payloads
+1328	   could be used to distinguish situations such as sensor offline,
+1329	   sensor absent, sensor error, or sensor out of calibration.  While
+1330	   this is technically possible in CBOR, it comes with significant
+1331	   drawbacks:
+
+1333	   *  Preferred-plus and deterministic serialization cannot be used for
+1334	      this protocol.
+
+1336	   *  Support for NaN payloads is unreliable across programming
+1337	      environments and CBOR libraries.
+
+1339	   *  Values cannot be translated directly to JSON, which does not
+1340	      support NaNs of any kind.
+
+1342	B.4.  Clarification of RFC 8949
+
+1344	   This is a clarifying restatement of how NaNs are to be treated
+1345	   according to [RFC8949].
+
+1347	   NaNs represented in floating-point values of different lengths are
+1348	   considered equivalent in the basic generic data model if:
+
+1350	   *  Their sign bits are identical, and
+
+1352	   *  Their significands are identical after both significands are zero-
+1353	      extended on the right to 64 bits
+
+1355	   This equivalence is established for the entire CBOR basic generic
+1356	   data model.  A NaN encoded as half-, single-, or double-precision is
+1357	   equivalent whenever it satisfies the rules above.  This remains true
+1358	   regardless of how a CBOR library accepts, stores, or presents a NaN
+1359	   in its API.  At the application layer, the equivalence still holds.
+1360	   The only way to avoid this equivalence is by using a tag specifically
+1361	   designed to carry NaNs without these equivalence rules, since tags
+1362	   extend the data model unless otherwise specified.
+
+1364	   The equivalence is similar to how the floating-point value 1.0 is
+1365	   treated as the same value regardless of the precision used to encode
+1366	   it.  Some floating-point values cannot be represented in shorter
+1367	   formats (e.g., 2.0e+50 cannot be encoded in half-precision).  The
+1368	   same is true for some NaNs.
+
+1370	   In preferred serialization, this equivalence MUST be used to shorten
+1371	   encoding length.  If a NaN can be represented equivalently in a
+1372	   shorter form (e.g., half-precision rather than single-precision),
+1373	   then the shorter representation MUST be used.
+
+1375	   This equivalence also applies when floating-point values are used as
+1376	   map keys.  A map key encoded as half-precision MUST be considered a
+1377	   duplicate of one encoded as double-precision if they meet the
+1378	   equivalence rules above.
+
+1380	   However, this equivalence does not apply to map sorting.  Sorting
+1381	   operates on the fully encoded and serialized representation, not on
+1382	   the abstract data model.
+
+1384	   It is Section 2 of [RFC8949] that establishes this equivalence by
+1385	   stating that the number of bytes used to encode a floating-point
+1386	   value is not visible in the data model.  Section 4.1 of [RFC8949]
+1387	   defines preferred serialization.  It requires shortest-length
+1388	   encoding of NaNs including instructions on how to do it.
+1389	   Section 5.6.1 of [RFC8949] describes how NaNs are treated as
+1390	   equivalent when used as map keys.  These three parts of [RFC8949] are
+1391	   consistent and are the basis of this restatement.
+
+1393	   Since Section 4.2.1 of [RFC8949], (Core Deterministic Encoding
+1394	   Requirements), explicitly requires preferred serialization, compliant
+1395	   deterministic encodings must use the shortest equivalent
+1396	   representation of NaNs.
+
+1398	   Finally, Section 4.2.2 of [RFC8949] discusses alternative approaches
+1399	   to deterministic encoding.  It suggests, for example, that all NaNs
+1400	   may be encoded as a half-precision quiet NaN.  This section is
+1401	   distinct from the Core Deterministic Encoding Requirements and
+1402	   represents an optional alternative for handling NaNs.
+
+1404	B.5.  Divergence from RFC 8949
+
+1406	   Non-trivial NaNs are not permitted in either preferred-plus or
+1407	   deterministic serializations.  This is in contrast to preferred
+1408	   serialization and Section 4.2.1 of [RFC8949].
+
+1410	   Note that the prohibition of non-trivial NaNs is the sole difference
+1411	   between deterministic serialization (Section 5) and Section 4.2.1 of
+1412	   [RFC8949].
+
+1414	   The divergence is justified by the following:
+
+1416	   *  Encoding and equivalence of non-trivial NaNs was a little unclear
+1417	      [RFC8949].
+
+1419	   *  IEEE 754 doesn't set requirements for their handling.
+
+1421	   *  Non-trivial NaNs are not well-supported across CPUs and
+1422	      programming environments.
+
+1424	   *  Because preferred serialization of non-trivial NaNs is difficult
+1425	      and error-prone to implement, many CBOR implementations don't
+1426	      encode and/or decode non-trivial NaNs, or don't encode or decode
+1427	      them correctly.
+
+1429	   *  Practical use cases for non-trivial NaNs are extremely rare.
+
+1431	   *  Reducing non-trivial NaNs to a half-precision quiet NaN is simple
+1432	      and supported by programming environments (e.g., isnan() can be
+1433	      used to detect all NaNs).
+
+1435	   *  Non-trivial NaNs remain supported by general serialization; the
+1436	      divergence is only for preferred-plus and deterministic
+1437	      serialization.
+
+1439	   *  A new CBOR tag can be defined in the future to explicitly support
+1440	      them.
+
+1442	B.6.  Recommendations for Use of Non-Trivial NaNs
+
+1444	   While non-trivial NaNs are excluded from preferred-plus and
+1445	   deterministic serialization, they are supported by Section 3.
+
+1447	   New protocol designs SHOULD avoid non-trivial NaNs.  Support for them
+1448	   is unreliable, and it is straightforward to design CBOR-based
+1449	   protocols that do not depend on them.  In many cases, the use of NaN
+1450	   can be replaced entirely with null.  JSON requires use of null as it
+1451	   does not support NaNs at all.
+
+1453	   The primary use case for non-trivial NaNs is existing systems that
+1454	   already use them.  For example, a program that relies on non-trivial
+1455	   NaNs internally may need to serialize its data to run across machines
+1456	   connected by a network.
+
+1458	Appendix C.  Code for Encoding Preferred-Plus Floating-Point Values
+
+1460	   Preferred-plus (Section 4.1) and deterministic serialization require
+1461	   that floating-point values fitting in single-precision and half-
+1462	   precision be encoded as such.  This C code implements that
+1463	   conversion.  While conversion between single and double is widely
+1464	   supported, conversion to half-precision is not.  Appendix D of
+1465	   [RFC8949] provides example code for decoding half-precision values;
+1466	   this appendix provides corresponding code for encoding them.
+
+1468	   Two functions are provided: one to convert from double to single, and
+1469	   another from single to half.  Used together, they cover all possible
+1470	   cases.  If the input is a double, pref_plus_double_to_single() must
+1471	   be called first; if it succeeds, pref_plus_single_to_half() is then
+1472	   called to complete the conversion from double to half.  If the input
+1473	   is already a single, only pref_plus_single_to_half() need be called.
+
+1475	   (The two functions have identical structure.  Because the constants
+1476	   are difficult to compute and verify, both are provided.)
+1477	   Both functions return an integer with the bit pattern for the
+1478	   resulting floating-point value, or a negative value on failure. -1
+1479	   indicates the conversion can't be performed because the input is out
+1480	   of range or precision would be lost. -2 indicates a non-trivial NaN
+1481	   was given for encoding which should either be rejected or output as a
+1482	   half-precision quiet NaN.
+
+1484	   /* Constants based on IEEE 754; _LEN is in bits */
+
+1486	   /* Half-precision */
+1487	   #define HLF_MANT_LEN          10
+1488	   #define HLF_EXP_LEN           5
+1489	   #define HLF_MANT_BITS         0x3ffUL /* 10 bits */
+1490	   #define HLF_SIGN_BIT         (0x01UL << (HLF_EXP_LEN + HLF_MANT_LEN))
+1491	   #define HLF_NAN_INF_EXP_BITS  0x7c00
+1492	   #define HLF_QUIET_NAN        (0x1UL << (HLF_MANT_LEN-1))
+
+1494	   /* Single-precision */
+1495	   #define SGL_MANT_LEN          23
+1496	   #define SGL_EXP_LEN           8
+1497	   #define SGL_MANT_BITS         0x7fffffUL /* 23 bits */
+1498	   #define SGL_SIGN_BIT         (0x01UL << (SGL_EXP_LEN + SGL_MANT_LEN))
+1499	   #define SGL_EXP_BITS          0xffUL /* 8 bits */
+1500	   #define SGL_QUIET_NAN        (0x1UL << (SGL_MANT_LEN - 1))
+1501	   #define SGL_ZERO_SUBNORM_EXP  0
+1502	   #define SGL_NAN_INF_EXP       255
+1503	   #define SGL_NAN_INF_EXP_BITS (SGL_NAN_INF_EXP << SGL_MANT_LEN)
+1504	   #define SGL_MANT_ADD_ONE     (0x01UL << SGL_MANT_LEN)
+
+1506	   /* Double-precision */
+1507	   #define DBL_MANT_LEN          52
+1508	   #define DBL_EXP_LEN           11
+1509	   #define DBL_MANT_BITS         0xfffffffffffffULL /* 52 bits */
+1510	   #define DBL_EXP_BITS          0x7ffULL /* 11 bits */
+1511	   #define DBL_QUIET_NAN        (0x1ULL << (DBL_MANT_LEN-1))
+1512	   #define DBL_ZERO_SUBNORM_EXP  0
+1513	   #define DBL_NAN_INF_EXP       2047
+1514	   #define DBL_MANT_ADD_ONE     (0x01ULL << (DBL_MANT_LEN))
+
+1516	   /* Converting single to half; _EXP are biased single exponents */
+1517	   #define S2H_SIGN_SHIFT       16
+1518	   #define S2H_BIAS_DIFF_EXP   (127 - 15)
+1519	   #define S2H_MIN_NORM_EXP     113
+1520	   #define S2H_MIN_SUBNORM_EXP  103
+1521	   #define S2H_SUBNORM_SHIFT    126
+1522	   #define S2H_MAX_NORM_EXP     142
+1523	   #define S2H_LOST_BITS        0x1fffUL /* 23 - 10 bits */
+1524	   /* Converting double to single; _EXP are biased double exponents */
+1525	   #define D2S_SIGN_SHIFT       32
+1526	   #define D2S_BIAS_DIFF_EXP   (1023 - 127)
+1527	   #define D2S_MIN_NORM_EXP     898
+1528	   #define D2S_MIN_SUBNORM_EXP  874
+1529	   #define D2S_SUBNORM_SHIFT    926
+1530	   #define D2S_MAX_NORM_EXP     1150
+1531	   #define D2S_LOST_BITS        0x1fffffffULL /* 52 - 23 bits */
+
+1533	   long pref_plus_single_to_half(unsigned long single) {
+1534	     const unsigned long sign = single >> S2H_SIGN_SHIFT & HLF_SIGN_BIT;
+1535	     const unsigned long mant = single & SGL_MANT_BITS;
+1536	     const unsigned long exp  = single >> SGL_MANT_LEN & SGL_EXP_BITS;
+
+1538	     if (exp == SGL_ZERO_SUBNORM_EXP) {
+1539	       if (mant == 0) {
+1540	         return (long)sign; /* +/- 0.0 */
+1541	       } else {
+1542	         return -1; /* single subnormals are out of range for half */
+1543	       }
+1544	     } else if (exp >= S2H_MIN_SUBNORM_EXP && exp < S2H_MIN_NORM_EXP) {
+1545	       if (mant & ((1UL << (S2H_SUBNORM_SHIFT - exp)) - 1)) {
+1546	         return -1;   /* bits lost in conversion to half subnormal */
+1547	       } else {
+1548	         return (long)(sign + /* converts to half subnormal */
+1549	              ((mant + SGL_MANT_ADD_ONE) >> (S2H_SUBNORM_SHIFT - exp)));
+1550	       }
+1551	     } else if (exp >= S2H_MIN_NORM_EXP && exp <= S2H_MAX_NORM_EXP) {
+1552	       if (mant & S2H_LOST_BITS) {
+1553	         return -1; /* bits lost in conversion */
+1554	       } else {
+1555	         return (long)(sign + /* Converts to normal */
+1556	                      ((exp - S2H_BIAS_DIFF_EXP) << HLF_MANT_LEN) +
+1557	                      (mant >> (SGL_MANT_LEN - HLF_MANT_LEN)));
+1558	       }
+1559	     } else if (exp == SGL_NAN_INF_EXP) {
+1560	       if (mant == 0) {
+1561	         return (long)(sign + HLF_NAN_INF_EXP_BITS); /* +/- infinity */
+1562	       } else if (mant == SGL_QUIET_NAN && sign == 0) {
+1563	          return HLF_QUIET_NAN + HLF_NAN_INF_EXP_BITS; /* trivial NaN */
+1564	       } else {
+1565	          return -2; /* non-trivial NaN */
+1566	       }
+1567	     } else {
+1568	        return -1; /* large exponent -- out of range for half */
+1569	     }
+1570	   }
+1571	   long long pref_plus_double_to_single(unsigned long long dbl) {
+1572	     const unsigned long long sign =
+1573	                                   dbl >> D2S_SIGN_SHIFT & SGL_SIGN_BIT;
+1574	     const unsigned long long mant = dbl & DBL_MANT_BITS;
+1575	     const unsigned long long exp  = dbl >> DBL_MANT_LEN & DBL_EXP_BITS;
+
+1577	     if (exp == DBL_ZERO_SUBNORM_EXP) {
+1578	       if (mant == 0) {
+1579	         return (long long)sign; /* +/- 0.0 */
+1580	       } else {
+1581	         return -1; /* double subnormals are out of range for single */
+1582	       }
+1583	     } else if (exp >= D2S_MIN_SUBNORM_EXP && exp < D2S_MIN_NORM_EXP) {
+1584	       if (mant & ((1ULL << (D2S_SUBNORM_SHIFT - exp)) - 1)) {
+1585	         return -1; /* bits lost in conversion to single subnormal */
+1586	       } else {
+1587	         return (long long)(sign + /* converts to single subnormal */
+1588	              ((mant + DBL_MANT_ADD_ONE) >> (D2S_SUBNORM_SHIFT - exp)));
+1589	        }
+1590	     } else if (exp >= D2S_MIN_NORM_EXP && exp <= D2S_MAX_NORM_EXP) {
+1591	       if (mant & D2S_LOST_BITS) {
+1592	         return -1; /* bits lost in conversion */
+1593	       } else {
+1594	          return (long long)(sign + /* Converts to normal */
+1595	                           ((exp - D2S_BIAS_DIFF_EXP) << SGL_MANT_LEN) +
+1596	                            (mant >> (DBL_MANT_LEN - SGL_MANT_LEN)));
+1597	       }
+1598	     } else if (exp == DBL_NAN_INF_EXP) {
+1599	       if (mant == 0) {
+1600	         /* +/- infinity */
+1601	         return (long long)(sign + SGL_NAN_INF_EXP_BITS);
+1602	       } else if (mant == DBL_QUIET_NAN && sign == 0) {
+1603	          return SGL_QUIET_NAN + SGL_NAN_INF_EXP_BITS; /* quiet NaN */
+1604	       } else {
+1605	          return -2; /* non-trivial NaN */
+1606	       }
+1607	     } else {
+1608	        return -1; /* large exponent -- out of range for single */
+1609	     }
+1610	   }
+
+1612	    Figure 1: Example C Code for Preferred-Plus Floating-Point Encoding
+
+1614	Appendix D.  Bignums and the CBOR Data Model
+
+1616	   The primary purpose of this document is to define preferred-plus and
+1617	   deterministic serialization.  Accordingly, Section 4 describes CBOR’s
+1618	   unified integer space in terms of serialization behavior.  This is an
+1619	   effective and clear way to describe what implementors must do.  An
+1620	   implementation that follows the requirements in Section 4 will be
+1621	   complete and correct with respect to serialization.
+
+1623	   From a conceptual perspective, however, additional discussion is
+1624	   warranted regarding the CBOR data model itself.  That discussion is
+1625	   provided in this appendix.  (Please review Section 1.1 for background
+1626	   on the difference between serialization and the data model).
+
+1628	   In the basic, generic CBOR data model, each tag represents a distinct
+1629	   data type (Section 2 of [RFC8949]).  Tags are also distinct from the
+1630	   major types, such as numbers and strings.  By this, an integer value
+1631	   such as 0 or 1 encoded as major type 0 is clearly distinct in the
+1632	   data model from the same integer value encoded as tag 2.
+
+1634	   However, the text in Section 3.4.3 of [RFC8949] overrides this by
+1635	   defining these encodings to be equivalent rather than distinct.  This
+1636	   text therefore modifies the CBOR data model.  No other serialization
+1637	   requirement in [RFC8949] or in this document alters the data model;
+1638	   this equivalence is the sole exception.  This is unusual because the
+1639	   data model is otherwise orthogonal to serialization.
+
+1641	   Further, Section 3.4.3 of [RFC8949] along with text in Section 2 of
+1642	   [RFC8949] are interpreted such that there is never a CBOR data model
+1643	   where there is a distinction between these integer representations.
+1644	   That is, the equivalence applies regardless of the serialization even
+1645	   though much of the relevant text appears in proximity to discussions
+1646	   of serialization.
+
+1648	   This document does not attempt to update or revise the text of
+1649	   Section 3.4.3 of [RFC8949].  Rather, it records the commonly accepted
+1650	   interpretation of that text and its implications for the CBOR data
+1651	   model.
+
+1653	   This document does create a new rule for future tag definitions.  See
+1654	   Section 7.
+
+1656	Appendix E.  CDDL for Bignums
+
+1658	   The types bigint and biguint in the CDDL Standard Prelude (Appendix D
+1659	   of [RFC8610]) do NOT describe the bignums described in this document
+1660	   or in Section 3.4.3 of [RFC8949], not even for general serialization.
+1661	   The types integer and unsigned can be used, but note that they do not
+1662	   fully express the rules that govern the choice between major types 0
+1663	   and 1 and the bignum tags.  CDDL-described protocols SHOULD use
+1664	   integer and unsigned and in prose state that these values correspond
+1665	   to either Section 4 of this document or Section 3.4.3 of [RFC8949].
+1666	   Appendix D explains the reasons for this.
+
+1668	   The following CDDL can be used:
+
+1670	   ; bignum byte strings are of unlimited size, but that
+1671	   ; can't be expressed in CDDL, so a limit of 1,000
+1672	   bnmax = 1000
+1673	   bnbstr = bstr .size (8..bnmax)
+
+1675	   pplus-tag2bstr = #6.2(bnbstr)
+1676	   pplus-biguint  = #0 / pplus-tag2bstr
+
+1678	   pplus-tag3bstr = #6.3(bnbstr)
+1679	   pplus-bignint  = #1 / pplus-tag3bstr
+
+1681	   pplus-bigint = pplus-biguint / pplus-bignint
+
+1683	Appendix F.  Bignum Implementation Strategies
+
+1685	   Appendix D describes how CBOR defines a single integer number space,
+1686	   in which bignums are not distinct from values encoded using major
+1687	   types 0 and 1.  This appendix discusses approaches for implementers
+1688	   to support that model.
+
+1690	   Some programming environments provide strong native support for
+1691	   bignums (e.g., JavaScript, Python, Ruby, and Go), while others do not
+1692	   (e.g., C, C++, and Rust).  Even in environments that support bignums,
+1693	   operations on native-sized integers (e.g., 64-bit integers) are
+1694	   typically much more efficient.  It is therefore reasonable for a CBOR
+1695	   library to expose separate APIs for native-sized integers and for
+1696	   bignums.
+
+1698	   When a CBOR library provides a bignum API, values that fall within
+1699	   the range of major types 0 and 1 must be encoded using those major
+1700	   types rather than tags 2 or 3.  Similarly, decoding facilities that
+1701	   return bignums must accept values encoded using major types 0 and 1,
+1702	   even though the returned representation is a bignum.
+
+1704	   Alternatively, some CBOR libraries may choose to return tags 2 and 3
+1705	   as raw byte strings, as this approach is simpler than implementing
+1706	   full bignum support.  When a library adopts this approach, it should
+1707	   clearly document that the application layer is responsible for
+1708	   performing the integer unification.  The application is also
+1709	   responsible for handling CBOR’s offset-by-one encoding of negative
+1710	   values and the extended negative integer range permitted by major
+1711	   type 1.
+
+1713	   In most cases, these additional processing steps are straightforward
+1714	   when the application already uses a bignum library.
+
+1716	   Another acceptable approach is for a CBOR library to provide a
+1717	   generic mechanism that allows applications to register handlers for
+1718	   specific tags.  In this case, handlers for tags 2 and 3 MUST perform
+1719	   the required unification with major types 0 and 1.
+
+1721	   Finally, note that bignums are not a widely used feature of CBOR.
+1722	   Some CBOR libraries may entirely omit support for tags 2 and 3.
+
+1724	Appendix G.  Serialization Checking
+
+1726	   Serialization checking rejects input that, while well-formed CBOR,
+1727	   does not conform to a serialization rule set it is enforcing.  For
+1728	   example, a decoder checking for deterministic serialization will
+1729	   error out if map keys are not in the required sorted order.
+1730	   Likewise, a decoder checking for preferred-plus serialization will
+1731	   reject, for instance, any CBOR data item that is not encoded in its
+1732	   shortest form.
+
+1734	   To align with long-settled security practice and defend against
+1735	   malformed input attacks, every CBOR decoder must reject all input
+1736	   that is not well-formed.  Serialization checking goes beyond that.
+1737	   The data rejected by serialization checking is well-formed; it is
+1738	   rejected only because of additional serialization constraints.
+
+1740	G.1.  Serialization Checking Use Cases
+
+1742	   Some protocol environments may use serialization checking to minimize
+1743	   representational variants as a strategy to improve interoperability.
+1744	   Discouraging variants early prevents them from compounding.  See
+1745	   [RFC9413] on maintaining robust protocols.
+
+1747	   Serialization checking helps defend against covert channels described
+1748	   in Section 9.1.
+
+1750	   Applications that rely on deterministic serialization may use
+1751	   serialization checking to ensure that the data they consume is truly
+1752	   deterministic and that the assumptions their logic makes about
+1753	   determinism hold.
+
+1755	   A protocol that depends on deterministic serialization may recommend
+1756	   or require its decoders to perform serialization checking.  CBOR
+1757	   libraries may offer serialization checking as a selectable option, at
+1758	   some cost in code size and processing.
+
+1760	   Serialization checking may enhance security in certain contexts, but
+1761	   such checking is never a substitute for complete well-formedness
+1762	   checking.  All CBOR decoders — regardless of their capabilities,
+1763	   modes, or optional features — must perform full well-formedness
+1764	   checking.  They must also reject well-formed input that uses features
+1765	   they do not support.  For example, a decoder that does not support
+1766	   indefinite-length items rejects them because they are unsupported,
+1767	   not because it is acting as a checking decoder.
+
+1769	   A decoder that fails to perform well-formedness checking is unsafe,
+1770	   whatever else it does.  The appropriate remedy is to fix it, not to
+1771	   add the serialization checking described here.
+
+1773	G.2.  Bignum Leading Zero Exception
+
+1775	   Section 3.4.3 of [RFC8949] requires that decoders supporting tags 2
+1776	   and 3 be able to decode bignums that have leading zeros, even though
+1777	   preferred serialization never produces them.  This conflicts with the
+1778	   goal of a decoder that checks for preferred or deterministic
+1779	   serialization: such a decoder needs to reject a bignum with leading
+1780	   zeros as non-conformant.
+
+1782	   This document recommends that decoders performing serialization
+1783	   checking reject bignums containing leading zeros, notwithstanding the
+1784	   MUST in Section 3.4.3 of [RFC8949].  Serialization checking is
+1785	   optional.  When a protocol selects it — for example, because it
+1786	   depends on deterministic encoding — decoders are expected to perform
+1787	   the check, including rejecting non-preferred bignum encodings such as
+1788	   those with leading zeros.
+
+1790	   Note that serialization-checking decoders always reject the empty
+1791	   byte string, because it always represents a value (0 for tag 2, -1
+1792	   for tag 3) that can be encoded directly using major type 0 or 1.
+
+1794	Appendix H.  CBOR Byte String Wrapping
+
+1796	   This appendix provides non-normative guidance on byte-string wrapping
+1797	   of CBOR.  It applies primarily to tag 24 and the CDDL .cbor and
+1798	   .cborseq control operators, but also to the serialization-specifying
+1799	   control operators described in Section 8.  It also applies when prose
+1800	   states the byte-string wrapping requirement, such as for the COSE
+1801	   protected headers.  See also Appendix J.1.
+
+1803	H.1.  Purpose
+
+1805	   Error isolation:  Wrapping CBOR in a byte string prevents encoding
+1806	      errors in the wrapped data from causing the enclosing CBOR to fail
+1807	      during decoding.  (CBOR decoding generally halts at the first
+1808	      error and lacks internal length redundancy found in formats like
+1809	      ASN.1/DER.)
+
+1811	   CBOR library support for signing and hashing:  When wrapped CBOR
+1812	      needs to be signed or hashed, its original encoded bytes must be
+1813	      available.  Most CBOR libraries cannot directly extract the raw
+1814	      bytes of substructures, but byte-string wrapping provides direct
+1815	      access to the exact bytes for signing or hashing.
+
+1817	   Protocol embedding:  Byte-string wrapping is generally useful when
+1818	      messages from one CBOR-based protocol need to be embedded within
+1819	      another CBOR protocol.
+
+1821	   Special map keys:  Some CBOR libraries only support simple, non-
+1822	      aggregate map keys (e.g., integers or strings).  To use complex
+1823	      data types like arrays and maps as map keys, they can be wrapped
+1824	      in a byte string.
+
+1826	H.2.  Wrapping Recommendations
+
+1828	   The serialization requirements for the wrapping CBOR may differ from
+1829	   those for the wrapped CBOR.  CBOR itself imposes no universal rule
+1830	   that they must match; this is determined by the design of the
+1831	   wrapping protocol.
+
+1833	   The wrapping protocol should not impose serialization requirements on
+1834	   the wrapped message.  The two should be treated as independent
+1835	   entities.  This approach avoids potential conflicts between
+1836	   serialization rules.
+
+1838	   For example, assume protocol XYZ wraps protocol ABC.  If protocol ABC
+1839	   requires Canonical CBOR as specified in Section 3.9 of [RFC7049]
+1840	   (e.g., [CTAP2] from WebAuthn) while protocol XYZ requires
+1841	   deterministic serialization, Section 5, a conflict would arise.
+
+1843	   Most CBOR data to be signed or hashed does not require a specific
+1844	   serialization.  CBOR, being a modern, fully specified, binary
+1845	   protocol, does not need canonicalization, wrapping, or armoring like
+1846	   other data representation formats such as JSON.  See the discussion
+1847	   in Section 5.3.
+
+1849	H.3.  CBOR Library Implementation Suggestion
+
+1851	   A straightforward implementation strategy is to instantiate a second
+1852	   CBOR encoder or decoder for the wrapped message.  However, this may
+1853	   be suboptimal in memory-constrained environments, as it may require
+1854	   both a duplicate copy of the wrapped data and an additional encoder/
+1855	   decoder instance.
+
+1857	   A more efficient approach can be for the CBOR library to treat the
+1858	   wrapped CBOR like a container (similar to arrays or maps).  Many CBOR
+1859	   implementations already handle arrays and maps as containers without
+1860	   requiring a separate instance.  Similarly, a byte-string wrapping
+1861	   encoded CBOR can be treated as a container that always contains
+1862	   exactly one item.
+
+1864	Appendix I.  Signing and Hashing Encoded CBOR
+
+1866	   CBOR protocols are generally described as a collection of data items,
+1867	   often using CDDL.  Signing or hashing is performed over some range of
+1868	   the encoded CBOR, possibly all of it.  For signing or hashing to
+1869	   work, the sender/encoder and the receiver/verifier must operate on
+1870	   exactly the same range of encoded bytes, so a protocol definition
+1871	   MUST define that range unambiguously.  There are several ways to
+1872	   specify it:
+
+1874	   *  Name an existing data item (e.g., a CDDL type)
+
+1876	   *  Name a data item created specifically for this purpose (e.g., a
+1877	      CDDL type)
+
+1879	   *  Describe the input data items in prose
+
+1881	   *  Wrap the input in a byte string
+
+1883	   Typically, a named data item is an array or a map, but non-aggregate
+1884	   items can be named as well.  When naming an item, the specification
+1885	   should state explicitly whether the input is the full encoded item
+1886	   (head, contents, and trailing "break" if indefinite-length) or only
+1887	   its contents.  Covering the full encoded item is recommended, as it
+1888	   is clearer.  If the item might be tag content (i.e., preceded by one
+1889	   or more tag numbers), the specification should state whether the tag
+1890	   numbers are included in the input; including them is recommended.
+
+1892	   It is also possible to specify a slice of a map or array as the
+1893	   input.  A good way to do this is to define a CDDL type that
+1894	   represents the slice as a CBOR sequence.
+
+1896	   Another practice is to wrap the bytes to be signed or hashed in a
+1897	   byte string, following the pattern of tag 24 (the tag number itself
+1898	   is typically unnecessary and omitted).  This makes the input to the
+1899	   signature or hash — the contents of the byte string — entirely
+1900	   unambiguous: there are no concerns about definite versus indefinite
+1901	   lengths, serialization variants, or tagging; any or all of these
+1902	   work.
+
+1904	   The choice of input bytes also affects implementations and their use
+1905	   of CBOR libraries.
+
+1907	   Byte-string wrapping is guaranteed to work with even simple, basic
+1908	   libraries, although it will probably require two instances of the
+1909	   encoder or decoder: one for the wrapped (signed/hashed) CBOR and one
+1910	   for the wrapping CBOR.  See Appendix H.
+
+1912	   If byte-string wrapping is not used, the CBOR library must provide an
+1913	   additional feature that gives access to the undecoded CBOR.  For
+1914	   example, it may offer a "tell()" operation that reports the byte
+1915	   offset of the start of the first covered item and of the end of the
+1916	   last covered item (which is more complicated when indefinite lengths
+1917	   are involved), or it may offer an API that directly returns the
+1918	   undecoded bytes of an item.
+
+1920	   Another tactic is to require deterministic encoding.  The receiver
+1921	   then reconstructs the signed/hashed bytes from the decoded data items
+1922	   rather than accessing the received encoded CBOR.
+
+1924	   In summary, byte-string wrapping is the most reliable approach
+1925	   because it clearly delineates what is signed or hashed and works with
+1926	   every decoder, but the other designs can also be made to work.
+
+1928	Appendix J.  Serialization for COSE
+
+1930	   This appendix highlights how the topics in this document apply to
+1931	   CBOR Object Signing and Encryption (COSE [RFC9052]).
+
+1933	   It focuses on the COSE_Sign1 message (Section 4.2 of [RFC9052]),
+1934	   which is sufficient for illustrating the relevant considerations.
+1935	   COSE_Sign1 is a simple structure for signing a payload.  Its
+1936	   serialization can be described in three parts:
+
+1938	   *  The payload
+1939	   *  The Sig_structure
+
+1941	   *  The encoded message (the header parameters and the array of four
+1942	      that is the COSE_Sign1)
+
+1944	J.1.  COSE Payload Serialization
+
+1946	   The signed payload may or may not be CBOR, but assume that it is,
+1947	   perhaps a CWT or EAT.  The payload is transmitted from the signer/
+1948	   sender fully intact all the way to the verifier/receiver.  Because it
+1949	   is transmitted fully intact, CBOR is a binary protocol and
+1950	   intermediaries do not do things like wrap long lines or add base 64
+1951	   encoding or such, it is not special in any way and COSE imposes no
+1952	   serialization restrictions on it at all.  That is, it can use any
+1953	   serialization it wants.  The serialization is selected by the
+1954	   protocol that defines the payload, not by COSE.
+
+1956	   This highlights the principle that determinism is often NOT needed
+1957	   for signing and hashing described in Section 5.3.
+
+1959	   It is also worth noting that the payload is a byte string wrapped.
+1960	   This is not for determinism, armoring or canonicalization.  It is so
+1961	   that the payload can be any data format, including not CBOR.  It is
+1962	   also so CBOR libraries can return the CBOR-encoded payload for
+1963	   processing by the verification algorithms.  Most CBOR libraries
+1964	   decoders do not provide access to any arbitrary chunk of encoded CBOR
+1965	   in the middle of a message.  This is an example of byte string
+1966	   wrapping described in Appendix H.
+
+1968	J.2.  COSE Sig_structure
+
+1970	   The Sig_structure Section 4.4 of [RFC9052] is used to aggregate all
+1971	   the items that are input to the signature algorithm — the payload,
+1972	   protected headers and other.
+
+1974	   The Sig_structure is not transmitted from the sender to the receiver;
+1975	   instead, it is constructed independently by both parties.  COSE
+1976	   therefore explicitly requires deterministic encoding so that both the
+1977	   sender and receiver produce identical encoded CBOR representations.
+1978	   This requirement is specified in Section 9 of [RFC9052].
+
+1980	   This COSE requirement is effectively equivalent to the deterministic
+1981	   serialization defined in Section 5, since no floating-point NaNs are
+1982	   involved.  It is also effectively equivalent to preferred-plus
+1983	   serialization as defined in Section 4, because the Sig_structure
+1984	   contains no maps.
+
+1986	   The determinism requirement does not apply to the protected headers
+1987	   incorporated into the Sig_structure.  Deterministic encoding of the
+1988	   headers is unnecessary because they are transmitted in the exact
+1989	   encoded form in which they are included in the Sig_structure.
+
+1991	   Furthermore, determinism requirements do not extend into CBOR inside
+1992	   of byte strings.  Once CBOR data is wrapped in a byte string, its
+1993	   internal encoding is treated as opaque and is not subject to
+1994	   surrounding serialization constraints.
+
+1996	   This illustrates the general need for deterministic serialization
+1997	   when signed data is reconstructed rather than transmitted in the
+1998	   exact form that was signed.  See Section 5.3.
+
+2000	J.3.  The Encoded Message
+
+2002	   A COSE_Sign1 message is an array of four elements containing two
+2003	   header parameter chunks, the payload, and the signature.  The two
+2004	   header parameter chunks are maps that hold the various header
+2005	   parameters.  COSE places no serialization requirements on these
+2006	   elements.  The COSE protocol functions correctly regardless of the
+2007	   CBOR serialization used, as long as the decoder can decode what the
+2008	   encoder sends.
+
+2010	   In this respect, the serialization of the COSE_Sign1 message is no
+2011	   different from that of any other CBOR-based protocol message.
+2012	   Indefinite-length items may be used, and non-shortest CBOR arguments
+2013	   are permitted.  The only requirement is that the serialization used
+2014	   by the encoder be decodable by the receiver.
+
+2016	   Strictly speaking, COSE is a framework protocol intended for
+2017	   incorporation into an end-to-end protocol, which should explicitly
+2018	   define its serialization requirements.  See Section 2.1.1 and
+2019	   Section 2.1.2.
+
+2021	   In practice, some COSE libraries have implicitly implemented only the
+2022	   preferred (or preferred-plus) serialization, and end-to-end protocols
+2023	   have often defaulted to whatever behavior the underlying COSE library
+2024	   provides.  While this generally works — particularly because the
+2025	   preferred serialization aligns with the recommendations here — it is
+2026	   more robust for an end-to-end protocol to state its serialization
+2027	   requirements explicitly.
+
+2029	Appendix K.  Examples
+
+2031	   This appendix provides examples of the serializations described in
+2032	   this document.  Each example is a single data item.  Collectively,
+2033	   the examples cover the major CBOR data types and some special cases.
+2034	   Table 3 describes the five fields provided for each example.
+
+2036	     +===============================+===============================+
+2037	     | field                         | description                   |
+2038	     +===============================+===============================+
+2039	     | description                   | Text describing the item      |
+2040	     +-------------------------------+-------------------------------+
+2041	     | edn-representations           | Unencoded value(s) for the    |
+2042	     |                               | data item                     |
+2043	     +-------------------------------+-------------------------------+
+2044	     | general-serializations        | Encoded representation(s) for |
+2045	     |                               | general serialization         |
+2046	     +-------------------------------+-------------------------------+
+2047	     | preferred-plus-serializations | Encoded representation(s) for |
+2048	     |                               | preferred-plus serialization  |
+2049	     +-------------------------------+-------------------------------+
+2050	     | deterministic-serialization   | Encoded representation for    |
+2051	     |                               | deterministic serialization   |
+2052	     +-------------------------------+-------------------------------+
+
+2054	                     Table 3: Example Data Item Fields
+
+2056	K.1.  Use for Testing
+
+2058	   These examples are designed to support testing of CBOR libraries.
+2059	   They cover only what is defined in this document and therefore do not
+2060	   provide complete or general CBOR test coverage.  All examples are
+2061	   well-formed and valid.
+
+2063	   While the CBOR-encoded serializations for each item can be used
+2064	   directly as test input, the EDN representation usually must be
+2065	   incorporated into the test manually.  For example, the EDN string "-
+2066	   5.0e-324" will likely need to be passed as a value of type double to
+2067	   the API of a C-language CBOR library that encodes double-precision
+2068	   numbers.
+
+2070	   Not all CBOR libraries support every data type represented in these
+2071	   examples.  This is acceptable: tests for unsupported types may be
+2072	   skipped, or used to verify that an appropriate “unsupported” error is
+2073	   returned.
+
+2075	K.1.1.  Encode Test
+
+2077	   To test encoding, invoke the encoder for each example data item.  The
+2078	   encoder input is the item's EDN representations.  If an example
+2079	   provides multiple EDN representations, each of them should be tested.
+
+2081	   The encoder should be either configured for, or to default to, one of
+2082	   the three serialization types described in this document.  A test
+2083	   succeeds if the encoder produces any of the encoded representations
+2084	   given in the example for that serialization type.
+
+2086	   If an encoder supports multiple serialization types, each type can be
+2087	   tested in turn.
+
+2089	K.1.2.  Decode Test
+
+2091	   To test decoding, invoke the decoder for each example data.
+
+2093	   The decoder should be either to be configured for, or to default to,
+2094	   one of the three serialization types described in this document.  For
+2095	   the selected serialization type, process every encoded representation
+2096	   defined for the target type.  A test passes if the decoded output
+2097	   matches the value specified by the corresponding EDN representation.
+
+2099	   If a decoder supports multiple serialization types, each type can be
+2100	   tested in turn.
+
+2102	K.1.3.  Checking Decoder Test
+
+2104	   Checking decoders are described in Appendix G.
+
+2106	   This test verifies that a checking decoder rejects encodings allowed
+2107	   by general serialization but non-conforming for the target
+2108	   serialization type.  It applies only to CBOR libraries that implement
+2109	   serialization conformance checking.
+
+2111	   Testing a checking decoder for a target serialization type is
+2112	   typically performed as follows: for each example, supply the decoder
+2113	   with every representation permitted under general serialization
+2114	   except those allowed for the target serialization type.  Decoding
+2115	   each such input must result in a conformance-checking error.
+
+2117	   General-serialization decoders are not tested in this way, since they
+2118	   must accept all valid serialization forms.
+
+2120	K.1.4.  Non-Checking Decoder Test
+
+2122	   A non-checking decoder may accept encodings beyond what is required
+2123	   for the target serialization type.  For example, a preferred-plus
+2124	   decoder will often accept non-shortest-length arguments, even though
+2125	   it is not required to do so, and such encodings are not permitted
+2126	   under preferred-plus.  These examples can be used to test such
+2127	   extended decoding.
+
+2129	   Testing proceeds similarly to that for a checking decoder: inputs
+2130	   outside the target serialization type are supplied to the decoder.
+2131	   The difference is that, for a non-checking decoder, many of these
+2132	   inputs may successfully decode rather than producing a conformance
+2133	   error.  When decoding does fail, the expected error is typically
+2134	   “unsupported.”
+
+2136	   Which encoding forms are accepted and which are rejected as
+2137	   unsupported is entirely dependent on the additional capabilities a
+2138	   CBOR library chooses to support and therefore not specified here.
+
+2140	   Note the following:
+
+2142	   *  It is common for preferred-plus and deterministic decoders to
+2143	      accept non-shortest-length arguments.
+
+2145	   *  If the floating-point data type is supported, all serialization
+2146	      types described in this document require support for decoding
+2147	      half-precision representations and subnormals.
+
+2149	K.2.  Example Data Items
+
+2151	   These are available as individual files at [Examples-Repo].
+
+2153	   All general serialization examples of strings, arrays and maps
+2154	   include indefinite-length encodings so as to provide full test cases.
+2155	   CBOR libraries that don't support indefinite-length decoding can not
+2156	   claim to support general serialization even if they support most of
+2157	   the rest of general serialization.  For the purpose of classification
+2158	   by this document they are preferred-plus libraries with extra
+2159	   decoding features.  The extra decoding features can be tested as
+2160	   described in Appendix K.1.4.
+
+2162	   File: zero.edn
+2163	   {
+2164	      "description": "The integer 0" ,
+2165	      "edn-representations" : ["0"] ,
+2166	      "general-serializations": [h'00',
+2167	                                 h'1800',
+2168	                                 h'190000',
+2169	                                 h'1a00000000',
+2170	                                 h'1b0000000000000000',
+2171	                                 h'c2420000',
+2172	                                 h'c240'],
+2173	      "preferred-plus-serializations": [h'00'],
+2174	      "deterministic-serialization": [h'00']
+2175	   }
+
+2177	   File: three.edn
+
+2179	   {
+2180	      "description": "The integer 3" ,
+2181	      "edn-representations" : ["3"] ,
+2182	      "general-serializations": [h'03',
+2183	                                 h'1803',
+2184	                                 h'190003',
+2185	                                 h'1a00000003',
+2186	                                 h'1b0000000000000003',
+2187	                                 h'c2420003' ],
+2188	      "preferred-plus-serializations": [h'03'],
+2189	      "deterministic-serialization": [h'03']
+2190	   }
+
+2192	   File: minus_twenty_five.edn
+
+2194	   {
+2195	      "description": "The integer -25",
+2196	      "edn-representations" : ["-25"],
+2197	      "general-serializations": [h'3818',
+2198	                                 h'390018',
+2199	                                 h'3a00000018',
+2200	                                 h'3b0000000000000018',
+2201	                                 h'c3420018' ],
+2202	      "preferred-plus-serializations": [h'3818'],
+2203	      "deterministic-serialization": [h'3818']
+2204	   }
+
+2206	   File: 65_bit_neg.edn
+2207	   {
+2208	      "description": "Largest negative integer" ,
+2209	      "edn-representations" : ["-18446744073709551616"] ,
+2210	      "general-serializations": [h'3bffffffffffffffff',
+2211	                                 h'c348ffffffffffffffff'],
+2212	      "preferred-plus-serializations": [h'3bffffffffffffffff'],
+2213	      "deterministic-serialization": [h'3bffffffffffffffff']
+2214	   }
+
+2216	   File: byte_string.edn
+
+2218	   {
+2219	      "description": "The byte string of length 3: 0x010203",
+2220	      "edn-representations" : ["h'010203'"],
+2221	      "general-serializations": [h'43010203',
+2222	                                 h'5f4101420203ff',
+2223	                                 h'5f5801015a000000020203ff'],
+2224	      "preferred-plus-serializations": [h'43010203'],
+2225	      "deterministic-serialization": [h'43010203']
+2226	   }
+
+2228	   File: text_string.edn
+
+2230	   {
+2231	      "description": "The text string 'hi there'",
+2232	      "edn-representations" : ["\"hi there\""],
+2233	      "general-serializations": [
+2234	        h'686869207468657265',
+2235	        h'7f686869207468657265ff',
+2236	        h'7f64686920746468657265ff',
+2237	        h'7f790004686920747b000000000000000468657265ff'],
+2238	      "preferred-plus-serializations": [
+2239	        h'686869207468657265'],
+2240	      "deterministic-serialization": [
+2241	        h'686869207468657265']
+2242	   }
+
+2244	   File: array.edn
+
+2246	   {
+2247	      "description": "The array [1, 2, 3]",
+2248	      "edn-representations" : ["[1, 2, 3]"],
+2249	      "general-serializations": [h'83010203',
+2250	                                 h'9f010203ff' ],
+2251	      "preferred-plus-serializations": [h'83010203'],
+2252	      "deterministic-serialization": [h'83010203']
+2253	   }
+2254	   File: map.edn
+
+2256	   Note that map order is not significant in the CBOR data model.  Maps
+2257	   are only sorted to provide deterministic encoding.
+
+2259	   {
+2260	     "description": "Map with three items using integer map keys",
+2261	     "edn-representations" : [
+2262	       "{1:\"x\", 2:\"y\", 3:\"z\"}",
+2263	       "{1:\"x\", 3:\"z\", 2:\"y\"}",
+2264	       "{2:\"y\", 3:\"z\", 1:\"x\"}",
+2265	       "{2:\"y\", 1:\"x\", 3:\"z\"}",
+2266	       "{3:\"z\", 1:\"x\", 2:\"y\"}",
+2267	       "{3:\"z\", 2:\"y\", 1:\"x\"}" ],
+2268	     "general-serializations": [
+2269	        h'a301617802617903617a',
+2270	        h'a301617803617a026179',
+2271	        h'a302617903617a016178',
+2272	        h'a302617901617803617a',
+2273	        h'a303617a016178026179',
+2274	        h'a303617a026179016178',
+2275	        h'bf03617a026179016178ff',
+2276	        h'a31a00000003617a19000261791b00000000000000016178'],
+2277	     "preferred-plus-serializations": [
+2278	        h'a301617802617903617a',
+2279	        h'a301617803617a026179',
+2280	        h'a302617903617a016178',
+2281	        h'a302617901617803617a',
+2282	        h'a303617a016178026179',
+2283	        h'a303617a026179016178'],
+2284	     "deterministic-serialization": [
+2285	       h'a301617802617903617a']
+2286	   }
+
+2288	   File: map_strings.edn
+2289	   {
+2290	     "description": "Three item map with string keys",
+2291	     "edn-representations" : [
+2292	        "{\"abc\": 1, \"def\": 2, \"ghi\": 3}",
+2293	        "{\"abc\": 1, \"ghi\": 3, \"def\": 2}",
+2294	        "{\"def\": 2, \"abc\": 1, \"ghi\": 3}",
+2295	        "{\"def\": 2, \"ghi\": 3, \"abc\": 1}",
+2296	        "{\"ghi\": 3, \"abc\": 1, \"def\": 2}",
+2297	        "{\"ghi\": 3, \"def\": 2, \"abc\": 1}" ],
+2298	     "general-serializations": [
+2299	        h'a3636162630163646566026367686903',
+2300	        h'a3636162630163676869036364656602',
+2301	        h'a3636465660263616263016367686903',
+2302	        h'a3636465660263676869036361626301',
+2303	        h'a3636768690363616263016364656602',
+2304	        h'a3636768690363646566026361626301',
+2305	        h'bf636162630163646566026367686903ff',
+2306	        h'bf7f6161626263ff017f6264656166ff027f63676869ff03ff'],
+2307	     "preferred-plus-serializations": [
+2308	       h'a3636162630163646566026367686903',
+2309	       h'a3636162630163676869036364656602',
+2310	       h'a3636465660263616263016367686903',
+2311	       h'a3636465660263676869036361626301',
+2312	       h'a3636768690363616263016364656602',
+2313	       h'a3636768690363646566026361626301'],
+2314	     "deterministic-serialization": [
+2315	       h'a3636162630163646566026367686903' ]
+2316	   }
+
+2318	   File: positive_bignum.edn
+
+2320	   Note that bignums are included in the test data because preferred-
+2321	   plus serialization requires their unification with integers.
+
+2323	   {
+2324	     "description": "A positive bignum",
+2325	     "edn-representations" : ["79228162514264337593543950335"],
+2326	     "general-serializations": [h'c24cffffffffffffffffffffffff',
+2327	                                h'c24e0000ffffffffffffffffffffffff' ],
+2328	     "preferred-plus-serializations": [h'c24cffffffffffffffffffffffff'],
+2329	     "deterministic-serialization":  [h'c24cffffffffffffffffffffffff']
+2330	   }
+
+2332	   File: negative_bignum.edn
+
+2334	   Note that this is the value closest that can be represented as a
+2335	   bignum, not a type 1 integer for preferred-plus serialization.
+
+2337	   {
+2338	      "description": "Negative bignum on boundary with type 1 integer",
+2339	      "edn-representations" : ["-18446744073709551617"],
+2340	      "general-serializations": [
+2341	        h'c349010000000000000000',
+2342	        h'c34c000000010000000000000000',
+2343	        h'c35f450000000001480000000000000000ff'],
+2344	      "preferred-plus-serializations": [
+2345	        h'c349010000000000000000'],
+2346	      "deterministic-serialization":  [
+2347	       h'c349010000000000000000']
+2348	   }
+
+2350	   File: date_epoch_tag.edn
+
+2352	   Note that this is provided as a test case for tags.  There are no
+2353	   requirements for dates in this document.  The tag content in this
+2354	   example does vary by serialization type.
+
+2356	   {
+2357	      "description": "An epoch date tag" ,
+2358	      "edn-representations" : ["1(1776614355)"] ,
+2359	      "general-serializations": [h'c11a69e4fbd3',
+2360	                                 h'd8011a69e4fbd3',
+2361	                                 h'd900011a69e4fbd3',
+2362	                                 h'da000000011a69e4fbd3',
+2363	                                 h'db00000000000000011a69e4fbd3',
+2364	                                 h'c11b0000000069e4fbd3'],
+2365	      "preferred-plus-serializations": [h'c11a69e4fbd3'],
+2366	      "deterministic-serialization":   [h'c11a69e4fbd3']
+2367	   }
+
+2369	   File: date_string_tag.edn
+
+2371	   Note that this is provided as a test case for tags.  There are no
+2372	   requirements for dates in this document.  The tag content in this
+2373	   example does vary by serialization type.
+
+2375	   {
+2376	     "description": "A date string tag" ,
+2377	     "edn-representations" : ["0(\"2026-04-19T03:59:15Z\")"] ,
+2378	     "general-serializations": [
+2379	       h'c074323032362d30342d31395430333a35393a31355a',
+2380	       h'd80074323032362d30342d31395430333a35393a31355a',
+2381	       h'd9000074323032362d30342d31395430333a35393a31355a',
+2382	       h'da0000000074323032362d30342d31395430333a35393a31355a',
+2383	       h'db000000000000000074323032362d30342d31395430333a35393a31355a',
+2384	       h'c07f74323032362d30342d31395430333a35393a31355aff',
+2385	       h'c07f6232307232362d30342d31395430333a35393a31355aff'],
+2386	     "preferred-plus-serializations": [
+2387	       h'c074323032362d30342d31395430333a35393a31355a'],
+2388	     "deterministic-serialization":  [
+2389	       h'c074323032362d30342d31395430333a35393a31355a']
+2390	   }
+
+2392	   File: true.edn
+
+2394	   {
+2395	      "description": "The simple value 'true'" ,
+2396	      "edn-representations" : ["true"] ,
+2397	      "general-serializations": [h'f5'],
+2398	      "preferred-plus-serializations": [h'f5'],
+2399	      "deterministic-serialization": [h'f5']
+2400	   }
+
+2402	   File: simple111.edn
+
+2404	   Note that the simple value 111 is of not particular significance.  It
+2405	   was selected because it is an unassigned simple value.
+
+2407	   {
+2408	      "description": "The simple value 111" ,
+2409	      "edn-representations" : ["simple(111)"] ,
+2410	      "general-serializations": [h'f86f'],
+2411	      "preferred-plus-serializations": [h'f86f'],
+2412	      "deterministic-serialization": [h'f86f']
+2413	   }
+
+2415	   File: float_zero.edn
+2416	   {
+2417	      "description": "Floating-point positive zero",
+2418	      "edn-representations" : ["0.0"] ,
+2419	      "general-serializations": [h'f90000',
+2420	                                 h'fa00000000',
+2421	                                 h'fb0000000000000000'],
+2422	      "preferred-plus-serializations": [h'f90000'],
+2423	      "deterministic-serialization": [h'f90000']
+2424	   }
+
+2426	   File: float_double.edn
+
+2428	   {
+2429	      "description": "Double-precision normal float" ,
+2430	      "edn-representations" : ["1.7976931348623157e+308"] ,
+2431	      "general-serializations": [h'fb7fefffffffffffff'],
+2432	      "preferred-plus-serializations": [h'fb7fefffffffffffff'],
+2433	      "deterministic-serialization": [h'fb7fefffffffffffff']
+2434	   }
+
+2436	   File: float_double_subnormal.edn
+
+2438	   Note that full subnormal support is required for all serializations
+2439	   defined in this document.
+
+2441	   {
+2442	      "description": "Double-precision negative subnormal float",
+2443	      "edn-representations": ["-5.0e-324"],
+2444	      "general-serializations": [h'fb8000000000000001' ],
+2445	      "preferred-plus-serializations": [h'fb8000000000000001' ],
+2446	      "deterministic-serialization": [h'fb8000000000000001']
+2447	   }
+
+2449	   File: float_single.edn
+
+2451	   {
+2452	      "description": "Single-precision normal float" ,
+2453	      "edn-representations" : ["-16777216.0"] ,
+2454	      "general-serializations": [h'fbc170000000000000',
+2455	                                 h'facb800000'],
+2456	      "preferred-plus-serializations": [h'facb800000'],
+2457	      "deterministic-serialization": [h'facb800000']
+2458	   }
+
+2460	   File: float_single_subnormal.edn
+2461	   {
+2462	      "description": "Single-precision subnormal float" ,
+2463	      "edn-representations" : ["5.8774717541114375E-39"] ,
+2464	      "general-serializations": [h'fb3800000000000000',
+2465	                                 h'fa00400000' ],
+2466	      "preferred-plus-serializations": [h'fa00400000'],
+2467	      "deterministic-serialization": [h'fa00400000']
+2468	   }
+
+2470	   File: float_half.edn
+
+2472	   {
+2473	      "description": "half-precision normal float" ,
+2474	      "edn-representations" : ["65504.0"] ,
+2475	      "general-serializations": [h'fb40effc0000000000',
+2476	                                 h'fa477fe000',
+2477	                                 h'f97bff' ],
+2478	      "preferred-plus-serializations": [h'f97bff'],
+2479	      "deterministic-serialization": [h'f97bff']
+2480	   }
+
+2482	   File: float_half_subnormal.edn
+
+2484	   {
+2485	      "description": "Half-precision subnormal float" ,
+2486	      "edn-representations" : ["3.0517578125E-5"] ,
+2487	      "general-serializations": [h'fb3f00000000000000',
+2488	                                 h'fa38000000',
+2489	                                 h'f90200' ],
+2490	      "preferred-plus-serializations": [h'f90200'],
+2491	      "deterministic-serialization": [h'f90200']
+2492	   }
+
+2494	   File: float_neg_infinity.edn
+
+2496	   {
+2497	     "description": "Negative Infinity",
+2498	     "edn-representations" : ["-Infinity"] ,
+2499	     "general-serializations": [h'f9fc00',
+2500	                                h'faff800000',
+2501	                                h'fbfff0000000000000'],
+2502	     "preferred-plus-serializations": [h'f9fc00'],
+2503	     "deterministic-serialization": [h'f9fc00']
+2504	   }
+
+2506	   File: float_quiet_nan.edn
+2507	   {
+2508	     "description": "Floating-point quiet NaN",
+2509	     "edn-representations" : ["NaN"] ,
+2510	     "general-serializations": [h'f97e00',
+2511	                                h'fa7fc00000',
+2512	                                h'fb7ff8000000000000'],
+2513	     "preferred-plus-serializations": [h'f97e00'],
+2514	     "deterministic-serialization": [h'f97e00']
+2515	   }
+
+2517	   File: float_nan_payload.edn
+
+2519	   The NaN payload is a special case.  For preferred-plus and
+2520	   deterministic serialization, the decode should fail.  For general
+2521	   serialization a NaN with a payload should be returned, but there is
+2522	   no EDN representation for that.
+
+2524	   {
+2525	     "description": " Floating-point NaN payload/significand is 0x1ff",
+2526	     "edn-representations" : [] ,
+2527	     "general-serializations": [h'f97dff',
+2528	                                h'fa7fbfe000',
+2529	                                h'fb7ff7fc0000000000'],
+2530	     "preferred-plus-serializations": [],
+2531	     "deterministic-serialization": []
+2532	   }
+
+2534	Contributors
+
+2536	   Joe Hildebrand
+2537	   Email: hildjj@cursive.net
+
+2539	   Vadim Goncharov
+2540	   Email: vadimnuclight@gmail.com
+
+2542	   Ken Takayama
+2543	   Email: ken.takayama.ietf@gmail.com
+
+2545	Author's Address
+
+2547	   Laurence Lundblade
+2548	   Security Theory LLC
+2549	   Email: lgl@securitytheory.com
+
+
+
+
+
+
+
+
+
