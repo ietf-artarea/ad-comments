@@ -1,0 +1,260 @@
+# Document Shepherd Write-Up for <a href="/doc/draft-ietf-oauth-sd-jwt-vc/16/">draft-ietf-oauth-sd-jwt-vc-16</a>
+
+## Document History
+
+### 1. Does the working group (WG) consensus represent the strong concurrence
+of a few individuals, with others being silent, or did it reach broad agreement?
+
+The document reached broad agreement among the active participants who reviewed
+and discussed it in the OAuth Working Group.
+
+### 2. Was there controversy about particular points, or were there decisions
+where the consensus was particularly rough?
+
+There were heated discussions about Section 2.5, “Issuer Verification Key
+Discovery and Validation,” where earlier draft versions also included a W3C
+DID-based method. The work on the document was delayed after the authors made
+changes to the specification without prior discussion in, or consensus from,
+the working group. These issues were eventually resolved through off-list
+conversations.
+
+### 3. Has anyone threatened an appeal or otherwise indicated extreme
+discontent?
+
+Appeals were threatened, and strong dissatisfaction was expressed during the
+discussions. These concerns have since been resolved.
+
+### 4. For protocol documents, are there existing implementations of the
+contents of the document? Have a significant number of potential implementers
+indicated plans to implement? Are any existing implementations reported
+somewhere, either in the document itself (as <a href="/doc/rfc7942/">RFC 7942</a> recommends) or elsewhere
+(where)?
+
+Yes. There are existing implementations and clear evidence of implementation
+interest.
+
+Implementation status is not described in a dedicated <a href="/doc/rfc7942/">RFC 7942</a> section in the
+draft itself, but it has been reported on the OAuth WG mailing list:
+
+- Takahiko Kawasaki reported that the open-source Java SD-JWT library can
+generate VCs compliant with the SD-JWT VC specification, and that Authlete can
+issue compliant VCs using OID4VCI:
+&lt;<a href="https://mailarchive.ietf.org/arch/msg/oauth/tqRpWdvU9iu0hVnsukzE_r6ACnY/&gt;">https://mailarchive.ietf.org/arch/msg/oauth/tqRpWdvU9iu0hVnsukzE_r6ACnY/&gt;</a> -
+Brian Campbell reported that SD-JWT VC was included in the February 2026 EU
+draft implementing acts for the European Digital Identity Wallet, which is not
+itself an implementation but is strong ecosystem evidence:
+&lt;<a href="https://mailarchive.ietf.org/arch/msg/oauth/nfCPj6hSWseXaalbv5CudUAkKZI/&gt;">https://mailarchive.ietf.org/arch/msg/oauth/nfCPj6hSWseXaalbv5CudUAkKZI/&gt;</a> -
+Oliver Terbu reported additional open-source implementations, including EUDI
+wallet libraries, <a href="http://walt.id">walt.id</a> support, and an OpenWallet Foundation Labs .NET
+implementation:
+&lt;<a href="https://mailarchive.ietf.org/arch/msg/oauth/TAlQ_M16SshUFVv2WazYL3gbV_4/&gt;">https://mailarchive.ietf.org/arch/msg/oauth/TAlQ_M16SshUFVv2WazYL3gbV_4/&gt;</a> and
+&lt;<a href="https://mailarchive.ietf.org/arch/msg/oauth/W7I-ldiurN5V68RaJolI06Ep74M/&gt;">https://mailarchive.ietf.org/arch/msg/oauth/W7I-ldiurN5V68RaJolI06Ep74M/&gt;</a>
+
+Representative implementation links mentioned in those threads are:
+
+- &lt;<a href="https://github.com/authlete/sd-jwt&gt;">https://github.com/authlete/sd-jwt&gt;</a>
+- &lt;<a href="https://www.authlete.com/developers/oid4vci/&gt;">https://www.authlete.com/developers/oid4vci/&gt;</a>
+- &lt;<a href="https://github.com/eu-digital-identity-wallet/eudi-lib-jvm-sdjwt-kt&gt;">https://github.com/eu-digital-identity-wallet/eudi-lib-jvm-sdjwt-kt&gt;</a>
+- &lt;<a href="https://github.com/eu-digital-identity-wallet/eudi-lib-sdjwt-swift&gt;">https://github.com/eu-digital-identity-wallet/eudi-lib-sdjwt-swift&gt;</a>
+-
+&lt;<a href="https://docs.walt.id/community-stack/issuer/credential-issuance/sd-jwt-vc-oid4vc&gt;">https://docs.walt.id/community-stack/issuer/credential-issuance/sd-jwt-vc-oid4vc&gt;</a>
+-
+&lt;<a href="https://github.com/walt-id/waltid-identity/tree/main/waltid-libraries/sdjwt/waltid-sdjwt&gt;">https://github.com/walt-id/waltid-identity/tree/main/waltid-libraries/sdjwt/waltid-sdjwt&gt;</a>
+- &lt;<a href="https://github.com/openwallet-foundation-labs/sd-jwt-dotnet&gt;">https://github.com/openwallet-foundation-labs/sd-jwt-dotnet&gt;</a>
+
+## Additional Reviews
+
+### 5. Do the contents of this document closely interact with technologies in
+other IETF working groups or external organizations, and would it therefore
+benefit from their review? Have those reviews occurred? If yes, describe which
+reviews took place.
+
+The document is primarily in the OAuth space and has received review from
+people with the relevant expertise in the OAuth Working Group. It also has
+ecosystem relevance to related work in the OpenID Foundation and to the
+European Digital Identity Wallet ecosystem, but those groups have closely
+followed the work and some of the authors/working group members are active in
+the OpenID Foundation and in the discussions related to the Wallet ecosystem.
+
+### 6. Describe how the document meets any required formal expert review
+criteria, such as the MIB Doctor, YANG Doctor, media type, and URI type reviews.
+
+The document does not contain a MIB module or a YANG module.
+
+The document does define:
+
+- an entry for the JSON Web Token Claims registry
+- a media type registration for `application/dc+sd-jwt`, and
+- a well-known URI registration for `jwt-vc-issuer`.
+
+The registration templates are present in the IANA considerations section and
+appear complete and consistent with the body of the draft.
+
+### 7. If the document contains a YANG module, has the final version of the
+module been checked with any of the recommended validation tools for syntax and
+formatting validation? If there are any resulting errors or warnings, what is
+the justification for not fixing them at this time? Does the YANG module comply
+with the Network Management Datastore Architecture (NMDA) as specified in <a href="/doc/rfc8342/">RFC
+8342</a>?
+
+Not applicable. The document does not contain a YANG module.
+
+### 8. Describe reviews and automated checks performed to validate sections of
+the final version of the document written in a formal language, such as XML
+code, BNF rules, MIB definitions, CBOR&#x27;s CDDL, etc.
+
+The document does not contain sections in a formal language such as YANG, MIB,
+ABNF, CDDL, or XML schema that would require specialized automated validation.
+
+The document does, however, contain many examples and those examples are in
+JSON. Most of the examples are valid expect for the examples in Figure 15,
+which is only a JSON snippet, and in Figure 22 where  the portrait claim value
+is a JSON string splitting across lines due to the 72 character line limit.
+
+## Document Shepherd Checks
+
+### 9. Based on the shepherd&#x27;s review of the document, is it their opinion that
+this document is needed, clearly written, complete, correctly designed, and
+ready to be handed off to the responsible Area Director?
+
+Yes.
+
+The shepherd believes the document is needed, sufficiently clear, technically
+mature, and ready to be handed off. The shepherd reviewed the document in
+detail and also sent a shepherd review to the working group during April 2026.
+That review focused mainly on clarity, terminology consistency, structure, and
+section naming; the document has improved in those areas.
+
+### 10. Several IETF Areas have assembled lists of common issues that their
+reviewers encounter. For which areas have such issues been identified and
+addressed? For which does this still need to happen in subsequent reviews?
+
+The document is mainly a security area document. The shepherd specifically
+looked at common security issues, including:
+
+- clear distinction between inherited SD-JWT processing and SD-JWT-VC-specific
+profiling, - trust-model clarity for issuer key discovery and validation, -
+integrity and retrieval of externally referenced metadata, - SSRF-related risks
+from dereferencing external resources, - privacy considerations, and -
+consistency of terminology and examples.
+
+Those issues have been addressed to a reasonable degree in the current
+document. No specific remaining area-review gap is known to the shepherd.
+
+### 11. What type of RFC publication is being requested on the IETF stream
+(Best Current Practice, Proposed Standard, Internet Standard, Informational,
+Experimental or Historic)? Why is this the proper type of RFC? Do all
+Datatracker state attributes correctly reflect this intent?
+
+The requested publication type is **Proposed Standard** on the IETF stream.
+
+That is the proper type because the document defines interoperable data
+formats, metadata formats, validation and processing rules, and IANA
+registrations intended for deployment and interoperation.
+
+### 12. Have reasonable efforts been made to remind all authors of the
+intellectual property rights (IPR) disclosure obligations described in <a href="/doc/bcp79/">BCP 79</a>?
+To the best of your knowledge, have all required disclosures been filed? If
+not, explain why. If yes, summarize any relevant discussion, including links to
+publicly-available messages when applicable.
+
+Yes. Reasonable efforts were made. The shepherd explicitly asked the authors on
+the OAuth WG mailing list to confirm compliance with the <a href="/doc/bcp78/">BCP 78</a> / <a href="/doc/bcp79/">BCP 79</a>
+disclosure obligations and to indicate whether they were aware of any IPR
+associated with the document.
+
+All authors responsed and are not aware of any IPR associated with this
+document.
+
+Links:
+- Brian Campbell:
+&lt;<a href="https://mailarchive.ietf.org/arch/msg/oauth/Lg9R8CduauGo4xv_h7F5wdKDieI/&gt;">https://mailarchive.ietf.org/arch/msg/oauth/Lg9R8CduauGo4xv_h7F5wdKDieI/&gt;</a> -
+Oliver Terbu:
+&lt;<a href="https://mailarchive.ietf.org/arch/msg/oauth/XHzKPRdSTZnTLmdqvM-6fMOROlY/&gt;">https://mailarchive.ietf.org/arch/msg/oauth/XHzKPRdSTZnTLmdqvM-6fMOROlY/&gt;</a> -
+Daniel Fett:
+&lt;<a href="https://mailarchive.ietf.org/arch/msg/oauth/sGHfUQzVPDnh2bDheRYQxZEUiqo/&gt;">https://mailarchive.ietf.org/arch/msg/oauth/sGHfUQzVPDnh2bDheRYQxZEUiqo/&gt;</a>
+
+### 13. Has each author, editor, and contributor shown their willingness to be
+listed as such? If the total number of authors and editors on the front page is
+greater than five, please provide a justification.
+
+Yes. All listed authors confirmed their willingness to be listed.
+
+- Brian Campbell:
+&lt;<a href="https://mailarchive.ietf.org/arch/msg/oauth/flxly7qdZatWFlOD1H-I7Ovbovw/&gt;">https://mailarchive.ietf.org/arch/msg/oauth/flxly7qdZatWFlOD1H-I7Ovbovw/&gt;</a> -
+Oliver Terbu:
+&lt;<a href="https://mailarchive.ietf.org/arch/msg/oauth/Qyml4EfYAzqJRGR6Ha1zkMICCtI/&gt;">https://mailarchive.ietf.org/arch/msg/oauth/Qyml4EfYAzqJRGR6Ha1zkMICCtI/&gt;</a> -
+Daniel Fett:
+&lt;<a href="https://mailarchive.ietf.org/arch/msg/oauth/5HgcsWWmpEq7M1zjc-myTmFqO_A/&gt;">https://mailarchive.ietf.org/arch/msg/oauth/5HgcsWWmpEq7M1zjc-myTmFqO_A/&gt;</a>
+
+### 14. Document any remaining I-D nits in this document. Simply running the
+idnits tool is not enough; please review the &quot;Content Guidelines&quot; on
+<a href="http://authors.ietf.org">authors.ietf.org</a>. (Also note that the current idnits tool generates some
+incorrect warnings; a rewrite is underway.)
+
+No remaining blocking I-D nits are known to the shepherd.
+
+The shepherd manually reviewed the front matter, boilerplate, references
+structure, and IANA considerations for obvious issues. The document still
+contains lines that are too long. The shepherd expects those to be fixed in
+AUTH48. <a href="/doc/rfc5785/">RFC 5785</a> could also be replaced by <a href="/doc/rfc8615/">RFC 8615</a>.
+
+### 15. Should any informative references be normative or vice-versa? See the
+IESG Statement on Normative and Informative References.
+
+The current normative/informative split appears correct. The shepherd is not
+aware of any reference that clearly belongs in the opposite category.
+
+### 16. List any normative references that are not freely available to anyone.
+Did the community have sufficient access to review any such normative
+references?
+
+None. The normative references are to publicly available RFCs and freely
+available W3C specifications.
+
+### 17. Are there any normative downward references (see <a href="/doc/rfc3967/">RFC 3967</a> and <a href="/doc/bcp97/">BCP 97</a>)
+that are not already listed in the DOWNREF registry? If so, list them.
+
+No normative downward references were identified.
+
+### 18. Are there normative references to documents that are not ready to be
+submitted to the IESG for publication or are otherwise in an unclear state? If
+so, what is the plan for their completion?
+
+No. The normative references are to published and stable specifications.
+
+### 19. Will publication of this document change the status of any existing
+RFCs? If so, does the Datatracker metadata correctly reflect this and are those
+RFCs listed on the title page, in the abstract, and discussed in the
+introduction? If not, explain why and point to the part of the document where
+the relationship of this document to these other RFCs is discussed.
+
+No. Publication of this document will not change the status of any existing
+RFCs.
+
+### 20. Describe the document shepherd&#x27;s review of the IANA considerations
+section, especially with regard to its consistency with the body of the
+document. Confirm that all aspects of the document requiring IANA assignments
+are associated with the appropriate reservations in IANA registries. Confirm
+that any referenced IANA registries have been clearly identified. Confirm that
+each newly created IANA registry specifies its initial contents, allocations
+procedures, and a reasonable name (see <a href="/doc/rfc8126/">RFC 8126</a>).
+
+The shepherd reviewed the IANA considerations section and found it consistent
+with the body of the document.
+
+These requests correspond to mechanisms defined in the document body, and the
+referenced IANA registries are clearly identified.
+
+The document does not create a new IANA registry.
+
+### 21. List any new IANA registries that require Designated Expert Review for
+future allocations. Are the instructions to the Designated Expert clear? Please
+include suggestions of designated experts, if appropriate.
+
+None. The document does not create any new IANA registries.
+
+## Reference Links
+
+- Datatracker page:
+&lt;<a href="https://datatracker.ietf.org/doc/draft-ietf-oauth-sd-jwt-vc/16/&gt;">https://datatracker.ietf.org/doc/draft-ietf-oauth-sd-jwt-vc/16/&gt;</a>
