@@ -1,0 +1,968 @@
+idnits 2.17.1 
+
+draft-ietf-lamps-csr-attestation-33.txt:
+
+  Showing Errors (**), Flaws (~~), Warnings (==), and Comments (--).
+  Errors MUST be fixed before draft submission.  Flaws SHOULD be fixed before draft submission.
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+  == There is 1 instance of lines with non-ascii characters in the document.
+
+
+  Running in submission checking mode -- *not* checking nits according to
+  https://www.ietf.org/id-info/checklist .
+  ----------------------------------------------------------------------------
+
+
+     Summary: 0 errors (**), 0 flaws (~~), 1 warning (==), 0 comments (--).
+
+--------------------------------------------------------------------------------
+
+
+2	Network Working Group                                       M. Ounsworth
+3	Internet-Draft                                            Cryptic Forest
+4	Intended status: Standards Track                           H. Tschofenig
+5	Expires: 6 May 2027                                              Siemens
+6	                                                             H. Birkholz
+7	                                                          Fraunhofer SIT
+8	                                                              M. Wiseman
+9	                                                             Independent
+10	                                                                N. Smith
+11	                                                         2 November 2026
+
+13	     Use of Remote Attestation with Certification Signing Requests
+14	                  draft-ietf-lamps-csr-attestation-33
+
+16	Abstract
+
+18	   Certification Authorities (CAs) issuing certificates to Public Key
+19	   Infrastructure (PKI) end entities may require a certificate signing
+20	   request (CSR) to include additional verifiable information to confirm
+21	   policy compliance.  For example, a CA may require an end entity to
+22	   demonstrate that the private key corresponding to a CSR's public key
+23	   is secured by a hardware security module (HSM), is not exportable,
+24	   etc.  The process of generating, transmitting, and verifying
+25	   additional information required by the CA is called remote
+26	   attestation.  While work is currently underway to standardize various
+27	   aspects of remote attestation, a variety of proprietary mechanisms
+28	   have been in use for years, particularly regarding protection of
+29	   private keys.
+
+31	   This specification defines ASN.1 structures which may carry
+32	   attestation data for PKCS#10 and Certificate Request Message Format
+33	   (CRMF) messages.  Both standardized and proprietary attestation
+34	   formats are supported by this specification.
+
+36	About This Document
+
+38	   This note is to be removed before publishing as an RFC.
+
+40	   The latest revision of this draft can be found at https://lamps-
+41	   wg.github.io/csr-attestation/draft-ietf-lamps-csr-attestation.html.
+42	   Status information for this document may be found at
+43	   https://datatracker.ietf.org/doc/draft-ietf-lamps-csr-attestation/.
+
+45	   Source for this draft and an issue tracker can be found at
+46	   https://github.com/lamps-wg/csr-attestation.
+
+48	Status of This Memo
+
+50	   This Internet-Draft is submitted in full conformance with the
+51	   provisions of BCP 78 and BCP 79.
+
+53	   Internet-Drafts are working documents of the Internet Engineering
+54	   Task Force (IETF).  Note that other groups may also distribute
+55	   working documents as Internet-Drafts.  The list of current Internet-
+56	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+58	   Internet-Drafts are draft documents valid for a maximum of six months
+59	   and may be updated, replaced, or obsoleted by other documents at any
+60	   time.  It is inappropriate to use Internet-Drafts as reference
+61	   material or to cite them other than as "work in progress."
+
+63	   This Internet-Draft will expire on 6 May 2027.
+
+65	Copyright Notice
+
+67	   Copyright (c) 2026 IETF Trust and the persons identified as the
+68	   document authors.  All rights reserved.
+
+70	   This document is subject to BCP 78 and the IETF Trust's Legal
+71	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+72	   license-info) in effect on the date of publication of this document.
+73	   Please review these documents carefully, as they describe your rights
+74	   and restrictions with respect to this document.  Code Components
+75	   extracted from this document must include Revised BSD License text as
+76	   described in Section 4.e of the Trust Legal Provisions and are
+77	   provided without warranty as described in the Revised BSD License.
+
+79	Table of Contents
+
+81	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
+82	   2.  Relationship to the IETF RATS Working Group . . . . . . . . .   4
+83	   3.  Conventions and Definitions . . . . . . . . . . . . . . . . .   5
+84	   4.  Conveying Attestations in CSRs  . . . . . . . . . . . . . . .   6
+85	     4.1.  AttestationStatement and AttestationBundle  . . . . . . .   6
+86	     4.2.  AttestationStatementSet . . . . . . . . . . . . . . . . .   8
+87	     4.3.  CSR Attribute and Extension . . . . . . . . . . . . . . .   9
+88	   5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  10
+89	     5.1.  Module Registration - SMI Security for PKIX Module
+90	           Identifier  . . . . . . . . . . . . . . . . . . . . . . .  10
+91	     5.2.  Object Identifier Update - SMI Security for S/MIME
+92	           Attributes  . . . . . . . . . . . . . . . . . . . . . . .  11
+93	   6.  Security Considerations . . . . . . . . . . . . . . . . . . .  11
+94	     6.1.  Binding Attestations to the CSR's Public Key  . . . . . .  11
+95	     6.2.  Freshness . . . . . . . . . . . . . . . . . . . . . . . .  13
+96	     6.3.  Resource Exhaustion . . . . . . . . . . . . . . . . . . .  13
+97	     6.4.  Additional Security Considerations  . . . . . . . . . . .  14
+98	   7.  Privacy Considerations  . . . . . . . . . . . . . . . . . . .  14
+99	   8.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  15
+100	     8.1.  Normative References  . . . . . . . . . . . . . . . . . .  15
+101	     8.2.  Informative References  . . . . . . . . . . . . . . . . .  16
+102	   Appendix A.  Examples . . . . . . . . . . . . . . . . . . . . . .  18
+103	   Appendix B.  ASN.1 Module . . . . . . . . . . . . . . . . . . . .  18
+104	   Appendix C.  Acknowledgments  . . . . . . . . . . . . . . . . . .  19
+105	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  20
+
+107	1.  Introduction
+
+109	   Certification Authorities (CAs) issuing certificates to PKI end
+110	   entities may require that a certificate signing request (CSR) include
+111	   verifiable attestations.  These attestations can contain claims
+112	   regarding the platform used by the end entity to generate the key
+113	   pair for which a certificate is sought.  These claims can also
+114	   include attributes of the key pair with respect to its protection,
+115	   use, and extractability.  At the time of writing, the most pressing
+116	   example of the need for remote attestation in certificate enrollment
+117	   is the Code-Signing Baseline Requirements (CSBR) document maintained
+118	   by the CA/Browser Forum [CSBR].  The [CSBR] requires compliant CAs to
+119	   "ensure that a Subscriber's Private Key is generated, stored, and
+120	   used in a secure environment that has controls to prevent theft or
+121	   misuse".  This requirement is a natural fit to enforce via remote
+122	   attestation.
+
+124	   This specification defines an attribute and an extension that allow
+125	   for conveyance of verifiable attestations in several Certificate
+126	   Signing Request (CSR) formats, including PKCS#10 [RFC2986] or
+127	   Certificate Request Message Format (CRMF) [RFC4211] messages.  Given
+128	   several standard and proprietary remote attestation technologies are
+129	   in use, this specification is intended to be as technology-agnostic
+130	   as is feasible with respect to implemented and future remote
+131	   attestation technologies.  This aligns with the fact that a CA may
+132	   wish to provide support for a variety of types of devices but cannot
+133	   dictate what format a device uses to represent attestations.
+134	   However, if a certificate requester does not include the number and
+135	   types of attestations required by the CA, it is unlikely the
+136	   requester will receive the requested certificate.
+
+138	   While CSRs are defined using Abstract Syntax Notation One (ASN.1),
+139	   attestations may be defined using any data description language,
+140	   i.e., ASN.1 or Concise Data Description Language (CDDL), or
+141	   represented using any type of encoding, including Distinguished
+142	   Encoding Rules (DER), Concise Binary Object Representation (CBOR),
+143	   JavaScript Object Notation (JSON).  The requirements for carrying
+144	   attestation formats not defined using ASN.1 are specified in
+145	   Section 4.1.
+
+147	2.  Relationship to the IETF RATS Working Group
+
+149	   As noted, attestation-related technologies have existed for many
+150	   years, albeit with no standard format and no standard means of
+151	   conveying attestation statements to a CA.  This draft addresses the
+152	   latter, and is equally applicable to standard and proprietary
+153	   attestation formats.  The IETF Remote Attestation Procedures (RATS)
+154	   working group is addressing the former.  In [RFC9334], RATS defined
+155	   vocabulary, architecture, and usage patterns related to the practice
+156	   of generating and verifying attestations.
+
+158	   In its simplest topological model, attestations are generated by the
+159	   certificate requester and verified by the CA/RA.  Section 5 of
+160	   [RFC9334] defines topological patterns that are more complex,
+161	   including the background check model and the passport model.  This
+162	   document may be applied to instantiating any of these topological
+163	   models for CSR processing, provided the required security
+164	   requirements specific to the context of certificate issuance are
+165	   satisfied.
+
+167	   Section 4.1 of [RFC9334] defines several roles that originate,
+168	   forward or process attestation statements (also see Section 1.2 of
+169	   [RFC9683]): the Attester, Endorser, Relying Party, and Verifier.
+170	   Attestation statements, such as Evidence, may be directed to an
+171	   entity taking at least one of these roles, including to an CA/RA
+172	   acting as a Verifier.  An CA/RA may also forward attestation
+173	   statements to a Verifier for appraisal.  Each attestation statements
+174	   may contain one or more claims, including claims that may be required
+175	   by an RA or CA.  Attestation statements transmitted by these parties
+176	   are defined in Section 8 of [RFC9334] as the "conceptual messages"
+177	   Evidence, Endorsement, and Attestation Results.  The structure
+178	   defined in this specification may be used by any of the roles that
+179	   originate attestation statements, and is equally applicable to these
+180	   three conceptual messages.
+
+182	3.  Conventions and Definitions
+
+184	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+185	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+186	   "OPTIONAL" in this document are to be interpreted as described in
+187	   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+188	   capitals, as shown here.
+
+190	   This document re-uses the terms defined in [RFC9334] related to
+191	   remote attestation.  Readers of this document are assumed to be
+192	   familiar with the following terms defined in [RFC9334]: Evidence,
+193	   Endorsement, Claim, Attestation Result (AR), Attester, Relying Party,
+194	   and Verifier.  Per [RFC9334], the CA/RA is the Relying Party with
+195	   respect to remote attestation.  This use of the term "relying party"
+196	   differs from the traditional PKIX use of the term.  This
+197	   specification uses CA/RA to refer to an [RFC9334] Relying Party,
+198	   which may or may not include an integrated Verifier.
+
+200	   The term "Certification Request" message is defined in [RFC2986].
+201	   Specifications, such as [RFC7030], later introduced the term
+202	   "Certificate Signing Request (CSR)" to refer to the Certification
+203	   Request message.  While the term "Certification Request" would have
+204	   been correct, the mistake was unnoticed.  In the meanwhile CSR is an
+205	   abbreviation used beyond PKCS#10.  Hence, it is equally applicable to
+206	   other protocols that use a different syntax and even a different
+207	   encoding, in particular this document also considers messages in the
+208	   Certificate Request Message Format (CRMF) [RFC4211] to be "CSRs".  In
+209	   this document, the terms "CSR" and Certificate Request message are
+210	   used interchangeably.
+
+212	   The term "hardware security module (HSM)" is used generically to
+213	   refer to the combination of hardware and software designed to protect
+214	   keys from unauthorized access.  Other commonly used terms include
+215	   Secure Element, Trusted Platform Module, and Trusted Execution
+216	   Environment.
+
+218	   Since this document combines terminology from two domains, Remote
+219	   Attestation (RATS) and X.509 PKI, it follows a naming convention to
+220	   avoid ambiguity.  RATS terminology is written in uppercase (e.g.,
+221	   Verifier), while X.509/PKI terminology is written in lowercase (e.g.,
+222	   certification authority (CA)).  This distinction clarifies terms that
+223	   exist in both domains; for instance, a Verifier refers to the RATS
+224	   entity that processes Evidence, whereas a verifier refers to the PKI
+225	   entity that validates certificates.  This convention is distinct from
+226	   camel-case identifiers like "AttestationStatement", which denote
+227	   ASN.1 types.
+
+229	4.  Conveying Attestations in CSRs
+
+231	   The focus of this specification is the conveyance of attestations to
+232	   a CA/RA as part of a CSR.  The following sub-sections define formats
+233	   to support this conveyance, an optional mechanism to limit support to
+234	   specific attestation types at the ASN.1 level, and bindings to the
+235	   attribute and extension mechanisms used in certificate managment
+236	   protocols.
+
+238	   The ASN.1 notation, information object classes, and constraint
+239	   notation used in this section and in Appendix B are specified in
+240	   [X680], [X681], and [X682], respectively.  For additional background
+241	   on information object classes and constraints used in ASN.1 modules,
+242	   see Sections 2.1.3 and 2.2 of [RFC6025].
+
+244	4.1.  AttestationStatement and AttestationBundle
+
+246	   The AttestationStatement structure (as shown in Figure 1) facilitates
+247	   the representation of Evidence, Endorsements, and Attestation Results
+248	   generated by an Attester, Endorser, or Verifier for processing by a
+249	   Verifier or Relying Party, such as verification by a CA/RA.
+
+251	   *  The type field is an OBJECT IDENTIFIER that identifies the format
+252	      of the stmt field.
+
+254	   *  The stmt field contains the attestation for processing,
+255	      constrained by the type field.  Formats that are not defined using
+256	      ASN.1 MUST define an ASN.1 wrapper for use with the
+257	      AttestationStatement structure.  For example, a CBOR-encoded
+258	      format may be defined as an OCTET STRING for AttestationStatement
+259	      purposes, where the contents of the OCTET STRING are the CBOR-
+260	      encoded data.
+
+262	   ATTESTATION-STATEMENT ::= TYPE-IDENTIFIER
+
+264	   AttestationStatement ::= SEQUENCE {
+265	      type   ATTESTATION-STATEMENT.&id({AttestationStatementSet}),
+266	      stmt   ATTESTATION-STATEMENT.&Type(
+267	                 {AttestationStatementSet}{@type})
+268	   }
+
+270	                Figure 1: Definition of AttestationStatement
+
+272	   In some cases, a CA may require CSRs to include a variety of claims,
+273	   which may require the cooperation of more than one Attester.
+274	   Similarly, a CA/RA may outsource verification of claims from
+275	   different Attesters to a single Verifier.  The AttestationBundle
+276	   structure, Figure 2, facilitates the representation of one or more
+277	   AttestationStatement structures along with an OPTIONAL collection of
+278	   certificates that may be useful for certification path building and
+279	   validation to verify each AttestationStatement.  AttestationBundle is
+280	   the structure included in a CSR attribute or extension.
+
+282	   AttestationBundle ::= SEQUENCE {
+283	      attestations SEQUENCE SIZE (1..MAX) OF AttestationStatement,
+284	      certs SEQUENCE SIZE (1..MAX) OF LimitedCertChoices OPTIONAL,
+285	   }
+
+287	                 Figure 2: Definition of AttestationBundle
+
+289	   A CA/RA's issuance policy may place additional requirements on the
+290	   contents of the attestations sequence, such as requiring claims that
+291	   are bound to the CSR's public key in a cryptographically verifiable
+292	   manner.  Such a binding may identify the public key directly or
+293	   through a cryptographically verifiable reference, as defined by the
+294	   applicable attestation format.  See Section 6 for more discussion.
+
+296	   The CertificateChoices structure defined in [RFC6268], and reproduced
+297	   below along with OtherCertificateFormat, allows for carrying
+298	   certificates in the default X.509 [RFC5280] format or in other
+299	   certificate formats.  Within an AttestationBundle, a
+300	   CertificateChoices value MUST use only the certificate or other
+301	   alternative; the extendedCertificate, v1AttrCert, and v2AttrCert
+302	   alternatives MUST NOT be used.  [RFC6268] marks extendedCertificate
+303	   and v1AttrCert as obsolete.  Although v2AttrCert is not obsolete, it
+304	   is excluded here because an attribute certificate does not contain a
+305	   subject public key that can be used to validate an
+306	   AttestationStatement.
+
+308	   OTHER-CERT-FMT is an ASN.1 information object class.  The &id field
+309	   identifies a certificate format by its OBJECT IDENTIFIER, and the
+310	   corresponding &Type field specifies the ASN.1 type used to carry that
+311	   format.  For a non-ASN.1 certificate format, an OTHER-CERT-FMT
+312	   information object MUST specify OCTET STRING as its &Type;
+313	   otherCertFormat then carries the format's &id, and otherCert carries
+314	   the encoded certificate in that OCTET STRING.  LimitedCertChoices
+315	   applies an ASN.1 constraint that limits the available alternatives to
+316	   certificate and other.
+
+318	      CertificateChoices ::= CHOICE {
+319	        certificate Certificate,
+320	        extendedCertificate [0] IMPLICIT ExtendedCertificate,
+321	             -- Obsolete
+322	        ...,
+323	        [[3: v1AttrCert [1] IMPLICIT AttributeCertificateV1]],
+324	             -- Obsolete
+325	        [[4: v2AttrCert [2] IMPLICIT AttributeCertificateV2]],
+326	        [[5: other      [3] IMPLICIT OtherCertificateFormat]] }
+
+328	      OTHER-CERT-FMT ::= TYPE-IDENTIFIER
+
+330	      OtherCertificateFormat ::= SEQUENCE {
+331	        otherCertFormat OTHER-CERT-FMT.&id({SupportedCertFormats}),
+332	        otherCert       OTHER-CERT-FMT.&Type(
+333	                {SupportedCertFormats}{@otherCertFormat})}
+
+335	      LimitedCertChoices ::=
+336	         CertificateChoices
+337	             (WITH COMPONENTS {certificate, other})
+
+339	   The certs field is OPTIONAL.  When validation of an
+340	   AttestationStatement requires a public key that cannot be obtained
+341	   otherwise, certs SHOULD contain a certificate containing that public
+342	   key.  A certificate is not needed when the corresponding public key
+343	   is already known to the Verifier or is embedded within the
+344	   AttestationStatement.  Additional certificates MAY be provided, for
+345	   example, to chain the attestation key back to a trust anchor.  No
+346	   specific order of the certificates in certs should be expected
+347	   because certificates contained in certs may be needed to validate
+348	   different AttestationStatement instances.
+
+350	   This specification places no restriction on mixing certificate types
+351	   within the certs field.  For example a non-X.509 attestation signer
+352	   certificate MAY chain to a trust anchor via a chain of X.509
+353	   certificates.  It is up to the Attester and its Verifier to agree on
+354	   supported certificate formats.
+
+356	4.2.  AttestationStatementSet
+
+358	   AttestationStatementSet ATTESTATION-STATEMENT ::= {
+359	      ... -- None defined in this document --
+360	   }
+
+362	              Figure 3: Definition of AttestationStatementSet
+
+364	   The expression illustrated in Figure 3 maps ASN.1 Types for
+365	   attestation statements to the OIDs that identify them.  These
+366	   mappings are used to construct or parse AttestationStatement objects
+367	   that appear in an AttestationBundle.  Attestation statements are
+368	   typically defined in other IETF standards, in standards produced by
+369	   other standards bodies, or as vendor proprietary formats along with
+370	   corresponding OIDs that identify them.  AttestationStatementSet is
+371	   left unconstrained in this document.  However, implementers MAY
+372	   populate it with the formats that they wish to support.  This
+373	   document does not define, allocate, or register an OID for any
+374	   attestation-statement format, nor does it establish an IANA registry
+375	   for such formats.  Specification authors who define an attestation-
+376	   statement format are responsible for assigning its OID from an arc
+377	   under their control.
+
+379	4.3.  CSR Attribute and Extension
+
+381	   The ASN.1 ATTRIBUTE and EXTENSION information object classes are
+382	   defined in [RFC5912].  Attributes within a PKCS#10 CSR use ATTRIBUTE,
+383	   and extensions within a CRMF CSR use EXTENSION.  The id-aa object
+384	   identifier is defined in the SecureMimeMessageV3dot1-2009 module in
+385	   Section 5 of [RFC5911].
+
+387	   id-aa-attestation OBJECT IDENTIFIER ::= { id-aa 59 }
+
+389	   -- For PKCS#10
+390	   attr-attestation ATTRIBUTE ::= {
+391	     TYPE AttestationBundle
+392	     COUNTS MAX 1
+393	     IDENTIFIED BY id-aa-attestation
+394	   }
+
+396	   -- For CRMF
+397	   ext-attestation EXTENSION ::= {
+398	     SYNTAX AttestationBundle
+399	     IDENTIFIED BY id-aa-attestation
+400	   }
+
+402	            Figure 4: Definitions of CSR attribute and extension
+
+404	   The Extension variant illustrated in Figure 4 is intended only for
+405	   use within CRMF CSRs and is NOT RECOMMENDED to be used within X.509
+406	   certificates due to the privacy implications of publishing
+407	   information about the end entity's hardware environment.
+
+409	   Multiple different types of AttestationStatement(s) may be included
+410	   within a single top-level AttestationBundle.  Note that this document
+411	   does not require the AttestationBundle.attestations field to contain
+412	   only one AttestationStatement of a given type.  For example, if a
+413	   given type is a "wrapper" type containing the conceptual message
+414	   wrapper (CMW) structure [RFC9999], multiple copies of a CMW-typed
+415	   AttestationStatement may be included.
+
+417	   Per [RFC5280] no more than one instance of a given type of Extension
+418	   may be carried within an Extensions structure, so an Extensions
+419	   structure MUST contain no more than one Extension of type id-aa-
+420	   attestation.
+
+422	   PKCS#10 uses the legacy structures Attributes and Attribute rather
+423	   than the later defined SingleAttribute and AttributeSet structures -
+424	   all of which are defined against the ATTRIBUTE ASN.1 CLASS.  The
+425	   ATTRIBUTE CLASS has a COUNTS MAX n clause which can be used to limit
+426	   the copies of ATTRIBUTE related structures.  For the purposes of this
+427	   document the COUNTS MAX 1 clause in the attr-attestation shall be
+428	   taken to mean the following:
+
+430	   *  An Attributes structure carried within a PKCS#10 CSR MUST contain
+431	      no more than one Attribute of type id-aa-attestation.
+
+433	   *  An Attribute of type id-aa-attestation MUST contain exactly one
+434	      copy of an AttestationBundle.
+
+436	   When multiple Verifiers support the same attestation-format OID,
+437	   ambiguity can arise in routing attestations to the appropriate
+438	   Verifier.  The attestation-format specification is responsible for
+439	   defining how this ambiguity is resolved, particularly for opaque
+440	   (wrapper) formats.  Possible approaches include defining separate
+441	   OIDs for different Verifier or verification types, even when they
+442	   share a format structure, or defining a wrapper with a hint that
+443	   assists Verifier selection.  This document does not specify a
+444	   Verifier selection mechanism.
+
+446	5.  IANA Considerations
+
+448	   IANA is requested to allocate an identifier for the ASN.1 module in
+449	   the "SMI Security for PKIX Module Identifier" registry and to update
+450	   the existing early allocation with decimal value 59 in the "SMI
+451	   Security for S/MIME Attributes" registry.
+
+453	5.1.  Module Registration - SMI Security for PKIX Module Identifier
+
+455	   IANA is asked to register the following within the registry id-mod
+456	   SMI Security for PKIX Module Identifier (1.3.6.1.5.5.7.0).
+
+458	   *  Decimal: IANA Assigned - *Replace TBDMOD*
+459	   *  Description: id-mod-pkix-attest-2025
+
+461	   *  References: This Document
+
+463	5.2.  Object Identifier Update - SMI Security for S/MIME Attributes
+
+465	   IANA is requested to update entry 59, early-allocated as "id-aa-
+466	   evidence", in the id-aa SMI Security for S/MIME Attributes registry
+467	   (1.2.840.113549.1.9.16.2).  The numeric value is unchanged.  The
+468	   updated entry is:
+
+470	   *  Decimal: 59
+
+472	   *  Description: id-aa-attestation
+
+474	   *  References: This Document
+
+476	6.  Security Considerations
+
+478	   This document defines a structure to convey attestations as
+479	   additional information in CSRs, as well as an attribute to convey
+480	   that structure in the Certification Request Message defined in
+481	   [RFC2986] and an extension to convey that structure in the
+482	   Certificate Request Message Format defined in [RFC4211].  The CA/RA
+483	   that receives the CSR may choose to verify the attestation(s) to
+484	   determine if an issuance policy is met, or which of a suite of
+485	   policies is satisfied.  The CA/RA is also free to discard the
+486	   additional information without processing.
+
+488	   A CA which accepts or requires attestation(s) SHOULD document its
+489	   requirements with its Certification Practice Statement(s) [RFC3647].
+
+491	   The remainder of this section identifies security considerations that
+492	   apply when the CA/RA chooses to verify the attestation as part of the
+493	   evaluation of a CSR.
+
+495	6.1.  Binding Attestations to the CSR's Public Key
+
+497	   Key attestation is one use case for the structures defined in this
+498	   document.  It enables a CA/RA to obtain assurance about the key pair
+499	   for which a certificate is requested, including the generation,
+500	   protection, permitted use, or extractability of its private key.
+501	   Platform attestation may provide additional claims about the
+502	   environment in which the key pair is generated, stored, or used.  To
+503	   provide assurance about the requested key pair, the relevant claims
+504	   must be bound to the CSR's public key in a cryptographically
+505	   verifiable manner, and appraisal must establish that they support the
+506	   claimed properties of that key pair.  Including a requester-supplied
+507	   public key or its hash in a signed platform attestation does not, by
+508	   itself, demonstrate that the corresponding private key was generated
+509	   or is protected in the attested environment.
+
+511	   Regardless of the topological model, when a CA/RA relies on
+512	   attestation statements to establish a property of the CSR's public
+513	   key or the corresponding private key, it MUST ensure that this
+514	   binding has been validated.  The CA/RA may rely on a trusted Verifier
+515	   to perform this validation but remains responsible for ensuring that
+516	   it has been performed.  The binding may identify the public key
+517	   directly or through a cryptographically verifiable reference, as
+518	   defined by the applicable attestation format.
+
+520	   When Evidence is used to establish such a key property, validation
+521	   includes establishing that the claims refer to the requested key pair
+522	   and support the properties on which the CA/RA relies.  This appraisal
+523	   may be performed by a CA/RA acting as a Verifier or by an external
+524	   trusted Verifier.  When Attestation Results are used for this
+525	   purpose, the CA/RA MUST authenticate the results and establish that
+526	   they apply to the CSR's public key and confirm the required
+527	   properties based on a binding validated by the trusted Verifier.
+528	   These requirements apply whether Evidence or Attestation Results are
+529	   carried in the CSR or obtained during its processing.  For the code-
+530	   signing use case described in Section 1, the CA/RA therefore needs
+531	   assurance that the claims of HSM generation and protection apply to
+532	   the key pair for which the certificate is requested.
+
+534	   If no validated binding is available, the CA/RA MUST NOT treat
+535	   attestation statements as establishing properties of the CSR's public
+536	   key or the corresponding private key.  The CA/RA's issuance policy
+537	   determines whether to reject the CSR, obtain additional evidence, or
+538	   issue a certificate based on other acceptable information.  The
+539	   absence of a validated binding does not, by itself, require rejection
+540	   under this specification.  However, an issuance policy that requires
+541	   attested properties of the requested key cannot be satisfied by
+542	   attestation statements that lack such validated binding.
+
+544	   Multiple attestation statements from multiple sources, as envisioned
+545	   in [RFC9334], can introduce additional complications as shown in the
+546	   following example.
+
+548	   For example, a CA may have an issuance policy that requires key
+549	   generation in an HSM on a company-owned platform in a known good
+550	   state.  The CSR might contain three AttestationStatements originated
+551	   by three different attesters:
+
+553	   1.  that a key pair was generated in an HSM;
+554	   2.  that a particular platform is company-owned; and
+
+556	   3.  that a particular platform was in a known good state (e.g, up to
+557	       date on patches, etc.).
+
+559	   While each of these attestations may be independently correct, the
+560	   CA/RA is responsible for confirming the attestations apply in concert
+561	   to the public key in the CSR.  That is, the CA/RA must analyze the
+562	   attestations to ensure that:
+
+564	   1.  the attestation of HSM generation by AttestationStatement 1
+565	       applies to the public key in the CSR;
+
+567	   2.  the attestation of company ownership by AttestationStatement 2
+568	       applies to the platform that contains the HSM; and
+
+570	   3.  the attestation that a platform was in a known good state by
+571	       AttestationStatement 3 applies to the platform that contains the
+572	       HSM.
+
+574	6.2.  Freshness
+
+576	   To avoid replay attacks, the CA/RA may choose to ignore attestation
+577	   statements that are stale, or whose freshness cannot be determined.
+578	   Mechanisms to address freshness and their application to the RATS
+579	   topological models are discussed in [RFC9334].  Other mechanisms for
+580	   determining freshness may be used as the CA/RA deems appropriate.
+581	   When CSRs are embedded within certificate management protocols such
+582	   as Certificate Management Protocol (CMP) [RFC9810], Enrollment over
+583	   Secure Transport (EST) [RFC7030], and Certificate Management over CMS
+584	   (CMC) [RFC10002], these protocols can supply an Attester with a
+585	   nonce, for example.  Further details are specified in
+586	   [I-D.ietf-lamps-attestation-freshness].
+
+588	6.3.  Resource Exhaustion
+
+590	   CSRs are untrusted input to a CA/RA, and processing attestation
+591	   bundles may consume substantial resources through parsing,
+592	   cryptographic verification, certification path building and
+593	   validation, and requests to external Verifiers or other services.  An
+594	   attacker can exploit these costs to cause resource exhaustion, even
+595	   with a syntactically valid bundle.
+
+597	   Implementations SHOULD impose limits appropriate to their deployment
+598	   on the total bundle size, the number, type and size of attestation
+599	   statements and certificates, parsing depth, and the computational
+600	   effort spent processing a request.  These limits SHOULD also bound
+601	   certification path building, as well as the number, duration, and
+602	   concurrency of external requests.  Implementations SHOULD enforce
+603	   limits as early as practicable.  When a limit is exceeded,
+604	   implementations SHOULD stop the affected processing and release
+605	   resources allocated to it.  An attestation statement whose
+606	   verification has not completed successfully MUST NOT be treated as
+607	   successfully verified.
+
+609	6.4.  Additional Security Considerations
+
+611	   In addition to the security considerations listed here, implementers
+612	   should be familiar with the security considerations of the
+613	   specifications on which this specification depends: PKCS#10
+614	   [RFC2986], CRMF [RFC4211], as well as general security concepts
+615	   relating to remote attestation.  Many of these concepts are discussed
+616	   in Section 6 of [RFC9334], Section 7 of [RFC9334], Section 9 of
+617	   [RFC9334], Section 11 of [RFC9334], and Section 12 of [RFC9334].
+618	   Implementers should also be aware of any security considerations
+619	   relating to the specific attestation formats being carried within the
+620	   CSR.
+
+622	7.  Privacy Considerations
+
+624	   Attestation statements and accompanying certificates can disclose
+625	   information about a device, its software and hardware environment,
+626	   and its owner or users.  These statements may contain Evidence,
+627	   Endorsements, or Attestation Results.  Attesters SHOULD consider how
+628	   much information is appropriate to disclose to a given CA.  Examples
+629	   include hardware identifiers, software versions, patch levels, and
+630	   device ownership.  These disclosures occur during enrollment, even if
+631	   no attestation data is copied into the issued certificate.
+
+633	   Attestation formats may use stable device-identifying public keys,
+634	   certificates, device IDs, or other identifiers.  These values can
+635	   enable a CA/RA or Verifier to link multiple CSRs to the same device
+636	   even when the CSR public key, subject name, or enrollment account
+637	   changes.  Such linkability can affect privacy even when the
+638	   individual attested claims are not otherwise sensitive.
+
+640	   A CA/RA that forwards attestation statements or accompanying
+641	   certificates to an external Verifier discloses this information to
+642	   another party.  That party may also be able to correlate requests
+643	   across enrollments or across CAs.  The privacy assessment of a
+644	   deployment therefore needs to cover the entire enrollment and
+645	   attestation verification path, including third-party processing,
+646	   retention, and logging.
+
+648	   Certificate requesters, CAs/RAs, and Verifiers SHOULD minimize the
+649	   claims contained in attestation statements and the accompanying
+650	   certificates they disclose, process, and retain to those needed for
+651	   the applicable issuance policy.  Where supported by the attestation
+652	   technology and compatible with that policy, deployments SHOULD use
+653	   mechanisms that reduce device linkability, such as privacy-preserving
+654	   attestation procedures.  Such mechanisms do not eliminate correlation
+655	   through other disclosed information.  Enrollment protocols and
+656	   communication with external Verifiers SHOULD provide confidentiality
+657	   protection and authenticate recipients.  Transport confidentiality
+658	   protects against observers but does not prevent correlation by the
+659	   recipients themselves.  Access to stored attestation statements and
+660	   accompanying certificates, including copies in logs, SHOULD be
+661	   restricted, and retention SHOULD be limited to the period needed for
+662	   issuance and applicable audit requirements.
+
+664	   Attestation statements are intended as additional information in the
+665	   issuance process.  It is NOT RECOMMENDED for a CA to copy attestation
+666	   statements into the published certificate.  CAs that choose to
+667	   republish attestation statements or claims contained in them in
+668	   certificates SHOULD review the contents and omit sensitive or
+669	   identifying information.
+
+671	   Further discussion of remote attestation privacy risks and
+672	   mitigations is provided in Section 11 of [RFC9334].  Deployments
+673	   should also consider the privacy considerations of the specific
+674	   attestation formats they use.
+
+676	8.  References
+
+678	8.1.  Normative References
+
+680	   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+681	              Requirement Levels", BCP 14, RFC 2119,
+682	              DOI 10.17487/RFC2119, March 1997,
+683	              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+685	   [RFC2986]  Nystrom, M. and B. Kaliski, "PKCS #10: Certification
+686	              Request Syntax Specification Version 1.7", RFC 2986,
+687	              DOI 10.17487/RFC2986, November 2000,
+688	              <https://www.rfc-editor.org/rfc/rfc2986>.
+
+690	   [RFC4211]  Schaad, J., "Internet X.509 Public Key Infrastructure
+691	              Certificate Request Message Format (CRMF)", RFC 4211,
+692	              DOI 10.17487/RFC4211, September 2005,
+693	              <https://www.rfc-editor.org/rfc/rfc4211>.
+
+695	   [RFC5280]  Cooper, D., Santesson, S., Farrell, S., Boeyen, S.,
+696	              Housley, R., and W. Polk, "Internet X.509 Public Key
+697	              Infrastructure Certificate and Certificate Revocation List
+698	              (CRL) Profile", RFC 5280, DOI 10.17487/RFC5280, May 2008,
+699	              <https://www.rfc-editor.org/rfc/rfc5280>.
+
+701	   [RFC5911]  Hoffman, P. and J. Schaad, "New ASN.1 Modules for
+702	              Cryptographic Message Syntax (CMS) and S/MIME", RFC 5911,
+703	              DOI 10.17487/RFC5911, June 2010,
+704	              <https://www.rfc-editor.org/rfc/rfc5911>.
+
+706	   [RFC5912]  Hoffman, P. and J. Schaad, "New ASN.1 Modules for the
+707	              Public Key Infrastructure Using X.509 (PKIX)", RFC 5912,
+708	              DOI 10.17487/RFC5912, June 2010,
+709	              <https://www.rfc-editor.org/rfc/rfc5912>.
+
+711	   [RFC6268]  Schaad, J. and S. Turner, "Additional New ASN.1 Modules
+712	              for the Cryptographic Message Syntax (CMS) and the Public
+713	              Key Infrastructure Using X.509 (PKIX)", RFC 6268,
+714	              DOI 10.17487/RFC6268, July 2011,
+715	              <https://www.rfc-editor.org/rfc/rfc6268>.
+
+717	   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+718	              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+719	              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+721	   [RFC9334]  Birkholz, H., Thaler, D., Richardson, M., Smith, N., and
+722	              W. Pan, "Remote ATtestation procedureS (RATS)
+723	              Architecture", RFC 9334, DOI 10.17487/RFC9334, January
+724	              2023, <https://www.rfc-editor.org/rfc/rfc9334>.
+
+726	   [X680]     ITU-T, "Information technology - Abstract Syntax Notation
+727	              One (ASN.1): Specification of basic notation", ITU-T
+728	              Recommendation X.680, February 2021,
+729	              <https://www.itu.int/rec/T-REC-X.680-202102-I/en>.
+
+731	   [X681]     ITU-T, "Information technology - Abstract Syntax Notation
+732	              One (ASN.1): Information object specification", ITU-T
+733	              Recommendation X.681, February 2021,
+734	              <https://www.itu.int/rec/T-REC-X.681-202102-I/en>.
+
+736	   [X682]     ITU-T, "Information technology - Abstract Syntax Notation
+737	              One (ASN.1): Constraint specification", ITU-T
+738	              Recommendation X.682, February 2021,
+739	              <https://www.itu.int/rec/T-REC-X.682-202102-I/en>.
+
+741	8.2.  Informative References
+
+743	   [CSBR]     CA/Browser Forum, "Baseline Requirements for Code-Signing
+744	              Certificates, v.3.7", February 2024,
+745	              <https://cabforum.org/uploads/Baseline-Requirements-for-
+746	              the-Issuance-and-Management-of-Code-Signing.v3.7.pdf>.
+
+748	   [I-D.ietf-lamps-attestation-freshness]
+749	              Tschofenig, H., Brockhaus, H., Mandel, J., and S. Turner,
+750	              "Requesting a Freshness Nonce for Attestation Evidence in
+751	              Certificate Signing Requests", Work in Progress, Internet-
+752	              Draft, draft-ietf-lamps-attestation-freshness-09, 17
+753	              October 2026, <https://datatracker.ietf.org/doc/html/
+754	              draft-ietf-lamps-attestation-freshness-09>.
+
+756	   [RFC3647]  Chokhani, S., Ford, W., Sabett, R., Merrill, C., and S.
+757	              Wu, "Internet X.509 Public Key Infrastructure Certificate
+758	              Policy and Certification Practices Framework", RFC 3647,
+759	              DOI 10.17487/RFC3647, November 2003,
+760	              <https://www.rfc-editor.org/rfc/rfc3647>.
+
+762	   [RFC6025]  Wallace, C. and C. Gardiner, "ASN.1 Translation",
+763	              RFC 6025, DOI 10.17487/RFC6025, October 2010,
+764	              <https://www.rfc-editor.org/rfc/rfc6025>.
+
+766	   [RFC7030]  Pritikin, M., Ed., Yee, P., Ed., and D. Harkins, Ed.,
+767	              "Enrollment over Secure Transport", RFC 7030,
+768	              DOI 10.17487/RFC7030, October 2013,
+769	              <https://www.rfc-editor.org/rfc/rfc7030>.
+
+771	   [RFC9683]  Fedorkow, G. C., Ed., Voit, E., and J. Fitzgerald-McKay,
+772	              "Remote Integrity Verification of Network Devices
+773	              Containing Trusted Platform Modules", RFC 9683,
+774	              DOI 10.17487/RFC9683, December 2024,
+775	              <https://www.rfc-editor.org/rfc/rfc9683>.
+
+777	   [RFC9810]  Brockhaus, H., von Oheimb, D., Ounsworth, M., and J. Gray,
+778	              "Internet X.509 Public Key Infrastructure -- Certificate
+779	              Management Protocol (CMP)", RFC 9810,
+780	              DOI 10.17487/RFC9810, July 2025,
+781	              <https://www.rfc-editor.org/rfc/rfc9810>.
+
+783	   [RFC9999]  Birkholz, H., Smith, N., Fossati, T., and H. Tschofenig,
+784	              "Remote ATtestation procedureS (RATS) Conceptual Message
+785	              Wrapper (CMW)", RFC 9999, DOI 10.17487/RFC9999, July 2026,
+786	              <https://www.rfc-editor.org/rfc/rfc9999>.
+
+788	   [RFC10002] Mandel, J., Ed. and S. Turner, Ed., "Certificate
+789	              Management over CMS (CMC)", RFC 10002,
+790	              DOI 10.17487/RFC10002, July 2026,
+791	              <https://www.rfc-editor.org/rfc/rfc10002>.
+
+793	   [SampleData]
+794	              "CSR Attestation Sample Data", n.d.,
+795	              <https://github.com/lamps-wg/csr-attestation-examples>.
+
+797	Appendix A.  Examples
+
+799	   Examples and sample data will be collected in the "CSR Attestation
+800	   Sample Data" GitHub repository [SampleData].
+
+802	Appendix B.  ASN.1 Module
+
+804	   CSR-ATTESTATION-2025
+805	     { iso(1) identified-organization(3) dod(6) internet(1) security(5)
+806	     mechanisms(5) pkix(7) id-mod(0) id-mod-pkix-attest-2025(TBDMOD) }
+
+808	   DEFINITIONS IMPLICIT TAGS ::= BEGIN
+
+810	   EXPORTS ALL;
+
+812	   IMPORTS
+
+814	   CertificateChoices
+815	     FROM CryptographicMessageSyntax-2010 -- from [RFC6268]
+816	       { iso(1) member-body(2) us(840) rsadsi(113549)
+817	       pkcs(1) pkcs-9(9) smime(16) modules(0) id-mod-cms-2009(58) }
+
+819	   EXTENSION, ATTRIBUTE
+820	     FROM PKIX-CommonTypes-2009 -- from [RFC5912]
+821	       { iso(1) identified-organization(3) dod(6) internet(1)
+822	       security(5) mechanisms(5) pkix(7) id-mod(0)
+823	       id-mod-pkixCommon-02(57) }
+
+825	   id-aa
+826	     FROM SecureMimeMessageV3dot1-2009 -- from [RFC5911]
+827	       { iso(1) member-body(2) us(840) rsadsi(113549)
+828	       pkcs(1) pkcs-9(9) smime(16) modules(0) msg-v3dot1-02(39) }
+829	     ;
+
+831	   ATTESTATION-STATEMENT ::= TYPE-IDENTIFIER
+
+833	   AttestationStatementSet ATTESTATION-STATEMENT ::= {
+834	      ... -- None defined in this document --
+835	   }
+836	   AttestationStatement ::= SEQUENCE {
+837	      type   ATTESTATION-STATEMENT.&id({AttestationStatementSet}),
+838	      stmt   ATTESTATION-STATEMENT.&Type(
+839	                 {AttestationStatementSet}{@type})
+840	   }
+
+842	   -- Arc for Attestation types
+843	   id-aa-attestation OBJECT IDENTIFIER ::= { id-aa 59 }
+
+845	   -- For PKCS#10 (Attestation)
+846	   attr-attestation ATTRIBUTE ::= {
+847	     TYPE AttestationBundle
+848	     COUNTS MAX 1
+849	     IDENTIFIED BY id-aa-attestation
+850	   }
+
+852	   -- For CRMF (Attestation)
+853	   ext-attestation EXTENSION ::= {
+854	     SYNTAX AttestationBundle
+855	     IDENTIFIED BY id-aa-attestation
+856	   }
+
+858	   -- Allow either X.509 or OTHER-CERT certificates
+859	   LimitedCertChoices ::=
+860	       CertificateChoices
+861	          (WITH COMPONENTS {certificate, other})
+
+863	   AttestationBundle ::= SEQUENCE {
+864	      attestations SEQUENCE SIZE (1..MAX) OF AttestationStatement,
+865	      certs SEQUENCE SIZE (1..MAX) OF LimitedCertChoices OPTIONAL
+866	   }
+
+868	   END
+
+870	Appendix C.  Acknowledgments
+
+872	   This specification is the work of a design team created by the chairs
+873	   of the LAMPS working group.  We would like to specifically thank Mike
+874	   StJohns for writing initial version of this draft and for his
+875	   substantial work on the final version.  The following persons, in no
+876	   specific order, contributed to the work directly, participated in
+877	   design team meetings, or provided review of the document.
+
+879	   Richard Kettlewell, Chris Trufan, Bruno Couillard, Jean-Pierre Fiset,
+880	   Sander Temme, Jethro Beekman, Zsolt Rózsahegyi, Ferenc Pető, Mike
+881	   Agrenius Kushner, Tomas Gustavsson, Dieter Bong, Christopher Meyer,
+882	   Carl Wallace, Michael Richardson, Tomofumi Okubo, Olivier Couillard,
+883	   John Gray, Eric Amador, Giri Mandyam, Darren Johnson, Herman Slatman,
+884	   Tiru Reddy, James Hagborg, A.J.  Stein, John Kemp, Daniel Migault and
+885	   Russ Housley.
+
+887	   Additionally, we would like to thank Andreas Kretschmer, Hendrik
+888	   Brockhaus, David von Oheimb, Corey Bonnell, and Thomas Fossati for
+889	   their feedback based on implementation experience.
+
+891	   Close to the end of the specification development process, the
+892	   working group chairs, Russ Housley and Tim Hollebeek, reached out to
+893	   Steve Hanna, Tim Polk, and Carl Wallace to help improve the document
+894	   and resolve contentious issues.  Their contributions substantially
+895	   impacted the final outcome of the document.
+
+897	   We thank Ketan Talaulikar for his detailed review during IESG
+898	   evaluation, and Meral Shirazipour, Shivan Kaul Sahib, and Sean Turner
+899	   for their Last Call reviews on behalf of Gen-ART, SECDIR, and ARTART,
+900	   respectively.
+
+902	   Finally, we would like to thank Deb Cooley for her review of the
+903	   document as part of the IESG evaluation process.
+
+905	Authors' Addresses
+
+907	   Mike Ounsworth
+908	   Cryptic Forest Software
+909	   Sioux Lookout, Ontario
+910	   Canada
+911	   Email: mike@ounsworth.ca
+
+913	   Hannes Tschofenig
+914	   Siemens
+915	   Germany
+916	   Email: Hannes.Tschofenig@gmx.net
+
+918	   Henk Birkholz
+919	   Fraunhofer SIT
+920	   Rheinstrasse 75
+921	   64295 Darmstadt
+922	   Germany
+923	   Email: henk.birkholz@sit.fraunhofer.de
+924	   Monty Wiseman
+925	   Independent
+926	   United States
+927	   Email: montywiseman32@gmail.com
+
+929	   Ned Smith
+930	   United States
+931	   Email: ned.smith.ietf@gmail.com
+
+
+
+
+
+
+
+
+
