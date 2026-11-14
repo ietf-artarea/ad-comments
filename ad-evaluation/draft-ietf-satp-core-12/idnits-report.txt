@@ -1,0 +1,2493 @@
+idnits 2.17.1 
+
+draft-ietf-satp-core-12.txt:
+-(7): Line appears to be too long, but this could be caused by non-ascii characters in UTF-8 encoding
+
+  Checking boilerplate required by RFC 5378 and the IETF Trust (see
+  https://trustee.ietf.org/license-info):
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Checking nits according to https://www.ietf.org/id-info/1id-guidelines.txt:
+  ----------------------------------------------------------------------------
+
+  == There are 3 instances of lines with non-ascii characters in the document.
+
+  == The page length should not exceed 58 lines per page, but there was 2
+     longer pages, the longest (page 16) being 75 lines
+
+
+  Checking nits according to https://www.ietf.org/id-info/checklist :
+  ----------------------------------------------------------------------------
+
+     No issues found here.
+
+  Miscellaneous warnings:
+  ----------------------------------------------------------------------------
+
+  == The copyright year in the IETF Trust and authors Copyright Line does not
+     match the current year
+
+  -- The document date (2 November 2025) is 104 days in the past.  Is this
+     intentional?
+
+
+  Checking references for intended status: Informational
+  ----------------------------------------------------------------------------
+
+  == Missing Reference: 'RFC7518' is mentioned on line 378, but not defined
+
+  == Missing Reference: 'RFC7517' is mentioned on line 379, but not defined
+
+  == Missing Reference: 'RFC 7519' is mentioned on line 562, but not defined
+
+  == Missing Reference: 'RFC6749' is mentioned on line 563, but not defined
+
+  == Missing Reference: 'RFC8448' is mentioned on line 573, but not defined
+
+  == Unused Reference: 'BASE64' is defined on line 2324, but no explicit
+     reference was found in the text
+
+  == Unused Reference: 'JWS' is defined on line 2341, but no explicit
+     reference was found in the text
+
+  == Unused Reference: 'ECDSA' is defined on line 2372, but no explicit
+     reference was found in the text
+
+  == Unused Reference: 'RFC5939' is defined on line 2385, but no explicit
+     reference was found in the text
+
+  ** Obsolete normative reference: RFC 2616 (Obsoleted by RFC 7230, RFC 7231,
+     RFC 7232, RFC 7233, RFC 7234, RFC 7235)
+
+
+     Summary: 1 error (**), 0 flaws (~~), 12 warnings (==), 1 comment (--).
+
+     Run idnits with the --verbose option for more detailed information about
+     the items above.
+
+--------------------------------------------------------------------------------
+
+
+2	Secure Asset Transfer Protocol                             M. Hargreaves
+3	Internet-Draft                                             Quant Network
+4	Intended status: Informational                               T. Hardjono
+5	Expires: 6 May 2026                                               MIT
+6	                                                             R. Belchior
+7	                                             Técnico Lisboa, Blockdaemon
+8	                                                          V. Ramakrishna
+9	                                                                     IBM
+10	                                                              A. Chiriac
+11	                                                           Quant Network
+12	                                                         2 November 2025
+
+14	               Secure Asset Transfer Protocol (SATP) Core
+15	                      draft-ietf-satp-core-12
+
+17	Abstract
+
+19	   This memo describes the Secure Asset Transfer (SAT) Protocol for
+20	   digital assets.  SAT is a protocol operating between two gateways
+21	   that conducts the transfer of a digital asset from one gateway to
+22	   another, each representing their corresponding digital asset
+23	   networks.  The protocol establishes a secure channel between the
+24	   endpoints and implements a 2-phase commit (2PC) to ensure the
+25	   properties of transfer atomicity, consistency, isolation and
+26	   durability.
+
+28	About This Document
+
+30	   This note is to be removed before publishing as an RFC.
+
+32	   The latest revision of this draft can be found at https://ietf-
+33	   satp.github.io/draft-ietf-satp-core/draft-ietf-satp-core.html.
+34	   Status information for this document may be found at
+35	   https://datatracker.ietf.org/doc/draft-ietf-satp-core/.
+
+37	   Discussion of this document takes place on the Secure Asset Transfer
+38	   Protocol Working Group mailing list (mailto:sat@ietf.org), which is
+39	   archived at https://mailarchive.ietf.org/arch/browse/sat/.  Subscribe
+40	   at https://www.ietf.org/mailman/listinfo/sat/.
+
+42	   Source for this draft and an issue tracker can be found at
+43	   https://github.com/ietf-satp/draft-ietf-satp-core.
+
+45	Status of This Memo
+
+47	   This Internet-Draft is submitted in full conformance with the
+48	   provisions of BCP 78 and BCP 79.
+
+50	   Internet-Drafts are working documents of the Internet Engineering
+51	   Task Force (IETF).  Note that other groups may also distribute
+52	   working documents as Internet-Drafts.  The list of current Internet-
+53	   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+55	   Internet-Drafts are draft documents valid for a maximum of six months
+56	   and may be updated, replaced, or obsoleted by other documents at any
+57	   time.  It is inappropriate to use Internet-Drafts as reference
+58	   material or to cite them other than as "work in progress."
+
+60	   This Internet-Draft will expire on 26 April 2026.
+
+62	Copyright Notice
+
+64	   Copyright (c) 2025 IETF Trust and the persons identified as the
+65	   document authors.  All rights reserved.
+
+67	   This document is subject to BCP 78 and the IETF Trust's Legal
+68	   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+69	   license-info) in effect on the date of publication of this document.
+70	   Please review these documents carefully, as they describe your rights
+71	   and restrictions with respect to this document.  Code Components
+72	   extracted from this document must include Revised BSD License text as
+73	   described in Section 4.e of the Trust Legal Provisions and are
+74	   provided without warranty as described in the Revised BSD License.
+
+76	Table of Contents
+
+78	   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   4
+79	   2.  Conventions used in this document . . . . . . . . . . . . . .   5
+80	   3.  Terminology . . . . . . . . . . . . . . . . . . . . . . . . .   5
+81	   4.  The Secure Asset Transfer Protocol  . . . . . . . . . . . . .   6
+82	     4.1.  Overview  . . . . . . . . . . . . . . . . . . . . . . . .   6
+83	     4.2.  SAT Model . . . . . . . . . . . . . . . . . . . . . . . .   7
+84	     4.3.  Stages of the Protocol  . . . . . . . . . . . . . . . . .   7
+85	     4.4.  Gateway Cryptographic Keys  . . . . . . . . . . . . . . .   7
+86	   5.  SATP Message Format, identifiers and Descriptors  . . . . . .   8
+87	     5.1.  Overview  . . . . . . . . . . . . . . . . . . . . . . . .   8
+88	     5.2.  SATP Message Digital Signatures and Key Types . . . . . .   8
+89	     5.3.  SATP Message Format and Payloads  . . . . . . . . . . . .   9
+90	       5.3.1.  Protocol version  . . . . . . . . . . . . . . . . . .   9
+91	       5.3.2.  Message Type  . . . . . . . . . . . . . . . . . . . .   9
+92	       5.3.3.  Digital Asset Identifier  . . . . . . . . . . . . . .  10
+93	       5.3.4.  Asset Profile Identifier  . . . . . . . . . . . . . .  10
+94	       5.3.5.  Gateway Network ID (NetworkID)  . . . . . . . . . . .  11
+95	       5.3.6.  Transfer-Context ID:  . . . . . . . . . . . . . . . .  11
+96	       5.3.7.  Session ID: . . . . . . . . . . . . . . . . . . . . .  12
+97	       5.3.8.  Client Credential Types Supported by Gateways . . . .  12
+98	       5.3.9.  Gateway Supported TLS Schemes . . . . . . . . . . . .  12
+99	       5.3.10. Client Offers Other Supported TLS Schemes . . . . . .  13
+100	       5.3.11. Gateway Identifier  . . . . . . . . . . . . . . . . .  13
+101	       5.3.12. Payload Hash  . . . . . . . . . . . . . . . . . . . .  13
+102	       5.3.13. Signature Algorithms Supported  . . . . . . . . . . .  13
+103	       5.3.14. Asset Lock Mechanism within a Network . . . . . . . .  14
+104	       5.3.15. Lock assertion Claim Format . . . . . . . . . . . . .  14
+105	       5.3.16. Lock assertion Claim  . . . . . . . . . . . . . . . .  14
+106	     5.4.  Negotiation of Security Protocols and Parameters  . . . .  14
+107	       5.4.1.  TLS Secure Channel Establishment  . . . . . . . . . .  15
+108	       5.4.2.  Client asserts or proves identity . . . . . . . . . .  15
+109	       5.4.3.  Messages can now be exchanged . . . . . . . . . . . .  15
+110	   6.  Overview of Message Flows . . . . . . . . . . . . . . . . . .  15
+111	   7.  Identity and Asset Verification Stage (Stage 0) . . . . . . .  16
+112	   8.  Transfer Initiation Stage (Stage 1) . . . . . . . . . . . . .  17
+113	     8.1.  Transfer Initialization Claim . . . . . . . . . . . . . .  17
+114	     8.2.  Conveyance of Gateway and Network Capabilities  . . . . .  20
+115	     8.3.  Transfer Proposal Message . . . . . . . . . . . . . . . .  21
+116	     8.4.  Transfer Proposal Receipt Message . . . . . . . . . . . .  22
+117	     8.5.  Reject Message  . . . . . . . . . . . . . . . . . . . . .  23
+118	     8.6.  Transfer Commence Message . . . . . . . . . . . . . . . .  24
+119	     8.7.  Commence Response Message (ACK-Commence)  . . . . . . . .  25
+120	   9.  Lock Assertion Stage (Stage 2)  . . . . . . . . . . . . . . .  26
+121	     9.1.  Lock Assertion Message  . . . . . . . . . . . . . . . . .  26
+122	     9.2.  Lock Assertion Receipt Message  . . . . . . . . . . . . .  27
+123	   10. Commitment Preparation and Finalization (Stage 3) . . . . . .  28
+124	     10.1.  Commit Preparation Message (Commit-Prepare)  . . . . . .  29
+125	     10.2.  Commit Ready Message (Commit-Ready)  . . . . . . . . . .  29
+126	     10.3.  Commit Final Assertion Message (Commit-Final)  . . . . .  30
+127	     10.4.  Commit-Final Acknowledgement Receipt Message
+128	            (ACK-Final-Receipt)  . . . . . . . . . . . . . . . . . .  31
+129	     10.5.  Transfer Complete Message  . . . . . . . . . . . . . . .  32
+130	     10.6.  Error Message  . . . . . . . . . . . . . . . . . . . . .  33
+131	     10.7.  Session abort message  . . . . . . . . . . . . . . . . .  34
+132	   11. SATP Session Resumption . . . . . . . . . . . . . . . . . . .  34
+133	   12. Error Messages  . . . . . . . . . . . . . . . . . . . . . . .  35
+134	     12.1.  Session Termination Notification . . . . . . . . . . . .  35
+135	     12.2.  Connection Errors  . . . . . . . . . . . . . . . . . . .  36
+136	     12.3.  SATP Protocol Errors . . . . . . . . . . . . . . . . . .  36
+137	     12.4.  Effectiveness of Session Aborts  . . . . . . . . . . . .  36
+138	   13. Security Consideration  . . . . . . . . . . . . . . . . . . .  37
+139	   14. IANA Consideration  . . . . . . . . . . . . . . . . . . . . .  38
+140	     14.1.  SATP Error Codes Registry  . . . . . . . . . . . . . . .  38
+141	     14.2.  URN Registration . . . . . . . . . . . . . . . . . . . .  45
+142	     14.3.  SATP Message Types Registry  . . . . . . . . . . . . . .  45
+143	     14.4.  Initial Registry Contents  . . . . . . . . . . . . . . .  45
+144	       14.4.1.  Parameter name: transfer-proposal-msg  . . . . . . .  46
+145	       14.4.2.  Parameter name: proposal-receipt-msg . . . . . . . .  46
+146	       14.4.3.  Parameter name: reject-msg . . . . . . . . . . . . .  46
+147	       14.4.4.  Parameter name: transfer-commence-msg  . . . . . . .  46
+148	       14.4.5.  Parameter name: ack-commence-msg . . . . . . . . . .  46
+149	       14.4.6.  Parameter name: lock-assert-msg  . . . . . . . . . .  46
+150	       14.4.7.  Parameter name: assertion-receipt-msg  . . . . . . .  47
+151	       14.4.8.  Parameter name: commit-prepare-msg . . . . . . . . .  47
+152	       14.4.9.  Parameter name: commit-ready-msg . . . . . . . . . .  47
+153	       14.4.10. Parameter name: commit-final-msg . . . . . . . . . .  47
+154	       14.4.11. Parameter name: ack-commit-final-msg . . . . . . . .  47
+155	       14.4.12. Parameter name: commit-transfer-complete-msg . . . .  47
+156	       14.4.13. Parameter name: error-msg  . . . . . . . . . . . . .  48
+157	       14.4.14. Parameter name: session-abort-msg  . . . . . . . . .  48
+158	   15. Error Types and Codes . . . . . . . . . . . . . . . . . . . .  48
+159	     15.1.  Protocol Error Codes . . . . . . . . . . . . . . . . . .  48
+160	   16. Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  49
+161	   17. References  . . . . . . . . . . . . . . . . . . . . . . . . .  49
+162	     17.1.  Normative References . . . . . . . . . . . . . . . . . .  49
+163	     17.2.  Informative References . . . . . . . . . . . . . . . . .  50
+164	   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  50
+
+166	1.  Introduction
+
+168	   This memo proposes a secure asset transfer protocol (SATP) that is
+169	   intended to be deployed between two gateway endpoints to transfer a
+170	   digital asset from an origin asset network to a destination asset
+171	   network.  Readers are directed first to [ARCH] for a description of
+172	   the architecture underlying the current protocol.
+
+174	   Both the origin and destination asset networks are assumed to be
+175	   opaque in the sense that the interior construct of a given network is
+176	   not read/write accessible to unauthorized entities.
+
+178	   The protocol utilizes the asset burn-and-mint paradigm whereby the
+179	   asset to be transferred is permanently disabled or destroyed (burned)
+180	   at the origin asset network and is re-generated (minted) at the
+181	   destination asset network.  This is achieved through the coordinated
+182	   actions of the peer gateways handling the unidirectional transfer at
+183	   the respective networks.
+
+185	   A gateway is assumed to be trusted to perform the tasks involved in
+186	   the asset transfer.
+
+188	   The overall aim of the protocol is to ensure that the state of assets
+189	   in the origin and destination networks remain consistent, and that
+190	   asset movements into (out of) networks via gateways can be accounted
+191	   for.
+
+193	   There are several desirable technical properties of the protocol.
+194	   The protocol must ensure that the properties of atomicity,
+195	   consistency, isolation, and durability (ACID) are satisfied.
+
+197	   The requirement of consistency implies that the asset transfer
+198	   protocol always leaves both asset networks in a consistent state
+199	   (that the asset is located in one system/network only at any time).
+
+201	   Atomicity means that the protocol must guarantee that either the
+202	   transfer commits (completes) or entirely fails, where failure is
+203	   taken to mean there is no change to the state of the asset in the
+204	   origin (sender) asset network.
+
+206	   The property of isolation means that while a transfer is occurring to
+207	   a digital asset from an origin network, no other state changes can
+208	   occur to the asset.
+
+210	   The property of durability means that once the transfer has been
+211	   committed by both gateways, that this commitment must hold regardless
+212	   of subsequent unavailability (e.g. crash) of the gateways
+213	   implementing the SAT protocol.
+
+215	   All messages exchanged between gateways are assumed to run over
+216	   TLS1.2 or higher, and the endpoints at the respective gateways are
+217	   associated with a certificate indicating the legal owner (or
+218	   operator) of the gateway.  HTTPS/S must be used intead of plain HTTP.
+
+220	2.  Conventions used in this document
+
+222	   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+223	   "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+224	   document are to be interpreted as described in RFC 2119 [REQ-LEVEL].
+
+226	   In this document, these words will appear with that interpretation
+227	   only when in ALL CAPS.  Lower case uses of these words are not to be
+228	   interpreted as carrying significance described in RFC 2119.
+
+230	3.  Terminology
+
+232	   The following are some terminology used in the current document, some
+233	   borrowed from [NIST]:
+
+235	   *  Digital asset: digital representation of a value or of a right
+236	      that is able to be transferred and stored electronically using
+237	      distributed ledger technology or similar technology [MICA].
+
+239	   *  Asset network: A monolithic system or a set of distributed systems
+240	      that manage digital assets.
+
+242	   *  Client application: This is the application employed by a user to
+243	      interact with a gateway.
+
+245	   *  Gateway: The computer system functionally capable of acting as a
+246	      gateway in an asset transfer.
+
+248	   *  Sender gateway: The gateway that initiates a unidirectional asset
+249	      transfer.
+
+251	   *  Recipient gateway: The gateway that is the recipient side of a
+252	      unidirectional asset transfer.
+
+254	   *  Claim: An assertion made by an Entity [JWT].
+
+256	   *  Claim Type: Syntax used for representing a Claim Value [JWT].
+
+258	   *  Gateway Claim: An assertion made by a Gateway regarding the status
+259	      or condition of resources (e.g. assets, public keys, etc.)
+260	      accessible to that gateway (e.g. within its asset network or
+261	      system).
+
+263	   In the remainder of this document, for brevity of description the
+264	   term “asset network” will often be shorted to "network".
+
+266	4.  The Secure Asset Transfer Protocol
+
+268	4.1.  Overview
+
+270	   The Secure Asset Transfer Protocol (SATP) is a gateway-to-gateway
+271	   protocol used by a sender gateway with a recipient gateway to perform
+272	   a unidirectional transfer of a digital asset.
+
+274	   The protocol defines a number of API endpoints, resources and
+275	   identifier definitions, and message flows corresponding to the asset
+276	   transfer between the two gateways.
+
+278	   The current document pertains to the interaction between gateways
+279	   through API2 [ARCH].
+
+281	                    +----------+                +----------+
+282	                    |  Client  |                | Off-net  |
+283	             ------ |   (App)  |                | Resource |
+284	             |      +----------+                +----------+
+285	             |           |                      |   API3   |
+286	             |           |                      +----------+
+287	             |           |                           ^
+288	             |           V                           |
+289	             |      +---------+                      |
+290	             V      |   API1  |                      |
+291	          +-----+   +---------+----+        +----+---------+   +-----+
+292	          |     |   |         |    |        |    |         |   |     |
+293	          | Net.|   | Gateway |API2|        |API2| Gateway |   | Net.|
+294	          | NW1 |---|    G1   |    |<------>|    |    G2   |---| NW2 |
+295	          |     |   |         |    |        |    |         |   |     |
+296	          +-----+   +---------+----+        +----+---------+   +-----+
+297	                                  Figure 1
+
+299	4.2.  SAT Model
+
+301	   The model for SATP is shown in Figure 1 [ARCH].  The Client
+302	   (application) interacts with its local gateway (G1) over an interface
+303	   (API1) in order to provide instructions to the gateway with regards
+304	   to actions to assets and related resources located in the local
+305	   system or network (NW1).
+
+307	   Gateways interact with each other over a gateway interface (API2).  A
+308	   given gateway may be required to access resources that are not
+309	   located in network NW1 or network NW2.  Access to these types of
+310	   resources are performed over an off-network interface (API3).
+
+312	4.3.  Stages of the Protocol
+
+314	   The SAT protocol defines three (3) stages for a unidirectional asset
+315	   transfer:
+
+317	   *  Transfer Initiation stage (Stage-1): These flows deal with
+318	      commencing a transfer from one gateway to another.  In this stage
+319	      the sender gateway delivers a proposal containing the parameters
+320	      agreed upon in Stage-0.
+
+322	   *  Lock-Assertion stage (Stage-2): These flows deal with the
+323	      conveyance of signed assertions from the sender gateway to the
+324	      receiver gateway regarding the locked status of an asset at the
+325	      origin network.
+
+327	   *  Commitment Preparation and Finalization stage (Stage-3): These
+328	      flows deal with the asset transfer and commitment establishment
+329	      between two gateways.
+
+331	   In order to clarify discussion, the interactions between the peer
+332	   gateways prior to the transfer initiation stage is referred to as the
+333	   setup stage (Stage-0), which is outside the scope of the current
+334	   specification.
+
+336	   The Stage-1, Stage-2 and Stage-3 flows will be discussed below.
+
+338	4.4.  Gateway Cryptographic Keys
+
+340	   SATP recognizes the following cryptographic keys which are intended
+341	   for distinct purposes within the different stages of the protocol.
+
+343	   *  Gateway signature public key-pair: This is the key-pair utilized
+344	      by a gateway to digitally sign assertions and receipts.
+
+346	   *  Gateway secure channel establishment public key-pair: This is the
+347	      key-pair utilized by peer gateways to establish a secure channel
+348	      (e.g. TLS) for a transfer session.
+
+350	   *  Gateway identity public key pair: This is the key-pair that
+351	      uniquely identifies a gateway.
+
+353	   *  Gateway-owner identity public key pair: This is the key-pair that
+354	      identifies the owner (e.g. legal entity) who is the legal owner of
+355	      a gateway.
+
+357	   This document assumes that the relevant X.509 certificates are
+358	   associated with these keys.  However, the mechanisms to obtain X.509
+359	   certificates is outside the scope of this specification.
+
+361	5.  SATP Message Format, identifiers and Descriptors
+
+363	5.1.  Overview
+
+365	   This section describes the SATP message-types, the format of the
+366	   messages exchanged between two gateways, the format for resource
+367	   descriptors and other related parameters.
+
+369	   The mandatory fields are determined by the message type exchanged
+370	   between the two gateways (see Section 7).
+
+372	5.2.  SATP Message Digital Signatures and Key Types
+
+374	   All SATP messages exchanged between gateways must be signed, using
+375	   JSON Web Signatures mechanism (RFC7515).
+
+377	   SATP gateways SHOULD support the algorithms defined in the JSON Web
+378	   Algorithms (JWA) specification [RFC7518] and key types defined in the
+379	   JSON Web Key (JWK) specification [RFC7517].  The choice of signature
+380	   algorithm and key-type must be agreed upon between the gateways prior
+381	   to the commencement of the SATP protocol session.  The agreed values
+382	   are then included within the Transfer Initialization Claim body in
+383	   Transfer Proposal Message.
+
+385	   All gateways implementing SATP must implement at minimal the ECDSA
+386	   signature algorithm with the P-256 curve and the SHA-256 hash
+387	   function.
+
+389	   Additional signature algorithms and keying parameters may be
+390	   negotiated by peer gateways.  However, the negotiation protocol is
+391	   outside the scope of this specification.
+
+393	5.3.  SATP Message Format and Payloads
+
+395	   SATP messages are exchanged between peer gateways, where depending on
+396	   the message type one gateway may act as a client of the other (and
+397	   vice versa).
+
+399	   All SATP messages exchanged between gateways are in JSON format
+400	   [JSON].
+
+402	5.3.1.  Protocol version
+
+404	   This refers to SATP protocol Version, encoded as "major.minor"
+405	   (separated by a period symbol).
+
+407	   The current version is "1.0" defined in this specification.
+408	   Implementations not understanding a future option value should return
+409	   an appropriate error response and cease the negotiation.
+
+411	5.3.2.  Message Type
+
+413	   This refers to the type of request or response to be conveyed in the
+414	   message.
+
+416	   The possible values are defined in the IANA SATP Message Types
+417	   Registry Section 14.3, Paragraph 1:
+
+419	   *  transfer-proposal-msg: This is the transfer proposal message from
+420	      the sender gateway carrying the set of proposed parameters for the
+421	      transfer.
+
+423	   *  proposal-receipt-msg: This is the signed receipt message
+424	      indicating acceptance of the proposal by the receiver gateway.
+
+426	   *  reject-msg: This is a reject message from a gateway to the peer
+427	      gateway in the session, indication the reason and the resulting
+428	      action.
+
+430	   *  transfer-commence-msg: Request to begin the commencement of the
+431	      asset transfer.
+
+433	   *  ack-commence-msg: Response to accept the commencement of the asset
+434	      transfer.
+
+436	   *  lock-assert-msg: Sender gateway has performed the lock of the
+437	      asset in the origin network.
+
+439	   *  assertion-receipt-msg: Receiver gateway acknowledges receiving the
+440	      signed lock-assert-msg.
+
+442	   *  commit-prepare-msg: Sender gateway requests the start of the
+443	      commitment stage.
+
+445	   *  ack-prepare-msg: Receiver gateway acknowledges receiving the
+446	      previous commit-prepare-msg and agrees to start the commitment
+447	      stage.
+
+449	   *  commit-final-msg: Sender gateway has performed the extinguishment
+450	      (burn) of the asset in the origin network.
+
+452	   *  ack-commit-final-msg: Receiver gateway acknowledges receiving the
+453	      signed commit-final-msg and has performed the asset creation and
+454	      assignment in the destination network.
+
+456	   *  commit-transfer-complete-msg: Sender gateway indicates closure of
+457	      the current transfer session.
+
+459	   *  error-msg: This message is used to indicate that an error has
+460	      occured at the SATP layer.  It can be transmitted by either
+461	      gateways.
+
+463	   *  session-abort-msg: This message is used by a gateway to abort the
+464	      current session.
+
+466	5.3.3.  Digital Asset Identifier
+
+468	   This is the identifier that uniquely identifies the digital asset in
+469	   the origin network which is to be transferred to the destination
+470	   network.
+
+472	   The digital asset identifier is a value that is derived by the
+473	   applications utilized by the originator and the beneficiary prior to
+474	   starting the asset transfer.
+
+476	   The default format of the digital asset Identifier is JSON, with
+477	   base64 encoding.
+
+479	   The mechanism used to derive the digital asset identifier is outside
+480	   the scope of the current document.
+
+482	5.3.4.  Asset Profile Identifier
+
+484	   This is the unique identifier of the asset schema or asset profile
+485	   which defines the class or type of asset in question.  The asset
+486	   profile is relevant from a regulatory perspective.
+
+488	   In some cases the profile identifier may be needed by the receiver
+489	   gateway at the destination network in order to evaluate whether the
+490	   asset is permitted to enter the destination network.
+
+492	   The default format of the asset profile identifier is JSON, with
+493	   base64 encoding.
+
+495	   The formal specification of asset profiles and their identification
+496	   is outside the scope of this document.
+
+498	5.3.5.  Gateway Network ID (NetworkID)
+
+500	   The network identifier (NetworkID) is the unique alphanumeric string
+501	   representing the asset network behind a gateway.  A gateway may
+502	   simultaneously stand in front of multiple asset networks.  As such,
+503	   for a specific asset transfer instance both the sender gateway and
+504	   recipient gateway must indicate which asset networks are the origin
+505	   network and destination network respectively.
+
+507	   The network identifier values of the origin network
+508	   (senderGatewayNetworkId) and destination network
+509	   (recipientGatewayNetworkId) must be communicated and agreed upon
+510	   prior to the commencement of the asset transfer.  This selection is
+511	   confirmed by peer gateways in the Transfer Initialization Claim that
+512	   is transmitted within Transfer Proposal Message.
+
+514	   The mechanism to allocate globally unique network identifier is
+515	   outside the scope of the current specification.
+
+517	5.3.6.  Transfer-Context ID:
+
+519	   This is the unique immutable identifier representing the application
+520	   layer context of a single unidirectional transfer.  The method to
+521	   generate the transfer-context ID is outside the scope of the current
+522	   document.
+
+524	   The transfer-context may be a complex data structure that contains
+525	   all information related to a SATP execution instance.  Examples of
+526	   information contained in a transfer-context may include identifiers
+527	   of sessions, gateways, networks or assets related to the specific
+528	   SATP execution instance.  The sender gateway provides this value to
+529	   the receiver gateway.
+
+531	   The default format of the transfer context identifier is JSON, with
+532	   base64 encoding.
+
+534	   The Transfer Context ID (transferContextId) value is established by
+535	   the sender application (possibly with the assistance of the sender
+536	   gateway) in the origin network.  The value is then communicated to
+537	   the receiving application in the destination network prior to the
+538	   commencement of the SAT protocol.  Both the sender gateway and
+539	   receiver gateway must understand how to process the transferContextId
+540	   value.  The value is used in the Transfer Proposal Message (with
+541	   message type satp:msgtype:transfer-proposal-msg) between the two
+542	   gateways.
+
+544	   The mechanism to derive the Transfer Context ID value and to
+545	   communicate it between the applications is outside the scope of the
+546	   current specification.
+
+548	5.3.7.  Session ID:
+
+550	   This is the unique identifier representing a session between two
+551	   gateways handling a single unidirectional transfer.  This may be
+552	   derived from the Transfer-Context ID at the application level.  There
+553	   may be several session IDs related to a SATP execution instance.
+554	   Only one Session ID may be active for a given SATP execution
+555	   instance.  Session IDs may be stored in the transfer-context for
+556	   audit trail purposes.
+
+558	   The sender gateway provides this value to the receiver gateway.
+
+560	5.3.8.  Client Credential Types Supported by Gateways
+
+562	   SATP Gateways must support JSON Web Tokens (JWT) [RFC 7519] with
+563	   OAUth2.0 [RFC6749] as the minimal credential type for authenticating
+564	   incoming API calls from Client Applications (see Figure 1).
+
+566	   A gateway may support additional credential mechanisms, which may be
+567	   advertised by the gateway through different mechanisms (e.g. config
+568	   file at a well-known endpoint).  However, these mechanisms are out of
+569	   scope for the current specification.
+
+571	5.3.9.  Gateway Supported TLS Schemes
+
+573	   Gateways must suport TLS1.2 or higher [RFC8448].
+
+575	   The TLS scheme is used by peer gateways to establish the TLS session
+576	   prior to the commencement of an asset transfer.  Gateways must a
+577	   minimal support the AES-128 in GCM mode with SHA-256
+578	   (TLS_AES_128_GCM_SHA256).
+
+580	   If the client (sender gateway) transmits a list of supported
+581	   credential schemes, the server (recipient gateway) selects one
+582	   acceptable credential scheme from the offered schemes.
+
+584	   If no acceptable credential scheme was offered, a "unsupported
+585	   gatewayCredentialScheme" (err_1.1.34) reject message is returned by
+586	   the server Section 8.5, Paragraph 1.
+
+588	5.3.10.  Client Offers Other Supported TLS Schemes
+
+590	   If a client (sender gateway) wishes to use TLS schemes other then the
+591	   basic scheme (AES-128 in GCM mode with SHA-256), then the client may
+592	   may choose to send a JSON block containing information regarding the
+593	   client's supported TLS schemes.
+
+595	5.3.11.  Gateway Identifier
+
+597	   This is the unique identifier of the gateway service.  The gateway
+598	   identifier MUST be uniquely bound to its SAT endpoint (e.g. via X.509
+599	   certificates).
+
+601	   This gateway identifier is distinct from the gateway operator
+602	   business identifier (e.g., legal entity identifier (LEI) number).  A
+603	   gateway operator may operate multiple gateways.  Each of the gateways
+604	   within an asset network MUST be identified by a unique gateway
+605	   identifier.
+
+607	   The mechanisms to establish the gateway identifier or the operator
+608	   identifier is outside the scope of this specification.
+
+610	5.3.12.  Payload Hash
+
+612	   This is the hash of the current message payload.
+
+614	5.3.13.  Signature Algorithms Supported
+
+616	   This is a JSON list of digital signature algorithms supported by a
+617	   gateway.  Each entry in the list should be either an Algorithm Name
+618	   value registered in the IANA "JSON Web Signature and Encryption
+619	   Algorithms" registry established by [JWA] or be a value that contains
+620	   a Collision-Resistant Name.
+
+622	   All implementations MUST support a common default of "ES256", which
+623	   is the ECDSA signature algorithm with the P-256 curve and the SHA-256
+624	   hash function.
+
+626	5.3.14.  Asset Lock Mechanism within a Network
+
+628	   SATP gateways may be providing service to multiple types of asset
+629	   networks, each of which may utilize different local mechanisms to
+630	   immobile (lock) a given asset as way to provide exclusion in the case
+631	   of multiple attempts to change the state of the asset.
+
+633	   The origin network and the destination network may in fact utilize
+634	   distinct asset locking mechanisms, and the type of mechanisms to
+635	   immobile (lock) a given asset may have different convergence
+636	   (finalization) speeds.  Peer gateways must exchange information about
+637	   the asset locking information in their respective network to enable
+638	   both gateways to compute an approximate time of convergence
+639	   (assetLockExpirationTime) and set timers for the transfer of asset.
+640	   A timer that expires too soon may result in the SAT protocol
+641	   terminating too early before reaching the final commitment stage.
+
+643	   Currently, the most common type of mechanisms (NetworkLockType) to
+644	   temporarily lock an asset in a network are (i) TIME_LOCK, (ii)
+645	   HASH_LOCK, (iii) HASH_TIME_LOCK.
+
+647	   The exact definition of these asset locking mechanisms are network-
+648	   dependent, and such are out of the scope of the current work.
+
+650	5.3.15.  Lock assertion Claim Format
+
+652	   This is the format of the claim regarding the state of the asset in
+653	   the origin network.  The default format is JSON, with parts being
+654	   base64 encoded as needed.
+
+656	   If the sender gateway offers multiple choices of other formats to the
+657	   receiver gateway, the selection must occur prior to the establishment
+658	   of the session.
+
+660	5.3.16.  Lock assertion Claim
+
+662	   The actual encoded JSON string representation of the claim using the
+663	   format as specified by the corresponding Lock Assertion Claim Format
+664	   value.
+
+666	5.4.  Negotiation of Security Protocols and Parameters
+
+668	   The peer gateways in SATP must establish a TLS session between them
+669	   prior to starting the transfer initiation stage (Stage-0).  The TLS
+670	   session continues until the transfer is completed at the end of the
+671	   commitment establishment stage (Stage-3).
+
+673	   In the following steps, the sender gateway is referred to as the
+674	   client while the receiver gateway as the server.
+
+676	5.4.1.  TLS Secure Channel Establishment
+
+678	   TLS 1.2 or higher MUST be implemented to protect gateway
+679	   communications.  TLS 1.3 or higher SHOULD be used where both gateways
+680	   support TLS 1.3 or higher.
+
+682	5.4.2.  Client asserts or proves identity
+
+684	   The details of the assertion/verification step are specific to the
+685	   chosen credential scheme and are outside the scope of this document.
+
+687	5.4.3.  Messages can now be exchanged
+
+689	   Handshaking is complete at this point, and the client and server can
+690	   begin exchanging SATP messages.
+
+692	6.  Overview of Message Flows
+
+694	   The SATP message flows are logically divided into three (3) stages
+695	   [ARCH], with the preparatory stage denoted as Stage-0.  How the tasks
+696	   are achieved in Stage-0 is out of the scope of this specification.
+
+698	   The Stage-1 flows pertains to the initialization of the transfer
+699	   between the two gateways.
+
+701	   After both gateways agree to commence the transfer at the start of
+702	   Stage-2, the sender gateway G1 must deliver a signed assertion that
+703	   it has correctly performed the relevant action on the asset within
+704	   the origin network (NW1).  Examples of actions by G1 include
+705	   performing a temporary lock on the asset, or performing a permanent
+706	   disablement (burn) of the asset in NW1.
+
+708	   If that signed assertion is accepted by gateway G2, it must in return
+709	   transmit a signed receipt to gateway G1 that it has correctly
+710	   performed the relevant corresponding action on destination network
+711	   (NW2).  Examples of actions by G2 include creating (minting) a
+712	   temporary asset under its control in NW2.
+
+714	   The Stage-3 flows commit gateways G1 and G2 to the burn and mint in
+715	   Stage-2.  The sender gateway G1 must make the lock on the asset in
+716	   the origin network NW1 to be permanent (burn).  The receiver gateway
+717	   G2 must assign (mint) the asset in the destination network NW2 to the
+718	   correct beneficiary.
+
+720	   The reader is directed to [ARCH] for further discussion of this
+721	   model.
+
+723	       App1  NW1          G1                     G2          NW2    App2
+724	      ..|.....|............|......................|............|.....|..
+725	        |     |            |       Stage 1        |            |     |
+726	        |     |            |                      |            |     |
+727	        |     |       (1.1)|--Transf. Proposal -->|            |     |
+728	        |     |            |                      |            |     |
+729	        |     |            |<--Proposal Receipt---|(1.2)       |     |
+730	        |     |            |                      |            |     |
+731	        |     |       (1.3)|---Transf. Commence-->|            |     |
+732	        |     |            |                      |            |     |
+733	        |     |            |<----ACK Commence-----|(1.4)       |     |
+734	        |     |            |                      |            |     |
+735	      ..|.....|............|......................|............|.....|..
+736	        |     |            |       Stage 2        |            |     |
+737	        |     |            |                      |            |     |
+738	        |     |<---Lock----|(2.1)                 |            |     |
+739	        |     |            |                      |            |     |
+740	        |     |       (2.2)|----Lock-Assertion--->|            |     |
+741	        |     |            |                      |            |     |
+742	        |     |            |                 (2.3)|--Record--->|     |
+743	        |     |            |                      |            |     |
+744	        |     |            |<--Assertion Receipt--|(2.4)       |     |
+745	        |     |            |                      |            |     |
+746	      ..|.....|............|......................|............|.....|..
+747	        |     |            |       Stage 3        |            |     |
+748	        |     |            |                      |            |     |
+749	        |     |       (3.1)|----Commit Prepare--->|            |     |
+750	        |     |            |                      |            |     |
+751	        |     |            |                 (3.2)|----Mint--->|     |
+752	        |     |            |                      |            |     |
+753	        |     |            |<----Commit Ready-----|(3.3)       |     |
+754	        |     |            |                      |            |     |
+755	        |     |<---Burn----|(3.4)                 |            |     |
+756	        |     |            |                      |            |     |
+757	        |     |       (3.5)|-----Commit Final---->|            |     |
+758	        |     |            |                      |            |     |
+759	        |     |            |                 (3.6)|---Assign-->|     |
+760	        |     |            |                      |            |     |
+761	        |     |            |<-----ACK Final-------|(3.7)       |     |
+762	        |     |            |                      |            |     |
+763	        |     |            |                      |            |     |
+764	        |     |<--Record---|(3.8)                 |            |     |
+765	        |     |            |                      |            |     |
+766	        |     |       (3.9)|--Transfer Complete-->|            |     |
+767	      ..|.....|............|......................|............|.....|..
+768	                                Figure 2
+
+770	7.  Identity and Asset Verification Stage (Stage 0)
+
+772	   Prior to commencing the asset transfer from the sender gateway
+773	   (client) to the recipient gateway (server), both gateways must
+774	   perform a number of verification steps.  The types of information
+775	   required by both the sender and recipient are use-case dependent and
+776	   asset-type dependent.
+
+778	   The verifications include, but not limited to, the following:
+
+780	   *  Verification of the gateway signature public key: The sender
+781	      gateway and receiver gateway must validate their respective
+782	      signature public keys that will later be used to sign assertions
+783	      and claims.  This may include validating the X509 certificates of
+784	      these keys.
+
+786	   *  Gateway owner verification: This is the verification of the
+787	      identity (e.g. LEI) of the owners of the gateways.
+
+789	   *  Gateway device and state validation: This is the device
+790	      attestation evidence [RFC9334] that a gateway must collect and
+791	      convey to each other, where a verifier is assumed to be available
+792	      to decode, parse and appraise the evidence.
+
+794	   *  Originator and beneficiary identity verification: This is the
+795	      identity and public-key of the entity (originator) in the origin
+796	      network seeking to transfer the asset to another entity
+797	      (beneficiary) in the destination network.
+
+799	   These are considered out of scope in the current specification, and
+800	   are assumed to have been successfully completed prior to the
+801	   commencement of the transfer initiation flow.  The reader is directed
+802	   to [ARCH] for further discussion regarding Stage-0.
+
+804	8.  Transfer Initiation Stage (Stage 1)
+
+806	   This section describes the transfer initiation stage, where the
+807	   sender gateway and the receiver gateway prepare for the start of the
+808	   asset transfer.
+
+810	   The sender gateway proposes the set of transfer parameters and asset-
+811	   related artifacts for the transfer to the receiver gateway.  These
+812	   are contained in the Transfer Initiation Claim.
+
+814	   If the receiver gateway accepts the proposal, it returns a signed
+815	   receipt message for the proposal indicating it agrees to proceed to
+816	   the next stage.  If the receiver gateway rejects any parameters or
+817	   artifacts in the proposal, it can provide a counteroffer to the
+818	   sender gateway by responding with a proposal reject message carrying
+819	   alternative parameters.
+
+821	   Gateways MUST support the use of the HTTP GET and POST methods
+822	   defined in RFC 2616 [RFC2616] for the endpoint.
+
+824	   Clients (sender gateway) MAY use the HTTP GET or POST methods to send
+825	   messages in this stage to the server (recipient gateway).  If using
+826	   the HTTP GET method, the request parameters may be serialized using
+827	   URI Query String Serialization.
+
+829	   (NOTE: Flows occur over TLS.  Nonces are not shown).
+
+831	8.1.  Transfer Initialization Claim
+
+833	   This is set of artifacts pertaining to the asset that must be agreed
+834	   upon between the client (sender gateway) and the server (recipient
+835	   gateway).
+
+837	   The format of the identity fields in this message, unless otherwise
+838	   stated, is a JSON string that contains a [X.500] Distinguished Name.
+
+840	   The Transfer Initialization Claim consists of the following:
+
+842	   *  digitalAssetId REQUIRED: This is the globally unique identifier
+843	      for the digital asset located in the origin network.  The default
+844	      format is JSON, with base64 encoding.
+
+846	   *  assetProfileId REQUIRED: This is the globally unique identifier
+847	      for the asset-profile definition (document) on which the digital
+848	      asset was issued.
+
+850	   *  networkLockType REQUIRED: The default locking mechanism used for
+851	      an asset.  These can be (i) TIME_LOCK, (ii) HASH_LOCK, (iii)
+852	      HASH_TIME_LOCK.
+
+854	   *  assetLockExpirationTime OPTIONAL: The duration of time (in
+855	      seconds) for an asset lock to expire in the network, if it is a
+856	      HASH_TIME_LOCK or a TIME_LOCK.
+
+858	   *  verifiedOriginatorEntityId REQUIRED: This is the identity data of
+859	      the originator entity (person or organization) in the origin
+860	      network.  This information must be verified by the sender gateway.
+
+862	   *  verifiedBeneficiaryEntityId REQUIRED: This is the identity data of
+863	      the beneficiary entity (person or organization) in the destination
+864	      network.  This information must be verified by the receiver
+865	      gateway.
+
+867	   *  originatorPubkey REQUIRED: This is the public key of the asset
+868	      owner (originator) in the origin network or system.
+
+870	   *  beneficiaryPubkey REQUIRED: This is the public key of the
+871	      beneficiary in the destination network.
+
+873	   *  senderGatewaySignaturePublicKey REQUIRED: This is the public key
+874	      of the key-pair used by the sender gateway to sign assertions and
+875	      receipts.
+
+877	   *  receiverGatewaySignaturePublicKey REQUIRED: This is the public key
+878	      of the key-pair used by the recevier gateway to sign assertions
+879	      and receipts.
+
+881	   *  senderGatewayId REQUIRED: This is the identifier of the sender
+882	      gateway.
+
+884	   *  recipientGatewayId REQUIRED: This is the identifier of the
+885	      receiver gateway.
+
+887	   *  senderGatewayNetworkId REQUIRED: This is the identifier of the
+888	      origin network or system behind the client.
+
+890	   *  recipientGatewayNetworkId REQUIRED: This is the identifier of the
+891	      destination network or system behind the server.
+
+893	   *  senderGatewayDeviceIdentityPubkey OPTIONAL: The device public key
+894	      of the sender gateway (client).
+
+896	   *  receiverGatewayDeviceIdentityPubkey OPTIONAL: The device public
+897	      key of the receiver gateway
+
+899	   *  senderGatewayOwnerId OPTIONAL: This is the identity information of
+900	      the owner or operator of the sender gateway.
+
+902	   *  receiverGatewayOwnerId OPTIONAL: This is the identity information
+903	      of the owner or operator of the recipient gateway.
+
+905	   Here is an example representation in JSON format:
+
+907	   { "digitalAssetId": "2c949e3c-5edb-4a2c-9ef4-20de64b9960d",\
+908	   "assetProfileId": "38561",\ "verifiedOriginatorEntityId": "CN=Alice,
+909	   OU=Example Org Unit, O=Example, L=New York, C=US",\
+910	   "verifiedBeneficiaryEntityId": "CN=Bob, OU=Case Org Unit, O=Case,
+911	   L=San Francisco, C=US",\ "originatorPubkey": "0304b9f34d3898b27f85b3d
+912	   88fa069a879abe14db5060dde466dd1e4a31ff75e44",\ "beneficiaryPubkey": "
+913	   02a7bc058e1c6f3a79601d046069c9b6d0cb8ea5afc99e6074a5997284756fc9ae",\
+914	   "senderGatewaySignaturePublicKey": "02a7bc058e1c6f3a79601d046069c9b6d
+915	   0cb8ea5afc99e6074a5997284756fc9ae",\
+916	   "receiverGatewaySignaturePublicKey": "0243b12ada6515ada3bf99a7da32e84
+917	   f00383b5765fd7701528e660449ba5ef260",\ "senderGatewayId": "GW1",\
+918	   "recipientGatewayId": "GW2",\ "senderGatewayNetworkId": "1",\
+919	   "recipientGatewayNetworkId": "43114",\
+920	   "senderGatewayDeviceIdentityPubkey": "0245785e34b4a7b457dd4683a297ea3
+921	   d78bab35f8b2583df55d9df8c69604d0e73",\
+922	   "receiverGatewayDeviceIdentityPubkey": "03763f0bc48ff154cff45ea533a9d
+923	   8a94349d65a45573e4de6ad6495b6e834312b",\ "senderGatewayOwnerId":
+924	   "CN=GatewayOps, OU=GatewayOps Systems, O=GatewayOps LTD, L=Austin,
+925	   C=US",\ "receiverGatewayOwnerId": "CN=BridgeSolutions,
+926	   OU=BridgeSolutions Engineering, O=BridgeSolutions LTD, L=Austin,
+927	   C=US"\ }
+
+929	8.2.  Conveyance of Gateway and Network Capabilities
+
+931	   This is the set of parameters pertaining to the origin network and
+932	   the destination network, and the technical capabilities supported by
+933	   the peer gateways.  Some of these parameters must be previously
+934	   agreed to during the Stage-0 negotiations, which is outside the scope
+935	   of this document.
+
+937	   Some network-specific parameters regarding the origin network may be
+938	   relevant for a receiver gateway to evaluate its ability to process
+939	   the proposed transfer.
+
+941	   The gateway capabilities list is as follows:
+
+943	   *  gatewayDefaultSignatureAlgorithm REQUIRED: The default digital
+944	      signature algorithm (algorithm-id) from the IANA "JSON Web
+945	      Signature and Encryption Algorithms" registry used by a gateway to
+946	      sign claims.
+
+948	   *  gatewaySupportedSignatureAlgorithms OPTIONAL: The list of other
+949	      digital signature algorithms (algorithm-id) from the IANA "JSON
+950	      Web Signature and Encryption Algorithms" registry supported by a
+951	      gateway to sign claims
+
+953	   *  networkLockType REQUIRED: The default locking mechanism used by a
+954	      network.  The values allowed are "TIME_LOCK", "HASH_LOCK",
+955	      "HASH_TIME_LOCK".  Future updates to this specification may define
+956	      new values and implementations not supporting a value or not
+957	      understanding a value for this field must return an appropriate
+958	      error and cease the negotiation.
+
+960	   *  networkLockExpirationTime REQUIRED: The duration of time (in
+961	      integer seconds) for a lock to expire in the network.
+
+963	   *  gatewayCredentialScheme REQUIRED: Specify the TLS1.2 or TLS1.3
+964	      scheme.
+
+966	   *  gatewayLoggingProfile REQUIRED: contains the profile of the
+967	      logging procedure.  "LOCAL_STORE" is the only defined allowed
+968	      value at this time, but others may be defined in future updates to
+969	      this specification.  Implementations not understanding a future
+970	      option value should return an appropriate error response and cease
+971	      the negotiation.
+
+973	   Here is an example representation in JSON format:
+
+975	   json { "gatewayDefaultSignatureAlgorithm": "ES256",
+976	   "gatewaySupportedSignatureAlgorithms": ["ES256", "RSA"],
+977	   "networkLockType": "HASH_TIME_LOCK", "networkLockExpirationTime":
+978	   120, "gatewayCredentialScheme": "TLS_AES_128_GCM_SHA256",
+979	   "gatewayLoggingProfile": "LOCAL_STORE" }
+
+981	8.3.  Transfer Proposal Message
+
+983	   The purpose of this message is for the sender gateway as the client
+984	   to initiate an asset transfer session with the receiver gateway as
+985	   the server.
+
+987	   The client transmits a proposal message that carries the claim
+988	   related to the asset to be transferred.  This message must be signed
+989	   by the client.
+
+991	   This message is sent from the client to the Transfer Initialization
+992	   Endpoint at the server.
+
+994	   The parameters of this message consist of the following:
+
+996	   *  version REQUIRED: SAT protocol Version (see Section 5.3.1,
+997	      Paragraph 1) as a string "major.minor".
+
+999	   *  messageType REQUIRED: urn:ietf:satp:msgtype:transfer-proposal-msg.
+
+1001	   *  sessionId REQUIRED: A unique identifier chosen by the client to
+1002	      identify the current session.
+
+1004	   *  transferContextId REQUIRED: A unique identifier used to identify
+1005	      the current transfer session at the application layer.
+
+1007	   *  transferInitClaimFormat REQUIRED: The default format is JSON, with
+1008	      parts being base64 encoded as needed.  The default format is
+1009	      denoted as "TRANSFER_INIT_CLAIM_FORMAT_1".
+
+1011	   *  transferInitClaim REQUIRED: The set of artifacts and parameters as
+1012	      the basis for the current transfer.
+
+1014	   *  gatewayAndNetworkCapabilities REQUIRED: The set of origin gateway
+1015	      and network parameters reported by the client to the server.
+
+1017	   Here is an example of the message request body:
+
+1019	   json { "version": "1.0", "messageType":
+1020	   "urn:ietf:satp:msgtype:transfer-proposal-msg", "sessionId":
+1021	   "d66a567c-11f2-4729-a0e9-17ce1faf47c1", "transferContextId":
+1022	   "89e04e71-bba2-4363-933c-262f42ec07a0", "transferInitClaimFormat":
+
+1024	   "TRANSFER_INIT_CLAIM_FORMAT_1", "transferInitClaim": {
+1025	   "digitalAssetId": "2c949e3c-5edb-4a2c-9ef4-20de64b9960d",
+1026	   "assetProfileId": "38561", "networkLockType": "HASH_TIME_LOCK",
+1027	   "assetLockExpirationTime": 120, "verifiedOriginatorEntityId":
+1028	   "CN=Alice, OU=Example Org Unit, O=Example, L=New York, C=US",
+1029	   "verifiedBeneficiaryEntityId": "CN=Bob, OU=Case Org Unit, O=Case,
+1030	   L=San Francisco, C=US", "originatorPubkey":
+1031	   "0304b9f34d3898b27f85b3d88fa069a879abe14db5060dde466dd1e4a31ff75e44",
+1032	   "beneficiaryPubkey":
+1033	   "02a7bc058e1c6f3a79601d046069c9b6d0cb8ea5afc99e6074a5997284756fc9ae",
+1034	   "senderGatewaySignaturePublicKey":
+1035	   "02a7bc058e1c6f3a79601d046069c9b6d0cb8ea5afc99e6074a5997284756fc9ae",
+1036	   "receiverGatewaySignaturePublicKey":
+1037	   "0243b12ada6515ada3bf99a7da32e84f00383b5765fd7701528e660449ba5ef260",
+1038	   "senderGatewayId": "GW1", "recipientGatewayId": "GW2",
+1039	   "senderGatewayNetworkId": "1", "recipientGatewayNetworkId": "43114",
+1040	   "senderGatewayDeviceIdentityPubkey":
+1041	   "0245785e34b4a7b457dd4683a297ea3d78bab35f8b2583df55d9df8c69604d0e73",
+1042	   "receiverGatewayDeviceIdentityPubkey":
+1043	   "03763f0bc48ff154cff45ea533a9d8a94349d65a45573e4de6ad6495b6e834312b",
+1044	   "senderGatewayOwnerId": "CN=GatewayOps, OU=GatewayOps Systems,
+1045	   O=GatewayOps LTD, L=Austin, C=US", "receiverGatewayOwnerId":
+1046	   "CN=BridgeSolutions, OU=BridgeSolutions Engineering,
+1047	   O=BridgeSolutions LTD, L=Austin, C=US" },
+1048	   "gatewayAndNetworkCapabilities": {
+1049	   "gatewayDefaultSignatureAlgorithm": "ES256",
+1050	   "gatewaySupportedSignatureAlgorithms": ["ES256", "RSA"],
+1051	   "networkLockType": "HASH_TIME_LOCK", "networkLockExpirationTime":
+1052	   120, "gatewayCredentialScheme": "TLS_AES_128_GCM_SHA256",
+1053	   "gatewayLoggingProfile": "LOCAL_STORE" } }
+
+1055	8.4.  Transfer Proposal Receipt Message
+
+1057	   The purpose of this message is for the server to indicate explicit
+1058	   acceptance of the parameters in the claim part of the transfer
+1059	   proposal message.
+
+1061	   The message must be signed by the server.
+
+1063	   The message is sent from the server to the Transfer Proposal Endpoint
+1064	   at the client.
+
+1066	   The parameters of this message consist of the following:
+
+1068	   *  version REQUIRED: SAT protocol Version see {satp-protocol-
+1069	      version}} as a string "major.minor".
+
+1071	   *  messageType REQUIRED: urn:ietf:satp:msgtype:proposal-receipt-msg.
+
+1073	   *  sessionId REQUIRED: A unique identifier chosen by the client to
+1074	      identify the current session.
+
+1076	   *  transferContextId REQUIRED: A unique identifier used to identify
+1077	      the current transfer session at the application layer.
+
+1079	   *  hashTransferInitClaim REQUIRED: Hash of the Transfer
+1080	      Initialization Claim received in the Transfer Proposal Message.
+
+1082	   *  timestamp REQUIRED: timestamp referring to when the Initialization
+1083	      Request Message was received.
+
+1085	   Here is an example of the message request body:
+
+1087	   {\ "version": "1.0",\ "messageType": "urn:ietf:satp:msgtype:proposal-
+1088	   receipt-msg",\ "sessionId": "d66a567c-11f2-4729-a0e9-17ce1faf47c1",\
+1089	   "transferContextId": "89e04e71-bba2-4363-933c-262f42ec07a0",\
+1090	   "hashTransferInitClaim":
+1091	   "154dfaf0406038641e7e59509febf41d9d5d80f367db96198690151f4758ca6e",\
+1092	   "timestamp": "2024-10-03T12:02+00Z",\ }\
+
+1094	8.5.  Reject Message
+
+1096	   The purpose of this message is for the server to indicate explicit
+1097	   rejection of the the previous message receuved from the client.  This
+1098	   message can be sent at any time in the session.  The server MUST
+1099	   include an error code (see Section 15, Paragraph 1) in this message.
+1100	   A reject message is taken to mean an immediate termination of the
+1101	   session.
+
+1103	   The message must be signed by the server.
+
+1105	   The parameters of this message consist of the following:
+
+1107	   *  version REQUIRED: SAT protocol Version see {satp-protocol-
+1108	      version}} as a string "major.minor".
+
+1110	   *  messageType REQUIRED: urn:ietf:satp:msgtype:reject-msg
+
+1112	   *  sessionId REQUIRED: A unique identifier chosen by the client to
+1113	      identify the current session.
+
+1115	   *  transferContextId REQUIRED: A unique identifier used to identify
+1116	      the current transfer session at the application layer.
+
+1118	   *  hashPrevMessage REQUIRED: The cryptographic hash of the last
+1119	      message that caused the rejection to occur.  The default hash
+1120	      algorothm is SHA256.
+
+1122	   *  reasonCode REQUIRED: the error code (see Section 15, Paragraph 1)
+1123	      causing the rejection.
+
+1125	   *  timestamp REQUIRED: timestamp of this message.
+
+1127	   Here is an example of the message request body:
+
+1129	   {\ "version": "1.0",\ "messageType": "urn:ietf:satp:msgtype:reject-
+1130	   msg",\ "sessionId": "d66a567c-11f2-4729-a0e9-17ce1faf47c1",\
+1131	   "transferContextId": "89e04e71-bba2-4363-933c-262f42ec07a0",\
+1132	   "hashPrevMessage":
+1133	   "154dfaf0406038641e7e59509febf41d9d5d80f367db96198690151f4758ca6e",\
+1134	   "reasonCode": "err_2.1",\ "timestamp": "2024-10-03T12:02+00Z",\ }\
+
+1136	8.6.  Transfer Commence Message
+
+1138	   The purpose of this message is for the client to signal to the server
+1139	   that the client is ready to start the transfer of the digital asset.
+1140	   This message must be signed by the client.
+
+1142	   This message is sent by the client as a response to the Transfer
+1143	   Proposal Receipt Message previously received from the server.
+
+1145	   This message is sent by the client to the Transfer Commence Endpoint
+1146	   at the server.
+
+1148	   The parameters of this message consist of the following:
+
+1150	   *  messageType REQUIRED: MUST be the value
+1151	      urn:ietf:satp:msgtype:transfer-commence-msg.
+
+1153	   *  sessionId REQUIRED: A unique identifier chosen earlier by the
+1154	      client in the Initialization Request Message.
+
+1156	   *  transferContextId REQUIRED: A unique identifier used to identify
+1157	      the current transfer session at the application layer.
+
+1159	   *  hashTransferInitClaim REQUIRED: Hash of the Transfer
+1160	      Initialization Claim in the Transfer Proposal message.
+
+1162	   *  hashPrevMessage REQUIRED.  The cryptographic hash of the last
+1163	      message, in this case the Transfer Proposal Receipt message.  The
+1164	      default hash algorithm is SHA256.
+
+1166	   For example, the client makes the following HTTP request using TLS:
+
+1168	   {\ "messageType": "urn:ietf:satp:msgtype:transfer-commence-msg",\
+1169	   "sessionId": "d66a567c-11f2-4729-a0e9-17ce1faf47c1",\
+1170	   "transferContextId": "89e04e71-bba2-4363-933c-262f42ec07a0",\
+1171	   "hashTransferInitClaim":
+1172	   "154dfaf0406038641e7e59509febf41d9d5d80f367db96198690151f4758ca6e",\
+1173	   "hashPrevMessage":
+1174	   "0b0aecc2680e0d8a86bece6b54c454fba67068799484f477cdf2f87e6541db66",\
+1175	   }\
+
+1177	8.7.  Commence Response Message (ACK-Commence)
+
+1179	   The purpose of this message is for the server to indicate agreement
+1180	   to proceed with the asset transfer, based on the artifacts found in
+1181	   the previous Transfer Proposal Message.
+
+1183	   This message is sent by the server to the Transfer Commence Endpoint
+1184	   at the client.
+
+1186	   The message must be signed by the server.
+
+1188	   The parameters of this message consist of the following:
+
+1190	   *  messageType REQUIRED: urn:ietf:satp:msgtype:ack-commence-msg
+
+1192	   *  sessionId REQUIRED: A unique identifier chosen earlier by the
+1193	      client in the Initialization Request Message.
+
+1195	   *  transferContextId REQUIRED: A unique identifier used to identify
+1196	      the current transfer session at the application layer.
+
+1198	   *  hashPrevMessage REQUIRED.  The cryptographic hash of the last
+1199	      message, in this case the Transfer Commence Message.  The default
+1200	      hash algorithm is SHA256.
+
+1202	   An example of a success response could be as follows:
+
+1204	   {\ "messageType": "urn:ietf:satp:msgtype:ack-commence-msg",\
+1205	   "sessionId": "d66a567c-11f2-4729-a0e9-17ce1faf47c1",\
+1206	   "transferContextId": "89e04e71-bba2-4363-933c-262f42ec07a0",\
+1207	   "hashPrevMessage":
+1208	   "dd5a61a26fc8f5d72e5ca6052c2a1fca1613115e5582d9417d336375c196db89",\
+1209	   }\
+
+1211	9.  Lock Assertion Stage (Stage 2)
+
+1213	   The messages in this stage pertain to the sender gateway providing
+1214	   the recipient gateway with a signed assertion that the asset in the
+1215	   origin network has been locked or disabled and under the control of
+1216	   the sender gateway.
+
+1218	   In the following steps, the sender gateway takes the role of the
+1219	   client while the recipient gateway takes the role of the server.
+
+1221	   The flow follows a request-response model.  The client makes a
+1222	   request (POST) to the Lock-Assertion Endpoint at the server.
+
+1224	   Gateways MUST support the use of the HTTP GET and POST methods
+1225	   defined in RFC 2616 [RFC2616] for the endpoint.
+
+1227	   Clients MAY use the HTTP GET or POST methods to send messages in this
+1228	   stage to the server.  If using the HTTP GET method, the request
+1229	   parameters may be serialized using URI Query String Serialization.
+
+1231	   (NOTE: Flows occur over TLS.  Nonces are not shown).
+
+1233	9.1.  Lock Assertion Message
+
+1235	   The purpose of this message is for the client (sender gateway) to
+1236	   convey a signed claim to the server (receiver gateway) declaring that
+1237	   the asset in question has been locked or escrowed by the client in
+1238	   the origin network (e.g. to prevent double-spending).
+
+1240	   The format of the claim is dependent on the network or system of the
+1241	   client and is outside the scope of this specification.
+
+1243	   This message is sent from the client to the Lock Assertion Endpoint
+1244	   at the server.
+
+1246	   The server must validate the claim (payload) in this message prior to
+1247	   the next step.
+
+1249	   The message must be signed by the client.
+
+1251	   The parameters of this message consist of the following:
+
+1253	   *  messageType REQUIRED: urn:ietf:satp:msgtype:lock-assert-msg.
+
+1255	   *  sessionId REQUIRED: A unique identifier chosen earlier by the
+1256	      client in the Initialization Request Message.
+
+1258	   *  transferContextId REQUIRED: A unique identifier used to identify
+1259	      the current transfer session at the application layer.
+
+1261	   *  lockAssertionClaimFormat REQUIRED.  The default format is JSON,
+1262	      with parts being base64 encoded as needed.  The default format is
+1263	      denoted as "LOCK_ASSERTION_CLAIM_FORMAT_1".
+
+1265	   *  lockAssertionClaim REQUIRED: The lock assertion claim or statement
+1266	      by the client.
+
+1268	   *  lockAssertionExpiration REQUIRED.  The expiration date and time
+1269	      [DATETIME] of the lock or escrow upon the asset on the origin
+1270	      network.
+
+1272	   *  hashPrevMessage REQUIRED.  The cryptographic hash of the last
+1273	      message.  The default hash algorithm is SHA256.
+
+1275	   Example:
+
+1277	   {\ "messageType": "urn:ietf:satp:msgtype:lock-assert-msg",\
+1278	   "sessionId": "d66a567c-11f2-4729-a0e9-17ce1faf47c1",\
+1279	   "transferContextId": "89e04e71-bba2-4363-933c-262f42ec07a0",\
+1280	   "lockAssertionClaimFormat": "LOCK_ASSERTION_CLAIM_FORMAT_1",\
+1281	   "lockAssertionClaim": {},\ "lockAssetionExpiration":
+1282	   "2024-12-23T23:59:59.999Z",\ "hashPrevMessage":
+1283	   "b2c3e916703c4ee4494f45bcf52414a2c3edfe53643510ff158ff4a406678346",\
+1284	   }\
+
+1286	9.2.  Lock Assertion Receipt Message
+
+1288	   The purpose of this message is for the server (receiver gateway) to
+1289	   indicate acceptance of the claim in the lock-assertion message
+1290	   delivered by the client (sender gateway) in the previous message.
+
+1292	   This message is sent from the server to the Assertion Receipt
+1293	   Endpoint at the client.
+
+1295	   The message must be signed by the server.
+
+1297	   The parameters of this message consist of the following:
+
+1299	   *  messageType REQUIRED: urn:ietf:satp:msgtype:assertion-receipt-msg.
+
+1301	   *  sessionId REQUIRED: A unique identifier chosen earlier by the
+1302	      client in the Initialization Request Message.
+
+1304	   *  transferContextId REQUIRED: A unique identifier used to identify
+1305	      the current transfer session at the application layer.
+
+1307	   *  hashPrevMessage REQUIRED.  The cryptographic hash of the last
+1308	      message.  The default hash algorithm is SHA256.
+
+1310	   Example:
+
+1312	   {\ "messageType": "urn:ietf:satp:msgtype:assertion-receipt-msg",\
+1313	   "sessionId": "d66a567c-11f2-4729-a0e9-17ce1faf47c1",\
+1314	   "transferContextId": "89e04e71-bba2-4363-933c-262f42ec07a0",\
+1315	   "hashPrevMessage":
+1316	   "16c983122d7506c78f906c15ca1dcc7142a0fa94552cdea9578fe87419c2c5d0",\
+1317	   }\
+
+1319	10.  Commitment Preparation and Finalization (Stage 3)
+
+1321	   This section describes the transfer commitment agreement between the
+1322	   client (sender gateway) and the server (receiver gateway).
+
+1324	   This stage must be completed within the time specified in the
+1325	   lockAssertionExpiration value in the lock-assertion message.  This
+1326	   value is the time when the lock or escrow upon the asset will expire
+1327	   on the origin network.
+
+1329	   The completion of this stage is denoted by the signed Commit-Final
+1330	   Acknowledgement Receipt Message sent from the receiver gateway
+1331	   (server) to the sender gateway (client).  If the
+1332	   lockAssertionExpiration timer at the client expires before the
+1333	   Commit-Final Acknowledgement Receipt Message is received by the
+1334	   client, the client may terminate the session.
+
+1336	   The flow follows a request-response model.  The client makes a
+1337	   request (POST) to the Transfer Commitment endpoint at the server.
+
+1339	   Gateways MUST support the use of the HTTP GET and POST methods
+1340	   defined in RFC 2616 [RFC2616] for the endpoint.
+
+1342	   Clients MAY use the HTTP GET or POST methods to send messages in this
+1343	   stage to the server.  If using the HTTP GET method, the request
+1344	   parameters may be serialized using URI Query String Serialization.
+
+1346	   The client and server may be required to sign certain messages in
+1347	   order to provide standalone proof (for non-repudiation) independent
+1348	   of the secure channel between the client and server.  This proof may
+1349	   be required for audit verifications post-event.
+
+1351	   (NOTE: Flows occur over TLS.  Nonces are not shown).
+
+1353	10.1.  Commit Preparation Message (Commit-Prepare)
+
+1355	   The purpose of this message is for the client to indicate its
+1356	   readiness to begin the commitment of the transfer.
+
+1358	   This message is sent from the client to the Commit Prepare Endpoint
+1359	   at the server.
+
+1361	   The message must be signed by the client.
+
+1363	   The parameters of this message consist of the following:
+
+1365	   *  messageType REQUIRED: It MUST be the value
+1366	      urn:ietf:satp:msgtype:commit-prepare-msg
+
+1368	   *  sessionId REQUIRED: A unique identifier chosen earlier by the
+1369	      client in the Initialization Request Message.
+
+1371	   *  transferContextId REQUIRED: A unique identifier used to identify
+1372	      the current transfer session at the application layer.
+
+1374	   *  hashPrevMessage REQUIRED.  The cryptographic hash of the last
+1375	      message.  The default hash algorithm is SHA256.
+
+1377	   Example:
+
+1379	   {\ "messageType": "urn:ietf:satp:msgtype:commit-prepare-msg",\
+1380	   "sessionId": "d66a567c-11f2-4729-a0e9-17ce1faf47c1",\
+1381	   "transferContextId": "89e04e71-bba2-4363-933c-262f42ec07a0",\
+1382	   "hashPrevMessage":
+1383	   "399bdadc07fe0bd57c4dfdd6cc176ceeca50a5e744f774154eccbeee8908fbaa",\
+1384	   }\
+
+1386	10.2.  Commit Ready Message (Commit-Ready)
+
+1388	   The purpose The purpose of this message is for the server to indicate
+1389	   to the client that: (i) the server has created (minted) an equivalent
+1390	   asset in the destination network; (ii) that the newly minted asset
+1391	   has been self-assigned to the server; and (iii) that the server is
+1392	   ready to proceed to the next step.
+
+1394	   This message is sent from the server to the Commit Ready Endpoint at
+1395	   the client.
+
+1397	   The message must be signed by the server.
+
+1399	   The parameters of this message consist of the following:
+
+1401	   *  messageType REQUIRED: It MUST be the value
+1402	      urn:ietf:satp:msgtype:commit-ready-msg.
+
+1404	   *  sessionId REQUIRED: A unique identifier chosen earlier by client
+1405	      in the Initialization Request Message.
+
+1407	   *  transferContextId REQUIRED: A unique identifier used to identify
+1408	      the current transfer session at the application layer.
+
+1410	   *  hashPrevMessage REQUIRED.  The cryptographic hash of the last
+1411	      message.  The default hash algorithm is SHA256.
+
+1413	   *  mintAssertionFormat REQUIRED.  The default format is JSON, with
+1414	      parts being base64 encoded as needed.  The default format is
+1415	      denoted as "MINT_ASSERTION_CLAIM_FORMAT_1".
+
+1417	   *  mintAssertionClaim REQUIRED: The mint assertion claim or statement
+1418	      by the server.
+
+1420	   Example:
+
+1422	   {\ "messageType": "urn:ietf:satp:msgtype:commit-ready-msg",\
+1423	   "sessionId": "d66a567c-11f2-4729-a0e9-17ce1faf47c1",\
+1424	   "transferContextId": "89e04e71-bba2-4363-933c-262f42ec07a0",\
+1425	   "hashPrevMessage":
+1426	   "8dcc8dc4e6c2c979474b42d24d3747ce4607a92637d1a7b294857ff7288b8e46",\
+1427	   "mintAssertionClaimFormat": "MINT_ASSERTION_CLAIM_FORMAT_1",\
+1428	   "mintAssertionClaim": {},\ }\
+
+1430	10.3.  Commit Final Assertion Message (Commit-Final)
+
+1432	   The purpose of this message is for the client to indicate to the
+1433	   server that the client (sender gateway) has completed the
+1434	   extinguishment (burn) of the asset in the origin network.
+
+1436	   The message must contain a standalone claim related to the
+1437	   extinguishment of the asset by the client.  The standalone claim must
+1438	   be signed by the client.
+
+1440	   This message is sent from the client to the Commit Final Assertion
+1441	   Endpoint at the server.
+
+1443	   The message must be signed by the server.
+
+1445	   The parameters of this message consist of the following:
+
+1447	   *  messageType REQUIRED: It MUST be the value
+1448	      urn:ietf:satp:msgtype:commit-final-msg.
+
+1450	   *  sessionId REQUIRED: A unique identifier chosen earlier by the
+1451	      client in the Initialization Request Message.
+
+1453	   *  transferContextId REQUIRED: A unique identifier used to identify
+1454	      the current transfer session at the application layer.
+
+1456	   *  hashPrevMessage REQUIRED.  The cryptographic hash of the last
+1457	      message.  The default hash algorithm is SHA256.
+
+1459	   *  burnAssertionClaimFormat REQUIRED.  The default format is JSON,
+1460	      with parts being base64 encoded as needed.  The default format is
+1461	      denoted as "BURN_ASSERTION_CLAIM_FORMAT_1".
+
+1463	   *  burnAssertionClaim REQUIRED: The burn assertion signed claim or
+1464	      statement by the client.
+
+1466	   Example:
+
+1468	   {\ "messageType": "urn:ietf:satp:msgtype:commit-final-msg",\
+1469	   "sessionId": "d66a567c-11f2-4729-a0e9-17ce1faf47c1",\
+1470	   "transferContextId": "89e04e71-bba2-4363-933c-262f42ec07a0",\
+1471	   "hashPrevMessage":
+1472	   "b92f13007216c58f2b51a8621599c3aef6527b02c8284e90c6a54a181d898e02",\
+1473	   "burnAssertionClaimFormat": "BURN_ASSERTION_CLAIM_FORMAT_1",\
+1474	   "burnAssertionClaim": {},\ }\
+
+1476	10.4.  Commit-Final Acknowledgement Receipt Message (ACK-Final-Receipt)
+
+1478	   The purpose of this message is to indicate to the client that the
+1479	   server has completed the assignment of the newly minted asset to the
+1480	   intended beneficiary at the destination network.
+
+1482	   This message is sent from the server to the Commit Final Receipt
+1483	   Endpoint at the client.
+
+1485	   The message must be signed by the server.
+
+1487	   The parameters of this message consist of the following:
+
+1489	   *  messageType REQUIRED: It MUST be the value
+1490	      urn:ietf:satp:msgtype:ack-commit-final-msg.
+
+1492	   *  sessionId REQUIRED: A unique identifier chosen earlier by client
+1493	      in the Initialization Request Message.
+
+1495	   *  transferContextId REQUIRED: A unique identifier used to identify
+1496	      the current transfer session at the application layer.
+
+1498	   *  hashPrevMessage REQUIRED.  The cryptographic hash of the last
+1499	      message.  The default hash algorithm is SHA256.
+
+1501	   *  assignmentAssertionClaimFormat REQUIRED.  The default format is
+1502	      JSON, with parts being base64 encoded as needed.  The default
+1503	      format is denoted as "ASSIGNMENT_ASSERTION_CLAIM_FORMAT_1".
+
+1505	   *  assignmentAssertionClaim REQUIRED: The claim or statement by the
+1506	      server that the asset has been assigned by the server to the
+1507	      intended beneficiary.
+
+1509	   Example:
+
+1511	   {\ "messageType": "urn:ietf:satp:msgtype:ack-commit-final-msg",\
+1512	   "sessionId": "d66a567c-11f2-4729-a0e9-17ce1faf47c1",\
+1513	   "transferContextId": "89e04e71-bba2-4363-933c-262f42ec07a0",\
+1514	   "hashPrevMessage":
+1515	   "9c8f07c22ccf6888fc0306fee0799325efb87dfd536d90bb47d97392f020e998",\
+1516	   "assignmentAssertionClaimFormat":
+1517	   "ASSIGNMENT_ASSERTION_CLAIM_FORMAT_1",\ "assignmentAssertionClaim":
+1518	   {},\ }\
+
+1520	10.5.  Transfer Complete Message
+
+1522	   The purpose of this message is for the client to indicate to the
+1523	   server that the asset transfer session (identified by sessionId) has
+1524	   been completed and no further messages are to be expected from the
+1525	   client in regards to this transfer instance.
+
+1527	   The message closes the first message of Stage 2 (Transfer Commence
+1528	   Message).
+
+1530	   This message is sent from the client to the Transfer Complete
+1531	   Endpoint at the server.
+
+1533	   The message must be signed by the client.
+
+1535	   The parameters of this message consist of the following:
+
+1537	   *  messageType REQUIRED: It MUST be the value
+1538	      urn:ietf:satp:msgtype:commit-transfer-complete-msg.
+
+1540	   *  sessionId REQUIRED: A unique identifier chosen earlier by the
+1541	      client in the Initialization Request Message.
+
+1543	   *  transferContextId REQUIRED: A unique identifier used to identify
+1544	      the current transfer session at the application layer.
+
+1546	   *  hashPrevMessage REQUIRED.  The cryptographic hash of the last
+1547	      message.  The default hash algorithm is SHA256.
+
+1549	   *  hashTransferCommence REQUIRED: The hash of the Transfer Commence
+1550	      message at the start of Stage 2.
+
+1552	   Example:
+
+1554	   {\ "messageType": "urn:ietf:satp:msgtype:commit-transfer-complete-
+1555	   msg",\ "sessionId": "d66a567c-11f2-4729-a0e9-17ce1faf47c1",\
+1556	   "transferContextId": "89e04e71-bba2-4363-933c-262f42ec07a0",\
+1557	   "hashPrevMessage":
+1558	   "9c8f07c22ccf6888fc0306fee0799325efb87dfd536d90bb47d97392f020e998",\
+1559	   "hashTransferCommence":
+1560	   "4ba76c69265f4215b4e2d2f24fe56e708512fdb49e27f50d2ac0095928e1531b",\
+1561	   }\
+
+1563	10.6.  Error Message
+
+1565	   The purpose of this message is for either the sender or the receiver
+1566	   gateways to indicate to its peer that an error has occurred within
+1567	   the transfer protocol flow.
+
+1569	   This message must contain the error type (see the appendix) and the
+1570	   course of action indicated by the severity level.  Typicaly, the
+1571	   action taken will be the immediate termination of the session.
+
+1573	   *  messageType REQUIRED: It MUST be the value
+1574	      urn:ietf:satp:msgtype:error-msg.
+
+1576	   *  sessionId REQUIRED: This is the current session in which the error
+1577	      pertains.
+
+1579	   *  errorMsgType: The pevious msg-type that was erronous.
+
+1581	   *  errorType REQUIRED: This is the error code being reported
+1582	      (Section 15, Paragraph 1).
+
+1584	   *  errorSeverity REQUIRED: This is the severity level of the error,
+1585	      leading to the action.
+
+1587	   Futher discussion on protocol errors can be found below (Section 15,
+1588	   Paragraph 1).
+
+1590	10.7.  Session abort message
+
+1592	   The purpose of this message is to indicate that one of the peer
+1593	   gateways has decided not to proceed with the session.  No further
+1594	   messages will be delivered after the abort message.
+
+1596	   *  messageType REQUIRED: It MUST be the value
+1597	      urn:ietf:satp:msgtype:session-abort-msg.
+
+1599	   *  sessionId REQUIRED: This is the current session in which the abort
+1600	      occurs.
+
+1602	   The effect of session aborts on the state of the asset is discussed
+1603	   below.
+
+1605	11.  SATP Session Resumption
+
+1607	   This section addresses the question of how can a backup gateway build
+1608	   trust with the counterparty gateway to resume the execution of the
+1609	   protocol, in the presence of errors and crashes.
+
+1611	   Gateways may enter a faulty state at any time while executing the
+1612	   protocol.  The faulty state can manifest itself in incorrect
+1613	   behavior, leading to gateways emitting alerts and errors.
+
+1615	   In some instances, gateways may crash.  Several stratgies can be
+1616	   utlized to address gateway crashes, two notable approaches being the
+1617	   primary-backup strategy or self-healing paradigm.  The first strategy
+1618	   pertains to the crashed gateway being eventually be replaced by a
+1619	   functioning one,while the second strategy focuses on the gateway
+1620	   recovering.  When a crash occurs, a recovery procedure is initiated
+1621	   by the backup gateway or the recovered gateway.  In either case, if
+1622	   the recovery happens within a time period defined as max_timeout (in
+1623	   Stage 2), the recovered gateway triggers a session resumption.
+
+1625	   In the case where there is no answer from the gateway within the
+1626	   specified max_timeout, the counterparty gateway rollbacks the process
+1627	   up to the point when the crash occured (crash-point).  Upon recovery,
+1628	   the crashed gateway learns that the counterparty gateway has
+1629	   initiated a rollback, and it proceeds accordingly (by also initiating
+1630	   a rollback).  Note that rollbacks can also happen in case of
+1631	   unresolved errors.
+
+1633	   The non-crashed gateway that conducts the rollback tries to
+1634	   communicate with the crashed gateway from time to time (self-healing)
+1635	   or to contact the backup gateways (primary-backup).  In any case,
+1636	   upon the completion of a rollback, the non-crashed gateway sends a
+1637	   ROLLBACK message to the recovered gateway to notify that a rollback
+1638	   happened.  The recovered gateway should answer with ROLLBACK-ACK.
+
+1640	   Since the self-healing recovery process does not require changes to
+1641	   the protocol (since from the counterparty gateway perspective, the
+1642	   sender gateway is just taking longer than normal; there are no new
+1643	   actions done or logs recorded), we focus on the primary-backup
+1644	   paradigm.
+
+1646	   The mechanism to perform recovery and resumption in SATP will be
+1647	   defined in a separate specification.
+
+1649	12.  Error Messages
+
+1651	   SATP distinguishes between session termination initiated by the user
+1652	   at the application layer from session termination cased by errors at
+1653	   the SATP protocol layer.
+
+1655	   A gateway can transmit an error message at any point in the SATP
+1656	   protocol flow to its peer gateway.
+
+1658	   The default action to be taken by the transitting gateway is to
+1659	   terminate the session immediately.
+
+1661	   Error messages at the SATP protocol layer is distinct from time-outs
+1662	   due to gateway crashes.
+
+1664	12.1.  Session Termination Notification
+
+1666	   Session closure initiated at the application layer is not considered
+1667	   to be an error at the SATP protocol layer.
+
+1669	   The message type used for application-initiated session termination:
+1670	   session-abort-msg.
+
+1672	   The message type used to indicate protocols errors: error-msg.
+
+1674	   A gateway can transmit the session abort message at any point in the
+1675	   SATP protocol flow.  No further messages will be sent by the gateway.
+
+1677	   Any data received after the session termination message MUST be
+1678	   ignored.
+
+1680	12.2.  Connection Errors
+
+1682	   Errors may occur at the connection layer, independent of the flows at
+1683	   the SATP layer and errors there.
+
+1685	   (a) connectionError: There is an error in the TLS session
+1686	   establishment (TLS error codes should be reported-up to the gateway
+1687	   level)
+
+1689	   (b) badCertificate: The gateway TLS certificate was corrupt,
+1690	   contained signatures, that did not verify correctly, etc.  (Some
+1691	   common TLS level errors: unsupported_certificate,
+1692	   certificate_revoked, certificate_expired, certificate_unknown,
+1693	   unknown_ca).
+
+1695	   Connection errors resuting in the time-out of the session SHOULD
+1696	   result in the termination of the transfer session.
+
+1698	12.3.  SATP Protocol Errors
+
+1700	   The errors at the SATP level pertain to protocol flow and the
+1701	   information carried within each message.  These are enumerated in the
+1702	   appendix.
+
+1704	12.4.  Effectiveness of Session Aborts
+
+1706	   The effectiveness of a session-abort message on the state of the
+1707	   asset depends on where the abort message occurs in the SATP protocol
+1708	   flow in Figure 2.
+
+1710	   Note that a session-abort message by be lost and never be received by
+1711	   the peer gateway.  Gateways can crash prior to receiving an abort
+1712	   message.
+
+1714	   If gateway G2 transmits a session-abort message after gateway G1
+1715	   performs a lock (msgtype:lock-assert-msg) on the asset in network
+1716	   NW1, the gateway G1 can always unlock the asset and restore its
+1717	   state.
+
+1719	   If either gateway G1 or gateway G2 transmits a session-abort message
+1720	   after gateway G1 sends a lock-assert message (msgtype:lock-assert-
+1721	   msg) but before G2 sends the commit ready message (msgtype:commit-
+1722	   ready-msg), the gateway G1 can always unlock the asset and restore
+1723	   its state in network NW1.
+
+1725	   Similarly, if either gateway G1 or gateway G2 transmits a session-
+1726	   abort message immediately after gateway G1 sends a commit-prepare
+1727	   message (msgtype:commit-prepare-msg) but before G2 sends the commit
+1728	   ready message (msgtype:commit-ready-msg), the gateway G2 can always
+1729	   reverse the changes made by G2 to NW2 (i.e. reverse the assignment-
+1730	   to-self of the minted asset).
+
+1732	   However, an abort message (occurring in either direction) after
+1733	   gateway G1 transmits the commit final message (msgtype:commit-final-
+1734	   msg) will not be effective.  This is because G1 has already burned
+1735	   the asset in NW1 and G2 has already minted the asset in NW2 and has
+1736	   legally agreed to assign the asset to the appropriate beneficiary in
+1737	   NW2.
+
+1739	   In general, the termination of sessions or aborts occurring before
+1740	   the sender gateway G1 disables (burns) the asset in NW1 (in flow 3.4
+1741	   in Figure 2) will incur a minimal cost in terms of computing
+1742	   resources or fees on the part of both gateways G1 and G2.
+
+1744	13.  Security Consideration
+
+1746	   Gateways may be of interest to attackers because they enable the
+1747	   transferal of digital assets across networks and therefore are an
+1748	   important function in the digital economy.
+
+1750	   *  Disruptions in transfers and denial of service: Disruptions to a
+1751	      transfer session may cause not only resource waste (e.g. CPU
+1752	      usage), but in some cases may result in financial loss on the part
+1753	      of the gateway operator (e.g. fees charged by network).  Denial-
+1754	      of-service attacks by third parties to a run of the protocol may
+1755	      result in the termination of the current run (e.g. time-outs at
+1756	      the SATP layer), and for new attempts to be conducted.  If the
+1757	      gateway selection mechanisms are utilized by networks NW1 and NW2,
+1758	      such attacks may incur more delays because new gateways may have
+1759	      to be elected at either network.
+
+1761	   *  Dishonest gateways: The SATP protocol requires gateways to sign
+1762	      messages related to the transfer layer, not only to provide
+1763	      message source authentication and integrity but also to maintain
+1764	      honesty on the part of the gateways.  Gateway-operators may take-
+1765	      on legal and financial liabilities in certain jurisdictions by
+1766	      digitally signing messages.  Dishonest gateways may intentionally
+1767	      delay the delivery of certain messages or intentionally fail
+1768	      (abort) the protocol run at certain crucial points [ARCH].  Two
+1769	      such crucial points in the message flows are the following: (i)
+1770	      the commit-final-msg, where the sender G1 asserts it has
+1771	      extinguished (burned) the asset in the origin network, and (ii)
+1772	      the ack-prepare-msg where the receiver gateway G2 asserts it is
+1773	      ready to proceed with the final commitment.  If gateway G1
+1774	      intentionally drops the commit-final-msg (commit-final) such that
+1775	      gateway G2 times-out, then G2 may suffer financial loss due to
+1776	      roll-back costs in network NW2.  Similarly, if G2 intentionally
+1777	      drops the ack-prepare-msg to signal that it is ready to proceed
+1778	      with the commitment (commit-ready), then gateway G1 may time-out
+1779	      and terminate the protocol run, causing resource waste at G1.
+1780	      Operators of gateways should utlize relevant tools to detect
+1781	      possible dishonest behavior of certain gateways, and select to
+1782	      have their gateways peer with other reliable gateways.
+
+1784	   *  Protection of gateway keys: It is crucial to protect the
+1785	      cryptographic keys utilized by gateways.  This includes keys for
+1786	      secure session establishment (TLS1.3) and keys utilized for
+1787	      signing SATP messages.  Loss of gateway keys may incur financial
+1788	      loss on the part of the gateway-operator.  Implementation of
+1789	      gateways should consider utilizing tamper-resistant hardware to
+1790	      store and manage the relevant keys for gateways operational
+1791	      functions.
+
+1793	   *  Gateway identification: Mechanisms must be utilized to provide
+1794	      unique identifiers to gateway implementations to ensure global
+1795	      uniqueness and reachability.  Existing identification mechanisms
+1796	      such a X509 certificates and Verifiable Credentials (VC) and
+1797	      Selective Disclosure CBOR Web Tokens (SD-CWT) may be applied for
+1798	      gateway identification.
+
+1800	   *  Identification of networks: There needs to be mechanism for
+1801	      gateways to declare or disclose the asset networks it current
+1802	      serves.  Combined with strong gateway identification, this allows
+1803	      remote gateways to quickly locate suitable gateways to peer with
+1804	      for the purposes of asset transfers.
+
+1806	14.  IANA Consideration
+
+1808	   The following request is being made to IANA.
+
+1810	14.1.  SATP Error Codes Registry
+
+1812	   This registry defines the error codes used in SATP protocol messages.
+1813	   Each entry consists of:
+
+1815	   *  *Code*: The enumeration string (e.g., err_3.3.1)
+
+1817	   *  *Category*: The protocol stage or message type (e.g., Commit Ready
+1818	      errors)
+
+1820	   *  *Type*: The error type (e.g., badly formed message)
+
+1822	   *  *Description*: A brief description (e.g., mismatch
+1823	      transferContextId)
+
+1825	   +==========+===========+=========+=================================+
+1826	   |Code      |Category   |Type     |Description                      |
+1827	   +==========+===========+=========+=================================+
+1828	   |err_1.1.1 |Transfer   |badly    |invalid transferContextId        |
+1829	   |          |Proposal/  |formed   |                                 |
+1830	   |          |Receipt    |message  |                                 |
+1831	   |          |errors     |         |                                 |
+1832	   +----------+-----------+---------+---------------------------------+
+1833	   |err_1.1.2 |Transfer   |badly    |invalid sessionId                |
+1834	   |          |Proposal/  |formed   |                                 |
+1835	   |          |Receipt    |message  |                                 |
+1836	   |          |errors     |         |                                 |
+1837	   +----------+-----------+---------+---------------------------------+
+1838	   |err_1.1.3 |Transfer   |badly    |incorect transferInitClaimFormat |
+1839	   |          |Proposal/  |formed   |                                 |
+1840	   |          |Receipt    |message  |                                 |
+1841	   |          |errors     |         |                                 |
+1842	   +----------+-----------+---------+---------------------------------+
+1843	   |err_1.1.4 |Transfer   |badly    |bad signature                    |
+1844	   |          |Proposal/  |formed   |                                 |
+1845	   |          |Receipt    |message  |                                 |
+1846	   |          |errors     |         |                                 |
+1847	   +----------+-----------+---------+---------------------------------+
+1848	   |err_1.1.11|Transfer   |badly    |invalid digitalAssetId           |
+1849	   |          |Proposal/  |formed   |                                 |
+1850	   |          |Receipt    |claim    |                                 |
+1851	   |          |errors     |         |                                 |
+1852	   +----------+-----------+---------+---------------------------------+
+1853	   |err_1.1.12|Transfer   |badly    |invalid assetProfileId           |
+1854	   |          |Proposal/  |formed   |                                 |
+1855	   |          |Receipt    |claim    |                                 |
+1856	   |          |errors     |         |                                 |
+1857	   +----------+-----------+---------+---------------------------------+
+1858	   |err_1.1.13|Transfer   |badly    |invalid                          |
+1859	   |          |Proposal/  |formed   |verifiedOriginatorEntityId       |
+1860	   |          |Receipt    |claim    |                                 |
+1861	   |          |errors     |         |                                 |
+1862	   +----------+-----------+---------+---------------------------------+
+1863	   |err_1.1.14|Transfer   |badly    |invalid                          |
+1864	   |          |Proposal/  |formed   |verifiedBeneficiaryEntityId      |
+1865	   |          |Receipt    |claim    |                                 |
+1866	   |          |errors     |         |                                 |
+1867	   +----------+-----------+---------+---------------------------------+
+1868	   |err_1.1.15|Transfer   |badly    |invalid originatorPubkey         |
+1869	   |          |Proposal/  |formed   |                                 |
+1870	   |          |Receipt    |claim    |                                 |
+1871	   |          |errors     |         |                                 |
+1872	   +----------+-----------+---------+---------------------------------+
+1873	   |err_1.1.16|Transfer   |badly    |invalid beneficiaryPubkey        |
+1874	   |          |Proposal/  |formed   |                                 |
+1875	   |          |Receipt    |claim    |                                 |
+1876	   |          |errors     |         |                                 |
+1877	   +----------+-----------+---------+---------------------------------+
+1878	   |err_1.1.17|Transfer   |badly    |invalid                          |
+1879	   |          |Proposal/  |formed   |senderGatewaySignaturePublicKey  |
+1880	   |          |Receipt    |claim    |                                 |
+1881	   |          |errors     |         |                                 |
+1882	   +----------+-----------+---------+---------------------------------+
+1883	   |err_1.1.18|Transfer   |badly    |invalid                          |
+1884	   |          |Proposal/  |formed   |receiverGatewaySignaturePublicKey|
+1885	   |          |Receipt    |claim    |                                 |
+1886	   |          |errors     |         |                                 |
+1887	   +----------+-----------+---------+---------------------------------+
+1888	   |err_1.1.19|Transfer   |badly    |invalid senderGatewayId          |
+1889	   |          |Proposal/  |formed   |                                 |
+1890	   |          |Receipt    |claim    |                                 |
+1891	   |          |errors     |         |                                 |
+1892	   +----------+-----------+---------+---------------------------------+
+1893	   |err_1.1.20|Transfer   |badly    |invalid recipientGatewayId       |
+1894	   |          |Proposal/  |formed   |                                 |
+1895	   |          |Receipt    |claim    |                                 |
+1896	   |          |errors     |         |                                 |
+1897	   +----------+-----------+---------+---------------------------------+
+1898	   |err_1.1.31|Transfer   |badly    |unsupported                      |
+1899	   |          |Proposal/  |formed   |gatewayDefaultSignatureAlgorithm |
+1900	   |          |Receipt    |parameter|                                 |
+1901	   |          |errors     |         |                                 |
+1902	   +----------+-----------+---------+---------------------------------+
+1903	   |err_1.1.32|Transfer   |badly    |unsupported networkLockType      |
+1904	   |          |Proposal/  |formed   |                                 |
+1905	   |          |Receipt    |parameter|                                 |
+1906	   |          |errors     |         |                                 |
+1907	   +----------+-----------+---------+---------------------------------+
+1908	   |err_1.1.33|Transfer   |badly    |unsupported                      |
+1909	   |          |Proposal/  |formed   |networkLockExpirationTime        |
+1910	   |          |Receipt    |parameter|                                 |
+1911	   |          |errors     |         |                                 |
+1912	   +----------+-----------+---------+---------------------------------+
+1913	   |err_1.1.34|Transfer   |badly    |unsupported                      |
+1914	   |          |Proposal/  |formed   |gatewayCredentialScheme          |
+1915	   |          |Receipt    |parameter|                                 |
+1916	   |          |errors     |         |                                 |
+1917	   +----------+-----------+---------+---------------------------------+
+1918	   |err_1.1.35|Transfer   |badly    |unsupported gatewayLoggingProfile|
+1919	   |          |Proposal/  |formed   |                                 |
+1920	   |          |Receipt    |parameter|                                 |
+1921	   |          |errors     |         |                                 |
+1922	   +----------+-----------+---------+---------------------------------+
+1923	   |err_1.1.36|Transfer   |badly    |unsupported                      |
+1924	   |          |Proposal/  |formed   |gatewayAccessControlProfile      |
+1925	   |          |Receipt    |parameter|                                 |
+1926	   |          |errors     |         |                                 |
+1927	   +----------+-----------+---------+---------------------------------+
+1928	   |err_1.2.1 |Transfer   |badly    |mismatch transferContextId       |
+1929	   |          |Proposal/  |formed   |                                 |
+1930	   |          |Receipt    |message  |                                 |
+1931	   |          |errors     |         |                                 |
+1932	   +----------+-----------+---------+---------------------------------+
+1933	   |err_1.2.2 |Transfer   |badly    |mismatch sessionId               |
+1934	   |          |Proposal/  |formed   |                                 |
+1935	   |          |Receipt    |message  |                                 |
+1936	   |          |errors     |         |                                 |
+1937	   +----------+-----------+---------+---------------------------------+
+1938	   |err_1.2.3 |Transfer   |badly    |mismatch hashTransferInitClaim   |
+1939	   |          |Proposal/  |formed   |                                 |
+1940	   |          |Receipt    |message  |                                 |
+1941	   |          |errors     |         |                                 |
+1942	   +----------+-----------+---------+---------------------------------+
+1943	   |err_1.2.4 |Transfer   |badly    |bad signature                    |
+1944	   |          |Proposal/  |formed   |                                 |
+1945	   |          |Receipt    |message  |                                 |
+1946	   |          |errors     |         |                                 |
+1947	   +----------+-----------+---------+---------------------------------+
+1948	   |err_1.3.1 |Transfer   |badly    |mismatch transferContextId       |
+1949	   |          |Commence   |formed   |                                 |
+1950	   |          |errors     |message  |                                 |
+1951	   +----------+-----------+---------+---------------------------------+
+1952	   |err_1.3.2 |Transfer   |badly    |mismatch sessionId               |
+1953	   |          |Commence   |formed   |                                 |
+1954	   |          |errors     |message  |                                 |
+1955	   +----------+-----------+---------+---------------------------------+
+1956	   |err_1.3.3 |Transfer   |badly    |mismatch hashTransferInitClaim   |
+1957	   |          |Commence   |formed   |                                 |
+1958	   |          |errors     |message  |                                 |
+1959	   +----------+-----------+---------+---------------------------------+
+1960	   |err_1.3.4 |Transfer   |badly    |mismatch hashPrevMessage         |
+1961	   |          |Commence   |formed   |                                 |
+1962	   |          |errors     |message  |                                 |
+1963	   +----------+-----------+---------+---------------------------------+
+1964	   |err_1.3.5 |Transfer   |badly    |bad signature                    |
+1965	   |          |Commence   |formed   |                                 |
+1966	   |          |errors     |message  |                                 |
+1967	   +----------+-----------+---------+---------------------------------+
+1968	   |err_1.4.1 |ACK        |badly    |mismatch transferContextId       |
+1969	   |          |Commence   |formed   |                                 |
+1970	   |          |errors     |message  |                                 |
+1971	   +----------+-----------+---------+---------------------------------+
+1972	   |err_1.4.2 |ACK        |badly    |mismatch sessionId               |
+1973	   |          |Commence   |formed   |                                 |
+1974	   |          |errors     |message  |                                 |
+1975	   +----------+-----------+---------+---------------------------------+
+1976	   |err_1.4.3 |ACK        |badly    |mismatch hashPrevMessage         |
+1977	   |          |Commence   |formed   |                                 |
+1978	   |          |errors     |message  |                                 |
+1979	   +----------+-----------+---------+---------------------------------+
+1980	   |err_1.4.4 |ACK        |badly    |bad signature                    |
+1981	   |          |Commence   |formed   |                                 |
+1982	   |          |errors     |message  |                                 |
+1983	   +----------+-----------+---------+---------------------------------+
+1984	   |err_2.2.1 |Lock       |badly    |mismatch transferContextId       |
+1985	   |          |Assertion  |formed   |                                 |
+1986	   |          |errors     |message  |                                 |
+1987	   +----------+-----------+---------+---------------------------------+
+1988	   |err_2.2.2 |Lock       |badly    |mismatch sessionId               |
+1989	   |          |Assertion  |formed   |                                 |
+1990	   |          |errors     |message  |                                 |
+1991	   +----------+-----------+---------+---------------------------------+
+1992	   |err_2.2.3 |Lock       |badly    |unsupported                      |
+1993	   |          |Assertion  |formed   |lockAssertionClaimFormat         |
+1994	   |          |errors     |message  |                                 |
+1995	   +----------+-----------+---------+---------------------------------+
+1996	   |err_2.2.4 |Lock       |badly    |unsupported                      |
+1997	   |          |Assertion  |formed   |lockAssertionExpiration          |
+1998	   |          |errors     |message  |                                 |
+1999	   +----------+-----------+---------+---------------------------------+
+2000	   |err_2.2.5 |Lock       |badly    |mismatch hashPrevMessage         |
+2001	   |          |Assertion  |formed   |                                 |
+2002	   |          |errors     |message  |                                 |
+2003	   +----------+-----------+---------+---------------------------------+
+2004	   |err_2.2.6 |Lock       |badly    |bad signature                    |
+2005	   |          |Assertion  |formed   |                                 |
+2006	   |          |errors     |message  |                                 |
+2007	   +----------+-----------+---------+---------------------------------+
+2008	   |err_2.4.1 |Lock       |badly    |mismatch transferContextId       |
+2009	   |          |Assertion  |formed   |                                 |
+2010	   |          |Receipt    |message  |                                 |
+2011	   |          |errors     |         |                                 |
+2012	   +----------+-----------+---------+---------------------------------+
+2013	   |err_2.4.2 |Lock       |badly    |mismatch sessionId               |
+2014	   |          |Assertion  |formed   |                                 |
+2015	   |          |Receipt    |message  |                                 |
+2016	   |          |errors     |         |                                 |
+2017	   +----------+-----------+---------+---------------------------------+
+2018	   |err_2.4.3 |Lock       |badly    |mismatch hashPrevMessage         |
+2019	   |          |Assertion  |formed   |                                 |
+2020	   |          |Receipt    |message  |                                 |
+2021	   |          |errors     |         |                                 |
+2022	   +----------+-----------+---------+---------------------------------+
+2023	   |err_2.4.4 |Lock       |badly    |bad signature                    |
+2024	   |          |Assertion  |formed   |                                 |
+2025	   |          |Receipt    |message  |                                 |
+2026	   |          |errors     |         |                                 |
+2027	   +----------+-----------+---------+---------------------------------+
+2028	   |err_3.1.1 |Commit     |badly    |mismatch transferContextId       |
+2029	   |          |Preparation|formed   |                                 |
+2030	   |          |errors     |message  |                                 |
+2031	   +----------+-----------+---------+---------------------------------+
+2032	   |err_3.1.2 |Commit     |badly    |mismatch sessionId               |
+2033	   |          |Preparation|formed   |                                 |
+2034	   |          |errors     |message  |                                 |
+2035	   +----------+-----------+---------+---------------------------------+
+2036	   |err_3.1.3 |Commit     |badly    |mismatch hashPrevMessage         |
+2037	   |          |Preparation|formed   |                                 |
+2038	   |          |errors     |message  |                                 |
+2039	   +----------+-----------+---------+---------------------------------+
+2040	   |err_3.1.4 |Commit     |badly    |bad signature                    |
+2041	   |          |Preparation|formed   |                                 |
+2042	   |          |errors     |message  |                                 |
+2043	   +----------+-----------+---------+---------------------------------+
+2044	   |err_3.3.1 |Commit     |badly    |mismatch transferContextId       |
+2045	   |          |Ready      |formed   |                                 |
+2046	   |          |errors     |message  |                                 |
+2047	   +----------+-----------+---------+---------------------------------+
+2048	   |err_3.3.2 |Commit     |badly    |mismatch sessionId               |
+2049	   |          |Ready      |formed   |                                 |
+2050	   |          |errors     |message  |                                 |
+2051	   +----------+-----------+---------+---------------------------------+
+2052	   |err_3.3.3 |Commit     |badly    |mismatch hashPrevMessage         |
+2053	   |          |Ready      |formed   |                                 |
+2054	   |          |errors     |message  |                                 |
+2055	   +----------+-----------+---------+---------------------------------+
+2056	   |err_3.3.4 |Commit     |badly    |unsupported mintAssertionFormat  |
+2057	   |          |Ready      |formed   |                                 |
+2058	   |          |errors     |message  |                                 |
+2059	   +----------+-----------+---------+---------------------------------+
+2060	   |err_3.3.5 |Commit     |badly    |bad signature                    |
+2061	   |          |Ready      |formed   |                                 |
+2062	   |          |errors     |message  |                                 |
+2063	   +----------+-----------+---------+---------------------------------+
+2064	   |err_3.5.1 |Commit     |badly    |mismatch transferContextId       |
+2065	   |          |Final      |formed   |                                 |
+2066	   |          |Assertion  |message  |                                 |
+2067	   |          |errors     |         |                                 |
+2068	   +----------+-----------+---------+---------------------------------+
+2069	   |err_3.5.2 |Commit     |badly    |mismatch sessionId               |
+2070	   |          |Final      |formed   |                                 |
+2071	   |          |Assertion  |message  |                                 |
+2072	   |          |errors     |         |                                 |
+2073	   +----------+-----------+---------+---------------------------------+
+2074	   |err_3.5.3 |Commit     |badly    |mismatch hashPrevMessage         |
+2075	   |          |Final      |formed   |                                 |
+2076	   |          |Assertion  |message  |                                 |
+2077	   |          |errors     |         |                                 |
+2078	   +----------+-----------+---------+---------------------------------+
+2079	   |err_3.5.4 |Commit     |badly    |unsupported                      |
+2080	   |          |Final      |formed   |burnAssertionClaimFormat         |
+2081	   |          |Assertion  |message  |                                 |
+2082	   |          |errors     |         |                                 |
+2083	   +----------+-----------+---------+---------------------------------+
+2084	   |err_3.5.5 |Commit     |badly    |bad signature                    |
+2085	   |          |Final      |formed   |                                 |
+2086	   |          |Assertion  |message  |                                 |
+2087	   |          |errors     |         |                                 |
+2088	   +----------+-----------+---------+---------------------------------+
+2089	   |err_3.7.1 |Commit     |badly    |mismatch transferContextId       |
+2090	   |          |Final Ack  |formed   |                                 |
+2091	   |          |Receipt    |message  |                                 |
+2092	   |          |errors     |         |                                 |
+2093	   +----------+-----------+---------+---------------------------------+
+2094	   |err_3.7.2 |Commit     |badly    |mismatch sessionId               |
+2095	   |          |Final Ack  |formed   |                                 |
+2096	   |          |Receipt    |message  |                                 |
+2097	   |          |errors     |         |                                 |
+2098	   +----------+-----------+---------+---------------------------------+
+2099	   |err_3.7.3 |Commit     |badly    |mismatch hashPrevMessage         |
+2100	   |          |Final Ack  |formed   |                                 |
+2101	   |          |Receipt    |message  |                                 |
+2102	   |          |errors     |         |                                 |
+2103	   +----------+-----------+---------+---------------------------------+
+2104	   |err_3.7.4 |Commit     |badly    |unsupported                      |
+2105	   |          |Final Ack  |formed   |assignmentAssertionClaimFormat   |
+2106	   |          |Receipt    |message  |                                 |
+2107	   |          |errors     |         |                                 |
+2108	   +----------+-----------+---------+---------------------------------+
+2109	   |err_3.7.5 |Commit     |badly    |bad signature                    |
+2110	   |          |Final Ack  |formed   |                                 |
+2111	   |          |Receipt    |message  |                                 |
+2112	   |          |errors     |         |                                 |
+2113	   +----------+-----------+---------+---------------------------------+
+2114	   |err_3.9.1 |Transfer   |badly    |mismatch transferContextId       |
+2115	   |          |Complete   |formed   |                                 |
+2116	   |          |errors     |message  |                                 |
+2117	   +----------+-----------+---------+---------------------------------+
+2118	   |err_3.9.2 |Transfer   |badly    |mismatch sessionId               |
+2119	   |          |Complete   |formed   |                                 |
+2120	   |          |errors     |message  |                                 |
+2121	   +----------+-----------+---------+---------------------------------+
+2122	   |err_3.9.3 |Transfer   |badly    |mismatch hashPrevMessage         |
+2123	   |          |Complete   |formed   |                                 |
+2124	   |          |errors     |message  |                                 |
+2125	   +----------+-----------+---------+---------------------------------+
+2126	   |err_3.9.4 |Transfer   |badly    |mismatch hashTransferCommence    |
+2127	   |          |Complete   |formed   |                                 |
+2128	   |          |errors     |message  |                                 |
+2129	   +----------+-----------+---------+---------------------------------+
+2130	   |err_3.9.5 |Transfer   |badly    |bad signature                    |
+2131	   |          |Complete   |formed   |                                 |
+2132	   |          |errors     |message  |                                 |
+2133	   +----------+-----------+---------+---------------------------------+
+
+2135	                                 Table 1
+
+2137	14.2.  URN Registration
+
+2139	   URN: Request to be assigned by IANA.
+
+2141	   Common Name: urn:ietf:satp
+
+2143	   Registrant Contact: IESG
+
+2145	   Description: The secure asset transfer protocol (SATP) requires
+2146	   message types, endpoints and parameters to be defined within a unique
+2147	   namespace to prevent collision.
+
+2149	14.3.  SATP Message Types Registry
+
+2151	   This specification establishes the SATP Message Types registry.  The
+2152	   purpose of this registry is to define the various message types
+2153	   utilized in the secure asset transfer protocol (SATP).
+
+2155	14.4.  Initial Registry Contents
+
+2157	   The SATP Message Types registry's initial contents are as follows:
+
+2159	14.4.1.  Parameter name: transfer-proposal-msg
+
+2161	   *  Parameter usage location: Transfer Proposal
+
+2163	   *  Change controller: IETF
+
+2165	   *  Specification document(s): Section 8.3 of draft-ietf-satp-core.
+
+2167	14.4.2.  Parameter name: proposal-receipt-msg
+
+2169	   *  Parameter usage location: Transfer Proposal Receipt Message
+
+2171	   *  Change controller: IETF
+
+2173	   *  Specification document(s): Section 8.4 of draft-ietf-satp-core.
+
+2175	14.4.3.  Parameter name: reject-msg
+
+2177	   *  Parameter usage location: Transfer Reject
+
+2179	   *  Change controller: IETF
+
+2181	   *  Specification document(s): Section 8.5 of draft-ietf-satp-core.
+
+2183	14.4.4.  Parameter name: transfer-commence-msg
+
+2185	   *  Parameter usage location: Transfer Commence
+
+2187	   *  Change controller: IETF
+
+2189	   *  Specification document(s): Section 8.6 of draft-ietf-satp-core.
+
+2191	14.4.5.  Parameter name: ack-commence-msg
+
+2193	   *  Parameter usage location: Transfer Commence Response
+
+2195	   *  Change controller: IETF
+
+2197	   *  Specification document(s): Section 8.7 of draft-ietf-satp-core.
+
+2199	14.4.6.  Parameter name: lock-assert-msg
+
+2201	   *  Parameter usage location: Lock Assertion
+
+2203	   *  Change controller: IETF
+
+2205	   *  Specification document(s): Section 9.1 of draft-ietf-satp-core.
+
+2207	14.4.7.  Parameter name: assertion-receipt-msg
+
+2209	   *  Parameter usage location: Lock Assertion Receipt
+
+2211	   *  Change controller: IETF
+
+2213	   *  Specification document(s): Section 9.2 of draft-ietf-satp-core.
+
+2215	14.4.8.  Parameter name: commit-prepare-msg
+
+2217	   *  Parameter usage location: Commit Preparation
+
+2219	   *  Change controller: IETF
+
+2221	   *  Specification document(s): Section 10.1 of draft-ietf-satp-core.
+
+2223	14.4.9.  Parameter name: commit-ready-msg
+
+2225	   *  Parameter usage location: Commit Ready
+
+2227	   *  Change controller: IETF
+
+2229	   *  Specification document(s): Section 10.2 of draft-ietf-satp-core.
+
+2231	14.4.10.  Parameter name: commit-final-msg
+
+2233	   *  Parameter usage location: Commit Final Assertion
+
+2235	   *  Change controller: IETF
+
+2237	   *  Specification document(s): Section 10.3 of draft-ietf-satp-core.
+
+2239	14.4.11.  Parameter name: ack-commit-final-msg
+
+2241	   *  Parameter usage location: Commit-Final Acknowledgement Receipt
+
+2243	   *  Change controller: IETF
+
+2245	   *  Specification document(s): Section 10.4 of draft-ietf-satp-core.
+
+2247	14.4.12.  Parameter name: commit-transfer-complete-msg
+
+2249	   *  Parameter usage location: Transfer Complete
+
+2251	   *  Change controller: IETF
+
+2253	   *  Specification document(s): Section 10.5 of draft-ietf-satp-core.
+
+2255	14.4.13.  Parameter name: error-msg
+
+2257	   *  Parameter usage location: Error message
+
+2259	   *  Change controller: IETF
+
+2261	   *  Specification document(s): Section 10.6 of draft-ietf-satp-core.
+
+2263	14.4.14.  Parameter name: session-abort-msg
+
+2265	   *  Parameter usage location: Session Abort
+
+2267	   *  Change controller: IETF
+
+2269	   *  Specification document(s): Section 10.7 of draft-ietf-satp-core.
+
+2271	15.  Error Types and Codes
+
+2273	   This appendix defines the error codes that may be returned in SATP
+2274	   protocol messages.
+
+2276	15.1.  Protocol Error Codes
+
+2278	   The following error codes are defined for SATP protocol errors:
+
+2280	   *  err_1.1: Invalid message type
+
+2282	   *  err_1.2: Invalid session ID
+
+2284	   *  err_1.3: Invalid transfer context ID
+
+2286	   *  err_1.4: Invalid signature
+
+2288	   *  err_1.5: Invalid hash value
+
+2290	   *  err_2.1: Asset not found
+
+2292	   *  err_2.2: Asset already locked
+
+2294	   *  err_2.3: Asset lock expired
+
+2296	   *  err_2.4: Insufficient permissions
+
+2298	   *  err_3.1: Network connection failure
+
+2300	   *  err_3.2: Gateway unavailable
+
+2302	   *  err_3.3: Timeout exceeded
+2303	   *  err_4.1: Unsupported credential scheme
+
+2305	   *  err_4.2: Invalid credential format
+
+2307	   *  err_4.3: Credential verification failed
+
+2309	16.  Acknowledgements
+
+2311	   The authors would like to thank the following people for their input
+2312	   and support:
+
+2314	   Andre Augusto, Denis Avrilionis, Rafael Belchior, Alexandru Chiriac,
+2315	   Anthony Culligan, Claire Facer, Martin Gfeller, Wes Hardaker, David
+2316	   Millman, Krishnasuri Narayanam, Anais Ofranc, Luke Riley, John
+2317	   Robotham, Orie Steele, Yaron Scheffer, Peter Somogyvari, Weijia
+2318	   Zhang.
+
+2320	17.  References
+
+2322	17.1.  Normative References
+
+2324	   [BASE64]   Josefsson, S., "The Base16, Base32, and Base64 Data
+2325	              Encodings", RFC 4648, DOI 10.17487/RFC4648, October 2006,
+2326	              <https://www.rfc-editor.org/rfc/rfc4648>.
+
+2328	   [DATETIME] Klyne, G. and C. Newman, "Date and Time on the Internet:
+2329	              Timestamps", RFC 3339, DOI 10.17487/RFC3339, July 2002,
+2330	              <https://www.rfc-editor.org/rfc/rfc3339>.
+
+2332	   [JSON]     Bray, T., Ed., "The JavaScript Object Notation (JSON) Data
+2333	              Interchange Format", STD 90, RFC 8259,
+2334	              DOI 10.17487/RFC8259, December 2017,
+2335	              <https://www.rfc-editor.org/rfc/rfc8259>.
+
+2337	   [JWA]      Jones, M., "JSON Web Algorithms (JWA)", RFC 7518,
+2338	              DOI 10.17487/RFC7518, May 2015,
+2339	              <https://www.rfc-editor.org/rfc/rfc7518>.
+
+2341	   [JWS]      Jones, M., Bradley, J., and N. Sakimura, "JSON Web
+2342	              Signature (JWS)", RFC 7515, DOI 10.17487/RFC7515, May
+2343	              2015, <https://www.rfc-editor.org/rfc/rfc7515>.
+
+2345	   [JWT]      Jones, M., Bradley, J., and N. Sakimura, "JSON Web Token
+2346	              (JWT)", RFC 7519, DOI 10.17487/RFC7519, May 2015,
+2347	              <https://www.rfc-editor.org/rfc/rfc7519>.
+
+2349	   [REQ-LEVEL]
+2350	              Bradner, S., "Key words for use in RFCs to Indicate
+2351	              Requirement Levels", BCP 14, RFC 2119,
+2352	              DOI 10.17487/RFC2119, March 1997,
+2353	              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+2355	   [RFC2616]  Fielding, R., Gettys, J., Mogul, J., Frystyk, H.,
+2356	              Masinter, L., Leach, P., and T. Berners-Lee, "Hypertext
+2357	              Transfer Protocol -- HTTP/1.1", RFC 2616,
+2358	              DOI 10.17487/RFC2616, June 1999,
+2359	              <https://www.rfc-editor.org/rfc/rfc2616>.
+
+2361	   [X.500]    ITU-T, "The Directory: Overview of concepts, models and
+2362	              services", 2005.
+
+2364	17.2.  Informative References
+
+2366	   [ARCH]     Hardjono, T., Hargreaves, M., Smith, N., and V.
+2367	              Ramakrishna, "Secure Asset Transfer (SAT) Interoperability
+2368	              Architecture", June 2024,
+2369	              <https://datatracker.ietf.org/doc/draft-ietf-satp-
+2370	              architecture/>.
+
+2372	   [ECDSA]    "Digital Signature Standard (FIPS 186-5)", February 2023,
+2373	              <https://doi.org/10.6028/NIST.FIPS.186-5>.
+
+2375	   [MICA]     European Commission, "EU Directive on Markets in Crypto-
+2376	              Assets Regulation (MiCA)", June 2023,
+2377	              <https://www.esma.europa.eu/esmas-activities/digital-
+2378	              finance-and-innovation/markets-crypto-assets-regulation-
+2379	              mica>.
+
+2381	   [NIST]     Yaga, D., Mell, P., Roby, N., and K. Scarfone, "NIST
+2382	              Blockchain Technology Overview (NISTR-8202)", October
+2383	              2018, <https://doi.org/10.6028/NIST.IR.8202>.
+
+2385	   [RFC5939]  Andreasen, F., "Session Description Protocol (SDP)
+2386	              Capability Negotiation", RFC 5939, DOI 10.17487/RFC5939,
+2387	              September 2010, <https://www.rfc-editor.org/rfc/rfc5939>.
+
+2389	   [RFC9334]  Birkholz, H., Thaler, D., Richardson, M., Smith, N., and
+2390	              W. Pan, "Remote ATtestation procedureS (RATS)
+2391	              Architecture", RFC 9334, DOI 10.17487/RFC9334, January
+2392	              2023, <https://www.rfc-editor.org/rfc/rfc9334>.
+
+2394	Authors' Addresses
+2395	   Martin Hargreaves
+2396	   Quant Network
+2397	   Email: martin.hargreaves@quant.network
+
+2399	   Thomas Hardjono
+2400	   MIT
+2401	   Email: hardjono@mit.edu
+
+2403	   Rafael Belchior
+2404	   INESC-ID, Técnico Lisboa, Blockdaemon
+2405	   Email: rafael.belchior@tecnico.ulisboa.pt
+
+2407	   Venkatraman Ramakrishna
+2408	   IBM
+2409	   Email: vramakr2@in.ibm.com
+
+2411	   Alex Chiriac
+2412	   Quant Network
+2413	   Email: alexandru.chiriac@quant.network
+
+
+
+
+
+
+
+
+
